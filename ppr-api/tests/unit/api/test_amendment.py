@@ -46,6 +46,7 @@ def test_amendment_invalid_type_400(session, client, jwt):
                      headers=create_header_account(jwt, [STAFF_ROLE]),
                      content_type='application/json')
     # check
+    print(rv.json)
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 

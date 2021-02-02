@@ -16,17 +16,14 @@ from __future__ import annotations
 
 from enum import Enum
 from http import HTTPStatus
+import json
 
 #from sqlalchemy import event
-
-from .db import db
-#from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.utils.datetime import format_ts, now_ts
 
-import json
-import datetime
+from .db import db
 
 
 class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -35,52 +32,51 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     class DraftTypes(Enum):
         """Render an Enum of the draft types."""
 
-        AMENDMENT_DRAFT = 'AMD'
-        CHANGE_DRAFT = 'CHD'
-        FINANCING_DRAFT = 'FSD'
+        REG_CLASS_AMEND = 'AMENDMENT'
+        REG_CLASS_AMEND_COURT = 'COURTORDER'
+        REG_CLASS_CHANGE = 'CHANGE'
+        REG_CLASS_FINANCING = 'PPSALIEN'
+        REG_CLASS_DISCHARGE = 'DISCHARGE'
+        REG_CLASS_RENEWAL = 'RENEWAL'
 
     __versioned__ = {}
     __tablename__ = 'draft'
 
-    draft_id = db.Column('draft_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    draft_type_cd = db.Column('draft_type_cd', db.String(3), nullable=False) #, db.ForeignKey('draft_type.draft_type_cd'))
-    document_id = db.Column('document_id', db.String(20), nullable=False, default=db.func.get_draft_document_id())
+#    draft_id = db.Column('draft_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    draft_id = db.Column('draft_id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
+    document_number = db.Column('document_number', db.String(10), nullable=False,
+                                default=db.func.get_document_num())
     account_id = db.Column('account_id', db.String(20), nullable=False)
     create_ts = db.Column('create_ts', db.DateTime, nullable=False)
-    # Included for convenience when querying account drafts
-    type_cd = db.Column('type_cd', db.String(3), nullable=False)
+    registration_type_cl = db.Column('registration_type_cl', db.String(10), nullable=False)
+    registration_type_cd = db.Column('registration_type_cd', db.String(2), nullable=False)
     draft = db.Column('draft', db.Text, nullable=False)
-    # Included for convenience when querying account change and amendment drafts
-    registration_num = db.Column('registration_num', db.String(3), nullable=True)
+    registration_number = db.Column('registration_number', db.String(10), nullable=False)
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, 
-                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id], 
-                               back_populates="draft", cascade='all, delete', uselist=False)
+    registration = db.relationship("Registration", back_populates="draft", uselist=False)
 
 
 
     @property
     def json(self) -> dict:
-        """Return the financing statement as a json object."""
+        """Return the draft as a json object."""
 
         draft = json.loads(self.draft)
 
         draft['createDateTime'] = format_ts(self.create_ts)
-
         if self.update_ts:
             draft['lastUpdateDateTime'] = format_ts(self.update_ts)
-
-        if 'amendmentStatement' in draft and self.document_id:
-            draft['amendmentStatement']['documentId'] = self.document_id
-        elif 'changeStatement' in draft and self.document_id:
-            draft['changeStatement']['documentId'] = self.document_id
-        elif 'financingStatement' in draft and self.document_id:
-            draft['financingStatement']['documentId'] = self.document_id
+        if self.document_number:
+            if self.registration_type_cl == 'AMENDMENT' or self.registration_type_cl == 'COURTORDER':
+                draft['amendmentStatement']['documentId'] = self.document_number
+            elif self.registration_type_cl == 'CHANGE':
+                draft['changeStatement']['documentId'] = self.document_number
+            elif self.registration_type_cl == 'PPSALIEN':
+                draft['financingStatement']['documentId'] = self.document_number
 
         return draft
 
@@ -90,9 +86,11 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a summary list of drafts belonging to an account."""
         draft_list = None
         if account_id:
-            draft_list = db.session.query(Draft.create_ts, Draft.draft_type_cd, Draft.document_id, 
-                                   Draft.type_cd, Draft.registration_num). \
+            draft_list = db.session.query(Draft.create_ts, Draft.registration_type_cl,
+                                          Draft.registration_type_cd, Draft.document_number,
+                                          Draft.registration_number). \
                             filter(Draft.account_id == account_id).order_by(Draft.draft_id).all()
+#                            filter(Draft.account_id == account_id, Draft.registration == None).order_by(Draft.draft_id).all()
 
         if not draft_list:
             raise BusinessException(
@@ -104,20 +102,18 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         for draft in draft_list:
             draft_json = {
                 'createDateTime': format_ts(draft.create_ts),
-                'documentId': draft.document_id,
-                'registrationType': draft.type_cd,
-                'path': '/api/v1/drafts/' + draft.document_id
-            }            
-            if draft.draft_type_cd == 'FSD':
+                'documentId': draft.document_number,
+                'registrationType': draft.registration_type_cd,
+                'path': '/api/v1/drafts/' + draft.document_number
+            }
+            if draft.registration_type_cl == 'PPSALIEN':
                 draft_json['type'] = 'FINANCING_STATEMENT'
-            elif draft.draft_type_cd == 'AMD':
+            elif draft.registration_type_cl == 'AMENDMENT' or draft.registration_type_cl == 'COURTORDER':
                 draft_json['type'] = 'AMENDMENT_STATEMENT'
-                draft_json['registrationType'] = draft.type_cd
-                draft_json['baseRegistrationNumber'] = draft.registration_num
+                draft_json['baseRegistrationNumber'] = draft.registration_number
             else:
                 draft_json['type'] = 'CHANGE_STATEMENT'
-                draft_json['registrationType'] = draft.type_cd
-                draft_json['baseRegistrationNumber'] = draft.registration_num
+                draft_json['baseRegistrationNumber'] = draft.registration_number
 
             drafts_json.append(draft_json)
 
@@ -125,21 +121,21 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
 
     @classmethod
-    def find_by_document_id(cls, document_id: str = None, allow_used: bool = False):
+    def find_by_document_number(cls, document_number: str = None, allow_used: bool = False):
         """Return a draft statement by document ID."""
         draft = None
-        if document_id:
-            draft = cls.query.filter(Draft.document_id == document_id).one_or_none()
+        if document_number:
+            draft = cls.query.filter(Draft.document_number == document_number).one_or_none()
 
         if not draft:
             raise BusinessException(
-                error=f'No Draft Statement found for Document ID {document_id}.',
+                error=f'No Draft Statement found for Document ID {document_number}.',
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        if draft.registration_id and not allow_used:
+        if draft.registration and not allow_used:
             raise BusinessException(
-                error=f'Draft Statement for Document ID {document_id} has been used.',
+                error=f'Draft Statement for Document ID {document_number} has been used.',
                 status_code=HTTPStatus.BAD_REQUEST
             )
 
@@ -147,11 +143,11 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
 
     @classmethod
-    def delete(cls, document_id: str = None):
+    def delete(cls, document_number: str = None):
         """Delete a draft statement by document ID."""
         draft = None
-        if document_id:
-            draft = cls.find_by_document_id(document_id, True)
+        if document_number:
+            draft = cls.find_by_document_number(document_number, True)
 
         if draft:
             db.session.delete(draft)
@@ -172,56 +168,78 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         return self.json
 
 
-#    @classmethod
-#    def _save(cls, request_json, account_id: str = None):
-#        """Save the object to the database immediately."""
-
-#        draft = None
-#        if request_json:
-#            draft = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
-
-#        return draft
-
-
     @classmethod
-    def update(cls, request_json, document_id: str = None, account_id: str = None):
-        """Update an existing draft statement by document ID."""
+    def update(cls, request_json, document_number: str = None):
+        """Update an existing draft statement by document number."""
         draft = None
-        if request_json and document_id:
-            draft = cls.find_by_document_id(document_id, False)
+        if request_json and document_number:
+            draft = cls.find_by_document_number(document_number, False)
 
         if draft:
             draft.update_ts = now_ts()
             draft.draft = json.dumps(request_json)
             if request_json['type'] == 'AMENDMENT_STATEMENT':
-                draft.type_cd = request_json['amendmentStatement']['changeType']
-                draft.registration_num = request_json['amendmentStatement']['baseRegistrationNumber']
+                if 'courtOrderInformation' in request_json:
+                    draft.registration_type_cl = 'COURTORDER'
+                else:
+                    draft.registration_type_cl = 'AMENDMENT'
+
+                draft.registration_type_cd = request_json['amendmentStatement']['changeType']
+                draft.registration_number = request_json['amendmentStatement']['baseRegistrationNumber']
             elif request_json['type'] == 'CHANGE_STATEMENT':
-                draft.type_cd = request_json['changeStatement']['changeType']
-                draft.registration_num = request_json['changeStatement']['baseRegistrationNumber']
+                draft.registration_type_cl = 'CHANGE'
+                draft.registration_type_cd = request_json['changeStatement']['changeType']
+                draft.registration_number = request_json['changeStatement']['baseRegistrationNumber']
             else:
-                draft.type_cd = request_json['financingStatement']['type']
+                draft.registration_type_cl = 'PPSALIEN'
+                draft.registration_type_cd = request_json['financingStatement']['type']
 
         return draft
 
 
     @staticmethod
-    def create_from_json(json_data, account_id:str):
+    def create_from_json(json_data, account_id: str):
         """Create a draft object from a json Draft schema object: map json to db."""
         draft = Draft()
         draft.account_id = account_id
         if json_data['type'] == 'AMENDMENT_STATEMENT':
-            draft.draft_type_cd = 'AMD'
-            draft.type_cd = json_data['amendmentStatement']['changeType']
-            draft.registration_num = json_data['amendmentStatement']['baseRegistrationNumber']
+            if 'courtOrderInformation' in json_data:
+                draft.registration_type_cl = 'COURTORDER'
+            else:
+                draft.registration_type_cl = 'AMENDMENT'
+            draft.registration_type_cd = json_data['amendmentStatement']['changeType']
+            draft.registration_number = json_data['amendmentStatement']['baseRegistrationNumber']
         elif json_data['type'] == 'CHANGE_STATEMENT':
-            draft.draft_type_cd = 'CHD'
-            draft.type_cd = json_data['changeStatement']['changeType']
-            draft.registration_num = json_data['changeStatement']['baseRegistrationNumber']
+            draft.registration_type_cl = 'CHANGE'
+            draft.registration_type_cd = json_data['changeStatement']['changeType']
+            draft.registration_number = json_data['changeStatement']['baseRegistrationNumber']
         else:
-            draft.draft_type_cd = 'FSD'
-            draft.type_cd = json_data['financingStatement']['type']
+            draft.registration_type_cl = 'PPSALIEN'
+            draft.registration_type_cd = json_data['financingStatement']['type']
+            draft.registration_number = 'NA'
+
+        # Not null constraint: should be removed.
+        if not account_id:
+            draft.account_id = 'NA'
 
         draft.draft = json.dumps(json_data)
+
+        return draft
+
+
+    @staticmethod
+    def create_from_registration(registration, json_data):
+        """Create a draft object from a registration."""
+        draft = Draft()
+        draft.account_id = registration.account_id
+        draft.create_ts = registration.registration_ts
+        draft.registration_number = registration.registration_num
+        draft.document_number = registration.document_number
+        draft.registration_type_cl = registration.registration_type_cl
+        draft.registration_type_cd = registration.registration_type_cd
+        draft.draft = json.dumps(json_data)
+        # Not null constraint: should be removed.
+        if not draft.account_id:
+            draft.account_id = 'NA'
 
         return draft

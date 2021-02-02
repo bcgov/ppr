@@ -29,29 +29,32 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     __versioned__ = {}
     __tablename__ = 'general_collateral'
 
-    collateral_id = db.Column('general_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+#    collateral_id = db.Column('general_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    collateral_id = db.Column('general_collateral_id', db.Integer,
+                              db.Sequence('general_collateral_id_seq'),
+                              primary_key=True)
     description = db.Column('description', db.String(4000), nullable=False)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, 
+    registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, 
+    financing_id = db.Column('financing_id', db.Integer,
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id], 
-                               back_populates="general_collateral", cascade='all, delete', uselist=False)
+    registration = db.relationship("Registration", foreign_keys=[registration_id],
+                                   back_populates="general_collateral", cascade='all, delete', uselist=False)
 #    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id], 
-                               back_populates="general_collateral", cascade='all, delete', uselist=False)
+    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
+                                          back_populates="general_collateral", cascade='all, delete', uselist=False)
 
 
-    def save(self):
-        """Save the object to the database immediately."""
+#    def save(self):
+#        """Save the object to the database immediately."""
 #        db.session.add(self)
 #        db.session.commit()
 
@@ -108,7 +111,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     def create_from_financing_json(json_data, registration_id: int = None):
         """Create a list of general collateral objects from a financing statement json schema object: map json to db."""
         collateral_list = []
-        if 'generalCollateral' in json_data and len(json_data['generalCollateral']) > 0:
+        if 'generalCollateral' in json_data and json_data['generalCollateral']:
             for collateral in json_data['generalCollateral']:
                 collateral_list.append(GeneralCollateral.create_from_json(collateral, registration_id))
 
@@ -120,10 +123,10 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Create a list of general collateral objects from an amendment/change statement json schema object: map json to db."""
         collateral_list = []
         if json_data and registration_id and financing_id and \
-                'addGeneralCollateral' in json_data and len(json_data['addGeneralCollateral']) > 0:
+                'addGeneralCollateral' in json_data and json_data['addGeneralCollateral']:
             for collateral in json_data['addGeneralCollateral']:
-                gc = GeneralCollateral.create_from_json(collateral, registration_id)
-                gc.financing_id = financing_id
-                collateral_list.append(gc)
+                gen_collateral = GeneralCollateral.create_from_json(collateral, registration_id)
+                gen_collateral.financing_id = financing_id
+                collateral_list.append(gen_collateral)
 
         return collateral_list

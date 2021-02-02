@@ -27,7 +27,7 @@ from .db import db
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the vehicle collateral information."""
 
-    class VehicleTypes(Enum):
+    class SerialTypes(Enum):
         """Render an Enum of the vehicle types."""
         AIRCRAFT = 'AC'
         AIRCRAFT_AIRFRAME = 'AF'
@@ -39,32 +39,39 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         TRAILER = 'TR'
 
     __versioned__ = {}
-    __tablename__ = 'vehicle_collateral'
+    __tablename__ = 'serial_collateral'
 
-    vehicle_id = db.Column('vehicle_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    vehicle_type_cd = db.Column('vehicle_type_cd', db.String(3), nullable=False) #, db.ForeignKey('vehicle_type.vehicle_type_cd'))
+
+#    vehicle_id = db.Column('serial_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    vehicle_id = db.Column('serial_collateral_id', db.Integer,
+                           db.Sequence('serial_collateral_id_seq'),
+                           primary_key=True)
+    vehicle_type_cd = db.Column('serial_type_cd', db.String(2), nullable=False)
+                                #, db.ForeignKey('serial_type.serial_type_cd'))
     year = db.Column('year', db.Integer, nullable=True)
     make = db.Column('make', db.String(60), nullable=True)
     model = db.Column('model', db.String(60), nullable=True)
     serial_number = db.Column('serial_number', db.String(30), nullable=True)
-    mhr_number = db.Column('mhr_number', db.String(20), nullable=True)
+    mhr_number = db.Column('mhr_number', db.String(7), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, 
+    registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, 
+    financing_id = db.Column('financing_id', db.Integer,
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id], 
-                               back_populates="vehicle_collateral", cascade='all, delete', uselist=False)
+    registration = db.relationship("Registration", foreign_keys=[registration_id],
+                                   back_populates="vehicle_collateral", cascade='all, delete',
+                                   uselist=False)
 #    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id], 
-                               back_populates="vehicle_collateral", cascade='all, delete', uselist=False)
+    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
+                                          back_populates="vehicle_collateral", cascade='all, delete',
+                                          uselist=False)
 
     def save(self):
         """Save the object to the database immediately."""
@@ -146,7 +153,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     def create_from_financing_json(json_data, registration_id: int = None):
         """Create a list of vehicle collateral objects from a financing statement json schema object: map json to db."""
         collateral_list = []
-        if 'vehicleCollateral' in json_data and len(json_data['vehicleCollateral']) > 0:
+        if 'vehicleCollateral' in json_data and json_data['vehicleCollateral']:
             for collateral in json_data['vehicleCollateral']:
                 collateral_list.append(VehicleCollateral.create_from_json(collateral, registration_id))
 
@@ -158,10 +165,10 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         """Create a list of vehicle collateral objects from an amendment/change statement json schema object: map json to db."""
         collateral_list = []
         if json_data and registration_id and financing_id and \
-                'addVehicleCollateral' in json_data and len(json_data['addVehicleCollateral']) > 0:
+                'addVehicleCollateral' in json_data and json_data['addVehicleCollateral']:
             for collateral in json_data['addVehicleCollateral']:
-                vc = VehicleCollateral.create_from_json(collateral, registration_id)
-                vc.financing_id = financing_id
-                collateral_list.append(vc)
+                v_collateral = VehicleCollateral.create_from_json(collateral, registration_id)
+                v_collateral.financing_id = financing_id
+                collateral_list.append(v_collateral)
 
         return collateral_list

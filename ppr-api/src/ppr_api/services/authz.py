@@ -141,4 +141,3 @@ def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statem
         return True
 
     return False
-

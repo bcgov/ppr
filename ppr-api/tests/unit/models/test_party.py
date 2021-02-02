@@ -41,7 +41,7 @@ def test_find_by_id(session):
     assert party.email_id
     assert not party.client_party_id
     assert not party.business_name
-    assert not party.birth_dt
+    assert not party.birth_date
     assert not party.registration_id_end
 
 def test_find_by_id_client(session):
@@ -54,7 +54,7 @@ def test_find_by_id_client(session):
     assert not party.first_name
     assert not party.middle_name
     assert not party.last_name
-    assert not party.birth_dt
+    assert not party.birth_date
     assert not party.registration_id_end
 
     json_data = party.json
@@ -208,4 +208,14 @@ def test_create_from_financing_json(session):
         assert party.party_type_cd
         if not party.client_party_id:
             assert party.address
+
+def test_verify_party_code_True(session):
+    """Assert that Party.verify_party_code works correctly with a valid code."""
+    result = Party.verify_party_code('200000000')
+    assert result == True
+
+def test_verify_party_code_False(session):
+    """Assert that Party.verify_party_code works correctly with an invalid code."""
+    result = Party.verify_party_code('300000000')
+    assert result == False
 

@@ -24,29 +24,27 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
 
 
     __versioned__ = {}
-    __tablename__ = 'address'
+    __tablename__ = 'address_ppr'
 
-    id = db.Column('address_id', db.Integer, primary_key=True)
-    street = db.Column('street_line1', db.String(50), nullable=False) # index=True)
-    street_additional = db.Column('street_line2', db.String(50), nullable=True)
-    city = db.Column('city', db.String(40), nullable=False)
+    address_id = db.Column('address_id', db.Integer, db.Sequence('address_id_seq'), primary_key=True)
+    street = db.Column('street_line_1', db.String(100), nullable=False) # index=True)
+    street_additional = db.Column('street_line_2', db.String(100), nullable=True)
+    city = db.Column('city', db.String(30), nullable=False)
     region = db.Column('province_type_cd', db.String(2), nullable=False)
     postal_code = db.Column('postal_cd', db.String(15), nullable=False)
     country = db.Column('country_type_cd', db.String(2), nullable=True)
 #    delivery_instructions = db.Column('delivery_instructions', db.String(4096))
 
     # parent keys
- #   business_id = db.Column('business_id', db.Integer, db.ForeignKey('businesses.id'), index=True)
- #   office_id = db.Column('office_id', db.Integer, db.ForeignKey('offices.id', ondelete='CASCADE'), nullable=True)
 
     # relationships
     party = db.relationship("Party", uselist=False, back_populates="address")
     client_party = db.relationship("ClientParty", uselist=False, back_populates="address")
 
     def save(self):
-        """Render an address to the local cache."""
-#        db.session.add(self)
-#        db.session.commit()
+        """Save the object to the database immediately. Only used for unit testing."""
+        db.session.add(self)
+        db.session.commit()
 
     @classmethod
     def find_by_id(cls, address_id: int):  # -> Address:
@@ -102,4 +100,3 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
         address.postal_code = json_data['postalCode'].strip().upper()
 
         return address
-

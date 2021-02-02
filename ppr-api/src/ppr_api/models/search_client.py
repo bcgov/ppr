@@ -17,62 +17,63 @@ from __future__ import annotations
 from enum import Enum
 from http import HTTPStatus
 import json
+import copy
 
 #from sqlalchemy import event
 
-from .db import db
-
+from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
 from ppr_api.utils.datetime import format_ts, now_ts, ts_from_iso_format
 from ppr_api.exceptions import BusinessException
 
+from .db import db
+
 # temporary mock responses
-import copy
-from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
 
 
-REG_NUM_QUERY = "SELECT financing_type_cd,state_type_cd,match_type," + \
+REG_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,match_type," + \
                        "base_registration_num,base_registration_ts " + \
                   "FROM SEARCH_BY_REG_NUM_VW " + \
                   "WHERE registration_num = '?'"
 
-MHR_NUM_QUERY = "SELECT financing_type_cd,state_type_cd,match_type,base_registration_num," + \
+MHR_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,match_type,base_registration_num," + \
                        "base_registration_ts, year, make, model, serial_number, mhr_number " + \
                   "FROM SEARCH_BY_MHR_NUM_VW " + \
                  "WHERE mhr_number = '?' " + \
               "ORDER BY base_registration_ts ASC"
 
-SERIAL_NUM_QUERY = "SELECT financing_type_cd,state_type_cd,base_registration_num, " + \
-                          "base_registration_ts,vehicle_type_cd,serial_number,year,make,model " + \
+SERIAL_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num, " + \
+                          "base_registration_ts,serial_type_cd,serial_number,year,make,model " + \
                      "FROM SEARCH_BY_SERIAL_NUM_VW " + \
                     "WHERE serial_number LIKE '%?%'"
 
-AIRCRAFT_DOT_QUERY = "SELECT financing_type_cd,state_type_cd,base_registration_num," + \
-                            "base_registration_ts,vehicle_type_cd,serial_number,year,make,model " + \
+AIRCRAFT_DOT_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num," + \
+                            "base_registration_ts,serial_type_cd,serial_number,year,make,model " + \
                        "FROM SEARCH_BY_AIRCRAFT_DOT_VW " + \
                       "WHERE serial_number LIKE '%?%'"
 
 
-class Search(db.Model):  # pylint: disable=too-many-instance-attributes
+class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search query (search step 1) information."""
 
     class SearchTypes(Enum):
         """Render an Enum of the search types."""
-        AIRCRAFT_AIRFRAME_DOT = 'ACD'
-        BUSINESS_DEBTOR = 'BD'
-        INDIVIDUAL_DEBTOR = 'ID'
-        REGISTRATION_NUM = 'RN'
-        SERIAL_NUM = 'SN'
-        MANUFACTURED_HOME_NUM = 'MHR'
+        AIRCRAFT_AIRFRAME_DOT = 'AC'
+        BUSINESS_DEBTOR = 'BS'
+        INDIVISUAL_DEBTOR = 'ID'
+        REGISTRATION_NUM = 'RG'
+        SERIAL_NUM = 'SS'
+        MANUFACTURED_HOME_NUM = 'MH'
 
     __versioned__ = {}
-    __tablename__ = 'search_audit'
+    __tablename__ = 'search_client'
 
 
-    search_id = db.Column('search_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+#    search_id = db.Column('search_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    search_id = db.Column('search_id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
     search_ts = db.Column('search_ts', db.DateTime, nullable=False)
-    search_type_cd = db.Column('search_type_cd', db.String(3), nullable=False) 
+    search_type_cd = db.Column('search_type_cd', db.String(2), nullable=False)
                                 #, db.ForeignKey('search_type.search_type_cd'))
-    search_criteria = db.Column('search_criteria', db.String(1000), nullable=False)
+    search_criteria = db.Column('api_criteria', db.String(1000), nullable=False)
     search_response = db.Column('search_response', db.Text, nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True)
     client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
@@ -84,8 +85,8 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
 
     # parent keys
 
-    # Relationships - SearchDetail
-    search_detail = db.relationship("SearchDetail", back_populates="search", uselist=False)
+    # Relationships - SearchResult
+    search_result = db.relationship("SearchResult", back_populates="search", uselist=False)
 
     request_json = {}
 
@@ -123,17 +124,17 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
         row = result.first()
         if row is not None:
             values = row.values()
-            financing_type = str(values[0])
+            registration_type = str(values[0])
             state_type = str(values[1])
-            if state_type != 'H':
-                ts = values[4]
-                result_json = [ {
+            if state_type != 'HIS':
+                timestamp = values[4]
+                result_json = [{
                     'matchType': str(values[2]),
                     'registrationNumber': reg_num,
                     'baseRegistrationNumber': str(values[3]),
-                    'createDateTime': format_ts(ts),
-                    'registrationType': financing_type
-                } ]
+                    'createDateTime': format_ts(timestamp),
+                    'registrationType': registration_type
+                }]
                 self.returned_results_size = 1
                 self.total_results_size = 1
                 self.search_response = json.dumps(result_json)
@@ -152,14 +153,14 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
         query = MHR_NUM_QUERY.replace('?', mhr_num)
         result = db.session.execute(query)
         rows = result.fetchall()
-        if rows is not None and len(rows) > 0:
+        if rows is not None:
             results_json = []
             for row in rows:
                 values = row.values()
-                financing_type = str(values[0])
+                registration_type = str(values[0])
                 state_type = str(values[1])
-                if state_type != 'H':
-                    ts = values[4]
+                if state_type != 'HIS':
+                    timestamp = values[4]
                     collateral = {
                         'type': 'MH',
                         'manufacturedHomeRegistrationNumber': mhr_num,
@@ -177,8 +178,8 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
                     result_json = {
                         'matchType': str(values[2]),
                         'baseRegistrationNumber': str(values[3]),
-                        'createDateTime': format_ts(ts),
-                        'registrationType': financing_type,
+                        'createDateTime': format_ts(timestamp),
+                        'registrationType': registration_type,
                         'vehicleCollateral': collateral
                     }
                     results_json.append(result_json)
@@ -199,15 +200,15 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
         query = SERIAL_NUM_QUERY.replace('?', serial_num)
         result = db.session.execute(query)
         rows = result.fetchall()
-        if rows is not None and len(rows) > 0:
+        if rows is not None:
             results_json = []
             for row in rows:
                 values = row.values()
-                financing_type = str(values[0])
+                registration_type = str(values[0])
                 state_type = str(values[1])
-                if state_type != 'H':
+                if state_type != 'HIS':
                     rs_serial_num = str(values[5])
-                    ts = values[3]
+                    timestamp = values[3]
                     collateral = {
                         'type': str(values[4]),
                         'serialNumber': rs_serial_num
@@ -223,8 +224,8 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
                         collateral['model'] = str(value)
                     result_json = {
                         'baseRegistrationNumber': str(values[2]),
-                        'createDateTime': format_ts(ts),
-                        'registrationType': financing_type,
+                        'createDateTime': format_ts(timestamp),
+                        'registrationType': registration_type,
                         'vehicleCollateral': collateral
                     }
                     if rs_serial_num == serial_num:
@@ -250,14 +251,14 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
         query = AIRCRAFT_DOT_QUERY.replace('?', ac_dot)
         result = db.session.execute(query)
         rows = result.fetchall()
-        if rows is not None and len(rows) > 0:
+        if rows is not None:
             results_json = []
             for row in rows:
                 values = row.values()
-                financing_type = str(values[0])
+                registration_type = str(values[0])
                 state_type = str(values[1])
-                if state_type != 'H':
-                    ts = values[3]
+                if state_type != 'HIS':
+                    timestamp = values[3]
                     rs_serial_num = str(values[5])
                     collateral = {
                         'type': str(values[4]),
@@ -274,8 +275,8 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
                         collateral['model'] = str(value)
                     result_json = {
                         'baseRegistrationNumber': str(values[2]),
-                        'createDateTime': format_ts(ts),
-                        'registrationType': financing_type,
+                        'createDateTime': format_ts(timestamp),
+                        'registrationType': registration_type,
                         'vehicleCollateral': collateral
                     }
                     if rs_serial_num == ac_dot:
@@ -295,13 +296,15 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
 
 
     def search(self):
-        if self.search_type_cd == 'RN':
+        """Execute a search by the previously set search type."""
+
+        if self.search_type_cd == 'RG':
             self.search_by_registration_number()
-        elif self.search_type_cd == 'SN':
+        elif self.search_type_cd == 'SS':
             self.search_by_serial_number()
-        elif self.search_type_cd == 'MHR':
+        elif self.search_type_cd == 'MH':
             self.search_by_mhr_number()
-        elif self.search_type_cd == 'ACD':
+        elif self.search_type_cd == 'AC':
             self.search_by_aircraft_dot()
         # temporary until implemented
         else:
@@ -325,30 +328,31 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_from_json(search_json,
                          account_id: str = None):
         """Create a search object from dict/json."""
-        search = Search()
-        search.request_json = search_json
-        type = search_json['type']
-        if type == 'REGISTRATION_NUMBER':
-            search.search_type_cd = 'RN'
-        elif type == 'SERIAL_NUMBER':
-            search.search_type_cd = 'SN'
-        elif type == 'MHR_NUMBER':
-            search.search_type_cd = 'MHR'
-        elif type == 'INDIVIDUAL_DEBTOR':
-            search.search_type_cd = 'ID'
-        elif type == 'BUSINESS_DEBTOR':
-            search.search_type_cd = 'BD'
-        elif type == 'AIRCRAFT_DOT':
-            search.search_type_cd = 'ACD'
 
-        search.search_criteria = json.dumps(search_json)
-        search.search_ts = now_ts()
+        new_search = SearchClient()
+        new_search.request_json = search_json
+        search_type = search_json['type']
+        if search_type == 'REGISTRATION_NUMBER':
+            new_search.search_type_cd = 'RG'
+        elif search_type == 'SERIAL_NUMBER':
+            new_search.search_type_cd = 'SS'
+        elif search_type == 'MHR_NUMBER':
+            new_search.search_type_cd = 'MH'
+        elif search_type == 'INDIVISUAL_DEBTOR':
+            new_search.search_type_cd = 'ID'
+        elif search_type == 'BUSINESS_DEBTOR':
+            new_search.search_type_cd = 'BS'
+        elif search_type == 'AIRCRAFT_DOT':
+            new_search.search_type_cd = 'AC'
+
+        new_search.search_criteria = json.dumps(search_json)
+        new_search.search_ts = now_ts()
         if account_id:
-            search.account_id = account_id
+            new_search.account_id = account_id
         if 'clientReferenceId' in search_json:
-            search.client_reference_id = search_json['clientReferenceId']
+            new_search.client_reference_id = search_json['clientReferenceId']
 
-        return search
+        return new_search
 
 
     @staticmethod
@@ -360,19 +364,17 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
         error_msg = ''
 
         # validate search type - criteria combinations
-        type = json_data['type']
-        if type != 'INDIVIDUAL_DEBTOR' and type != 'BUSINESS_DEBTOR':
+        search_type = json_data['type']
+        if search_type not in ('INDIVIDUAL_DEBTOR', 'BUSINESS_DEBTOR'):
             if 'value' not in json_data['criteria']:
-                error_msg = error_msg + f'Search criteria value is required for search type {type}. '
+                error_msg = error_msg + f'Search criteria value is required for search type {search_type}. '
         else:
             if 'debtorName' not in json_data['criteria']:
-                error_msg = error_msg + f'Search criteria debtorName is required for search type {type}. '
-            elif type == 'INDIVIDUAL_DEBTOR' and 'last' not in json_data['criteria']['debtorName']:
-                error_msg = error_msg + f'Search criteria debtorName last is required for search type {type}. '
-            elif type == 'BUSINESS_DEBTOR' and 'businessName' not in json_data['criteria']['debtorName']:
-                error_msg = error_msg + f'Search criteria debtorName businessName is required for search type {type}. '
-
-        # Validate serial numbers by type???
+                error_msg = error_msg + f'Search criteria debtorName is required for search type {search_type}. '
+            elif search_type == 'INDIVIDUAL_DEBTOR' and 'last' not in json_data['criteria']['debtorName']:
+                error_msg = error_msg + f'Search criteria debtorName last is required for search type {search_type}. '
+            elif search_type == 'BUSINESS_DEBTOR' and 'businessName' not in json_data['criteria']['debtorName']:
+                error_msg = error_msg + f'Search criteria debtorName businessName is required for search type {search_type}. '
 
         # Verify the start and end dates.
         if 'startDateTime' in json_data or 'startDateTime' in json_data:
@@ -396,4 +398,3 @@ class Search(db.Model):  # pylint: disable=too-many-instance-attributes
                 error=error_msg,
                 status_code=HTTPStatus.BAD_REQUEST
             )
-

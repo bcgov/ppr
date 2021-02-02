@@ -1,10 +1,8 @@
-
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/bcgov/lear/branch/master/graph/badge.svg?flag=legalapi)](https://codecov.io/gh/bcgov/lear/tree/master/legal-api)
-
 # Application Name
 
-BC Registries Names Examination, research and approval system API
+BC Registries Personal Property Registry API
+
+Content incomplete.
 
 ## Technology Stack Used
 * Python, Flask
@@ -13,7 +11,6 @@ BC Registries Names Examination, research and approval system API
 ## Third-Party Products/Libraries used and the the License they are covert by
 
 ## Project Status
-As of 2019-08-22 in **Production**
 
 ## Documnentation
 
@@ -21,21 +18,9 @@ GitHub Pages (https://guides.github.com/features/pages/) are a neat way to docum
 
 ## Security
 
-Future - BCGov Keycloak
-
-Current - JWT hack
 
 ## Files in this repository
 
-```
-docs/           - Project Documentation
-└── images
-└── icons
-
-openshift/      - OpenShift-specific files
-├── scripts     - helper scripts
-└── templates   - application templates
-```
 
 ## Deployment (Local Development)
 
@@ -59,7 +44,7 @@ By participating in this project you agree to abide by its terms.
 
 ## License
 
-    Copyright 2018 Province of British Columbia
+    Copyright 2021 Province of British Columbia
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

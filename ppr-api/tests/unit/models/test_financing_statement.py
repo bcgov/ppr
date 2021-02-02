@@ -71,8 +71,8 @@ def test_save_SA_from_draft(session):
     draft_json = copy.deepcopy(DRAFT_FINANCING_STATEMENT)
     draft = Draft.create_from_json(draft_json, 'PS12345')
     draft.save()
-    assert draft.document_id
-    json_data['documentId'] = draft.document_id
+    assert draft.document_number
+    json_data['documentId'] = draft.document_number
 
     statement = FinancingStatement.create_from_json(json_data, 'PS12345')
     statement.save()
@@ -80,7 +80,7 @@ def test_save_SA_from_draft(session):
     assert statement.registration[0].draft
     result = statement.json
     assert result
-    assert 'documentId' in result
+#    assert 'documentId' in result
 
 
 def test_save_RL(session):
@@ -108,7 +108,6 @@ def test_save_RL(session):
     assert result['debtors'][0]
     assert result['securedParties'][0]
     assert result['vehicleCollateral'][0]
-    assert 'documentId' not in result
 
 
 def test_save_no_account(session):
@@ -161,7 +160,7 @@ def test_find_all_by_account_id_invalid(session):
 
 def test_find_by_registration_number_valid(session):
     """Assert that a fetch individual financing statement on a valid registration number works as expected."""
-    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
+    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
     assert statement
     result = statement.json
     assert result['type'] == 'SA'
@@ -181,7 +180,7 @@ def test_find_by_id(session):
     """Assert that find financing statement by ID contains all expected elements."""
     result = FinancingStatement.find_by_id(200000000)
     assert result
-    assert result.financing_type_cd == 'SA'
+    assert result.registration_num
     if result:
         json_data = result.json
         assert json_data['type'] == 'SA'
@@ -193,11 +192,12 @@ def test_find_by_id(session):
         assert json_data['generalCollateral'][0]
         assert json_data['vehicleCollateral'][0]
 
+
 def test_find_by_financing_id(session):
     """Assert that find financing statement by financing statement ID contains all expected elements."""
     result = FinancingStatement.find_by_financing_id(200000000)
     assert result
-    assert result.financing_type_cd == 'SA'
+    assert result.registration_num
     if result:
         json_data = result.json
         assert json_data['type'] == 'SA'
@@ -216,7 +216,7 @@ def test_find_by_registration_number_invalid(session):
     """Assert that a fetch financing statement on a non-existent registration number works as expected."""
 
     with pytest.raises(BusinessException) as not_found_err:
-        FinancingStatement.find_by_registration_number('X12345X', 'PS12345', False)
+        FinancingStatement.find_by_registration_number('X12345X', False)
 
     # check
     assert not_found_err
@@ -226,7 +226,7 @@ def test_find_by_registration_number_historical(session):
     """Assert that a fetch a discharged financing statement on a valid registration number works as expected."""
 
     with pytest.raises(BusinessException) as historical_err:
-        FinancingStatement.find_by_registration_number('TEST0003', 'PS12345', False)
+        FinancingStatement.find_by_registration_number('TEST0003', False)
 
     # check
     assert historical_err
@@ -234,7 +234,7 @@ def test_find_by_registration_number_historical(session):
 
 def test_find_by_registration_number_historical_staff(session):
     """Assert that a fetch discharged financing statement on a registration number works as expected for staff."""
-    result = FinancingStatement.find_by_registration_number('TEST0003', 'PS12345', True)
+    result = FinancingStatement.find_by_registration_number('TEST0003', True)
     assert result
 
 def test_validate_base_debtor(session):
@@ -243,7 +243,7 @@ def test_validate_base_debtor(session):
     json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
 
 #    statement = FinancingStatement.find_by_financing_id(200000000)
-    statement = FinancingStatement.find_by_registration_number('TEST0001','PS12345', False)
+    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
     assert statement
 
     # valid business name

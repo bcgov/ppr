@@ -15,9 +15,8 @@
 from __future__ import annotations
 
 from enum import Enum
-from http import HTTPStatus
 
-from sqlalchemy import event
+#from sqlalchemy import event
 
 from .db import db
 
@@ -37,27 +36,24 @@ class ClientParty(db.Model):  # pylint: disable=too-many-instance-attributes
     __tablename__ = 'client_party'
 
     client_party_id = db.Column('client_party_id', db.Integer, primary_key=True)
-    party_type_cd = db.Column('party_type_cd', db.String(3), db.ForeignKey('party_type.party_type_cd'), nullable=False)
+    party_type_cd = db.Column('party_type_cd', db.String(3))
+                    #, db.ForeignKey('party_type.party_type_cd'), nullable=False)
     account_id = db.Column('account_id', db.String(20), nullable=False)
     # contact info
     contact_name = db.Column('contact_name', db.String(100), nullable=False)
     contact_area_cd = db.Column('contact_area_cd', db.String(3), nullable=True)
     contact_phone_number = db.Column('contact_phone_number', db.String(15), nullable=False)
-    contact_email_id = db.Column('contact_email_id', db.String(250), nullable=True)
-    # party person
-    first_name = db.Column('first_name', db.String(50), index=True, nullable=True)
-    middle_name = db.Column('middle_name', db.String(50), index=True, nullable=True)
-    last_name = db.Column('last_name', db.String(50), index=True, nullable=True)
-    # or party business
-    business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
-    email_id = db.Column('email_id', db.String(250), nullable=True)
+#    contact_email_id = db.Column('contact_email_id', db.String(250), nullable=True)
+    # party business name
+    business_name = db.Column('party_name', db.String(150), index=True, nullable=True)
+#    email_id = db.Column('email_id', db.String(250), nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address.address_id'), nullable=False)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
 
     # Relationships - Address
-    address = db.relationship("Address", foreign_keys=[address_id], uselist=False, 
-                                back_populates="client_party", cascade='all, delete')
+    address = db.relationship("Address", foreign_keys=[address_id], uselist=False,
+                              back_populates="client_party", cascade='all, delete')
     party = db.relationship("Party", uselist=False, back_populates="client_party")
 
 
@@ -74,20 +70,12 @@ class ClientParty(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if self.contact_area_cd:
             party['contact']['areaCode'] = self.contact_area_cd
-        if self.contact_email_id:
-            party['contact']['emailAddress'] = self.contact_email_id
-        if self.email_id:
-            party['emailAddress'] = self.email_id
+#        if self.contact_email_id:
+#            party['contact']['emailAddress'] = self.contact_email_id
+#        if self.email_id:
+#            party['emailAddress'] = self.email_id
         if self.business_name:
             party['businessName'] = self.business_name
-        if self.last_name:
-            person_name = {
-                'first': self.first_name,
-                'last': self.last_name
-            }
-            if self.middle_name:
-                person_name['middle'] = self.middle_name
-            party['personName'] = person_name
 
         if self.address:
             cp_address = self.address.json

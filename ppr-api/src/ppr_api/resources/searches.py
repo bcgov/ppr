@@ -13,19 +13,22 @@
 # limitations under the License.
 """API endpoints for executing PPR searches."""
 
+# pylint: disable=too-many-return-statements
+
 from http import HTTPStatus
 
-from flask import abort, g, jsonify, request
+from flask import request
+#from flask import g, jsonify, request
 from flask_restplus import Namespace, Resource, cors
-from flask_jwt_oidc import JwtManager
+#from flask_jwt_oidc import JwtManager
 
+from registry_schemas import utils as schema_utils
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import Search, SearchDetail
+from ppr_api.models import SearchClient, SearchResult
 
-from registry_schemas import utils as schema_utils
 from .utils import get_account_id, account_required_response, \
                    validation_error_response, business_exception_response
 from .utils import unauthorized_error_response, unprocessable_error_response, \
@@ -54,7 +57,7 @@ class SearchResource(Resource):
 
         try:
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -69,12 +72,12 @@ class SearchResource(Resource):
             if not valid_format:
                 return validation_error_response(errors, VAL_ERROR)
             # Perform any extra data validation such as start and end dates here
-            Search.validate_query(request_json)
+            SearchClient.validate_query(request_json)
 
             # TODO: charge a search fee.
 
-            # Execute the search query: if no results return a 422 status.  
-            query = Search.create_from_json(request_json, account_id)
+            # Execute the search query: if no results return a 422 status.
+            query = SearchClient.create_from_json(request_json, account_id)
             query.search()
             if not query.search_response or query.returned_results_size == 0:
                 return unprocessable_error_response('search query')
@@ -83,12 +86,12 @@ class SearchResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
 @cors_preflight('PUT,OPTIONS')
-@API.route('/<path:searchId>', methods=['PUT', 'OPTIONS'])
+@API.route('/<path:search_id>', methods=['PUT', 'OPTIONS'])
 class SearchDetailResource(Resource):
     """Resource for processing PPR search detail (second step) requests."""
 
@@ -96,15 +99,15 @@ class SearchDetailResource(Resource):
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
 #    @jwt.requires_auth
-    def put(searchId):
+    def put(search_id):
         """Execute a search detail request using criteria in the request body."""
 #        token = g.jwt_oidc_token_info
 
         try:
-            if searchId is None:
+            if search_id is None:
                 return path_param_error_response('search ID')
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -120,10 +123,10 @@ class SearchDetailResource(Resource):
                 return validation_error_response(errors, VAL_ERROR)
 
             # Perform any extra data validation such as start and end dates here
-            SearchDetail.validate_search_select(request_json, searchId)
+            SearchResult.validate_search_select(request_json, search_id)
 
-            # Try to fetch requested search details: failure throws a business exception.  
-            results = SearchDetail.create_from_json(request_json, searchId)
+            # Try to fetch requested search details: failure throws a business exception.
+            results = SearchResult.create_from_json(request_json, search_id)
             if not results.search_response:
                 return unprocessable_error_response('search result details')
 
@@ -131,6 +134,5 @@ class SearchDetailResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
-
+        except Exception as default_exception:
+            return default_exception_response(default_exception)

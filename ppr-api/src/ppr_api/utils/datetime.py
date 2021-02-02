@@ -45,9 +45,9 @@ def now_ts_offset(offset_days: int = 1, add: bool = False):
     """Create a timestamp representing the current date and time adjusted by offset number of days."""
     now = now_ts()
     if add:
-        return now + timedelta(days=offset_days) 
+        return now + timedelta(days=offset_days)
 
-    return now - timedelta(days=offset_days) 
+    return now - timedelta(days=offset_days)
 
 def expiry_dt_from_years(life_years: int):
     """Create a date representing the current date adjusted by the life_years number of years in the future."""
@@ -57,7 +57,7 @@ def expiry_dt_from_years(life_years: int):
     day = today.day
 
 #    add_days = 365 * life_years
-#    return today + timedelta(days=add_days) 
+#    return today + timedelta(days=add_days)
     return date(year, month, day)
 
 def ts_from_iso_format(timestamp_iso: str):

@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from http import HTTPStatus
+#from http import HTTPStatus
 from datetime import date
 
 #from sqlalchemy import event
@@ -42,8 +42,11 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     __versioned__ = {}
     __tablename__ = 'party'
 
-    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    party_type_cd = db.Column('party_type_cd', db.String(3), nullable=False) #, db.ForeignKey('party_type.party_type_cd'))
+
+#    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    party_id = db.Column('party_id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
+    party_type_cd = db.Column('party_type_cd', db.String(3), nullable=False)
+                              #, db.ForeignKey('party_type.party_type_cd'))
     # party person
     first_name = db.Column('first_name', db.String(50), index=True, nullable=True)
     middle_name = db.Column('middle_name', db.String(50), index=True, nullable=True)
@@ -52,39 +55,40 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
 
     email_id = db.Column('email_id', db.String(250), nullable=True)
-    birth_dt = db.Column('birth_dt', db.Date, nullable=True)
+    birth_date = db.Column('birth_date', db.Date, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address.address_id'), nullable=True)
-    client_party_id = db.Column('client_party_id', db.Integer, 
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
+    client_party_id = db.Column('client_party_id', db.Integer,
                                 db.ForeignKey('client_party.client_party_id'), nullable=True)
-    registration_id = db.Column('registration_id', db.Integer, 
+    registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, 
+    financing_id = db.Column('financing_id', db.Integer,
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Address
-    address = db.relationship("Address", foreign_keys=[address_id], uselist=False, 
-                                back_populates="party", cascade='all, delete')
+    address = db.relationship("Address", foreign_keys=[address_id], uselist=False,
+                              back_populates="party", cascade='all, delete')
 
     # Relationships - ClientParty
-    client_party = db.relationship("ClientParty", foreign_keys=[client_party_id], uselist=False, 
-                                    back_populates="party")
+    client_party = db.relationship("ClientParty", foreign_keys=[client_party_id], uselist=False,
+                                   back_populates="party")
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id], 
-                               back_populates="parties", cascade='all, delete', uselist=False)
+    registration = db.relationship("Registration", foreign_keys=[registration_id],
+                                   back_populates="parties", cascade='all, delete', uselist=False)
 #    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id], 
-                               back_populates="parties", cascade='all, delete', uselist=False)
+    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
+                                          back_populates="parties", cascade='all, delete',
+                                          uselist=False)
 
 
-    def save(self):
-        """Save the object to the database immediately."""
+#    def save(self):
+#        """Save the object to the database immediately. Only used for unit testing."""
 #        db.session.add(self)
 #        db.session.commit()
 
@@ -101,21 +105,13 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 party['code'] = str(self.client_party_id)
             if self.client_party.business_name:
                 party['businessName'] = self.client_party.business_name
-            if self.client_party.last_name:
-                person_name = {
-                    'first': self.client_party.first_name,
-                    'last': self.client_party.last_name
-                }
-                if self.client_party.middle_name:
-                    person_name['middle'] = self.client_party.middle_name
-                party['personName'] = person_name
 
             if self.client_party.address:
                 cp_address = self.client_party.address.json
                 party['address'] = cp_address
 
-            if self.client_party.email_id:
-                party['emailAddress'] = self.client_party.email_id
+#            if self.client_party.email_id:
+#                party['emailAddress'] = self.client_party.email_id
         else:
             if self.business_name:
                 party['businessName'] = self.business_name
@@ -135,8 +131,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.email_id:
                 party['emailAddress'] = self.email_id
 
-            if self.birth_dt:
-                party['birthDate'] = self.birth_dt.isoformat()
+            if self.birth_date:
+                party['birthDate'] = self.birth_date.isoformat()
 
         return party
 
@@ -199,7 +195,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party.client_party_id = int(json_data['code'])
         else:
             if party_type == 'DC' and 'birthDate' in json_data:
-                party.birth_dt = date.fromisoformat(json_data['birthDate'])
+                party.birth_date = date.fromisoformat(json_data['birthDate'])
             if 'businessName' in json_data:
                 party.business_name = json_data['businessName'].strip().upper()
             else:
@@ -236,8 +232,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
 
     @staticmethod
-    def create_from_statement_json(json_data, 
-                                   registration_type: str,
+    def create_from_statement_json(json_data,
+                                   registration_type_cl: str,
                                    financing_id: int):
         """Create a list of party objects from a non-financing statement json schema object: map json to db."""
         parties = []
@@ -247,7 +243,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         registering.financing_id = financing_id
         parties.append(registering)
 
-        if registration_type == 'AS' or registration_type == 'CS':
+        if registration_type_cl in ('AMENDMENT', 'COURTORDER', 'CHANGE'):
             if 'addSecuredParties' in json_data:
                 for secured in json_data['addSecuredParties']:
                     secured_party = Party.create_from_json(secured, 'SP', None)
