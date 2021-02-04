@@ -1,0 +1,9 @@
+{
+  "PPR_API_URL": "",
+  "AUTH_URL": "https://dev.bcregistry.ca/business/auth/",
+  "AUTH_API_URL": "https://auth-api-dev.pathfinder.gov.bc.ca/api/v1/",
+  "SBC_CONFIG_AUTH_API_URL": "https://auth-api-dev.pathfinder.gov.bc.ca/api/v1",
+  "LD_CLIENT_ID": "",
+  "SENTRY_DSN": "",
+  "KEYCLOAK_CONFIG_PATH": "/local-keycloak-config-url/keycloak.json"
+}
