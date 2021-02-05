@@ -10,7 +10,12 @@ SELECT r.registration_type_cd,
    AND r.financing_id = fs.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
    AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > sysdate)
+   AND (fs.expire_date IS NULL OR fs.expire_date > (sysdate - 30))
+   AND NOT EXISTS (SELECT r3.registration_id
+                     FROM registration r3
+                    WHERE r3.financing_id = fs.financing_id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < (sysdate - 30))
 WITH READ ONLY
 ;
 
@@ -30,7 +35,12 @@ SELECT r.registration_type_cd,
  WHERE r.financing_id = fs.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
    AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > sysdate)
+   AND (fs.expire_date IS NULL OR fs.expire_date > (sysdate - 30))
+   AND NOT EXISTS (SELECT r3.registration_id
+                     FROM registration r3
+                    WHERE r3.financing_id = fs.financing_id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < (sysdate - 30))
    AND sc.financing_id = fs.financing_id
    AND sc.serial_type_cd = 'MH'
    AND sc.registration_id_end IS NULL
@@ -53,7 +63,12 @@ SELECT r.registration_type_cd,
  WHERE r.financing_id = fs.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
    AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > sysdate)
+   AND (fs.expire_date IS NULL OR fs.expire_date > (sysdate - 30))
+   AND NOT EXISTS (SELECT r3.registration_id
+                     FROM registration r3
+                    WHERE r3.financing_id = fs.financing_id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < (sysdate - 30))
    AND sc.financing_id = fs.financing_id
    AND sc.serial_type_cd NOT IN ('AC', 'AF')
    AND sc.registration_id_end IS NULL
@@ -74,7 +89,12 @@ SELECT r.registration_type_cd,
  WHERE r.financing_id = fs.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
    AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > sysdate)
+   AND (fs.expire_date IS NULL OR fs.expire_date > (sysdate - 30))
+   AND NOT EXISTS (SELECT r3.registration_id
+                     FROM registration r3
+                    WHERE r3.financing_id = fs.financing_id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < (sysdate - 30))
    AND sc.financing_id = fs.financing_id
    AND sc.serial_type_cd IN ('AC', 'AF')
    AND sc.registration_id_end IS NULL

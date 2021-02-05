@@ -134,22 +134,18 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         if row is not None:
             values = row.values()
             registration_type = str(values[0])
-            state_type = str(values[1])
-            if state_type == model_utils.STATE_ACTIVE:
-                timestamp = values[4]
-                result_json = [{
-                    'matchType': str(values[2]),
-                    'registrationNumber': reg_num,
-                    'baseRegistrationNumber': str(values[3]),
-                    'createDateTime': format_ts(timestamp),
-                    'registrationType': registration_type
-                }]
-                self.returned_results_size = 1
-                self.total_results_size = 1
-                self.search_response = json.dumps(result_json)
-            else:
-                self.returned_results_size = 0
-                self.total_results_size = 0
+            # Remove state check for now - let the DB view take care of it.
+            timestamp = values[4]
+            result_json = [{
+                'matchType': str(values[2]),
+                'registrationNumber': reg_num,
+                'baseRegistrationNumber': str(values[3]),
+                'createDateTime': format_ts(timestamp),
+                'registrationType': registration_type
+            }]
+            self.returned_results_size = 1
+            self.total_results_size = 1
+            self.search_response = json.dumps(result_json)
         else:
             self.returned_results_size = 0
             self.total_results_size = 0
@@ -167,31 +163,30 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             for row in rows:
                 values = row.values()
                 registration_type = str(values[0])
-                state_type = str(values[1])
-                if state_type == model_utils.STATE_ACTIVE:
-                    timestamp = values[4]
-                    collateral = {
-                        'type': 'MH',
-                        'manufacturedHomeRegistrationNumber': mhr_num,
-                        'serialNumber': values[8]
-                    }
-                    value = values[5]
-                    if value is not None:
-                        collateral['year'] = int(value)
-                    value = values[6]
-                    if value is not None:
-                        collateral['make'] = str(value)
-                    value = values[7]
-                    if value is not None:
-                        collateral['model'] = str(value)
-                    result_json = {
-                        'matchType': str(values[2]),
-                        'baseRegistrationNumber': str(values[3]),
-                        'createDateTime': format_ts(timestamp),
-                        'registrationType': registration_type,
-                        'vehicleCollateral': collateral
-                    }
-                    results_json.append(result_json)
+                # Remove state check for now - let the DB view take care of it.
+                timestamp = values[4]
+                collateral = {
+                    'type': 'MH',
+                    'manufacturedHomeRegistrationNumber': mhr_num,
+                    'serialNumber': values[8]
+                }
+                value = values[5]
+                if value is not None:
+                    collateral['year'] = int(value)
+                value = values[6]
+                if value is not None:
+                    collateral['make'] = str(value)
+                value = values[7]
+                if value is not None:
+                    collateral['model'] = str(value)
+                result_json = {
+                    'matchType': str(values[2]),
+                    'baseRegistrationNumber': str(values[3]),
+                    'createDateTime': format_ts(timestamp),
+                    'registrationType': registration_type,
+                    'vehicleCollateral': collateral
+                }
+                results_json.append(result_json)
 
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
@@ -215,31 +210,30 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             for row in rows:
                 values = row.values()
                 registration_type = str(values[0])
-                state_type = str(values[1])
-                if state_type == model_utils.STATE_ACTIVE:
-                    rs_serial_num = str(values[5])
-                    timestamp = values[3]
-                    collateral = {
-                        'type': str(values[4]),
-                        'serialNumber': rs_serial_num
-                    }
-                    value = values[6]
-                    if value is not None:
-                        collateral['year'] = int(value)
-                    value = values[7]
-                    if value is not None:
-                        collateral['make'] = str(value)
-                    value = values[8]
-                    if value is not None:
-                        collateral['model'] = str(value)
-                    result_json = {
-                        'baseRegistrationNumber': str(values[2]),
-                        'createDateTime': format_ts(timestamp),
-                        'registrationType': registration_type,
-                        'vehicleCollateral': collateral,
-                        'matchType': str(values[9])
-                    }
-                    results_json.append(result_json)
+                # Remove state check for now - let the DB view take care of it.
+                rs_serial_num = str(values[5])
+                timestamp = values[3]
+                collateral = {
+                    'type': str(values[4]),
+                    'serialNumber': rs_serial_num
+                }
+                value = values[6]
+                if value is not None:
+                    collateral['year'] = int(value)
+                value = values[7]
+                if value is not None:
+                    collateral['make'] = str(value)
+                value = values[8]
+                if value is not None:
+                    collateral['model'] = str(value)
+                result_json = {
+                    'baseRegistrationNumber': str(values[2]),
+                    'createDateTime': format_ts(timestamp),
+                    'registrationType': registration_type,
+                    'vehicleCollateral': collateral,
+                    'matchType': str(values[9])
+                }
+                results_json.append(result_json)
 
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
@@ -262,35 +256,34 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             for row in rows:
                 values = row.values()
                 registration_type = str(values[0])
-                state_type = str(values[1])
-                if state_type == model_utils.STATE_ACTIVE:
-                    timestamp = values[3]
-                    rs_serial_num = str(values[5])
-                    collateral = {
-                        'type': str(values[4]),
-                        'serialNumber': rs_serial_num
-                    }
-                    value = values[6]
-                    if value is not None:
-                        collateral['year'] = int(value)
-                    value = values[7]
-                    if value is not None:
-                        collateral['make'] = str(value)
-                    value = values[8]
-                    if value is not None:
-                        collateral['model'] = str(value)
-                    result_json = {
-                        'baseRegistrationNumber': str(values[2]),
-                        'createDateTime': format_ts(timestamp),
-                        'registrationType': registration_type,
-                        'vehicleCollateral': collateral
-                    }
-                    if rs_serial_num == ac_dot:
-                        result_json['matchType'] = 'EXACT'
-                    else:
-                        result_json['matchType'] = 'SIMILAR'
+                # Remove state check for now - let the DB view take care of it.
+                timestamp = values[3]
+                rs_serial_num = str(values[5])
+                collateral = {
+                    'type': str(values[4]),
+                    'serialNumber': rs_serial_num
+                }
+                value = values[6]
+                if value is not None:
+                    collateral['year'] = int(value)
+                value = values[7]
+                if value is not None:
+                    collateral['make'] = str(value)
+                value = values[8]
+                if value is not None:
+                    collateral['model'] = str(value)
+                result_json = {
+                    'baseRegistrationNumber': str(values[2]),
+                    'createDateTime': format_ts(timestamp),
+                    'registrationType': registration_type,
+                    'vehicleCollateral': collateral
+                }
+                if rs_serial_num == ac_dot:
+                    result_json['matchType'] = 'EXACT'
+                else:
+                    result_json['matchType'] = 'SIMILAR'
 
-                    results_json.append(result_json)
+                results_json.append(result_json)
 
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
