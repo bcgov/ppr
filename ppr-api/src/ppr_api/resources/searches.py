@@ -18,9 +18,7 @@
 from http import HTTPStatus
 
 from flask import request
-#from flask import g, jsonify, request
-from flask_restplus import Namespace, Resource, cors
-#from flask_jwt_oidc import JwtManager
+from flask_restx import Namespace, Resource, cors
 
 from registry_schemas import utils as schema_utils
 from ppr_api.utils.auth import jwt
@@ -50,10 +48,8 @@ class SearchResource(Resource):
     @staticmethod
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post():
         """Execute a new search request using criteria in the request body."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
@@ -98,10 +94,8 @@ class SearchDetailResource(Resource):
     @staticmethod
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def put(search_id):
         """Execute a search detail request using criteria in the request body."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if search_id is None:

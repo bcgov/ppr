@@ -18,8 +18,7 @@
 from http import HTTPStatus
 
 from flask import jsonify, request #, g
-from flask_restplus import Namespace, Resource, cors
-#from flask_jwt_oidc import JwtManager
+from flask_restx import Namespace, Resource, cors
 
 from registry_schemas import utils as schema_utils
 from ppr_api.utils.auth import jwt
@@ -50,10 +49,8 @@ class FinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def get():
         """Get the list of financing statements created by the header account ID."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
@@ -68,8 +65,6 @@ class FinancingResource(Resource):
 
             # Try to fetch financing statement list for account ID
             statement_list = FinancingStatement.find_all_by_account_id(account_id, is_staff(jwt))
-#            if not statement_list:
-#                return not_found_error_response('financing statements', account_id)
 
             return jsonify(statement_list), HTTPStatus.OK
 
@@ -81,10 +76,8 @@ class FinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post():
         """Create a new financing statement."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
@@ -125,10 +118,8 @@ class GetFinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def get(registration_num):
         """Get a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if registration_num is None:
@@ -163,10 +154,8 @@ class AmendmentResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post(registration_num):
         """Amend a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if registration_num is None:
@@ -227,10 +216,8 @@ class ChangeResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post(registration_num):
         """Change a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if registration_num is None:
@@ -292,10 +279,8 @@ class RenewalResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post(registration_num):
         """Renew a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if registration_num is None:
@@ -356,10 +341,8 @@ class DischargeResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post(registration_num):
         """Discharge a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if registration_num is None:

@@ -18,7 +18,7 @@
 from http import HTTPStatus
 
 from flask import request
-from flask_restplus import Namespace, Resource, cors
+from flask_restx import Namespace, Resource, cors
 
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight

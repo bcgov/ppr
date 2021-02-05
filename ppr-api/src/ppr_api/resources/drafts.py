@@ -18,9 +18,7 @@
 from http import HTTPStatus
 
 from flask import request, jsonify
-#from flask import g, request, jsonify
-from flask_restplus import Namespace, Resource, cors
-#from flask_jwt_oidc import JwtManager
+from flask_restx import Namespace, Resource, cors
 
 from registry_schemas import utils as schema_utils
 
@@ -46,10 +44,8 @@ class DraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def get():
         """Get the list of draft statements belonging to the header account ID."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
@@ -64,8 +60,6 @@ class DraftResource(Resource):
 
             # Try to fetch draft list for account ID
             draft_list = Draft.find_all_by_account_id(account_id)
-#            if not draft_list:
-#                return not_found_error_response('drafts', account_id)
 
             return jsonify(draft_list), HTTPStatus.OK
 
@@ -77,10 +71,8 @@ class DraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post():
         """Create a new draft statement."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
@@ -119,10 +111,8 @@ class MaintainDraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def get(document_id):
         """Get a draft statement by document ID."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if document_id is None:
@@ -150,10 +140,8 @@ class MaintainDraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def put(document_id):
         """Update a draft statement by document ID with data in the request body."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if document_id is None:
@@ -188,10 +176,8 @@ class MaintainDraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def delete(document_id):
         """Delete a draft statement by document ID."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if document_id is None:
@@ -208,8 +194,6 @@ class MaintainDraftResource(Resource):
 
             # Try to fetch draft statement by document ID
             Draft.delete(document_id)
-#            if not draft:
-#                return not_found_error_response('draft', documentId)
 
             return '', HTTPStatus.NO_CONTENT
 
