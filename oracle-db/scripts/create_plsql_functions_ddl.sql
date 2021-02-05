@@ -1,11 +1,11 @@
-DROP FUNCTION get_document_num;
-CREATE FUNCTION get_document_num
+DROP FUNCTION get_draft_document_number;
+CREATE FUNCTION get_draft_document_number
   RETURN VARCHAR2
   IS
   BEGIN
-    RETURN 'D' || to_char(document_num_seq.nextval);
+    RETURN 'D'||to_char(DOCUMENT_NUMBER_SEQ.nextval);
   END
-;
+; 
 
 DROP FUNCTION get_registration_num;
 CREATE FUNCTION get_registration_num

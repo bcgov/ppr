@@ -429,3 +429,22 @@ def test_search_BS_invalid_criteria(session, client, jwt):
     assert bad_request_err
     assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     print(bad_request_err.value.error)
+
+
+def test_create_from_json(session):
+    """Assert that the search_client creates from a json format correctly."""
+    json_data = {
+        'type': 'SERIAL_NUMBER',
+        'criteria': {
+            'value': 'JU622994'
+        },
+        'clientReferenceId': 'T-SQ-SS-1'
+    }
+    search_client = SearchClient.create_from_json(json_data, 'PS12345')
+
+    assert search_client.account_id == 'PS12345'
+    assert search_client.search_type_cd == 'SS'
+    assert search_client.client_reference_id == 'T-SQ-SS-1'
+    assert search_client.search_ts
+    assert search_client.search_criteria
+

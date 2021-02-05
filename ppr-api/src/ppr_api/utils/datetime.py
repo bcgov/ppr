@@ -55,10 +55,11 @@ def expiry_dt_from_years(life_years: int):
     year = today.year + life_years
     month = today.month
     day = today.day
-
-#    add_days = 365 * life_years
-#    return today + timedelta(days=add_days)
-    return date(year, month, day)
+    future_date = date(year, month, day)
+    add_days = future_date - today
+    now = now_ts()
+    add_days = 365 * life_years
+    return now + timedelta(days=add_days)
 
 def ts_from_iso_format(timestamp_iso: str):
     """Create a datetime object from a timestamp string in the ISO format."""

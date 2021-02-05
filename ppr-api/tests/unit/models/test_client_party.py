@@ -38,6 +38,7 @@ def test_find_by_code(session):
     assert party['contact']['areaCode']
     assert party['contact']['phoneNumber']
     assert party['businessName']
+    assert party['emailAddress']
 
 def test_find_by_code_invalid(session):
     """Assert that find client party by non-existent code returns the expected result."""
@@ -53,7 +54,8 @@ def test_client_party_json(session):
         contact_name='CONTACT',
         contact_area_cd='250',
         contact_phone_number='1234567',
-        business_name='BUSINESS'
+        business_name='BUSINESS',
+        email_id = 'test@gmail.com'
     )
 
     party_json = {
@@ -63,6 +65,7 @@ def test_client_party_json(session):
             'phoneNumber': party.contact_phone_number,
             'areaCode': party.contact_area_cd
         },
+        'emailAddress': party.email_id,
         'businessName': party.business_name
     }
 

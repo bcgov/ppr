@@ -24,6 +24,7 @@ import copy
 from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
 from ppr_api.utils.datetime import format_ts, now_ts, ts_from_iso_format
 from ppr_api.exceptions import BusinessException
+from ppr_api.models import utils as model_utils
 
 from .db import db
 
@@ -41,10 +42,12 @@ MHR_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,match_type,base_regis
                  "WHERE mhr_number = '?' " + \
               "ORDER BY base_registration_ts ASC"
 
-SERIAL_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num, " + \
-                          "base_registration_ts,serial_type_cd,serial_number,year,make,model " + \
-                     "FROM SEARCH_BY_SERIAL_NUM_VW " + \
-                    "WHERE serial_number LIKE '%?%'"
+SERIAL_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num," + \
+                          "base_registration_ts,serial_type_cd,serial_number,year,make,model," + \
+                          "DECODE(serial_number, '?', 'EXACT', 'SIMILAR') AS match_type " + \
+                    "FROM SEARCH_BY_SERIAL_NUM_VW " + \
+                   "WHERE srch_vin = to_char(search_key_pkg.vehicle('?')) " + \
+                "ORDER BY match_type, serial_number"
 
 AIRCRAFT_DOT_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num," + \
                             "base_registration_ts,serial_type_cd,serial_number,year,make,model " + \
@@ -82,6 +85,12 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
+
+    jaro = db.Column('jaro', db.Integer, nullable=True)
+    match = db.Column('match', db.String(1), nullable=True)
+    document_number = db.Column('document_number', db.String(8), nullable=True)
+    block_number = db.Column('block_number', db.Integer, nullable=True)
+    result = db.Column('result', db.String(150), nullable=True)
 
     # parent keys
 
@@ -126,7 +135,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             values = row.values()
             registration_type = str(values[0])
             state_type = str(values[1])
-            if state_type != 'HIS':
+            if state_type == model_utils.STATE_ACTIVE:
                 timestamp = values[4]
                 result_json = [{
                     'matchType': str(values[2]),
@@ -159,7 +168,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 values = row.values()
                 registration_type = str(values[0])
                 state_type = str(values[1])
-                if state_type != 'HIS':
+                if state_type == model_utils.STATE_ACTIVE:
                     timestamp = values[4]
                     collateral = {
                         'type': 'MH',
@@ -200,13 +209,14 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         query = SERIAL_NUM_QUERY.replace('?', serial_num)
         result = db.session.execute(query)
         rows = result.fetchall()
+
         if rows is not None:
             results_json = []
             for row in rows:
                 values = row.values()
                 registration_type = str(values[0])
                 state_type = str(values[1])
-                if state_type != 'HIS':
+                if state_type == model_utils.STATE_ACTIVE:
                     rs_serial_num = str(values[5])
                     timestamp = values[3]
                     collateral = {
@@ -226,13 +236,9 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                         'baseRegistrationNumber': str(values[2]),
                         'createDateTime': format_ts(timestamp),
                         'registrationType': registration_type,
-                        'vehicleCollateral': collateral
+                        'vehicleCollateral': collateral,
+                        'matchType': str(values[9])
                     }
-                    if rs_serial_num == serial_num:
-                        result_json['matchType'] = 'EXACT'
-                    else:
-                        result_json['matchType'] = 'SIMILAR'
-
                     results_json.append(result_json)
 
             self.returned_results_size = len(results_json)
@@ -257,7 +263,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 values = row.values()
                 registration_type = str(values[0])
                 state_type = str(values[1])
-                if state_type != 'HIS':
+                if state_type == model_utils.STATE_ACTIVE:
                     timestamp = values[3]
                     rs_serial_num = str(values[5])
                     collateral = {
@@ -332,19 +338,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         new_search = SearchClient()
         new_search.request_json = search_json
         search_type = search_json['type']
-        if search_type == 'REGISTRATION_NUMBER':
-            new_search.search_type_cd = 'RG'
-        elif search_type == 'SERIAL_NUMBER':
-            new_search.search_type_cd = 'SS'
-        elif search_type == 'MHR_NUMBER':
-            new_search.search_type_cd = 'MH'
-        elif search_type == 'INDIVISUAL_DEBTOR':
-            new_search.search_type_cd = 'ID'
-        elif search_type == 'BUSINESS_DEBTOR':
-            new_search.search_type_cd = 'BS'
-        elif search_type == 'AIRCRAFT_DOT':
-            new_search.search_type_cd = 'AC'
-
+        new_search.search_type_cd = model_utils.TO_DB_SEARCH_TYPE[search_type]
         new_search.search_criteria = json.dumps(search_json)
         new_search.search_ts = now_ts()
         if account_id:

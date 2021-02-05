@@ -19,7 +19,6 @@ from http import HTTPStatus
 
 from flask import request
 from flask_restplus import Namespace, Resource, cors
-#from flask_jwt_oidc import JwtManager
 
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
@@ -41,10 +40,8 @@ class ClientPartyResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def get(code):
         """Get a preset registering or secured party by client code."""
-#        token = g.jwt_oidc_token_info
 
         try:
             if code is None:

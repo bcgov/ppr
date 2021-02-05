@@ -26,7 +26,7 @@ from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import Registration, FinancingStatement
+from ppr_api.models import Registration, FinancingStatement, utils as model_utils
 
 from .utils import get_account_id, account_required_response, validation_error_response, \
                    business_exception_response, default_exception_response
@@ -205,7 +205,7 @@ class AmendmentResource(Resource):
 
             # Try to save the amendment statement: failure throws a business exception.
             statement = Registration.create_from_json(request_json,
-                                                      'AMENDMENT',
+                                                      model_utils.REG_CLASS_AMEND,
                                                       statement,
                                                       registration_num,
                                                       account_id)
@@ -270,7 +270,7 @@ class ChangeResource(Resource):
 
             # Try to save the change statement: failure throws a business exception.
             statement = Registration.create_from_json(request_json,
-                                                      'CHANGE',
+                                                      model_utils.REG_CLASS_CHANGE,
                                                       statement,
                                                       registration_num,
                                                       account_id)
@@ -334,7 +334,7 @@ class RenewalResource(Resource):
 
             # Try to save the renewal statement: failure throws a business exception.
             statement = Registration.create_from_json(request_json,
-                                                      'RENEWAL',
+                                                      model_utils.REG_CLASS_RENEWAL,
                                                       statement,
                                                       registration_num,
                                                       account_id)
@@ -398,7 +398,7 @@ class DischargeResource(Resource):
 
             # Try to save the discharge statement: failure throws a business exception.
             statement = Registration.create_from_json(request_json,
-                                                      'DISCHARGE',
+                                                      model_utils.REG_CLASS_DISCHARGE,
                                                       statement,
                                                       registration_num,
                                                       account_id)

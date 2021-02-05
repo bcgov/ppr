@@ -29,7 +29,7 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     __tablename__ = 'trust_indenture'
 
 #    trust_id = db.Column('trust_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    trust_id = db.Column('trust_id', db.Integer, db.Sequence('trust_indenture_id_seq'), primary_key=True)
+    trust_id = db.Column('trust_id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
     trust_indenture = db.Column('trust_indenture', db.String(1), nullable=False)
 
     # parent keys

@@ -288,12 +288,13 @@ def test_save_amendment(session):
     del json_data['amendmentRegistrationNumber']
     del json_data['payment']
     del json_data['documentId']
+    json_data['changeType'] = 'CO'
 
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DC' or party.party_type_cd == 'DI':
+            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
                 json_data['deleteDebtors'][0]['partyId'] = party.party_id
             elif party.party_type_cd == 'SP':
                 json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
@@ -344,7 +345,7 @@ def test_save_amendment_from_draft(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DC' or party.party_type_cd == 'DI':
+            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
                 json_data['deleteDebtors'][0]['partyId'] = party.party_id
             elif party.party_type_cd == 'SP':
                 json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
@@ -388,7 +389,7 @@ def test_save_change(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DC' or party.party_type_cd == 'DI':
+            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
                 json_data['deleteDebtors'][0]['partyId'] = party.party_id
             elif party.party_type_cd == 'SP':
                 json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
@@ -438,7 +439,7 @@ def test_save_change_from_draft(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DC' or party.party_type_cd == 'DI':
+            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
                 json_data['deleteDebtors'][0]['partyId'] = party.party_id
             elif party.party_type_cd == 'SP':
                 json_data['deleteSecuredParties'][0]['partyId'] = party.party_id

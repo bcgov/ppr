@@ -30,7 +30,8 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
     __versioned__ = {}
     __tablename__ = 'court_order'
 
-    court_order_id = db.Column('court_order_id', db.Integer, db.Sequence('court_order_id_seq'), primary_key=True)
+    court_order_id = db.Column('court_order_id', db.Integer,
+                               db.Sequence('court_order_id_seq'), primary_key=True)
     court_date = db.Column('court_date', db.Date, nullable=False)
     court_name = db.Column('court_name', db.String(256), nullable=False)
     court_registry = db.Column('court_registry', db.String(64), nullable=False)

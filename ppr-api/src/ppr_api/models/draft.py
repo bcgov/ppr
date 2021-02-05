@@ -22,6 +22,7 @@ import json
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.utils.datetime import format_ts, now_ts
+from ppr_api.models import utils as model_utils
 
 from .db import db
 
@@ -45,7 +46,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 #    draft_id = db.Column('draft_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     draft_id = db.Column('draft_id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
     document_number = db.Column('document_number', db.String(10), nullable=False,
-                                default=db.func.get_document_num())
+                                default=db.func.get_draft_document_number())
     account_id = db.Column('account_id', db.String(20), nullable=False)
     create_ts = db.Column('create_ts', db.DateTime, nullable=False)
     registration_type_cl = db.Column('registration_type_cl', db.String(10), nullable=False)
@@ -55,9 +56,12 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
 
     # parent keys
+    registration_id = db.Column('registration_id', db.Integer,
+                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", back_populates="draft", uselist=False)
+    registration = db.relationship("Registration", foreign_keys=[registration_id],
+                                   back_populates="draft", uselist=False)
 
 
 
@@ -71,11 +75,11 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.update_ts:
             draft['lastUpdateDateTime'] = format_ts(self.update_ts)
         if self.document_number:
-            if self.registration_type_cl == 'AMENDMENT' or self.registration_type_cl == 'COURTORDER':
+            if self.registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                 draft['amendmentStatement']['documentId'] = self.document_number
-            elif self.registration_type_cl == 'CHANGE':
+            elif self.registration_type_cl == model_utils.REG_CLASS_CHANGE:
                 draft['changeStatement']['documentId'] = self.document_number
-            elif self.registration_type_cl == 'PPSALIEN':
+            elif self.registration_type_cl in (model_utils.REG_CLASS_FINANCING, model_utils.REG_CLASS_MISC):
                 draft['financingStatement']['documentId'] = self.document_number
 
         return draft
@@ -89,8 +93,8 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             draft_list = db.session.query(Draft.create_ts, Draft.registration_type_cl,
                                           Draft.registration_type_cd, Draft.document_number,
                                           Draft.registration_number). \
-                            filter(Draft.account_id == account_id).order_by(Draft.draft_id).all()
-#                            filter(Draft.account_id == account_id, Draft.registration == None).order_by(Draft.draft_id).all()
+                            filter(Draft.account_id == account_id, \
+                                   Draft.registration_id == None).order_by(Draft.draft_id).all()
 
         if not draft_list:
             raise BusinessException(
@@ -106,13 +110,10 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                 'registrationType': draft.registration_type_cd,
                 'path': '/api/v1/drafts/' + draft.document_number
             }
-            if draft.registration_type_cl == 'PPSALIEN':
-                draft_json['type'] = 'FINANCING_STATEMENT'
-            elif draft.registration_type_cl == 'AMENDMENT' or draft.registration_type_cl == 'COURTORDER':
-                draft_json['type'] = 'AMENDMENT_STATEMENT'
-                draft_json['baseRegistrationNumber'] = draft.registration_number
-            else:
-                draft_json['type'] = 'CHANGE_STATEMENT'
+            draft_json['type'] = model_utils.REG_CLASS_TO_DRAFT_TYPE[draft.registration_type_cl]
+            if draft.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                              model_utils.REG_CLASS_AMEND_COURT,
+                                              model_utils.REG_CLASS_CHANGE):
                 draft_json['baseRegistrationNumber'] = draft.registration_number
 
             drafts_json.append(draft_json)
@@ -202,23 +203,20 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create a draft object from a json Draft schema object: map json to db."""
         draft = Draft()
         draft.account_id = account_id
-        if json_data['type'] == 'AMENDMENT_STATEMENT':
-            if 'courtOrderInformation' in json_data:
-                draft.registration_type_cl = 'COURTORDER'
-            else:
-                draft.registration_type_cl = 'AMENDMENT'
+        draft_type = json_data['type']
+        draft.registration_type_cl = model_utils.DRAFT_TYPE_TO_REG_CLASS[draft_type]
+        if 'amendmentStatement' in json_data and 'courtOrderInformation' in json_data['amendmentStatement']:
+            draft.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
+        if draft_type == model_utils.DRAFT_TYPE_AMENDMENT:
             draft.registration_type_cd = json_data['amendmentStatement']['changeType']
             draft.registration_number = json_data['amendmentStatement']['baseRegistrationNumber']
-        elif json_data['type'] == 'CHANGE_STATEMENT':
-            draft.registration_type_cl = 'CHANGE'
+        elif draft_type == model_utils.DRAFT_TYPE_CHANGE:
             draft.registration_type_cd = json_data['changeStatement']['changeType']
             draft.registration_number = json_data['changeStatement']['baseRegistrationNumber']
         else:
-            draft.registration_type_cl = 'PPSALIEN'
             draft.registration_type_cd = json_data['financingStatement']['type']
-            draft.registration_number = 'NA'
 
-        # Not null constraint: should be removed.
+        # Not null constraint: should be removed if staff can submit requests without an account id.
         if not account_id:
             draft.account_id = 'NA'
 

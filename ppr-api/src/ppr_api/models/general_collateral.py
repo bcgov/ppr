@@ -31,7 +31,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
 #    collateral_id = db.Column('general_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     collateral_id = db.Column('general_collateral_id', db.Integer,
-                              db.Sequence('general_collateral_id_seq'),
+                              db.Sequence('general_id_seq'),
                               primary_key=True)
     description = db.Column('description', db.String(4000), nullable=False)
 

@@ -38,8 +38,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
     search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_client.search_id'),
                           primary_key=True, nullable=False)
-    search_select = db.Column('results', db.Text, nullable=False)
+    search_select = db.Column('api_result', db.Text, nullable=False)
     search_response = db.Column('registrations', db.Text, nullable=False)
+    jaro = db.Column('jaro', db.Integer, nullable=True)
+    match = db.Column('match', db.String(1), nullable=True)
+    document_number = db.Column('document_number', db.String(8), nullable=True)
+    block_number = db.Column('block_number', db.Integer, nullable=True)
+    result = db.Column('result', db.String(150), nullable=True)
 
     # parent keys
 

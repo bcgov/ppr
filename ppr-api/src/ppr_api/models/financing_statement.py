@@ -25,6 +25,7 @@ from datetime import date
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.utils.datetime import format_ts, now_ts_offset, expiry_dt_from_years
+from ppr_api.models import utils as model_utils
 
 from .db import db
 from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
@@ -33,10 +34,6 @@ from .party import Party  # noqa: F401 pylint: disable=unused-import; needed by 
 from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
-
-LIFE_INFINITE = -99
-REPAIRER_LIEN_DAYS = 180
-REPAIRER_LIEN_YEARS = 0
 
 class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains financing statement information."""
@@ -68,6 +65,17 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     expire_date = db.Column('expire_date', db.Date, nullable=True)
     discharged = db.Column('discharged', db.String(1), nullable=True)
     renewed = db.Column('renewed', db.String(1), nullable=True)
+
+    type_claim = db.Column('type_claim', db.String(2), nullable=True)
+    crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
+    crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
+    prev_reg_type = db.Column('prev_reg_type', db.Integer, nullable=True)
+    prev_reg_cr_nbr = db.Column('prev_reg_cr_nbr', db.String(7), nullable=True)
+    prev_reg_cr_date = db.Column('prev_reg_cr_date', db.String(7), nullable=True)
+    prev_reg_cb_nbr = db.Column('prev_reg_cb_nbr', db.String(10), nullable=True)
+    prev_reg_cb_date = db.Column('prev_reg_cb_date', db.String(7), nullable=True)
+    prev_reg_mh_nbr = db.Column('prev_reg_mh_nbr', db.String(7), nullable=True)
+    prev_reg_mh_date = db.Column('prev_reg_mh_date', db.String(7), nullable=True)
 
     # Parent keys
 
@@ -103,11 +111,11 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 debtors = []
                 secured = []
                 for party in self.parties:
-                    if party.party_type_cd == 'RP' and party.registration_id == registration_id:
+                    if party.party_type_cd == 'RG' and party.registration_id == registration_id:
                         statement['registeringParty'] = party.json
                     elif party.party_type_cd == 'SP' and not party.registration_id_end:
                         secured.append(party.json)
-                    elif (party.party_type_cd == 'DC' or party.party_type_cd == 'DI') and \
+                    elif (party.party_type_cd == 'DB' or party.party_type_cd == 'DI') and \
                             not party.registration_id_end:
                         debtors.append(party.json)
 
@@ -132,7 +140,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 if v_collateral:
                     statement['vehicleCollateral'] = v_collateral
 
-            if reg.registration_type_cd == 'RL':
+            if reg.registration_type_cd == model_utils.REG_TYPE_REPAIRER_LIEN:
                 if reg.lien_value:
                     statement['lienAmount'] = reg.lien_value
                 if reg.surrender_date:
@@ -148,7 +156,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         else:
             statement['trustIndenture'] = False
 
-        if self.life and self.life == LIFE_INFINITE:
+        if self.life and self.life == model_utils.LIFE_INFINITE:
             statement['lifeInfinite'] = True
         elif self.life:
             statement['lifeYears'] = self.life
@@ -183,7 +191,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         if self.parties:
             for party in self.parties:
-                if (party.party_type_cd == 'DC' or party.party_type_cd == 'DI') and \
+                if (party.party_type_cd == 'DB' or party.party_type_cd == 'DI') and \
                         not party.registration_id_end:
                     if bus_name and party.business_name and \
                             bus_name == party.business_name.upper():
@@ -204,6 +212,13 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         db.session.add(self)
         db.session.commit()
+
+        # Now save draft.registration_id
+        draft = self.registration[0].draft
+        draft.registration_id = self.registration[0].registration_id
+        db.session.add(draft)
+        db.session.commit()
+
 
 
     @classmethod
@@ -242,7 +257,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         results_json = []
         # only staff may view historical
         for statement in statement_list:
-            if staff or statement.state_type_cd != 'HIS':
+            if staff or statement.state_type_cd == model_utils.STATE_ACTIVE:
                 statement_json = {
                     'matchType': 'EXACT',
                     'createDateTime': format_ts(statement.registration_ts),
@@ -287,7 +302,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        if not staff and statement.state_type_cd != 'ACT':
+        if not staff and statement.state_type_cd != model_utils.STATE_ACTIVE:
             raise BusinessException(
                 error=f'The Financing Statement for registration number {registration_num} has been discharged.',
                 status_code=HTTPStatus.BAD_REQUEST
@@ -314,17 +329,17 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         FinancingStatement.validate(json_data)
 
         statement = FinancingStatement()
-        statement.state_type_cd = 'ACT'
+        statement.state_type_cd = model_utils.STATE_ACTIVE
 
         # Do this early as it also checks the party codes and may throw an exception
         statement.parties = Party.create_from_financing_json(json_data, None)
 
         reg_type = json_data['type']
-        if reg_type == 'RL':
-            statement.expire_date = now_ts_offset(REPAIRER_LIEN_DAYS, True)
-            statement.life = REPAIRER_LIEN_YEARS
+        if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+            statement.expire_date = now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+            statement.life = model_utils.REPAIRER_LIEN_YEARS
         elif 'lifeInfinite' in json_data and json_data['lifeInfinite']:
-            statement.life = LIFE_INFINITE
+            statement.life = model_utils.LIFE_INFINITE
         else:
             if 'lifeYears' in json_data:
                 statement.life = json_data['lifeYears']

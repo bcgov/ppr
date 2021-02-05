@@ -6,7 +6,7 @@ INSERT INTO search_client(search_id, search_ts, search_type_cd, api_criteria, se
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
          'PS12345', null, null, 'UT-SQ-RG-001', 1, 1)
 ;
-INSERT INTO search_result(search_id, results, registrations)
+INSERT INTO search_result(search_id, api_result, registrations)
    VALUES(200000000,
 '[{"baseRegistrationNumber": "TEST0001", "matchType": "EXACT", "registrationType": "SA"}]',
 'UNIT TEST RESPONSE CONTENT NOT EXAMINED')

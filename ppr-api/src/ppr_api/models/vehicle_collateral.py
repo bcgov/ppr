@@ -23,6 +23,8 @@ from enum import Enum
 
 from .db import db
 
+SEARCH_VIN_STATEMENT = "SELECT TO_CHAR(search_key_pkg.vehicle('?')) FROM DUAL"
+SEARCH_VIN_STATEMENT_AC = "SELECT TO_CHAR(search_key_pkg.vehicle('?')) FROM DUAL"
 
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the vehicle collateral information."""
@@ -43,8 +45,8 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
 
 #    vehicle_id = db.Column('serial_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    vehicle_id = db.Column('serial_collateral_id', db.Integer,
-                           db.Sequence('serial_collateral_id_seq'),
+    vehicle_id = db.Column('vehicle_collateral_id', db.Integer,
+                           db.Sequence('vehicle_id_seq'),
                            primary_key=True)
     vehicle_type_cd = db.Column('serial_type_cd', db.String(2), nullable=False)
                                 #, db.ForeignKey('serial_type.serial_type_cd'))
@@ -53,6 +55,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     model = db.Column('model', db.String(60), nullable=True)
     serial_number = db.Column('serial_number', db.String(30), nullable=True)
     mhr_number = db.Column('mhr_number', db.String(7), nullable=True)
+    search_vin = db.Column('srch_vin', db.String(6), nullable=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer,
@@ -146,6 +149,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             collateral.model = json_data['model']
         if 'manufacturedHomeRegistrationNumber' in json_data:
             collateral.mhr_number = json_data['manufacturedHomeRegistrationNumber']
+        if collateral.serial_number:
+            collateral.search_vin = VehicleCollateral.get_search_vin(collateral.vehicle_type_cd,
+                                                                     collateral.serial_number)
 
         return collateral
 
@@ -172,3 +178,20 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                 collateral_list.append(v_collateral)
 
         return collateral_list
+
+    @staticmethod
+    def get_search_vin(vehicle_type: str, serial_number: str):
+        """Conditionally generate the search_vin value from a database function."""
+
+        if not vehicle_type or not serial_number:
+            return None
+
+        statement = SEARCH_VIN_STATEMENT.replace('?', serial_number)
+        if vehicle_type in ('AC', 'AF'):
+            statement = SEARCH_VIN_STATEMENT_AC.replace('?', serial_number)
+
+        result = db.session.execute(statement)
+        row = result.first()
+        values = row.values()
+        search_vin = str(values[0])
+        return search_vin
