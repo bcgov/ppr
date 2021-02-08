@@ -127,7 +127,7 @@ def test_draft_valid_get_statement_200(client, jwt):
     # setup
  
     # test
-    rv = client.get(f'/api/v1/drafts/TEST-FSD1',
+    rv = client.get(f'/api/v1/drafts/D-T-FS01',
                     headers=create_header_account(jwt, [STAFF_ROLE]))
     # check
     assert rv.status_code == HTTPStatus.OK
@@ -163,7 +163,7 @@ def test_draft_update_valid_financing_200(client, jwt):
     json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
  
     # test
-    rv = client.put(f'/api/v1/drafts/TEST-FSD1',
+    rv = client.put(f'/api/v1/drafts/D-T-FS01',
                      json=json_data,
                      headers=create_header_account(jwt, [STAFF_ROLE]),
                      content_type='application/json')
@@ -176,7 +176,7 @@ def test_draft_update_valid_amendment_200(client, jwt):
     json_data = copy.deepcopy(SAMPLE_JSON_AMENDMENT)
  
     # test
-    rv = client.put(f'/api/v1/drafts/TEST-AMD1',
+    rv = client.put(f'/api/v1/drafts/D-T-AM01',
                      json=json_data,
                      headers=create_header_account(jwt, [STAFF_ROLE]),
                      content_type='application/json')
@@ -189,7 +189,7 @@ def test_draft_update_valid_change_200(client, jwt):
     json_data = copy.deepcopy(SAMPLE_JSON_CHANGE)
  
     # test
-    rv = client.put(f'/api/v1/drafts/TEST-CHD1',
+    rv = client.put(f'/api/v1/drafts/D-T-CH01',
                      json=json_data,
                      headers=create_header_account(jwt, [STAFF_ROLE]),
                      content_type='application/json')
@@ -342,7 +342,7 @@ def test_draft_get_staff_missing_account_201(client, jwt):
     # setup
  
     # test
-    rv = client.get(f'/api/v1/drafts/TEST-FSD1',
+    rv = client.get(f'/api/v1/drafts/D-T-FS01',
                     headers=create_header(jwt, [STAFF_ROLE]))
     # check
     assert rv.status_code == HTTPStatus.OK

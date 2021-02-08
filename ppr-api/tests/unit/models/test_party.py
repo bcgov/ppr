@@ -33,15 +33,14 @@ def test_find_by_id(session):
     assert party
     assert party.party_id == 200000000
     assert party.address_id
-    assert party.party_type_cd == 'RP'
+    assert party.party_type_cd == 'RG'
     assert party.first_name
     assert party.middle_name
     assert party.last_name
     assert party.registration_id
-    assert party.email_id
     assert not party.client_party_id
     assert not party.business_name
-    assert not party.birth_dt
+    assert not party.birth_date
     assert not party.registration_id_end
 
 def test_find_by_id_client(session):
@@ -54,7 +53,7 @@ def test_find_by_id_client(session):
     assert not party.first_name
     assert not party.middle_name
     assert not party.last_name
-    assert not party.birth_dt
+    assert not party.birth_date
     assert not party.registration_id_end
 
     json_data = party.json
@@ -67,9 +66,9 @@ def test_find_by_financing_id(session):
     parties = Party.find_by_financing_id(200000000)
     assert parties
     assert len(parties) >= 5
-    assert parties[0].party_type_cd == 'RP'
+    assert parties[0].party_type_cd == 'RG'
     assert parties[1].party_type_cd == 'DI'
-    assert parties[2].party_type_cd == 'DC'
+    assert parties[2].party_type_cd == 'DB'
     assert parties[3].party_type_cd == 'SP'
     assert parties[4].party_type_cd == 'SP'
 
@@ -79,9 +78,9 @@ def test_find_by_registration_id(session):
     parties = Party.find_by_registration_id(200000000)
     assert parties
     assert len(parties) == 5
-    assert parties[0].party_type_cd == 'RP'
+    assert parties[0].party_type_cd == 'RG'
     assert parties[1].party_type_cd == 'DI'
-    assert parties[2].party_type_cd == 'DC'
+    assert parties[2].party_type_cd == 'DB'
     assert parties[3].party_type_cd == 'SP'
     assert parties[4].party_type_cd == 'SP'
 
@@ -108,7 +107,6 @@ def test_party_json(session):
         middle_name='MIDDLE',
         last_name='LAST',
         business_name='BUSINESS',
-        email_id='email@gmail.com',
         registration_id=1000,
         address_id=1000
     )
@@ -120,8 +118,7 @@ def test_party_json(session):
             'first': party.first_name,
             'last': party.last_name,
             'middle': party.middle_name
-        },
-        'emailAddress': party.email_id
+        }
     }
 
     assert party.json == party_json
@@ -164,7 +161,6 @@ def test_create_from_json(session):
     assert party_bus.registration_id
     assert party_bus.party_type_cd == 'SP'
     assert party_bus.business_name
-    assert party_bus.email_id
     assert party_bus.address
     assert party_bus.address.street
     assert party_bus.address.street_additional
@@ -174,13 +170,12 @@ def test_create_from_json(session):
     assert party_bus.address.postal_code
     assert not party_bus.last_name
 
-    party_ind = Party.create_from_json(party_ind_json, 'DC', 1234)
+    party_ind = Party.create_from_json(party_ind_json, 'DB', 1234)
     assert party_ind.registration_id
     assert party_ind.party_type_cd =='DI'
     assert party_ind.last_name
     assert party_ind.first_name
     assert party_ind.middle_name
-    assert party_ind.email_id
     assert party_ind.address
     assert party_ind.address.street
     assert party_ind.address.street_additional
@@ -208,4 +203,14 @@ def test_create_from_financing_json(session):
         assert party.party_type_cd
         if not party.client_party_id:
             assert party.address
+
+def test_verify_party_code_True(session):
+    """Assert that Party.verify_party_code works correctly with a valid code."""
+    result = Party.verify_party_code('200000000')
+    assert result == True
+
+def test_verify_party_code_False(session):
+    """Assert that Party.verify_party_code works correctly with an invalid code."""
+    result = Party.verify_party_code('300000000')
+    assert result == False
 

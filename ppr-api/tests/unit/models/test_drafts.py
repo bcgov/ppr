@@ -17,11 +17,13 @@
 Test-Suite to ensure that the Draft Model is working as expected.
 """
 from http import HTTPStatus
+import json
 
 import pytest
 
 from ppr_api.models import Draft
 from ppr_api.exceptions import BusinessException
+from ppr_api.utils.datetime import now_ts
 
 import copy
 from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT
@@ -40,7 +42,7 @@ def test_find_all_by_account_id(session):
 
 def test_find_by_document_id_financing(session):
     """Assert that the find draft financing statement by document id contains all expected elements."""
-    draft = Draft.find_by_document_id('TEST-FSD1', True)
+    draft = Draft.find_by_document_number('D-T-FS01', True)
     assert draft
     json_data = draft.json
     assert json_data['financingStatement']
@@ -50,9 +52,10 @@ def test_find_by_document_id_financing(session):
     assert json_data['financingStatement']['vehicleCollateral'][0]
     assert json_data['financingStatement']['lifeYears']
 
+
 def test_find_by_document_id_change(session):
     """Assert that the find draft change statement by document id contains all expected elements."""
-    draft = Draft.find_by_document_id('TEST-CHD1', True)
+    draft = Draft.find_by_document_number('D-T-CH01', True)
     assert draft
     json_data = draft.json
     assert json_data['changeStatement']
@@ -63,7 +66,7 @@ def test_find_by_document_id_change(session):
 
 def test_find_by_document_id_amendment(session):
     """Assert that the find draft amendment statement by document id contains all expected elements."""
-    draft = Draft.find_by_document_id('TEST-AMD1', True)
+    draft = Draft.find_by_document_number('D-T-AM01', True)
     assert draft
     json_data = draft.json
     assert json_data['amendmentStatement']
@@ -86,7 +89,7 @@ def test_find_by_account_id_invalid(session):
 def test_find_by_document_id_invalid(session):
     """Assert that the find draft statement by invalid document returns the expected result."""
     with pytest.raises(BusinessException) as not_found_err:
-        Draft.find_by_document_id('X12345X', False)
+        Draft.find_by_document_number('X12345X', False)
 
     # check
     assert not_found_err
@@ -96,7 +99,6 @@ def test_find_by_document_id_invalid(session):
 def test_save_then_delete(session):
     """Assert that a save then delete draft statement returns the expected result."""
     json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
-#    draft = Draft._save(json_data, 'PS12345')
 
     new_draft = Draft.create_from_json(json_data, 'PS12345')
     new_draft.save()
@@ -119,7 +121,7 @@ def test_save_then_delete(session):
 def test_update(session):
     """Assert that a valid update draft statement returns the expected result."""
     json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
-    updated = Draft.update(json_data, 'TEST-CHD1', 'PS12345')
+    updated = Draft.update(json_data, 'D-T-CH01')
     updated.save()
     draft = updated.json
     assert draft
@@ -137,7 +139,7 @@ def test_update_invalid(session):
     json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
 
     with pytest.raises(BusinessException) as not_found_err:
-        Draft.update(json_data, 'X12345X', 'PS12345')
+        Draft.update(json_data, 'X12345X')
 
     # check
     assert not_found_err
@@ -152,3 +154,43 @@ def test_delete_bad_id(session):
     # check
     assert not_found_err
     assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
+
+def test_draft_json(session):
+    """Assert that the draft renders to a json format correctly."""
+
+    json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
+    draft = Draft(
+        document_number = 'TEST1234',
+        account_id='PS12345',
+        create_ts = now_ts(),
+        registration_type_cd=json_data['changeStatement']['changeType'],
+        registration_type_cl='CHANGE',
+        draft=json.dumps(json_data),
+        registration_number=json_data['changeStatement']['baseRegistrationNumber']
+    )
+
+    draft_json = draft.json
+    assert draft_json
+    assert draft_json['type'] == 'CHANGE_STATEMENT'
+
+
+def test_draft_create_from_json(session):
+    """Assert that the draft creates from json data correctly."""
+
+    json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
+    draft = Draft.create_from_json(json_data, 'PS12345')
+
+    assert draft.draft
+    assert draft.account_id == 'PS12345'
+    assert draft.registration_type_cl == 'CHANGE'
+    assert draft.registration_type_cd == json_data['changeStatement']['changeType']
+    assert draft.registration_number == json_data['changeStatement']['baseRegistrationNumber']
+
+    json_data = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)
+    draft = Draft.create_from_json(json_data, 'PS12345')
+
+    assert draft.draft
+    assert draft.account_id == 'PS12345'
+    assert draft.registration_type_cl == 'COURTORDER'
+    assert draft.registration_type_cd == 'CO'
+    assert draft.registration_number == json_data['amendmentStatement']['baseRegistrationNumber']

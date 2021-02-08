@@ -35,7 +35,7 @@ def test_find_by_id(session):
     assert court_order.court_order_id == 200000000
     assert court_order.court_name
     assert court_order.court_registry
-    assert court_order.court_dt
+    assert court_order.court_date
     assert court_order.file_number
     assert court_order.effect_of_order
 
@@ -46,7 +46,7 @@ def test_find_by_registration_id(session):
     assert court_order.court_order_id == 200000000
     assert court_order.court_name
     assert court_order.court_registry
-    assert court_order.court_dt
+    assert court_order.court_date
     assert court_order.file_number
     assert court_order.effect_of_order
 
@@ -68,14 +68,14 @@ def test_court_order_json(session):
         court_registry='registry',
         file_number='file',
         effect_of_order='effect',
-        court_dt=date.today()
+        court_date=date.today()
     )
 
     court_json = {
         'courtName': court_order.court_name,
         'courtRegistry': court_order.court_registry,
         'fileNumber': court_order.file_number,
-        'orderDate': court_order.court_dt.isoformat(),
+        'orderDate': court_order.court_date.isoformat(),
         'effectOfOrder': court_order.effect_of_order
     }
 
@@ -91,7 +91,7 @@ def test_create_from_renewal_json(session):
     assert court_order.registration_id == 12345
     assert court_order.court_name
     assert court_order.court_registry
-    assert court_order.court_dt
+    assert court_order.court_date
     assert court_order.file_number
     assert court_order.effect_of_order
 

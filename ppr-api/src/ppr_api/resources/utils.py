@@ -14,7 +14,7 @@
 """Resource helper utilities for processing requests."""
 
 from http import HTTPStatus
-from flask import jsonify, request
+from flask import jsonify
 
 
 ACCOUNT_REQUIRED = "Account-Id header required."
@@ -27,9 +27,9 @@ def serialize(errors):
         error_message.append('Schema validation: ' + error.message + '.')
     return error_message
 
-def get_account_id(request):
+def get_account_id(req):
     """Get account ID from request headers."""
-    return request.headers.get('Account-Id')
+    return req.headers.get('Account-Id')
 
 
 def account_required_response():
@@ -79,7 +79,7 @@ def historical_error_response(reg_num):
     return jsonify({'message': f'The Financing Statement for registration number {reg_num} has been discharged.'}), \
            HTTPStatus.BAD_REQUEST
 
-def base_debtor_invalid_response(account_id):
+def base_debtor_invalid_response():
     """Build an error response for no match on base debtor name."""
     message = 'No exact match found for provided base debtor name.'
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST

@@ -15,12 +15,12 @@
 from __future__ import annotations
 
 from enum import Enum
-from http import HTTPStatus
+#from http import HTTPStatus
 from datetime import date
 
 #from sqlalchemy import event
 
-#from ppr_api.exceptions import BusinessException
+from ppr_api.models import utils as model_utils
 
 from .db import db
 
@@ -34,66 +34,72 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     class PartyTypes(Enum):
         """Render an Enum of the party types."""
 
-        DEBTOR_COMPANY = 'DC'
+        DEBTOR_COMPANY = 'DB'
         DEBTOR_INDIVIDUAL = 'DI'
-        REGISTERING_PARTY = 'RP'
+        REGISTERING_PARTY = 'RG'
         SECURED_PARTY = 'SP'
 
     __versioned__ = {}
     __tablename__ = 'party'
 
-    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    party_type_cd = db.Column('party_type_cd', db.String(3), nullable=False) #, db.ForeignKey('party_type.party_type_cd'))
+
+#    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    party_id = db.Column('party_id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
+    party_type_cd = db.Column('party_type_cd', db.String(3), nullable=False)
+                              #, db.ForeignKey('party_type.party_type_cd'))
     # party person
-    first_name = db.Column('first_name', db.String(50), index=True, nullable=True)
-    middle_name = db.Column('middle_name', db.String(50), index=True, nullable=True)
-    last_name = db.Column('last_name', db.String(50), index=True, nullable=True)
+    first_name = db.Column('first_name', db.String(50), nullable=True)
+    middle_name = db.Column('middle_name', db.String(50), nullable=True)
+    last_name = db.Column('last_name', db.String(50), nullable=True)
     # or party business
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
+    # Moved by Bob to client_party
+    # email_id = db.Column('email_id', db.String(250), nullable=True)
+    birth_date = db.Column('birth_date', db.Date, nullable=True)
 
-    email_id = db.Column('email_id', db.String(250), nullable=True)
-    birth_dt = db.Column('birth_dt', db.Date, nullable=True)
+    first_name_first = db.Column('first_name_first', db.String(50), nullable=True)
+    first_name_second = db.Column('first_name_second', db.String(50), nullable=True)
+    first_name_third = db.Column('first_name_third', db.String(50), nullable=True)
+    last_name_first = db.Column('last_name_first', db.String(50), nullable=True)
+    last_name_second = db.Column('last_name_second', db.String(50), nullable=True)
+    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True)
+
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address.address_id'), nullable=True)
-    client_party_id = db.Column('client_party_id', db.Integer, 
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
+    client_party_id = db.Column('client_party_id', db.Integer,
                                 db.ForeignKey('client_party.client_party_id'), nullable=True)
-    registration_id = db.Column('registration_id', db.Integer, 
+    registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, 
+    financing_id = db.Column('financing_id', db.Integer,
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Address
-    address = db.relationship("Address", foreign_keys=[address_id], uselist=False, 
-                                back_populates="party", cascade='all, delete')
+    address = db.relationship("Address", foreign_keys=[address_id], uselist=False,
+                              back_populates="party", cascade='all, delete')
 
     # Relationships - ClientParty
-    client_party = db.relationship("ClientParty", foreign_keys=[client_party_id], uselist=False, 
-                                    back_populates="party")
+    client_party = db.relationship("ClientParty", foreign_keys=[client_party_id], uselist=False,
+                                   back_populates="party")
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id], 
-                               back_populates="parties", cascade='all, delete', uselist=False)
-#    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
+    registration = db.relationship("Registration", foreign_keys=[registration_id],
+                                   back_populates="parties", cascade='all, delete', uselist=False)
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id], 
-                               back_populates="parties", cascade='all, delete', uselist=False)
+    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
+                                          back_populates="parties", cascade='all, delete',
+                                          uselist=False)
 
-
-    def save(self):
-        """Save the object to the database immediately."""
-#        db.session.add(self)
-#        db.session.commit()
 
     @property
     def json(self) -> dict:
         """Return the party as a json object."""
         party = {
         }
-        if self.party_type_cd != 'RP':
+        if self.party_type_cd != model_utils.PARTY_REGISTERING:
             party['partyId'] = self.party_id
 
         if self.client_party:
@@ -101,14 +107,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 party['code'] = str(self.client_party_id)
             if self.client_party.business_name:
                 party['businessName'] = self.client_party.business_name
-            if self.client_party.last_name:
-                person_name = {
-                    'first': self.client_party.first_name,
-                    'last': self.client_party.last_name
-                }
-                if self.client_party.middle_name:
-                    person_name['middle'] = self.client_party.middle_name
-                party['personName'] = person_name
 
             if self.client_party.address:
                 cp_address = self.client_party.address.json
@@ -132,11 +130,11 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 cp_address = self.address.json
                 party['address'] = cp_address
 
-            if self.email_id:
-                party['emailAddress'] = self.email_id
+#            if self.email_id:
+#                party['emailAddress'] = self.email_id
 
-            if self.birth_dt:
-                party['birthDate'] = self.birth_dt.isoformat()
+            if self.birth_date:
+                party['birthDate'] = self.birth_date.isoformat()
 
         return party
 
@@ -188,18 +186,18 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_from_json(json_data, party_type: str, registration_id: int = None):
         """Create a party object from a json schema object: map json to db."""
         party = Party()
-        if party_type != 'DC':
+        if party_type != model_utils.PARTY_DEBTOR_BUS:
             party.party_type_cd = party_type
         elif 'businessName' in json_data:
             party.party_type_cd = party_type
         else:
-            party.party_type_cd = 'DI'
+            party.party_type_cd = model_utils.PARTY_DEBTOR_IND
 
-        if party_type != 'DC' and 'code' in json_data:
+        if party_type != model_utils.PARTY_DEBTOR_BUS and 'code' in json_data:
             party.client_party_id = int(json_data['code'])
         else:
-            if party_type == 'DC' and 'birthDate' in json_data:
-                party.birth_dt = date.fromisoformat(json_data['birthDate'])
+            if party_type == model_utils.PARTY_DEBTOR_BUS and 'birthDate' in json_data:
+                party.birth_date = date.fromisoformat(json_data['birthDate'])
             if 'businessName' in json_data:
                 party.business_name = json_data['businessName'].strip().upper()
             else:
@@ -208,8 +206,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 if 'middle' in json_data['personName']:
                     party.middle_name = json_data['personName']['middle'].strip().upper()
 
-            if 'emailAddress' in json_data:
-                party.email_id = json_data['emailAddress']
+ #           if 'emailAddress' in json_data:
+ #               party.email_id = json_data['emailAddress']
 
             party.address = Address.create_from_json(json_data['address'])
 
@@ -224,38 +222,50 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create a list of party objects from a financing statement json schema object: map json to db."""
         parties = []
 
-        parties.append(Party.create_from_json(json_data['registeringParty'], 'RP', registration_id))
+        parties.append(Party.create_from_json(json_data['registeringParty'],
+                                              model_utils.PARTY_REGISTERING,
+                                              registration_id))
         if 'securedParties' in json_data:
             for secured in json_data['securedParties']:
-                parties.append(Party.create_from_json(secured, 'SP', registration_id))
+                parties.append(Party.create_from_json(secured,
+                                                      model_utils.PARTY_SECURED,
+                                                      registration_id))
         if 'debtors' in json_data:
             for debtor in json_data['debtors']:
-                parties.append(Party.create_from_json(debtor, 'DC', registration_id))
+                parties.append(Party.create_from_json(debtor,
+                                                      model_utils.PARTY_DEBTOR_BUS,
+                                                      registration_id))
 
         return parties
 
 
     @staticmethod
-    def create_from_statement_json(json_data, 
-                                   registration_type: str,
+    def create_from_statement_json(json_data,
+                                   registration_type_cl: str,
                                    financing_id: int):
         """Create a list of party objects from a non-financing statement json schema object: map json to db."""
         parties = []
 
         # All statements have a registering party
-        registering = Party.create_from_json(json_data['registeringParty'], 'RP', None)
+        registering = Party.create_from_json(json_data['registeringParty'],
+                                             model_utils.PARTY_REGISTERING,
+                                             None)
         registering.financing_id = financing_id
         parties.append(registering)
 
-        if registration_type == 'AS' or registration_type == 'CS':
+        if registration_type_cl in ('AMENDMENT', 'COURTORDER', 'CHANGE'):
             if 'addSecuredParties' in json_data:
                 for secured in json_data['addSecuredParties']:
-                    secured_party = Party.create_from_json(secured, 'SP', None)
+                    secured_party = Party.create_from_json(secured,
+                                                           model_utils.PARTY_SECURED,
+                                                           None)
                     secured_party.financing_id = financing_id
                     parties.append(secured_party)
             if 'addDebtors' in json_data:
                 for debtor in json_data['addDebtors']:
-                    debtor_party = Party.create_from_json(debtor, 'DC', None)
+                    debtor_party = Party.create_from_json(debtor,
+                                                          model_utils.PARTY_DEBTOR_BUS,
+                                                          None)
                     debtor_party.financing_id = financing_id
                     parties.append(debtor_party)
 
@@ -271,7 +281,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
 #    @property
 #    def valid_party_type_data(self) -> bool:
-#        """Validate the model based on the party type (DC/DI/RP/SP)."""
+#        """Validate the model based on the party type (DB/DI/RG/SP)."""
 #        if self.party_type == Party.PartyTypes.ORGANIZATION.value:
 #            if not self.organization_name or self.first_name or self.middle_initial or self.last_name:
 #                return False

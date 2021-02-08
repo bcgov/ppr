@@ -13,23 +13,24 @@
 # limitations under the License.
 """API endpoints for maintaining financing statements and updates to financing statements."""
 
+# pylint: disable=too-many-return-statements
+
 from http import HTTPStatus
 
-from flask import abort, g, jsonify, request
-from flask_restplus import Namespace, Resource, cors
-from flask_jwt_oidc import JwtManager
+from flask import jsonify, request #, g
+from flask_restx import Namespace, Resource, cors
 
+from registry_schemas import utils as schema_utils
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import Registration, FinancingStatement
+from ppr_api.models import Registration, FinancingStatement, utils as model_utils
 
 from .utils import get_account_id, account_required_response, validation_error_response, \
                    business_exception_response, default_exception_response
-from .utils import not_found_error_response, unauthorized_error_response, path_param_error_response
+from .utils import unauthorized_error_response, path_param_error_response
 from .utils import path_data_mismatch_error_response, base_debtor_invalid_response
-from registry_schemas import utils as schema_utils
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -48,14 +49,12 @@ class FinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def get():
         """Get the list of financing statements created by the header account ID."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
-            # Quick check: must provide an account ID. 
+            # Quick check: must provide an account ID.
             account_id = get_account_id(request)
             if account_id is None:
                 return account_required_response()
@@ -64,29 +63,25 @@ class FinancingResource(Resource):
             if not authorized(account_id, jwt):
                 return unauthorized_error_response(account_id)
 
-            # Try to fetch financing statement list for account ID  
+            # Try to fetch financing statement list for account ID
             statement_list = FinancingStatement.find_all_by_account_id(account_id, is_staff(jwt))
-#            if not statement_list:
-#                return not_found_error_response('financing statements', account_id)
 
             return jsonify(statement_list), HTTPStatus.OK
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
     def post():
         """Create a new financing statement."""
-#        token = g.jwt_oidc_token_info
 
         try:
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -111,28 +106,26 @@ class FinancingResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/<path:registrationNum>', methods=['GET', 'OPTIONS'])
+@API.route('/<path:registration_num>', methods=['GET', 'OPTIONS'])
 class GetFinancingResource(Resource):
     """Resource to get an individual financing statement by registration number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
-    def get(registrationNum):
+    def get(registration_num):
         """Get a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
-            if registrationNum is None:
+            if registration_num is None:
                 return path_param_error_response('registration number')
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -141,37 +134,34 @@ class GetFinancingResource(Resource):
             if not authorized(account_id, jwt):
                 return unauthorized_error_response(account_id)
 
-            # Try to fetch financing statement by registration number  
+            # Try to fetch financing statement by registration number
             # Not found or non-staff historical throws a business exception.
-            statement = FinancingStatement.find_by_registration_number(registrationNum, 
-                                                                       account_id,
+            statement = FinancingStatement.find_by_registration_number(registration_num,
                                                                        is_staff(jwt))
             return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/<path:registrationNum>/amendments', methods=['POST', 'OPTIONS'])
+@API.route('/<path:registration_num>/amendments', methods=['POST', 'OPTIONS'])
 class AmendmentResource(Resource):
     """Resource to register an amendment statement by registration number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
-    def post(registrationNum):
+    def post(registration_num):
         """Amend a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
-            if registrationNum is None:
+            if registration_num is None:
                 return path_param_error_response('registration number')
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -187,26 +177,26 @@ class AmendmentResource(Resource):
                 return validation_error_response(errors, VAL_ERROR_AMEND)
 
             # payload base registration number must match path registration number
-            if registrationNum != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registrationNum, \
+            if registration_num != request_json['baseRegistrationNumber']:
+                return path_data_mismatch_error_response(registration_num, \
                                                          'base registration number', \
                                                          request_json['baseRegistrationNumber'])
 
-            # Fetch base registration information: business exception thrown if not 
+            # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registrationNum, account_id, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)) == False:
-                return base_debtor_invalid_response(account_id)
+            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+                return base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
             # Try to save the amendment statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json, 
-                                                      'AS',
-                                                      statement, 
-                                                      registrationNum, 
+            statement = Registration.create_from_json(request_json,
+                                                      model_utils.REG_CLASS_AMEND,
+                                                      statement,
+                                                      registration_num,
                                                       account_id)
             statement.save()
 
@@ -214,28 +204,26 @@ class AmendmentResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/<path:registrationNum>/changes', methods=['POST', 'OPTIONS'])
+@API.route('/<path:registration_num>/changes', methods=['POST', 'OPTIONS'])
 class ChangeResource(Resource):
     """Resource to register an change statement by registration number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
-    def post(registrationNum):
+    def post(registration_num):
         """Change a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
-            if registrationNum is None:
+            if registration_num is None:
                 return path_param_error_response('registration number')
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -251,27 +239,27 @@ class ChangeResource(Resource):
                 return validation_error_response(errors, VAL_ERROR_CHANGE)
 
             # payload base registration number must match path registration number
-            if registrationNum != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registrationNum, \
+            if registration_num != request_json['baseRegistrationNumber']:
+                return path_data_mismatch_error_response(registration_num, \
                                                          'base registration number', \
                                                          request_json['baseRegistrationNumber'])
 
 
-            # Fetch base registration information: business exception thrown if not 
+            # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registrationNum, account_id, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)) == False:
-                return base_debtor_invalid_response(account_id)
+            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+                return base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
             # Try to save the change statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json, 
-                                                      'CS',
-                                                      statement, 
-                                                      registrationNum, 
+            statement = Registration.create_from_json(request_json,
+                                                      model_utils.REG_CLASS_CHANGE,
+                                                      statement,
+                                                      registration_num,
                                                       account_id)
             statement.save()
 
@@ -279,28 +267,26 @@ class ChangeResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/<path:registrationNum>/renewals', methods=['POST', 'OPTIONS'])
+@API.route('/<path:registration_num>/renewals', methods=['POST', 'OPTIONS'])
 class RenewalResource(Resource):
     """Resource to register an renewal statement by registration number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
-    def post(registrationNum):
+    def post(registration_num):
         """Renew a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
-            if registrationNum is None:
+            if registration_num is None:
                 return path_param_error_response('registration number')
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -316,26 +302,26 @@ class RenewalResource(Resource):
                 return validation_error_response(errors, VAL_ERROR_RENEWAL)
 
             # payload base registration number must match path registration number
-            if registrationNum != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registrationNum, \
-                                                         'base registration number', \
+            if registration_num != request_json['baseRegistrationNumber']:
+                return path_data_mismatch_error_response(registration_num,
+                                                         'base registration number',
                                                          request_json['baseRegistrationNumber'])
 
-            # Fetch base registration information: business exception thrown if not 
+            # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registrationNum, account_id, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)) == False:
-                return base_debtor_invalid_response(account_id)
+            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+                return base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
             # Try to save the renewal statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json, 
-                                                      'RS', 
-                                                      statement, 
-                                                      registrationNum, 
+            statement = Registration.create_from_json(request_json,
+                                                      model_utils.REG_CLASS_RENEWAL,
+                                                      statement,
+                                                      registration_num,
                                                       account_id)
             statement.save()
 
@@ -343,28 +329,26 @@ class RenewalResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)
 
 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/<path:registrationNum>/discharges', methods=['POST', 'OPTIONS'])
+@API.route('/<path:registration_num>/discharges', methods=['POST', 'OPTIONS'])
 class DischargeResource(Resource):
     """Resource to discharge an individual financing statement by registration number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
-#    @jwt.requires_auth
-    def post(registrationNum):
+    def post(registration_num):
         """Discharge a financing statement by registration number."""
-#        token = g.jwt_oidc_token_info
 
         try:
-            if registrationNum is None:
+            if registration_num is None:
                 return path_param_error_response('registration number')
 
-            # Quick check: must be staff or provide an account ID. 
+            # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return account_required_response()
@@ -380,27 +364,26 @@ class DischargeResource(Resource):
                 return validation_error_response(errors, VAL_ERROR_DISCHARGE)
 
             # payload base registration number must match path registration number
-            if registrationNum != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registrationNum, \
-                                                         'base registration number', \
+            if registration_num != request_json['baseRegistrationNumber']:
+                return path_data_mismatch_error_response(registration_num,
+                                                         'base registration number',
                                                          request_json['baseRegistrationNumber'])
 
-            # Fetch base registration information: business exception thrown if not 
+            # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registrationNum, account_id, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)) == False:
-                return base_debtor_invalid_response(account_id)
+            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+                return base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
             # Try to save the discharge statement: failure throws a business exception.
-#            result = DischargeStatement.save(request_json, account_id)
-            statement = Registration.create_from_json(request_json, 
-                                                      'DS', 
-                                                      statement, 
-                                                      registrationNum, 
+            statement = Registration.create_from_json(request_json,
+                                                      model_utils.REG_CLASS_DISCHARGE,
+                                                      statement,
+                                                      registration_num,
                                                       account_id)
             statement.save()
 
@@ -409,5 +392,5 @@ class DischargeResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as ex:
-            return default_exception_response(ex)
+        except Exception as default_exception:
+            return default_exception_response(default_exception)

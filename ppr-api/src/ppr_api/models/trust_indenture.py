@@ -14,16 +14,12 @@
 """This module holds data for financing statement trust indenture information."""
 from __future__ import annotations
 
-from http import HTTPStatus
-from datetime import date
-
 #from sqlalchemy import event
 
 #from ppr_api.exceptions import BusinessException
 
 from .db import db
 from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-#from .financing_statement import FinancingStatement  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
 
 class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -32,29 +28,30 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     __versioned__ = {}
     __tablename__ = 'trust_indenture'
 
-    trust_id = db.Column('trust_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+#    trust_id = db.Column('trust_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    trust_id = db.Column('trust_id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
     trust_indenture = db.Column('trust_indenture', db.String(1), nullable=False)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, 
+    registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, 
+    financing_id = db.Column('financing_id', db.Integer,
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id], 
-                               back_populates="trust_indenture", cascade='all, delete', uselist=False)
+    registration = db.relationship("Registration", foreign_keys=[registration_id],
+                                   back_populates="trust_indenture", cascade='all, delete', uselist=False)
 #    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id], 
-                               back_populates="trust_indenture", cascade='all, delete', uselist=False)
+    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
+                                          back_populates="trust_indenture", cascade='all, delete', uselist=False)
 
 
-    def save(self):
-        """Save the object to the database immediately."""
+#    def save(self):
+#        """Save the object to the database immediately."""
 #        db.session.add(self)
 #        db.session.commit()
 
@@ -98,7 +95,7 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         trust_indenture = TrustIndenture()
         if registration_id:
             trust_indenture.registration_id = registration_id
-        if 'trustIndenture' in json_data and json_data['trustIndenture'] == True:
+        if 'trustIndenture' in json_data and json_data['trustIndenture']:
             trust_indenture.trust_indenture = 'Y'
         else:
             trust_indenture.trust_indenture = 'N'

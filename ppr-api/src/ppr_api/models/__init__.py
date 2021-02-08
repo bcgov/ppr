@@ -18,18 +18,16 @@ from .address import Address
 from .client_party import ClientParty
 from .court_order import CourtOrder
 from .draft import Draft
-from .expiry import Expiry
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
 from .party import Party
 from .registration import Registration
-from .search import Search
-from .search_detail import SearchDetail
+from .search_client import SearchClient
+from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
 from .vehicle_collateral import VehicleCollateral
 
 __all__ = ('db',
-           'Address','ClientParty','CourtOrder',
-           'Draft', 'Expiry','FinancingStatement','GeneralCollateral','Party',
-           'Registration','Search','SearchDetail','TrustIndenture','VehicleCollateral')
-
+           'Address', 'ClientParty', 'CourtOrder', 'Draft', 'FinancingStatement',
+           'GeneralCollateral', 'Party', 'Registration', 'SearchClient',
+           'SearchResult', 'TrustIndenture', 'VehicleCollateral')

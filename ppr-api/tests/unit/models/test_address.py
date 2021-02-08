@@ -27,6 +27,7 @@ def test_find_by_id(session):
     """Assert that find address by id contains all expected elements."""
     address = Address.find_by_id(200000000)
     assert address
+    assert address.address_id
     if address:
         json_data = address.json
         assert json_data['street']
@@ -35,6 +36,23 @@ def test_find_by_id(session):
         assert json_data['region']
         assert json_data['postalCode']
         assert json_data['country']
+
+
+def test_save(session):
+    """Assert that creating an address works as expected."""
+
+    address_json = {
+        'street': 'street1',
+        'streetAdditional': 'street2',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S3R6'
+    }
+    address = Address.create_from_json(address_json)
+    address.save()
+    assert address.address_id
+
 
 def test_address_json(session):
     """Assert that the address renders to a json format correctly."""
@@ -57,4 +75,3 @@ def test_address_json(session):
     }
 
     assert address.json == address_json
-
