@@ -42,11 +42,11 @@
 
     <sbc-header
         class="sbc-header"
-        :in-auth="false"
+        :inAuth="false"
         :redirectOnLoginSuccess="baseUrl"
         :redirectUrlLoginFail="registryUrl"
         :redirectOnLogout="registryUrl"
-        :show-actions="true"
+        :showActions="true"
       />
 
     <div class="app-body">
