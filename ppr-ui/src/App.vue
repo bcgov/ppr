@@ -152,7 +152,6 @@ export default class App extends Mixins(AuthMixin, DateMixin) {
   private get registryUrl (): string {
     // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
     const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')
-    console.log(configRegistryUrl)
     if (configRegistryUrl) return configRegistryUrl
     return null
   }

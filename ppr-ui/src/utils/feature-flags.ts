@@ -74,8 +74,5 @@ export async function updateLdUser (
  * @returns the flag value/variation, or undefined if the flag is not found
  */
 export function getFeatureFlag (name: string): any {
-  console.log(name)
-  console.log(ldClient.getUser())
-  console.log(ldClient.variation(name))
   return ldClient ? ldClient.variation(name) : defaultFlagSet[name]
 }
