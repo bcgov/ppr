@@ -7,15 +7,17 @@ export const routes = [
     path: '/signin',
     name: RouteNames.SIGN_IN,
     component: Signin,
+    props: true,
     meta: {
       requiresAuth: false
     }
   },
   {
     // SbcHeader.logout() redirects here:
-    path: '/signout',
+    path: '/signout/:redirectUrl',
     name: RouteNames.SIGN_OUT,
     component: Signout,
+    props: true,
     meta: {
       requiresAuth: false
     }

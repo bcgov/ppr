@@ -40,7 +40,14 @@
       </div>
     </transition>
 
-    <sbc-header />
+    <sbc-header
+        class="sbc-header"
+        :in-auth="false"
+        :redirectOnLoginSuccess="baseUrl"
+        :redirectUrlLoginFail="registryUrl"
+        :redirectOnLogout="registryUrl"
+        :show-actions="true"
+      />
 
     <div class="app-body">
       <main v-if="!isErrorDialog">
@@ -49,6 +56,8 @@
             <v-col cols="12" lg="9">
               <router-view
                 :appReady=appReady
+                :isJestRunning=isJestRunning
+                :registryUrl=registryUrl
                 @profileReady="profileReady = true"
                 @fetchError="fetchErrorDialog = true"
                 @haveData="haveData = true"
@@ -70,11 +79,12 @@ import { Component, Watch, Mixins } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { StatusCodes } from 'http-status-codes'
-import { getKeycloakRoles } from '@/utils'
+import { getKeycloakRoles, updateLdUser } from '@/utils'
 
 // Components
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
+import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
 import * as Dialogs from '@/components/dialogs'
 import * as Views from '@/views'
 
@@ -89,6 +99,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
   components: {
     SbcHeader,
     SbcFooter,
+    SbcAuthenticationOptionsDialog,
     ...Dialogs,
     ...Views
   }
@@ -100,6 +111,7 @@ export default class App extends Mixins(AuthMixin, DateMixin) {
   @Getter getUserLastName!: string
   @Getter getUserRoles!: string
   @Getter getUserUsername!: string
+  @Getter isPremiumAccount!: boolean
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -128,6 +140,22 @@ export default class App extends Mixins(AuthMixin, DateMixin) {
 
   /** Whether the token refresh service is initialized. */
   private tokenService: boolean = false
+
+  private loggedOut: boolean = false
+
+  /** The base URL that auth will redirect to. */
+  private get baseUrl (): string {
+    return sessionStorage.getItem('BASE_URL')
+  }
+
+  /** The registry URL. */
+  private get registryUrl (): string {
+    // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
+    const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')
+    console.log(configRegistryUrl)
+    if (configRegistryUrl) return configRegistryUrl
+    return null
+  }
 
   /** The URL of the Pay API. */
   private get payApiUrl (): string {
@@ -259,12 +287,14 @@ export default class App extends Mixins(AuthMixin, DateMixin) {
     }
 
     // update Launch Darkly
-    // try {
-    //   await this.updateLaunchDarkly()
-    // } catch (error) {
-    //   // just log the error -- no need to halt app
-    //   console.log('Launch Darkly update error =', error) // eslint-disable-line no-console
-    // }
+    if (!this.isJestRunning) {
+      try {
+        await this.updateLaunchDarkly()
+      } catch (error) {
+        // just log the error -- no need to halt app
+        console.log('Launch Darkly update error =', error) // eslint-disable-line no-console
+      }
+    }
 
     // finally, let router views know they can load their data
     this.appReady = true
@@ -345,17 +375,17 @@ export default class App extends Mixins(AuthMixin, DateMixin) {
   }
 
   /** Updates Launch Darkly with user info. */
-  // private async updateLaunchDarkly (): Promise<any> {
-  //   // since username is unique, use it as the user key
-  //   const key: string = this.getUserUsername
-  //   const email: string = this.getUserEmail
-  //   const firstName: string = this.getUserFirstName
-  //   const lastName: string = this.getUserLastName
-  //   // remove leading { and trailing } and tokenize string
-  //   const custom: any = { roles: this.getUserRoles?.slice(1, -1).split(',') }
+  private async updateLaunchDarkly (): Promise<any> {
+    // since username is unique, use it as the user key
+    const key: string = this.getUserUsername
+    const email: string = this.getUserEmail
+    const firstName: string = this.getUserFirstName
+    const lastName: string = this.getUserLastName
+    // remove leading { and trailing } and tokenize string
+    const custom: any = { roles: this.getUserRoles?.slice(1, -1).split(',') }
 
-  //   // await updateLdUser(key, email, firstName, lastName, custom)
-  // }
+    await updateLdUser(key, email, firstName, lastName, custom)
+  }
 }
 </script>
 

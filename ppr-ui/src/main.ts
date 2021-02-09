@@ -23,7 +23,7 @@ import '@/assets/styles/overrides.scss'
 import App from './App.vue'
 
 // Helpers
-import { fetchConfig } from '@/utils'
+import { fetchConfig, initLdClient } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 
 // get rid of "element implicitly has an 'any' type..."
@@ -49,7 +49,9 @@ async function start () {
   })
 
   // initialize Launch Darkly
-  // await initLdClient()
+  if (window.ldClientId) {
+    await initLdClient()
+  }
 
   // configure KeyCloak Service
   console.info('Starting Keycloak service...') // eslint-disable-line no-console

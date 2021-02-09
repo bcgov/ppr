@@ -10,6 +10,7 @@ import { Dashboard } from '@/views'
 
 // Other
 import mockRouter from './MockRouter'
+import { Search } from '@/components/search'
 
 Vue.use(Vuetify)
 
@@ -22,9 +23,6 @@ document.body.setAttribute('data-app', 'true')
 describe('App component', () => {
   let wrapper: any
   const { assign } = window.location
-
-  // Define Session
-  sessionStorage.setItem('KEYCLOAK_TOKEN', '')
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -46,5 +44,6 @@ describe('App component', () => {
 
   it('renders Dashboard View', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
+    expect(wrapper.findComponent(Search).exists()).toBe(true)
   })
 })

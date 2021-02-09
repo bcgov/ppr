@@ -4,7 +4,6 @@ import { axios } from '@/utils'
 
 /**
  * Fetches config from environment and API.
- * Also identifies Business ID from initial route.
  * @returns A promise to get & set session storage keys with appropriate values.
  */
 export async function fetchConfig (): Promise<any> {
@@ -21,7 +20,7 @@ export async function fetchConfig (): Promise<any> {
 
   // fetch config from API
   // eg, http://localhost:8080/basePath/config/configuration.json
-  // eg, https://business-create-dev.pathfinder.gov.bc.ca/businesses/edit/config/configuration.json
+  // eg, https://ppr-dev.pathfinder.gov.bc.ca/ppr/config/configuration.json
   const url = `${origin}/${processEnvVueAppPath}/config/configuration.json`
   const headers = {
     Accept: 'application/json',
@@ -55,6 +54,10 @@ export async function fetchConfig (): Promise<any> {
   const pprApiUrl: string = response.data.PPR_API_URL
   sessionStorage.setItem('PPR_API_URL', pprApiUrl)
   console.log('Set PPR API URL to: ' + pprApiUrl)
+
+  const registryUrl: string = response.data.REGISTRY_URL
+  sessionStorage.setItem('REGISTRY_URL', registryUrl)
+  console.log('Set REGISTRY URL to: ' + registryUrl)
 
   const keycloakConfigPath: string = response.data.KEYCLOAK_CONFIG_PATH
   sessionStorage.setItem('KEYCLOAK_CONFIG_PATH', keycloakConfigPath)
