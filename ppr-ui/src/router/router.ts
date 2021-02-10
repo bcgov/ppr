@@ -25,6 +25,7 @@ export function getVueRouter () {
     if (requiresAuth(to) && !isAuthenticated()) {
       // this route needs authentication, so re-route to signin
       // NB: save current route for future redirect
+
       next({
         name: 'signin',
         query: { redirect: to.fullPath }

@@ -4,7 +4,7 @@
 
 <script lang="ts">
 // Libraries
-import { Component, Emit, Vue } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 // Components
 import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
@@ -22,6 +22,9 @@ import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
   }
 })
 export default class Signin extends Vue {
+  @Prop({ default: 'https://bcregistry.ca' })
+  private registryUrl: string
+
   /** Called when user profile is ready (ie, the user is authenticated). */
   private onProfileReady () {
     // let App know that data can now be loaded
@@ -33,7 +36,7 @@ export default class Signin extends Vue {
     } else {
       console.error('Signin page missing redirect param') // eslint-disable-line no-console
       // redirect to PPR home page
-      window.location.assign(window.location.origin)
+      window.location.assign(this.registryUrl)
     }
   }
 

@@ -15,7 +15,7 @@ document.body.setAttribute('data-app', 'true')
 
 describe('Payment Error Dialog', () => {
   const padError = [{
-    message: `Test error message.`,
+    message: 'Test error message.',
     payment_error_type: 'BCOL_ERROR'
   }]
 

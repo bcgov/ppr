@@ -31,7 +31,7 @@ export default class Search extends Vue {
   // Local Properties
   private searchOptions: Array<string> = [
     'Serial Number',
-    'something'
+    '...'
   ]
 
   private selected: string = null

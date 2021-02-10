@@ -1,4 +1,5 @@
 {
+  "REGISTRY_URL": "https://dev.bcregistry.ca",
   "PPR_API_URL": "",
   "AUTH_URL": "https://dev.bcregistry.ca/business/auth/",
   "AUTH_API_URL": "https://auth-api-dev.pathfinder.gov.bc.ca/api/v1/",

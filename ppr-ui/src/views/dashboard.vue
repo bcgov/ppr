@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="copy-normal pa-10">
     <v-row no-gutters>
-      hello world
+      PPR
     </v-row>
     <search class ="mt-10">
     </search>
@@ -10,6 +10,7 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
+import { getFeatureFlag } from '@/utils'
 import { Search } from '@/components/search'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
@@ -31,8 +32,19 @@ export default class Dashboard extends Vue {
   @Prop({ default: false })
   private appReady: boolean
 
+  @Prop({ default: false })
+  private isJestRunning: boolean
+
+  @Prop({ default: 'https://bcregistry.ca' })
+  private registryUrl: string
+
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  /** Redirects browser to Business Registry home page. */
+  private redirectRegistryHome (): void {
+    window.location.assign(this.registryUrl)
   }
 
   /** Called when App is ready and this component can load its data. */
@@ -41,8 +53,12 @@ export default class Dashboard extends Vue {
     // do not proceed if app is not ready
     if (!val) return
 
-    // do not proceed if we are not authenticated (safety check - should never happen)
-    if (!this.isAuthenticated) return
+    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      window.alert('Personal Property Registry is under contruction. Please check again later.')
+      this.redirectRegistryHome()
+      return
+    }
 
     // try to fetch data TBD
     try {
