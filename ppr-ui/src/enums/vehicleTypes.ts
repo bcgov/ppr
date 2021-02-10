@@ -1,0 +1,10 @@
+export enum VehicleTypes {
+  AIRCRAFT = 'AC',
+  AIRCRAFT_AIRFRAME = 'AF',
+  BOAT = 'BO',
+  ELECTRIC_VEHICLE = 'EV',
+  MANUFACTURED_HOME = 'MH',
+  MOTOR_VEHICLE = 'MV',
+  OUTBOARD_MOTOR = 'OB',
+  TRAILER = 'TR'
+}
