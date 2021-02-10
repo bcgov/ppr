@@ -1,6 +1,6 @@
 {
   "REGISTRY_URL": "https://dev.bcregistry.ca",
-  "PPR_API_URL": "",
+  "PPR_API_URL": "https://bcregistry-dev.apigee.net/ppr/api/v1/",
   "AUTH_URL": "https://dev.bcregistry.ca/business/auth/",
   "AUTH_API_URL": "https://auth-api-dev.pathfinder.gov.bc.ca/api/v1/",
   "SBC_CONFIG_AUTH_API_URL": "https://auth-api-dev.pathfinder.gov.bc.ca/api/v1",
