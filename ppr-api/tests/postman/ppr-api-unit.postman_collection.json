@@ -1,0 +1,2443 @@
+{
+	"info": {
+		"_postman_id": "4c63f6f8-012b-4dde-9d93-c7399080e884",
+		"name": "PPR API Unit Test",
+		"description": "Intended for unit testing of PPR API endpoints in local and develepment environments. To use with a gateway endpoint, an API key is required. A JWT is always required.\n\nThe account_id variable is required if the JWT does not have the staff role.\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "drafts",
+			"item": [
+				{
+					"name": "Get drafts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts"
+							]
+						},
+						"description": "Get drafts example."
+					},
+					"response": []
+				},
+				{
+					"name": "Get drafts no API key",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts"
+							]
+						},
+						"description": "Example of error missing API key."
+					},
+					"response": []
+				},
+				{
+					"name": "Get drafts no account ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts"
+							]
+						},
+						"description": "Error missing account ID example."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a draft Financing Statement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"FINANCING_STATEMENT\",\n  \"financingStatement\": {\n    \"type\": \"SA\",\n    \"clientReferenceId\": \"A-00000402\",\n    \"registeringParty\": {\n      \"businessName\": \"ABC SEARCHING COMPANY\",\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"bsmith@abc-search.com\"\n    },\n    \"debtors\": [\n      {\n        \"businessName\": \"Debtor 1 Inc.\",\n        \"address\": {\n          \"street\": \"721 Debtor Ave\",\n          \"city\": \"Victoria\",\n          \"region\": \"BC\",\n          \"country\": \"CA\",\n          \"postalCode\": \"A1A 1A1\"\n        },\n        \"birthDate\": \"1990-06-15\",\n        \"emailAddress\": \"dsmith@debtor1.com\"\n      }\n    ],\n    \"vehicleCollateral\": [\n      {\n        \"type\": \"MV\",\n        \"serialNumber\": \"KM8J3CA46JU622994\",\n        \"year\": 2018,\n        \"make\": \"HYUNDAI\",\n        \"model\": \"TUCSON\"\n      }\n    ],\n    \"generalCollateral\": [],\n    \"lifeYears\": 5,\n    \"securedParties\": [\n      {\n        \"businessName\": \"BANK OF BRITISH COLUMBIA\",\n        \"address\": {\n          \"street\": \"3721 BEACON AVENUE\",\n          \"city\": \"SIDNEY\",\n          \"region\": \"BC\",\n          \"country\": \"CA\",\n          \"postalCode\": \"V7R 1R7\"\n        },\n        \"emailAddress\": \"asmith@bobc.com\"\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts"
+							]
+						},
+						"description": "Example of a request to create a draft of a Financing Statement.."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a Financing Statement draft",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034001"
+							]
+						},
+						"description": "Get a draft Financing Statement example."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Amendment Statement draft",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034002",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034002"
+							]
+						},
+						"description": "Get a draft Amendment Statement example."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a Change Statement draft",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034003",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034003"
+							]
+						},
+						"description": "Get a draft Change Statement example."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Financing Statement Draft",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"FINANCING_STATEMENT\",\n  \"financingStatement\": {\n    \"type\": \"SA\",\n    \"clientReferenceId\": \"A-00000402\",\n    \"documentId\": \"D0034001\",\n    \"registeringParty\": {\n      \"businessName\": \"ABC SEARCHING COMPANY\",\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"bsmith@abc-search.com\"\n    },\n    \"securedParties\": [\n      {\n        \"businessName\": \"BANK OF BRITISH COLUMBIA\",\n        \"address\": {\n          \"street\": \"3721 BEACON AVENUE\",\n          \"city\": \"SIDNEY\",\n          \"region\": \"BC\",\n          \"country\": \"CA\",\n          \"postalCode\": \"V7R 1R7\"\n        },\n        \"emailAddress\": \"asmith@bobc.com\"\n      }\n    ],\n    \"debtors\": [\n      {\n        \"businessName\": \"Debtor 1 Inc.\",\n        \"address\": {\n          \"street\": \"721 Debtor Ave\",\n          \"city\": \"Victoria\",\n          \"region\": \"BC\",\n          \"country\": \"CA\",\n          \"postalCode\": \"A1A 1A1\"\n        },\n        \"birthDate\": \"1990-06-15\",\n        \"emailAddress\": \"dsmith@debtor1.com\"\n      }\n    ],\n    \"vehicleCollateral\": [\n      {\n        \"type\": \"MV\",\n        \"serialNumber\": \"KM8J3CA46JU622994\",\n        \"year\": 2018,\n        \"make\": \"HYUNDAI\",\n        \"model\": \"TUCSON\"\n      }\n    ],\n    \"generalCollateral\": [],\n    \"lifeYears\": 5\n  },\n  \"createDateTime\": \"2020-02-21T18:56:20Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034001"
+							]
+						},
+						"description": "Update draft by ID example."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Amendment Statement Draft",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"AMENDMENT_STATEMENT\",\n  \"amendmentStatement\": {\n    \"baseRegistrationNumber\": \"023003B\",\n    \"documentId\": \"D0034002\",\n    \"description\": \"Amendment to correct spelling mistake in debtor name. Name changed from \\\"Brawn\\\" to \\\"Brown\\\".\",\n    \"changeType\": \"AM\",\n    \"clientReferenceId\": \"A-00000402\",\n    \"baseDebtor\": {\n      \"businessName\": \"DEBTOR 1 INC.\"\n    },\n    \"registeringParty\": {\n      \"businessName\": \"ABC SEARCHING COMPANY\",\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"bsmith@abc-search.com\"\n    },\n    \"removeDebtors\": [\n      {\n        \"businessName\": \"Brawn Window Cleaning Inc.\",\n        \"partyId\": 1321065\n      }\n    ],\n    \"addDebtors\": [\n      {\n        \"businessName\": \"Brown Window Cleaning Inc.\",\n        \"address\": {\n          \"street\": \"1234 Blanshard St\",\n          \"city\": \"Victoria\",\n          \"region\": \"BC\",\n          \"country\": \"CA\",\n          \"postalCode\": \"V8S 3J5\"\n        },\n        \"emailAddress\": \"csmith@bwc.com\"\n      }\n    ]\n  },\n  \"createDateTime\": \"2020-02-21T18:56:20Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034002",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034002"
+							]
+						},
+						"description": "Update draft Amendment Statement by ID example."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Change Statement Draft",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"CHANGE_STATEMENT\",\n  \"changeStatement\": {\n    \"baseRegistrationNumber\": \"023010B\",\n    \"documentId\": \"D0034003\",\n    \"changeType\": \"DT\",\n    \"baseDebtor\": {\n      \"businessName\": \"DEBTOR 1 INC.\"\n    },\n    \"registeringParty\": {\n      \"businessName\": \"ABC SEARCHING COMPANY\",\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"bsmith@abc-search.com\"\n    },\n    \"addDebtors\": [\n      {\n        \"businessName\": \"Brown Window Cleaning Inc.\",\n        \"address\": {\n          \"street\": \"1234 Blanshard St\",\n          \"city\": \"Victoria\",\n          \"region\": \"BC\",\n          \"country\": \"CA\",\n          \"postalCode\": \"V8S 3J5\"\n        },\n        \"emailAddress\": \"csmith@bwc.com\"\n      }\n    ],\n    \"deleteDebtors\": [\n      {\n        \"businessName\": \"Brawn Window Cleaning Inc.\",\n        \"partyId\": 1321065\n      }\n    ]\n  },\n  \"createDateTime\": \"2020-02-21T18:56:20Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034003",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034003"
+							]
+						},
+						"description": "Update draft Change Statement by ID example."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete draft by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/D0034001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"D0034001"
+							]
+						},
+						"description": "Delete draft by ID example."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "financing-statements",
+			"item": [
+				{
+					"name": "List Account Financing Statements",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements?debtorName=My Company Inc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements"
+							],
+							"query": [
+								{
+									"key": "debtorName",
+									"value": "My Company Inc",
+									"description": "Debtor business name"
+								}
+							]
+						},
+						"description": "List the Financing Statements previously created with the account ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Account Financing Statement",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023000B",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023000B"
+							]
+						},
+						"description": "Retrieve by registration number a Financing Statement previously created with the account ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Financing Statement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SA\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"documentId\": \"D0034001\",\n  \"registeringParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"securedParties\": [\n    {\n      \"businessName\": \"BANK OF BRITISH COLUMBIA\",\n      \"address\": {\n        \"street\": \"3721 BEACON AVENUE\",\n        \"city\": \"SIDNEY\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V7R 1R7\"\n      },\n      \"emailAddress\": \"asmith@bobc.com\"\n    }\n  ],\n  \"debtors\": [\n    {\n      \"businessName\": \"Debtor 1 Inc.\",\n      \"address\": {\n        \"street\": \"721 Debtor Ave\",\n        \"city\": \"Victoria\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"A1A 1A1\"\n      },\n      \"birthDate\": \"1990-06-15\",\n      \"emailAddress\": \"dsmith@debtor1.com\"\n    }\n  ],\n  \"vehicleCollateral\": [\n    {\n      \"type\": \"MV\",\n      \"serialNumber\": \"KM8J3CA46JU622994\",\n      \"year\": 2018,\n      \"make\": \"HYUNDAI\",\n      \"model\": \"TUCSON\"\n    }\n  ],\n  \"generalCollateral\": [\n    {\n      \"description\": \"ALL THE DEBTOR'S PRESENT AND AFTER ACQUIRED PERSONAL PROPERTY,INCLUDING BUT NOT RESTRICTED TO MACHINERY, EQUIPMENT, FURNITURE,FIXTURES, INVENTORY AND RECEIVABLES.\",\n      \"addedDateTime\": \"2020-02-21T18:38:20Z\"\n    }\n  ],\n  \"lifeYears\": 5,\n  \"trustIndenture\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements"
+							]
+						},
+						"description": "Create  a Financing Statement example: register security agreement."
+					},
+					"response": []
+				},
+				{
+					"name": "Register an Amendment Statement (court order)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023001B\",\n  \"description\": \"Court Order debtor removal.\",\n  \"changeType\": \"CO\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"courtOrderInformation\": {\n    \"courtName\": \"Supreme Court of British Columbia.\",\n    \"courtRegistry\": \"KAMLOOPS\",\n    \"fileNumber\": \"BC123445\",\n    \"orderDate\": \"2020-02-02\",\n    \"effectOfOrder\": \"Court Order to remove James Smith as debtor.\"\n  },\n  \"deleteDebtors\": [\n    {\n      \"personName\": {\n        \"first\": \"James\",\n        \"last\": \"Smith\"\n      },\n      \"partyId\": 1321067\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023001B/amendments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023001B",
+								"amendments"
+							]
+						},
+						"description": "Create an amendment to a Financing Statement example: register a court order Amendment Statement."
+					},
+					"response": []
+				},
+				{
+					"name": "Register an Amendment Statement Secured Parties",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023002B\",\n  \"description\": \"Correct secured party address.\",\n  \"changeType\": \"AM\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"deleteSecuredParties\": [\n    {\n      \"businessName\": \"BANK OF BRITISH COLUMBIA\",\n      \"address\": {\n        \"street\": \"3720 BEACON AVENUE\",\n        \"city\": \"SIDNEY\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V7R 1R7\"\n      },\n      \"partyId\": 1321095\n    }\n  ],\n  \"addSecuredParties\": [\n    {\n      \"businessName\": \"BANK OF BRITISH COLUMBIA\",\n      \"address\": {\n        \"street\": \"3721 BEACON AVENUE\",\n        \"city\": \"SIDNEY\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V7R 1R7\"\n      },\n      \"emailAddress\": \"asmith@bobc.com\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023002B/amendments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023002B",
+								"amendments"
+							]
+						},
+						"description": "Create an amendment to a Financing Statement to correct the Secured Parties example: delete 1 secured party and add 1 secured party."
+					},
+					"response": []
+				},
+				{
+					"name": "Register an Amendment Statement Debtors",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023003B\",\n  \"description\": \"Correct debtor name.\",\n  \"changeType\": \"AM\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"deleteDebtors\": [\n    {\n      \"businessName\": \"Brawn Window Cleaning Inc.\",\n      \"address\": {\n        \"street\": \"1234 Blanshard St\",\n        \"city\": \"Victoria\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8S 3J5\"\n      },\n      \"partyId\": 1321961\n    }\n  ],\n  \"addDebtors\": [\n    {\n      \"businessName\": \"Brown Window Cleaning Inc.\",\n      \"address\": {\n        \"street\": \"1234 Blanshard St\",\n        \"city\": \"Victoria\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8S 3J5\"\n      },\n      \"emailAddress\": \"csmith@bwc.com\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023003B/amendments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023003B",
+								"amendments"
+							]
+						},
+						"description": "Create an amendment to a Financing Statement to correct the Debtors example: delete 1 debtor and add 1 debtor."
+					},
+					"response": []
+				},
+				{
+					"name": "Register an Amendment Statement Vehicles",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023004B\",\n  \"description\": \"Correct vehicle VIN.\",\n  \"changeType\": \"AM\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"deleteVehicleCollateral\": [\n    {\n      \"type\": \"MV\",\n      \"serialNumber\": \"KNADM5A39E6904135\",\n      \"year\": 2014,\n      \"make\": \"KIA\",\n      \"model\": \"RIO\",\n      \"vehicleId\": 974124\n    }\n  ],\n  \"addVehicleCollateral\": [\n    {\n      \"type\": \"MV\",\n      \"serialNumber\": \"KM8J3CA46JU622994\",\n      \"year\": 2018,\n      \"make\": \"HYUNDAI\",\n      \"model\": \"TUCSON\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023004B/amendments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023004B",
+								"amendments"
+							]
+						},
+						"description": "Create an amendment to a Financing Statement to correct the Vehicle Collateral example: delete 1 vehicle and add 1 vehicle."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Change Statement Transfer Debtor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023010B\",\n  \"documentId\": \"D0034004\",\n  \"changeType\": \"DT\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"deleteDebtors\": [\n    {\n      \"businessName\": \"Brawn Window Cleaning Inc.\",\n      \"partyId\": 1321065\n    }\n  ],\n  \"addDebtors\": [\n    {\n      \"businessName\": \"Brown Window Cleaning Inc.\",\n      \"address\": {\n        \"street\": \"1234 Blanshard St\",\n        \"city\": \"Victoria\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8S 3J5\"\n      },\n      \"emailAddress\": \"csmith@bwc.com\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023010B/changes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023010B",
+								"changes"
+							]
+						},
+						"description": "Change a Financing Statement example: register a Change Statement to update debtor information."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Change Statement Transfer Secured Party",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023011B\",\n  \"changeType\": \"ST\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"deleteSecuredParties\": [\n    {\n      \"businessName\": \"Secured 1 Ltd\",\n      \"address\": {\n        \"street\": \"721 Pandora Ave\",\n        \"city\": \"Victoria\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8S 1V2\",\n        \"partyId\": 1321061\n      }\n    }\n  ],\n  \"addSecuredParties\": [\n    {\n      \"businessName\": \"BANK OF BRITISH COLUMBIA\",\n      \"address\": {\n        \"street\": \"3721 BEACON AVENUE\",\n        \"city\": \"SIDNEY\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V7R 1R7\"\n      },\n      \"emailAddress\": \"asmith@bobc.com\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023011B/changes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023011B",
+								"changes"
+							]
+						},
+						"description": "Change a Financing Statement example: register a Change Statement to transfer a secured party. Remove 1 secured party and add 1 secured party."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Change Statement Debtor Release",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023012B\",\n  \"changeType\": \"DR\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"deleteDebtors\": [\n    {\n      \"businessName\": \"Debtor Enterprises LTD.\",\n      \"partyId\": 1321065\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023012B/changes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023012B",
+								"changes"
+							]
+						},
+						"description": "Change a Financing Statement example: register a Change Statement to release 1 debtor."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Change Statement Add Collateral",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023013B\",\n  \"changeType\": \"AC\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"addVehicleCollateral\": [\n    {\n      \"type\": \"MV\",\n      \"serialNumber\": \"RDBKK21F81F944350\",\n      \"year\": 2018,\n      \"make\": \"Honda\",\n      \"model\": \"Civic\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023013B/changes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023013B",
+								"changes"
+							]
+						},
+						"description": "Change a Financing Statement example: register a Change Statement to add 1 vehicle as collateral."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Change Statement Substitute Collateral",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023014B\",\n  \"changeType\": \"SU\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n    \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"deleteVehicleCollateral\": [\n    {\n      \"type\": \"MV\",\n      \"serialNumber\": \"2D4FV47V66H472408\",\n      \"year\": 2016,\n      \"make\": \"DODGE\",\n      \"model\": \"MAGNUM\",\n      \"vehicleId\": 974567\n    }\n  ],\n  \"addVehicleCollateral\": [\n    {\n      \"type\": \"MV\",\n      \"serialNumber\": \"KM8J3CA46JU622994\",\n      \"year\": 2018,\n      \"make\": \"HYUNDAI\",\n      \"model\": \"TUCSON\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023014B/changes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023014B",
+								"changes"
+							]
+						},
+						"description": "Change a Financing Statement example: register a Change Statement to subsitute collateral. Delete 1 vehicle and add 1 vehicle."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Change Statement Partial Discharge",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023015B\",\n  \"changeType\": \"PD\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n      \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"deleteGeneralCollateral\": [\n    {\n      \"description\": \"1985 white Fender Stratocaster Guitar #1234\",\n       \"collateralId\": 125000\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023015B/changes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023015B",
+								"changes"
+							]
+						},
+						"description": "Change a Financing Statement example: register a Change Statement for a partial discharge. Delete 1 general collateral item."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Renewal Statement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023001B\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n      \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"expiryDate\": \"2025-12-21\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023001B/renewals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023001B",
+								"renewals"
+							]
+						},
+						"description": "Renew a Financing Statement example: register a Renewal Statement to extend the expiry date."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Repairer's Lien Renewal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023020B\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n      \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"code\": \"3000001\"\n  },\n  \"courtOrderInformation\": {\n    \"courtName\": \"Supreme Court of British Columbia.\",\n    \"courtRegistry\": \"VICTORIA\",\n    \"fileNumber\": \"BC123495\",\n    \"orderDate\": \"2020-05-22\",\n    \"effectOfOrder\": \"Court Order to renew Repairer's Lien.\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023020B/renewals?",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023020B",
+								"renewals"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null
+								}
+							]
+						},
+						"description": "Renew a Financing Statement example for a Repairer's Lien registration type. Include court order information and no expiry date."
+					},
+					"response": []
+				},
+				{
+					"name": "Register a Discharge Statement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"baseRegistrationNumber\": \"023001B\",\n  \"clientReferenceId\": \"A-00000402\",\n  \"baseDebtor\": {\n      \"businessName\": \"DEBTOR 1 INC.\"\n  },\n  \"registeringParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8V 4V6\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/023001B/discharges",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"023001B",
+								"discharges"
+							]
+						},
+						"description": "Discharge a Financing Statement example."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "party-codes",
+			"item": [
+				{
+					"name": "Get party by code",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/party-codes/3000001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"3000001"
+							]
+						},
+						"description": "Get party by code example"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "search queries",
+			"item": [
+				{
+					"name": "Search Step 1 Query by Financing Reg Num",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"REGISTRATION_NUMBER\",\n  \"criteria\": {\n    \"value\": \"TEST0001\"\n  },\n  \"clientReferenceId\": \"PT-SQ-RG-1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Change Reg Num",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"REGISTRATION_NUMBER\",\n  \"criteria\": {\n    \"value\": \"TEST0008\"\n  },\n  \"clientReferenceId\": \"PT-SQ-RG-2\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Change Statement registration number."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Amendment Reg Num",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"REGISTRATION_NUMBER\",\n  \"criteria\": {\n    \"value\": \"TEST0007\"\n  },\n  \"clientReferenceId\": \"PT-SQ-RG-3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Amendment Statement registration number."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Reg Num No Match",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"REGISTRATION_NUMBER\",\n  \"criteria\": {\n    \"value\": \"TESTXXXXX\"\n  },\n  \"clientReferenceId\": \"PT-SQ-RG-4\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a registration number that does not exist in the system."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Reg Num Expired",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"REGISTRATION_NUMBER\",\n  \"criteria\": {\n    \"value\": \"TEST0013\"\n  },\n  \"clientReferenceId\": \"PT-SQ-RG-5\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a registration number for a financing statement that expired more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Reg Num Discharged",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"REGISTRATION_NUMBER\",\n  \"criteria\": {\n    \"value\": \"TEST0014\"\n  },\n  \"clientReferenceId\": \"PT-SQ-RG-6\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a registration number for a financing statement that was discharged more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Serial Num Single Exact",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SERIAL_NUMBER\",\n  \"criteria\": {\n    \"value\": \"KM8J3CA46JU622994\"\n  },\n  \"clientReferenceId\": \"PT-SQ-SS-1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by serial number with an exact match single result."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Serial Num Multiple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SERIAL_NUMBER\",\n  \"criteria\": {\n    \"value\": \"KX8J3CA46JU622994\"\n  },\n  \"clientReferenceId\": \"PT-SQ-SS-2\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by serial number with multiple exact match results."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Serial Num No Match",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SERIAL_NUMBER\",\n  \"criteria\": {\n    \"value\": \"VIN000000\"\n  },\n  \"clientReferenceId\": \"PT-SQ-SS-3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by serial number with no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Serial Num No Match Expired",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SERIAL_NUMBER\",\n  \"criteria\": {\n    \"value\": \"XXXXX999999\"\n  },\n  \"clientReferenceId\": \"PT-SQ-SS-4\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by serial number for a financing statement that expired more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Serial Num No Match Discharged",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SERIAL_NUMBER\",\n  \"criteria\": {\n    \"value\": \"ZZZZZ999999\"\n  },\n  \"clientReferenceId\": \"PT-SQ-SS-5\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by serial number for a financing statement that was discarged more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by MHR Num",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MHR_NUMBER\",\n  \"criteria\": {\n    \"value\": \"T200000\"\n  },\n  \"clientReferenceId\": \"PT-SQ-MH-1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by manufactured home registration number."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by MHR Num No Match",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MHR_NUMBER\",\n  \"criteria\": {\n    \"value\": \"T000000\"\n  },\n  \"clientReferenceId\": \"PT-SQ-MH-2\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by manufactured home registration number with no matching results."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by MHR Num No Match Expired",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MHR_NUMBER\",\n  \"criteria\": {\n    \"value\": \"T999999\"\n  },\n  \"clientReferenceId\": \"PT-SQ-MH-3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by manufactured home registration number for a financing statement that expired more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by MHR Num No Match Discharged",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MHR_NUMBER\",\n  \"criteria\": {\n    \"value\": \"Z999999\"\n  },\n  \"clientReferenceId\": \"PT-SQ-MH-4\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by manufactured home registration number for a financing statement that was discharged more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Aircraft DOT AC",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"AIRCRAFT_DOT\",\n  \"criteria\": {\n    \"value\": \"CFYXW\"\n  },\n  \"clientReferenceId\": \"PT-SQ-AC-1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by aircraft DOT with an AC serial type result."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Aircraft DOT AF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"AIRCRAFT_DOT\",\n  \"criteria\": {\n    \"value\": \"AF16031\"\n  },\n  \"clientReferenceId\": \"PT-SQ-AF-1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by aircraft DOT with an AF serial type result."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Aircraft DOT No Match",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"AIRCRAFT_DOT\",\n  \"criteria\": {\n    \"value\": \"XXXXXXX\"\n  },\n  \"clientReferenceId\": \"PT-SQ-AC-2\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by aircraft DOT with no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Aircraft DOT No Match Expired",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"AIRCRAFT_DOT\",\n  \"criteria\": {\n    \"value\": \"XXXXX999999\"\n  },\n  \"clientReferenceId\": \"PT-SQ-AC-3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by aircraft DOT for a financing statement that expired more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Aircraft DOT No Match Discharged",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"AIRCRAFT_DOT\",\n  \"criteria\": {\n    \"value\": \"ZZZZZ999999\"\n  },\n  \"clientReferenceId\": \"PT-SQ-AC-4\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by aircraft DOT for a financing statement that was discharged more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Debtor Individual Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"INDIVIDUAL_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"first\": \"James\",\n      \"last\": \"Smith\"\n    }\n  },\n  \"clientReferenceId\": \"A-00000402\",\n  \"startDateTime\": \"2020-01-15T00:00:00Z\",\n  \"endDateTime\": \"2020-02-28T00:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor individual name."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Debtor Business Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"BUSINESS_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"business\": \"BROWN AUTOMOTIVE LTD.\"\n    }\n  },\n  \"clientReferenceId\": \"A-00000402\",\n  \"startDateTime\": \"2020-08-01T00:00:00Z\",\n  \"endDateTime\": \"2020-08-15T00:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor individual name."
+					},
+					"response": []
+				}
+			],
+			"description": "Search step 1 submit search query.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "search details",
+			"item": [
+				{
+					"name": "Search Select Results Step 2 Exact",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"matchType\": \"EXACT\",\n    \"registrationType\": \"SA\",\n    \"baseRegistrationNumber\": \"023001B\",\n    \"createDateTime\": \"2020-02-21T18:56:20Z\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches/1294371",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches",
+								"1294371"
+							]
+						},
+						"description": "Select Financing Statements to retrieve details exact match example."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Select Results Step 2 Similar",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"matchType\": \"EXACT\",\n    \"baseRegistrationNumber\": \"013739B\",\n    \"createDateTime\": \"2020-08-10T18:56:20Z\",\n    \"registrationType\": \"SA\"\n  },\n  {\n    \"matchType\": \"SIMILAR\",\n    \"baseRegistrationNumber\": \"013600B\",\n    \"createDateTime\": \"2020-08-03T10:12:20Z\",\n    \"registrationType\": \"SA\"\n  },\n  {\n    \"matchType\": \"SIMILAR\",\n    \"baseRegistrationNumber\": \"013699B\",\n    \"createDateTime\": \"2020-08-08T10:12:20Z\",\n    \"registrationType\": \"SA\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches/1294376",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches",
+								"1294376"
+							]
+						},
+						"description": "Select Financing Statements to retrieve details similar Debtor business name match example."
+					},
+					"response": []
+				}
+			],
+			"description": "Search step 2 get financing statement details/history."
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{apikey}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "x-apikey",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apikey",
+			"value": "PROVIDE"
+		},
+		{
+			"key": "account_id",
+			"value": "PROVIDE"
+		},
+		{
+			"key": "base_url_flask",
+			"value": "http://127.0.0.1:5000/"
+		},
+		{
+			"key": "base_url",
+			"value": "bcregistry-dev.apigee.net/ppr"
+		},
+		{
+			"key": "jwt",
+			"value": "PROVIDE"
+		},
+		{
+			"key": "base_url_sandbox",
+			"value": "bcregistry-sandbox.apigee.net/ppr"
+		},
+		{
+			"key": "base_url_test",
+			"value": "bcregistry-test.apigee.net/ppr"
+		},
+		{
+			"key": "base_url_mock",
+			"value": "bcregistry-bcregistry-mock.apigee.net"
+		}
+	]
+}

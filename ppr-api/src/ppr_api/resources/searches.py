@@ -31,12 +31,9 @@ from .utils import get_account_id, account_required_response, \
                    validation_error_response, business_exception_response
 from .utils import unauthorized_error_response, unprocessable_error_response, \
                    path_param_error_response, default_exception_response
-#from auth_api.tracer import Tracer
 
 
 API = Namespace('searches', description='Endpoints for PPR searches.')
-#TRACER = Tracer.get_instance()
-
 VAL_ERROR = "Search request data validation errors."  # Validation error prefix
 
 
