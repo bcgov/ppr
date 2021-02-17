@@ -48,13 +48,13 @@ def test_search_reg_num_financing(session):
     assert result['searchId']
     assert result['searchQuery']
     assert result['searchDateTime']
-    assert result['totalResultsSize']
-    assert result['maxResultsSize']
-    assert result['returnedResultsSize']
+    assert result['totalResultsSize'] == 1
+    assert result['returnedResultsSize'] == 1
+    assert result['maxResultsSize'] == 1000
     assert result['results'][0]
     assert result['results'][0]['baseRegistrationNumber'] == 'TEST0001'
     assert result['results'][0]['createDateTime']
-    assert result['results'][0]['matchType']
+    assert result['results'][0]['matchType'] == 'EXACT'
     assert result['results'][0]['registrationType']
 
 
@@ -78,14 +78,14 @@ def test_search_reg_num_amendment(session):
     assert result['searchId']
     assert result['searchQuery']
     assert result['searchDateTime']
-    assert result['totalResultsSize']
-    assert result['maxResultsSize']
-    assert result['returnedResultsSize']
+    assert result['totalResultsSize'] == 1
+    assert result['returnedResultsSize'] == 1
+    assert result['maxResultsSize'] == 1000
     assert result['results'][0]
     assert result['results'][0]['baseRegistrationNumber'] == 'TEST0001'
     assert result['results'][0]['registrationNumber'] == 'TEST0007'
     assert result['results'][0]['createDateTime']
-    assert result['results'][0]['matchType']
+    assert result['results'][0]['matchType'] == 'EXACT'
     assert result['results'][0]['registrationType']
 
 
@@ -109,14 +109,14 @@ def test_search_reg_num_change(session):
     assert result['searchId']
     assert result['searchQuery']
     assert result['searchDateTime']
-    assert result['totalResultsSize']
-    assert result['maxResultsSize']
-    assert result['returnedResultsSize']
+    assert result['totalResultsSize'] == 1
+    assert result['returnedResultsSize'] == 1
+    assert result['maxResultsSize'] == 1000
     assert result['results'][0]
     assert result['results'][0]['baseRegistrationNumber'] == 'TEST0001'
     assert result['results'][0]['registrationNumber'] == 'TEST0008'
     assert result['results'][0]['createDateTime']
-    assert result['results'][0]['matchType']
+    assert result['results'][0]['matchType'] == 'EXACT'
     assert result['results'][0]['registrationType']
 
 
@@ -168,7 +168,19 @@ def test_search_mhr_num(session):
     assert result['results'][0]['vehicleCollateral']['serialNumber']
     assert result['results'][0]['vehicleCollateral']['year']
     assert result['results'][0]['vehicleCollateral']['make']
-    assert result['results'][0]['vehicleCollateral']['manufacturedHomeRegistrationNumber']
+    assert result['results'][0]['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == 'T200000'
+    if len(result['results']) > 0:
+        assert result['results'][1]['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == 'T200000'
+
+    # Test no partial match: T20000 and T200000 exist, T20000 search should not return T200000
+    json_data['criteria']['value'] = 'T20000'
+    query = SearchClient.create_from_json(json_data, 'PS12345')
+    query.search()
+
+    result = query.json
+    assert result['results'][0]
+    for r in result['results']:
+      assert r['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == 'T20000'
 
 
 def test_search_serial_num(session):
@@ -205,8 +217,8 @@ def test_search_serial_num(session):
     assert result['results'][0]['vehicleCollateral']['make']
 
 
-def test_search_aircraft_dot(session):
-    """Assert that a search query by aircraft DOT returns the expected result."""
+def test_search_aircraft_dot_AC(session):
+    """Assert that a search query by aircraft DOT returns the expected AC serial type result."""
     json_data = {
         'type': 'AIRCRAFT_DOT',
         'criteria': {
@@ -230,11 +242,46 @@ def test_search_aircraft_dot(session):
     assert len(result['results']) >= 1
     assert result['results'][0]['baseRegistrationNumber']
     assert result['results'][0]['createDateTime']
-    assert result['results'][0]['matchType']
+    assert result['results'][0]['matchType'] == 'EXACT'
     assert result['results'][0]['registrationType']
     assert result['results'][0]['vehicleCollateral']
-    assert result['results'][0]['vehicleCollateral']['type']
-    assert result['results'][0]['vehicleCollateral']['serialNumber']
+    assert result['results'][0]['vehicleCollateral']['type'] == 'AC'
+    assert result['results'][0]['vehicleCollateral']['serialNumber'] == 'CFYXW'
+    assert result['results'][0]['vehicleCollateral']['year']
+    assert result['results'][0]['vehicleCollateral']['make']
+    assert result['results'][0]['vehicleCollateral']['model']
+
+
+def test_search_aircraft_dot_AF(session):
+    """Assert that a search query by aircraft DOT returns the expected AF serial type result."""
+    json_data = {
+        'type': 'AIRCRAFT_DOT',
+        'criteria': {
+            'value': 'AF16031'
+        },
+        'clientReferenceId': 'T-SQ-AF-1'
+    }
+    query = SearchClient.create_from_json(json_data, 'PS12345')
+    query.search()
+
+    result = query.json
+#    print(result)
+    assert query.search_id
+    assert query.search_response
+    assert result['searchId']
+    assert result['searchQuery']
+    assert result['searchDateTime']
+    assert result['totalResultsSize']
+    assert result['maxResultsSize']
+    assert result['returnedResultsSize']
+    assert len(result['results']) >= 1
+    assert result['results'][0]['baseRegistrationNumber']
+    assert result['results'][0]['createDateTime']
+    assert result['results'][0]['matchType'] == 'EXACT'
+    assert result['results'][0]['registrationType']
+    assert result['results'][0]['vehicleCollateral']
+    assert result['results'][0]['vehicleCollateral']['type'] == 'AF'
+    assert result['results'][0]['vehicleCollateral']['serialNumber'] == 'AF16031'
     assert result['results'][0]['vehicleCollateral']['year']
     assert result['results'][0]['vehicleCollateral']['make']
     assert result['results'][0]['vehicleCollateral']['model']
@@ -268,6 +315,15 @@ def test_search_mhr_num_invalid(session):
         },
         'clientReferenceId': 'T-SQ-MH-2'
     }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+
+    assert query.search_id
+    assert not query.search_response
+    assert query.returned_results_size == 0
+
+    # Verify partial match fails
+    json_data['criteria']['value'] = 'T2000'
     query = SearchClient.create_from_json(json_data, None)
     query.search()
 
@@ -312,6 +368,162 @@ def test_search_aircraft_dot_invalid(session):
     assert query.returned_results_size == 0
 
 
+def test_search_reg_num_expired(session):
+    """Assert that a search by registration number on an expired financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'REGISTRATION_NUMBER',
+        'criteria': {
+            'value': 'TEST0013'
+        },
+        'clientReferenceId': 'T-SQ-RG-6'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+
+    assert query.search_id
+    assert not query.search_response
+    assert query.returned_results_size == 0
+
+
+def test_search_mhr_number_expired(session):
+    """Assert that a search by MHR number on an expired financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'MHR_NUMBER',
+        'criteria': {
+            'value': 'T999999'
+        },
+        'clientReferenceId': 'T-SQ-MH-3'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+    result = query.json
+
+    assert result['searchId']
+    if 'results' in result:
+        for r in result['results']:
+            assert r['vehicleCollateral']['serialNumber'] != 'XXXXX999999'
+
+
+def test_search_serial_number_expired(session):
+    """Assert that a search by serial number on an expired financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'SERIAL_NUMBER',
+        'criteria': {
+            'value': 'XXXXX999999'
+        },
+        'clientReferenceId': 'T-SQ-SS-3'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+    result = query.json
+
+    assert result['searchId']
+    if 'results' in result:
+        for r in result['results']:
+            assert r['vehicleCollateral']['serialNumber'] != 'XXXXX999999'
+
+
+def test_search_aircraft_dot_expired(session):
+    """Assert that a search by aircraft DOT on an expired financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'AIRCRAFT_DOT',
+        'criteria': {
+            'value': 'XXXXX999999'
+        },
+        'clientReferenceId': 'T-SQ-AC-3'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+    result = query.json
+
+    assert result['searchId']
+    if 'results' in result:
+        for r in result['results']:
+            assert r['vehicleCollateral']['serialNumber'] != 'XXXXX999999'
+
+
+def test_search_reg_num_discharged(session):
+    """Assert that a search by registration number on a discharged financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'REGISTRATION_NUMBER',
+        'criteria': {
+            'value': 'TEST0014'
+        },
+        'clientReferenceId': 'T-SQ-RG-7'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+
+    assert query.search_id
+    assert not query.search_response
+    assert query.returned_results_size == 0
+
+
+def test_search_mhr_number_discharged(session):
+    """Assert that a search by MHR number on a discharged financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'MHR_NUMBER',
+        'criteria': {
+            'value': 'Z999999'
+        },
+        'clientReferenceId': 'T-SQ-MH-4'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+    result = query.json
+
+    assert result['searchId']
+    if 'results' in result:
+        for r in result['results']:
+            assert r['vehicleCollateral']['serialNumber'] != 'ZZZZZ999999'
+
+
+def test_search_serial_number_discharged(session):
+    """Assert that a search by serial number on a discharged financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'SERIAL_NUMBER',
+        'criteria': {
+            'value': 'ZZZZZ999999'
+        },
+        'clientReferenceId': 'T-SQ-SS-4'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+    result = query.json
+
+    assert result['searchId']
+    if 'results' in result:
+        for r in result['results']:
+            assert r['vehicleCollateral']['serialNumber'] != 'ZZZZZ999999'
+
+
+def test_search_aircraft_dot_discharged(session):
+    """Assert that a search by aircraft DOT on a discarged financing statement is 
+       excluded in the results."""
+    json_data = {
+        'type': 'AIRCRAFT_DOT',
+        'criteria': {
+            'value': 'ZZZZZ999999'
+        },
+        'clientReferenceId': 'T-SQ-AC-4'
+    }
+    query = SearchClient.create_from_json(json_data, None)
+    query.search()
+    result = query.json
+
+    assert result['searchId']
+    if 'results' in result:
+        for r in result['results']:
+            assert r['vehicleCollateral']['serialNumber'] != 'XXXXX999999'
+
+
 def test_search_startDateTime_invalid(session, client, jwt):
     """Assert that validation of a search request with an invalid startDateTime 
        throws a BusinessException."""
@@ -321,7 +533,7 @@ def test_search_startDateTime_invalid(session, client, jwt):
         'criteria': {
             'value': 'TEST0001'
         },
-        'clientReferenceId': 'T-API-SQ-RG-6',
+        'clientReferenceId': 'T-API-SQ-RG-7',
         'endDateTime': '2021-01-20T19:38:43+00:00'
     }
     ts_start = now_ts_offset(1, True)
@@ -346,7 +558,7 @@ def test_search_endDateTime_invalid(session, client, jwt):
         'criteria': {
             'value': 'TEST0001'
         },
-        'clientReferenceId': 'T-API-SQ-RG-7',
+        'clientReferenceId': 'T-API-SQ-RG-8',
         'startDateTime': '2021-01-20T19:38:43+00:00'
     }
     ts_end = now_ts_offset(1, True)

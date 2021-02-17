@@ -28,31 +28,62 @@ from ppr_api.models import utils as model_utils
 
 from .db import db
 
-# temporary mock responses
+# Serial number search base where clause
+SERIAL_SEARCH_BASE = \
+    "SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts," + \
+            "sc.serial_type_cd,sc.serial_number,sc.year,sc.make,sc.model," + \
+            "r.registration_number AS base_registration_num," + \
+            "DECODE(serial_number, '?', 'EXACT', 'SIMILAR') AS match_type," + \
+            "fs.expire_date,fs.state_type_cd,sc.vehicle_collateral_id AS vehicle_id  " + \
+      "FROM registration r, financing_statement fs, serial_collateral sc " + \
+     "WHERE r.financing_id = fs.financing_id " + \
+       "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
+       "AND r.base_reg_number IS NULL " + \
+       "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+       "AND NOT EXISTS (SELECT r3.registration_id " + \
+                         "FROM registration r3 " + \
+                        "WHERE r3.financing_id = fs.financing_id " + \
+                          "AND r3.registration_type_cl = 'DISCHARGE' " + \
+                          "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+      "AND sc.financing_id = fs.financing_id " + \
+      "AND sc.registration_id_end IS NULL "
 
+# Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
+REG_NUM_QUERY = \
+    "SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts," + \
+            "r.registration_number AS base_registration_num," + \
+            "'EXACT' AS match_type,fs.state_type_cd, fs.expire_date " + \
+      "FROM registration r, financing_statement fs, registration r2 " + \
+     "WHERE r2.financing_id = r.financing_id " + \
+       "AND r.financing_id = fs.financing_id " + \
+       "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
+       "AND r.base_reg_number IS NULL " + \
+       "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+       "AND NOT EXISTS (SELECT r3.registration_id " + \
+                         "FROM registration r3 " + \
+                        "WHERE r3.financing_id = fs.financing_id " + \
+                          "AND r3.registration_type_cl = 'DISCHARGE' " + \
+                          "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+      "AND r2.registration_number = '?'"
 
-REG_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,match_type," + \
-                       "base_registration_num,base_registration_ts " + \
-                  "FROM SEARCH_BY_REG_NUM_VW " + \
-                  "WHERE registration_num = '?'"
+# Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
+MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
+                 "AND sc.serial_type_cd = 'MH' " + \
+                 "AND sc.mhr_number = '?' " + \
+            "ORDER BY r.registration_ts ASC"
 
-MHR_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,match_type,base_registration_num," + \
-                       "base_registration_ts, year, make, model, serial_number, mhr_number " + \
-                  "FROM SEARCH_BY_MHR_NUM_VW " + \
-                 "WHERE mhr_number = '?' " + \
-              "ORDER BY base_registration_ts ASC"
+# Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
+SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
+                     "AND sc.serial_type_cd NOT IN ('AC', 'AF') " + \
+                     "AND sc.srch_vin = to_char(search_key_pkg.vehicle('?')) " + \
+                "ORDER BY match_type, sc.serial_number"
 
-SERIAL_NUM_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num," + \
-                          "base_registration_ts,serial_type_cd,serial_number,year,make,model," + \
-                          "DECODE(serial_number, '?', 'EXACT', 'SIMILAR') AS match_type " + \
-                    "FROM SEARCH_BY_SERIAL_NUM_VW " + \
-                   "WHERE srch_vin = to_char(search_key_pkg.vehicle('?')) " + \
-                "ORDER BY match_type, serial_number"
-
-AIRCRAFT_DOT_QUERY = "SELECT registration_type_cd,state_type_cd,base_registration_num," + \
-                            "base_registration_ts,serial_type_cd,serial_number,year,make,model " + \
-                       "FROM SEARCH_BY_AIRCRAFT_DOT_VW " + \
-                      "WHERE serial_number LIKE '%?%'"
+# Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
+# pylint: disable=anomalous-backslash-in-string
+AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
+                    "AND sc.serial_type_cd IN ('AC', 'AF') " + \
+                    "AND UPPER(REGEXP_REPLACE(sc.serial_number,'\s|-','')) = UPPER(REGEXP_REPLACE('?','\s|-','')) " + \
+                   "ORDER BY r.registration_ts ASC"
 
 
 class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -135,14 +166,16 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             values = row.values()
             registration_type = str(values[0])
             # Remove state check for now - let the DB view take care of it.
-            timestamp = values[4]
+            timestamp = values[1]
             result_json = [{
-                'matchType': str(values[2]),
-                'registrationNumber': reg_num,
-                'baseRegistrationNumber': str(values[3]),
+                'baseRegistrationNumber': str(values[2]),
+                'matchType': str(values[3]),
                 'createDateTime': format_ts(timestamp),
                 'registrationType': registration_type
             }]
+            if reg_num != str(values[2]):
+                result_json[0]['registrationNumber'] = reg_num
+
             self.returned_results_size = 1
             self.total_results_size = 1
             self.search_response = json.dumps(result_json)
@@ -151,11 +184,18 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.total_results_size = 0
 
 
-    def search_by_mhr_number(self):
-        """Execute a search by mhr number query."""
+    def search_by_serial_type(self):
+        """Execute a search query for either an aircraft DOT, MHR number, or
+           serial number search type."""
 
-        mhr_num = self.request_json['criteria']['value']
-        query = MHR_NUM_QUERY.replace('?', mhr_num)
+        search_value = self.request_json['criteria']['value']
+        query = SERIAL_NUM_QUERY
+        if self.search_type_cd == 'MH':
+            query = MHR_NUM_QUERY
+        elif self.search_type_cd == 'AC':
+            query = AIRCRAFT_DOT_QUERY
+
+        query = query.replace('?', search_value)
         result = db.session.execute(query)
         rows = result.fetchall()
         if rows is not None:
@@ -163,125 +203,31 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             for row in rows:
                 values = row.values()
                 registration_type = str(values[0])
-                # Remove state check for now - let the DB view take care of it.
-                timestamp = values[4]
+                timestamp = values[1]
                 collateral = {
-                    'type': 'MH',
-                    'manufacturedHomeRegistrationNumber': mhr_num,
-                    'serialNumber': values[8]
+                    'type': str(values[2]),
+                    'serialNumber': str(values[3])
                 }
+                value = values[4]
+                if value is not None:
+                    collateral['year'] = int(value)
                 value = values[5]
                 if value is not None:
-                    collateral['year'] = int(value)
+                    collateral['make'] = str(value)
                 value = values[6]
                 if value is not None:
-                    collateral['make'] = str(value)
-                value = values[7]
-                if value is not None:
                     collateral['model'] = str(value)
+                match_type = str(values[8])
+                if self.search_type_cd == 'MH':
+                    collateral['manufacturedHomeRegistrationNumber'] = search_value
+                    match_type = 'EXACT'
                 result_json = {
-                    'matchType': str(values[2]),
-                    'baseRegistrationNumber': str(values[3]),
+                    'baseRegistrationNumber': str(values[7]),
+                    'matchType': match_type,
                     'createDateTime': format_ts(timestamp),
                     'registrationType': registration_type,
                     'vehicleCollateral': collateral
                 }
-                results_json.append(result_json)
-
-            self.returned_results_size = len(results_json)
-            self.total_results_size = self.returned_results_size
-            if self.returned_results_size > 0:
-                self.search_response = json.dumps(results_json)
-        else:
-            self.returned_results_size = 0
-            self.total_results_size = 0
-
-
-    def search_by_serial_number(self):
-        """Execute a search by serial number query."""
-
-        serial_num = self.request_json['criteria']['value']
-        query = SERIAL_NUM_QUERY.replace('?', serial_num)
-        result = db.session.execute(query)
-        rows = result.fetchall()
-
-        if rows is not None:
-            results_json = []
-            for row in rows:
-                values = row.values()
-                registration_type = str(values[0])
-                # Remove state check for now - let the DB view take care of it.
-                rs_serial_num = str(values[5])
-                timestamp = values[3]
-                collateral = {
-                    'type': str(values[4]),
-                    'serialNumber': rs_serial_num
-                }
-                value = values[6]
-                if value is not None:
-                    collateral['year'] = int(value)
-                value = values[7]
-                if value is not None:
-                    collateral['make'] = str(value)
-                value = values[8]
-                if value is not None:
-                    collateral['model'] = str(value)
-                result_json = {
-                    'baseRegistrationNumber': str(values[2]),
-                    'createDateTime': format_ts(timestamp),
-                    'registrationType': registration_type,
-                    'vehicleCollateral': collateral,
-                    'matchType': str(values[9])
-                }
-                results_json.append(result_json)
-
-            self.returned_results_size = len(results_json)
-            self.total_results_size = self.returned_results_size
-            if self.returned_results_size > 0:
-                self.search_response = json.dumps(results_json)
-        else:
-            self.returned_results_size = 0
-            self.total_results_size = 0
-
-
-    def search_by_aircraft_dot(self):
-        """Execute a search by aircraft DOT query."""
-
-        ac_dot = self.request_json['criteria']['value']
-        query = AIRCRAFT_DOT_QUERY.replace('?', ac_dot)
-        result = db.session.execute(query)
-        rows = result.fetchall()
-        if rows is not None:
-            results_json = []
-            for row in rows:
-                values = row.values()
-                registration_type = str(values[0])
-                # Remove state check for now - let the DB view take care of it.
-                timestamp = values[3]
-                rs_serial_num = str(values[5])
-                collateral = {
-                    'type': str(values[4]),
-                    'serialNumber': rs_serial_num
-                }
-                value = values[6]
-                if value is not None:
-                    collateral['year'] = int(value)
-                value = values[7]
-                if value is not None:
-                    collateral['make'] = str(value)
-                value = values[8]
-                if value is not None:
-                    collateral['model'] = str(value)
-                result_json = {
-                    'baseRegistrationNumber': str(values[2]),
-                    'createDateTime': format_ts(timestamp),
-                    'registrationType': registration_type,
-                    'vehicleCollateral': collateral
-                }
-                if rs_serial_num == ac_dot:
-                    result_json['matchType'] = 'EXACT'
-                else:
-                    result_json['matchType'] = 'SIMILAR'
 
                 results_json.append(result_json)
 
@@ -299,13 +245,9 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if self.search_type_cd == 'RG':
             self.search_by_registration_number()
-        elif self.search_type_cd == 'SS':
-            self.search_by_serial_number()
-        elif self.search_type_cd == 'MH':
-            self.search_by_mhr_number()
-        elif self.search_type_cd == 'AC':
-            self.search_by_aircraft_dot()
-        # temporary until implemented
+        elif self.search_type_cd in ('SS', 'MH', 'AC'):
+            self.search_by_serial_type()
+        # temporary until debtor search implemented
         else:
             self.search_response = json.dumps(copy.deepcopy(SEARCH_QUERY_RESULT))
             self.returned_results_size = 1
