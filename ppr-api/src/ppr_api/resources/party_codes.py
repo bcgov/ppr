@@ -40,6 +40,7 @@ class ClientPartyResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def get(code):
         """Get a preset registering or secured party by client code."""
 

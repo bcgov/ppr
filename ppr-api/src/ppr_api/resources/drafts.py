@@ -44,6 +44,7 @@ class DraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def get():
         """Get the list of draft statements belonging to the header account ID."""
 
@@ -71,6 +72,7 @@ class DraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post():
         """Create a new draft statement."""
 
@@ -111,6 +113,7 @@ class MaintainDraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def get(document_id):
         """Get a draft statement by document ID."""
 
@@ -140,6 +143,7 @@ class MaintainDraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def put(document_id):
         """Update a draft statement by document ID with data in the request body."""
 
@@ -176,6 +180,7 @@ class MaintainDraftResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def delete(document_id):
         """Delete a draft statement by document ID."""
 

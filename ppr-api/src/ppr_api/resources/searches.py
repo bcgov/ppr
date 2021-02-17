@@ -45,6 +45,7 @@ class SearchResource(Resource):
     @staticmethod
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post():
         """Execute a new search request using criteria in the request body."""
 
@@ -91,6 +92,7 @@ class SearchDetailResource(Resource):
     @staticmethod
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def put(search_id):
         """Execute a search detail request using criteria in the request body."""
 

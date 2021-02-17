@@ -49,6 +49,7 @@ class FinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def get():
         """Get the list of financing statements created by the header account ID."""
 
@@ -76,6 +77,7 @@ class FinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post():
         """Create a new financing statement."""
 
@@ -118,6 +120,7 @@ class GetFinancingResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def get(registration_num):
         """Get a financing statement by registration number."""
 
@@ -154,6 +157,7 @@ class AmendmentResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post(registration_num):
         """Amend a financing statement by registration number."""
 
@@ -216,6 +220,7 @@ class ChangeResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post(registration_num):
         """Change a financing statement by registration number."""
 
@@ -279,6 +284,7 @@ class RenewalResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post(registration_num):
         """Renew a financing statement by registration number."""
 
@@ -341,6 +347,7 @@ class DischargeResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
+    @jwt.requires_auth
     def post(registration_num):
         """Discharge a financing statement by registration number."""
 
