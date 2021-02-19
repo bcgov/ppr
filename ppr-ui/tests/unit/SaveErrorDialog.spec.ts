@@ -29,10 +29,8 @@ describe('Save Error Dialog', () => {
     expect(wrapper.attributes('contentclass')).toBe('save-error-dialog')
     expect(wrapper.isVisible()).toBe(true)
     expect(wrapper.find('#dialog-title').text()).toBe('Unable to save this search')
-    expect(wrapper.findAll('p').length).toBe(2)
+    expect(wrapper.findAll('p').length).toBe(1)
     expect(wrapper.findAll('p').at(0).text()).toContain('We were unable to save')
-    expect(wrapper.findAll('p').at(1).text()).toContain('If you exit this page')
-    expect(wrapper.find('#dialog-exit-button').exists()).toBe(true)
     expect(wrapper.find('#dialog-okay-button').exists()).toBe(true)
 
     wrapper.destroy()
@@ -50,12 +48,10 @@ describe('Save Error Dialog', () => {
     expect(wrapper.attributes('contentclass')).toBe('save-error-dialog')
     expect(wrapper.isVisible()).toBe(true)
     expect(wrapper.find('#dialog-title').text()).toBe('Unable to save this search')
-    expect(wrapper.findAll('p').length).toBe(3)
+    expect(wrapper.findAll('p').length).toBe(2)
     expect(wrapper.findAll('p').at(0).text()).toContain('We were unable to save')
-    expect(wrapper.findAll('p').at(1).text()).toContain('If you exit this page')
-    expect(wrapper.findAll('p').at(2).text()).toContain('If this error persists')
+    expect(wrapper.findAll('p').at(1).text()).toContain('If this error persists')
     expect(wrapper.findComponent(ErrorContact).exists()).toBe(true)
-    expect(wrapper.find('#dialog-exit-button').exists()).toBe(true)
     expect(wrapper.find('#dialog-okay-button').exists()).toBe(true)
 
     wrapper.destroy()
@@ -83,7 +79,6 @@ describe('Save Error Dialog', () => {
     expect(wrapper.findAll('li').length).toBe(2)
     expect(wrapper.findAll('li').at(0).text()).toBe('Test Error 1')
     expect(wrapper.findAll('li').at(1).text()).toBe('Test Error 2')
-    expect(wrapper.find('#dialog-exit-button').exists()).toBe(true)
     expect(wrapper.find('#dialog-okay-button').exists()).toBe(true)
 
     wrapper.destroy()
@@ -138,7 +133,6 @@ describe('Save Error Dialog', () => {
     expect(wrapper.findAll('li').length).toBe(2)
     expect(wrapper.findAll('li').at(0).text()).toBe('Test Error')
     expect(wrapper.findAll('li').at(1).text()).toBe('Test Warning')
-    expect(wrapper.find('#dialog-exit-button').exists()).toBe(true)
     expect(wrapper.find('#dialog-okay-button').exists()).toBe(true)
 
     wrapper.destroy()
@@ -152,15 +146,15 @@ describe('Save Error Dialog', () => {
         propsData: { dialog: true }
       })
 
-    expect(wrapper.emitted('exit')).toBeUndefined()
+    expect(wrapper.emitted('okay')).toBeUndefined()
 
     // verify and click Exit button
-    const exitButton = wrapper.find('#dialog-exit-button')
-    expect(exitButton.text()).toBe('Exit without saving')
+    const exitButton = wrapper.find('#dialog-okay-button')
+    expect(exitButton.text()).toBe('OK')
     exitButton.trigger('click')
     await Vue.nextTick()
 
-    expect(wrapper.emitted('exit').length).toBe(1)
+    expect(wrapper.emitted('okay').length).toBe(1)
 
     wrapper.destroy()
   })

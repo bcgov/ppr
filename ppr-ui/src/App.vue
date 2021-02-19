@@ -60,6 +60,8 @@
                 :registryUrl=registryUrl
                 @profileReady="profileReady = true"
                 @fetchError="fetchErrorDialog = true"
+                @paymentError="paymentErrorDialog = true"
+                @saveSearchError="saveErrorDialog = true"
                 @haveData="haveData = true"
                 @haveChanges="stateChangeHandler($event)"
               />

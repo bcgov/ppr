@@ -16,9 +16,9 @@
       <v-divider class="my-0"></v-divider>
 
       <v-card-actions>
-        <v-btn id="dialog-exit-button" color="primary" text @click="exit()">Exit and Continue</v-btn>
+        <v-btn id="dialog-exit-button" text @click="exit()">Exit and Continue</v-btn>
         <v-spacer></v-spacer>
-        <v-btn id="dialog-retry-button" color="primary" text @click="retry()">Retry</v-btn>
+        <v-btn id="dialog-retry-button" text @click="retry()">Retry</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

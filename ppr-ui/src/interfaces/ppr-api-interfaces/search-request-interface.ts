@@ -1,7 +1,7 @@
 
 // Search Query request (search step 1) interface.
 export interface SearchCriteriaIF {
-  type: string, // One of SearchTypes
+  type: string, // One of APISearchTypes
   criteria: {
     value?: string // Conditional: required if not debtor search
     debtorName?: { // Conditional: required if debtor search

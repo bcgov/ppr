@@ -15,7 +15,7 @@
       <v-divider class="my-0"></v-divider>
 
       <v-card-actions>
-        <v-btn id="dialog-retry-button" color="primary" text @click="retry()">Retry</v-btn>
+        <v-btn id="dialog-retry-button" text @click="retry()">Retry</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

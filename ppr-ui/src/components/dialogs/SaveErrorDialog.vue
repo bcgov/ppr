@@ -15,8 +15,7 @@
         <!-- display generic message (no errors or warnings) -->
         <div class="genErr" v-if="(numErrors + numWarnings) < 1">
           <p>We were unable to save this search. You can continue to try to save this
-            search or you can exit without saving and retry at another time.</p>
-          <p>If you exit this page, any changes you've made will not be saved.</p>
+            search or you can exit and retry at another time.</p>
         </div>
 
         <!-- display errors -->
@@ -45,15 +44,16 @@
 
       <!-- if there are errors, or neither errors nor warnings... -->
       <v-card-actions v-if="numErrors > 0 || numWarnings < 1">
-        <v-btn id="dialog-exit-button" color="primary" text @click="exit()">Exit without saving</v-btn>
         <v-spacer></v-spacer>
-        <v-btn id="dialog-okay-button" color="primary" text @click="okay()">OK</v-btn>
+        <v-btn id="dialog-okay-button" text @click="okay()">OK</v-btn>
+        <v-spacer></v-spacer>
       </v-card-actions>
 
       <!-- otherwise there are only warnings... -->
       <v-card-actions v-else>
         <v-spacer></v-spacer>
-        <v-btn id="dialog-okay-button" color="primary" text @click="okay()">OK</v-btn>
+        <v-btn id="dialog-okay-button" text @click="okay()">OK</v-btn>
+        <v-spacer></v-spacer>
       </v-card-actions>
     </v-card>
   </v-dialog>

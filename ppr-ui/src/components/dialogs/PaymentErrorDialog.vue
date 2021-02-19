@@ -36,9 +36,8 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn id="dialog-exit-button" color="primary" text @click="exit()">Return to dashboard</v-btn>
+        <v-btn id="dialog-exit-button" text @click="exit()">OK</v-btn>
         <v-spacer></v-spacer>
-        <v-btn id="dialog-retry-button" color="primary" text @click="retry()">Retry</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
