@@ -86,8 +86,8 @@ describe('App component', () => {
 
   // GET NR data
   post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
+    data: resp
+  })))
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })

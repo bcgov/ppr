@@ -1,4 +1,4 @@
-import { APISearchTypes, UISearchTypes } from "@/enums";
+import { APISearchTypes, UISearchTypes } from '@/enums'
 import { HintIF } from '.'
 
 // Search type interface
