@@ -78,7 +78,7 @@ def test_search_mhr_number_valid_201(session, client, jwt):
     json_data = {
         'type': 'MHR_NUMBER',
         'criteria': {
-            'value': 'T200000'
+            'value': '220000'
         },
         'clientReferenceId': 'T-API-SQ-MH-1'
     }
@@ -121,7 +121,7 @@ def test_search_query_invalid_type_400(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/searches',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -159,7 +159,7 @@ def test_search_query_staff_missing_account_201(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/searches',
                      json=json_data,
-                     headers=create_header(jwt, [STAFF_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
 
     # check
@@ -238,7 +238,7 @@ def test_search_detail_valid_200(client, jwt):
     # test
     rv = client.put(f'/api/v1/searches/123456',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code #== HTTPStatus.OK
@@ -255,7 +255,7 @@ def test_search_detail_invalid_regnum_400(client, jwt):
     # test
     rv = client.put(f'/api/v1/searches/123456',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -284,7 +284,7 @@ def test_search_detail_staff_missing_account_200(client, jwt):
     # test
     rv = client.put(f'/api/v1/searches/123456',
                     json=json_data,
-                    headers=create_header(jwt, [STAFF_ROLE]),
+                    headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                     content_type='application/json')
 
     # check

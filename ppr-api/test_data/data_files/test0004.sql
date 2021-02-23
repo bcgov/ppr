@@ -36,7 +36,7 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000004, 'MV', 200000003, 200000003, null, 2018, 'HONDA', 'CIVIC', 'JU622994', null,
-         to_char(search_key_pkg.vehicle('JU622994')))
+         search_key_pkg.vehicle('JU622994'))
 ;
 -- Create discharge
 INSERT INTO draft(draft_id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,

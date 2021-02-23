@@ -33,7 +33,7 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000003, 'MV', 200000002, 200000002, null, 2014, 'HYUNDAI', 'TUSCON', 'KX8J3CA46JU622994', null,
-         to_char(search_key_pkg.vehicle('KX8J3CA46JU622994')))
+         search_key_pkg.vehicle('KX8J3CA46JU622994'))
 ;
 UPDATE draft
    SET registration_id = 200000002

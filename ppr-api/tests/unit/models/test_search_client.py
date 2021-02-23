@@ -141,7 +141,7 @@ def test_search_mhr_num(session):
     json_data = {
         'type': 'MHR_NUMBER',
         'criteria': {
-            'value': 'T200000'
+            'value': '220000'
         },
         'clientReferenceId': 'T-SQ-MH-1'
     }
@@ -168,19 +168,19 @@ def test_search_mhr_num(session):
     assert result['results'][0]['vehicleCollateral']['serialNumber']
     assert result['results'][0]['vehicleCollateral']['year']
     assert result['results'][0]['vehicleCollateral']['make']
-    assert result['results'][0]['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == 'T200000'
+    assert result['results'][0]['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == '220000'
     if len(result['results']) > 0:
-        assert result['results'][1]['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == 'T200000'
+        assert result['results'][1]['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == '220000'
 
-    # Test no partial match: T20000 and T200000 exist, T20000 search should not return T200000
-    json_data['criteria']['value'] = 'T20000'
+    # Test no partial match: 22000 and 220000 exist, 22000 search should not return 220000
+    json_data['criteria']['value'] = '22000'
     query = SearchClient.create_from_json(json_data, 'PS12345')
     query.search()
 
     result = query.json
     assert result['results'][0]
     for r in result['results']:
-      assert r['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == 'T20000'
+      assert r['vehicleCollateral']['manufacturedHomeRegistrationNumber'] == '22000'
 
 
 def test_search_serial_num(session):
@@ -311,7 +311,7 @@ def test_search_mhr_num_invalid(session):
     json_data = {
         'type': 'MHR_NUMBER',
         'criteria': {
-            'value': 'TESTXXXX'
+            'value': '999999'
         },
         'clientReferenceId': 'T-SQ-MH-2'
     }
@@ -323,7 +323,7 @@ def test_search_mhr_num_invalid(session):
     assert query.returned_results_size == 0
 
     # Verify partial match fails
-    json_data['criteria']['value'] = 'T2000'
+    json_data['criteria']['value'] = '2200'
     query = SearchClient.create_from_json(json_data, None)
     query.search()
 
@@ -392,7 +392,7 @@ def test_search_mhr_number_expired(session):
     json_data = {
         'type': 'MHR_NUMBER',
         'criteria': {
-            'value': 'T999999'
+            'value': '299999'
         },
         'clientReferenceId': 'T-SQ-MH-3'
     }
@@ -470,7 +470,7 @@ def test_search_mhr_number_discharged(session):
     json_data = {
         'type': 'MHR_NUMBER',
         'criteria': {
-            'value': 'Z999999'
+            'value': '399999'
         },
         'clientReferenceId': 'T-SQ-MH-4'
     }

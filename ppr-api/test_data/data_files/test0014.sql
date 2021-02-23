@@ -34,16 +34,19 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000017)
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000018, 'MV', 200000015, 200000008, null, 2012, 'DISCHARGED MV', 'MODEL', 'ZZZZZ999999', null)
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000018, 'MV', 200000015, 200000008, null, 2012, 'DISCHARGED MV', 'MODEL', 'ZZZZZ999999', null,
+         search_key_pkg.vehicle('ZZZZZ999999'))
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000019, 'MH', 200000015, 200000008, null, 2012, 'DISCHARGED MH', 'MODEL', 'ZZZZZ999999', 'Z999999')
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000019, 'MH', 200000015, 200000008, null, 2012, 'DISCHARGED MH', 'MODEL', 'ZZZZZ999999', '399999',
+        search_key_pkg.mhr('399999'))
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000020, 'AC', 200000015, 200000008, null, 2012, 'DISCHARGED AC', 'MODEL', 'ZZZZZ999999', null)
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000020, 'AC', 200000015, 200000008, null, 2012, 'DISCHARGED AC', 'MODEL', 'ZZZZZ999999', null,
+         search_key_pkg.aircraft('ZZZZZ999999'))
 ;
 UPDATE draft
    SET registration_id = 200000015

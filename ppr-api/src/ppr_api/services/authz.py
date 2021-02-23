@@ -34,22 +34,25 @@ PUBLIC_USER = 'public_user'
 
 #def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool: # pylint: disable=too-many-return-statements
 def authorized(identifier: str, jwt: JwtManager) -> bool: # pylint: disable=too-many-return-statements
-    """Verify the user is authorized to submit the request by inspecting the web token."""
+    """Verify the user is authorized to submit the request by inspecting the web
+       token. The gateway has already verified the JWT with the OIDC service."""
 
     if not jwt:
         return False
 
-    if jwt.validate_roles([STAFF_ROLE]) \
-            or jwt.validate_roles([SYSTEM_ROLE]):
+    # Could call the auth api here to check the token roles (/api/v1/orgs/{account_id}/authorizations),
+    # but JWTMangager.validate_roles does the same thing.
+
+    # All users including staff must have the PPR role.
+    if not jwt.validate_roles([PPR_ROLE]):
+        return False
+
+    # Account ID (idenfifier) is required if not staff.
+    if identifier and identifier.strip() != '':
         return True
 
-    if jwt.validate_roles([PPR_ROLE]):
-
-        # account id (identifier) is required if not staff.
-        if identifier and identifier.strip() != '':
-            return True
-
-        # TODO: verify account ID here against JWT. Possibly verify action as well?
+    if jwt.validate_roles([STAFF_ROLE]):
+        return True
 
 #        template_url = current_app.config.get('AUTH_SVC_URL')
 #        auth_url = template_url.format(**vars())
@@ -84,21 +87,16 @@ def authorized(identifier: str, jwt: JwtManager) -> bool: # pylint: disable=too-
 
 def authorized_token(  # pylint: disable=too-many-return-statements
         identifier: str, jwt: JwtManager, action: List[str]) -> bool:
-    """Assert that the user is authorized to create transactions against the business identifier."""
-    # if they are registry staff, they are always authorized
+    """Assert that the user is authorized to submit API requests for a particular action."""
+
     if not action or not identifier or not jwt:
         return False
 
-    if jwt.validate_roles([STAFF_ROLE]) \
-            or jwt.validate_roles([SYSTEM_ROLE]) \
-            or jwt.validate_roles([PPR_ROLE]):
-        return True
+    # All users including staff must have the PPR role.
+    if not jwt.validate_roles([PPR_ROLE]):
+        return False
 
     if jwt.has_one_of_roles([BASIC_USER, PRO_DATA_USER]):
-
-        # if the action is create_comment, disallow - only staff are allowed
-        if action == 'add_comment':
-            return False
 
         template_url = current_app.config.get('AUTH_SVC_URL')
         auth_url = template_url.format(**vars())

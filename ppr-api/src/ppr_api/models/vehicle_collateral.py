@@ -23,8 +23,9 @@ from enum import Enum
 
 from .db import db
 
-SEARCH_VIN_STATEMENT = "SELECT TO_CHAR(search_key_pkg.vehicle('?')) FROM DUAL"
-SEARCH_VIN_STATEMENT_AC = "SELECT TO_CHAR(search_key_pkg.vehicle('?')) FROM DUAL"
+SEARCH_VIN_STATEMENT = "SELECT search_key_pkg.vehicle('?') FROM DUAL"
+SEARCH_VIN_STATEMENT_AC = "SELECT search_key_pkg.aircraft('?') FROM DUAL"
+SEARCH_VIN_STATEMENT_MH = "SELECT search_key_pkg.mhr('?') FROM DUAL"
 
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the vehicle collateral information."""
@@ -147,9 +148,12 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             collateral.make = json_data['make']
         if 'model' in json_data:
             collateral.model = json_data['model']
-        if 'manufacturedHomeRegistrationNumber' in json_data:
+        if 'manufacturedHomeRegistrationNumber' in json_data and \
+                collateral.vehicle_type_cd == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
             collateral.mhr_number = json_data['manufacturedHomeRegistrationNumber']
-        if collateral.serial_number:
+            collateral.search_vin = VehicleCollateral.get_search_vin(collateral.vehicle_type_cd,
+                                                                     collateral.mhr_number)
+        elif collateral.serial_number:
             collateral.search_vin = VehicleCollateral.get_search_vin(collateral.vehicle_type_cd,
                                                                      collateral.serial_number)
 
@@ -187,8 +191,11 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             return None
 
         statement = SEARCH_VIN_STATEMENT.replace('?', serial_number)
-        if vehicle_type in ('AC', 'AF'):
+        if vehicle_type in (VehicleCollateral.SerialTypes.AIRCRAFT.value, \
+                            VehicleCollateral.SerialTypes.AIRCRAFT_AIRFRAME.value):
             statement = SEARCH_VIN_STATEMENT_AC.replace('?', serial_number)
+        elif vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
+            statement = SEARCH_VIN_STATEMENT_MH.replace('?', serial_number)
 
         result = db.session.execute(statement)
         row = result.first()
