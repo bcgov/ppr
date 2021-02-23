@@ -5,7 +5,7 @@ INSERT INTO draft(draft_id, document_number, account_id, create_ts, registration
 INSERT INTO registration(registration_id, financing_id, registration_number, base_reg_number, registration_type_cd,
                          registration_type_cl, registration_ts, document_number, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
-    VALUES(200000008, 200000000, 'TEST0007', 'TEST0001', 'CO', 'AMENDMENT', sysdate, 'D-T-00A7', null,
+    VALUES(200000008, 200000000, 'TEST0007', 'TEST0001', 'CO', 'AMENDMENT', sysdate + 5/1440, 'D-T-00A7', null,
            null, null, 'PS12345', 'TEST-AM-0007', null, null)
 ;
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
@@ -29,7 +29,7 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000006, 'MV', 200000008, 200000000, null, 2018, 'FORD', 'FIESTA', 'T346JU622994', null,
-         to_char(search_key_pkg.vehicle('T346JU622994')))
+         search_key_pkg.vehicle('T346JU622994'))
 ;
 INSERT INTO general_collateral(general_collateral_id, registration_id, financing_id, registration_id_end, description)
   VALUES(200000002, 200000008, 200000000, null, 'TEST GENERAL COLLATERAL AMEND ADD.')

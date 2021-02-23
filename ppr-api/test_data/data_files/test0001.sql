@@ -52,11 +52,12 @@ INSERT INTO general_collateral(general_collateral_id, registration_id, financing
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000000, 'MV', 200000000, 200000000, null, 2018, 'HYUNDAI', 'TUSCON', 'KM8J3CA46JU622994', null,
-         to_char(search_key_pkg.vehicle('KM8J3CA46JU622994')))
+         search_key_pkg.vehicle('KM8J3CA46JU622994'))
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000001, 'MH', 200000000, 200000000, null, 2001, 'HOMCO IND. LTD DIPLOMAT', null, '9407', '21324')
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000001, 'MH', 200000000, 200000000, null, 2001, 'HOMCO IND. LTD DIPLOMAT', null, '9407', '21324', 
+         search_key_pkg.mhr('9407'))
 ;
 UPDATE draft
    SET registration_id = 200000000

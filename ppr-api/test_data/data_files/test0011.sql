@@ -34,12 +34,14 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000014)
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000009, 'MH', 200000012, 200000005, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '999999', 'T200000')
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000009, 'MH', 200000012, 200000005, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '999999', '220000',
+         search_key_pkg.mhr('220000'))
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000010, 'AC', 200000012, 200000005, null, 1998, 'CESSNA', '172R SKYHAWK', 'CFYXW', null)
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000010, 'AC', 200000012, 200000005, null, 1998, 'CESSNA', '172R SKYHAWK', 'CFYXW', null,
+         search_key_pkg.aircraft('CFYXW'))
 ;
 UPDATE draft
    SET registration_id = 200000012

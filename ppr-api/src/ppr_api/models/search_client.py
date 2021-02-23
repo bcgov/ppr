@@ -75,15 +75,16 @@ MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
                      "AND sc.serial_type_cd NOT IN ('AC', 'AF') " + \
-                     "AND sc.srch_vin = to_char(search_key_pkg.vehicle('?')) " + \
+                     "AND sc.srch_vin = search_key_pkg.vehicle('?') " + \
                 "ORDER BY match_type, sc.serial_number"
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
+#                    "AND UPPER(REGEXP_REPLACE(sc.serial_number,'\s|-','')) = UPPER(REGEXP_REPLACE('?','\s|-','')) " + \
 # pylint: disable=anomalous-backslash-in-string
 AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
                     "AND sc.serial_type_cd IN ('AC', 'AF') " + \
-                    "AND UPPER(REGEXP_REPLACE(sc.serial_number,'\s|-','')) = UPPER(REGEXP_REPLACE('?','\s|-','')) " + \
-                   "ORDER BY r.registration_ts ASC"
+                    "AND sc.srch_vin = search_key_pkg.aircraft('?') " + \
+               "ORDER BY match_type, sc.serial_number"
 
 
 class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes

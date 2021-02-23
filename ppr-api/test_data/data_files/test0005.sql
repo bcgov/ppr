@@ -36,7 +36,7 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000005, 'MV', 200000005, 200000004, null, 2018, 'TESLA', 'MODEL 3', 'YJ46JU622994', null,
-         to_char(search_key_pkg.vehicle('YJ46JU622994')))
+         search_key_pkg.vehicle('YJ46JU622994'))
 ;
 -- Create renewal
 INSERT INTO draft(draft_id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
@@ -45,7 +45,7 @@ INSERT INTO draft(draft_id, document_number, account_id, create_ts, registration
 INSERT INTO registration(registration_id, financing_id, registration_number, base_reg_number, registration_type_cd,
                          registration_type_cl, registration_ts, document_number, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
-    VALUES(200000006, 200000004, 'TEST00R5', 'TEST0005', 'RE', 'RENEWAL', sysdate, 'D-T-00R5', 2,
+    VALUES(200000006, 200000004, 'TEST00R5', 'TEST0005', 'RE', 'RENEWAL', sysdate + 5/1440, 'D-T-00R5', 2,
            null, null, 'PS12345', 'TEST-REN-0005', null, null)
 ;
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)

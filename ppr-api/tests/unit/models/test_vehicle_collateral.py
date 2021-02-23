@@ -113,23 +113,23 @@ def test_create_from_json(session):
     """Assert that the vehicle collateral json renders to a vehicle collateral model correctly."""
 
     json_data = {
-        'type': 'MV',
+        'type': 'MH',
         'year': 2004,
         'make': 'MAKE',
         'model': 'MODEL',
         'serialNumber': 'SERIAL',
-        'manufacturedHomeRegistrationNumber': 'MHR_NUMBER'
+        'manufacturedHomeRegistrationNumber': '123456'
     }
 
     collateral = VehicleCollateral.create_from_json(json_data, 12345)
     assert collateral
     assert collateral.registration_id == 12345
-    assert collateral.vehicle_type_cd == 'MV'
+    assert collateral.vehicle_type_cd == 'MH'
     assert collateral.serial_number == 'SERIAL'
     assert collateral.year == 2004
     assert collateral.make == 'MAKE'
     assert collateral.model == 'MODEL'
-    assert collateral.mhr_number == 'MHR_NUMBER'
+    assert collateral.mhr_number == '123456'
 
 
 def test_create_from_financing_json(session):

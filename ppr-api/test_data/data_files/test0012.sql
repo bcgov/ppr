@@ -34,16 +34,19 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000015)
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000011, 'MH', 200000013, 200000006, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '9999', 'T20000')
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000011, 'MH', 200000013, 200000006, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '9999', '22000',
+         search_key_pkg.mhr('22000'))
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000012, 'AC', 200000013, 200000006, null, 1998, 'CESSNA', '172R SKYHAWK', 'CFYX', null)
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000012, 'AC', 200000013, 200000006, null, 1998, 'CESSNA', '172R SKYHAWK', 'CFYX', null,
+         search_key_pkg.aircraft('CFYX'))
 ;
 INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
-                              year, make, model, serial_number, mhr_number)
-  VALUES(200000013, 'AF', 200000013, 200000006, null, 1998, 'AIRFRAME make', 'AIRFRAME model', 'AF16031', null)
+                              year, make, model, serial_number, mhr_number, srch_vin)
+  VALUES(200000013, 'AF', 200000013, 200000006, null, 1998, 'AIRFRAME make', 'AIRFRAME model', 'AF16031', null,
+         search_key_pkg.aircraft('AF16031'))
 ;
 UPDATE draft
    SET registration_id = 200000013
