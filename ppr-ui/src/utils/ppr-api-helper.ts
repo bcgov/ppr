@@ -25,6 +25,7 @@ export class PPRApiHelper {
    * @returns SearchResponseIF, or null if no results.
    */
   search (searchCriteria: SearchCriteriaIF): Promise<any> {
+    // console.log('search called')
     const url = sessionStorage.getItem('PPR_API_URL')
     // console.log('URL=' + url)
     const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
@@ -37,12 +38,16 @@ export class PPRApiHelper {
         }
         return data
       }).catch(error => {
+        // TODO: do something based on specific api responses
         // console.log('search response error: ' + error)
-        if (error?.response?.status === HttpStatus.NOT_FOUND ||
-            error?.response?.status === HttpStatus.UNPROCESSABLE_ENTITY) {
-          return null // No search results
+        // if (error?.response?.status === HttpStatus.NOT_FOUND ||
+        //     error?.response?.status === HttpStatus.UNPROCESSABLE_ENTITY) {
+        //   return null
+        // }
+        return {
+          // temporary -- forces payment error dialogue popup unless message given
+          errors: error?.response?.data?.message || 'payment'
         }
-        throw error
       })
   }
 }

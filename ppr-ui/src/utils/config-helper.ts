@@ -13,7 +13,6 @@ export async function fetchConfig (): Promise<any> {
   const processEnvBaseUrl = process.env.BASE_URL
   const windowLocationPathname = window.location.pathname // eg, /basePath/...
   const windowLocationOrigin = window.location.origin // eg, http://localhost:8080
-  const pprApiKey = process.env.PPR_API_KEY // Move long term to somewhere more secure.
 
   if (!origin || !processEnvVueAppPath || !processEnvBaseUrl || !windowLocationPathname || !windowLocationOrigin) {
     return Promise.reject(new Error('Missing environment variables'))
@@ -53,6 +52,7 @@ export async function fetchConfig (): Promise<any> {
   console.log('Set Pay API URL to: ' + payApiUrl)
 
   const pprApiUrl: string = response.data.PPR_API_URL
+  const pprApiKey: string = response.data.PPR_API_KEY
   sessionStorage.setItem('PPR_API_URL', pprApiUrl)
   sessionStorage.setItem('PPR_API_KEY', pprApiKey)
   console.log('Set PPR API URL to: ' + pprApiUrl)

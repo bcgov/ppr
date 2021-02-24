@@ -9,10 +9,10 @@ axios.interceptors.request.use(
   config => {
     config.headers.common.Authorization = `Bearer ${sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)}`
     config.headers.common['x-apikey'] = sessionStorage.getItem('PPR_API_KEY')
-    var accountId = sessionStorage.getItem('accountId')
-    // console.log('accountId=' + accountId + ', baseURL=' + config.baseURL)
-    if (accountId !== null) {
-      config.headers.common['Account-Id'] = accountId
+    const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+    if (currentAccount) {
+      const accountInfo = JSON.parse(currentAccount)
+      config.headers.common['Account-Id'] = accountInfo.id
     }
     return config
   },

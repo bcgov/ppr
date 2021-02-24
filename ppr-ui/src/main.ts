@@ -6,6 +6,7 @@ import 'regenerator-runtime/runtime' // to use transpiled generator functions
 import Vue from 'vue'
 import Vuetify from 'vuetify/lib'
 import Vuelidate from 'vuelidate'
+import VueCompositionApi from '@vue/composition-api'
 import { getVueRouter } from '@/router'
 import { getVuexStore } from '@/store'
 import Affix from 'vue-affix'
@@ -31,6 +32,7 @@ declare const window: any
 
 Vue.config.productionTip = false
 
+Vue.use(VueCompositionApi)
 Vue.use(Vuetify)
 Vue.use(Affix)
 Vue.use(Vuelidate)
@@ -65,10 +67,10 @@ async function start () {
       theme: {
         themes: {
           light: {
-            primary: '#1669bb', // same as $app-blue
-            'app-dk-blue': '#38598a', // same as $app-dk-blue
-            error: '#d3272c', // same as $app-red
-            success: '#1a9031' // same as $app-green
+            primary: '#1669bb', // same as $$primary-blue
+            'app-dk-blue': '#38598a',
+            error: '#d3272c',
+            success: '#1a9031'
           }
         }
       }
