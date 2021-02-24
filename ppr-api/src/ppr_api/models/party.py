@@ -16,10 +16,10 @@ from __future__ import annotations
 
 from enum import Enum
 #from http import HTTPStatus
-from datetime import date
 
 #from sqlalchemy import event
 
+from ppr_api.utils.datetime import ts_from_date_iso_format, format_ts
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -55,7 +55,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
     # Moved by Bob to client_party
     # email_id = db.Column('email_id', db.String(250), nullable=True)
-    birth_date = db.Column('birth_date', db.Date, nullable=True)
+    birth_date = db.Column('birth_date', db.DateTime, nullable=True)
 
     first_name_first = db.Column('first_name_first', db.String(50), nullable=True)
     first_name_second = db.Column('first_name_second', db.String(50), nullable=True)
@@ -134,7 +134,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 #                party['emailAddress'] = self.email_id
 
             if self.birth_date:
-                party['birthDate'] = self.birth_date.isoformat()
+                party['birthDate'] = format_ts(self.birth_date)
 
         return party
 
@@ -197,7 +197,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party.client_party_id = int(json_data['code'])
         else:
             if party_type == model_utils.PARTY_DEBTOR_BUS and 'birthDate' in json_data:
-                party.birth_date = date.fromisoformat(json_data['birthDate'])
+                party.birth_date = ts_from_date_iso_format(json_data['birthDate'])
             if 'businessName' in json_data:
                 party.business_name = json_data['businessName'].strip().upper()
             else:

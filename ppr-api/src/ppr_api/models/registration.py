@@ -19,12 +19,12 @@
 
 from enum import Enum
 from http import HTTPStatus
-from datetime import date
 import json
 
 #from sqlalchemy import event
 
-from ppr_api.utils.datetime import format_ts, now_ts, now_ts_offset
+from ppr_api.utils.datetime import format_ts, now_ts, now_ts_offset,\
+                                   ts_from_date_iso_format, expiry_ts_from_iso_format
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -68,7 +68,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
     life = db.Column('life', db.Integer, nullable=True)
     lien_value = db.Column('lien_value', db.String(15), nullable=True)
-    surrender_date = db.Column('surrender_date', db.Date, nullable=True)
+    surrender_date = db.Column('surrender_date', db.DateTime, nullable=True)
     ver_bypassed = db.Column('ver_bypassed', db.String(1), nullable=True)
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
@@ -102,7 +102,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the registration as a json object."""
         registration = {
-            'baseRegistrationNumber': self.base_registration_num,
+            'baseRegistrationNumber': self.base_reg_num,
             'createDateTime': format_ts(self.registration_ts)
         }
         if self.registration_type_cd == model_utils.REG_TYPE_DISCHARGE:
@@ -136,7 +136,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if self.registration_type_cd == model_utils.REG_TYPE_RENEWAL and \
                 self.financing_statement.expire_date:
-            registration['expiryDate'] = self.financing_statement.expire_date.isoformat()
+            registration['expiryDate'] = format_ts(self.financing_statement.expire_date)
 
         if self.court_order:
             registration['courtOrderInformation'] = self.court_order.json
@@ -302,7 +302,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         elif registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
             registration.registration_type_cd = model_utils.REG_TYPE_DISCHARGE
 
-        registration.base_registration_num = base_registration_num
+        registration.base_reg_num = base_registration_num
         registration.ver_bypassed = 'Y'
         registration.draft.registration_type_cd = registration.registration_type_cd
         registration.draft.registration_type_cl = registration.registration_type_cl
@@ -327,7 +327,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if financing_reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
                 registration.financing_statement.expiry_date = now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
             elif 'expiryDate' in json_data:
-                registration.financing_statement.expiry_date = date.fromisoformat(json_data['expiryDate'])
+                registration.financing_statement.expiry_date = expiry_ts_from_iso_format(json_data['expiryDate'])
 
 
         # Repairer's lien renewal or amendment can have court order information.
@@ -369,7 +369,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if 'lienAmount' in json_data:
                 registration.lien_value = json_data['lienAmount'].strip()
             if 'surrenderDate' in json_data:
-                registration.surrender_date = date.fromisoformat(json_data['surrenderDate'])
+                registration.surrender_date = ts_from_date_iso_format(json_data['surrenderDate'])
             registration.life = model_utils.REPAIRER_LIEN_YEARS
         elif 'lifeInfinite' in json_data and json_data['lifeInfinite']:
             registration.life = model_utils.LIFE_INFINITE

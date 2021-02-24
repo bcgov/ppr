@@ -11,18 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Test Suite to ensure the PPR address schema is valid.
-
+"""Test Suite to ensure the common address schema is valid and the registries-schema 
+   package import is working correctly.
 """
 import copy
 
 from registry_schemas import validate
-from registry_schemas.example_data.ppr import ADDRESS
+from registry_schemas.example_data.common import ADDRESS
 
 
 def test_valid_address():
     """Assert that the schema is performing as expected."""
-    is_valid, errors = validate(ADDRESS, 'address', 'ppr')
+    is_valid, errors = validate(ADDRESS, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -37,7 +37,7 @@ def test_valid_address_null_region():
     address = copy.deepcopy(ADDRESS)
     address['region'] = None
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -52,7 +52,7 @@ def test_invalid_address_street():
     address = copy.deepcopy(ADDRESS)
     address['street'] = 'This is a really long string, over the 50 char maximum.'
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -67,7 +67,7 @@ def test_invalid_address_city():
     address = copy.deepcopy(ADDRESS)
     address['city'] = 'This is a really long string, over the 40 char maximum'
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -82,7 +82,7 @@ def test_invalid_address_postal():
     address = copy.deepcopy(ADDRESS)
     address['postalCode'] = '0123456789ABCDEF'
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -97,7 +97,7 @@ def test_invalid_address_street_missing():
     address = copy.deepcopy(ADDRESS)
     del address['street']
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -112,7 +112,7 @@ def test_invalid_address_city_missing():
     address = copy.deepcopy(ADDRESS)
     del address['city']
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -127,7 +127,7 @@ def test_invalid_address_missing_region():
     address = copy.deepcopy(ADDRESS)
     del address['region']
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:
@@ -141,7 +141,7 @@ def test_invalid_address_postal_missing():
     address = copy.deepcopy(ADDRESS)
     del address['postalCode']
 
-    is_valid, errors = validate(address, 'address', 'ppr')
+    is_valid, errors = validate(address, 'address', 'common')
 
     if errors:
         for err in errors:

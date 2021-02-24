@@ -45,7 +45,7 @@ def test_renewal_valid_200(session, client, jwt):
  
     rv1 = client.post(f'/api/v1/financing-statements',
                      json=statement,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -62,7 +62,7 @@ def test_renewal_valid_200(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/'  + base_reg_num + '/renewals',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.OK
@@ -85,7 +85,7 @@ def test_renewal_valid_RL_200(session, client, jwt):
  
     rv1 = client.post(f'/api/v1/financing-statements',
                      json=statement,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -102,7 +102,7 @@ def test_renewal_valid_RL_200(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/' + base_reg_num + '/renewals',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.OK
@@ -122,10 +122,11 @@ def test_renewal_invalid_regnum_404(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/X12345X/renewals',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
+    # print(rv.json)
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -163,7 +164,7 @@ def test_renewal_staff_missing_account_200(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0001/renewals',
                      json=json_data,
-                     headers=create_header(jwt, [STAFF_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.OK
@@ -202,7 +203,7 @@ def test_renewal_invalid_missing_basedebtor_400(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0001/renewals',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -221,7 +222,7 @@ def test_renewal_invalid_historical_400(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0003/renewals',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check

@@ -14,7 +14,7 @@
 """Date time utilities."""
 # from datetime import datetime, timezone
 import time as _time
-from datetime import date, datetime as _datetime, timezone, timedelta  # pylint: disable=unused-import # noqa: F401, I001
+from datetime import date, datetime as _datetime, timezone, timedelta, time  # pylint: disable=unused-import # noqa: F401, I001
 
 
 class datetime(_datetime):  # pylint: disable=invalid-name; # noqa: N801; ha datetime is invalid??
@@ -38,7 +38,6 @@ def format_ts(time_stamp):
 
 def now_ts():
     """Create a timestamp representing the current date and time in the UTC time zone."""
-
     return _datetime.now(timezone.utc)
 
 def now_ts_offset(offset_days: int = 1, add: bool = False):
@@ -50,17 +49,30 @@ def now_ts_offset(offset_days: int = 1, add: bool = False):
     return now - timedelta(days=offset_days)
 
 def expiry_dt_from_years(life_years: int):
-    """Create a date representing the current date adjusted by the life_years number of years in the future."""
+    """Create a date representing the current UTC date at 23:59:59 adjusted by
+       the life_years number of years in the future."""
     today = date.today()
     year = today.year + life_years
     month = today.month
     day = today.day
     future_date = date(year, month, day)
-    add_days = future_date - today
-    now = now_ts()
-    add_days = 365 * life_years
-    return now + timedelta(days=add_days)
+    expiry_time = time(23, 59, 59, tzinfo=timezone.utc)
+    return _datetime.combine(future_date, expiry_time)
 
 def ts_from_iso_format(timestamp_iso: str):
     """Create a datetime object from a timestamp string in the ISO format."""
-    return _datetime.fromisoformat(timestamp_iso) #.replace(tzinfo=timezone.utc)
+    time_stamp = _datetime.fromisoformat(timestamp_iso).timestamp()
+    return _datetime.utcfromtimestamp(time_stamp).replace(tzinfo=timezone.utc)
+
+def expiry_ts_from_iso_format(timestamp_iso: str):
+    """Create a datetime object from a timestamp string in the ISO format.
+       For expiry timestamps, the time is set to 23:59:59."""
+
+    expiry_ts = ts_from_iso_format(timestamp_iso)
+    return expiry_ts.replace(hour=23, minute=59, second=59)
+
+def ts_from_date_iso_format(date_iso: str):
+    """Create a UTC datetime object from a date string in the ISO format.
+       Use the current UTC time."""
+
+    return ts_from_iso_format(date_iso)
