@@ -1,4 +1,4 @@
-<template `>
+<template>
   <v-container fluid no-gutters>
     <v-row no-gutters>
       <v-col cols="3">
@@ -112,7 +112,6 @@ export default defineComponent({
       // future: do something with this in dashboard
       else emit('search-data', resp)
     }
-
     watch(() => localState.searchValue, () => {
       localState.validations = validateSearchRealTime(localState)
     })

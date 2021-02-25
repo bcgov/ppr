@@ -1,6 +1,7 @@
 // Core Libraries
 import 'core-js/stable' // to polyfill ECMAScript features
 import 'regenerator-runtime/runtime' // to use transpiled generator functions
+import 'moment'
 
 // Vue Libraries
 import Vue from 'vue'

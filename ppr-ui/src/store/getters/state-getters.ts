@@ -1,7 +1,8 @@
 // Enums and Interfaces
-import { AccountTypes } from '@/enums'
+import { AccountTypes, MatchTypes } from '@/enums'
+import { SearchResponseIF, StateIF } from '@/interfaces'
 
-/** Whether the user has "staff" keycloak role. */
+/** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: any): boolean => {
   return state.stateModel.tombstone.keycloakRoles.includes('staff')
 }
@@ -54,7 +55,6 @@ export const getUserUsername = (state: any): any => {
   return state.stateModel.tombstone.userInfo?.username
 }
 
-/** The staff payment. */
-export const getStaffPayment = (state: any): any => {
-  return state.stateModel.staffPayment
+export const getSearchResults = (state: StateIF): SearchResponseIF => {
+  return state.stateModel.searchResults
 }
