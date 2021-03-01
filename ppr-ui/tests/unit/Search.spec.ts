@@ -36,7 +36,7 @@ const searchDropDown: string = '#search-type-select'
  *
  * @returns the value of the last named event for the wrapper.
  */
-function getLastEvent (wrapper: Wrapper<Search>, name: string): any {
+function getLastEvent (wrapper: Wrapper<any>, name: string): any {
   const eventsList: Array<any> = wrapper.emitted(name)
   if (!eventsList) {
     return null
@@ -52,7 +52,7 @@ function getLastEvent (wrapper: Wrapper<Search>, name: string): any {
  */
 function createComponent (
   searchTypes: Array<SearchTypeIF>
-): Wrapper<Search> {
+): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
@@ -66,7 +66,7 @@ function createComponent (
 }
 
 describe('App component', () => {
-  let wrapper: Wrapper<Search>
+  let wrapper: Wrapper<any>
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   const post = sinon.stub(axios, 'post')
 
@@ -84,7 +84,7 @@ describe('App component', () => {
     results: null
   }
 
-  // GET NR data
+  // GET search data
   post.returns(new Promise(resolve => resolve({
     data: resp
   })))
@@ -96,7 +96,6 @@ describe('App component', () => {
   })
 
   it('renders Search Component with search types', () => {
-    // const wrapper: Wrapper<Search> = createComponent(SearchTypes)
     expect(wrapper.findComponent(Search).exists()).toBe(true)
     expect(wrapper.vm.$data.searchTypes).toStrictEqual(SearchTypes)
     expect(wrapper.find(searchButtonSelector).attributes('disabled')).toBeUndefined()

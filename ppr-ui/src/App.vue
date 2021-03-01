@@ -53,7 +53,7 @@
       <main v-if="!isErrorDialog">
         <v-container class="view-container py-0">
           <v-row>
-            <v-col cols="12" lg="9">
+            <v-col cols="12">
               <router-view
                 :appReady=appReady
                 :isJestRunning=isJestRunning
@@ -63,7 +63,6 @@
                 @paymentError="paymentErrorDialog = true"
                 @saveSearchError="saveErrorDialog = true"
                 @haveData="haveData = true"
-                @haveChanges="stateChangeHandler($event)"
               />
             </v-col>
           </v-row>

@@ -1,3 +1,4 @@
+import { SearchResponseIF } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 
 export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {
@@ -14,4 +15,12 @@ export const setUserInfo: ActionIF = ({ commit }, userInfo): void => {
 
 export const setAccountInformation: ActionIF = ({ commit }, accountInformation): void => {
   commit('mutateAccountInformation', accountInformation)
+}
+
+export const setSearching: ActionIF = ({ commit }, searching: boolean): void => {
+  commit('mutateSearching', searching)
+}
+
+export const setSearchResults: ActionIF = ({ commit }, searchResults: SearchResponseIF): void => {
+  commit('mutateSearchResults', searchResults)
 }

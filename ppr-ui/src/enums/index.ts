@@ -1,4 +1,5 @@
 export * from './accountTypes'
+export * from './matchTypes'
 export * from './routeNames'
 export * from './searchTypes'
 export * from './vehicleTypes'

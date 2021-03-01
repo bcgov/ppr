@@ -1,16 +1,17 @@
-import { StateModelIF } from '@/interfaces'
+import { SearchResponseIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   tombstone: {
     keycloakRoles: [],
     authRoles: [],
-    userInfo: null,
-    haveChanges: false
+    userInfo: null
   },
   accountInformation: {
     accountType: '',
     id: null,
     label: '',
     type: ''
-  }
+  },
+  searching: false,
+  searchResults: null
 }

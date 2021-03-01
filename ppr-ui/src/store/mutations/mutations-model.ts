@@ -1,4 +1,4 @@
-import { AccountInformationIF } from '@/interfaces'
+import { AccountInformationIF, SearchResponseIF, StateIF } from '@/interfaces'
 
 export const mutateKeycloakRoles = (state: any, keyCloakRoles: Array<string>) => {
   state.stateModel.tombstone.keycloakRoles = keyCloakRoles
@@ -14,4 +14,12 @@ export const mutateUserInfo = (state: any, userInfo: any) => {
 
 export const mutateAccountInformation = (state: any, accountInformation: AccountInformationIF) => {
   state.stateModel.accountInformation = accountInformation
+}
+
+export const mutateSearching = (state: StateIF, searching: boolean) => {
+  state.stateModel.searching = searching
+}
+
+export const mutateSearchResults = (state: StateIF, searchResults: SearchResponseIF) => {
+  state.stateModel.searchResults = searchResults
 }
