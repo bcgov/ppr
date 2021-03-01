@@ -18,7 +18,7 @@ from __future__ import annotations
 #from sqlalchemy import event
 
 #from ppr_api.exceptions import BusinessException
-from ppr_api.utils.datetime import format_ts, ts_from_date_iso_format
+from .utils import format_ts, ts_from_date_iso_format
 
 from .db import db
 

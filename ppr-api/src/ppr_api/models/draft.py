@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds model data and database operations for draft statements."""
+# pylint: disable=singleton-comparison
+
+
 from __future__ import annotations
 
 from enum import Enum
@@ -21,7 +24,6 @@ import json
 #from sqlalchemy import event
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.utils.datetime import format_ts, now_ts
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -71,9 +73,9 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
         draft = json.loads(self.draft)
 
-        draft['createDateTime'] = format_ts(self.create_ts)
+        draft['createDateTime'] = model_utils.format_ts(self.create_ts)
         if self.update_ts:
-            draft['lastUpdateDateTime'] = format_ts(self.update_ts)
+            draft['lastUpdateDateTime'] = model_utils.format_ts(self.update_ts)
         if self.document_number:
             if self.registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                 draft['amendmentStatement']['documentId'] = self.document_number
@@ -105,7 +107,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         drafts_json = []
         for draft in draft_list:
             draft_json = {
-                'createDateTime': format_ts(draft.create_ts),
+                'createDateTime': model_utils.format_ts(draft.create_ts),
                 'documentId': draft.document_number,
                 'registrationType': draft.registration_type_cd,
                 'path': '/api/v1/drafts/' + draft.document_number
@@ -161,7 +163,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         """Save the object to the database immediately."""
 
         if not self.create_ts:
-            self.create_ts = now_ts()
+            self.create_ts = model_utils.now_ts()
 
         db.session.add(self)
         db.session.commit()
@@ -177,7 +179,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             draft = cls.find_by_document_number(document_number, False)
 
         if draft:
-            draft.update_ts = now_ts()
+            draft.update_ts = model_utils.now_ts()
             draft.draft = json.dumps(request_json)
             if request_json['type'] == 'AMENDMENT_STATEMENT':
                 if 'courtOrderInformation' in request_json:

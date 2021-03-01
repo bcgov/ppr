@@ -22,7 +22,6 @@ import copy
 #from sqlalchemy import event
 
 from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
-from ppr_api.utils.datetime import format_ts, now_ts, ts_from_iso_format
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -137,7 +136,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query results as a json object."""
         result = {
             'searchId': str(self.search_id),
-            'searchDateTime': format_ts(self.search_ts),
+            'searchDateTime': model_utils.format_ts(self.search_ts),
             'totalResultsSize': self.total_results_size,
             'returnedResultsSize': self.returned_results_size,
             'maxResultsSize': 1000,
@@ -171,7 +170,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             result_json = [{
                 'baseRegistrationNumber': str(values[2]),
                 'matchType': str(values[3]),
-                'createDateTime': format_ts(timestamp),
+                'createDateTime': model_utils.format_ts(timestamp),
                 'registrationType': registration_type
             }]
             if reg_num != str(values[2]):
@@ -225,7 +224,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 result_json = {
                     'baseRegistrationNumber': str(values[7]),
                     'matchType': match_type,
-                    'createDateTime': format_ts(timestamp),
+                    'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
                     'vehicleCollateral': collateral
                 }
@@ -276,7 +275,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         search_type = search_json['type']
         new_search.search_type_cd = model_utils.TO_DB_SEARCH_TYPE[search_type]
         new_search.search_criteria = json.dumps(search_json)
-        new_search.search_ts = now_ts()
+        new_search.search_ts = model_utils.now_ts()
         if account_id:
             new_search.account_id = account_id
         if 'clientReferenceId' in search_json:
@@ -308,15 +307,15 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # Verify the start and end dates.
         if 'startDateTime' in json_data or 'startDateTime' in json_data:
-            now = now_ts()
+            now = model_utils.now_ts()
             ts_start = None
             ts_end = None
             if 'startDateTime' in json_data:
-                ts_start = ts_from_iso_format(json_data['startDateTime'])
+                ts_start = model_utils.ts_from_iso_format(json_data['startDateTime'])
                 if ts_start > now:
                     error_msg = error_msg + 'Search startDateTime invalid: it cannot be in the future. '
             if 'endDateTime' in json_data:
-                ts_end = ts_from_iso_format(json_data['endDateTime'])
+                ts_end = model_utils.ts_from_iso_format(json_data['endDateTime'])
                 if ts_end > now:
                     error_msg = error_msg + 'Search endDateTime invalid: it cannot be in the future. '
 

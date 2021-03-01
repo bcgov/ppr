@@ -19,7 +19,6 @@ from enum import Enum
 
 #from sqlalchemy import event
 
-from ppr_api.utils.datetime import ts_from_date_iso_format, format_ts
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -134,7 +133,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 #                party['emailAddress'] = self.email_id
 
             if self.birth_date:
-                party['birthDate'] = format_ts(self.birth_date)
+                party['birthDate'] = model_utils.format_ts(self.birth_date)
 
         return party
 
@@ -197,7 +196,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party.client_party_id = int(json_data['code'])
         else:
             if party_type == model_utils.PARTY_DEBTOR_BUS and 'birthDate' in json_data:
-                party.birth_date = ts_from_date_iso_format(json_data['birthDate'])
+                party.birth_date = model_utils.ts_from_date_iso_format(json_data['birthDate'])
             if 'businessName' in json_data:
                 party.business_name = json_data['businessName'].strip().upper()
             else:

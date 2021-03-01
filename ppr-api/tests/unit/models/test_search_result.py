@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 
 from ppr_api.models import SearchClient, Registration, SearchResult
-from ppr_api.utils.datetime import now_ts_offset, format_ts
+from ppr_api.models.utils import now_ts_offset, format_ts
 from ppr_api.exceptions import BusinessException
 
 

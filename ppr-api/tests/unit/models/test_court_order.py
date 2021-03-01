@@ -23,7 +23,7 @@ import pytest
 
 from ppr_api.models import CourtOrder
 from ppr_api.exceptions import BusinessException
-from ppr_api.utils.datetime import format_ts, now_ts
+from ppr_api.models.utils import format_ts, now_ts
 
 import copy
 from registry_schemas.example_data.ppr import RENEWAL_STATEMENT
