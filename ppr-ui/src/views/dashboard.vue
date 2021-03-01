@@ -18,8 +18,7 @@
         </v-row>
         <v-row>
           <search @search-error="emitError"
-                  @search-data="setSearchResults">
-          </search>
+                  @search-data="setSearchResults"/>
         </v-row>
       </v-col>
     </v-row>
@@ -45,8 +44,7 @@
           </v-col>
         </v-row>
         <v-row v-if="getSearchResults">
-          <result :data="getSearchResults">
-          </result>
+          <result :data="getSearchResults"/>
         </v-row>
       </v-col>
     </v-row>
@@ -57,11 +55,10 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
-import moment from 'moment'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, convertDate } from '@/utils'
 import { Result } from '@/components/results'
 import { Search } from '@/components/search'
 import { SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -96,17 +93,7 @@ export default class Dashboard extends Vue {
     const searchResult = this.getSearchResults
     if (searchResult) {
       const searchDate = new Date(searchResult.searchDateTime)
-      let timezone = ''
-      if ((searchDate.toString()).includes('Pacific')) timezone = 'Pacific Time'
-      // format datetime -- have to put in zeros manually when needed
-      let hour = `0${searchDate.getHours()}`
-      let min = `0${searchDate.getMinutes()}`
-      let sec = `0${searchDate.getSeconds()}`
-      if (hour.length > 2) hour = hour.slice(1)
-      if (min.length > 2) min = min.slice(1)
-      if (sec.length > 2) sec = sec.slice(1)
-      const datetime = `${hour}:${min}:${sec}`
-      return 'saved ' + moment(searchDate).format('MMMM D, Y') + ` ${datetime} ${timezone}`
+      return convertDate(searchDate)
     }
     return ''
   }
@@ -114,7 +101,7 @@ export default class Dashboard extends Vue {
   private get searchValue (): string {
     const searchResult = this.getSearchResults
     if (searchResult) {
-      return searchResult.searchQuery.criteria.value
+      return searchResult.searchQuery?.criteria?.value
     }
     return ''
   }

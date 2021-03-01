@@ -13,7 +13,7 @@
     <v-row v-if="totalResultsLength !== 0" no-gutters>
       <v-container fluid no-gutters>
         <v-row no-gutters>
-          <v-col class="auto">
+          <v-col cols="12">
             <v-data-table v-if="results"
                           class="results-table"
                           height="20rem"
@@ -136,16 +136,6 @@ export default defineComponent({
 
 <style lang="scss">
 @import '@/assets/styles/theme.scss';
-#search-btn {
-  width: 8rem;
-}
-#search-btn-info {
-  color: $gray8;
-  font-size: 0.725rem;
-}
-.close-popup-btn {
-  background-color: transparent !important;
-}
 .exact-match td {
   color: $gray9 !important;
   font-weight: bold;
@@ -165,16 +155,5 @@ export default defineComponent({
   font-size: 0.825rem;
   width: 100%;
   height: 8rem;
-}
-// .result-header {
-//   font-size: 0.825rem !important;
-//   color: $gray7 !important;
-// }
-// .results-table {
-//   height: 500px;
-// }
-.v-select-list {
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 </style>
