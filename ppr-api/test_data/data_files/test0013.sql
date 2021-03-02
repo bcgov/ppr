@@ -33,22 +33,22 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
     VALUES(200000036, 'SP', 200000014, 200000007, null, null, null, null, null, 'TEST 13 SECURED PARTY',
            null, 200000016)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000014, 'MV', 200000014, 200000007, null, 2012, 'EXPIRED MV', 'MODEL', 'XXXXX999999', null,
          search_key_pkg.vehicle('XXXXX999999'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000015, 'MH', 200000014, 200000007, null, 2012, 'EXPIRED MH', 'MODEL', 'XXXXX999999', '299999',
          search_key_pkg.mhr('299999'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000016, 'AC', 200000014, 200000007, null, 2012, 'EXPIRED AC', 'MODEL', 'XXXXX999999', null,
          search_key_pkg.aircraft('XXXXX999999'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000017, 'AF', 200000014, 200000007, null, 2012, 'EXPIRED AF', 'MODEL', 'XXXXX999999', null,
          search_key_pkg.aircraft('XXXXX999999'))

@@ -19,12 +19,10 @@ from __future__ import annotations
 
 from enum import Enum
 from http import HTTPStatus
-from datetime import date
 
 #from sqlalchemy import event
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.utils.datetime import format_ts, now_ts_offset, expiry_dt_from_years
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -62,7 +60,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                               #, db.ForeignKey('state_type.state_type_cd'))
     registration_num = db.Column('registration_number', db.String(10), nullable=False)
     life = db.Column('life', db.Integer, nullable=True)
-    expire_date = db.Column('expire_date', db.Date, nullable=True)
+    expire_date = db.Column('expire_date', db.DateTime, nullable=True)
     discharged = db.Column('discharged', db.String(1), nullable=True)
     renewed = db.Column('renewed', db.String(1), nullable=True)
 
@@ -99,7 +97,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             registration_id = reg.registration_id
             statement['type'] = reg.registration_type_cd
             statement['baseRegistrationNumber'] = reg.registration_num
-            statement['createDateTime'] = format_ts(reg.registration_ts)
+            statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
 
             if reg.client_reference_id:
                 statement['clientReferenceId'] = reg.client_reference_id
@@ -144,7 +142,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 if reg.lien_value:
                     statement['lienAmount'] = reg.lien_value
                 if reg.surrender_date:
-                    statement['surrenderDate'] = reg.surrender_date.isoformat()
+                    statement['surrenderDate'] = model_utils.format_ts(reg.surrender_date)
 
         if self.trust_indenture:
             for trust in self.trust_indenture:
@@ -162,7 +160,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             statement['lifeYears'] = self.life
 
         if self.expire_date:
-            statement['expiryDate'] = self.expire_date.isoformat()
+            statement['expiryDate'] = model_utils.format_ts(self.expire_date)
 
         return statement
 
@@ -234,17 +232,17 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                                   FinancingStatement.state_type_cd).\
                                     filter(FinancingStatement.financing_id == Registration.financing_id,\
                                            Registration.account_id == account_id,\
-                                           Registration.registration_type_cl == 'PPSALIEN').\
+                                           Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).\
                                     order_by(FinancingStatement.financing_id).all()
             else:
-                days_ago = now_ts_offset(10, False)
+                days_ago = model_utils.now_ts_offset(10, False)
                 statement_list = db.session.query(Registration.registration_ts,\
                                                   Registration.registration_num,\
                                                   Registration.registration_type_cd,\
                                                   FinancingStatement.state_type_cd).\
                                     filter(FinancingStatement.financing_id == Registration.financing_id,\
                                            Registration.account_id == account_id,\
-                                           Registration.registration_type_cl == 'PPSALIEN',\
+                                           Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN']),\
                                            Registration.registration_ts > days_ago).\
                                     order_by(FinancingStatement.financing_id).all()
 
@@ -260,7 +258,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if staff or statement.state_type_cd == model_utils.STATE_ACTIVE:
                 statement_json = {
                     'matchType': 'EXACT',
-                    'createDateTime': format_ts(statement.registration_ts),
+                    'createDateTime': model_utils.format_ts(statement.registration_ts),
                     'baseRegistrationNumber': statement.registration_num,
                     'registrationType': statement.registration_type_cd
                 }
@@ -294,7 +292,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         if registration_num:
             statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id, \
                                           Registration.registration_num == registration_num, \
-                                          Registration.registration_type_cl == 'PPSALIEN').one_or_none()
+                                          Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
 
         if not statement:
             raise BusinessException(
@@ -336,7 +334,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         reg_type = json_data['type']
         if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-            statement.expire_date = now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+            statement.expire_date = model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
             statement.life = model_utils.REPAIRER_LIEN_YEARS
         elif 'lifeInfinite' in json_data and json_data['lifeInfinite']:
             statement.life = model_utils.LIFE_INFINITE
@@ -344,9 +342,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if 'lifeYears' in json_data:
                 statement.life = json_data['lifeYears']
                 if statement.life > 0:
-                    statement.expire_date = expiry_dt_from_years(statement.life)
+                    statement.expire_date = model_utils.expiry_dt_from_years(statement.life)
             if 'expiryDate' in json_data and not statement.expire_date:
-                statement.expire_date = date.fromisoformat(json_data['expiryDate'])
+                statement.expire_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
 
         statement.registration = [Registration.create_financing_from_json(json_data, account_id)]
         statement.registration_num = statement.registration[0].registration_num

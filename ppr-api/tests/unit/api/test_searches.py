@@ -24,7 +24,7 @@ from http import HTTPStatus
 #from tests.unit.models import Address, PartyRole, factory_business, factory_party_role
 from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
-from ppr_api.utils.datetime import now_ts_offset, format_ts
+from ppr_api.models.utils import now_ts_offset, format_ts
 
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_QUERY, SEARCH_SUMMARY

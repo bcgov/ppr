@@ -16,12 +16,12 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
     VALUES(200000027, 'RG', 200000011, 200000000, null, null, 'TEST-CHANGE-SU', '10', 'REGISTERING', null,
            null, 200000013)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000007, 'MV', 200000011, 200000000, null, 2014, 'BMW', 'Z4', 'JU622994', null,
          search_key_pkg.vehicle('JU622994'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000008, 'MH', 200000011, 200000000, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '999999', '220000',
          search_key_pkg.mhr('220000'))
@@ -35,7 +35,7 @@ WHERE general_collateral_id = 200000002
 ;
 UPDATE serial_collateral
   SET registration_id_end = 200000011
-WHERE vehicle_collateral_id = 200000006
+WHERE serial_id = 200000006
 ;
 UPDATE draft
    SET registration_id = 200000011

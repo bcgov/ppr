@@ -17,9 +17,9 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000011)
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id)
+                  middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
     VALUES(200000024, 'DB', 200000009, 200000000, null, null, null, null, null, 'TEST 8 TRANSFER DEBTOR',
-           null, 200000011)
+           null, 200000011, search_key_pkg.businame('TEST 8 TRANSFER DEBTOR'))
 ;
 UPDATE party
    SET registration_id_end = 200000009

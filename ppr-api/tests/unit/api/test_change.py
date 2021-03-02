@@ -49,7 +49,7 @@ def test_change_create_invalid_type_400(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -71,7 +71,7 @@ def test_change_create_valid_SU_200(session, client, jwt):
  
     rv1 = client.post(f'/api/v1/financing-statements',
                      json=statement,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -97,7 +97,7 @@ def test_change_create_valid_SU_200(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/' + base_reg_num + '/changes',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -120,7 +120,7 @@ def test_change_create_valid_DT_200(session, client, jwt):
  
     rv1 = client.post(f'/api/v1/financing-statements',
                      json=statement,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -146,7 +146,7 @@ def test_change_create_valid_DT_200(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/' + base_reg_num + '/changes',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -175,7 +175,7 @@ def test_change_create_invalid_regnum_404(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/X12345X/changes',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -233,7 +233,7 @@ def test_change_staff_missing_account_200(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
-                     headers=create_header(jwt, [STAFF_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
 
     # check
@@ -283,7 +283,7 @@ def test_change_invalid_missing_basedebtor_400(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -303,7 +303,7 @@ def test_change_invalid_historical_400(session, client, jwt):
     # test
     rv = client.post(f'/api/v1/financing-statements/TEST0003/changes',
                      json=json_data,
-                     headers=create_header_account(jwt, [STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check

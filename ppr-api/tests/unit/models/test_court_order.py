@@ -17,12 +17,13 @@
 Test-Suite to ensure that the Court Order Model is working as expected.
 """
 from http import HTTPStatus
-from datetime import date
+#from datetime import date
 
 import pytest
 
 from ppr_api.models import CourtOrder
 from ppr_api.exceptions import BusinessException
+from ppr_api.models.utils import format_ts, now_ts
 
 import copy
 from registry_schemas.example_data.ppr import RENEWAL_STATEMENT
@@ -68,14 +69,14 @@ def test_court_order_json(session):
         court_registry='registry',
         file_number='file',
         effect_of_order='effect',
-        court_date=date.today()
+        court_date=now_ts()
     )
 
     court_json = {
         'courtName': court_order.court_name,
         'courtRegistry': court_order.court_registry,
         'fileNumber': court_order.file_number,
-        'orderDate': court_order.court_date.isoformat(),
+        'orderDate': format_ts(court_order.court_date),
         'effectOfOrder': court_order.effect_of_order
     }
 

@@ -19,12 +19,10 @@
 
 from enum import Enum
 from http import HTTPStatus
-from datetime import date
 import json
 
 #from sqlalchemy import event
 
-from ppr_api.utils.datetime import format_ts, now_ts, now_ts_offset
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -63,12 +61,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     registration_ts = db.Column('registration_ts', db.DateTime, nullable=False)
     registration_num = db.Column('registration_number', db.String(10), nullable=False, index=True,
                                  default=db.func.get_registration_num())
-    base_reg_num = db.Column('base_reg_number', db.String(10), nullable=True)
+    base_registration_num = db.Column('base_reg_number', db.String(10), nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True)
     client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
     life = db.Column('life', db.Integer, nullable=True)
     lien_value = db.Column('lien_value', db.String(15), nullable=True)
-    surrender_date = db.Column('surrender_date', db.Date, nullable=True)
+    surrender_date = db.Column('surrender_date', db.DateTime, nullable=True)
     ver_bypassed = db.Column('ver_bypassed', db.String(1), nullable=True)
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
@@ -103,7 +101,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the registration as a json object."""
         registration = {
             'baseRegistrationNumber': self.base_registration_num,
-            'createDateTime': format_ts(self.registration_ts)
+            'createDateTime': model_utils.format_ts(self.registration_ts)
         }
         if self.registration_type_cd == model_utils.REG_TYPE_DISCHARGE:
             registration['dischargeRegistrationNumber'] = self.registration_num
@@ -136,7 +134,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if self.registration_type_cd == model_utils.REG_TYPE_RENEWAL and \
                 self.financing_statement.expire_date:
-            registration['expiryDate'] = self.financing_statement.expire_date.isoformat()
+            registration['expiryDate'] = model_utils.format_ts(self.financing_statement.expire_date)
 
         if self.court_order:
             registration['courtOrderInformation'] = self.court_order.json
@@ -280,7 +278,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration = Registration()
         registration.registration_id = reg_vals.registration_id
         registration.registration_num = reg_vals.registration_num
-        registration.registration_ts = now_ts()
+        registration.registration_ts = model_utils.now_ts()
         registration.financing_id = financing_statement.financing_id
         registration.financing_statement = financing_statement
         registration.account_id = account_id
@@ -325,9 +323,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.life = model_utils.REPAIRER_LIEN_YEARS
             registration.financing_statement.life = registration.life
             if financing_reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-                registration.financing_statement.expiry_date = now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+                registration.financing_statement.expiry_date = \
+                    model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
             elif 'expiryDate' in json_data:
-                registration.financing_statement.expiry_date = date.fromisoformat(json_data['expiryDate'])
+                registration.financing_statement.expiry_date = \
+                    model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
 
 
         # Repairer's lien renewal or amendment can have court order information.
@@ -359,7 +359,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create a registraion object from dict/json."""
         registration = Registration()
         registration.account_id = account_id
-        registration.registration_ts = now_ts()
+        registration.registration_ts = model_utils.now_ts()
         reg_type = json_data['type']
         registration.registration_type_cl = model_utils.REG_TYPE_TO_REG_CLASS[reg_type]
         registration.registration_type_cd = reg_type
@@ -369,7 +369,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if 'lienAmount' in json_data:
                 registration.lien_value = json_data['lienAmount'].strip()
             if 'surrenderDate' in json_data:
-                registration.surrender_date = date.fromisoformat(json_data['surrenderDate'])
+                registration.surrender_date = model_utils.ts_from_date_iso_format(json_data['surrenderDate'])
             registration.life = model_utils.REPAIRER_LIEN_YEARS
         elif 'lifeInfinite' in json_data and json_data['lifeInfinite']:
             registration.life = model_utils.LIFE_INFINITE
