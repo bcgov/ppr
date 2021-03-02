@@ -62,7 +62,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     last_name_first = db.Column('last_name_first', db.String(50), nullable=True)
     last_name_second = db.Column('last_name_second', db.String(50), nullable=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True)
-
+    # Legacy only
+    block_number = db.Column('block_number', db.Integer, nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)

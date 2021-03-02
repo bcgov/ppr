@@ -117,12 +117,6 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
 
-    jaro = db.Column('jaro', db.Integer, nullable=True)
-    match = db.Column('match', db.String(1), nullable=True)
-    document_number = db.Column('document_number', db.String(8), nullable=True)
-    block_number = db.Column('block_number', db.Integer, nullable=True)
-    result = db.Column('result', db.String(150), nullable=True)
-
     # parent keys
 
     # Relationships - SearchResult
