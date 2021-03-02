@@ -33,17 +33,17 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
     VALUES(200000039, 'SP', 200000015, 200000008, null, null, null, null, null, 'TEST 14 SECURED PARTY',
            null, 200000017)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000018, 'MV', 200000015, 200000008, null, 2012, 'DISCHARGED MV', 'MODEL', 'ZZZZZ999999', null,
          search_key_pkg.vehicle('ZZZZZ999999'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000019, 'MH', 200000015, 200000008, null, 2012, 'DISCHARGED MH', 'MODEL', 'ZZZZZ999999', '399999',
         search_key_pkg.mhr('399999'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000020, 'AC', 200000015, 200000008, null, 2012, 'DISCHARGED AC', 'MODEL', 'ZZZZZ999999', null,
          search_key_pkg.aircraft('ZZZZZ999999'))

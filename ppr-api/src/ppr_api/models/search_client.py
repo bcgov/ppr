@@ -33,7 +33,7 @@ SERIAL_SEARCH_BASE = \
             "sc.serial_type_cd,sc.serial_number,sc.year,sc.make,sc.model," + \
             "r.registration_number AS base_registration_num," + \
             "DECODE(serial_number, '?', 'EXACT', 'SIMILAR') AS match_type," + \
-            "fs.expire_date,fs.state_type_cd,sc.vehicle_collateral_id AS vehicle_id  " + \
+            "fs.expire_date,fs.state_type_cd,sc.serial_id AS vehicle_id  " + \
       "FROM registration r, financing_statement fs, serial_collateral sc " + \
      "WHERE r.financing_id = fs.financing_id " + \
        "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \

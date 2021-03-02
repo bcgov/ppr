@@ -17,16 +17,16 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000010)
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id)
+                  middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
     VALUES(200000021, 'DB', 200000008, 200000000, null, null, null, null, null, 'TEST 7 AMEND DEBTOR',
-           null, 200000010)
+           null, 200000010, search_key_pkg.businame('TEST 7 AMEND DEBTOR'))
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000022, 'SP', 200000008, 200000000, null, null, null, null, null, 'TEST 7 AMEND SECURED PARTY',
            null, 200000010)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000006, 'MV', 200000008, 200000000, null, 2018, 'FORD', 'FIESTA', 'T346JU622994', null,
          search_key_pkg.vehicle('T346JU622994'))
@@ -48,7 +48,7 @@ WHERE general_collateral_id = 200000001
 ;
 UPDATE serial_collateral
   SET registration_id_end = 200000008
-WHERE vehicle_collateral_id = 200000001
+WHERE serial_id = 200000001
 ;
 UPDATE draft
    SET registration_id = 200000008

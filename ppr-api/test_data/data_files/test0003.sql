@@ -21,16 +21,16 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000004)
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id)
-    VALUES(200000009, 'DB', 200000002, 200000002, null, null, null, null, null, 'TEST BUS DEBTOR',
-           null, 200000004)
+                  middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
+    VALUES(200000009, 'DB', 200000002, 200000002, null, null, null, null, null, 'TEST BUS 3 DEBTOR',
+           null, 200000004, search_key_pkg.businame('TEST BUS 3 DEBTOR'))
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000010, 'SP', 200000002, 200000002, null, 200000000, null, null, null, null,
            null, 200000004)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000003, 'MV', 200000002, 200000002, null, 2014, 'HYUNDAI', 'TUSCON', 'KX8J3CA46JU622994', null,
          search_key_pkg.vehicle('KX8J3CA46JU622994'))

@@ -45,8 +45,8 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     __tablename__ = 'serial_collateral'
 
 
-#    vehicle_id = db.Column('serial_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    vehicle_id = db.Column('vehicle_collateral_id', db.Integer,
+#    vehicle_id = db.Column('serial_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
+    vehicle_id = db.Column('serial_id', db.Integer,
                            db.Sequence('vehicle_id_seq'),
                            primary_key=True)
     vehicle_type_cd = db.Column('serial_type_cd', db.String(2), nullable=False)

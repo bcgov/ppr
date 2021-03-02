@@ -33,7 +33,7 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
     VALUES(200000017, 'SP', 200000005, 200000004, null, null, null, null, null, 'TEST 5 SECURED PARTY',
            null, 200000007)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000005, 'MV', 200000005, 200000004, null, 2018, 'TESLA', 'MODEL 3', 'YJ46JU622994', null,
          search_key_pkg.vehicle('YJ46JU622994'))

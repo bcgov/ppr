@@ -33,12 +33,12 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
     VALUES(200000030, 'SP', 200000012, 200000005, null, null, null, null, null, 'TEST 11 SECURED PARTY',
            null, 200000014)
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000009, 'MH', 200000012, 200000005, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '999999', '220000',
          search_key_pkg.mhr('220000'))
 ;
-INSERT INTO serial_collateral(vehicle_collateral_id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000010, 'AC', 200000012, 200000005, null, 1998, 'CESSNA', '172R SKYHAWK', 'CFYXW', null,
          search_key_pkg.aircraft('CFYXW'))
