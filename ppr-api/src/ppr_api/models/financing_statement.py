@@ -286,7 +286,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
     @classmethod
     def find_by_registration_number(cls, registration_num: str = None,
-                                    staff: bool = False):
+                                    staff: bool = False,
+                                    allow_historical: bool = False):
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
@@ -300,7 +301,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        if not staff and statement.state_type_cd != model_utils.STATE_ACTIVE:
+        if not allow_historical and not staff and statement.state_type_cd != model_utils.STATE_ACTIVE:
             raise BusinessException(
                 error=f'The Financing Statement for registration number {registration_num} has been discharged.',
                 status_code=HTTPStatus.BAD_REQUEST

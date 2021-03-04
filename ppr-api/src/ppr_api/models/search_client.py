@@ -19,6 +19,7 @@ from http import HTTPStatus
 import json
 import copy
 
+from flask import current_app
 #from sqlalchemy import event
 
 from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
@@ -68,14 +69,15 @@ REG_NUM_QUERY = \
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
 MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
                  "AND sc.serial_type_cd = 'MH' " + \
-                 "AND sc.mhr_number = '?' " + \
-            "ORDER BY r.registration_ts ASC"
-
+                 "AND sc.srch_vin = search_key_pkg.mhr('?') " + \
+            "ORDER BY r.registration_ts ASC " + \
+         "FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
                      "AND sc.serial_type_cd NOT IN ('AC', 'AF') " + \
                      "AND sc.srch_vin = search_key_pkg.vehicle('?') " + \
-                "ORDER BY match_type, sc.serial_number"
+                "ORDER BY match_type, sc.serial_number " + \
+             "FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
 #                    "AND UPPER(REGEXP_REPLACE(sc.serial_number,'\s|-','')) = UPPER(REGEXP_REPLACE('?','\s|-','')) " + \
@@ -83,7 +85,35 @@ SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
 AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
                     "AND sc.serial_type_cd IN ('AC', 'AF') " + \
                     "AND sc.srch_vin = search_key_pkg.aircraft('?') " + \
-               "ORDER BY match_type, sc.serial_number"
+               "ORDER BY match_type, sc.serial_number " + \
+            "FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
+
+BUSINESS_NAME_QUERY = \
+"SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts, " + \
+       "p.business_name, " + \
+       "r.registration_number AS base_registration_num, " + \
+       "DECODE(p.business_name, '?', 'EXACT', 'SIMILAR') AS match_type, " + \
+       "fs.expire_date,fs.state_type_cd, p.party_id " + \
+  "FROM registration r, financing_statement fs, party p " + \
+ "WHERE r.financing_id = fs.financing_id " + \
+   "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
+   "AND r.base_reg_number IS NULL " + \
+   "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+   "AND NOT EXISTS (SELECT r3.registration_id " + \
+                     "FROM registration r3 " + \
+                    "WHERE r3.financing_id = fs.financing_id " + \
+                      "AND r3.registration_type_cl = 'DISCHARGE' " + \
+                      "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+  "AND p.financing_id = fs.financing_id " + \
+  "AND p.registration_id_end IS NULL " + \
+  "AND p.party_type_cd = 'DB' " + \
+  "AND UTL_MATCH.JARO_WINKLER_SIMILARITY(p.business_srch_key, SEARCH_KEY_PKG.businame('?')) >= " + \
+      "NVL((SELECT MAX(JARO_VALUE) " + \
+             "FROM THESAURUS A, JARO  B " + \
+            "WHERE REGEXP_LIKE(SEARCH_KEY_PKG.businame('?'),WORD,'i') " + \
+              "AND A.WORD_ID = B.WORD_ID), 85) " + \
+"ORDER BY match_type, p.business_name " + \
+"FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
 
 
 class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -93,7 +123,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Render an Enum of the search types."""
         AIRCRAFT_AIRFRAME_DOT = 'AC'
         BUSINESS_DEBTOR = 'BS'
-        INDIVISUAL_DEBTOR = 'ID'
+        INDIVISUAL_DEBTOR = 'IS'
         REGISTRATION_NUM = 'RG'
         SERIAL_NUM = 'SS'
         MANUFACTURED_HOME_NUM = 'MH'
@@ -133,20 +163,33 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             'searchDateTime': model_utils.format_ts(self.search_ts),
             'totalResultsSize': self.total_results_size,
             'returnedResultsSize': self.returned_results_size,
-            'maxResultsSize': 1000,
+            'maxResultsSize': model_utils.SEARCH_RESULTS_MAX_SIZE,
             'searchQuery': json.loads(self.search_criteria)
         }
         if self.search_response:
             result['results'] = json.loads(self.search_response)
+
+        if self.pay_invoice_id and self.pay_path:
+            payment = {
+                'invoiceId': str(self.pay_invoice_id),
+                'receipt': self.pay_path
+            }
+            result['payment'] = payment
 
         return result
 
 
     def save(self):
         """Render a search query to the local cache."""
-
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as db_exception:
+            current_app.logger.error('DB search_client save exception: ' + repr(db_exception))
+            raise BusinessException(
+                error='Database search_client save failed: ' + repr(db_exception),
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
 
 
     def search_by_registration_number(self):
@@ -234,14 +277,53 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.total_results_size = 0
 
 
-    def search(self):
-        """Execute a search by the previously set search type."""
+    def search_by_business_name(self):
+        """Execute a search query debtor business_name search type."""
 
-        if self.search_type_cd == 'RG':
+        search_value = self.request_json['criteria']['debtorName']['business']
+        query = BUSINESS_NAME_QUERY.replace('?', search_value.strip().upper())
+        result = db.session.execute(query)
+        rows = result.fetchall()
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                values = row.values()
+                registration_type = str(values[0])
+                timestamp = values[1]
+                debtor = {
+                    'businessName': str(values[2]),
+                    'partyId': int(values[7])
+                }
+                result_json = {
+                    'baseRegistrationNumber': str(values[3]),
+                    'matchType': str(values[4]),
+                    'createDateTime': model_utils.format_ts(timestamp),
+                    'registrationType': registration_type,
+                    'debtor': debtor
+                }
+                results_json.append(result_json)
+
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            if self.returned_results_size > 0:
+                self.search_response = json.dumps(results_json)
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
+
+    def search(self):
+        """Execute a search by the previously set search type and criteria."""
+
+        if self.search_type_cd == self.SearchTypes.REGISTRATION_NUM.value:
             self.search_by_registration_number()
-        elif self.search_type_cd in ('SS', 'MH', 'AC'):
+        elif self.search_type_cd in (self.SearchTypes.SERIAL_NUM.value, \
+                                     self.SearchTypes.MANUFACTURED_HOME_NUM.value, \
+                                     self.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value):
             self.search_by_serial_type()
-        # temporary until debtor search implemented
+        elif self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
+            self.search_by_business_name()
+        # temporary until individual debtor search implemented
         else:
             self.search_response = json.dumps(copy.deepcopy(SEARCH_QUERY_RESULT))
             self.returned_results_size = 1
@@ -257,6 +339,29 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         if search_id:
             search = cls.query.get(search_id)
         return search
+
+
+    @classmethod
+    def find_all_by_account_id(cls, account_id: str = None):
+        """Return a search history summary list belonging to an account."""
+        history_list = None
+        if account_id:
+            history_list = db.session.query(SearchClient). \
+                            filter(SearchClient.account_id == account_id).\
+                            order_by(SearchClient.search_ts.desc()).\
+                            limit(model_utils.ACCOUNT_SEARCH_HISTORY_MAX_SIZE).all()
+
+        if not history_list:
+            raise BusinessException(
+                error=f'No search history found for Account ID {account_id}.',
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        results_json = []
+        for result in history_list:
+            results_json.append(result.json)
+
+        return results_json
 
 
     @staticmethod
@@ -296,7 +401,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 error_msg = error_msg + f'Search criteria debtorName is required for search type {search_type}. '
             elif search_type == 'INDIVIDUAL_DEBTOR' and 'last' not in json_data['criteria']['debtorName']:
                 error_msg = error_msg + f'Search criteria debtorName last is required for search type {search_type}. '
-            elif search_type == 'BUSINESS_DEBTOR' and 'businessName' not in json_data['criteria']['debtorName']:
+            elif search_type == 'BUSINESS_DEBTOR' and 'business' not in json_data['criteria']['debtorName']:
                 error_msg = error_msg + f'Search criteria debtorName businessName is required for search type {search_type}. '
 
         # Verify the start and end dates.

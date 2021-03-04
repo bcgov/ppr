@@ -29,8 +29,13 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000016)
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
+                  middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
+    VALUES(200000036, 'DB', 200000014, 200000007, null, null, null, null, null, 'XXXXX99',
+           null, 200000016, search_key_pkg.businame('XXXXX99'))
+;
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
-    VALUES(200000036, 'SP', 200000014, 200000007, null, null, null, null, null, 'TEST 13 SECURED PARTY',
+    VALUES(200000037, 'SP', 200000014, 200000007, null, null, null, null, null, 'TEST 13 SECURED PARTY',
            null, 200000016)
 ;
 INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,

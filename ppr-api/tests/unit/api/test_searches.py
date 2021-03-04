@@ -112,6 +112,29 @@ def test_search_aircraft_dot_valid_201(session, client, jwt):
     assert rv.status_code == HTTPStatus.CREATED
 
 
+def test_search_debtor_bus_valid_201(session, client, jwt):
+    """Assert that valid search by debtor business name criteria returns a 201 status."""
+    # setup
+    json_data = {
+        'type': 'BUSINESS_DEBTOR',
+        'criteria': {
+            'debtorName': {
+                'business': 'TEST BUS 2 DEBTOR'
+            }
+        },
+        'clientReferenceId': 'T-API-SQ-DB-1'
+    }
+ 
+    # test
+    rv = client.post(f'/api/v1/searches',
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     content_type='application/json')
+    # check
+    print(rv.json)
+    assert rv.status_code == HTTPStatus.CREATED
+
+
 def test_search_query_invalid_type_400(session, client, jwt):
     """Assert that search criteria with an invalid type returns a 400 error."""
     # setup
@@ -230,22 +253,40 @@ def test_search_query_invalid_startDateTime_400(session, client, jwt):
     print(rv.json)
 
 
-def test_search_detail_valid_200(client, jwt):
+def test_search_detail_valid_200(session, client, jwt):
     """Assert that a valid search detail request returns a 200 status."""
     # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
-
+    json_data = {
+        'type': 'BUSINESS_DEBTOR',
+        'criteria': {
+            'debtorName': {
+                'business': 'TEST BUS 2 DEBTOR'
+            }
+        },
+        'clientReferenceId': 'T-API-SQ-DB-2'
+    }
+ 
     # test
-    rv = client.put(f'/api/v1/searches/123456',
+    rv1 = client.post(f'/api/v1/searches',
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     content_type='application/json')
+    search_id = rv1.json['searchId']
+    json_data = []
+    json_data.append(rv1.json['results'][0])
+    # print(json_data)
+    # test
+    rv = client.put(f'/api/v1/searches/' + search_id,
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
-    assert rv.status_code #== HTTPStatus.OK
+    print(rv.json)
+    assert rv.status_code == HTTPStatus.OK
+    assert len(rv.json) == 1
 
 
-#def test_search_detail_invalid_regnum_400(session, client, jwt):
-def test_search_detail_invalid_regnum_400(client, jwt):
+def test_search_detail_invalid_regnum_400(session, client, jwt):
     """Assert that search detail requests with a missing base registration number returns a 400 error."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
@@ -261,7 +302,7 @@ def test_search_detail_invalid_regnum_400(client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_search_detail_nonstaff_missing_account_400(client, jwt):
+def test_search_detail_nonstaff_missing_account_400(session, client, jwt):
     """Assert that a search detail request with a non-staff jwt and no account ID returns a 400 status."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
@@ -276,22 +317,38 @@ def test_search_detail_nonstaff_missing_account_400(client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_search_detail_staff_missing_account_200(client, jwt):
+def test_search_detail_staff_missing_account_200(session, client, jwt):
     """Assert that a search detail request with a staff jwt and no account ID returns a 201 status."""
     # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
+    json_data = {
+        'type': 'REGISTRATION_NUMBER',
+        'criteria': {
+            'value': 'TEST0001'
+        },
+        'clientReferenceId': 'T-API-SD-RN-1'
+    }
 
     # test
-    rv = client.put(f'/api/v1/searches/123456',
+    rv1 = client.post(f'/api/v1/searches',
+                     json=json_data,
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     content_type='application/json')
+    assert rv1.status_code == HTTPStatus.CREATED
+
+    search_id = rv1.json['searchId']
+    json_data = rv1.json['results']
+
+    # test
+    rv = client.put(f'/api/v1/searches/' + search_id,
                     json=json_data,
                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                     content_type='application/json')
 
     # check
-    assert rv.status_code #== HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.OK
 
 
-def test_search_detail_nonstaff_unauthorized_404(client, jwt):
+def test_search_detail_nonstaff_unauthorized_404(session, client, jwt):
     """Assert that a search detail request with a non-ppr role and an account ID returns a 404 status."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON_DATA)
@@ -306,4 +363,39 @@ def test_search_detail_nonstaff_unauthorized_404(client, jwt):
 
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
+
+def test_search_detail_no_duplicates_200(session, client, jwt):
+    """Assert that a a selection with 2 matches on the same registration returns 
+       the expected result."""
+    # setup
+    json_data = {
+        'type': 'BUSINESS_DEBTOR',
+        'criteria': {
+            'debtorName': {
+                'business': 'DUPLICATE NAME'
+            }
+        },
+        'clientReferenceId': 'T-API-SQ-DB-3'
+    }
+ 
+    # test
+    rv1 = client.post(f'/api/v1/searches',
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     content_type='application/json')
+    search_id = rv1.json['searchId']
+    json_data = []
+    json_data.append(rv1.json['results'][0])
+    json_data.append(rv1.json['results'][1])
+    # print(json_data)
+    # test
+    rv = client.put(f'/api/v1/searches/' + search_id,
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     content_type='application/json')
+    # check
+    print(rv.json)
+    assert rv.status_code == HTTPStatus.OK
+    assert len(rv.json) == 1
+
 

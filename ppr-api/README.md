@@ -23,13 +23,43 @@ GitHub Pages (https://guides.github.com/features/pages/) are a neat way to docum
 
 ## Files in this repository
 
+## Environment Variables
+The set of environment variables used by this API includes:
+
+| Variable Name | Description |
+|---------------|-------------|
+| PAYMENT_SVC_UR | Pay API |
+| PAYMENT_SVC_PREFIX | Pay API |
+| PAYMENT_GATEWAY_APIKEY_TEST | Pay API integration testing if using gateway endpoint.  |
+| DATABASE_PASSWORD | Database  |
+| DATABASE_URL | Database  |
+| DATABASE_USERNAME | Database  |
+| DATABASE_NAME | Database   |
+| DATABASE_HOST | Database   |
+| DATABASE_PORT | Database   |
+| DATABASE_TEST_PASSWORD | Database Test |
+| DATABASE_TEST_URL | Database Test |
+| DATABASE_TEST_USERNAME | Database Test |
+| DATABASE_TEST_NAME | Database Test |
+| DATABASE_TEST_HOST | Database Test |
+| DATABASE_TEST_PORT | Database Test |
+| JWT_OIDC_ALGORITHMS | Authorization  |
+| JWT_OIDC_AUDIENCE | Authorization  |
+| JWT_OIDC_CACHING_ENABLED | Authorization  |
+| JWT_OIDC_JWKS_CACHE_TIMEOUT | Authorization  |
+| JWT_OIDC_WELL_KNOWN_CONFIG | Authorization  |
+| JWT_OIDC_CLIENT_SECRET | Authorization  |
 
 ## Development Environment
 Follow the instructions of the [Development Readme](https://github.com/bcgov/entity/blob/master/docs/development.md)
 to setup your local development environment.
 
+### Mock pay-api environment variable.
+To use the mock pay-api service for local testing, set the .env variable:
+   PAYMENT_SVC_URL="https://bcregistry-bcregistry-mock.apigee.net/pay/api/v1"
+
 ### Development Setup
-1. Open the ppr-api directory in VS Code to treat it as a project (or WSL projec). To prevent version clashes, set up avirtual environment to install the Python packages used by this project.
+1. Open the ppr-api directory in VS Code to treat it as a project (or WSL projec). To prevent version clashes, set up a virtual environment to install the Python packages used by this project.
 1. Run `make setup`
 1. Run `pip install .`
 1. See [Oracle DB README](./oracle-db/README.md) on running a local Docker Oracle PPR database.
