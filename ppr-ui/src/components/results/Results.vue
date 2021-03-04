@@ -23,11 +23,14 @@
                           :headers="headers"
                           :items="results"
                           :item-class="getClass"
-                          item-key="vehicleCollateral.serialNumber"
+                          item-key="baseRegistrationNumber"
                           multi-sort
                           show-select
                           return-object
                           v-model="selected">
+              <template v-slot:[`item.makeModel`]="{ item }">
+                {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
+              </template>
             </v-data-table>
           </v-col>
         </v-row>

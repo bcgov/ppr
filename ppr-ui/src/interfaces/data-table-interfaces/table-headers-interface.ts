@@ -6,10 +6,10 @@ interface BaseHeaderIF {
     class?: string
 }
 export interface TableHeadersIF {
-    [UISearchTypes.AIRCRAFT]?: Array<BaseHeaderIF>
-    [UISearchTypes.BUSINESS_DEBTOR]?: Array<BaseHeaderIF>
-    [UISearchTypes.INDIVIDUAL_DEBTOR]?: Array<BaseHeaderIF>
-    [UISearchTypes.MHR_NUMBER]?: Array<BaseHeaderIF>
-    [UISearchTypes.REGISTRATION_NUMBER]?: Array<BaseHeaderIF>
+    [APISearchTypes.AIRCRAFT]?: Array<BaseHeaderIF>
+    [APISearchTypes.BUSINESS_DEBTOR]?: Array<BaseHeaderIF>
+    [APISearchTypes.INDIVIDUAL_DEBTOR]?: Array<BaseHeaderIF>
+    [APISearchTypes.MHR_NUMBER]?: Array<BaseHeaderIF>
+    [APISearchTypes.REGISTRATION_NUMBER]?: Array<BaseHeaderIF>
     [APISearchTypes.SERIAL_NUMBER]?: Array<BaseHeaderIF>
 }

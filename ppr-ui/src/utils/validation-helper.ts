@@ -1,43 +1,145 @@
 import { UISearchTypes } from '@/enums'
-import { SearchValidationIF } from '@/interfaces'
+import { SearchTypeIF, SearchValidationIF } from '@/interfaces'
 
-export function validateSearchAction (searchState): SearchValidationIF {
-  if (!searchState.selectedSearchType) {
-    return {
-      category: {
-        message: 'Please select a category'
-      }
-    }
+// subset of the localState that includes what the validator needs
+type partialSearchState = { searchValue: string, selectedSearchType: SearchTypeIF }
+
+const specialChars = /[!@#$%^&*(),.?":{}|<>]/
+const numbersOnly = /^\d+$/
+const lettersOnly = /^[A-z]+$/
+const regNumber = /^\d{6}[A-z]{1}$/
+const regNumberPartial = /^\d{1,6}[A-z]{0,1}$/
+// replaceAll fails in jest so use regex
+const dash = /-/g
+
+export function validateSearchAction (searchState: partialSearchState): SearchValidationIF {
+  const validation:SearchValidationIF = {
+    category: {},
+    searchValue: {}
   }
-  switch (searchState.selectedSearchType.searchTypeUI) {
+  let searchValue:string = searchState?.searchValue?.trim()
+  if (!searchState?.selectedSearchType) {
+    validation.category.message = 'Please select a category'
+    return validation
+  }
+  switch (searchState?.selectedSearchType?.searchTypeUI) {
     case UISearchTypes.SERIAL_NUMBER:
-      if (!searchState.searchValue) {
-        return {
-          searchValue: {
-            message: 'Enter a serial number to search'
-          }
+      if (!searchValue) {
+        validation.searchValue.message = 'Enter a serial number to search'
+      }
+      break
+    case UISearchTypes.BUSINESS_DEBTOR:
+      if (!searchValue) {
+        validation.searchValue.message = 'Enter a business debtor name to search'
+      }
+      if (searchValue?.length > 70) {
+        validation.searchValue.message = 'Maximum 70 characters'
+      }
+      if (searchValue?.length < 3) {
+        validation.searchValue.message = 'Must contain more than 2 characters'
+      }
+      break
+    case UISearchTypes.MHR_NUMBER:
+      if (!searchValue) {
+        validation.searchValue.message = 'Enter a manufactured home registration number to search'
+      }
+      if (searchValue?.length > 6) {
+        validation.searchValue.message = 'Maximum 6 digits'
+      }
+      if (searchValue && !numbersOnly.test(searchValue)) {
+        validation.searchValue.message = 'Must contain numbers only'
+      }
+      break
+    case UISearchTypes.AIRCRAFT:
+      if (!searchValue) {
+        validation.searchValue.message = 'Enter an aircraft airframe D.O.T. number to search'
+      } else {
+        searchValue = searchValue?.replace(dash, '')
+        if (searchValue?.length > 25) {
+          validation.searchValue.message = 'Maximum 25 letters'
+        }
+        if (!lettersOnly.test(searchValue)) {
+          validation.searchValue.message = 'Must contain letters only'
         }
       }
+      break
+    case UISearchTypes.REGISTRATION_NUMBER:
+      if (!searchValue) {
+        validation.searchValue.message = 'Enter a registration number to search'
+      }
+      if (searchValue && !regNumber.test(searchValue)) {
+        validation.searchValue.message = 'Must contain 6 digits followed by 1 letter, e.g., 123456A'
+      }
+      break
   }
-  return null
+  if (Object.keys(validation.searchValue)?.length || Object.keys(validation.category)?.length) return validation
+  else return null
 }
 
-export function validateSearchRealTime (searchState): SearchValidationIF {
-  var specialChars = /[!@#$%^&*(),.?":{}|<>]/
-  const validation:SearchValidationIF = {}
-  switch (searchState.selectedSearchType.searchTypeUI) {
+export function validateSearchRealTime (searchState: partialSearchState): SearchValidationIF {
+  const validation:SearchValidationIF = {
+    category: {},
+    searchValue: {}
+  }
+  let searchValue = searchState?.searchValue?.trim()
+  switch (searchState?.selectedSearchType?.searchTypeUI) {
     case UISearchTypes.SERIAL_NUMBER:
-      validation.searchValue = {}
-      if (searchState.searchValue && specialChars.test(searchState.searchValue)) {
+      if (searchValue && specialChars.test(searchValue)) {
         validation.searchValue.message = "Serial numbers don't normally contain special characters"
       }
-      if (searchState.searchValue && searchState.searchValue.length < 4) {
+      if (searchValue?.length < 4) {
         validation.searchValue.popUp = [
           'This may not be a valid serial number.',
           'You can search using this number but you might not obtain any results (the search fee will be applied).',
           'Select "Search" to continue with this serial number.'
         ]
       }
+      break
+    case UISearchTypes.BUSINESS_DEBTOR:
+      if (searchValue && specialChars.test(searchValue)) {
+        validation.searchValue.message = "Names don't normally contain special characters"
+      }
+      if (searchValue?.length > 70) {
+        validation.searchValue.message = 'Maximum 70 characters'
+      }
+      break
+    case UISearchTypes.MHR_NUMBER:
+      if (searchValue?.length > 6) {
+        validation.searchValue.message = 'Maximum 6 digits'
+      }
+      if (searchValue && !numbersOnly.test(searchValue)) {
+        validation.searchValue.message = 'Must contain numbers only'
+      }
+      // only want popup if there isn't an error message that will prevent searching already
+      if (!validation.searchValue.message && searchValue?.length < 6) {
+        validation.searchValue.popUp = [
+          'This may not be a valid manufactured home registration number.',
+          'You can search this number but you might not obtain useful results (the search fee will be applied)'
+        ]
+      }
+      break
+    case UISearchTypes.AIRCRAFT:
+      searchValue = searchValue?.replace(dash, '')
+      if (searchValue?.length > 25) {
+        validation.searchValue.message = 'Maximum 25 letters'
+      }
+      if (!lettersOnly.test(searchValue)) {
+        validation.searchValue.message = 'Must contain letters only'
+      }
+      // only want popup if there isn't an error message that will prevent searching already
+      if (!validation.searchValue.message && searchValue?.length < 10) {
+        validation.searchValue.popUp = [
+          'This may not be a valid Aircraft Airframe D.O.T. number.',
+          'You can search this number but you might not obtain useful results (the search fee will be applied)'
+        ]
+      }
+      break
+    case UISearchTypes.REGISTRATION_NUMBER:
+      if (searchValue && !regNumberPartial.test(searchValue)) {
+        validation.searchValue.message = 'Must contain 6 digits followed by 1 letter, e.g., 123456A'
+      }
+      break
   }
-  return validation
+  if (Object.keys(validation.searchValue)?.length || Object.keys(validation.category)?.length) return validation
+  else return null
 }
