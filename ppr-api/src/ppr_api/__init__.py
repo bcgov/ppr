@@ -21,8 +21,8 @@ import logging.config
 import os
 from http import HTTPStatus
 
-# import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports; conflicts with Flake8
-# from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
+import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports; conflicts with Flake8
+from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 from flask import redirect, Flask  # noqa: I001
 from registry_schemas import __version__ as registry_schemas_version
 from registry_schemas.flask import SchemaServices  # noqa: I001
@@ -47,11 +47,11 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     app.config.from_object(config.CONFIGURATION[run_mode])
 
     # Configure Sentry
-#    if app.config.get('SENTRY_DSN', None):
-#        sentry_sdk.init(
-#            dsn=app.config.get('SENTRY_DSN'),
-#            integrations=[FlaskIntegration()]
-#        )
+    if app.config.get('SENTRY_DSN', None):
+        sentry_sdk.init(
+            dsn=app.config.get('SENTRY_DSN'),
+            integrations=[FlaskIntegration()]
+            )
 
     errorhandlers.init_app(app)
     db.init_app(app)

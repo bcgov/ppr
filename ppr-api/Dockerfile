@@ -37,4 +37,4 @@ ENV PYTHONPATH=/opt/app-root/src
 
 EXPOSE 8080
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080",  "--config", "/opt/app-root/src/gunicorn_config.py", "wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080",  "--config", "/opt/app-root/gunicorn_config.py", "wsgi:application"]
