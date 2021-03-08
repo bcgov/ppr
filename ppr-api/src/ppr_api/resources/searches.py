@@ -36,7 +36,7 @@ from .utils import unauthorized_error_response, unprocessable_error_response, \
 
 
 API = Namespace('searches', description='Endpoints for PPR searches.')
-VAL_ERROR = "Search request data validation errors."  # Validation error prefix
+VAL_ERROR = 'Search request data validation errors.'  # Validation error prefix
 
 
 @cors_preflight('POST,OPTIONS')
@@ -50,7 +50,6 @@ class SearchResource(Resource):
     @jwt.requires_auth
     def post():
         """Execute a new search request using criteria in the request body."""
-
         try:
 
             # Quick check: must be staff or provide an account ID.
@@ -72,11 +71,12 @@ class SearchResource(Resource):
             query = SearchClient.create_from_json(request_json, account_id)
 
             # Charge a search fee.
-            payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-            pay_ref = payment.create_payment(TransactionTypes.SEARCH.value, 1, None, query.client_reference_id)
-            invoice_id = pay_ref['invoiceId']
-            query.pay_invoice_id = int(invoice_id)
-            query.pay_path = pay_ref['receipt']
+            if account_id:
+                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+                pay_ref = payment.create_payment(TransactionTypes.SEARCH.value, 1, None, query.client_reference_id)
+                invoice_id = pay_ref['invoiceId']
+                query.pay_invoice_id = int(invoice_id)
+                query.pay_path = pay_ref['receipt']
 
             # Execute the search query: if no results return a 422 status.
             try:
@@ -95,7 +95,7 @@ class SearchResource(Resource):
                 try:
                     payment.cancel_payment(invoice_id)
                 except Exception as cancel_exception:
-                    current_app.logger.error(f'Search {account_id} payment refund failed for invoice {invoice_id}: ' + \
+                    current_app.logger.error(f'Search {account_id} payment refund failed for invoice {invoice_id}: ' +
                                              repr(cancel_exception))
 
                 raise db_exception
@@ -121,7 +121,6 @@ class SearchDetailResource(Resource):
     @jwt.requires_auth
     def put(search_id):
         """Execute a search detail request using criteria in the request body."""
-
         try:
             if search_id is None:
                 return path_param_error_response('search ID')
