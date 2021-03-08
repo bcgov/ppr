@@ -20,13 +20,73 @@ export const tableHeaders: TableHeadersIF =
         class: 'result-header'
       },
       {
-        text: 'Make',
-        value: 'vehicleCollateral.make',
+        text: 'Make/Model',
+        value: 'makeModel',
+        class: 'result-header'
+      }
+    ],
+    [APISearchTypes.INDIVIDUAL_DEBTOR]: [
+      {
+        text: 'Debtor Name',
+        value: 'debtor.personalName',
         class: 'result-header'
       },
       {
-        text: 'Model',
-        value: 'vehicleCollateral.model',
+        text: 'Birthdate',
+        value: '',
+        class: 'result-header'
+      }
+    ],
+    [APISearchTypes.BUSINESS_DEBTOR]: [
+      {
+        text: 'Debtor Name',
+        value: 'debtor.businessName',
+        class: 'result-header'
+      }
+    ],
+    [APISearchTypes.MHR_NUMBER]: [
+      {
+        text: 'Manufactured Home Registration Number',
+        value: 'vehicleCollateral.manufacturedHomeRegistrationNumber',
+        class: 'result-header'
+      },
+      {
+        text: 'Serial Number',
+        value: 'vehicleCollateral.serialNumber',
+        class: 'result-header'
+      },
+      {
+        text: 'Year',
+        value: 'vehicleCollateral.year',
+        class: 'result-header'
+      },
+      {
+        text: 'Make/Model',
+        value: 'makeModel',
+        class: 'result-header'
+      }
+    ],
+    [APISearchTypes.AIRCRAFT]: [
+      {
+        text: 'Serial Number',
+        value: 'vehicleCollateral.serialNumber',
+        class: 'result-header'
+      },
+      {
+        text: 'Year',
+        value: 'vehicleCollateral.year',
+        class: 'result-header'
+      },
+      {
+        text: 'Make/Model',
+        value: 'makeModel',
+        class: 'result-header'
+      }
+    ],
+    [APISearchTypes.REGISTRATION_NUMBER]: [
+      {
+        text: 'Registration Number',
+        value: 'registrationNumber',
         class: 'result-header'
       }
     ]

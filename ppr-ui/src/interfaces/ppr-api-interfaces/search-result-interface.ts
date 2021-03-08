@@ -1,4 +1,3 @@
-import { MatchTypes } from '@/enums'
 import { VehicleCollateralIF, SearchNameIF } from '@/interfaces'
 
 // Interface for a single search result matching the search criteria.

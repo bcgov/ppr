@@ -19,17 +19,16 @@
                    :disabled="!searchPopUp"
                    transition="fade-transition"
                    :value="showSearchPopUp && searchPopUp">
-          <template v-slot:activator="scope">
-            <div v-on="scope.on">
-              <v-text-field :error-messages="searchMessage ? searchMessage : ''"
-                            autocomplete="off"
-                            :disabled="!selectedSearchType"
-                            filled
-                            :hint="searchHint ? searchHint : ''"
-                            :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
-                            v-model="searchValue">
-              </v-text-field>
-            </div>
+          <template v-slot:activator="scope" & v-on="scope.on">
+            <v-text-field :error-messages="searchMessage ? searchMessage : ''"
+                          autocomplete="off"
+                          :disabled="!selectedSearchType"
+                          filled
+                          :hint="searchHint"
+                          persistent-hint
+                          :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
+                          v-model="searchValue">
+            </v-text-field>
           </template>
           <v-row v-for="(line, index) in searchPopUp" :key="index" class="pt-2 pl-3">
             {{ line }}
@@ -63,6 +62,7 @@ import {
   SearchTypeIF, // eslint-disable-line no-unused-vars
   SearchValidationIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { UISearchTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -89,27 +89,33 @@ export default defineComponent({
       }),
       searchHint: computed((): string => {
         if (localState.searchMessage) return ''
-        return localState.selectedSearchType?.hints?.searchValue || ''
+        else return localState.selectedSearchType?.hints?.searchValue || ''
       }),
       searchPopUp: computed((): Array<string> | boolean => {
         return localState.validations?.searchValue?.popUp || false
       })
     })
     const getSearchApiParams = (): SearchCriteriaIF => {
+      let cleanedSearchValue = localState.searchValue?.trim()
+      if (localState.selectedSearchType.searchTypeUI === UISearchTypes.AIRCRAFT) {
+        // replaceAll fails in jest so use regex
+        const dash = /-/g
+        cleanedSearchValue = cleanedSearchValue?.replace(dash, '')
+      }
       return {
         type: localState.selectedSearchType.searchTypeAPI,
         criteria: {
-          value: localState.searchValue
+          value: cleanedSearchValue
         }
       }
     }
     const searchAction = async () => {
       localState.validations = validateSearchAction(localState)
       if (localState.validations) return
+      else emit('search-data', null) // clear any current results
       const apiHelper = new PPRApiHelper()
       const resp: SearchResponseIF = await apiHelper.search(getSearchApiParams())
       if (resp?.errors) emit('search-error', resp.errors)
-      // future: do something with this in dashboard
       else emit('search-data', resp)
     }
     watch(() => localState.searchValue, () => {
@@ -117,6 +123,7 @@ export default defineComponent({
     })
     watch(() => localState.selectedSearchType, (val) => {
       localState.validations = null
+      localState.searchValue = null
     })
 
     return {
@@ -140,8 +147,13 @@ export default defineComponent({
 .close-popup-btn {
   background-color: transparent !important;
 }
-.v-select-list {
-  padding-left: 1rem;
-  padding-right: 1rem;
+::v-deep {
+  .v-select-list {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .v-select__selections {
+    line-height: 1.5rem !important;
+  }
 }
 </style>

@@ -13,6 +13,8 @@ import { Search } from '@/components/search'
 // Other
 import { SearchTypes } from '@/resources'
 import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import { mockResponse } from './test-data'
+import { UISearchTypes } from '@/enums'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -26,7 +28,6 @@ const searchData: string = 'search-data'
 
 // Input field selectors / buttons
 const searchButtonSelector: string = '#search-btn'
-const searchDropDown: string = '#search-type-select'
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
@@ -65,29 +66,9 @@ function createComponent (
   })
 }
 
-describe('App component', () => {
+describe('Search component', () => {
   let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  const post = sinon.stub(axios, 'post')
 
-  const resp: SearchResponseIF = {
-    searchId: '1',
-    maxResultsSize: 1,
-    totalResultsSize: 1,
-    returnedResultsSize: 1,
-    searchQuery: {
-      type: 'SERIAL_NUMBER',
-      criteria: {
-        value: 'F100'
-      }
-    },
-    results: null
-  }
-
-  // GET search data
-  post.returns(new Promise(resolve => resolve({
-    data: resp
-  })))
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -100,69 +81,199 @@ describe('App component', () => {
     expect(wrapper.vm.$data.searchTypes).toStrictEqual(SearchTypes)
     expect(wrapper.find(searchButtonSelector).attributes('disabled')).toBeUndefined()
   })
+})
 
-  it('prevents searching and gives validation when category is not selected', async () => {
-    expect(wrapper.vm.$data.selectedSearchType).toBeUndefined()
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.searchTypes).toStrictEqual(SearchTypes)
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toBeNull()
-    expect(wrapper.vm.$data.validations.category?.message).toBeDefined()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Please select a category')
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toBeNull()
+describe('Serial number search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  let sandbox;
+  const resp: SearchResponseIF = mockResponse[UISearchTypes.SERIAL_NUMBER]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox();
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    wrapper = createComponent(SearchTypes)
   })
-
-  it('prevents searching and gives validation when the search is empty', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
-    wrapper.vm.$data.selectedSearchType = select1
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.searchValue).toBeUndefined()
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Enter a serial number to search')
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
   })
 
   it('searches when fields are filled', async () => {
     const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
     wrapper.vm.$data.selectedSearchType = select1
-    wrapper.vm.$data.searchValue = 'F100'
     await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'F100'
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(0)
+    expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Serial numbers normally contain')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
+})
 
-  it('gives validation messages/hints as user types', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
+describe('Business debtor search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  let sandbox;
+  const resp: SearchResponseIF = mockResponse[UISearchTypes.BUSINESS_DEBTOR]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox();
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    wrapper = createComponent(SearchTypes)
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('searches when fields are filled', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'F10'
+    wrapper.vm.$data.searchValue = 'test business debtor'
+    wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
-    expect(wrapper.vm.$data.validations?.searchValue?.popUp).toBeDefined()
-    await Vue.nextTick()
-    const popUpMessages = wrapper.findAll('.v-tooltip__content')
-    expect(popUpMessages.length).toBe(1)
-    wrapper.vm.$data.searchValue = 'F10@'
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
-    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Business names must contain')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+})
+
+describe('MHR search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  let sandbox;
+  const resp: SearchResponseIF = mockResponse[UISearchTypes.MHR_NUMBER]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox();
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    wrapper = createComponent(SearchTypes)
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('searches when fields are filled', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[4]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = '123456'
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+})
+
+describe('Aircraft search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  let sandbox;
+  const resp: SearchResponseIF = mockResponse[UISearchTypes.AIRCRAFT]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox();
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    wrapper = createComponent(SearchTypes)
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('searches when fields are filled', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[5]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'abcd-efgh-fhgh' // dashes allowed
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Up to 25 letters')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+})
+
+describe('Registration number search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  let sandbox;
+  const resp: SearchResponseIF = mockResponse[UISearchTypes.REGISTRATION_NUMBER]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox();
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    wrapper = createComponent(SearchTypes)
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('searches when fields are filled', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[6]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = '123456A'
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Registration numbers contain')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
