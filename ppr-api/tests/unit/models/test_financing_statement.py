@@ -17,17 +17,16 @@
 Test-Suite to ensure that the Financing Statement Model is working as expected.
 """
 from http import HTTPStatus
+import copy
 
 import pytest
-
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT, DISCHARGE_STATEMENT, DRAFT_FINANCING_STATEMENT
 from ppr_api.models import FinancingStatement, Draft
+
 from ppr_api.exceptions import BusinessException
 
-import copy
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT, DISCHARGE_STATEMENT, DRAFT_FINANCING_STATEMENT
 
-
-def test_save_SA(session):
+def test_save_sa(session):
     """Assert that a save valid SA financing statement works as expected."""
     json_data = copy.deepcopy(FINANCING_STATEMENT)
     json_data['type'] = 'SA'
@@ -55,7 +54,8 @@ def test_save_SA(session):
     assert result['generalCollateral'][0]
     assert 'documentId' not in result
 
-def test_save_SA_from_draft(session):
+
+def test_save_sa_from_draft(session):
     """Assert that a save valid SA financing statement from draft works as expected."""
     json_data = copy.deepcopy(FINANCING_STATEMENT)
     json_data['type'] = 'SA'
@@ -83,7 +83,7 @@ def test_save_SA_from_draft(session):
 #    assert 'documentId' in result
 
 
-def test_save_RL(session):
+def test_save_rl(session):
     """Assert that a save valid RL financing statement works as expected."""
     json_data = copy.deepcopy(FINANCING_STATEMENT)
     json_data['type'] = 'RL'
@@ -136,6 +136,7 @@ def test_save_no_account(session):
     assert result['securedParties'][0]
     assert result['vehicleCollateral'][0]
     assert result['generalCollateral'][0]
+
 
 def test_find_all_by_account_id(session):
     """Assert that the financing statement summary list by account id first item contains all expected elements."""
@@ -212,9 +213,9 @@ def test_find_by_financing_id(session):
         assert json_data['lifeYears']
         assert json_data['trustIndenture']
 
+
 def test_find_by_registration_number_invalid(session):
     """Assert that a fetch financing statement on a non-existent registration number works as expected."""
-
     with pytest.raises(BusinessException) as not_found_err:
         FinancingStatement.find_by_registration_number('X12345X', False)
 
@@ -222,9 +223,9 @@ def test_find_by_registration_number_invalid(session):
     assert not_found_err
     assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
 
+
 def test_find_by_registration_number_historical(session):
     """Assert that a fetch a discharged financing statement on a valid registration number works as expected."""
-
     with pytest.raises(BusinessException) as historical_err:
         FinancingStatement.find_by_registration_number('TEST0003', False)
 
@@ -232,10 +233,12 @@ def test_find_by_registration_number_historical(session):
     assert historical_err
     assert historical_err.value.status_code == HTTPStatus.BAD_REQUEST
 
+
 def test_find_by_registration_number_historical_staff(session):
     """Assert that a fetch discharged financing statement on a registration number works as expected for staff."""
     result = FinancingStatement.find_by_registration_number('TEST0003', True)
     assert result
+
 
 def test_validate_base_debtor(session):
     """Assert that base debtor check on an existing registration works as expected."""
@@ -248,18 +251,18 @@ def test_validate_base_debtor(session):
 
     # valid business name
     valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert valid == True
+    assert valid
 
     # invalid business name
     json_data['baseDebtor']['businessName'] = 'xxx debtor'
     valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert valid == False
+    assert valid
 
     # invalid individual name
     person = {
         'last': 'Debtor',
         'first': 'Test ind',
-        'middle': '1' 
+        'middle': '1'
     }
     del json_data['baseDebtor']['businessName']
     json_data['baseDebtor']['personName'] = person
@@ -269,7 +272,8 @@ def test_validate_base_debtor(session):
     # invalid individual name
     json_data['baseDebtor']['personName']['first'] = 'John'
     valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert valid == False
+    assert valid
+
 
 def test_financing_client_code_invalid(session):
     """Assert that the financing statement json with an invalid RP client code validates correctly."""

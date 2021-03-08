@@ -15,23 +15,21 @@
 from __future__ import annotations
 
 from enum import Enum
-#from http import HTTPStatus
-
-#from sqlalchemy import event
-
-#from ppr_api.exceptions import BusinessException
 
 from .db import db
 
-SEARCH_VIN_STATEMENT = "SELECT search_key_pkg.vehicle('?') FROM DUAL"
-SEARCH_VIN_STATEMENT_AC = "SELECT search_key_pkg.aircraft('?') FROM DUAL"
-SEARCH_VIN_STATEMENT_MH = "SELECT search_key_pkg.mhr('?') FROM DUAL"
+
+SEARCH_VIN_STATEMENT = "SELECT search_key_pkg.vehicle('?') FROM DUAL"  # noqa: Q000
+SEARCH_VIN_STATEMENT_AC = "SELECT search_key_pkg.aircraft('?') FROM DUAL"  # noqa: Q000
+SEARCH_VIN_STATEMENT_MH = "SELECT search_key_pkg.mhr('?') FROM DUAL"  # noqa: Q000
+
 
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the vehicle collateral information."""
 
     class SerialTypes(Enum):
         """Render an Enum of the vehicle types."""
+
         AIRCRAFT = 'AC'
         AIRCRAFT_AIRFRAME = 'AF'
         BOAT = 'BO'
@@ -50,7 +48,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                            db.Sequence('vehicle_id_seq'),
                            primary_key=True)
     vehicle_type_cd = db.Column('serial_type_cd', db.String(2), nullable=False)
-                                #, db.ForeignKey('serial_type.serial_type_cd'))
+    # , db.ForeignKey('serial_type.serial_type_cd'))
     year = db.Column('year', db.Integer, nullable=True)
     make = db.Column('make', db.String(60), nullable=True)
     model = db.Column('model', db.String(60), nullable=True)
@@ -69,14 +67,14 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id],
-                                   back_populates="vehicle_collateral", cascade='all, delete',
+    registration = db.relationship('Registration', foreign_keys=[registration_id],
+                                   back_populates='vehicle_collateral', cascade='all, delete',
                                    uselist=False)
 #    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
-                                          back_populates="vehicle_collateral", cascade='all, delete',
+    financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
+                                          back_populates='vehicle_collateral', cascade='all, delete',
                                           uselist=False)
 
     def save(self):
@@ -104,7 +102,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
         return collateral
 
-
     @classmethod
     def find_by_id(cls, vehicle_id: int = None):
         """Return a vehicle collateral object by collateral ID."""
@@ -113,7 +110,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             collateral = cls.query.get(vehicle_id)
 
         return collateral
-
 
     @classmethod
     def find_by_registration_id(cls, registration_id: int = None):
@@ -125,7 +121,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
         return collateral
 
-
     @classmethod
     def find_by_financing_id(cls, financing_id: int = None):
         """Return a list of vehicle collateral objects by financing statement ID."""
@@ -135,7 +130,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                                   .order_by(VehicleCollateral.vehicle_id).all()
 
         return collateral
-
 
     @staticmethod
     def create_from_json(json_data, registration_id: int = None):
@@ -171,10 +165,12 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
         return collateral_list
 
-
     @staticmethod
     def create_from_statement_json(json_data, registration_id: int, financing_id: int):
-        """Create a list of vehicle collateral objects from an amendment/change statement json schema object: map json to db."""
+        """Create a list of vehicle collateral objects from an amendment/change statement json schema object.
+
+        Map json to db.
+        """
         collateral_list = []
         if json_data and registration_id and financing_id and \
                 'addVehicleCollateral' in json_data and json_data['addVehicleCollateral']:
@@ -188,12 +184,11 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     @staticmethod
     def get_search_vin(vehicle_type: str, serial_number: str):
         """Conditionally generate the search_vin value from a database function."""
-
         if not vehicle_type or not serial_number:
             return None
 
         statement = SEARCH_VIN_STATEMENT.replace('?', serial_number)
-        if vehicle_type in (VehicleCollateral.SerialTypes.AIRCRAFT.value, \
+        if vehicle_type in (VehicleCollateral.SerialTypes.AIRCRAFT.value,
                             VehicleCollateral.SerialTypes.AIRCRAFT_AIRFRAME.value):
             statement = SEARCH_VIN_STATEMENT_AC.replace('?', serial_number)
         elif vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:

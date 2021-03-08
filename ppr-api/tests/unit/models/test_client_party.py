@@ -16,9 +16,6 @@
 
 Test-Suite to ensure that the ClientParty Model is working as expected.
 """
-from http import HTTPStatus
-
-import pytest
 
 from ppr_api.models import ClientParty
 
@@ -40,6 +37,7 @@ def test_find_by_code(session):
     assert party['businessName']
     assert party['emailAddress']
 
+
 def test_find_by_code_invalid(session):
     """Assert that find client party by non-existent code returns the expected result."""
     party = ClientParty.find_by_code('12345')
@@ -55,7 +53,7 @@ def test_client_party_json(session):
         contact_area_cd='250',
         contact_phone_number='1234567',
         business_name='BUSINESS',
-        email_id = 'test@gmail.com'
+        email_id='test@gmail.com'
     )
 
     party_json = {
@@ -70,4 +68,3 @@ def test_client_party_json(session):
     }
 
     assert party.json == party_json
-

@@ -17,16 +17,16 @@
 Test-Suite to ensure that the Registration Model is working as expected.
 """
 from http import HTTPStatus
+import copy
 
 import pytest
-
-from ppr_api.models import Registration, FinancingStatement, Draft
-from ppr_api.exceptions import BusinessException
-
-import copy
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT, DISCHARGE_STATEMENT
+from registry_schemas.example_data.ppr import DISCHARGE_STATEMENT
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, RENEWAL_STATEMENT, CHANGE_STATEMENT
 from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT, DRAFT_CHANGE_STATEMENT
+from ppr_api.models import Registration, FinancingStatement, Draft
+
+from ppr_api.exceptions import BusinessException
+
 
 def test_find_by_id(session):
     """Assert that find registration by ID contains all expected elements."""
@@ -39,7 +39,8 @@ def test_find_by_id(session):
     assert registration.account_id
     assert registration.client_reference_id
 
-def test_find_by_id_AS(session):
+
+def test_find_by_id_as(session):
     """Assert that find an amemdment registration by ID contains all expected elements."""
     registration = Registration.find_by_id(200000008)
     assert registration
@@ -68,7 +69,8 @@ def test_find_by_id_AS(session):
     assert len(json_data['deleteVehicleCollateral']) == 1
     assert 'documentId' not in json_data
 
-def test_find_by_id_CS_DT(session):
+
+def test_find_by_id_cs_dt(session):
     """Assert that find an change registration DT by ID contains all expected elements."""
     registration = Registration.find_by_id(200000009)
     assert registration
@@ -90,7 +92,8 @@ def test_find_by_id_CS_DT(session):
     assert 'deleteVehicleCollateral' not in json_data
     assert 'documentId' not in json_data
 
-def test_find_by_id_CS_ST(session):
+
+def test_find_by_id_cs_st(session):
     """Assert that find an change registration ST by ID contains all expected elements."""
     registration = Registration.find_by_id(200000010)
     assert registration
@@ -111,7 +114,8 @@ def test_find_by_id_CS_ST(session):
     assert 'deleteGeneralCollateral' not in json_data
     assert 'deleteVehicleCollateral' not in json_data
 
-def test_find_by_id_CS_SU(session):
+
+def test_find_by_id_cs_su(session):
     """Assert that find an change registration SU by ID contains all expected elements."""
     registration = Registration.find_by_id(200000011)
     assert registration
@@ -134,7 +138,8 @@ def test_find_by_id_CS_SU(session):
     assert 'addSecuredParties' not in json_data
     assert 'deleteSecuredParties' not in json_data
 
-def test_find_by_registration_num_FS(session):
+
+def test_find_by_registration_num_fs(session):
     """Assert that find a financing statement by registration number contains all expected elements."""
     registration = Registration.find_by_registration_number('TEST0001')
     assert registration
@@ -145,7 +150,8 @@ def test_find_by_registration_num_FS(session):
     assert registration.account_id
     assert registration.client_reference_id
 
-def test_find_by_registration_num_DS(session):
+
+def test_find_by_registration_num_ds(session):
     """Assert that find a discharge statement by registration number contains all expected elements."""
     registration = Registration.find_by_registration_number('TEST00D4')
     assert registration
@@ -176,6 +182,7 @@ def test_find_by_reg_num_invalid(session):
     registration = Registration.find_by_registration_number('100000234')
     assert not registration
 
+
 def test_save_discharge(session):
     """Assert that creating a discharge statement contains all expected elements."""
     json_data = copy.deepcopy(DISCHARGE_STATEMENT)
@@ -186,14 +193,14 @@ def test_save_discharge(session):
     financing_statement = FinancingStatement.find_by_financing_id(200000003)
     assert financing_statement
 
-    registration = Registration.create_from_json(json_data, 
-                                                 'DISCHARGE', 
-                                                 financing_statement, 
-                                                 'TEST0003', 
+    registration = Registration.create_from_json(json_data,
+                                                 'DISCHARGE',
+                                                 financing_statement,
+                                                 'TEST0003',
                                                  'PS12345')
     print(str(registration.registration_id))
-    print(registration.document_number)    
-    print(registration.registration_num)    
+    print(registration.document_number)
+    print(registration.registration_num)
 #    print(registration.json)
     registration.save()
     assert registration.financing_id == 200000003
@@ -223,9 +230,9 @@ def test_save_renewal(session):
     financing_statement = FinancingStatement.find_by_financing_id(200000004)
     assert financing_statement
 
-    registration = Registration.create_from_json(json_data, 
-                                                 'RENEWAL', 
-                                                 financing_statement, 
+    registration = Registration.create_from_json(json_data,
+                                                 'RENEWAL',
+                                                 financing_statement,
                                                  'TEST0005',
                                                  'PS12345')
 #    print(registration.financing_id)
@@ -246,7 +253,8 @@ def test_save_renewal(session):
     assert result['createDateTime']
     assert result['registeringParty']
 
-def test_save_renewal_RL(session):
+
+def test_save_renewal_rl(session):
     """Assert that creating a renewal statement on a RL financing statement contains all expected elements."""
     json_data = copy.deepcopy(RENEWAL_STATEMENT)
     del json_data['createDateTime']
@@ -257,9 +265,9 @@ def test_save_renewal_RL(session):
     financing_statement = FinancingStatement.find_by_financing_id(200000001)
     assert financing_statement
 
-    registration = Registration.create_from_json(json_data, 
-                                                 'RENEWAL', 
-                                                 financing_statement, 
+    registration = Registration.create_from_json(json_data,
+                                                 'RENEWAL',
+                                                 financing_statement,
                                                  'TEST0002',
                                                  'PS12345')
 #    print(registration.financing_id)
@@ -280,6 +288,7 @@ def test_save_renewal_RL(session):
     assert result['createDateTime']
     assert result['registeringParty']
     assert result['courtOrderInformation']
+
 
 def test_save_amendment(session):
     """Assert that creating an amendment statement on a non-RL financing statement contains all expected elements."""
@@ -307,9 +316,9 @@ def test_save_amendment(session):
         if vc.registration_id != 200000000 and not vc.registration_id_end:
             json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
 
-    registration = Registration.create_from_json(json_data, 
-                                                 'AMENDMENT', 
-                                                 financing_statement, 
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
                                                  'TEST0001',
                                                  'PS12345')
 #    print(registration.financing_id)
@@ -334,8 +343,10 @@ def test_save_amendment(session):
 
 
 def test_save_amendment_from_draft(session):
-    """Assert that creating an amendment statement from a draft on a non-RL financing 
-       statement contains all expected elements."""
+    """Assert that creating an amendment statement from a draft on a non-RL financing statement.
+
+    Verify it contains all expected elements.
+    """
     json_data = copy.deepcopy(AMENDMENT_STATEMENT)
     del json_data['createDateTime']
     del json_data['amendmentRegistrationNumber']
@@ -359,21 +370,21 @@ def test_save_amendment_from_draft(session):
             json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
 
     # Now create a draft amendment
-    draft_json = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)     
+    draft_json = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)
     draft = Draft.create_from_json(draft_json, 'PS12345')
     draft.save()
     assert draft.document_number
     json_data['documentId'] = draft.document_number
-    registration = Registration.create_from_json(json_data, 
-                                                 'AMENDMENT', 
-                                                 financing_statement, 
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
                                                  'TEST0001',
                                                  'PS12345')
     registration.save()
     assert registration.draft
     result = registration.json
     assert result
- #   assert 'documentId' in result
+    # assert 'documentId' in result
 
 
 def test_save_change(session):
@@ -402,9 +413,9 @@ def test_save_change(session):
         if vc.registration_id != 200000000 and not vc.registration_id_end:
             json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
 
-    registration = Registration.create_from_json(json_data, 
-                                                 'CHANGE', 
-                                                 financing_statement, 
+    registration = Registration.create_from_json(json_data,
+                                                 'CHANGE',
+                                                 financing_statement,
                                                  'TEST0001',
                                                  'PS12345')
 #    print(registration.financing_id)
@@ -453,15 +464,15 @@ def test_save_change_from_draft(session):
             json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
 
     # Now create a draft change
-    draft_json = copy.deepcopy(DRAFT_CHANGE_STATEMENT)     
+    draft_json = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
     draft = Draft.create_from_json(draft_json, 'PS12345')
     draft.save()
     assert draft.document_number
     json_data['documentId'] = draft.document_number
 
-    registration = Registration.create_from_json(json_data, 
-                                                 'CHANGE', 
-                                                 financing_statement, 
+    registration = Registration.create_from_json(json_data,
+                                                 'CHANGE',
+                                                 financing_statement,
                                                  'TEST0001',
                                                  'PS12345')
     registration.save()
@@ -486,11 +497,11 @@ def test_renewal_client_code_invalid(session):
 
     financing_statement = FinancingStatement.find_by_financing_id(200000004)
     assert financing_statement
-  
+
     with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data, 
-                                      'RS', 
-                                      financing_statement, 
+        Registration.create_from_json(json_data,
+                                      'RS',
+                                      financing_statement,
                                       'TEST0001',
                                       'PS12345')
 
@@ -519,9 +530,9 @@ def test_amendment_party_id_invalid(session):
 
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
     with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data, 
-                                      'AMENDMENT', 
-                                      financing_statement, 
+        Registration.create_from_json(json_data,
+                                      'AMENDMENT',
+                                      financing_statement,
                                       'TEST0005',
                                       'PS12345')
 
@@ -529,7 +540,6 @@ def test_amendment_party_id_invalid(session):
     assert bad_request_err
     assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     print(bad_request_err.value.error)
-
 
 
 def test_amendment_vehicle_id_invalid(session):
@@ -551,9 +561,9 @@ def test_amendment_vehicle_id_invalid(session):
 
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
     with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data, 
-                                      'AMENDMENT', 
-                                      financing_statement, 
+        Registration.create_from_json(json_data,
+                                      'AMENDMENT',
+                                      financing_statement,
                                       'TEST0001',
                                       'PS12345')
 
@@ -561,7 +571,6 @@ def test_amendment_vehicle_id_invalid(session):
     assert bad_request_err
     assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     print(bad_request_err.value.error)
-
 
 
 def test_amendment_collateral_id_invalid(session):
@@ -583,9 +592,9 @@ def test_amendment_collateral_id_invalid(session):
 
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
     with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data, 
-                                      'AMENDMENT', 
-                                      financing_statement, 
+        Registration.create_from_json(json_data,
+                                      'AMENDMENT',
+                                      financing_statement,
                                       'TEST0001',
                                       'PS12345')
 
@@ -593,4 +602,3 @@ def test_amendment_collateral_id_invalid(session):
     assert bad_request_err
     assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     print(bad_request_err.value.error)
-

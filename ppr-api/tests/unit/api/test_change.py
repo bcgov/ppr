@@ -18,10 +18,12 @@ Test-Suite to ensure that the /financing-statement/registrationNum/changes endpo
 """
 import copy
 from http import HTTPStatus
+
 from registry_schemas.example_data.ppr import CHANGE_STATEMENT, FINANCING_STATEMENT
 
 from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
+
 
 # prep sample post change statement data
 SAMPLE_JSON = copy.deepcopy(CHANGE_STATEMENT)
@@ -47,7 +49,7 @@ def test_change_create_invalid_type_400(session, client, jwt):
     del json_data['addGeneralCollateral']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -55,7 +57,7 @@ def test_change_create_invalid_type_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_change_create_valid_SU_200(session, client, jwt):
+def test_change_create_valid_su_200(session, client, jwt):
     """Assert that a valid SU type change statement returns a 200 status."""
     # setup
     statement = copy.deepcopy(FINANCING_STATEMENT)
@@ -68,11 +70,11 @@ def test_change_create_valid_SU_200(session, client, jwt):
     del statement['lifeInfinite']
     del statement['lienAmount']
     del statement['surrenderDate']
- 
-    rv1 = client.post(f'/api/v1/financing-statements',
-                     json=statement,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+
+    rv1 = client.post('/api/v1/financing-statements',
+                      json=statement,
+                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
     base_reg_num = rv1.json['baseRegistrationNumber']
@@ -95,7 +97,7 @@ def test_change_create_valid_SU_200(session, client, jwt):
     json_data['deleteVehicleCollateral'] = rv1.json['vehicleCollateral']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/' + base_reg_num + '/changes',
+    rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -104,7 +106,7 @@ def test_change_create_valid_SU_200(session, client, jwt):
     assert rv.status_code == HTTPStatus.OK
 
 
-def test_change_create_valid_DT_200(session, client, jwt):
+def test_change_create_valid_dt_200(session, client, jwt):
     """Assert that a valid DT type change statement returns a 200 status."""
     # setup
     statement = copy.deepcopy(FINANCING_STATEMENT)
@@ -117,11 +119,11 @@ def test_change_create_valid_DT_200(session, client, jwt):
     del statement['lifeInfinite']
     del statement['lienAmount']
     del statement['surrenderDate']
- 
-    rv1 = client.post(f'/api/v1/financing-statements',
-                     json=statement,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+
+    rv1 = client.post('/api/v1/financing-statements',
+                      json=statement,
+                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
     base_reg_num = rv1.json['baseRegistrationNumber']
@@ -144,7 +146,7 @@ def test_change_create_valid_DT_200(session, client, jwt):
     json_data['deleteDebtors'] = rv1.json['debtors']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/' + base_reg_num + '/changes',
+    rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -173,7 +175,7 @@ def test_change_create_invalid_regnum_404(session, client, jwt):
     del json_data['addGeneralCollateral']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/X12345X/changes',
+    rv = client.post('/api/v1/financing-statements/X12345X/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -202,7 +204,7 @@ def test_change_nonstaff_missing_account_400(session, client, jwt):
     del json_data['addGeneralCollateral']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
                      headers=create_header(jwt, [COLIN_ROLE]),
                      content_type='application/json')
@@ -231,7 +233,7 @@ def test_change_staff_missing_account_200(session, client, jwt):
     del json_data['addGeneralCollateral']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
@@ -240,7 +242,7 @@ def test_change_staff_missing_account_200(session, client, jwt):
     assert rv.status_code == HTTPStatus.OK
 
 
-def test_change_nonstaff_unauthorized_404(session, client, jwt):
+def test_change_nonstaff_unauthorized_401(session, client, jwt):
     """Assert that a change statement request with a non-ppr role and account ID returns a 404 status."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON)
@@ -260,7 +262,7 @@ def test_change_nonstaff_unauthorized_404(session, client, jwt):
     del json_data['addGeneralCollateral']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [COLIN_ROLE]),
                      content_type='application/json')
@@ -281,7 +283,7 @@ def test_change_invalid_missing_basedebtor_400(session, client, jwt):
     del json_data['baseDebtor']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -301,7 +303,7 @@ def test_change_invalid_historical_400(session, client, jwt):
     del json_data['documentId']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0003/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0003/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -322,12 +324,10 @@ def test_change_invalid_debtor_400(session, client, jwt):
     del json_data['documentId']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/changes',
+    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-

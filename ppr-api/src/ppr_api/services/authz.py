@@ -32,16 +32,17 @@ PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 
 
-#def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool: # pylint: disable=too-many-return-statements
-def authorized(identifier: str, jwt: JwtManager) -> bool: # pylint: disable=too-many-return-statements
-    """Verify the user is authorized to submit the request by inspecting the web
-       token. The gateway has already verified the JWT with the OIDC service."""
+#  def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool:
+def authorized(identifier: str, jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
+    """Verify the user is authorized to submit the request by inspecting the web token.
 
+    The gateway has already verified the JWT with the OIDC service.
+    """
     if not jwt:
         return False
 
     # Could call the auth api here to check the token roles (/api/v1/orgs/{account_id}/authorizations),
-    # but JWTMangager.validate_roles does the same thing.
+    # but JWTManager.validate_roles does the same thing.
 
     # All users including staff must have the PPR role.
     if not jwt.validate_roles([PPR_ROLE]):
@@ -88,7 +89,6 @@ def authorized(identifier: str, jwt: JwtManager) -> bool: # pylint: disable=too-
 def authorized_token(  # pylint: disable=too-many-return-statements
         identifier: str, jwt: JwtManager, action: List[str]) -> bool:
     """Assert that the user is authorized to submit API requests for a particular action."""
-
     if not action or not identifier or not jwt:
         return False
 
@@ -130,8 +130,7 @@ def authorized_token(  # pylint: disable=too-many-return-statements
 
 
 def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
-    """True if user has the BC Registries staff role."""
-
+    """Return True if the user has the BC Registries staff role."""
     if not jwt:
         return False
 

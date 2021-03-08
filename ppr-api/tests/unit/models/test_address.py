@@ -16,10 +16,6 @@
 
 Test-Suite to ensure that the Address Model is working as expected.
 """
-from http import HTTPStatus
-
-import pytest
-
 from ppr_api.models import Address
 
 
@@ -40,7 +36,6 @@ def test_find_by_id(session):
 
 def test_save(session):
     """Assert that creating an address works as expected."""
-
     address_json = {
         'street': 'street1',
         'streetAdditional': 'street2',
@@ -73,5 +68,4 @@ def test_address_json(session):
         'country': address.country,
         'postalCode': address.postal_code
     }
-
     assert address.json == address_json

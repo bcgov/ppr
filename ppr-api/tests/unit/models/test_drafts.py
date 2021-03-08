@@ -18,17 +18,14 @@ Test-Suite to ensure that the Draft Model is working as expected.
 """
 from http import HTTPStatus
 import json
+import copy
 
 import pytest
 
+from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT, DRAFT_CHANGE_STATEMENT
 from ppr_api.models import Draft
 from ppr_api.exceptions import BusinessException
 from ppr_api.models.utils import now_ts
-
-import copy
-from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT
-from registry_schemas.example_data.ppr import DRAFT_FINANCING_STATEMENT, DRAFT_CHANGE_STATEMENT
-
 
 
 def test_find_all_by_account_id(session):
@@ -39,6 +36,7 @@ def test_find_all_by_account_id(session):
     assert draft_list[0]['registrationType']
     assert draft_list[0]['path']
     assert draft_list[0]['createDateTime']
+
 
 def test_find_by_document_id_financing(session):
     """Assert that the find draft financing statement by document id contains all expected elements."""
@@ -63,6 +61,7 @@ def test_find_by_document_id_change(session):
     assert json_data['changeStatement']['registeringParty']
     assert json_data['changeStatement']['baseRegistrationNumber']
     assert json_data['changeStatement']['changeType']
+
 
 def test_find_by_document_id_amendment(session):
     """Assert that the find draft amendment statement by document id contains all expected elements."""
@@ -114,8 +113,8 @@ def test_save_then_delete(session):
 
     # Now test delete draft
     document_id = draft['changeStatement']['documentId']
-    deleteDraft = Draft.delete(document_id)
-    assert deleteDraft
+    delete_draft = Draft.delete(document_id)
+    assert delete_draft
 
 
 def test_update(session):
@@ -134,6 +133,7 @@ def test_update(session):
     assert draft['changeStatement']['changeType']
     assert draft['changeStatement']['documentId']
 
+
 def test_update_invalid(session):
     """Assert that an update draft statement with a non-existent document id returns the expected result."""
     json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
@@ -147,7 +147,7 @@ def test_update_invalid(session):
 
 
 def test_delete_bad_id(session):
-    """Assert that delete by invalid document ID works as expected """
+    """Assert that delete by invalid document ID works as expected."""
     with pytest.raises(BusinessException) as not_found_err:
         Draft.delete('X12345X')
 
@@ -155,14 +155,14 @@ def test_delete_bad_id(session):
     assert not_found_err
     assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
 
+
 def test_draft_json(session):
     """Assert that the draft renders to a json format correctly."""
-
     json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
     draft = Draft(
-        document_number = 'TEST1234',
+        document_number='TEST1234',
         account_id='PS12345',
-        create_ts = now_ts(),
+        create_ts=now_ts(),
         registration_type_cd=json_data['changeStatement']['changeType'],
         registration_type_cl='CHANGE',
         draft=json.dumps(json_data),
@@ -176,7 +176,6 @@ def test_draft_json(session):
 
 def test_draft_create_from_json(session):
     """Assert that the draft creates from json data correctly."""
-
     json_data = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
     draft = Draft.create_from_json(json_data, 'PS12345')
 

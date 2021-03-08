@@ -14,24 +14,22 @@
 
 """Tests to assure the Search Detail Model.
 
-Test-Suite to ensure that the Search Detail Model (search step 2 select search 
+Test-Suite to ensure that the Search Detail Model (search step 2 select search
 results) is working as expected.
 """
 from http import HTTPStatus
 
 import pytest
 
-from ppr_api.models import SearchClient, Registration, SearchResult
-from ppr_api.models.utils import now_ts_offset, format_ts
+from ppr_api.models import SearchResult
 from ppr_api.exceptions import BusinessException
 
 
 def test_search_single(session):
-    """Assert that a search detail results on a registration number returns the
-    expected result."""
+    """Assert that a search detail results on a registration number returns the expected result."""
     json_data = [{
-        'baseRegistrationNumber': 'TEST0001', 
-        'matchType': 'EXACT', 
+        'baseRegistrationNumber': 'TEST0001',
+        'matchType': 'EXACT',
         'registrationType': 'SA'
     }]
     select = SearchResult.create_from_json(json_data, 200000001)
@@ -47,11 +45,10 @@ def test_search_single(session):
 
 
 def test_search_single_financing_only(session):
-    """Assert that a search detail results on a registration number for a 
-       financing statement with no other registrations returns the expected result."""
+    """Assert that search details for a financing statement with no registrations returns the expected result."""
     json_data = [{
-        'baseRegistrationNumber': 'TEST0012', 
-        'matchType': 'EXACT', 
+        'baseRegistrationNumber': 'TEST0012',
+        'matchType': 'EXACT',
         'registrationType': 'SA'
     }]
     select = SearchResult.create_from_json(json_data, 200000002)
@@ -65,12 +62,12 @@ def test_search_single_financing_only(session):
     assert result[0]['financingStatement']
     assert 'changes' not in result[0]['financingStatement']
 
+
 def test_search_single_renewal(session):
-    """Assert that a search detail results on a registration number with a renewal 
-       statement returns the expected result."""
+    """Assert that a search detail results on a renewal statement registration returns the expected result."""
     json_data = [{
-        'baseRegistrationNumber': 'TEST0002', 
-        'matchType': 'EXACT', 
+        'baseRegistrationNumber': 'TEST0002',
+        'matchType': 'EXACT',
         'registrationType': 'SA'
     }]
     select = SearchResult.create_from_json(json_data, 200000003)
@@ -91,8 +88,8 @@ def test_search_id_invalid(session, client, jwt):
     """Assert that validation of an invalid search ID throws a BusinessException."""
     # setup
     json_data = [{
-        'baseRegistrationNumber': 'TEST0001', 
-        'matchType': 'EXACT', 
+        'baseRegistrationNumber': 'TEST0001',
+        'matchType': 'EXACT',
         'registrationType': 'SA'
     }]
 
@@ -107,12 +104,11 @@ def test_search_id_invalid(session, client, jwt):
 
 
 def test_search_id_invalid_used(session, client, jwt):
-    """Assert that validation of a search ID that has already been submitted 
-       throws a BusinessException."""
+    """Assert that validation of a search ID that has already been submitted throws a BusinessException."""
     # setup
     json_data = [{
-        'baseRegistrationNumber': 'TEST0001', 
-        'matchType': 'EXACT', 
+        'baseRegistrationNumber': 'TEST0001',
+        'matchType': 'EXACT',
         'registrationType': 'SA'
     }]
 

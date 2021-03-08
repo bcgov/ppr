@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds model data and database operations for financing statements."""
-
+# flake8: noqa E127
 # pylint: disable=too-many-statements, too-many-branches
 
 from __future__ import annotations
@@ -20,17 +20,16 @@ from __future__ import annotations
 from enum import Enum
 from http import HTTPStatus
 
-#from sqlalchemy import event
-
+# from sqlalchemy import event
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
 from .db import db
-from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .trust_indenture import TrustIndenture  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .party import Party  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .registration import Registration  # noqa: F401 pylint: disable=unused-import
+from .trust_indenture import TrustIndenture  # noqa: F401 pylint: disable=unused-import
+from .party import Party  # noqa: F401 pylint: disable=unused-import
+from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import
+from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import
 
 
 class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -57,7 +56,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     financing_id = db.Column('financing_id', db.Integer,
                              db.Sequence('financing_id_seq'), primary_key=True)
     state_type_cd = db.Column('state_type_cd', db.String(3), nullable=False)
-                              #, db.ForeignKey('state_type.state_type_cd'))
+    # , db.ForeignKey('state_type.state_type_cd'))
     registration_num = db.Column('registration_number', db.String(10), nullable=False)
     life = db.Column('life', db.Integer, nullable=True)
     expire_date = db.Column('expire_date', db.DateTime, nullable=True)
@@ -78,13 +77,12 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     # Parent keys
 
     # Relationships
-    registration = db.relationship("Registration", order_by="asc(Registration.registration_ts)",
-                                   back_populates="financing_statement")
-    parties = db.relationship("Party", back_populates="financing_statement")
-    vehicle_collateral = db.relationship("VehicleCollateral", back_populates="financing_statement")
-    general_collateral = db.relationship("GeneralCollateral", back_populates="financing_statement")
-    trust_indenture = db.relationship("TrustIndenture", back_populates="financing_statement")
-
+    registration = db.relationship('Registration', order_by='asc(Registration.registration_ts)',
+                                   back_populates='financing_statement')
+    parties = db.relationship('Party', back_populates='financing_statement')
+    vehicle_collateral = db.relationship('VehicleCollateral', back_populates='financing_statement')
+    general_collateral = db.relationship('GeneralCollateral', back_populates='financing_statement')
+    trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
 
     @property
     def json(self) -> dict:
@@ -164,7 +162,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return statement
 
-
     def validate_base_debtor(self, base_debtor_json, staff: bool = False):
         """Verify supplied base debtor when registering non-financing statements. Bypass the check for staff."""
         valid = False
@@ -204,10 +201,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return valid
 
-
     def save(self):
         """Save the object to the database immediately."""
-
         db.session.add(self)
         db.session.commit()
 
@@ -217,8 +212,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         db.session.add(draft)
         db.session.commit()
 
-
-
     @classmethod
     def find_all_by_account_id(cls, account_id: str = None, staff: bool = False):
         """Return a summary list of recent financing statements belonging to an account."""
@@ -226,25 +219,25 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         if account_id:
             # No date range restriction for staff?
             if staff:
-                statement_list = db.session.query(Registration.registration_ts,\
-                                                  Registration.registration_num,\
-                                                  Registration.registration_type_cd,\
+                statement_list = db.session.query(Registration.registration_ts,
+                                                  Registration.registration_num,
+                                                  Registration.registration_type_cd,
                                                   FinancingStatement.state_type_cd).\
-                                    filter(FinancingStatement.financing_id == Registration.financing_id,\
-                                           Registration.account_id == account_id,\
-                                           Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).\
-                                    order_by(FinancingStatement.financing_id).all()
+                                filter(FinancingStatement.financing_id == Registration.financing_id,
+                                       Registration.account_id == account_id,
+                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).\
+                                order_by(FinancingStatement.financing_id).all()
             else:
                 days_ago = model_utils.now_ts_offset(10, False)
-                statement_list = db.session.query(Registration.registration_ts,\
-                                                  Registration.registration_num,\
-                                                  Registration.registration_type_cd,\
+                statement_list = db.session.query(Registration.registration_ts,
+                                                  Registration.registration_num,
+                                                  Registration.registration_type_cd,
                                                   FinancingStatement.state_type_cd).\
-                                    filter(FinancingStatement.financing_id == Registration.financing_id,\
-                                           Registration.account_id == account_id,\
-                                           Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN']),\
-                                           Registration.registration_ts > days_ago).\
-                                    order_by(FinancingStatement.financing_id).all()
+                                filter(FinancingStatement.financing_id == Registration.financing_id,
+                                       Registration.account_id == account_id,
+                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN']),
+                                       Registration.registration_ts > days_ago).\
+                                order_by(FinancingStatement.financing_id).all()
 
         if not statement_list:
             raise BusinessException(
@@ -273,7 +266,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return results_json
 
-
     @classmethod
     def find_by_id(cls, financing_id: int = None):
         """Return a financing statement object by financing ID."""
@@ -283,7 +275,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return statement
 
-
     @classmethod
     def find_by_registration_number(cls, registration_num: str = None,
                                     staff: bool = False,
@@ -291,9 +282,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
-            statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id, \
-                                          Registration.registration_num == registration_num, \
-                                          Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
+            statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
+                                         Registration.registration_num == registration_num,
+                                         Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
 
         if not statement:
             raise BusinessException(
@@ -309,17 +300,15 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return statement
 
-
     @classmethod
     def find_by_financing_id(cls, financing_id: int = None):
         """Return a financing statement by financing statement ID."""
         statement = None
         if financing_id:
-            statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id, \
+            statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
                                          FinancingStatement.financing_id == financing_id).one_or_none()
 
         return statement
-
 
     @staticmethod
     def create_from_json(json_data, account_id: str):
@@ -361,15 +350,12 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return statement
 
-
-
     @staticmethod
     def validate(json_data):
-        """Perform any extra data validation here, either because it is too
+        """Perform any extra data validation here, either because it is too complicated for the schema.
 
-        complicated for the schema, or because it requires existing data (client party codes).
+        Or because it requires existing data (client party codes).
         """
-
         error_msg = ''
 
         # Verify the party codes.
@@ -380,7 +366,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 error=error_msg,
                 status_code=HTTPStatus.BAD_REQUEST
             )
-
 
     @staticmethod
     def validate_parties(json_data):

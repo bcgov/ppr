@@ -20,15 +20,16 @@ from http import HTTPStatus
 from flask import request
 from flask_restx import Namespace, Resource, cors
 
+from ppr_api.exceptions import BusinessException
+from ppr_api.models import ClientParty
+from ppr_api.services.authz import is_staff, authorized
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.exceptions import BusinessException
-from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import ClientParty
 
 from .utils import get_account_id, account_required_response, business_exception_response
-from .utils import unauthorized_error_response, not_found_error_response, \
-                   path_param_error_response, default_exception_response
+from .utils import unauthorized_error_response, not_found_error_response
+from .utils import path_param_error_response, default_exception_response
+
 
 API = Namespace('party-codes', description='Endpoints for maintaining client registering and secured parties.')
 
@@ -43,7 +44,6 @@ class ClientPartyResource(Resource):
     @jwt.requires_auth
     def get(code):
         """Get a preset registering or secured party by client code."""
-
         try:
             if code is None:
                 return path_param_error_response('code')

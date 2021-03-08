@@ -11,22 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This module holds model data and database operations for search results detail
-    requests."""
+"""This module holds model data and database operations for search results detail requests."""
 
 from __future__ import annotations
 
 from http import HTTPStatus
 import json
 
-#from sqlalchemy import event
+# from sqlalchemy import event
 from flask import current_app
 
 from ppr_api.exceptions import BusinessException
+from ppr_api.models.utils import REG_CLASS_TO_STATEMENT_TYPE  # , format_ts
 
-from ppr_api.models.utils import REG_CLASS_TO_STATEMENT_TYPE #, format_ts
 from .db import db
-#from .search_client import SearchClient
+# from .search_client import SearchClient
 from .financing_statement import FinancingStatement
 
 
@@ -35,7 +34,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __versioned__ = {}
     __tablename__ = 'search_result'
-
 
     search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_client.search_id'),
                           primary_key=True, nullable=False)
@@ -49,10 +47,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     # parent keys
 
     # Relationships - Search
-    search = db.relationship("SearchClient", foreign_keys=[search_id],
-                             back_populates="search_result", cascade='all, delete', uselist=False)
-
-
+    search = db.relationship('SearchClient', foreign_keys=[search_id],
+                             back_populates='search_result', cascade='all, delete', uselist=False)
 
     @property
     def json(self) -> dict:
@@ -62,7 +58,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             result = json.loads(self.search_response)
 
         return result
-
 
     def save(self):
         """Render a search results detail information to the local cache."""
@@ -76,11 +71,11 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-
     def update_selection(self):
-        """Update the set of search details from the search query selection, removing
-           financing statements that are not in the search query selection."""
+        """Update the set of search details from the search query selection.
 
+        Remove financing statements that are not in the search query selection.
+        """
         results = json.loads(self.search_response)
         selected = self.search_select
         new_results = []
@@ -99,12 +94,11 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             if found:
                 new_results.append(result)
 
-        #current_app.logger.debug('exact_count=' + str(exact_count) + ' similar_count=' + str(similar_count))
+        # current_app.logger.debug('exact_count=' + str(exact_count) + ' similar_count=' + str(similar_count))
         self.search_response = json.dumps(new_results)
         self.search_select = json.dumps(selected)
-        #current_app.logger.debug('saving updates')
+        # current_app.logger.debug('saving updates')
         self.save()
-
 
     @classmethod
     def find_by_search_id(cls, search_id: int):
@@ -115,11 +109,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return search_detail
 
-
     @staticmethod
     def create_from_search_query(search_query):
-        """Create a search detail object from the inital search query with no search
-           selection criteria."""
+        """Create a search detail object from the inital search query with no search selection criteria."""
         search_result = SearchResult()
         search_result.search_id = search_query.search_id
         query_results = json.loads(search_query.search_response)
@@ -155,11 +147,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         search_result.search_response = json.dumps(detail_results)
         return search_result
 
-
     @staticmethod
     def create_from_json(search_json, search_id: int):
-        """Create a search detail object from dict/json specifying the search
-           selection."""
+        """Create a search detail object from dict/json specifying the search selection."""
         search = SearchResult()
         search.search_id = search_id
         search.search_select = json.dumps(search_json)
@@ -188,13 +178,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return search
 
-
     @staticmethod
     def validate_search_select(select_json, search_id: int):  # pylint: disable=unused-argument
-        """Perform any extra data validation here, either because it is too
-           complicated for the schema, or because it requires existing data.
-           Also fetch the existing search_detail record and verify a previous search
-           detail request on the same search ID has not been submitted.
+        """Perform any extra data validation here.
+
+        Either because it is too complicated for the schema, or because it requires existing data.
+        Also fetch the existing search_detail record and verify a previous search detail request on
+        the same search ID has not been submitted.
         """
         error_msg = ''
 

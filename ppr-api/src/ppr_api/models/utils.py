@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Model helper utilities for processing requests.
-   Common constants used across models and utilities for mapping type codes
-   between the API and the database in both directions.
+
+Common constants used across models and utilities for mapping type codes
+between the API and the database in both directions.
 """
 
-from datetime import date, datetime as _datetime, timezone, timedelta, time  # pylint: disable=unused-import # noqa: F401, I001
+from datetime import date, datetime as _datetime, timezone, timedelta
+from datetime import time  # noqa: F401 pylint: disable=unused-import
 
 
 # Account search history max result set size.
@@ -137,14 +139,15 @@ def format_ts(time_stamp):
     """Build a UTC ISO 8601 date and time string with no microseconds."""
     formatted_ts = None
     if time_stamp:
-#        formatted_ts = time_stamp.replace(microsecond=0).isoformat()
         formatted_ts = time_stamp.replace(tzinfo=timezone.utc).replace(microsecond=0).isoformat()
 
     return formatted_ts
 
+
 def now_ts():
     """Create a timestamp representing the current date and time in the UTC time zone."""
     return _datetime.now(timezone.utc)
+
 
 def now_ts_offset(offset_days: int = 1, add: bool = False):
     """Create a timestamp representing the current date and time adjusted by offset number of days."""
@@ -154,9 +157,12 @@ def now_ts_offset(offset_days: int = 1, add: bool = False):
 
     return now - timedelta(days=offset_days)
 
+
 def expiry_dt_from_years(life_years: int):
-    """Create a date representing the current UTC date at 23:59:59 adjusted by
-       the life_years number of years in the future."""
+    """Create a date representing the current UTC date at 23:59:59.
+
+    Adjusted by the life_years number of years in the future.
+    """
     today = date.today()
     year = today.year + life_years
     month = today.month
@@ -165,20 +171,25 @@ def expiry_dt_from_years(life_years: int):
     expiry_time = time(23, 59, 59, tzinfo=timezone.utc)
     return _datetime.combine(future_date, expiry_time)
 
+
 def ts_from_iso_format(timestamp_iso: str):
     """Create a datetime object from a timestamp string in the ISO format."""
     time_stamp = _datetime.fromisoformat(timestamp_iso).timestamp()
     return _datetime.utcfromtimestamp(time_stamp).replace(tzinfo=timezone.utc)
 
+
 def expiry_ts_from_iso_format(timestamp_iso: str):
     """Create a datetime object from a timestamp string in the ISO format.
-       For expiry timestamps, the time is set to 23:59:59."""
 
+    For expiry timestamps, the time is set to 23:59:59.
+    """
     expiry_ts = ts_from_iso_format(timestamp_iso)
     return expiry_ts.replace(hour=23, minute=59, second=59)
 
+
 def ts_from_date_iso_format(date_iso: str):
     """Create a UTC datetime object from a date string in the ISO format.
-       Use the current UTC time."""
 
+    Use the current UTC time.
+    """
     return ts_from_iso_format(date_iso)

@@ -16,15 +16,11 @@
 
 Test-Suite to ensure that the Party Model is working as expected.
 """
-from http import HTTPStatus
+import copy
 
-import pytest
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import Party
-#from ppr_api.exceptions import BusinessException
-
-import copy
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 
 def test_find_by_id(session):
@@ -43,6 +39,7 @@ def test_find_by_id(session):
     assert not party.birth_date
     assert not party.registration_id_end
 
+
 def test_find_by_id_client(session):
     """Assert that find party by party ID for a client party contains all expected elements."""
     party = Party.find_by_id(200000004)
@@ -60,6 +57,7 @@ def test_find_by_id_client(session):
     assert json_data['code'] == '200000000'
     assert json_data['businessName']
     assert json_data['address']
+
 
 def test_find_by_financing_id(session):
     """Assert that find party by registration number contains all expected elements."""
@@ -84,20 +82,24 @@ def test_find_by_registration_id(session):
     assert parties[3].party_type_cd == 'SP'
     assert parties[4].party_type_cd == 'SP'
 
+
 def test_find_by_id_invalid(session):
     """Assert that find party by non-existent party ID returns the expected result."""
     party = Party.find_by_id(300000000)
     assert not party
+
 
 def test_find_by_financing_id_invalid(session):
     """Assert that find party by non-existent financing statement ID returns the expected result."""
     party = Party.find_by_financing_id(300000000)
     assert not party
 
+
 def test_find_by_reg_id_invalid(session):
     """Assert that find party by non-existent registration id eturns the expected result."""
     parties = Party.find_by_registration_id(300000000)
     assert not parties
+
 
 def test_party_json(session):
     """Assert that the party model renders to a json format correctly."""
@@ -141,7 +143,7 @@ def test_create_from_json(session):
 
     party_ind_json = {
         'personName': {
-            'first':'first',
+            'first': 'first',
             'last': 'last',
             'middle': 'middle'
         },
@@ -172,7 +174,7 @@ def test_create_from_json(session):
 
     party_ind = Party.create_from_json(party_ind_json, 'DB', 1234)
     assert party_ind.registration_id
-    assert party_ind.party_type_cd =='DI'
+    assert party_ind.party_type_cd == 'DI'
     assert party_ind.last_name
     assert party_ind.first_name
     assert party_ind.middle_name
@@ -191,7 +193,7 @@ def test_create_from_financing_json(session):
     json_data = copy.deepcopy(FINANCING_STATEMENT)
     del json_data['securedParties']
 
-    secured = [ {
+    secured = [{
             'code': '200000000'
         }
     ]
@@ -204,13 +206,14 @@ def test_create_from_financing_json(session):
         if not party.client_party_id:
             assert party.address
 
-def test_verify_party_code_True(session):
+
+def test_verify_party_code_frue(session):
     """Assert that Party.verify_party_code works correctly with a valid code."""
     result = Party.verify_party_code('200000000')
-    assert result == True
+    assert result
 
-def test_verify_party_code_False(session):
+
+def test_verify_party_code_false(session):
     """Assert that Party.verify_party_code works correctly with an invalid code."""
     result = Party.verify_party_code('300000000')
-    assert result == False
-
+    assert not result

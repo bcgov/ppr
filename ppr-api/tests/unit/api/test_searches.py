@@ -20,14 +20,14 @@ Test-Suite to ensure that the /searches endpoint is working as expected.
 import copy
 from http import HTTPStatus
 
-#from legal_api.models import Business
-#from tests.unit.models import Address, PartyRole, factory_business, factory_party_role
+# prep sample post search data
+from registry_schemas.example_data.ppr import SEARCH_QUERY, SEARCH_SUMMARY
+
 from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 from ppr_api.models.utils import now_ts_offset, format_ts
 
-# prep sample post search data
-from registry_schemas.example_data.ppr import SEARCH_QUERY, SEARCH_SUMMARY
+
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
 SAMPLE_JSON_SUMMARY = copy.deepcopy(SEARCH_SUMMARY)
 
@@ -42,9 +42,9 @@ def test_search_reg_num_valid_201(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-RN-1'
     }
- 
+
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -62,9 +62,9 @@ def test_search_serial_num_valid_201(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-SS-1'
     }
- 
+
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -82,9 +82,9 @@ def test_search_mhr_number_valid_201(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-MH-1'
     }
- 
+
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -102,9 +102,9 @@ def test_search_aircraft_dot_valid_201(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-AC-1'
     }
- 
+
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -124,9 +124,9 @@ def test_search_debtor_bus_valid_201(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-DB-1'
     }
- 
+
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -142,7 +142,7 @@ def test_search_query_invalid_type_400(session, client, jwt):
     json_data['type'] = 'INVALID_TYPE'
 
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -159,7 +159,7 @@ def test_search_query_nonstaff_missing_account_400(session, client, jwt):
     del json_data['criteria']['value']
 
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -180,7 +180,7 @@ def test_search_query_staff_missing_account_201(session, client, jwt):
     }
 
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
@@ -201,14 +201,13 @@ def test_search_query_no_result_422(session, client, jwt):
     }
 
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
     assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
-
 
 
 def test_search_query_nonstaff_unauthorized_404(session, client, jwt):
@@ -219,7 +218,7 @@ def test_search_query_nonstaff_unauthorized_404(session, client, jwt):
     del json_data['criteria']['value']
 
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [COLIN_ROLE]),
                      content_type='application/json')
@@ -228,7 +227,7 @@ def test_search_query_nonstaff_unauthorized_404(session, client, jwt):
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
 
 
-def test_search_query_invalid_startDateTime_400(session, client, jwt):
+def test_search_query_invalid_start_datetime_400(session, client, jwt):
     """Assert that a valid search request with an invalid startDateTime returns a 400 status."""
     # setup
     json_data = {
@@ -240,10 +239,10 @@ def test_search_query_invalid_startDateTime_400(session, client, jwt):
         'endDateTime': '2021-01-20T19:38:43+00:00'
     }
     ts_start = now_ts_offset(1, True)
-    json_data['startDateTime'] =  format_ts(ts_start)
+    json_data['startDateTime'] = format_ts(ts_start)
 
     # test
-    rv = client.post(f'/api/v1/searches',
+    rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -265,21 +264,21 @@ def test_search_detail_valid_200(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-DB-2'
     }
- 
+
     # test
-    rv1 = client.post(f'/api/v1/searches',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    rv1 = client.post('/api/v1/searches',
+                      json=json_data,
+                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []
     json_data.append(rv1.json['results'][0])
     # print(json_data)
     # test
-    rv = client.put(f'/api/v1/searches/' + search_id,
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    rv = client.put('/api/v1/searches/' + search_id,
+                    json=json_data,
+                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    content_type='application/json')
     # check
     print(rv.json)
     assert rv.status_code == HTTPStatus.OK
@@ -294,10 +293,10 @@ def test_search_detail_invalid_regnum_400(session, client, jwt):
     del json_data[0]['baseRegistrationNumber']
 
     # test
-    rv = client.put(f'/api/v1/searches/123456',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    rv = client.put('/api/v1/searches/123456',
+                    json=json_data,
+                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
@@ -308,7 +307,7 @@ def test_search_detail_nonstaff_missing_account_400(session, client, jwt):
     json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
 
     # test
-    rv = client.put(f'/api/v1/searches/123456',
+    rv = client.put('/api/v1/searches/123456',
                     json=json_data,
                     headers=create_header(jwt, [COLIN_ROLE]),
                     content_type='application/json')
@@ -329,17 +328,17 @@ def test_search_detail_staff_missing_account_200(session, client, jwt):
     }
 
     # test
-    rv1 = client.post(f'/api/v1/searches',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
+    rv1 = client.post('/api/v1/searches',
+                      json=json_data,
+                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
 
     search_id = rv1.json['searchId']
     json_data = rv1.json['results']
 
     # test
-    rv = client.put(f'/api/v1/searches/' + search_id,
+    rv = client.put('/api/v1/searches/' + search_id,
                     json=json_data,
                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                     content_type='application/json')
@@ -356,7 +355,7 @@ def test_search_detail_nonstaff_unauthorized_404(session, client, jwt):
     del json_data['criteria']['value']
 
     # test
-    rv = client.put(f'/api/v1/searches/123456',
+    rv = client.put('/api/v1/searches/123456',
                     json=json_data,
                     headers=create_header_account(jwt, [COLIN_ROLE]),
                     content_type='application/json')
@@ -364,9 +363,9 @@ def test_search_detail_nonstaff_unauthorized_404(session, client, jwt):
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
 
+
 def test_search_detail_no_duplicates_200(session, client, jwt):
-    """Assert that a a selection with 2 matches on the same registration returns 
-       the expected result."""
+    """Assert that a a selection with 2 matches on the same registration returns the expected result."""
     # setup
     json_data = {
         'type': 'BUSINESS_DEBTOR',
@@ -377,25 +376,23 @@ def test_search_detail_no_duplicates_200(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-DB-3'
     }
- 
+
     # test
-    rv1 = client.post(f'/api/v1/searches',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    rv1 = client.post('/api/v1/searches',
+                      json=json_data,
+                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []
     json_data.append(rv1.json['results'][0])
     json_data.append(rv1.json['results'][1])
     # print(json_data)
     # test
-    rv = client.put(f'/api/v1/searches/' + search_id,
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    rv = client.put('/api/v1/searches/' + search_id,
+                    json=json_data,
+                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    content_type='application/json')
     # check
     print(rv.json)
     assert rv.status_code == HTTPStatus.OK
     assert len(rv.json) == 1
-
-

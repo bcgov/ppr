@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Test Suite to ensure the common address schema is valid and the registries-schema 
-   package import is working correctly.
+
+"""Test Suite to ensure the common address schema is valid.
+
+Verify the registries-schema package import is working correctly.
 """
+
 import copy
 
 from registry_schemas import validate
@@ -48,7 +51,7 @@ def test_valid_address_null_region():
 
 
 def test_invalid_address_street():
-    """Assert that an invalid address fails - street too long"""
+    """Assert that an invalid address fails - street too long."""
     address = copy.deepcopy(ADDRESS)
     address['street'] = 'This is a really long string, over the 50 char maximum.'
 
@@ -63,7 +66,7 @@ def test_invalid_address_street():
 
 
 def test_invalid_address_city():
-    """Assert that an invalid address fails - city too long"""
+    """Assert that an invalid address fails - city too long."""
     address = copy.deepcopy(ADDRESS)
     address['city'] = 'This is a really long string, over the 40 char maximum'
 
@@ -93,7 +96,7 @@ def test_invalid_address_postal():
 
 
 def test_invalid_address_street_missing():
-    """Assert that an invalid address fails - required street missing"""
+    """Assert that an invalid address fails - required street missing."""
     address = copy.deepcopy(ADDRESS)
     del address['street']
 
@@ -136,6 +139,7 @@ def test_invalid_address_missing_region():
 
     assert not is_valid
 
+
 def test_invalid_address_postal_missing():
     """Assert that an invalid address fails - required postal code missing."""
     address = copy.deepcopy(ADDRESS)
@@ -149,5 +153,3 @@ def test_invalid_address_postal_missing():
     print(errors)
 
     assert not is_valid
-
-

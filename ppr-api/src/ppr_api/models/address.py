@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds data for registry addresses."""
-#import pycountry
+# import pycountry
 
 from .db import db
 
 
 class Address(db.Model):  # pylint: disable=too-many-instance-attributes
-    """This class manages all of the registry addresses.
-
-    """
-
+    """This class manages all of the registry addresses."""
 
     __versioned__ = {}
     __tablename__ = 'address_ppr'
 
     address_id = db.Column('address_id', db.Integer, db.Sequence('address_id_seq'), primary_key=True)
-    street = db.Column('street_line_1', db.String(50), nullable=False) # index=True)
+    street = db.Column('street_line_1', db.String(50), nullable=False)  # index=True)
     street_additional = db.Column('street_line_2', db.String(50), nullable=True)
     city = db.Column('city', db.String(30), nullable=False)
     region = db.Column('province_type_cd', db.String(2), nullable=False)
@@ -38,8 +35,8 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     # parent keys
 
     # relationships
-    party = db.relationship("Party", uselist=False, back_populates="address")
-    client_party = db.relationship("ClientParty", uselist=False, back_populates="address")
+    party = db.relationship('Party', uselist=False, back_populates='address')
+    client_party = db.relationship('ClientParty', uselist=False, back_populates='address')
 
     def save(self):
         """Save the object to the database immediately. Only used for unit testing."""
@@ -54,11 +51,9 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
             address = cls.query.get(address_id)
         return address
 
-
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
-
         address = {
             'street': self.street,
             'city': self.city,

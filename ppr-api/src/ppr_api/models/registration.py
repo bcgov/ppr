@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds common statement registration data."""
-
 # pylint: disable=too-many-statements, too-many-branches
-
-#import pycountry
 
 from enum import Enum
 from http import HTTPStatus
 import json
-
-#from sqlalchemy import event
+# import pycountry
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
 from .db import db
-from .party import Party  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .court_order import CourtOrder  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .draft import Draft  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .draft import Draft
+from .party import Party
+from .court_order import CourtOrder
+from .general_collateral import GeneralCollateral
+from .vehicle_collateral import VehicleCollateral
+# noqa: I003
 
 
 class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -84,17 +81,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                                 db.ForeignKey('draft.document_number'), nullable=False)
 
     # relationships
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
-                                          back_populates="registration", cascade='all, delete', uselist=False)
-    parties = db.relationship("Party", back_populates="registration")
-    general_collateral = db.relationship("GeneralCollateral", back_populates="registration")
-    vehicle_collateral = db.relationship("VehicleCollateral", back_populates="registration")
-    draft = db.relationship("Draft", foreign_keys=[document_number], uselist=False)
-    trust_indenture = db.relationship("TrustIndenture", back_populates="registration", uselist=False)
-    court_order = db.relationship("CourtOrder", back_populates="registration", uselist=False)
+    financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
+                                          back_populates='registration', cascade='all, delete', uselist=False)
+    parties = db.relationship('Party', back_populates='registration')
+    general_collateral = db.relationship('GeneralCollateral', back_populates='registration')
+    vehicle_collateral = db.relationship('VehicleCollateral', back_populates='registration')
+    draft = db.relationship('Draft', foreign_keys=[document_number], uselist=False)
+    trust_indenture = db.relationship('TrustIndenture', back_populates='registration', uselist=False)
+    court_order = db.relationship('CourtOrder', back_populates='registration', uselist=False)
 
     base_registration_num = None
-
 
     @property
     def json(self) -> dict:
@@ -124,7 +120,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.client_reference_id:
             registration['clientReferenceId'] = self.client_reference_id
 
-
         registration_id = self.registration_id
         if self.parties:
             for party in self.parties:
@@ -141,8 +136,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # add debtors, secured parties
         if self.parties and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,\
-                                               model_utils.REG_CLASS_AMEND_COURT,\
+                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                               model_utils.REG_CLASS_AMEND_COURT,
                                                model_utils.REG_CLASS_CHANGE)):
             secured = []
             debtors = []
@@ -160,8 +155,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # delete debtors, secured parties
         if self.financing_statement.parties and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,\
-                                               model_utils.REG_CLASS_AMEND_COURT,\
+                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                               model_utils.REG_CLASS_AMEND_COURT,
                                                model_utils.REG_CLASS_CHANGE)):
             secured = []
             debtors = []
@@ -179,9 +174,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # add general collateral
         if self.general_collateral and \
-                 (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,\
-                                                model_utils.REG_CLASS_AMEND_COURT,\
-                                                model_utils.REG_CLASS_CHANGE)):
+                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                               model_utils.REG_CLASS_AMEND_COURT,
+                                               model_utils.REG_CLASS_CHANGE)):
             collateral = []
             for gen_c in self.general_collateral:
                 if gen_c.registration_id == registration_id:
@@ -191,8 +186,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # delete general collateral
         if self.financing_statement.general_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,\
-                                               model_utils.REG_CLASS_AMEND_COURT,\
+                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                               model_utils.REG_CLASS_AMEND_COURT,
                                                model_utils.REG_CLASS_CHANGE)):
             collateral = []
             for gen_c in self.financing_statement.general_collateral:
@@ -203,8 +198,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # add vehicle collateral
         if self.vehicle_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,\
-                                               model_utils.REG_CLASS_AMEND_COURT,\
+                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                               model_utils.REG_CLASS_AMEND_COURT,
                                                model_utils.REG_CLASS_CHANGE)):
             collateral = []
             for vehicle_c in self.vehicle_collateral:
@@ -215,8 +210,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         # delete vehicle collateral
         if self.financing_statement.general_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,\
-                                               model_utils.REG_CLASS_AMEND_COURT,\
+                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                               model_utils.REG_CLASS_AMEND_COURT,
                                                model_utils.REG_CLASS_CHANGE)):
             collateral = []
             for vehicle_c in self.financing_statement.vehicle_collateral:
@@ -227,10 +222,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return registration
 
-
     def save(self):
         """Render a registration to the local cache."""
-
         db.session.add(self)
         db.session.commit()
 
@@ -240,7 +233,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.add(draft)
         db.session.commit()
 
-
     @classmethod
     def find_by_id(cls, registration_id: int):
         """Return the registration matching the id."""
@@ -248,7 +240,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if registration_id:
             registration = cls.query.get(registration_id)
         return registration
-
 
     @classmethod
     def find_by_registration_number(cls, registration_num: str):
@@ -259,7 +250,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return registration
 
-
     @staticmethod
     def create_from_json(json_data,
                          registration_type_cl: str,
@@ -267,10 +257,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                          base_registration_num: str,
                          account_id: str = None):
         """Create a registration object for an existing financing statement from dict/json."""
-
         # Perform all addtional data validation checks.
         Registration.validate(json_data, financing_statement, registration_type_cl)
-
 
         # Create or update draft.
         draft = Registration.find_draft(json_data, None, None)
@@ -289,8 +277,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.document_number = draft.document_number
         registration.draft = draft
         registration.registration_type_cl = registration_type_cl
-        if registration_type_cl in (model_utils.REG_CLASS_AMEND, \
-                                    model_utils.REG_CLASS_AMEND_COURT, \
+        if registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                    model_utils.REG_CLASS_AMEND_COURT,
                                     model_utils.REG_CLASS_CHANGE):
             registration.registration_type_cd = json_data['changeType']
             if registration.registration_type_cd == model_utils.REG_TYPE_AMEND_COURT:
@@ -329,16 +317,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration.financing_statement.expiry_date = \
                     model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
 
-
         # Repairer's lien renewal or amendment can have court order information.
-        if (registration.registration_type_cd == model_utils.REG_TYPE_AMEND_COURT  or \
+        if (registration.registration_type_cd == model_utils.REG_TYPE_AMEND_COURT or
                 registration.registration_type_cd == model_utils.REG_TYPE_RENEWAL) and \
                 'courtOrderInformation' in json_data:
             registration.court_order = CourtOrder.create_from_json(json_data['courtOrderInformation'],
                                                                    registration_id)
 
-        if registration_type_cl in (model_utils.REG_CLASS_AMEND, \
-                                    model_utils.REG_CLASS_AMEND_COURT,\
+        if registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                    model_utils.REG_CLASS_AMEND_COURT,
                                     model_utils.REG_CLASS_CHANGE):
             # Possibly add vehicle collateral
             registration.vehicle_collateral = VehicleCollateral.create_from_statement_json(json_data,
@@ -352,7 +339,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             Registration.delete_from_json(json_data, registration, financing_statement)
 
         return registration
-
 
     @staticmethod
     def create_financing_from_json(json_data, account_id: str = None):
@@ -393,13 +379,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return registration
 
-
-
     @staticmethod
     def delete_from_json(json_data, registration, financing_statement):
-        """For deleted parties and collateral in change/amendment registrations set registration_id_end
-           from dict/json."""
-
+        """For deleted parties and collateral in registrations set registration_id_end from dict/json."""
         if 'deleteDebtors' in json_data and json_data['deleteDebtors']:
             for party in json_data['deleteDebtors']:
                 existing = Registration.find_party_by_id(party['partyId'],
@@ -430,20 +412,18 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if collateral:
                     collateral.registration_id_end = registration.registration_id
 
-
     @staticmethod
     def validate(json_data, financing_statement, registration_type_cl: str):
-        """Perform any extra data validation here, either because it is too
+        """Perform any extra data validation here, either because it is too complicated for the schema.
 
-        complicated for the schema, or because it requires existing data.
+        Or because it requires existing data.
         """
-
         error_msg = ''
 
         # Verify the party codes and delete party ID's.
         error_msg = error_msg + Registration.validate_parties(json_data, financing_statement)
 
-        if registration_type_cl in (model_utils.REG_CLASS_AMEND,\
+        if registration_type_cl in (model_utils.REG_CLASS_AMEND,
                                     model_utils.REG_CLASS_AMEND_COURT,
                                     model_utils.REG_CLASS_CHANGE):
             # Check delete vehicle ID's
@@ -477,7 +457,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 error=error_msg,
                 status_code=HTTPStatus.BAD_REQUEST
             )
-
 
     @staticmethod
     def validate_parties(json_data, financing_statement):
@@ -523,11 +502,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return error_msg
 
-
     @staticmethod
     def find_party_by_id(party_id: int, party_type: str, parties):
         """Search existing list of party objects for a matching party id and type."""
-
         party = None
 
         if party_id and party_type and parties:
@@ -542,11 +519,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return party
 
-
     @staticmethod
     def find_vehicle_collateral_by_id(vehicle_id: int, vehicle_collateral):
         """Search existing list of vehicle_collateral objects for a matching vehicle id."""
-
         collateral = None
 
         if vehicle_id and vehicle_collateral:
@@ -556,11 +531,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return collateral
 
-
     @staticmethod
     def find_general_collateral_by_id(collateral_id: int, general_collateral):
         """Search existing list of general_collateral objects for a matching collateral id."""
-
         collateral = None
 
         if collateral_id and general_collateral:
@@ -570,12 +543,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return collateral
 
-
     @staticmethod
     def find_draft(json_data, registration_class: str, registration_type: str):
         """Try to find an existing draft if a documentId is in json_data.).
-           Return None if not found or no documentId."""
 
+        Return None if not found or no documentId.
+        """
         draft = None
 
         if 'documentId' in json_data:
@@ -593,15 +566,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return draft
 
-
     @staticmethod
     def get_generated_values(draft):
-        """Get db generated identifiers that are in more than one table:
-           registration_id, registration_number, and optionally document_number."""
+        """Get db generated identifiers that are in more than one table.
 
+        Get registration_id, registration_number, and optionally document_number.
+        """
         registration = Registration()
 
-         # generate reg id, reg number. If not existing draft also generate doc number
+        # generate reg id, reg number. If not existing draft also generate doc number
         query = 'select registration_id_seq.nextval, get_registration_num(), get_draft_document_number() from dual'
         if draft:
             query = 'select registration_id_seq.nextval, get_registration_num() from dual'

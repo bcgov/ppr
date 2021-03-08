@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Common setup and fixtures for the pytest suite used by this service."""
-import datetime
-import time
+# import datetime
+# import time
+# from flask_migrate import Migrate, upgrade
+# from sqlalchemy.schema import DropConstraint, MetaData
+# from . import FROZEN_DATETIME
 from contextlib import contextmanager
 
 import pytest
-from flask_migrate import Migrate, upgrade
 from sqlalchemy import event, text
-#from sqlalchemy.schema import DropConstraint, MetaData
 
 from ppr_api import create_app
 from ppr_api import jwt as _jwt
 from ppr_api.models import db as _db
-
-#from . import FROZEN_DATETIME
 
 
 @contextmanager
@@ -41,8 +40,8 @@ def not_raises(exception):
 
 
 # fixture to freeze utcnow to a fixed date-time
-#@pytest.fixture
-#def freeze_datetime_utcnow(monkeypatch):
+# @pytest.fixture
+# def freeze_datetime_utcnow(monkeypatch):
 #    """Fixture to return a static time for utcnow()."""
 #    class _Datetime:
 #        @classmethod
@@ -104,46 +103,46 @@ def client_ctx(app):  # pylint: disable=redefined-outer-name
 
 @pytest.fixture(scope='session')
 def db(app):  # pylint: disable=redefined-outer-name, invalid-name
-#    """Return a session-wide initialised database.
+    """Return a session-wide initialised database.
 
-#    Drops all existing tables - Meta follows Postgres FKs
-#    """
-#    with app.app_context():
-#        # Clear out any existing tables
-#        metadata = MetaData(_db.engine)
-#        metadata.reflect()
-#        for table in metadata.tables.values():
-#            for fk in table.foreign_keys:  # pylint: disable=invalid-name
-#                _db.engine.execute(DropConstraint(fk.constraint))
-#        metadata.drop_all()
-#        _db.drop_all()
+    Drops all existing tables - Meta follows Postgres FKs
+    """
+    # with app.app_context():
+    # Clear out any existing tables
+    # metadata = MetaData(_db.engine)
+    # metadata.reflect()
+    # for table in metadata.tables.values():
+    #   for fk in table.foreign_keys:  # pylint: disable=invalid-name
+    #       _db.engine.execute(DropConstraint(fk.constraint))
+    #       metadata.drop_all()
+    #       _db.drop_all()
 
-#        sequence_sql = """SELECT sequence_name FROM information_schema.sequences
-#                          WHERE sequence_schema='public'
-#                       """
+    #       sequence_sql = """SELECT sequence_name FROM information_schema.sequences
+    #                         WHERE sequence_schema='public'
+    #                      """
 
-#        sess = _db.session()
-#        for seq in [name for (name,) in sess.execute(text(sequence_sql))]:
-#            try:
-#                sess.execute(text('DROP SEQUENCE public.%s ;' % seq))
-#                print('DROP SEQUENCE public.%s ' % seq)
-#            except Exception as err:  # pylint: disable=broad-except
-#                print(f'Error: {err}')
-#        sess.commit()
+    #        sess = _db.session()
+    #        for seq in [name for (name,) in sess.execute(text(sequence_sql))]:
+    #            try:
+    #                sess.execute(text('DROP SEQUENCE public.%s ;' % seq))
+    #                print('DROP SEQUENCE public.%s ' % seq)
+    #            except Exception as err:  # pylint: disable=broad-except
+    #                print(f'Error: {err}')
+    #        sess.commit()
 
-        # ############################################
-        # There are 2 approaches, an empty database, or the same one that the app will use
-        #     create the tables
-        #     _db.create_all()
-        # or
-        # Use Alembic to load all of the DB revisions including supporting lookup data
-        # This is the path we'll use in legal_api!!
+    # ############################################
+    # There are 2 approaches, an empty database, or the same one that the app will use
+    #     create the tables
+    #     _db.create_all()
+    # or
+    # Use Alembic to load all of the DB revisions including supporting lookup data
+    # This is the path we'll use in legal_api!!
 
-        # even though this isn't referenced directly, it sets up the internal configs that upgrade needs
-#        Migrate(app, _db)
-#        upgrade()
+    # even though this isn't referenced directly, it sets up the internal configs that upgrade needs
+    #   Migrate(app, _db)
+    #   upgrade()
 
-        return _db
+    return _db
 
 
 @pytest.fixture(scope='function')
@@ -180,11 +179,16 @@ def session(app, db):  # pylint: disable=redefined-outer-name, invalid-name
         sess.remove()
         # This instruction rollsback any commit that were executed in the tests.
         txn.rollback()
+
+        # Fix need here for ResourceClosedError('This Connection is closed') running
+        # the test suite. The problem does not occur running a small number of tests,
+        # such as in an individual file.
+        #
         conn.close()
 
 
-#@pytest.fixture(scope='session')
-#def stan_server(docker_services):
+# @pytest.fixture(scope='session')
+# def stan_server(docker_services):
 #    """Create the nats / stan services that the integration tests will use."""
 #    docker_services.start('nats')
 #    time.sleep(2)
