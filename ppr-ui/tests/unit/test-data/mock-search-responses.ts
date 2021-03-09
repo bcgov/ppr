@@ -364,6 +364,6 @@ export const mockedSearchResponse:mockedSearchResponse = {
 }
 
 export const mockedVonResponse: AutoCompleteResponseIF = {
-  total: 10,
+  total: 6,
   results: mockedVonResults
 }

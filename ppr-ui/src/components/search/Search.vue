@@ -153,10 +153,8 @@ export default defineComponent({
     watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
       localState.validations = null
       localState.searchValue = null
-      if (val.searchTypeUI !== UISearchTypes.BUSINESS_DEBTOR) {
-        localState.autoCompleteIsActive = false
-        // localState.autoCompleteResults = []
-      } else localState.autoCompleteIsActive = true
+      if (val.searchTypeUI !== UISearchTypes.BUSINESS_DEBTOR) localState.autoCompleteIsActive = false
+      else localState.autoCompleteIsActive = true
     })
 
     return {
