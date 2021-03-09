@@ -67,7 +67,7 @@ function createComponent (
 
 describe('Search base validation', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -94,7 +94,7 @@ describe('Search base validation', () => {
 
 describe('Serial number validation', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -147,7 +147,7 @@ describe('Serial number validation', () => {
 
 describe('Business debtor validation', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -220,7 +220,7 @@ describe('Business debtor validation', () => {
     await Vue.nextTick()
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
-    expect(messages1.at(0).text()).toContain("Maximum 70 characters")
+    expect(messages1.at(0).text()).toContain('Maximum 70 characters')
     // special chars
     wrapper.vm.$data.searchValue = 'F10@'
     await Vue.nextTick()
@@ -234,7 +234,7 @@ describe('Business debtor validation', () => {
 
 describe('MHR validation', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -337,7 +337,7 @@ describe('MHR validation', () => {
 
 describe('Aircraft validation', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -440,7 +440,7 @@ describe('Aircraft validation', () => {
 
 describe('Registration number validation', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(SearchTypes)
   })
@@ -466,7 +466,7 @@ describe('Registration number validation', () => {
 
   it('prevents searching when search value is in incorrect format', async () => {
     const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[6]
-    const incorrectValues = ['123456WW', '12345W', '123456%','123', 'abc', 'abcdef1', '1234567']
+    const incorrectValues = ['123456WW', '12345W', '123456%', '123', 'abc', 'abcdef1', '1234567']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.$data.selectedSearchType = select1
       await Vue.nextTick()
@@ -492,7 +492,7 @@ describe('Registration number validation', () => {
     const hints = wrapper.findAll('.v-messages__message')
     expect(hints.length).toBe(1)
     expect(hints.at(0).text()).toContain('Registration numbers contain')
-    const incorrectValues = ['123456WW', '123456%','W1', 'ab', '@', '1234567', '123WA', '.']
+    const incorrectValues = ['123456WW', '123456%', 'W1', 'ab', '@', '1234567', '123WA', '.']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.$data.selectedSearchType = select1
       await Vue.nextTick()

@@ -25,6 +25,7 @@
                           :disabled="!selectedSearchType"
                           filled
                           :hint="searchHint"
+                          :hide-details="hideDetails"
                           persistent-hint
                           :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
                           v-model="searchValue">
@@ -34,6 +35,11 @@
             {{ line }}
           </v-row>
         </v-tooltip>
+        <auto-complete :searchValue="autoCompleteSearchValue"
+                       :setAutoCompleteIsActive="autoCompleteIsActive"
+                       @search-value="setSearchValue"
+                       @hide-details="setHideDetails">
+        </auto-complete>
       </v-col>
       <v-col cols="2" class="pl-3 pt-3">
         <v-row no-gutters>
@@ -42,7 +48,7 @@
             <v-icon right>mdi-magnify</v-icon>
           </v-btn>
         </v-row>
-        <v-row no-gutters>
+        <v-row no-gutters class="pl-1">
           <span id="search-btn-info">
             Each search incurs a fee
           </span>
@@ -54,6 +60,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+
 import { validateSearchAction, validateSearchRealTime, PPRApiHelper } from '@/utils'
 import { SearchTypes } from '@/resources'
 import {
@@ -63,8 +70,13 @@ import {
   SearchValidationIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { UISearchTypes } from '@/enums'
+// won't render properly from @/components/search
+import AutoComplete from '@/components/search/AutoComplete.vue'
 
 export default defineComponent({
+  components: {
+    AutoComplete
+  },
   props: {
     defaultSelectedSearchType: {
       type: Object as () => SearchTypeIF
@@ -75,6 +87,9 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const localState = reactive({
+      autoCompleteIsActive: true,
+      autoCompleteSearchValue: '',
+      hideDetails: false,
       searchTypes: SearchTypes,
       searchValue: props.defaultSearchValue,
       searchTypeLabel: 'Select a search category',
@@ -118,18 +133,38 @@ export default defineComponent({
       if (resp?.errors) emit('search-error', resp.errors)
       else emit('search-data', resp)
     }
-    watch(() => localState.searchValue, () => {
-      localState.validations = validateSearchRealTime(localState)
+    const setHideDetails = (hideDetails: boolean) => {
+      localState.hideDetails = hideDetails
+    }
+    const setSearchValue = (searchValue: string) => {
+      localState.autoCompleteIsActive = false
+      localState.searchValue = searchValue
+    }
+    watch(() => localState.searchValue, (val: string) => {
+      if (!val) localState.validations = null
+      else localState.validations = validateSearchRealTime(localState)
+      if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR &&
+          localState.autoCompleteIsActive) {
+        localState.autoCompleteSearchValue = val
+      }
+      // show autocomplete results there is a searchValue and if no error messages
+      localState.autoCompleteIsActive = !localState.validations && val !== ''
     })
-    watch(() => localState.selectedSearchType, (val) => {
+    watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
       localState.validations = null
       localState.searchValue = null
+      if (val.searchTypeUI !== UISearchTypes.BUSINESS_DEBTOR) {
+        localState.autoCompleteIsActive = false
+        // localState.autoCompleteResults = []
+      } else localState.autoCompleteIsActive = true
     })
 
     return {
       ...toRefs(localState),
       getSearchApiParams,
-      searchAction
+      searchAction,
+      setHideDetails,
+      setSearchValue
     }
   }
 })
@@ -138,14 +173,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 #search-btn {
-  width: 8rem;
+  width: 9rem;
 }
 #search-btn-info {
   color: $gray8;
   font-size: 0.725rem;
-}
-.close-popup-btn {
-  background-color: transparent !important;
 }
 ::v-deep {
   .v-select-list {

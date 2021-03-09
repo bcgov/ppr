@@ -1,7 +1,7 @@
 import { APISearchTypes, MatchTypes, UISearchTypes } from '@/enums'
-import { SearchResponseIF, SearchResultIF, SearchTypeIF } from '@/interfaces'
+import { AutoCompleteResponseIF, AutoCompleteResultIF, SearchResponseIF, SearchResultIF } from '@/interfaces'
 
-type mockResults = {
+type mockSearchResults = {
   [UISearchTypes.SERIAL_NUMBER]?: Array<SearchResultIF>
   [UISearchTypes.INDIVIDUAL_DEBTOR]?: Array<SearchResultIF>
   [UISearchTypes.BUSINESS_DEBTOR]?: Array<SearchResultIF>
@@ -10,7 +10,7 @@ type mockResults = {
   [UISearchTypes.REGISTRATION_NUMBER]?: Array<SearchResultIF>
 }
 
-type mockResponse = {
+type mockedSearchResponse = {
   [UISearchTypes.SERIAL_NUMBER]?: SearchResponseIF
   [UISearchTypes.INDIVIDUAL_DEBTOR]?: SearchResponseIF
   [UISearchTypes.BUSINESS_DEBTOR]?: SearchResponseIF
@@ -19,7 +19,7 @@ type mockResponse = {
   [UISearchTypes.REGISTRATION_NUMBER]?: SearchResponseIF
 }
 
-const mockedResults: mockResults = {
+const mockedSearchResults: mockSearchResults = {
   [UISearchTypes.SERIAL_NUMBER]: [
     {
       matchType: MatchTypes.EXACT,
@@ -231,7 +231,7 @@ const mockedResults: mockResults = {
       registrationNumber: '223456A',
       baseRegistrationNumber: '123456A',
       createDateTime: '2020-02-21T18:56:20Z',
-      registrationType: 'SA',
+      registrationType: 'SA'
     },
     {
       matchType: MatchTypes.EXACT,
@@ -256,13 +256,45 @@ const mockedResults: mockResults = {
     }
   ]
 }
+const mockedVonResults: Array<AutoCompleteResultIF> = [
+  {
+    type: 'name',
+    value: 'test1',
+    score: 1
+  },
+  {
+    type: 'name',
+    value: 'test2',
+    score: 1
+  },
+  {
+    type: 'name',
+    value: 'test3',
+    score: 1
+  },
+  {
+    type: 'name',
+    value: 'test4',
+    score: 1
+  },
+  {
+    type: 'name',
+    value: 'test5',
+    score: 1
+  },
+  {
+    type: 'name',
+    value: 'test6',
+    score: 1
+  }
+]
 
-export const mockResponse:mockResponse = {
+export const mockedSearchResponse:mockedSearchResponse = {
   [UISearchTypes.SERIAL_NUMBER]: {
     searchId: '12234',
     searchDateTime: '2020-05-14T21:08:32Z',
-    returnedResultsSize: mockedResults[UISearchTypes.SERIAL_NUMBER].length,
-    totalResultsSize: mockedResults[UISearchTypes.SERIAL_NUMBER].length,
+    returnedResultsSize: mockedSearchResults[UISearchTypes.SERIAL_NUMBER].length,
+    totalResultsSize: mockedSearchResults[UISearchTypes.SERIAL_NUMBER].length,
     maxResultsSize: 1000,
     searchQuery: {
       type: APISearchTypes.SERIAL_NUMBER,
@@ -270,14 +302,14 @@ export const mockResponse:mockResponse = {
         value: 'serial1'
       }
     },
-    results: mockedResults[UISearchTypes.SERIAL_NUMBER]
+    results: mockedSearchResults[UISearchTypes.SERIAL_NUMBER]
   },
   [UISearchTypes.INDIVIDUAL_DEBTOR]: null,
   [UISearchTypes.BUSINESS_DEBTOR]: {
     searchId: '12236',
     searchDateTime: '2020-05-16T21:08:32Z',
-    returnedResultsSize: mockedResults[UISearchTypes.BUSINESS_DEBTOR].length,
-    totalResultsSize: mockedResults[UISearchTypes.BUSINESS_DEBTOR].length,
+    returnedResultsSize: mockedSearchResults[UISearchTypes.BUSINESS_DEBTOR].length,
+    totalResultsSize: mockedSearchResults[UISearchTypes.BUSINESS_DEBTOR].length,
     maxResultsSize: 1000,
     searchQuery: {
       type: APISearchTypes.BUSINESS_DEBTOR,
@@ -285,13 +317,13 @@ export const mockResponse:mockResponse = {
         value: 'test business debtor'
       }
     },
-    results: mockedResults[UISearchTypes.BUSINESS_DEBTOR]
+    results: mockedSearchResults[UISearchTypes.BUSINESS_DEBTOR]
   },
   [UISearchTypes.MHR_NUMBER]: {
     searchId: '12237',
     searchDateTime: '2020-05-17T21:08:32Z',
-    returnedResultsSize: mockedResults[UISearchTypes.MHR_NUMBER].length,
-    totalResultsSize: mockedResults[UISearchTypes.MHR_NUMBER].length,
+    returnedResultsSize: mockedSearchResults[UISearchTypes.MHR_NUMBER].length,
+    totalResultsSize: mockedSearchResults[UISearchTypes.MHR_NUMBER].length,
     maxResultsSize: 1000,
     searchQuery: {
       type: APISearchTypes.MHR_NUMBER,
@@ -299,13 +331,13 @@ export const mockResponse:mockResponse = {
         value: '123456'
       }
     },
-    results: mockedResults[UISearchTypes.MHR_NUMBER]
+    results: mockedSearchResults[UISearchTypes.MHR_NUMBER]
   },
   [UISearchTypes.AIRCRAFT]: {
     searchId: '12238',
     searchDateTime: '2020-05-18T21:08:32Z',
-    returnedResultsSize: mockedResults[UISearchTypes.AIRCRAFT].length,
-    totalResultsSize: mockedResults[UISearchTypes.AIRCRAFT].length,
+    returnedResultsSize: mockedSearchResults[UISearchTypes.AIRCRAFT].length,
+    totalResultsSize: mockedSearchResults[UISearchTypes.AIRCRAFT].length,
     maxResultsSize: 1000,
     searchQuery: {
       type: APISearchTypes.AIRCRAFT,
@@ -313,13 +345,13 @@ export const mockResponse:mockResponse = {
         value: 'testAircraft'
       }
     },
-    results: mockedResults[UISearchTypes.AIRCRAFT]
+    results: mockedSearchResults[UISearchTypes.AIRCRAFT]
   },
   [UISearchTypes.REGISTRATION_NUMBER]: {
     searchId: '12239',
     searchDateTime: '2020-05-19T21:08:32Z',
-    returnedResultsSize: mockedResults[UISearchTypes.REGISTRATION_NUMBER].length,
-    totalResultsSize: mockedResults[UISearchTypes.REGISTRATION_NUMBER].length,
+    returnedResultsSize: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER].length,
+    totalResultsSize: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER].length,
     maxResultsSize: 1000,
     searchQuery: {
       type: APISearchTypes.REGISTRATION_NUMBER,
@@ -327,6 +359,11 @@ export const mockResponse:mockResponse = {
         value: '123456A'
       }
     },
-    results: mockedResults[UISearchTypes.REGISTRATION_NUMBER]
+    results: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER]
   }
+}
+
+export const mockedVonResponse: AutoCompleteResponseIF = {
+  total: 10,
+  results: mockedVonResults
 }

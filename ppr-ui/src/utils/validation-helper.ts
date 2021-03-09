@@ -4,7 +4,8 @@ import { SearchTypeIF, SearchValidationIF } from '@/interfaces'
 // subset of the localState that includes what the validator needs
 type partialSearchState = { searchValue: string, selectedSearchType: SearchTypeIF }
 
-const specialChars = /[!@#$%^&*(),.?":{}|<>]/
+const specialCharsStrict = /[!@#$%^&*(),.?"{}|<>`~_;:'/\\[\]-]/
+const specialCharsLax = /[!@#$%^*(),?"{}|<>`~_[\]]/
 const numbersOnly = /^\d+$/
 const lettersOnly = /^[A-z]+$/
 const regNumber = /^\d{6}[A-z]{1}$/
@@ -84,7 +85,7 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
   let searchValue = searchState?.searchValue?.trim()
   switch (searchState?.selectedSearchType?.searchTypeUI) {
     case UISearchTypes.SERIAL_NUMBER:
-      if (searchValue && specialChars.test(searchValue)) {
+      if (searchValue && specialCharsStrict.test(searchValue)) {
         validation.searchValue.message = "Serial numbers don't normally contain special characters"
       }
       if (searchValue?.length < 4) {
@@ -96,7 +97,7 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
       }
       break
     case UISearchTypes.BUSINESS_DEBTOR:
-      if (searchValue && specialChars.test(searchValue)) {
+      if (searchValue && specialCharsLax.test(searchValue)) {
         validation.searchValue.message = "Names don't normally contain special characters"
       }
       if (searchValue?.length > 70) {

@@ -12,7 +12,7 @@ import { Result } from '@/components/results'
 import { SearchTypes, tableHeaders } from '@/resources'
 import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { APISearchTypes, UISearchTypes } from '@/enums'
-import { mockResponse } from './test-data'
+import { mockedSearchResponse } from './test-data'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -81,7 +81,7 @@ describe('Test result table with no results', () => {
 
 describe('Serial number results', () => {
   let wrapper: Wrapper<any>
-  const testResults = mockResponse[UISearchTypes.SERIAL_NUMBER]
+  const testResults = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
 
   beforeEach(async () => {
     await store.dispatch('setSearchResults', testResults)
@@ -123,7 +123,7 @@ describe('Serial number results', () => {
 
 describe('Business debtor results', () => {
   let wrapper: Wrapper<any>
-  const testResults = mockResponse[UISearchTypes.BUSINESS_DEBTOR]
+  const testResults = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
 
   beforeEach(async () => {
     await store.dispatch('setSearchResults', testResults)
@@ -161,7 +161,7 @@ describe('Business debtor results', () => {
 
 describe('Manufactured home results', () => {
   let wrapper: Wrapper<any>
-  const testResults = mockResponse[UISearchTypes.MHR_NUMBER]
+  const testResults = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
 
   beforeEach(async () => {
     await store.dispatch('setSearchResults', testResults)
@@ -193,7 +193,8 @@ describe('Manufactured home results', () => {
     expect(rows.length).toBe(testResults.results.length + 1)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.serialNumber)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.manufacturedHomeRegistrationNumber)
+      expect(rows.at(i + 1).text()).toContain(
+        testResults.results[i].vehicleCollateral.manufacturedHomeRegistrationNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.year)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.make)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.model)
@@ -203,7 +204,7 @@ describe('Manufactured home results', () => {
 
 describe('Aircraft results', () => {
   let wrapper: Wrapper<any>
-  const testResults = mockResponse[UISearchTypes.AIRCRAFT]
+  const testResults = mockedSearchResponse[UISearchTypes.AIRCRAFT]
 
   beforeEach(async () => {
     await store.dispatch('setSearchResults', testResults)
@@ -234,7 +235,7 @@ describe('Aircraft results', () => {
     // includes header so add 1
     expect(rows.length).toBe(testResults.results.length + 1)
     for (let i; i < testResults.results; i++) {
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.serialNumber)      
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.serialNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.year)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.make)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.model)
@@ -244,7 +245,7 @@ describe('Aircraft results', () => {
 
 describe('Registration number results', () => {
   let wrapper: Wrapper<any>
-  const testResults = mockResponse[UISearchTypes.REGISTRATION_NUMBER]
+  const testResults = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
 
   beforeEach(async () => {
     await store.dispatch('setSearchResults', testResults)
