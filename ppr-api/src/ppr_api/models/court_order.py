@@ -21,7 +21,6 @@ from .db import db
 class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the amendment, renewal statement court order information."""
 
-    __versioned__ = {}
     __tablename__ = 'court_order'
 
     court_order_id = db.Column('court_order_id', db.Integer,

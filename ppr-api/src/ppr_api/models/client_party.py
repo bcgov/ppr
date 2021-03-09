@@ -18,13 +18,13 @@ Currently the API only selects client parties. There are no create, update, dele
 from __future__ import annotations
 
 from .db import db
+# Needed by the SQLAlchemy relationship
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 
 
 class ClientParty(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains client party information (registering and secured parties)."""
 
-    __versioned__ = {}
     __tablename__ = 'client_party'
 
     client_party_id = db.Column('client_party_id', db.Integer,

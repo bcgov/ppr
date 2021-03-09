@@ -20,7 +20,6 @@ from .db import db
 class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the general collateral information."""
 
-    __versioned__ = {}
     __tablename__ = 'general_collateral'
 
 #    collateral_id = db.Column('general_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())

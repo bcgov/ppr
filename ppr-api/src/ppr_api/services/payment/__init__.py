@@ -12,8 +12,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module wraps the calls to external payment service used by the API."""
-import os
-
-
-# Service endpoint including /api/v1 with or without trailing backslash.
-PAYMENT_SVC_URL = os.getenv('PAYMENT_SVC_URL')

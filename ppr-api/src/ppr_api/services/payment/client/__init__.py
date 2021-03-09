@@ -19,16 +19,9 @@ from enum import Enum
 from functools import wraps
 import json
 import copy
-import os
 
 from flask import current_app
-
 import requests
-
-# Follow env variable names from other API's
-# Service endpoint with or without trailing backslash.
-PAYMENT_SVC_URL = os.getenv('PAYMENT_SVC_URL')
-PAYMENT_SVC_PREFIX = os.getenv('PAYMENT_SVC_PREFIX', 'api/v1/')
 
 
 MSG_CLIENT_CREDENTIALS_REQ_FAILED = 'Client credentials request failed'
@@ -129,8 +122,10 @@ class BaseClient:
 
     def __init__(self, jwt=None, account_id=None, api_key=None):
         """Set the API URL from the env variables PAYMENT_SVC_PREFIX and PAYMENT_SVC_URL."""
-        self.api_prefix = PAYMENT_SVC_PREFIX + '/' if PAYMENT_SVC_PREFIX[-1] != '/' else PAYMENT_SVC_PREFIX
-        self.api_url = PAYMENT_SVC_URL + '/' if PAYMENT_SVC_URL[-1] != '/' else PAYMENT_SVC_URL
+        service_url = current_app.config.get('PAYMENT_SVC_URL')
+        service_prefix = current_app.config.get('PAYMENT_SVC_PREFIX')
+        self.api_prefix = service_prefix + '/' if service_prefix[-1] != '/' else service_prefix
+        self.api_url = service_url + '/' if service_url[-1] != '/' else service_url
         self.api_url += self.api_prefix
         self.jwt = jwt
         self.account_id = account_id

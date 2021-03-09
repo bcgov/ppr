@@ -39,7 +39,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         OUTBOARD_MOTOR = 'OB'
         TRAILER = 'TR'
 
-    __versioned__ = {}
     __tablename__ = 'serial_collateral'
 
 

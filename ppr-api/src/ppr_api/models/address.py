@@ -20,7 +20,6 @@ from .db import db
 class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the registry addresses."""
 
-    __versioned__ = {}
     __tablename__ = 'address_ppr'
 
     address_id = db.Column('address_id', db.Integer, db.Sequence('address_id_seq'), primary_key=True)

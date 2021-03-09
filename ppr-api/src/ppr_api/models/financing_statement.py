@@ -20,16 +20,15 @@ from __future__ import annotations
 from enum import Enum
 from http import HTTPStatus
 
-# from sqlalchemy import event
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
 from .db import db
-from .registration import Registration  # noqa: F401 pylint: disable=unused-import
-from .trust_indenture import TrustIndenture  # noqa: F401 pylint: disable=unused-import
-from .party import Party  # noqa: F401 pylint: disable=unused-import
-from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import
-from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import
+from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .trust_indenture import TrustIndenture  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .party import Party  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
 
 class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -49,7 +48,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         FORESTRY_SUBCONTRACTOR_LIEN = 'FS'
         MISCELLANEOUS = 'MR'
 
-    __versioned__ = {}
     __tablename__ = 'financing_statement'
 
 #    financing_id = db.Column('financing_id', db.Integer, primary_key=True, server_default=db.FetchedValue())

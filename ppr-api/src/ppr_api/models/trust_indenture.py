@@ -15,13 +15,13 @@
 from __future__ import annotations
 
 from .db import db
+# Needed by the SQLAlchemy relationship
 from .registration import Registration  # noqa: F401 pylint: disable=unused-import
 
 
 class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the financing statement trust indenture information."""
 
-    __versioned__ = {}
     __tablename__ = 'trust_indenture'
 
 #    trust_id = db.Column('trust_id', db.Integer, primary_key=True, server_default=db.FetchedValue())

@@ -17,7 +17,6 @@
 from enum import Enum
 from http import HTTPStatus
 import json
-# import pycountry
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
@@ -44,7 +43,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         REG_CLASS_DISCHARGE = 'DISCHARGE'
         REG_CLASS_RENEWAL = 'RENEWAL'
 
-    __versioned__ = {}
     __tablename__ = 'registration'
 
 #    registration_id = db.Column('registration_id', db.Integer, primary_key=True, server_default=db.FetchedValue())

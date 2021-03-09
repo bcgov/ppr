@@ -34,7 +34,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         REGISTERING_PARTY = 'RG'
         SECURED_PARTY = 'SP'
 
-    __versioned__ = {}
     __tablename__ = 'party'
 
 

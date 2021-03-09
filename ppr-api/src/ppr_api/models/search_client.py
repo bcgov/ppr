@@ -13,6 +13,9 @@
 # limitations under the License.
 """This module holds model data and database operations for search queries."""
 # flake8: noqa Q000,E122,E131
+# Disable Q000: Allow query strings to be in double quotation marks that contain single quotation marks.
+# Disable E122: allow query strings to be more human readable.
+# Disable E131: allow query strings to be more human readable.
 from __future__ import annotations
 
 from enum import Enum
@@ -25,7 +28,9 @@ from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
+
 from .db import db
+
 
 # Serial number search base where clause
 SERIAL_SEARCH_BASE = \
@@ -128,7 +133,6 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         SERIAL_NUM = 'SS'
         MANUFACTURED_HOME_NUM = 'MH'
 
-    __versioned__ = {}
     __tablename__ = 'search_client'
 
 

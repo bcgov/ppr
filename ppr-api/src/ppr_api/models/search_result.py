@@ -18,21 +18,18 @@ from __future__ import annotations
 from http import HTTPStatus
 import json
 
-# from sqlalchemy import event
 from flask import current_app
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models.utils import REG_CLASS_TO_STATEMENT_TYPE  # , format_ts
 
 from .db import db
-# from .search_client import SearchClient
 from .financing_statement import FinancingStatement
 
 
 class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search results detail (search step 2) information."""
 
-    __versioned__ = {}
     __tablename__ = 'search_result'
 
     search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_client.search_id'),

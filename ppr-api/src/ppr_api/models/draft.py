@@ -40,7 +40,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         REG_CLASS_DISCHARGE = 'DISCHARGE'
         REG_CLASS_RENEWAL = 'RENEWAL'
 
-    __versioned__ = {}
     __tablename__ = 'draft'
 
 #    draft_id = db.Column('draft_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
