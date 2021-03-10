@@ -27,6 +27,7 @@ from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
 from .vehicle_collateral import VehicleCollateral
 
+
 __all__ = ('db',
            'Address', 'ClientParty', 'CourtOrder', 'Draft', 'FinancingStatement',
            'GeneralCollateral', 'Party', 'Registration', 'SearchClient',

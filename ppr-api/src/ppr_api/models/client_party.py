@@ -12,32 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds data for client parties (reusable registering parties, secured parties).
-   Currently the API only selects client parties. There are no create, update, delete requests.
+
+Currently the API only selects client parties. There are no create, update, delete requests.
 """
 from __future__ import annotations
 
-from enum import Enum
-
-#from sqlalchemy import event
-
 from .db import db
-
-from .address import Address  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+# Needed by the SQLAlchemy relationship
+from .address import Address  # noqa: F401 pylint: disable=unused-import
 
 
 class ClientParty(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains client party information (registering and secured parties)."""
 
-    class PartyTypes(Enum):
-        """Render an Enum of the client party types."""
-
-    __versioned__ = {}
     __tablename__ = 'client_party'
 
     client_party_id = db.Column('client_party_id', db.Integer,
                                 db.Sequence('client_party_id_seq'), primary_key=True)
     party_type_cd = db.Column('party_type_cd', db.String(3))
-                    #, db.ForeignKey('party_type.party_type_cd'), nullable=False)
+    # , db.ForeignKey('party_type.party_type_cd'), nullable=False)
     account_id = db.Column('account_id', db.String(20), nullable=False)
     # contact info
     contact_name = db.Column('contact_name', db.String(100), nullable=False)
@@ -59,10 +52,9 @@ class ClientParty(db.Model):  # pylint: disable=too-many-instance-attributes
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
 
     # Relationships - Address
-    address = db.relationship("Address", foreign_keys=[address_id], uselist=False,
-                              back_populates="client_party", cascade='all, delete')
-    party = db.relationship("Party", uselist=False, back_populates="client_party")
-
+    address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
+                              back_populates='client_party', cascade='all, delete')
+    party = db.relationship('Party', uselist=False, back_populates='client_party')
 
     @property
     def json(self) -> dict:

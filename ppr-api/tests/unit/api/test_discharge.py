@@ -18,10 +18,12 @@ Test-Suite to ensure that the /financing-statement/registrationNum/discharges en
 """
 import copy
 from http import HTTPStatus
+
 from registry_schemas.example_data.ppr import DISCHARGE_STATEMENT, FINANCING_STATEMENT
 
 from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
+
 
 # prep sample post discharge statement data
 SAMPLE_JSON = copy.deepcopy(DISCHARGE_STATEMENT)
@@ -29,7 +31,7 @@ SAMPLE_JSON = copy.deepcopy(DISCHARGE_STATEMENT)
 
 def test_discharge_valid_200(session, client, jwt):
     """Assert that a valid create statement returns a 200 status."""
-    # setup - create a financing statement as the base registration, then a discharge 
+    # setup - create a financing statement as the base registration, then a discharge
     statement = copy.deepcopy(FINANCING_STATEMENT)
     statement['type'] = 'SA'
     statement['debtors'][0]['businessName'] = 'TEST BUS 2 DEBTOR'
@@ -40,11 +42,11 @@ def test_discharge_valid_200(session, client, jwt):
     del statement['lienAmount']
     del statement['surrenderDate']
     del statement['documentId']
- 
-    rv1 = client.post(f'/api/v1/financing-statements',
-                     json=statement,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+
+    rv1 = client.post('/api/v1/financing-statements',
+                      json=statement,
+                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
     base_reg_num = rv1.json['baseRegistrationNumber']
@@ -57,7 +59,7 @@ def test_discharge_valid_200(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/' + base_reg_num + '/discharges',
+    rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/discharges',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -75,7 +77,7 @@ def test_discharge_invalid_missing_basedebtor_400(session, client, jwt):
     del json_data['baseDebtor']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/023001B/discharges',
+    rv = client.post('/api/v1/financing-statements/023001B/discharges',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -93,7 +95,7 @@ def test_discharge_invalid_regnum_404(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/X12345X/discharges',
+    rv = client.post('/api/v1/financing-statements/X12345X/discharges',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -112,7 +114,7 @@ def test_discharge_invalid_historical_400(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0003/discharges',
+    rv = client.post('/api/v1/financing-statements/TEST0003/discharges',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -132,7 +134,7 @@ def test_discharge_invalid_debtor_400(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/discharges',
+    rv = client.post('/api/v1/financing-statements/TEST0001/discharges',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
@@ -152,7 +154,7 @@ def test_discharge_nonstaff_missing_account_400(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/discharges',
+    rv = client.post('/api/v1/financing-statements/TEST0001/discharges',
                      json=json_data,
                      headers=create_header(jwt, [COLIN_ROLE]),
                      content_type='application/json')
@@ -172,7 +174,7 @@ def test_discharge_staff_missing_account_200(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/TEST0001/discharges',
+    rv = client.post('/api/v1/financing-statements/TEST0001/discharges',
                      json=json_data,
                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
@@ -181,7 +183,7 @@ def test_discharge_staff_missing_account_200(session, client, jwt):
     assert rv.status_code == HTTPStatus.OK
 
 
-def test_discharge_nonstaff_unauthorized_404(session, client, jwt):
+def test_discharge_nonstaff_unauthorized_401(session, client, jwt):
     """Assert that a discharge statement request with a non-ppr role and account ID returns a 404 status."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON)
@@ -190,11 +192,10 @@ def test_discharge_nonstaff_unauthorized_404(session, client, jwt):
     del json_data['payment']
 
     # test
-    rv = client.post(f'/api/v1/financing-statements/023001B/discharges',
+    rv = client.post('/api/v1/financing-statements/023001B/discharges',
                      json=json_data,
                      headers=create_header_account(jwt, [COLIN_ROLE]),
                      content_type='application/json')
 
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
-

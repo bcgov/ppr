@@ -11,13 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Create SQLAlchenmy and Schema managers.
-
-These will get initialized by the application using the models
-"""
-from flask_sqlalchemy import SQLAlchemy
-
-
-# by convention in the Flask community these are lower case,
-# whereas pylint wants them upper case
-db = SQLAlchemy()  # pylint: disable=invalid-name
+"""This module wraps the calls to external payment service used by the API."""

@@ -21,8 +21,6 @@ from enum import Enum
 from http import HTTPStatus
 import json
 
-#from sqlalchemy import event
-
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -42,7 +40,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         REG_CLASS_DISCHARGE = 'DISCHARGE'
         REG_CLASS_RENEWAL = 'RENEWAL'
 
-    __versioned__ = {}
     __tablename__ = 'draft'
 
 #    draft_id = db.Column('draft_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
@@ -62,15 +59,12 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                                 db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id],
-                                   back_populates="draft", uselist=False)
-
-
+    registration = db.relationship('Registration', foreign_keys=[registration_id],
+                                   back_populates='draft', uselist=False)
 
     @property
     def json(self) -> dict:
         """Return the draft as a json object."""
-
         draft = json.loads(self.draft)
 
         draft['createDateTime'] = model_utils.format_ts(self.create_ts)
@@ -86,7 +80,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return draft
 
-
     @classmethod
     def find_all_by_account_id(cls, account_id: str = None):
         """Return a summary list of drafts belonging to an account."""
@@ -95,8 +88,8 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             draft_list = db.session.query(Draft.create_ts, Draft.registration_type_cl,
                                           Draft.registration_type_cd, Draft.document_number,
                                           Draft.registration_number). \
-                            filter(Draft.account_id == account_id, \
-                                   Draft.registration_id == None).order_by(Draft.draft_id).all()
+                            filter(Draft.account_id == account_id,
+                                   Draft.registration_id == None).order_by(Draft.draft_id).all()  # noqa: E711
 
         if not draft_list:
             raise BusinessException(
@@ -122,7 +115,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return drafts_json
 
-
     @classmethod
     def find_by_document_number(cls, document_number: str = None, allow_used: bool = False):
         """Return a draft statement by document ID."""
@@ -144,7 +136,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return draft
 
-
     @classmethod
     def delete(cls, document_number: str = None):
         """Delete a draft statement by document ID."""
@@ -158,10 +149,8 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return draft
 
-
     def save(self):
         """Save the object to the database immediately."""
-
         if not self.create_ts:
             self.create_ts = model_utils.now_ts()
 
@@ -169,7 +158,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.commit()
 
         return self.json
-
 
     @classmethod
     def update(cls, request_json, document_number: str = None):
@@ -199,7 +187,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return draft
 
-
     @staticmethod
     def create_from_json(json_data, account_id: str):
         """Create a draft object from a json Draft schema object: map json to db."""
@@ -225,7 +212,6 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         draft.draft = json.dumps(json_data)
 
         return draft
-
 
     @staticmethod
     def create_from_registration(registration, json_data):

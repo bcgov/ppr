@@ -15,16 +15,12 @@
 from __future__ import annotations
 
 from enum import Enum
-#from http import HTTPStatus
-
-#from sqlalchemy import event
 
 from ppr_api.models import utils as model_utils
 
 from .db import db
-
-from .address import Address  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
-from .client_party import ClientParty  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .address import Address  # noqa: F401 pylint: disable=unused-import
+from .client_party import ClientParty  # noqa: F401 pylint: disable=unused-import
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -38,14 +34,13 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         REGISTERING_PARTY = 'RG'
         SECURED_PARTY = 'SP'
 
-    __versioned__ = {}
     __tablename__ = 'party'
 
 
 #    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     party_id = db.Column('party_id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
     party_type_cd = db.Column('party_type_cd', db.String(3), nullable=False)
-                              #, db.ForeignKey('party_type.party_type_cd'))
+    # , db.ForeignKey('party_type.party_type_cd'))
     # party person
     first_name = db.Column('first_name', db.String(50), nullable=True)
     middle_name = db.Column('middle_name', db.String(50), nullable=True)
@@ -77,22 +72,21 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Address
-    address = db.relationship("Address", foreign_keys=[address_id], uselist=False,
-                              back_populates="party", cascade='all, delete')
+    address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
+                              back_populates='party', cascade='all, delete')
 
     # Relationships - ClientParty
-    client_party = db.relationship("ClientParty", foreign_keys=[client_party_id], uselist=False,
-                                   back_populates="party")
+    client_party = db.relationship('ClientParty', foreign_keys=[client_party_id], uselist=False,
+                                   back_populates='party')
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id],
-                                   back_populates="parties", cascade='all, delete', uselist=False)
+    registration = db.relationship('Registration', foreign_keys=[registration_id],
+                                   back_populates='parties', cascade='all, delete', uselist=False)
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
-                                          back_populates="parties", cascade='all, delete',
+    financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
+                                          back_populates='parties', cascade='all, delete',
                                           uselist=False)
-
 
     @property
     def json(self) -> dict:
@@ -138,7 +132,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return party
 
-
     @property
     def name(self) -> str:
         """Return the full name of the party for comparison."""
@@ -148,7 +141,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             return ' '.join((self.first_name, self.last_name)).strip().upper()
         return self.business_name.strip().upper()
 
-
     @classmethod
     def find_by_id(cls, party_id: int = None):
         """Return a party object by party ID."""
@@ -157,7 +149,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party = cls.query.get(party_id)
 
         return party
-
 
     @classmethod
     def find_by_registration_id(cls, registration_id: int = None):
@@ -169,7 +160,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return parties
 
-
     @classmethod
     def find_by_financing_id(cls, financing_id: int = None):
         """Return a list of party objects by financing statement ID."""
@@ -179,8 +169,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                                .order_by(Party.party_id).all()
 
         return parties
-
-
 
     @staticmethod
     def create_from_json(json_data, party_type: str, registration_id: int = None):
@@ -206,8 +194,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 if 'middle' in json_data['personName']:
                     party.middle_name = json_data['personName']['middle'].strip().upper()
 
- #           if 'emailAddress' in json_data:
- #               party.email_id = json_data['emailAddress']
+            # if 'emailAddress' in json_data:
+            #   party.email_id = json_data['emailAddress']
 
             party.address = Address.create_from_json(json_data['address'])
 
@@ -215,7 +203,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party.registration_id = registration_id
 
         return party
-
 
     @staticmethod
     def create_from_financing_json(json_data, registration_id: int = None):
@@ -237,7 +224,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                                                       registration_id))
 
         return parties
-
 
     @staticmethod
     def create_from_statement_json(json_data,
@@ -291,11 +277,9 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 #                return False
 #        return True
 
-
-
-#@event.listens_for(Party, 'before_insert')
-#@event.listens_for(Party, 'before_update')
-#def receive_before_change(mapper, connection, target):  # pylint: disable=unused-argument; SQLAlchemy callback signature
+# @event.listens_for(Party, 'before_insert')
+# @event.listens_for(Party, 'before_update')
+# def receive_before_change(mapper, connection, target):  # pylint: disable=unused-argument
 #    """Run checks/updates before adding/changing the party model data."""
 #    party = target
 

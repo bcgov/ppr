@@ -17,7 +17,7 @@
 
 from http import HTTPStatus
 
-from flask import request
+from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
 
 from registry_schemas import utils as schema_utils
@@ -26,15 +26,17 @@ from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
 from ppr_api.models import SearchClient, SearchResult
+from ppr_api.services.payment.exceptions import SBCPaymentException
+from ppr_api.services.payment.payment import Payment, TransactionTypes
 
 from .utils import get_account_id, account_required_response, \
                    validation_error_response, business_exception_response
 from .utils import unauthorized_error_response, unprocessable_error_response, \
-                   path_param_error_response, default_exception_response
+                   path_param_error_response, default_exception_response, pay_exception_response
 
 
 API = Namespace('searches', description='Endpoints for PPR searches.')
-VAL_ERROR = "Search request data validation errors."  # Validation error prefix
+VAL_ERROR = 'Search request data validation errors.'  # Validation error prefix
 
 
 @cors_preflight('POST,OPTIONS')
@@ -48,7 +50,6 @@ class SearchResource(Resource):
     @jwt.requires_auth
     def post():
         """Execute a new search request using criteria in the request body."""
-
         try:
 
             # Quick check: must be staff or provide an account ID.
@@ -67,17 +68,42 @@ class SearchResource(Resource):
                 return validation_error_response(errors, VAL_ERROR)
             # Perform any extra data validation such as start and end dates here
             SearchClient.validate_query(request_json)
+            query = SearchClient.create_from_json(request_json, account_id)
 
-            # TODO: charge a search fee.
+            # Charge a search fee.
+            if account_id:
+                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+                pay_ref = payment.create_payment(TransactionTypes.SEARCH.value, 1, None, query.client_reference_id)
+                invoice_id = pay_ref['invoiceId']
+                query.pay_invoice_id = int(invoice_id)
+                query.pay_path = pay_ref['receipt']
 
             # Execute the search query: if no results return a 422 status.
-            query = SearchClient.create_from_json(request_json, account_id)
-            query.search()
-            if not query.search_response or query.returned_results_size == 0:
-                return unprocessable_error_response('search query')
+            try:
+                query.search()
+                if not query.search_response or query.returned_results_size == 0:
+                    return unprocessable_error_response('search query')
+
+                # Now save the initial detail results in the search_result table with no
+                # search selection criteria (the absence indicates an incomplete search).
+                search_result = SearchResult.create_from_search_query(query)
+                search_result.save()
+
+            except Exception as db_exception:
+                current_app.logger.error(f'Search {account_id} db save failed: ' + repr(db_exception))
+                current_app.logger.error(f'Search {account_id} rolling back payment for invoice {invoice_id}.')
+                try:
+                    payment.cancel_payment(invoice_id)
+                except Exception as cancel_exception:
+                    current_app.logger.error(f'Search {account_id} payment refund failed for invoice {invoice_id}: ' +
+                                             repr(cancel_exception))
+
+                raise db_exception
 
             return query.json, HTTPStatus.CREATED
 
+        except SBCPaymentException as pay_exception:
+            return pay_exception_response(pay_exception)
         except BusinessException as exception:
             return business_exception_response(exception)
         except Exception as default_exception:
@@ -95,7 +121,6 @@ class SearchDetailResource(Resource):
     @jwt.requires_auth
     def put(search_id):
         """Execute a search detail request using criteria in the request body."""
-
         try:
             if search_id is None:
                 return path_param_error_response('search ID')
@@ -116,14 +141,14 @@ class SearchDetailResource(Resource):
                 return validation_error_response(errors, VAL_ERROR)
 
             # Perform any extra data validation such as start and end dates here
-            SearchResult.validate_search_select(request_json, search_id)
+            search_detail = SearchResult.validate_search_select(request_json, search_id)
 
-            # Try to fetch requested search details: failure throws a business exception.
-            results = SearchResult.create_from_json(request_json, search_id)
-            if not results.search_response:
+            # Save the search query selection and details that match the selection.
+            search_detail.update_selection()
+            if not search_detail.search_response:
                 return unprocessable_error_response('search result details')
 
-            return results.json, HTTPStatus.OK
+            return jsonify(search_detail.json), HTTPStatus.OK
 
         except BusinessException as exception:
             return business_exception_response(exception)

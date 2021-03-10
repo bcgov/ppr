@@ -17,10 +17,10 @@
 
 from http import HTTPStatus
 
-from flask import jsonify, request #, g
+from flask import jsonify, request
 from flask_restx import Namespace, Resource, cors
-
 from registry_schemas import utils as schema_utils
+
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
@@ -35,24 +35,23 @@ from .utils import path_data_mismatch_error_response, base_debtor_invalid_respon
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
 
-VAL_ERROR = "Financing Statement request data validation errors."  # Default validation error prefix
-VAL_ERROR_AMEND = "Amendment Statement request data validation errors."  # Amendment validation error prefix
-VAL_ERROR_CHANGE = "Change Statement request data validation errors."  # Change validation error prefix
-VAL_ERROR_RENEWAL = "Renewal Statement request data validation errors."  # Renewal validation error prefix
-VAL_ERROR_DISCHARGE = "Discharge Statement request data validation errors."  # Discharge validation error prefix
+VAL_ERROR = 'Financing Statement request data validation errors.'  # Default validation error prefix
+VAL_ERROR_AMEND = 'Amendment Statement request data validation errors.'  # Amendment validation error prefix
+VAL_ERROR_CHANGE = 'Change Statement request data validation errors.'  # Change validation error prefix
+VAL_ERROR_RENEWAL = 'Renewal Statement request data validation errors.'  # Renewal validation error prefix
+VAL_ERROR_DISCHARGE = 'Discharge Statement request data validation errors.'  # Discharge validation error prefix
 
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('', methods=['GET', 'POST', 'OPTIONS'])
 class FinancingResource(Resource):
-    """Resource for executing PPR searches."""
+    """Resource for maintaining Financing Statements."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def get():
         """Get the list of financing statements created by the header account ID."""
-
         try:
 
             # Quick check: must provide an account ID.
@@ -74,13 +73,11 @@ class FinancingResource(Resource):
         except Exception as default_exception:
             return default_exception_response(default_exception)
 
-
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def post():
         """Create a new financing statement."""
-
         try:
 
             # Quick check: must be staff or provide an account ID.
@@ -112,7 +109,6 @@ class FinancingResource(Resource):
             return default_exception_response(default_exception)
 
 
-
 @cors_preflight('GET,OPTIONS')
 @API.route('/<path:registration_num>', methods=['GET', 'OPTIONS'])
 class GetFinancingResource(Resource):
@@ -123,7 +119,6 @@ class GetFinancingResource(Resource):
     @jwt.requires_auth
     def get(registration_num):
         """Get a financing statement by registration number."""
-
         try:
             if registration_num is None:
                 return path_param_error_response('registration number')
@@ -149,7 +144,6 @@ class GetFinancingResource(Resource):
             return default_exception_response(default_exception)
 
 
-
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/amendments', methods=['POST', 'OPTIONS'])
 class AmendmentResource(Resource):
@@ -160,7 +154,6 @@ class AmendmentResource(Resource):
     @jwt.requires_auth
     def post(registration_num):
         """Amend a financing statement by registration number."""
-
         try:
             if registration_num is None:
                 return path_param_error_response('registration number')
@@ -182,8 +175,8 @@ class AmendmentResource(Resource):
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registration_num, \
-                                                         'base registration number', \
+                return path_data_mismatch_error_response(registration_num,
+                                                         'base registration number',
                                                          request_json['baseRegistrationNumber'])
 
             # Fetch base registration information: business exception thrown if not
@@ -212,7 +205,6 @@ class AmendmentResource(Resource):
             return default_exception_response(default_exception)
 
 
-
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/changes', methods=['POST', 'OPTIONS'])
 class ChangeResource(Resource):
@@ -223,7 +215,6 @@ class ChangeResource(Resource):
     @jwt.requires_auth
     def post(registration_num):
         """Change a financing statement by registration number."""
-
         try:
             if registration_num is None:
                 return path_param_error_response('registration number')
@@ -245,10 +236,9 @@ class ChangeResource(Resource):
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registration_num, \
-                                                         'base registration number', \
+                return path_data_mismatch_error_response(registration_num,
+                                                         'base registration number',
                                                          request_json['baseRegistrationNumber'])
-
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
@@ -276,7 +266,6 @@ class ChangeResource(Resource):
             return default_exception_response(default_exception)
 
 
-
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/renewals', methods=['POST', 'OPTIONS'])
 class RenewalResource(Resource):
@@ -287,7 +276,6 @@ class RenewalResource(Resource):
     @jwt.requires_auth
     def post(registration_num):
         """Renew a financing statement by registration number."""
-
         try:
             if registration_num is None:
                 return path_param_error_response('registration number')
@@ -339,7 +327,6 @@ class RenewalResource(Resource):
             return default_exception_response(default_exception)
 
 
-
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/discharges', methods=['POST', 'OPTIONS'])
 class DischargeResource(Resource):
@@ -350,7 +337,6 @@ class DischargeResource(Resource):
     @jwt.requires_auth
     def post(registration_num):
         """Discharge a financing statement by registration number."""
-
         try:
             if registration_num is None:
                 return path_param_error_response('registration number')
@@ -393,8 +379,6 @@ class DischargeResource(Resource):
                                                       registration_num,
                                                       account_id)
             statement.save()
-
-
             return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:

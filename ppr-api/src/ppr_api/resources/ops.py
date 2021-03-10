@@ -13,7 +13,8 @@
 # limitations under the License.
 """Endpoints to check and manage the health of the service."""
 from flask_restx import Namespace, Resource
-from sqlalchemy import text #, exc
+from sqlalchemy import text  # , exc
+
 
 # from ppr_api.models import db
 

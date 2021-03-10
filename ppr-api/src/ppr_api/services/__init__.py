@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module wraps the calls to external services used by the API."""
-from .authz import BASIC_USER, PPR_ROLE, STAFF_ROLE, SYSTEM_ROLE, authorized
-from .authz import is_staff
-#from .bootstrap import RegistrationBootstrapService
-#from .business_details_version import VersionedBusinessDetailsService
-#from .document_meta import DocumentMetaService
-#from .flags import Flags
-#from .queue import QueueService
+
+from .authz import BASIC_USER, PPR_ROLE, STAFF_ROLE, SYSTEM_ROLE, authorized, is_staff
 
 
-#flags = Flags()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
+# from .bootstrap import RegistrationBootstrapService
+# from .business_details_version import VersionedBusinessDetailsService
+# from .document_meta import DocumentMetaService
+# from .flags import Flags
+# from .queue import QueueService
 
-#queue = QueueService()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
+# flags = Flags()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
 
+# queue = QueueService()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
 
-#  document_meta = DocumentMetaService()  # pylint: disable=invalid-name;
+# document_meta = DocumentMetaService()  # pylint: disable=invalid-name;

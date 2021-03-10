@@ -16,14 +16,11 @@
 
 Test-Suite to ensure that the Vehicle Collateral Model is working as expected.
 """
-from http import HTTPStatus
+import copy
 
-import pytest
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT, AMENDMENT_STATEMENT
 
 from ppr_api.models import VehicleCollateral
-
-import copy
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT, AMENDMENT_STATEMENT
 
 
 def test_find_by_id(session):
@@ -39,6 +36,7 @@ def test_find_by_id(session):
     assert collateral.serial_number
     assert not collateral.registration_id_end
     assert not collateral.mhr_number
+
 
 def test_find_by_financing_id(session):
     """Assert that find vehicle collateral by financing statement ID contains all expected elements."""
@@ -70,20 +68,24 @@ def test_find_by_registration_id(session):
     assert collateral[1].vehicle_type_cd == 'MH'
     assert collateral[1].mhr_number
 
+
 def test_find_by_id_invalid(session):
     """Assert that find vehicle collateral by non-existent vehicle collateral ID returns the expected result."""
     collateral = VehicleCollateral.find_by_id(300000000)
     assert not collateral
+
 
 def test_find_by_financing_id_invalid(session):
     """Assert that find vehicle collateral by non-existent financing statement ID returns the expected result."""
     collateral = VehicleCollateral.find_by_financing_id(300000000)
     assert not collateral
 
+
 def test_find_by_reg_id_invalid(session):
     """Assert that find vehicle collateral by non-existent registration ID returns the expected result."""
     collateral = VehicleCollateral.find_by_registration_id(300000000)
     assert not collateral
+
 
 def test_vehicle_collateral_json(session):
     """Assert that the general collateral model renders to a json format correctly."""
@@ -109,9 +111,9 @@ def test_vehicle_collateral_json(session):
 
     assert collateral.json == collateral_json
 
+
 def test_create_from_json(session):
     """Assert that the vehicle collateral json renders to a vehicle collateral model correctly."""
-
     json_data = {
         'type': 'MH',
         'year': 2004,
@@ -142,7 +144,6 @@ def test_create_from_financing_json(session):
         assert c.registration_id == 12345
         assert c.vehicle_type_cd
         assert c.serial_number
-
 
 
 def test_create_from_statement_json(session):

@@ -16,14 +16,12 @@
 
 Test-Suite to ensure that the General Collateral Model is working as expected.
 """
-from http import HTTPStatus
+import copy
 
-import pytest
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT, AMENDMENT_STATEMENT
 
 from ppr_api.models import GeneralCollateral
 
-import copy
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT, AMENDMENT_STATEMENT
 
 def test_find_by_id(session):
     """Assert that find general collateral by collateral ID contains all expected elements."""
@@ -53,6 +51,7 @@ def test_find_by_registration_id(session):
     assert collateral[1].financing_id
     assert collateral[1].description
 
+
 def test_find_by_financing_id(session):
     """Assert that find general collateral by financing statement ID contains all expected elements."""
     collateral = GeneralCollateral.find_by_financing_id(200000000)
@@ -67,20 +66,24 @@ def test_find_by_financing_id(session):
     assert collateral[1].financing_id
     assert collateral[1].description
 
+
 def test_find_by_id_invalid(session):
     """Assert that find general collateral by non-existent collateral ID returns the expected result."""
     collateral = GeneralCollateral.find_by_id(300000000)
     assert not collateral
+
 
 def test_find_by_financing_id_invalid(session):
     """Assert that find general collateral by non-existent financing statement ID returns the expected result."""
     collateral = GeneralCollateral.find_by_financing_id(300000000)
     assert not collateral
 
+
 def test_find_by_reg_id_invalid(session):
     """Assert that find general collateral by non-existent registration ID returns the expected result."""
     collateral = GeneralCollateral.find_by_registration_id(300000000)
     assert not collateral
+
 
 def test_general_collateral_json(session):
     """Assert that the general collateral model renders to a json format correctly."""
@@ -96,9 +99,9 @@ def test_general_collateral_json(session):
 
     assert collateral.json == collateral_json
 
+
 def test_create_from_json(session):
     """Assert that the general collateral json renders to a general collateral model correctly."""
-
     json_data = {
         'description': 'description'
     }
@@ -118,6 +121,7 @@ def test_create_from_financing_json(session):
     for c in collateral:
         assert c.registration_id == 12345
         assert c.description
+
 
 def test_create_from_statement_json(session):
     """Assert that the amendment/change statement json renders to a list of general collateral models correctly."""

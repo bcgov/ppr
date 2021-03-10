@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Test Suite to ensure the datetime utility functions are working as expected.
+"""Test Suite to ensure the datetime utility functions are working as expected."""
 
-"""
 from datetime import timedelta as _timedelta
+
 from ppr_api.utils import datetime
+
 
 def test_expiry_dt_from_years():
     """Assert that generating an expiry date from life years is performing as expected."""
@@ -30,9 +31,9 @@ def test_expiry_dt_from_years():
     assert expiry_ts.day == now_ts.day
     assert expiry_ts.month in (now_ts.month, (now_ts.month + 1))
 
+
 def test_ts_from_iso_format():
-    """Assert that creating a UTC datetime object from an ISO date-time
-       formatted string is performing as expected."""
+    """Assert that creating a UTC datetime object from an ISO date-time formatted string is performing as expected."""
     test_ts = datetime.ts_from_iso_format('2021-02-16T23:00:00-08:00')
     print('Test timestamp: ' + datetime.format_ts(test_ts))
     assert test_ts.day == 17
@@ -58,9 +59,9 @@ def test_ts_from_iso_format():
     assert test_ts.day == 1
     assert test_ts.hour == 7
 
+
 def test_ts_from_date_iso_format():
-    """Assert that creating a UTC datetime object from an ISO date-time
-       formatted string is performing as expected."""
+    """Assert that creating a UTC datetime object from an ISO date-time formatted string is performing as expected."""
     test_ts = datetime.ts_from_date_iso_format('2021-02-16')
     print('Test timestamp: ' + datetime.format_ts(test_ts))
     assert test_ts.day in (16, 17)

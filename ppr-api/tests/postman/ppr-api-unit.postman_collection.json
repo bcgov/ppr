@@ -2160,6 +2160,51 @@
 					"response": []
 				},
 				{
+					"name": "Search Step 1 Query By Debtor Business Name No Match Discharged",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"BUSINESS_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"business\": \"ZZZZZ99\"\n    }\n  },\n  \"clientReferenceId\": \"T-P-SQ-DB-4\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor business name for a financing statement that was discharged more than 30 days in the past."
+					},
+					"response": []
+				},
+				{
 					"name": "Search Step 1 Query By Debtor Individual Name",
 					"request": {
 						"method": "POST",
@@ -2205,7 +2250,7 @@
 					"response": []
 				},
 				{
-					"name": "Search Step 1 Query By Debtor Business Name",
+					"name": "Search Step 1 Query By Debtor Business Name Match",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -2232,7 +2277,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": \"BUSINESS_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"business\": \"BROWN AUTOMOTIVE LTD.\"\n    }\n  },\n  \"clientReferenceId\": \"A-00000402\",\n  \"startDateTime\": \"2020-08-01T00:00:00Z\",\n  \"endDateTime\": \"2020-08-15T00:00:00Z\"\n}"
+							"raw": "{\n  \"type\": \"BUSINESS_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"business\": \"TEST BUS 2 DEBTOR\"\n    }\n  },\n  \"clientReferenceId\": \"T-P-SQ-DB-1\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/searches",
@@ -2245,7 +2290,97 @@
 								"searches"
 							]
 						},
-						"description": "Search step 1 submit a query example: search by debtor individual name."
+						"description": "Search step 1 submit a query example: search by debtor business name."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Debtor Business Name No Match",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"BUSINESS_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"business\": \"XZXZXZXZ\"\n    }\n  },\n  \"clientReferenceId\": \"T-P-SQ-DB-2\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor business name with no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Debtor Business No Match Expired",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"BUSINESS_DEBTOR\",\n  \"criteria\": {\n    \"debtorName\": {\n      \"business\": \"XXXXX99\"\n    }\n  },\n  \"clientReferenceId\": \"T-P-SQ-DB-3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor business name for a financing statement that expired more than 30 days in the past."
 					},
 					"response": []
 				}
@@ -2408,12 +2543,8 @@
 	],
 	"variable": [
 		{
-			"key": "apikey",
-			"value": "PROVIDE"
-		},
-		{
 			"key": "account_id",
-			"value": "PROVIDE"
+			"value": "PS12345"
 		},
 		{
 			"key": "base_url_flask",
@@ -2422,10 +2553,6 @@
 		{
 			"key": "base_url",
 			"value": "bcregistry-dev.apigee.net/ppr"
-		},
-		{
-			"key": "jwt",
-			"value": "PROVIDE"
 		},
 		{
 			"key": "base_url_sandbox",

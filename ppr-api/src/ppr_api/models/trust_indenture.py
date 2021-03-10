@@ -14,18 +14,14 @@
 """This module holds data for financing statement trust indenture information."""
 from __future__ import annotations
 
-#from sqlalchemy import event
-
-#from ppr_api.exceptions import BusinessException
-
 from .db import db
-from .registration import Registration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+# Needed by the SQLAlchemy relationship
+from .registration import Registration  # noqa: F401 pylint: disable=unused-import
 
 
 class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the financing statement trust indenture information."""
 
-    __versioned__ = {}
     __tablename__ = 'trust_indenture'
 
 #    trust_id = db.Column('trust_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
@@ -41,20 +37,13 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id],
-                                   back_populates="trust_indenture", cascade='all, delete', uselist=False)
+    registration = db.relationship('Registration', foreign_keys=[registration_id],
+                                   back_populates='trust_indenture', cascade='all, delete', uselist=False)
 #    registration_end = db.relationship("Registration", foreign_keys=[registration_id_end])
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship("FinancingStatement", foreign_keys=[financing_id],
-                                          back_populates="trust_indenture", cascade='all, delete', uselist=False)
-
-
-#    def save(self):
-#        """Save the object to the database immediately."""
-#        db.session.add(self)
-#        db.session.commit()
-
+    financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
+                                          back_populates='trust_indenture', cascade='all, delete', uselist=False)
 
     @classmethod
     def find_by_id(cls, trust_id: int = None):
@@ -65,18 +54,16 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return trust_indenture
 
-
     @classmethod
     def find_by_registration_number(cls, registration_num: str = None):
         """Return a list of trust indenture objects by registration number."""
         trust_indenture = None
         if registration_num:
-            trust_indenture = cls.query.filter(TrustIndenture.registration_id == Registration.registration_id, \
+            trust_indenture = cls.query.filter(TrustIndenture.registration_id == Registration.registration_id,
                                                Registration.registration_num == registration_num) \
                                         .order_by(TrustIndenture.trust_id).all()
 
         return trust_indenture
-
 
     @classmethod
     def find_by_financing_id(cls, financing_id: int = None):
@@ -87,7 +74,6 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
                                         .order_by(TrustIndenture.trust_id).all()
 
         return trust_indenture
-
 
     @staticmethod
     def create_from_json(json_data, registration_id: int = None):

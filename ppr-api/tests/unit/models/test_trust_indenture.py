@@ -16,14 +16,11 @@
 
 Test-Suite to ensure that the Trust Indenture Model is working as expected.
 """
-from http import HTTPStatus
+import copy
 
-import pytest
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import TrustIndenture
-
-import copy
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 
 def test_find_by_id(session):
@@ -46,6 +43,7 @@ def test_find_by_registration_num(session):
     assert trust_indenture[0].financing_id == 200000000
     assert trust_indenture[0].trust_indenture == 'Y'
 
+
 def test_find_by_financing_id(session):
     """Assert that find trust indenture by financing statement ID contains all expected elements."""
     trust_indenture = TrustIndenture.find_by_financing_id(200000000)
@@ -56,28 +54,29 @@ def test_find_by_financing_id(session):
     assert trust_indenture[0].financing_id == 200000000
     assert trust_indenture[0].trust_indenture == 'Y'
 
+
 def test_find_by_id_invalid(session):
     """Assert that find trust indenture by non-existent trust indenture ID returns the expected result."""
     trust_indenture = TrustIndenture.find_by_id(300000000)
     assert not trust_indenture
+
 
 def test_find_by_financing_id_invalid(session):
     """Assert that find trust indenture by non-existent financing statement ID returns the expected result."""
     trust_indenture = TrustIndenture.find_by_financing_id(300000000)
     assert not trust_indenture
 
+
 def test_find_by_reg_num_invalid(session):
     """Assert that find trust indenture by non-existent registration number returns the expected result."""
     trust_indenture = TrustIndenture.find_by_registration_number('300000000')
     assert not trust_indenture
 
+
 def test_create_from_json(session):
     """Assert that the expiry model renders from a json format correctly."""
-            
     test_json = copy.deepcopy(FINANCING_STATEMENT)
     test_json['trustIndenture'] = True
     trust_indenture = TrustIndenture.create_from_json(test_json, 1234)
 
     assert trust_indenture[0].trust_indenture == 'Y'
-
-

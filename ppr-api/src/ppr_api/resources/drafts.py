@@ -19,7 +19,6 @@ from http import HTTPStatus
 
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, cors
-
 from registry_schemas import utils as schema_utils
 
 from ppr_api.utils.auth import jwt
@@ -35,7 +34,8 @@ from .utils import unauthorized_error_response, path_param_error_response
 
 API = Namespace('drafts', description='Endpoints for maintaining draft statements.')
 
-VAL_ERROR = "Draft request data validation errors."  # Validation error prefix
+VAL_ERROR = 'Draft request data validation errors.'  # Validation error prefix
+
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('', methods=['GET', 'POST', 'OPTIONS'])
@@ -47,7 +47,6 @@ class DraftResource(Resource):
     @jwt.requires_auth
     def get():
         """Get the list of draft statements belonging to the header account ID."""
-
         try:
 
             # Quick check: must provide an account ID.
@@ -69,13 +68,11 @@ class DraftResource(Resource):
         except Exception as default_exception:
             return default_exception_response(default_exception)
 
-
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def post():
         """Create a new draft statement."""
-
         try:
 
             # Quick check: must provide an account ID.
@@ -105,7 +102,6 @@ class DraftResource(Resource):
             return default_exception_response(default_exception)
 
 
-
 @cors_preflight('GET,PUT,DELETE,OPTIONS')
 @API.route('/<path:document_id>', methods=['GET', 'PUT', 'DELETE', 'OPTIONS'])
 class MaintainDraftResource(Resource):
@@ -116,7 +112,6 @@ class MaintainDraftResource(Resource):
     @jwt.requires_auth
     def get(document_id):
         """Get a draft statement by document ID."""
-
         try:
             if document_id is None:
                 return path_param_error_response('document ID')
@@ -140,13 +135,11 @@ class MaintainDraftResource(Resource):
         except Exception as default_exception:
             return default_exception_response(default_exception)
 
-
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def put(document_id):
         """Update a draft statement by document ID with data in the request body."""
-
         try:
             if document_id is None:
                 return path_param_error_response('document ID')
@@ -177,13 +170,11 @@ class MaintainDraftResource(Resource):
         except Exception as default_exception:
             return default_exception_response(default_exception)
 
-
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def delete(document_id):
         """Delete a draft statement by document ID."""
-
         try:
             if document_id is None:
                 return path_param_error_response('document ID')

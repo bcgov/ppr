@@ -14,19 +14,13 @@
 """This module holds data for amendment, renewal statement court order information."""
 from __future__ import annotations
 
-#from http import HTTPStatus
-#from sqlalchemy import event
-
-#from ppr_api.exceptions import BusinessException
 from .utils import format_ts, ts_from_date_iso_format
-
 from .db import db
 
 
 class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the amendment, renewal statement court order information."""
 
-    __versioned__ = {}
     __tablename__ = 'court_order'
 
     court_order_id = db.Column('court_order_id', db.Integer,
@@ -42,7 +36,7 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
                                 db.ForeignKey('registration.registration_id'), nullable=False)
 
     # Relationships - Registration
-    registration = db.relationship("Registration", foreign_keys=[registration_id],
+    registration = db.relationship('Registration', foreign_keys=[registration_id],
                                    cascade='all, delete', uselist=False)
 
     @property
@@ -68,7 +62,6 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return expiry
 
-
     @classmethod
     def find_by_registration_id(cls, registration_id: int = None):
         """Return a list of expiry objects by registration number."""
@@ -77,7 +70,6 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
             expiry = cls.query.filter(CourtOrder.registration_id == registration_id).one_or_none()
 
         return expiry
-
 
     @staticmethod
     def create_from_json(json_data, registration_id: int = None):
