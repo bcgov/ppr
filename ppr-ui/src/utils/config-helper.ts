@@ -65,6 +65,10 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('KEYCLOAK_CONFIG_PATH', keycloakConfigPath)
   console.info('Set Keycloak Config Path to: ' + keycloakConfigPath)
 
+  const vonApiUrl: string = response.data.VON_API_URL
+  sessionStorage.setItem('VON_API_URL', vonApiUrl)
+  console.log('Set VON API URL to: ' + vonApiUrl)
+
   const ldClientId: string = response.data.LD_CLIENT_ID
   if (ldClientId) {
     (<any>window).ldClientId = ldClientId
