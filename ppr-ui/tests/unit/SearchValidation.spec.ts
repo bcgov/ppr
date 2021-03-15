@@ -4,15 +4,13 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
 
 // Components
-import { Search } from '@/components/search'
+import { SearchBar } from '@/components/search'
 
 // Other
 import { SearchTypes } from '@/resources'
-import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import { SearchTypeIF } from '@/interfaces'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -25,8 +23,7 @@ const searchError: string = 'search-error'
 const searchData: string = 'search-data'
 
 // Input field selectors / buttons
-const searchButtonSelector: string = '#search-btn'
-const searchDropDown: string = '#search-type-select'
+const searchButtonSelector: string = '.search-bar-btn'
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
@@ -48,7 +45,7 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<Search> object with the given parameters.
+ * @returns a Wrapper<SearchBar> object with the given parameters.
  */
 function createComponent (
   searchTypes: Array<SearchTypeIF>
@@ -57,7 +54,7 @@ function createComponent (
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Search, {
+  return mount(SearchBar, {
     localVue,
     propsData: { searchTypes },
     store,
@@ -65,7 +62,7 @@ function createComponent (
   })
 }
 
-describe('Search base validation', () => {
+describe('SearchBar base validation', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {

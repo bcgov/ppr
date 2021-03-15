@@ -5,7 +5,6 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
 import { axios as vonAxios } from '@/utils/axios-von'
 
 // Components

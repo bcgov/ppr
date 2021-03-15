@@ -1,4 +1,4 @@
-import { Dashboard, Signin, Signout } from '@/views'
+import { Dashboard, Search, Signin, Signout } from '@/views'
 import { RouteNames } from '@/enums'
 
 export const routes = [
@@ -26,6 +26,14 @@ export const routes = [
     path: '/dashboard',
     name: RouteNames.DASHBOARD,
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/search',
+    name: RouteNames.SEARCH,
+    component: Search,
     meta: {
       requiresAuth: true
     }

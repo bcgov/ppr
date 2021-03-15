@@ -1,6 +1,6 @@
 // Enums and Interfaces
 import { AccountTypes, MatchTypes } from '@/enums'
-import { SearchResponseIF, StateIF } from '@/interfaces'
+import { SearchResponseIF, SearchTypeIF, StateIF } from '@/interfaces'
 
 /** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: any): boolean => {
@@ -57,4 +57,12 @@ export const getUserUsername = (state: any): any => {
 
 export const getSearchResults = (state: StateIF): SearchResponseIF => {
   return state.stateModel.searchResults
+}
+
+export const getSearchedType = (state: StateIF): SearchTypeIF => {
+  return state.stateModel.searchedType
+}
+
+export const getSearchedValue = (state: StateIF): string => {
+  return state.stateModel.searchedValue
 }

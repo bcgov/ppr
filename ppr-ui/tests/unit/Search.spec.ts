@@ -1,331 +1,67 @@
 // Libraries
 import Vue from 'vue'
 import Vuetify from 'vuetify'
+import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import sinon from 'sinon'
-import { axios } from '@/utils/axios-ppr'
-import { axios as vonAxios } from '@/utils/axios-von'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
-import { Search } from '@/components/search'
+import { Result } from '@/components/results'
+import { Search } from '@/views'
+import { SearchBar } from '@/components/search'
 
 // Other
-import { SearchTypes } from '@/resources'
-import { AutoCompleteResponseIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
-import { mockedSearchResponse, mockedVonResponse } from './test-data'
+import mockRouter from './MockRouter'
+import { mockedSearchResponse } from './test-data'
 import { UISearchTypes } from '@/enums'
 
-// Vue.use(CompositionApi)
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
-const searchError: string = 'search-error'
-const searchData: string = 'search-data'
+// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
+document.body.setAttribute('data-app', 'true')
 
-// Input field selectors / buttons
-const searchButtonSelector: string = '#search-btn'
-
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<Search> object with the given parameters.
- */
-function createComponent (
-  searchTypes: Array<SearchTypeIF>
-): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(CompositionApi)
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount(Search, {
-    localVue,
-    propsData: { searchTypes },
-    store,
-    vuetify
-  })
-}
+// input field / button selectors
+const doneButton = '.search-done-btn'
 
 describe('Search component', () => {
-  let wrapper: Wrapper<any>
+  let wrapper: any
+  const { assign } = window.location
 
   beforeEach(async () => {
-    wrapper = createComponent(SearchTypes)
+    // mock the window.location.assign function
+    delete window.location
+    window.location = { assign: jest.fn() } as any
+
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = mockRouter.mock()
+    await router.push({ name: 'search' })
+    wrapper = shallowMount(Search, { localVue, store, router, vuetify })
   })
+
   afterEach(() => {
+    window.location.assign = assign
     wrapper.destroy()
   })
 
-  it('renders Search Component with search types', () => {
+  it('renders Search View with base components', () => {
     expect(wrapper.findComponent(Search).exists()).toBe(true)
-    expect(wrapper.vm.$data.searchTypes).toStrictEqual(SearchTypes)
-    expect(wrapper.find(searchButtonSelector).attributes('disabled')).toBeUndefined()
+    expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
+    // doesn't render unless there are results
+    expect(wrapper.vm.getSearchResults).toBeNull()
+    expect(wrapper.find(doneButton).exists()).toBe(false)
+    expect(wrapper.findComponent(Result).exists()).toBe(false)
+    wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
   })
-})
-
-describe('Serial number search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
-  const select: SearchTypeIF = SearchTypes[0]
-
-  beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    wrapper = createComponent(SearchTypes)
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
-    wrapper.vm.$data.selectedSearchType = select
+  it('renders the Results component when there are results.', async () => {
+    wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'F100'
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Serial numbers normally contain')
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-  })
-})
-
-describe('Business debtor search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  sessionStorage.setItem('VON_API_URL', 'mock-url-von')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
-  const vonResp: AutoCompleteResponseIF = mockedVonResponse
-  const select: SearchTypeIF = SearchTypes[2]
-
-  beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    // GET search data
-    const post = sandbox.stub(axios, 'post')
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    // GET autocomplete
-    const get = sandbox.stub(vonAxios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: vonResp
-    })))
-    wrapper = createComponent(SearchTypes)
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.BUSINESS_DEBTOR)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'test business debtor'
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
-    const messages = wrapper.findAll('.v-messages__message')
-    if (messages) {
-      expect(messages.length).toBe(1)
-      // ensure its the hint message not a validation message
-      expect(messages.at(0).text()).toContain('Business names must contain')
-    }
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-  })
-  it('shows von api results while typing', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.BUSINESS_DEBTOR)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'test'
-    // takes 4 ticks before displayed
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    const autoCompleteNames = wrapper.findAll('.auto-complete-item')
-    // 6 in the response, but should only display up to 5
-    expect(autoCompleteNames.length).toBe(5)
-    expect(autoCompleteNames.at(0).text()).toEqual(mockedVonResponse.results[0].value)
-    expect(autoCompleteNames.at(1).text()).toEqual(mockedVonResponse.results[1].value)
-    expect(autoCompleteNames.at(2).text()).toEqual(mockedVonResponse.results[2].value)
-    expect(autoCompleteNames.at(3).text()).toEqual(mockedVonResponse.results[3].value)
-    expect(autoCompleteNames.at(4).text()).toEqual(mockedVonResponse.results[4].value)
-  })
-  it('updates the search value and removes the autocomplete list after a name is selected', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.BUSINESS_DEBTOR)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'test'
-    // takes 4 ticks before displayed
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    const autoCompleteNames = wrapper.findAll('.auto-complete-item')
-    expect(autoCompleteNames.length).toBe(5)
-    const selectedText = autoCompleteNames.at(3).text()
-    autoCompleteNames.at(3).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.searchValue).toEqual(selectedText)
-    const autoCompleteNamesAfterClose = wrapper.findAll('.auto-complete-item')
-    expect(autoCompleteNamesAfterClose.length).toBe(0)
-  })
-})
-
-describe('MHR search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
-  const select: SearchTypeIF = SearchTypes[4]
-
-  beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    wrapper = createComponent(SearchTypes)
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.MHR_NUMBER)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = '123456'
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-  })
-})
-
-describe('Aircraft search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.AIRCRAFT]
-  const select: SearchTypeIF = SearchTypes[5]
-
-  beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    wrapper = createComponent(SearchTypes)
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.AIRCRAFT)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'abcd-efgh-fhgh' // dashes allowed
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Up to 25 letters')
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-  })
-})
-
-describe('Registration number search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
-  const select: SearchTypeIF = SearchTypes[6]
-
-  beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    wrapper = createComponent(SearchTypes)
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.REGISTRATION_NUMBER)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = '123456A'
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Registration numbers contain')
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+    expect(wrapper.vm.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    expect(wrapper.find(doneButton).exists()).toBe(true)
+    expect(wrapper.findComponent(Result).exists()).toBe(true)
   })
 })
