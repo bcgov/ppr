@@ -27,6 +27,8 @@ from .meta import API as META_API
 from .ops import API as OPS_API
 from .drafts import API as DRAFT_API
 from .searches import API as SEARCH_API
+from .search_history import API as SEARCH_HISTORY_API
+from .search_results import API as SEARCH_RESULTS_API
 from .party_codes import API as CLIENT_PARTY_API
 from .financing_statements import API as STATEMENT_API
 
@@ -68,3 +70,5 @@ API.add_namespace(DRAFT_API, path='/drafts')
 API.add_namespace(CLIENT_PARTY_API, path='/party-codes')
 API.add_namespace(SEARCH_API, path='/searches')
 API.add_namespace(STATEMENT_API, path='/financing-statements')
+API.add_namespace(SEARCH_HISTORY_API, path='/search-history')
+API.add_namespace(SEARCH_RESULTS_API, path='/search-results')

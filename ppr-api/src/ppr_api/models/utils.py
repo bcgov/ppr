@@ -21,11 +21,6 @@ from datetime import date, datetime as _datetime, timezone, timedelta
 from datetime import time  # noqa: F401 pylint: disable=unused-import
 
 
-# Account search history max result set size.
-ACCOUNT_SEARCH_HISTORY_MAX_SIZE = 500
-# Maximum number or results returned by search.
-SEARCH_RESULTS_MAX_SIZE = 1000
-
 # API draft types
 DRAFT_TYPE_AMENDMENT = 'AMENDMENT_STATEMENT'
 DRAFT_TYPE_CHANGE = 'CHANGE_STATEMENT'
@@ -53,6 +48,8 @@ REG_TYPE_DISCHARGE = 'DC'
 REG_TYPE_RENEWAL = 'RE'
 REG_TYPE_REPAIRER_LIEN = 'RL'
 
+SEARCH_MATCH_EXACT = 'EXACT'
+SEARCH_MATCH_SIMILAR = 'SIMILAR'
 
 # DB state types
 STATE_DISCHARGED = 'HDC'
@@ -128,7 +125,7 @@ REG_TYPE_TO_REG_CLASS = {
 TO_DB_SEARCH_TYPE = {
     'AIRCRAFT_DOT': 'AC',
     'BUSINESS_DEBTOR': 'BS',
-    'INDIVIDUAL_DEBTOR': 'ID',
+    'INDIVIDUAL_DEBTOR': 'IS',
     'MHR_NUMBER': 'MH',
     'REGISTRATION_NUMBER': 'RG',
     'SERIAL_NUMBER': 'SS'
@@ -156,6 +153,17 @@ def now_ts_offset(offset_days: int = 1, add: bool = False):
         return now + timedelta(days=offset_days)
 
     return now - timedelta(days=offset_days)
+
+
+def today_ts_offset(offset_days: int = 1, add: bool = False):
+    """Create a timestamp representing the current date at 00:00:00 adjusted by offset number of days."""
+    today = date.today()
+    day_time = time(0, 0, 0, tzinfo=timezone.utc)
+    today_ts = _datetime.combine(today, day_time)
+    if add:
+        return today_ts + timedelta(days=offset_days)
+
+    return today_ts - timedelta(days=offset_days)
 
 
 def expiry_dt_from_years(life_years: int):

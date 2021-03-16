@@ -16,6 +16,7 @@
 # pylint: disable=too-many-return-statements
 
 from http import HTTPStatus
+import json
 
 from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
@@ -28,11 +29,7 @@ from ppr_api.services.authz import is_staff, authorized
 from ppr_api.models import SearchClient, SearchResult
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
-
-from .utils import get_account_id, account_required_response, \
-                   validation_error_response, business_exception_response
-from .utils import unauthorized_error_response, unprocessable_error_response, \
-                   path_param_error_response, default_exception_response, pay_exception_response
+from ppr_api.resources import utils as resource_utils
 
 
 API = Namespace('searches', description='Endpoints for PPR searches.')
@@ -53,19 +50,19 @@ class SearchResource(Resource):
         try:
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate request against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'searchQuery', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR)
+                return resource_utils.validation_error_response(errors, VAL_ERROR)
             # Perform any extra data validation such as start and end dates here
             SearchClient.validate_query(request_json)
             query = SearchClient.create_from_json(request_json, account_id)
@@ -82,7 +79,7 @@ class SearchResource(Resource):
             try:
                 query.search()
                 if not query.search_response or query.returned_results_size == 0:
-                    return unprocessable_error_response('search query')
+                    return resource_utils.unprocessable_error_response('search query')
 
                 # Now save the initial detail results in the search_result table with no
                 # search selection criteria (the absence indicates an incomplete search).
@@ -103,54 +100,52 @@ class SearchResource(Resource):
             return query.json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
-            return pay_exception_response(pay_exception)
+            return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('PUT,OPTIONS')
 @API.route('/<path:search_id>', methods=['PUT', 'OPTIONS'])
 class SearchDetailResource(Resource):
-    """Resource for processing PPR search detail (second step) requests."""
+    """Resource for processing requests to update the search selection (UI autosave)."""
 
     @staticmethod
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def put(search_id):
-        """Execute a search detail request using criteria in the request body."""
+        """Execute a search selection update request replacing the current value with the request body contents."""
         try:
             if search_id is None:
-                return path_param_error_response('search ID')
+                return resource_utils.path_param_error_response('search ID')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate schema.
             valid_format, errors = schema_utils.validate(request_json, 'searchSummary', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR)
+                return resource_utils.validation_error_response(errors, VAL_ERROR)
 
-            # Perform any extra data validation such as start and end dates here
-            search_detail = SearchResult.validate_search_select(request_json, search_id)
+            search_client = SearchClient.find_by_id(search_id)
+            if not search_client:
+                return resource_utils.not_found_error_response('searchId', search_id)
 
-            # Save the search query selection and details that match the selection.
-            search_detail.update_selection()
-            if not search_detail.search_response:
-                return unprocessable_error_response('search result details')
-
-            return jsonify(search_detail.json), HTTPStatus.OK
+            # Save the updated search selection.
+            search_client.update_search_selection(request_json)
+            return jsonify(json.loads(search_client.search_response)), HTTPStatus.OK
 
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
