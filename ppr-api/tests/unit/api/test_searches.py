@@ -21,7 +21,7 @@ import copy
 from http import HTTPStatus
 
 # prep sample post search data
-from registry_schemas.example_data.ppr import SEARCH_QUERY, SEARCH_SUMMARY
+from registry_schemas.example_data.ppr import SEARCH_QUERY
 
 from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
@@ -29,7 +29,6 @@ from ppr_api.models.utils import now_ts_offset, format_ts
 
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
-SAMPLE_JSON_SUMMARY = copy.deepcopy(SEARCH_SUMMARY)
 
 
 def test_search_reg_num_valid_201(session, client, jwt):
@@ -249,150 +248,129 @@ def test_search_query_invalid_start_datetime_400(session, client, jwt):
 
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
-    print(rv.json)
+    # print(rv.json)
 
 
-def test_search_detail_valid_200(session, client, jwt):
-    """Assert that a valid search detail request returns a 200 status."""
+def test_search_selection_update_valid(session, client, jwt):
+    """Assert that a valid search selection update returns a 200 status."""
     # setup
-    json_data = {
-        'type': 'BUSINESS_DEBTOR',
-        'criteria': {
-            'debtorName': {
-                'business': 'TEST BUS 2 DEBTOR'
+    json_data = [
+        {
+            'baseRegistrationNumber': 'TEST0001',
+            'matchType': 'EXACT',
+            'createDateTime': '2021-03-02T22:46:43+00:00',
+            'registrationType': 'SA',
+            'debtor': {
+                'businessName': 'TEST BUS 2 DEBTOR',
+                'partyId': 200000002
             }
         },
-        'clientReferenceId': 'T-API-SQ-DB-2'
-    }
-
-    # test
-    rv1 = client.post('/api/v1/searches',
-                      json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
-                      content_type='application/json')
-    search_id = rv1.json['searchId']
-    json_data = []
-    json_data.append(rv1.json['results'][0])
-    # print(json_data)
-    # test
-    rv = client.put('/api/v1/searches/' + search_id,
-                    json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
-                    content_type='application/json')
-    # check
-    print(rv.json)
-    assert rv.status_code == HTTPStatus.OK
-    assert len(rv.json) == 1
-
-
-def test_search_detail_invalid_regnum_400(session, client, jwt):
-    """Assert that search detail requests with a missing base registration number returns a 400 error."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
-    del json_data[2]
-    del json_data[0]['baseRegistrationNumber']
-
-    # test
-    rv = client.put('/api/v1/searches/123456',
-                    json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_search_detail_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a search detail request with a non-staff jwt and no account ID returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_SUMMARY)
-
-    # test
-    rv = client.put('/api/v1/searches/123456',
-                    json=json_data,
-                    headers=create_header(jwt, [COLIN_ROLE]),
-                    content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_search_detail_staff_missing_account_200(session, client, jwt):
-    """Assert that a search detail request with a staff jwt and no account ID returns a 201 status."""
-    # setup
-    json_data = {
-        'type': 'REGISTRATION_NUMBER',
-        'criteria': {
-            'value': 'TEST0001'
+        {
+            'baseRegistrationNumber': 'TEST0002',
+            'matchType': 'EXACT',
+            'createDateTime': '2021-03-02T22:46:43+00:00',
+            'registrationType': 'RL',
+            'debtor': {
+                'businessName': 'TEST BUS 2 DEBTOR',
+                'partyId': 200000006
+            }
         },
-        'clientReferenceId': 'T-API-SD-RN-1'
-    }
+        {
+            'baseRegistrationNumber': 'TEST0003',
+            'matchType': 'SIMILAR',
+            'createDateTime': '2021-03-02T22:46:43+00:00',
+            'registrationType': 'RL',
+            'selected': True,
+            'debtor': {
+                'businessName': 'TEST BUS 3 DEBTOR',
+                'partyId': 200000009
+            }
+        }
+    ]
+    if json_data[2]['selected']:
+        json_data[2]['selected'] = False
+    else:
+        json_data[2]['selected'] = True
 
     # test
-    rv1 = client.post('/api/v1/searches',
-                      json=json_data,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                      content_type='application/json')
-    assert rv1.status_code == HTTPStatus.CREATED
-
-    search_id = rv1.json['searchId']
-    json_data = rv1.json['results']
-
-    # test
-    rv = client.put('/api/v1/searches/' + search_id,
+    rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                    headers=create_header_account(jwt, [PPR_ROLE]),
                     content_type='application/json')
-
     # check
     assert rv.status_code == HTTPStatus.OK
+    assert rv.json[2]['selected'] == json_data[2]['selected']
 
 
-def test_search_detail_nonstaff_unauthorized_404(session, client, jwt):
-    """Assert that a search detail request with a non-ppr role and an account ID returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_DATA)
-    del json_data['criteria']['debtorName']['business']
-    del json_data['criteria']['value']
+def test_search_selection_update_invalid_400(session, client, jwt):
+    """Assert that an invalid search selection update returns a 400 status."""
+    # setup missing required matchType
+    json_data = [
+        {
+            'baseRegistrationNumber': 'TEST0001',
+            'createDateTime': '2021-03-02T22:46:43+00:00',
+            'registrationType': 'SA',
+            'debtor': {
+                'businessName': 'TEST BUS 2 DEBTOR',
+                'partyId': 200000002
+            }
+        }
+    ]
 
     # test
-    rv = client.put('/api/v1/searches/123456',
+    rv = client.put('/api/v1/searches/200000004',
+                    json=json_data,
+                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    content_type='application/json')
+    # check
+    assert rv.status_code == HTTPStatus.BAD_REQUEST
+
+
+def test_search_selection_update_unauthorized_404(session, client, jwt):
+    """Assert that a valid search selection update with an invalid role returns a 404 status."""
+    # setup
+    json_data = [
+        {
+            'baseRegistrationNumber': 'TEST0001',
+            'matchType': 'EXACT',
+            'createDateTime': '2021-03-02T22:46:43+00:00',
+            'registrationType': 'SA',
+            'debtor': {
+                'businessName': 'TEST BUS 2 DEBTOR',
+                'partyId': 200000002
+            }
+        }
+    ]
+
+    # test
+    rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
                     headers=create_header_account(jwt, [COLIN_ROLE]),
                     content_type='application/json')
-
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
 
 
-def test_search_detail_no_duplicates_200(session, client, jwt):
-    """Assert that a a selection with 2 matches on the same registration returns the expected result."""
+def test_search_selection_update_nonstaff_no_account_400(session, client, jwt):
+    """Assert that a valid search selection update with non-staff role, no account ID returns a 400 status."""
     # setup
-    json_data = {
-        'type': 'BUSINESS_DEBTOR',
-        'criteria': {
-            'debtorName': {
-                'business': 'DUPLICATE NAME'
+    json_data = [
+        {
+            'baseRegistrationNumber': 'TEST0001',
+            'matchType': 'EXACT',
+            'createDateTime': '2021-03-02T22:46:43+00:00',
+            'registrationType': 'SA',
+            'debtor': {
+                'businessName': 'TEST BUS 2 DEBTOR',
+                'partyId': 200000002
             }
-        },
-        'clientReferenceId': 'T-API-SQ-DB-3'
-    }
+        }
+    ]
 
     # test
-    rv1 = client.post('/api/v1/searches',
-                      json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
-                      content_type='application/json')
-    search_id = rv1.json['searchId']
-    json_data = []
-    json_data.append(rv1.json['results'][0])
-    json_data.append(rv1.json['results'][1])
-    # print(json_data)
-    # test
-    rv = client.put('/api/v1/searches/' + search_id,
+    rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    headers=create_header(jwt, [PPR_ROLE]),
                     content_type='application/json')
     # check
-    print(rv.json)
-    assert rv.status_code == HTTPStatus.OK
-    assert len(rv.json) == 1
+    assert rv.status_code == HTTPStatus.BAD_REQUEST

@@ -17,6 +17,7 @@
 Test-Suite to ensure that the Search Model is working as expected.
 """
 from http import HTTPStatus
+import json
 
 import pytest
 
@@ -718,14 +719,14 @@ def test_search_bs_invalid_criteria(session, client, jwt):
 def test_find_by_account_id(session):
     """Assert that the account search history list first item contains all expected elements."""
     history = SearchClient.find_all_by_account_id('PS12345')
+    print(history)
+    assert history
     assert history[0]['searchId']
     assert history[0]['searchDateTime']
     assert history[0]['totalResultsSize']
     assert history[0]['returnedResultsSize']
-    assert history[0]['maxResultsSize']
     assert history[0]['searchQuery']
-    assert history[0]['results']
-    assert len(history) >= 3
+    assert len(history) >= 2
 
 
 def test_find_by_account_id_no_result(session):
@@ -754,3 +755,33 @@ def test_create_from_json(session):
     assert search_client.client_reference_id == 'T-SQ-SS-1'
     assert search_client.search_ts
     assert search_client.search_criteria
+
+
+def test_search_autosave(session):
+    """Assert that a valid search query selection update works as expected."""
+    query = SearchClient.find_by_id(200000000)
+    assert query.search_response
+    update_data = json.loads(query.search_response)
+    if update_data[0]['matchType'] == 'EXACT':
+        update_data[0]['matchType'] = 'SIMILAR'
+    else:
+        update_data[0]['matchType'] = 'EXACT'
+
+    query.update_search_selection(update_data)
+    json_data = query.json
+    assert json_data['results'][0]['matchType'] == update_data[0]['matchType']
+
+
+def test_get_total_count(session):
+    """Assert that the get total count function works as expected."""
+    json_data = {
+        'type': 'SERIAL_NUMBER',
+        'criteria': {
+            'value': 'JU622994'
+        },
+        'clientReferenceId': 'T-SQ-SS-1'
+    }
+    search_client = SearchClient.create_from_json(json_data, 'PS12345')
+    search_client.get_total_count()
+    # print(str(search_client.total_results_size))
+    assert search_client.total_results_size >= 7

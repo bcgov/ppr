@@ -207,7 +207,7 @@ def test_create_from_financing_json(session):
             assert party.address
 
 
-def test_verify_party_code_frue(session):
+def test_verify_party_code_true(session):
     """Assert that Party.verify_party_code works correctly with a valid code."""
     result = Party.verify_party_code('200000000')
     assert result

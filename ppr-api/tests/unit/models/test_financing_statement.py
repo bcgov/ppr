@@ -46,6 +46,8 @@ def test_save_sa(session):
     result = statement.json
     assert result
     assert result['baseRegistrationNumber']
+    assert result['registrationDescription']
+    assert result['registrationAct']
     assert result['createDateTime']
     assert result['registeringParty']
     assert result['debtors'][0]
@@ -256,7 +258,7 @@ def test_validate_base_debtor(session):
     # invalid business name
     json_data['baseDebtor']['businessName'] = 'xxx debtor'
     valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert valid
+    assert not valid
 
     # invalid individual name
     person = {
@@ -267,12 +269,12 @@ def test_validate_base_debtor(session):
     del json_data['baseDebtor']['businessName']
     json_data['baseDebtor']['personName'] = person
     valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-#    assert valid == True
+    assert not valid
 
     # invalid individual name
     json_data['baseDebtor']['personName']['first'] = 'John'
     valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert valid
+    assert not valid
 
 
 def test_financing_client_code_invalid(session):

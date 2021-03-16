@@ -15,15 +15,15 @@
 
 from datetime import timedelta as _timedelta
 
-from ppr_api.utils import datetime
+from ppr_api.models import utils as model_utils
 
 
 def test_expiry_dt_from_years():
     """Assert that generating an expiry date from life years is performing as expected."""
-    expiry_ts = datetime.expiry_dt_from_years(5)
-    now_ts = datetime.now_ts()
-    print('Expiry timestamp: ' + datetime.format_ts(expiry_ts))
-    print('Now timestamp: ' + datetime.format_ts(now_ts))
+    expiry_ts = model_utils.expiry_dt_from_years(5)
+    now_ts = model_utils.now_ts()
+    print('Expiry timestamp: ' + model_utils.format_ts(expiry_ts))
+    print('Now timestamp: ' + model_utils.format_ts(now_ts))
     assert (expiry_ts.year - now_ts.year) == 5
     assert expiry_ts.hour == 23
     assert expiry_ts.minute == 59
@@ -34,8 +34,8 @@ def test_expiry_dt_from_years():
 
 def test_ts_from_iso_format():
     """Assert that creating a UTC datetime object from an ISO date-time formatted string is performing as expected."""
-    test_ts = datetime.ts_from_iso_format('2021-02-16T23:00:00-08:00')
-    print('Test timestamp: ' + datetime.format_ts(test_ts))
+    test_ts = model_utils.ts_from_iso_format('2021-02-16T23:00:00-08:00')
+    print('Test timestamp: ' + model_utils.format_ts(test_ts))
     assert test_ts.day == 17
     assert test_ts.month == 2
     assert test_ts.year == 2021
@@ -43,18 +43,18 @@ def test_ts_from_iso_format():
     assert test_ts.minute == 0
     assert test_ts.second == 0
 
-    test_ts = datetime.ts_from_iso_format('2021-02-16T23:00:00+00:00')
-    print('Test timestamp: ' + datetime.format_ts(test_ts))
+    test_ts = model_utils.ts_from_iso_format('2021-02-16T23:00:00+00:00')
+    print('Test timestamp: ' + model_utils.format_ts(test_ts))
     assert test_ts.day == 16
     assert test_ts.hour == 23
 
-    test_ts = datetime.ts_from_iso_format('2021-02-16T13:00:00-08:00')
-    print('Test timestamp: ' + datetime.format_ts(test_ts))
+    test_ts = model_utils.ts_from_iso_format('2021-02-16T13:00:00-08:00')
+    print('Test timestamp: ' + model_utils.format_ts(test_ts))
     assert test_ts.day == 16
     assert test_ts.hour == 21
 
-    test_ts = datetime.ts_from_iso_format('2021-03-31T23:00:00-08:00')
-    print('Test timestamp: ' + datetime.format_ts(test_ts))
+    test_ts = model_utils.ts_from_iso_format('2021-03-31T23:00:00-08:00')
+    print('Test timestamp: ' + model_utils.format_ts(test_ts))
     assert test_ts.month == 4
     assert test_ts.day == 1
     assert test_ts.hour == 7
@@ -62,8 +62,8 @@ def test_ts_from_iso_format():
 
 def test_ts_from_date_iso_format():
     """Assert that creating a UTC datetime object from an ISO date-time formatted string is performing as expected."""
-    test_ts = datetime.ts_from_date_iso_format('2021-02-16')
-    print('Test timestamp: ' + datetime.format_ts(test_ts))
+    test_ts = model_utils.ts_from_date_iso_format('2021-02-16')
+    print('Test timestamp: ' + model_utils.format_ts(test_ts))
     assert test_ts.day in (16, 17)
     assert test_ts.month == 2
     assert test_ts.year == 2021
@@ -75,16 +75,28 @@ def test_ts_from_date_iso_format():
 
 def test_now_ts_offset():
     """Assert that adjusting UTC now by a number of days is performing as expected."""
-    now_ts = datetime.now_ts() + _timedelta(days=60)
-    test_ts = datetime.now_ts_offset(60, True)
-    print('Now timestamp + 60 days: ' + datetime.format_ts(test_ts))
+    now_ts = model_utils.now_ts() + _timedelta(days=60)
+    test_ts = model_utils.now_ts_offset(60, True)
+    print('Now timestamp + 60 days: ' + model_utils.format_ts(test_ts))
     assert test_ts.day == now_ts.day
     assert test_ts.month == now_ts.month
     assert test_ts.year == now_ts.year
 
-    now_ts = datetime.now_ts() - _timedelta(days=60)
-    test_ts = datetime.now_ts_offset(60, False)
-    print('Now timestamp - 60 days: ' + datetime.format_ts(test_ts))
+    now_ts = model_utils.now_ts() - _timedelta(days=60)
+    test_ts = model_utils.now_ts_offset(60, False)
+    print('Now timestamp - 60 days: ' + model_utils.format_ts(test_ts))
     assert test_ts.day == now_ts.day
     assert test_ts.month == now_ts.month
     assert test_ts.year == now_ts.year
+
+
+def test_today_ts_offset():
+    """Assert that adjusting UTC today by a number of days is performing as expected."""
+    test_now_ts = model_utils.now_ts_offset(7, False)
+    test_today_ts = model_utils.today_ts_offset(7, False)
+    print('test now - 7 days: ' + model_utils.format_ts(test_now_ts))
+    print('test today - 7 days: ' + model_utils.format_ts(test_today_ts))
+    assert test_today_ts.hour == 0
+    assert test_today_ts.minute == 0
+    assert test_today_ts.second == 0
+    assert test_today_ts < test_now_ts
