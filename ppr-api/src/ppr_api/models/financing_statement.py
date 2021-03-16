@@ -93,6 +93,10 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             registration_id = reg.registration_id
             statement['type'] = reg.registration_type_cd
             statement['baseRegistrationNumber'] = reg.registration_num
+            if reg.registration_type:
+                statement['registrationDescription'] = reg.registration_type.registration_desc
+                statement['registrationAct'] = reg.registration_type.registration_act
+
             statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
 
             if reg.client_reference_id:

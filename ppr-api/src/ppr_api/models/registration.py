@@ -49,8 +49,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 #    registration_id = db.Column('registration_id', db.Integer, db.Sequence('registration_id_seq'), primary_key=True)
     # Always use get_generated_values() to generate PK.
     registration_id = db.Column('registration_id', db.Integer, primary_key=True)
-    registration_type_cd = db.Column('registration_type_cd', db.String(2), nullable=False)
-#                                     db.ForeignKey('registration_type.registration_type_cd'))
     registration_type_cl = db.Column('registration_type_cl', db.String(10), nullable=False)
 #                                     db.ForeignKey('registration_type.registration_type_class'))
     registration_ts = db.Column('registration_ts', db.DateTime, nullable=False)
@@ -77,18 +75,20 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
     document_number = db.Column('document_number', db.String(10),
                                 db.ForeignKey('draft.document_number'), nullable=False)
+    registration_type_cd = db.Column('registration_type_cd', db.String(2),
+                                     db.ForeignKey('registration_type.registration_type_cd'), nullable=False)
 
     # relationships
     financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
                                           back_populates='registration', cascade='all, delete', uselist=False)
+    registration_type = db.relationship('RegistrationType', foreign_keys=[registration_type_cd],
+                                        back_populates='registration', cascade='all, delete', uselist=False)
     parties = db.relationship('Party', back_populates='registration')
     general_collateral = db.relationship('GeneralCollateral', back_populates='registration')
     vehicle_collateral = db.relationship('VehicleCollateral', back_populates='registration')
     draft = db.relationship('Draft', foreign_keys=[document_number], uselist=False)
     trust_indenture = db.relationship('TrustIndenture', back_populates='registration', uselist=False)
     court_order = db.relationship('CourtOrder', back_populates='registration', uselist=False)
-
-    base_registration_num = None
 
     @property
     def json(self) -> dict:
