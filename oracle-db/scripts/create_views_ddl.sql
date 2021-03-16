@@ -33,7 +33,8 @@ SELECT r.registration_type_cd,
        sc.make,
        sc.model,
        sc.mhr_number,
-       sc.vehicle_collateral_id AS vehicle_id
+       sc.serial_id AS vehicle_id,
+       sc.srch_vin
   FROM registration r, financing_statement fs, serial_collateral sc
  WHERE r.financing_id = fs.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
@@ -62,7 +63,7 @@ SELECT r.registration_type_cd,
        sc.year,
        sc.make,
        sc.model,
-       sc.vehicle_collateral_id AS vehicle_id,
+       sc.serial_id AS vehicle_id,
        sc.srch_vin
   FROM registration r, financing_statement fs, serial_collateral sc
  WHERE r.financing_id = fs.financing_id
@@ -91,7 +92,8 @@ SELECT r.registration_type_cd,
        sc.year,
        sc.make,
        sc.model,
-       sc.vehicle_collateral_id AS vehicle_id
+       sc.serial_id AS vehicle_id,
+       sc.srch_vin
   FROM registration r, financing_statement fs, serial_collateral sc
  WHERE r.financing_id = fs.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')

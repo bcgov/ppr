@@ -20,13 +20,8 @@ INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
-    VALUES(200000042, 'RG', 200000017, 200000009, null, null, 'TEST', '14', 'REGISTERING', null,
+    VALUES(200000043, 'RG', 200000017, 200000009, null, null, 'TEST', '14', 'REGISTERING', null,
            null, 200000019)
-;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
-    VALUES(200000043, 'DB', 200000017, 200000009, null, null, null, null, null, 'DUPLICATE NAME',
-           null, 200000019, search_key_pkg.businame('DUPLICATE NAME'))
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
@@ -34,8 +29,13 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000019, search_key_pkg.businame('DUPLICATE NAME'))
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
+                  middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
+    VALUES(200000045, 'DB', 200000017, 200000009, null, null, null, null, null, 'DUPLICATE NAME',
+           null, 200000019, search_key_pkg.businame('DUPLICATE NAME'))
+;
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
-    VALUES(200000045, 'SP', 200000017, 200000009, null, null, null, null, null, 'TEST 14 SECURED PARTY',
+    VALUES(200000046, 'SP', 200000017, 200000009, null, null, null, null, null, 'TEST 14 SECURED PARTY',
            null, 200000019)
 ;
 INSERT INTO serial_collateral(serial_id, serial_type_cd, registration_id, financing_id, registration_id_end,
