@@ -20,6 +20,7 @@ Test-Suite to ensure that the /searches endpoint is working as expected.
 import copy
 from http import HTTPStatus
 
+import pytest
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_QUERY
 
@@ -29,108 +30,74 @@ from ppr_api.models.utils import now_ts_offset, format_ts
 
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
+# Valid test search criteria
+AIRCRAFT_DOT_JSON = {
+    'type': 'AIRCRAFT_DOT',
+    'criteria': {
+        'value': 'CFYXW'
+    },
+    'clientReferenceId': 'T-SQ-AC-1'
+}
+MHR_NUMBER_JSON = {
+    'type': 'MHR_NUMBER',
+    'criteria': {
+        'value': '220000'
+    },
+    'clientReferenceId': 'T-SQ-MH-1'
+}
+REGISTRATION_NUMBER_JSON = {
+    'type': 'REGISTRATION_NUMBER',
+    'criteria': {
+        'value': 'TEST0001'
+    },
+    'clientReferenceId': 'T-SQ-RG-3'
+}
+SERIAL_NUMBER_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': 'JU622994'
+    },
+    'clientReferenceId': 'T-SQ-SS-1'
+}
+INDIVIDUAL_DEBTOR_JSON = {
+    'type': 'INDIVIDUAL_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'last': 'Debtor',
+            'first': 'Test Ind'
+        }
+    },
+    'clientReferenceId': 'T-SQ-IS-1'
+}
+BUSINESS_DEBTOR_JSON = {
+    'type': 'BUSINESS_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'business': 'TEST BUS 2 DEBTOR'
+        }
+    },
+    'clientReferenceId': 'T-SQ-DB-1'
+}
+
+# testdata pattern is ({search type}, {JSON data})
+TEST_VALID_DATA = [
+    ('AC', AIRCRAFT_DOT_JSON),
+    ('RG', REGISTRATION_NUMBER_JSON),
+    ('MH', MHR_NUMBER_JSON),
+    ('SS', SERIAL_NUMBER_JSON),
+    ('IS', INDIVIDUAL_DEBTOR_JSON),
+    ('BS', BUSINESS_DEBTOR_JSON)
+]
 
 
-def test_search_reg_num_valid_201(session, client, jwt):
-    """Assert that valid search by registration number criteria returns a 201 status."""
-    # setup
-    json_data = {
-        'type': 'REGISTRATION_NUMBER',
-        'criteria': {
-            'value': 'TEST0001'
-        },
-        'clientReferenceId': 'T-API-SQ-RN-1'
-    }
-
-    # test
+@pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
+def test_search_valid(session, client, jwt, search_type, json_data):
+    """Assert that valid search criteria returns a 201 status."""
     rv = client.post('/api/v1/searches',
                      json=json_data,
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_search_serial_num_valid_201(session, client, jwt):
-    """Assert that valid search by serial number criteria returns a 201 status."""
-    # setup
-    json_data = {
-        'type': 'SERIAL_NUMBER',
-        'criteria': {
-            'value': 'JU622994'
-        },
-        'clientReferenceId': 'T-API-SQ-SS-1'
-    }
-
-    # test
-    rv = client.post('/api/v1/searches',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_search_mhr_number_valid_201(session, client, jwt):
-    """Assert that valid search by MHR number criteria returns a 201 status."""
-    # setup
-    json_data = {
-        'type': 'MHR_NUMBER',
-        'criteria': {
-            'value': '220000'
-        },
-        'clientReferenceId': 'T-API-SQ-MH-1'
-    }
-
-    # test
-    rv = client.post('/api/v1/searches',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_search_aircraft_dot_valid_201(session, client, jwt):
-    """Assert that valid search by aircraft dot criteria returns a 201 status."""
-    # setup
-    json_data = {
-        'type': 'AIRCRAFT_DOT',
-        'criteria': {
-            'value': 'CFYXW'
-        },
-        'clientReferenceId': 'T-API-SQ-AC-1'
-    }
-
-    # test
-    rv = client.post('/api/v1/searches',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_search_debtor_bus_valid_201(session, client, jwt):
-    """Assert that valid search by debtor business name criteria returns a 201 status."""
-    # setup
-    json_data = {
-        'type': 'BUSINESS_DEBTOR',
-        'criteria': {
-            'debtorName': {
-                'business': 'TEST BUS 2 DEBTOR'
-            }
-        },
-        'clientReferenceId': 'T-API-SQ-DB-1'
-    }
-
-    # test
-    rv = client.post('/api/v1/searches',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-    # check
-    print(rv.json)
     assert rv.status_code == HTTPStatus.CREATED
 
 

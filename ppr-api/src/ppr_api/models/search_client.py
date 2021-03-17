@@ -21,10 +21,8 @@ from __future__ import annotations
 from enum import Enum
 from http import HTTPStatus
 import json
-import copy
 
 from flask import current_app
-from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
@@ -41,7 +39,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Render an Enum of the search types."""
         AIRCRAFT_AIRFRAME_DOT = 'AC'
         BUSINESS_DEBTOR = 'BS'
-        INDIVISUAL_DEBTOR = 'IS'
+        INDIVIDUAL_DEBTOR = 'IS'
         REGISTRATION_NUM = 'RG'
         SERIAL_NUM = 'SS'
         MANUFACTURED_HOME_NUM = 'MH'
@@ -144,6 +142,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         query = search_utils.SERIAL_NUM_QUERY
         if self.search_type_cd == 'MH':
             query = search_utils.MHR_NUM_QUERY
+            query = query.replace('DECODE(serial_number', 'DECODE(mhr_number')
         elif self.search_type_cd == 'AC':
             query = search_utils.AIRCRAFT_DOT_QUERY
 
@@ -222,16 +221,62 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = 0
             self.total_results_size = 0
 
+    def search_by_individual_name(self):
+        """Execute a search query debtor individual name search type."""
+        last_name = self.request_json['criteria']['debtorName']['last']
+        first_name = self.request_json['criteria']['debtorName']['first']
+        query = search_utils.INDIVIDUAL_NAME_QUERY.replace('LNAME?', last_name.strip().upper())
+        query = query.replace('FNAME?', first_name.strip().upper())
+        result = db.session.execute(query)
+        rows = result.fetchall()
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                values = row.values()
+                registration_type = str(values[0])
+                timestamp = values[1]
+                person = {
+                    'last': str(values[2]),
+                    'first': str(values[3])
+                }
+                middle = str(values[4])
+                if middle:
+                    person['middle'] = middle
+                debtor = {
+                    'personName': person,
+                    'partyId': int(values[5])
+                }
+                result_json = {
+                    'baseRegistrationNumber': str(values[6]),
+                    'matchType': str(values[7]),
+                    'createDateTime': model_utils.format_ts(timestamp),
+                    'registrationType': registration_type,
+                    'debtor': debtor
+                }
+                results_json.append(result_json)
+
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            if self.returned_results_size > 0:
+                self.search_response = json.dumps(results_json)
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
     def get_total_count(self):
         """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
         count_query = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type_cd]
-        if count_query and count_query != '':
+        if count_query:
             if self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json['criteria']['debtorName']['business']
                 count_query = count_query.replace('?', search_value.strip().upper())
-            elif self.search_type_cd != self.SearchTypes.INDIVISUAL_DEBTOR.value:
+            elif self.search_type_cd == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
+                last_name = self.request_json['criteria']['debtorName']['last']
+                first_name = self.request_json['criteria']['debtorName']['first']
+                count_query = count_query.replace('LNAME?', last_name.strip().upper())
+                count_query = count_query.replace('FNAME?', first_name.strip().upper())
+            else:
                 count_query = count_query.replace('?', self.request_json['criteria']['value'])
-            # TODO add ind debtor name count
 
             result = db.session.execute(count_query)
             row = result.first()
@@ -248,15 +293,12 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.search_by_serial_type()
         elif self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
             self.search_by_business_name()
-        # temporary until individual debtor search implemented
         else:
-            self.search_response = json.dumps(copy.deepcopy(SEARCH_QUERY_RESULT))
-            self.returned_results_size = 1
-            self.total_results_size = 1
+            self.search_by_individual_name()
 
         if self.returned_results_size == search_utils.SEARCH_RESULTS_MAX_SIZE:
             # Actual result size exceeds limit: need to get total match count
-            self.total_results_size = self.returned_results_size
+            self.get_total_count()
 
         self.save()
 

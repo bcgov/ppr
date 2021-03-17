@@ -74,7 +74,7 @@ REG_NUM_QUERY = \
 MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
         "AND sc.serial_type_cd = 'MH' " + \
         "AND sc.srch_vin = search_key_pkg.mhr('?') " + \
-"ORDER BY r.registration_ts ASC " + RESULTS_SIZE_LIMIT_CLAUSE
+"ORDER BY match_type, r.registration_ts ASC " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
@@ -114,6 +114,29 @@ BUSINESS_NAME_QUERY = \
               "AND A.WORD_ID = B.WORD_ID), 85) " + \
 "ORDER BY match_type, p.business_name " + RESULTS_SIZE_LIMIT_CLAUSE
 
+INDIVIDUAL_NAME_QUERY = \
+'SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,'+ \
+       'p.last_name,p.first_name,p.middle_name,p.party_id,' + \
+       'r.registration_number AS base_registration_num,' + \
+       "DECODE(p.last_name, 'LNAME?'," + \
+              "DECODE(p.first_name, 'FNAME?', 'EXACT', 'SIMILAR'), 'SIMILAR') AS match_type," + \
+       'fs.expire_date,fs.state_type_cd ' + \
+  'FROM registration r, financing_statement fs, party p ' + \
+ 'WHERE r.financing_id = fs.financing_id ' + \
+   "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
+   'AND r.base_reg_number IS NULL ' + \
+   "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+   'AND NOT EXISTS (SELECT r3.registration_id ' + \
+                     'FROM registration r3 ' + \
+                    'WHERE r3.financing_id = fs.financing_id ' + \
+                      "AND r3.registration_type_cl = 'DISCHARGE' " + \
+                      "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+  'AND p.financing_id = fs.financing_id ' + \
+  'AND p.registration_id_end IS NULL ' + \
+  "AND p.party_type_cd = 'DI' " + \
+  "AND p.party_id IN (SELECT * FROM match_individual_name('LNAME?', 'FNAME?')) " + \
+'ORDER BY match_type, p.last_name, p.first_name ' + RESULTS_SIZE_LIMIT_CLAUSE
+
 # Total result count queries for serial number, debtor name searches:
 BUSINESS_NAME_TOTAL_COUNT = \
 "SELECT COUNT(r.registration_id) " + \
@@ -135,6 +158,23 @@ BUSINESS_NAME_TOTAL_COUNT = \
              "FROM THESAURUS A, JARO  B " + \
             "WHERE REGEXP_LIKE(SEARCH_KEY_PKG.businame('?'),WORD,'i') " + \
               "AND A.WORD_ID = B.WORD_ID), 85) "
+
+INDIVIDUAL_NAME_TOTAL_COUNT = \
+"SELECT COUNT(r.registration_id) " + \
+  'FROM registration r, financing_statement fs, party p ' + \
+ 'WHERE r.financing_id = fs.financing_id ' + \
+   "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
+   'AND r.base_reg_number IS NULL ' + \
+   "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+   'AND NOT EXISTS (SELECT r3.registration_id ' + \
+                     'FROM registration r3 ' + \
+                    'WHERE r3.financing_id = fs.financing_id ' + \
+                      "AND r3.registration_type_cl = 'DISCHARGE' " + \
+                      "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
+  'AND p.financing_id = fs.financing_id ' + \
+  'AND p.registration_id_end IS NULL ' + \
+  "AND p.party_type_cd = 'DI' " + \
+  "AND p.party_id IN (SELECT * FROM match_individual_name('LNAME?', 'FNAME?'))"
 
 SERIAL_SEARCH_COUNT_BASE = \
     "SELECT COUNT(r.registration_id) " + \
@@ -166,7 +206,7 @@ AIRCRAFT_DOT_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
 COUNT_QUERY_FROM_SEARCH_TYPE = {
     'AC': AIRCRAFT_DOT_TOTAL_COUNT,
     'BS': BUSINESS_NAME_TOTAL_COUNT,
-    'IS': '',
+    'IS': INDIVIDUAL_NAME_TOTAL_COUNT,
     'MH': MHR_NUM_TOTAL_COUNT,
     'SS': SERIAL_NUM_TOTAL_COUNT
 }
