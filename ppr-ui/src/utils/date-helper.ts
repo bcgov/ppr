@@ -15,5 +15,5 @@ export function convertDate (date: Date): string {
   if (sec.length > 2) sec = sec.slice(1)
   const datetime = `${hour}:${min}:${sec}`
 
-  return 'saved ' + moment(date).format('MMMM D, Y') + ` ${datetime} ${timezone}`
+  return moment(date).format('MMMM D, Y') + ` ${datetime} ${timezone}`
 }

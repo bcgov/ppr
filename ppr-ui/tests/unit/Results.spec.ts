@@ -6,7 +6,7 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { Result } from '@/components/results'
+import { SearchedResult } from '@/components/results'
 
 // Other
 import { tableHeaders } from '@/resources'
@@ -41,14 +41,14 @@ const noResultsDiv: string = '#search-no-results-info'
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<Result> object with the given parameters.
+ * @returns a Wrapper<SearchedResult> object with the given parameters.
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Result, {
+  return mount(SearchedResult, {
     localVue,
     store,
     vuetify
@@ -66,7 +66,7 @@ describe('Test result table with no results', () => {
   })
 
   it('doesnt display table if there are no results', async () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(noResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(noResults.totalResultsSize)
@@ -92,7 +92,7 @@ describe('Serial number results', () => {
   })
 
   it('renders Results Component with serial number results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.SERIAL_NUMBER)
@@ -134,7 +134,7 @@ describe('Business debtor results', () => {
   })
 
   it('renders Results Component with business debtor name results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.BUSINESS_DEBTOR)
@@ -172,7 +172,7 @@ describe('Manufactured home results', () => {
   })
 
   it('renders Results Component with manufactured home results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.MHR_NUMBER)
@@ -215,7 +215,7 @@ describe('Aircraft results', () => {
   })
 
   it('renders Results Component with aircraft results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.AIRCRAFT_DOT)
@@ -256,7 +256,7 @@ describe('Registration number results', () => {
   })
 
   it('renders Results Component with registration number results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.REGISTRATION_NUMBER)

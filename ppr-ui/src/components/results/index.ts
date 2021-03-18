@@ -1,1 +1,2 @@
-export { default as Result } from './Results.vue'
+export { default as SavedResult } from './SavedResults.vue'
+export { default as SearchedResult } from './SearchedResults.vue'

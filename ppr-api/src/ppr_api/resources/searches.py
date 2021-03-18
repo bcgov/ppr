@@ -51,7 +51,7 @@ class SearchResource(Resource):
     def post():
         """Execute a new search request using criteria in the request body."""
         try:
-
+            print('HERE')
             # Quick check: must be staff or provide an account ID.
             account_id = get_account_id(request)
             if not is_staff(jwt) and account_id is None:

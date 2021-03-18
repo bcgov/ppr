@@ -145,6 +145,9 @@
   border-bottom: 8px solid RGBA(73,80,87,0.95) !important;
 }
 
+.v-data-table__selected {
+  background: $blueSelected !important;
+}
 .v-select-list {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -152,7 +155,6 @@
 .v-select__selections {
   line-height: 1.5rem !important;
 }
-
 .v-simple-checkbox .theme--light.v-icon{
   color: $primary-blue;
 }

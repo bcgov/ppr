@@ -12,6 +12,7 @@ export const stateModel: StateModelIF = {
     label: '',
     type: ''
   },
+  savedResults: null,
   searchResults: null,
   searchedType: null,
   searchedValue: ''

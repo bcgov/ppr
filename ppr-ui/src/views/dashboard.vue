@@ -1,26 +1,30 @@
 <template>
   <v-container fluid class="pa-10">
-    <v-row>
+    <v-row no-gutters>
       <v-col>
-        <v-row no-gutters>
-          <v-col cols="12" :class="$style['search-title']">
-            <b>Search</b>
+        <v-row no-gutters :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-col cols="auto">
+            <b>Personal Property Search</b>
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="12" :class="[$style['search-info'], 'pt-2']">
-            <span>
-              Select a search category and then enter a value to search.
-              <b>Note:</b>
-              Each search incurs a fee (including searches that return no results).
-            </span>
-          </v-col>
-        </v-row>
-        <v-row>
-          <search-bar @searched-type="setSearchedType"
+          <search-bar class="soft-corners-bottom"
+                      @searched-type="setSearchedType"
                       @searched-value="setSearchedValue"
                       @search-data="setSearchResults"
                       @search-error="emitError"/>
+        </v-row>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class='pt-12'>
+      <v-col>
+        <v-row no-gutters :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-col cols="auto">
+            <b>My Searches</b> (110)
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <saved-result class="soft-corners-bottom"/>
         </v-row>
       </v-col>
     </v-row>
@@ -35,21 +39,24 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local
 import { getFeatureFlag } from '@/utils'
+import { SavedResult } from '@/components/results'
 import { SearchBar } from '@/components/search'
 import { ActionBindingIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { RouteNames } from '@/enums'
 
 @Component({
   components: {
+    SavedResult,
     SearchBar
   }
 })
 export default class Dashboard extends Vue {
+  @Getter getSavedResults: SearchResponseIF
   @Getter getSearchResults: SearchResponseIF
 
+  @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
-  @Action setSearchResults: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -137,16 +144,9 @@ export default class Dashboard extends Vue {
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-#search-time {
-  font-size: 0.825rem;
-  color: $gray8;
-}
-.search-title {
+.dashboard-title {
   font-size: 1rem;
   color: $gray9;
-}
-.search-info {
-  font-size: 0.825rem;
-  color: $gray8;
+  background-color: $BCgovBlue0;
 }
 </style>

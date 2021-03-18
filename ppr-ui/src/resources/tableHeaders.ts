@@ -6,88 +6,73 @@ export const tableHeaders: TableHeadersIF =
     [APISearchTypes.SERIAL_NUMBER]: [
       {
         text: 'Serial Number',
-        value: 'vehicleCollateral.serialNumber',
-        class: 'result-header'
+        value: 'vehicleCollateral.serialNumber'
       },
       {
         text: 'Type',
-        value: 'vehicleCollateral.type',
-        class: 'result-header'
+        value: 'vehicleCollateral.type'
       },
       {
         text: 'Year',
-        value: 'vehicleCollateral.year',
-        class: 'result-header'
+        value: 'vehicleCollateral.year'
       },
       {
         text: 'Make/Model',
-        value: 'makeModel',
-        class: 'result-header'
+        value: 'makeModel'
       }
     ],
     [APISearchTypes.INDIVIDUAL_DEBTOR]: [
       {
         text: 'Debtor Name',
-        value: 'debtor.personalName',
-        class: 'result-header'
+        value: 'debtor.personalName'
       },
       {
         text: 'Birthdate',
-        value: '',
-        class: 'result-header'
+        value: ''
       }
     ],
     [APISearchTypes.BUSINESS_DEBTOR]: [
       {
         text: 'Debtor Name',
-        value: 'debtor.businessName',
-        class: 'result-header'
+        value: 'debtor.businessName'
       }
     ],
     [APISearchTypes.MHR_NUMBER]: [
       {
         text: 'Manufactured Home Registration Number',
-        value: 'vehicleCollateral.manufacturedHomeRegistrationNumber',
-        class: 'result-header'
+        value: 'vehicleCollateral.manufacturedHomeRegistrationNumber'
       },
       {
         text: 'Serial Number',
-        value: 'vehicleCollateral.serialNumber',
-        class: 'result-header'
+        value: 'vehicleCollateral.serialNumber'
       },
       {
         text: 'Year',
-        value: 'vehicleCollateral.year',
-        class: 'result-header'
+        value: 'vehicleCollateral.year'
       },
       {
         text: 'Make/Model',
-        value: 'makeModel',
-        class: 'result-header'
+        value: 'makeModel'
       }
     ],
     [APISearchTypes.AIRCRAFT]: [
       {
         text: 'Serial Number',
-        value: 'vehicleCollateral.serialNumber',
-        class: 'result-header'
+        value: 'vehicleCollateral.serialNumber'
       },
       {
         text: 'Year',
-        value: 'vehicleCollateral.year',
-        class: 'result-header'
+        value: 'vehicleCollateral.year'
       },
       {
         text: 'Make/Model',
-        value: 'makeModel',
-        class: 'result-header'
+        value: 'makeModel'
       }
     ],
     [APISearchTypes.REGISTRATION_NUMBER]: [
       {
         text: 'Registration Number',
-        value: 'registrationNumber',
-        class: 'result-header'
+        value: 'registrationNumber'
       }
     ]
   }

@@ -72,6 +72,58 @@ const mockedSearchResults: mockSearchResults = {
         make: 'TESTmake3',
         model: 'TESTmodel3'
       }
+    },
+    {
+      matchType: MatchTypes.SIMILAR,
+      baseRegistrationNumber: '023002F',
+      createDateTime: '2020-02-21T18:56:20Z',
+      registrationType: 'SA',
+      vehicleCollateral: {
+        type: 'MV',
+        serialNumber: 'KM8J3CA46JU622998',
+        year: 2017,
+        make: 'TESTmake4',
+        model: 'TESTmodel4'
+      }
+    },
+    {
+      matchType: MatchTypes.SIMILAR,
+      baseRegistrationNumber: '023003G',
+      createDateTime: '2020-02-21T18:56:20Z',
+      registrationType: 'SA',
+      vehicleCollateral: {
+        type: 'MV',
+        serialNumber: 'KM8J3CA46JU622999',
+        year: 2017,
+        make: 'TESTmake5',
+        model: 'TESTmodel5'
+      }
+    },
+    {
+      matchType: MatchTypes.SIMILAR,
+      baseRegistrationNumber: '023002H',
+      createDateTime: '2020-02-21T18:56:20Z',
+      registrationType: 'SA',
+      vehicleCollateral: {
+        type: 'MV',
+        serialNumber: 'KM8J3CA46JU623000',
+        year: 2017,
+        make: 'TESTmake6',
+        model: 'TESTmodel6'
+      }
+    },
+    {
+      matchType: MatchTypes.SIMILAR,
+      baseRegistrationNumber: '023003I',
+      createDateTime: '2020-02-21T18:56:20Z',
+      registrationType: 'SA',
+      vehicleCollateral: {
+        type: 'MV',
+        serialNumber: 'KM8J3CA46JU623001',
+        year: 2017,
+        make: 'TESTmake7',
+        model: 'TESTmodel7'
+      }
     }
   ],
   [UISearchTypes.INDIVIDUAL_DEBTOR]: null,

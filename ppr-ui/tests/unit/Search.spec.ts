@@ -6,7 +6,7 @@ import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
-import { Result } from '@/components/results'
+import { SearchedResult } from '@/components/results'
 import { Search } from '@/views'
 import { SearchBar } from '@/components/search'
 
@@ -54,7 +54,7 @@ describe('Search component', () => {
     // doesn't render unless there are results
     expect(wrapper.vm.getSearchResults).toBeNull()
     expect(wrapper.find(doneButton).exists()).toBe(false)
-    expect(wrapper.findComponent(Result).exists()).toBe(false)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(false)
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
   })
   it('renders the Results component when there are results.', async () => {
@@ -62,6 +62,6 @@ describe('Search component', () => {
     await Vue.nextTick()
     expect(wrapper.vm.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     expect(wrapper.find(doneButton).exists()).toBe(true)
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
   })
 })

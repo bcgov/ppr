@@ -5,6 +5,7 @@ import { axios } from '@/utils/axios-ppr'
 // Interfaces
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
 import { mockedSearchResponse } from '../../tests/unit/test-data'
+import { UISearchTypes } from '@/enums'
 
 const HttpStatus = require('http-status-codes')
 
@@ -34,10 +35,12 @@ export class PPRApiHelper {
       .then(response => {
         const data = response?.data
         // console.log('search response data: ' + data)
-        if (!data) {
-          throw new Error('Invalid API response')
-        }
-        return data
+        // if (!data) {
+        //   throw new Error('Invalid API response')
+        // }
+        return mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
+        // return mockedSearchResponse[UISearchTypes.MHR_NUMBER]
+        // return mockedSearchResponse[UISearchTypes.AIRCRAFT]
       }).catch(error => {
         // TODO: do something based on specific api responses
         // console.log('search response error: ' + error)
@@ -45,10 +48,15 @@ export class PPRApiHelper {
         //     error?.response?.status === HttpStatus.UNPROCESSABLE_ENTITY) {
         //   return null
         // }
-        return {
-          // temporary -- forces payment error dialogue popup unless message given
-          errors: error?.response?.data?.message || 'payment'
-        }
+        console.log(error)
+        return mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
+        // return mockedSearchResponse[UISearchTypes.MHR_NUMBER
+        // return mockedSearchResponse[UISearchTypes.AIRCRAFT]
+        // return {
+        //   // temporary -- forces payment error dialogue popup unless message given
+        //   errors: error?.response?.data?.message || 'payment'
+        // }
       })
   }
+  // updateSelected ()
 }

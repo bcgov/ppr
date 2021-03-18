@@ -66,3 +66,7 @@ export const getSearchedType = (state: StateIF): SearchTypeIF => {
 export const getSearchedValue = (state: StateIF): string => {
   return state.stateModel.searchedValue
 }
+
+export const getSavedResults = (state: StateIF): SearchResponseIF => {
+  return state.stateModel.savedResults
+}

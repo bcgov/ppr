@@ -26,6 +26,7 @@ export const setSearchResults: ActionIF = ({ commit }, searchResults: SearchResp
 }
 
 export const setSearchedType: ActionIF = ({ commit }, searchedType: SearchTypeIF): void => {
+  console.log('setting searched type: ', searchedType)
   commit('mutateSearchedType', searchedType)
 }
 

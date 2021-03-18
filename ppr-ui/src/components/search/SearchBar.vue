@@ -1,6 +1,15 @@
 <template>
-  <v-container fluid no-gutters>
+  <v-container fluid no-gutters class="white pl-6 pt-6">
     <v-row no-gutters>
+      <v-col cols="12" :class="[$style['search-info']]">
+        <span>
+          Select a search category and then enter a value to search.
+          <b>Note:</b>
+          Each search incurs a fee (including searches that return no results).
+        </span>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class="pt-3">
       <v-col cols="3">
         <v-select :id="$style['search-type-select']"
                   class="search-bar-type-select"
@@ -123,7 +132,8 @@ export default defineComponent({
         type: localState.selectedSearchType.searchTypeAPI,
         criteria: {
           value: cleanedSearchValue
-        }
+        },
+        clientReferenceId: 'T-S-MHR-001'
       }
     }
     const searchAction = async () => {
@@ -186,5 +196,9 @@ export default defineComponent({
 #search-btn-info {
   color: $gray8;
   font-size: 0.725rem;
+}
+.search-info {
+  font-size: 0.825rem;
+  color: $gray8;
 }
 </style>
