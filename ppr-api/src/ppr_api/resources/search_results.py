@@ -71,7 +71,10 @@ class SearchResultsResource(Resource):
                 return resource_utils.unprocessable_error_response('search result details')
 
             response_data = search_detail.json
-            # TODO: if request header Accept MIME type is application/pdf, format as pdf.
+            if resource_utils.is_pdf(request):
+                # TODO: if request header Accept MIME type is application/pdf, format as pdf.
+                return response_data, HTTPStatus.OK
+
             return jsonify(response_data), HTTPStatus.OK
 
         except BusinessException as exception:

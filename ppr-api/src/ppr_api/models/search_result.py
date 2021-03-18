@@ -148,7 +148,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         return search_detail
 
     @staticmethod
-    def create_from_search_query(search_query):
+    def create_from_search_query(search_query, mark_added: bool = True):
         """Create a search detail object from the inital search query with no search selection criteria."""
         search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
         # search_result.search_id = search_query.search_id
@@ -164,6 +164,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                         found = True
             if not found:  # No duplicates.
                 financing = FinancingStatement.find_by_registration_number(reg_num, staff=False, allow_historical=True)
+                financing.mark_update_json = mark_added  # Added for PDF, indicate if party or collateral was added.
                 # Special business rule: if search is by serial number, only include
                 # serial_collateral records where the serial number is an exact match.
                 # Do not include general_collateral records.

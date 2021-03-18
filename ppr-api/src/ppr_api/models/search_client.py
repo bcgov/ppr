@@ -360,7 +360,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         new_search.search_ts = model_utils.now_ts()
         if account_id:
             new_search.account_id = account_id
-        if 'clientReferenceId' in search_json:
+        if 'clientReferenceId' in search_json and search_json['clientReferenceId'].strip() != '':
             new_search.client_reference_id = search_json['clientReferenceId']
 
         return new_search

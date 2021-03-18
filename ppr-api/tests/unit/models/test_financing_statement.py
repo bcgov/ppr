@@ -26,20 +26,41 @@ from ppr_api.models import FinancingStatement, Draft
 from ppr_api.exceptions import BusinessException
 
 
-def test_save_sa(session):
-    """Assert that a save valid SA financing statement works as expected."""
+# testdata pattern is ({registration type}, {account ID}, {create draft})
+TEST_REGISTRATION_DATA = [
+    ('SA', 'PS12345', False),
+    ('SA', 'PS12345', True),
+    ('RL', 'PS12345', False),
+    ('SA', None, False)
+]
+
+
+@pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)
+def test_save(session, reg_type, account_id, create_draft):
+    """Assert that saveing a valid financing statement works as expected."""
     json_data = copy.deepcopy(FINANCING_STATEMENT)
-    json_data['type'] = 'SA'
+    json_data['type'] = reg_type
     del json_data['createDateTime']
     del json_data['baseRegistrationNumber']
     del json_data['payment']
     del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
     del json_data['expiryDate']
     del json_data['documentId']
+    if reg_type != 'RL':
+        del json_data['lienAmount']
+        del json_data['surrenderDate']
+    if reg_type != 'SA':
+        del json_data['trustIndenture']
+        del json_data['generalCollateral']
 
-    statement = FinancingStatement.create_from_json(json_data, 'PS12345')
+    if create_draft:
+        draft_json = copy.deepcopy(DRAFT_FINANCING_STATEMENT)
+        draft = Draft.create_from_json(draft_json, account_id)
+        draft.save()
+        assert draft.document_number
+        json_data['documentId'] = draft.document_number
+
+    statement = FinancingStatement.create_from_json(json_data, account_id)
     statement.save()
     assert statement.financing_id
 
@@ -53,91 +74,9 @@ def test_save_sa(session):
     assert result['debtors'][0]
     assert result['securedParties'][0]
     assert result['vehicleCollateral'][0]
-    assert result['generalCollateral'][0]
+    if reg_type == 'SA':
+        assert result['generalCollateral'][0]
     assert 'documentId' not in result
-
-
-def test_save_sa_from_draft(session):
-    """Assert that a save valid SA financing statement from draft works as expected."""
-    json_data = copy.deepcopy(FINANCING_STATEMENT)
-    json_data['type'] = 'SA'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['expiryDate']
-
-    # Now create draft
-    draft_json = copy.deepcopy(DRAFT_FINANCING_STATEMENT)
-    draft = Draft.create_from_json(draft_json, 'PS12345')
-    draft.save()
-    assert draft.document_number
-    json_data['documentId'] = draft.document_number
-
-    statement = FinancingStatement.create_from_json(json_data, 'PS12345')
-    statement.save()
-    assert statement.registration
-    assert statement.registration[0].draft
-    result = statement.json
-    assert result
-#    assert 'documentId' in result
-
-
-def test_save_rl(session):
-    """Assert that a save valid RL financing statement works as expected."""
-    json_data = copy.deepcopy(FINANCING_STATEMENT)
-    json_data['type'] = 'RL'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['trustIndenture']
-    del json_data['generalCollateral']
-    del json_data['expiryDate']
-    del json_data['documentId']
-
-    statement = FinancingStatement.create_from_json(json_data, 'PS12345')
-    statement.save()
-    assert statement.financing_id
-
-    result = statement.json
-    assert result
-    assert result['baseRegistrationNumber']
-    assert result['createDateTime']
-    assert result['registeringParty']
-    assert result['debtors'][0]
-    assert result['securedParties'][0]
-    assert result['vehicleCollateral'][0]
-
-
-def test_save_no_account(session):
-    """Assert that a save valid financing statement with no account ID works as expected."""
-    json_data = copy.deepcopy(FINANCING_STATEMENT)
-    json_data['type'] = 'SA'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['expiryDate']
-    del json_data['documentId']
-
-    statement = FinancingStatement.create_from_json(json_data, 'PS12345')
-    statement.save()
-    assert statement.financing_id
-
-    result = statement.json
-    assert result
-    assert result['baseRegistrationNumber']
-    assert result['createDateTime']
-    assert result['registeringParty']
-    assert result['debtors'][0]
-    assert result['securedParties'][0]
-    assert result['vehicleCollateral'][0]
-    assert result['generalCollateral'][0]
 
 
 def test_find_all_by_account_id(session):
@@ -202,7 +141,9 @@ def test_find_by_financing_id(session):
     assert result
     assert result.registration_num
     if result:
+        result.mark_update_json = True
         json_data = result.json
+        # print(json_data)
         assert json_data['type'] == 'SA'
         assert json_data['baseRegistrationNumber'] == 'TEST0001'
         assert json_data['registeringParty']
@@ -304,3 +245,23 @@ def test_financing_client_code_invalid(session):
     assert bad_request_err
     assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     print(bad_request_err.value.error)
+
+
+def test_current_json(session):
+    """Assert that financing statement JSON contains expected current view elements."""
+    result = FinancingStatement.find_by_id(200000000)
+    result.mark_update_json = True
+    result.current_view_json = True
+    json_data = result.json
+    assert len(json_data['debtors']) >= 2
+    assert len(json_data['securedParties']) >= 2
+    assert len(json_data['generalCollateral']) >= 2
+    assert len(json_data['vehicleCollateral']) >= 2
+    assert 'added' in json_data['debtors'][1]
+    assert 'added' in json_data['securedParties'][1]
+    assert 'added' in json_data['generalCollateral'][1]
+    assert 'added' in json_data['vehicleCollateral'][1]
+    assert json_data['debtors'][1]['added']
+    assert json_data['securedParties'][1]['added']
+    assert json_data['generalCollateral'][1]['added']
+    assert json_data['vehicleCollateral'][1]['added']

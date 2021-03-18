@@ -34,6 +34,12 @@ def get_account_id(req):
     return req.headers.get('Account-Id')
 
 
+def is_pdf(req):
+    """Check if request headers Accept is application/pdf."""
+    accept = req.headers.get('Accept')
+    return accept and accept.upper() == 'APPLICATION/PDF'
+
+
 def get_apikey(req):
     """Get gateway api key from request headers."""
     return req.headers.get('x-apikey')
