@@ -122,6 +122,7 @@ describe('Serial number search', () => {
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Serial numbers normally contain')
     await Vue.nextTick()
+    await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
@@ -169,6 +170,7 @@ describe('Business debtor search', () => {
       // ensure its the hint message not a validation message
       expect(messages.at(0).text()).toContain('Business names must contain')
     }
+    await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
@@ -248,6 +250,7 @@ describe('MHR search', () => {
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
     await Vue.nextTick()
+    await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
@@ -288,6 +291,7 @@ describe('Aircraft search', () => {
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Up to 25 letters')
     await Vue.nextTick()
+    await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
@@ -327,6 +331,7 @@ describe('Registration number search', () => {
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Registration numbers contain')
+    await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)

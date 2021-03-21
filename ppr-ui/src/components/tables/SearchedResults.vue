@@ -1,6 +1,6 @@
 <template>
   <v-container :class="[$style['main-results-div'], 'pa-0', 'white']">
-    <v-row v-if="searched && resultsType === 'searched'" no-gutters :class="[$style['result-info'], 'pl-5', 'pt-8']">
+    <v-row v-if="searched" no-gutters :class="[$style['result-info'], 'pl-5', 'pt-8']">
       <v-row v-if="totalResultsLength !== 0" no-gutters>
         <v-col>
           <v-row no-gutters>
@@ -19,21 +19,56 @@
     <v-row v-if="totalResultsLength !== 0" no-gutters class="pt-4">
       <v-col cols="12">
         <v-data-table v-if="results"
-                      id="results-table"
+                      id="search-results-table"
                       :class="$style['results-table']"
-                      height="20rem"
-                      hide-default-footer
                       fixed
                       fixed-header
                       :headers="headers"
+                      height="20rem"
+                      hide-default-footer
                       :items="results"
                       :item-class="getClass"
                       item-key="baseRegistrationNumber"
                       multi-sort
                       return-object
-                      :show-select="resultsType === 'searched'"
+                      show-select
+                      @toggle-select-all="selectAll"
                       v-model="selected">
-          <template v-if="resultsType === 'searched'" v-slot:[`item.makeModel`]="{ item }">
+          <template v-slot:[`item.data-table-select`]="{ item, isSelected, select }">
+            <td v-if="isSelected && item.matchType === 'EXACT'" :class="$style['checkbox-info']">
+              <v-row no-gutters>
+                <v-col cols="2">
+                  <v-simple-checkbox readonly :ripple="false" :value="isSelected"/>
+                </v-col>
+                <v-col cols="auto" class="pl-2 pt-1">
+                  exact match added
+                </v-col>
+              </v-row>
+            </td>
+            <td v-else :class="$style['checkbox-info']">
+              <v-row no-gutters>
+                <v-col cols="2">
+                  <v-simple-checkbox :ripple="false" :value="isSelected" @click="select(!isSelected)"/>
+                </v-col>
+                <v-col v-if="isSelected" cols="auto" class="pl-2 pt-1">
+                  added
+                </v-col>
+              </v-row>
+            </td>
+          </template>
+          <template v-slot:[`item.vehicleCollateral.type`]="{ item }">
+            <span v-if="item.vehicleCollateral.type === 'MV'">
+              Motor Vehicle
+            </span>
+            <span v-else-if="item.vehicleCollateral.type === 'MH'">
+              Manufactured Home
+            </span>
+            <span v-else-if="item.vehicleCollateral.type === 'AC'">
+              Aircraft
+            </span>
+            ({{ item.vehicleCollateral.type }})
+          </template>
+          <template v-slot:[`item.vehicleCollateral.make`]="{ item }">
             {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
           </template>
         </v-data-table>
@@ -58,7 +93,7 @@
 import { computed, defineComponent, reactive, toRefs, useCssModule, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
-import { tableHeaders } from '@/resources'
+import { searchTableHeaders } from '@/resources'
 import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MatchTypes } from '@/enums'
 
@@ -72,19 +107,16 @@ export default defineComponent({
     },
     defaultSelected: {
       type: Array as () => Array<SearchResultIF>
-    },
-    resultsType: {
-      type: String,
-      default: 'searched'
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const style = useCssModule()
-    const { getSearchResults, getSavedResults } = useGetters<any>(['getSearchResults', 'getSavedResults'])
+    const { getSearchResults } = useGetters<any>(['getSearchResults'])
     const localState = reactive({
       searched: false,
       searchValue: '',
       selected: props.defaultSelected,
+      selectedInitialized: false,
       headers: props.defaultHeaders,
       results: props.defaultResults,
       exactMatchesLength: 0,
@@ -92,15 +124,14 @@ export default defineComponent({
       selectedLength: computed((): number => {
         return localState.selected?.length | 0
       }),
-      resultResponse: computed((): SearchResponseIF => {
+      setTableData: computed((): SearchResponseIF => {
         let resp = null
-        if (props.resultsType === 'searched') resp = getSearchResults.value
-        else resp = getSavedResults.value
+        resp = getSearchResults.value
 
         if (resp) {
           localState.searchValue = resp.searchQuery.criteria.value
           localState.searched = true
-          localState.headers = tableHeaders[resp.searchQuery.type]
+          localState.headers = searchTableHeaders[resp.searchQuery.type]
           localState.results = resp.results
           localState.totalResultsLength = resp.totalResultsSize
           return resp
@@ -124,6 +155,18 @@ export default defineComponent({
       }
       return style['normal-match']
     }
+    const selectAll = (props: { items:Array<SearchResultIF>, value:boolean }):void => {
+      // ensures exact matches are never deselected
+      if (!props.value) {
+        const selected = []
+        props.items.forEach(item => {
+          if (item.matchType === MatchTypes.EXACT) {
+            selected.push(item)
+          }
+        })
+        localState.selected = selected
+      }
+    }
     watch(() => localState.results, (results) => {
       const selectedExactMatches = []
       let count = 0
@@ -137,10 +180,18 @@ export default defineComponent({
       localState.exactMatchesLength = count
       localState.selected = selectedExactMatches
     })
+    watch(() => localState.selected, (val) => {
+      if (!localState.selectedInitialized) {
+        localState.selectedInitialized = true
+        return
+      }
+      emit('selected-matches', val)
+    })
 
     return {
       ...toRefs(localState),
       getClass,
+      selectAll,
       style
     }
   }
@@ -156,12 +207,18 @@ th {
 td {
   font-size: 0.875rem !important;
   color: $gray7 !important;
+  min-width: 9rem;
+}
+.checkbox-info {
+  font-size: 0.725rem !important;
+  font-weight: bold;
+  text-align: center;
 }
 .divider {
   border-right:1px solid $gray3;
 }
 .exact-match td {
-  background-color: $BCgovBlue0;
+  background-color: $blueSelected;
   font-weight: bold;
   pointer-events: none;
 }

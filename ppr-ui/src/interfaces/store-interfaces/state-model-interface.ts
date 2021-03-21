@@ -4,7 +4,7 @@ import { AccountInformationIF, SearchResponseIF, TombStoneIF, SearchTypeIF } fro
 export interface StateModelIF {
   tombstone: TombStoneIF
   accountInformation: AccountInformationIF
-  savedResults: any
+  searchHistory: Array<SearchResponseIF>
   // results from current search
   searchResults: SearchResponseIF
   searchedType: SearchTypeIF

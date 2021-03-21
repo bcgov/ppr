@@ -20,11 +20,11 @@
       <v-col>
         <v-row no-gutters :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
           <v-col cols="auto">
-            <b>My Searches</b> (110)
+            <b>My Searches</b> ({{ searchHistoryLength }})
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <saved-result class="soft-corners-bottom"/>
+          <search-history class="soft-corners-bottom"/>
         </v-row>
       </v-col>
     </v-row>
@@ -35,25 +35,27 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
+import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local
-import { getFeatureFlag } from '@/utils'
-import { SavedResult } from '@/components/results'
+import { getFeatureFlag, searchHistory } from '@/utils'
+import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { ActionBindingIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { RouteNames } from '@/enums'
 
 @Component({
   components: {
-    SavedResult,
+    SearchHistory,
     SearchBar
   }
 })
 export default class Dashboard extends Vue {
-  @Getter getSavedResults: SearchResponseIF
+  @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchResults: SearchResponseIF
 
+  @Action setSearchHistory: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
@@ -79,12 +81,21 @@ export default class Dashboard extends Vue {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  private emitError (error) {
-    // temporary until we know what errors to define
-    if (error === 'payment') {
-      this.emitPaymentError(error)
+  private get searchHistoryLength (): number {
+    return this.getSearchHistory?.length || 0
+  }
+
+  private emitError (statusCode: number): void {
+    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
+    if (statusCode === StatusCodes.PAYMENT_REQUIRED) {
+      this.emitPaymentError()
+    } else if (saveErrorCodes.includes(statusCode)) {
+      this.emitSaveSearchError()
+    } else if (statusCode === StatusCodes.UNAUTHORIZED) {
+      this.emitAuthenticationError()
     } else {
-      this.emitSaveSearchError(error)
+      // temporary catch all (should be a more generic dialogue)
+      this.emitSaveSearchError()
     }
   }
 
@@ -106,14 +117,14 @@ export default class Dashboard extends Vue {
       return
     }
 
-    // try to fetch data TBD
-    try {
-      // tell App that we're finished loading
-      this.emitHaveData()
-    } catch (err) {
-      console.log(err) // eslint-disable-line no-console
-      this.emitFetchError(err)
+    // get/set search history
+    const resp = await searchHistory()
+    if (!resp || resp?.error) this.emitFetchError()
+    else {
+      this.setSearchHistory(resp?.searches)
     }
+    // tell App that we're finished loading
+    this.emitHaveData()
   }
 
   @Watch('getSearchResults')
@@ -126,7 +137,9 @@ export default class Dashboard extends Vue {
     }
   }
 
-  /** Emits Fetch Error event. */
+  @Emit('authenticationError')
+  private emitAuthenticationError (message: string = ''): void { }
+
   @Emit('fetchError')
   private emitFetchError (message: string = ''): void { }
 

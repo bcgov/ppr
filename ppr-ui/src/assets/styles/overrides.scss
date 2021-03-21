@@ -1,6 +1,23 @@
 // Vuetify Overrides
 @import "theme.scss";
 
+// tables
+table {
+  table-layout: fixed;
+}
+th {
+  color: $gray9 !important;
+  font-size: 0.875rem !important;
+}
+td {
+  color: $gray7 !important;
+  font-size: 0.875rem !important;
+  min-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // Buttons
 .v-btn {
   background-color: $primary-blue !important;

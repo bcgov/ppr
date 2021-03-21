@@ -67,6 +67,6 @@ export const getSearchedValue = (state: StateIF): string => {
   return state.stateModel.searchedValue
 }
 
-export const getSavedResults = (state: StateIF): SearchResponseIF => {
-  return state.stateModel.savedResults
+export const getSearchHistory = (state: StateIF): Array<SearchResponseIF> => {
+  return state.stateModel.searchHistory
 }

@@ -6,10 +6,10 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { SearchedResult } from '@/components/results'
+import { SearchedResult } from '@/components/tables'
 
 // Other
-import { tableHeaders } from '@/resources'
+import { searchTableHeaders } from '@/resources'
 import { SearchResponseIF } from '@/interfaces'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { mockedSearchResponse } from './test-data'
@@ -74,7 +74,7 @@ describe('Test result table with no results', () => {
     expect(datatable.length).toBe(0)
     const noResultsInfo = wrapper.findAll(noResultsDiv)
     expect(noResultsInfo.length).toBe(1)
-    expect(noResultsInfo.at(0).text()).toContain('No registrations were found for the Serial Number:')
+    expect(noResultsInfo.at(0).text()).toContain('Nil Result 0 registrations | 0 exact matches')
     expect(noResultsInfo.at(0).text()).toContain(noResults.searchQuery.criteria.value)
   })
 })
@@ -95,7 +95,7 @@ describe('Serial number results', () => {
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.SERIAL_NUMBER)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.SERIAL_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -137,7 +137,7 @@ describe('Business debtor results', () => {
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.BUSINESS_DEBTOR)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.BUSINESS_DEBTOR)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -175,7 +175,7 @@ describe('Manufactured home results', () => {
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.MHR_NUMBER)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.MHR_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -218,7 +218,7 @@ describe('Aircraft results', () => {
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.AIRCRAFT_DOT)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.AIRCRAFT_DOT)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -259,7 +259,7 @@ describe('Registration number results', () => {
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.REGISTRATION_NUMBER)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.REGISTRATION_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })

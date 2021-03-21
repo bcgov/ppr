@@ -7,7 +7,7 @@ import { AutoCompleteResponseIF } from '@/interfaces'
 
 const HttpStatus = require('http-status-codes')
 
-export function getAutoComplete (searchValue: string): Promise<any> {
+export async function getAutoComplete (searchValue: string): Promise<any> {
   if (!searchValue) return
   const url = sessionStorage.getItem('VON_API_URL')
   const config = { baseURL: url }

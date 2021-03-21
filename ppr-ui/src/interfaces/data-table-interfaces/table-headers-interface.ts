@@ -1,9 +1,11 @@
-import { APISearchTypes, UISearchTypes } from '@/enums'
+import { APISearchTypes } from '@/enums'
 
-interface BaseHeaderIF {
+export interface BaseHeaderIF {
     text: string
     value: string
     class?: string
+    sortable?: boolean
+    width?: string
 }
 export interface TableHeadersIF {
     [APISearchTypes.AIRCRAFT]?: Array<BaseHeaderIF>

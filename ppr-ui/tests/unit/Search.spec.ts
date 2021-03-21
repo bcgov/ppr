@@ -6,7 +6,7 @@ import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
-import { SearchedResult } from '@/components/results'
+import { SearchedResult } from '@/components/tables'
 import { Search } from '@/views'
 import { SearchBar } from '@/components/search'
 
@@ -61,6 +61,7 @@ describe('Search component', () => {
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await Vue.nextTick()
     expect(wrapper.vm.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    await Vue.nextTick()
     expect(wrapper.find(doneButton).exists()).toBe(true)
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
   })

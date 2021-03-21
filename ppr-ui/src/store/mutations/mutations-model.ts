@@ -16,6 +16,10 @@ export const mutateAccountInformation = (state: any, accountInformation: Account
   state.stateModel.accountInformation = accountInformation
 }
 
+export const mutateSearchHistory = (state: StateIF, searchHistory: Array<SearchResponseIF>) => {
+  state.stateModel.searchHistory = searchHistory
+}
+
 export const mutateSearchResults = (state: StateIF, searchResults: SearchResponseIF) => {
   state.stateModel.searchResults = searchResults
 }

@@ -72,11 +72,10 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 
-import { validateSearchAction, validateSearchRealTime, PPRApiHelper } from '@/utils'
+import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes } from '@/resources'
 import {
   SearchCriteriaIF, // eslint-disable-line no-unused-vars
-  SearchResponseIF, // eslint-disable-line no-unused-vars
   SearchTypeIF, // eslint-disable-line no-unused-vars
   SearchValidationIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
@@ -142,9 +141,8 @@ export default defineComponent({
         localState.autoCompleteIsActive = false
         return
       } else emit('search-data', null) // clear any current results
-      const apiHelper = new PPRApiHelper()
-      const resp: SearchResponseIF = await apiHelper.search(getSearchApiParams())
-      if (resp?.errors) emit('search-error', resp.errors)
+      const resp = await search(getSearchApiParams())
+      if (resp?.error) emit('search-error', resp.error.statusCode)
       else {
         emit('searched-type', localState.selectedSearchType)
         emit('searched-value', localState.searchValue)

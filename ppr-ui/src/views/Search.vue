@@ -43,11 +43,13 @@
               <v-col cols="8" :class="$style['search-info']">
                 <span v-if="totalResultsLength !== 0">
                   Select the registrations you want to include in a printable search report.
-                  This report will contain the full record of each selected registration and will be automatically saved to your PPR Dashboard.
+                  This report will contain the full record of each selected registration and will be
+                  automatically saved to your PPR Dashboard.
                   A general record of your search results will also be saved.
                 </span>
                 <span v-else>
-                  No Registrations were found. Your search results and a printable PDF have been automatically saved to My Searches on your PPR Dashboard.
+                  No Registrations were found. Your search results and a printable PDF have been automatically
+                  saved to My Searches on your PPR Dashboard.
                 </span>
               </v-col>
             </v-row>
@@ -78,13 +80,19 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
+import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local
-import { getFeatureFlag, convertDate } from '@/utils'
-import { SearchedResult } from '@/components/results'
+import { convertDate, getFeatureFlag, submitSelected, updateSelected } from '@/utils'
+import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
-import { ActionBindingIF, SearchResponseIF, SearchResultIF, SearchTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import {
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  SearchResponseIF, // eslint-disable-line no-unused-vars
+  SearchResultIF, // eslint-disable-line no-unused-vars
+  SearchTypeIF // eslint-disable-line no-unused-vars
+} from '@/interfaces'
 import { RouteNames } from '@/enums'
 
 @Component({
@@ -93,7 +101,7 @@ import { RouteNames } from '@/enums'
     SearchedResult
   }
 })
-export default class Dashboard extends Vue {
+export default class Search extends Vue {
   @Getter getSearchResults: SearchResponseIF
   @Getter getSearchedValue: string
   @Getter getSearchedType: SearchTypeIF
@@ -127,7 +135,7 @@ export default class Dashboard extends Vue {
     const searchResult = this.getSearchResults
     if (searchResult) {
       const searchDate = new Date(searchResult.searchDateTime)
-      return ` as of ${convertDate(searchDate)}`
+      return ` as of ${convertDate(searchDate, true)}`
     }
     return ''
   }
@@ -153,18 +161,17 @@ export default class Dashboard extends Vue {
     return 0
   }
 
-  private downloadReport (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private emitError (error) {
-    // temporary until we know what errors to define
-    if (error === 'payment') {
-      this.emitPaymentError(error)
+  private emitError (statusCode: number): void {
+    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
+    if (statusCode === StatusCodes.PAYMENT_REQUIRED) {
+      this.emitPaymentError()
+    } else if (saveErrorCodes.includes(statusCode)) {
+      this.emitSaveSearchError()
+    } else if (statusCode === StatusCodes.UNAUTHORIZED) {
+      this.emitAuthenticationError()
     } else {
-      this.emitSaveSearchError(error)
+      // temporary catch all (should be a more generic dialogue)
+      this.emitSaveSearchError()
     }
   }
 
@@ -173,15 +180,22 @@ export default class Dashboard extends Vue {
     window.location.assign(this.registryUrl)
   }
 
-  private submit (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
+  private async submit (): Promise<void> {
+    const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+    if (statusCode !== StatusCodes.CREATED) {
+      this.emitError(statusCode)
+    } else {
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
   }
 
   private async updateSelectedMatches (matches:Array<SearchResultIF>): Promise<void> {
     this.selectedMatches = matches
-    // await
+    const statusCode = await updateSelected(this.getSearchResults.searchId, matches)
+    if (statusCode !== StatusCodes.ACCEPTED) {
+      this.emitError(statusCode)
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
   }
 
   /** Called when App is ready and this component can load its data. */
@@ -196,18 +210,12 @@ export default class Dashboard extends Vue {
       this.redirectRegistryHome()
       return
     }
-
-    // try to fetch data TBD
-    try {
-      // tell App that we're finished loading
-      this.emitHaveData()
-    } catch (err) {
-      console.log(err) // eslint-disable-line no-console
-      this.emitFetchError(err)
-    }
+    this.emitHaveData()
   }
 
-  /** Emits Fetch Error event. */
+  @Emit('authenticationError')
+  private emitAuthenticationError (message: string = ''): void { }
+
   @Emit('fetchError')
   private emitFetchError (message: string = ''): void { }
 
