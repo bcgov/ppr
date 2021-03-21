@@ -1,2 +1,2 @@
-export { default as Search } from './Search.vue'
+export { default as SearchBar } from './SearchBar.vue'
 export { default as AutoComplete } from './AutoComplete.vue'

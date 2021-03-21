@@ -1,6 +1,6 @@
 <template>
-  <div class="main-results-div">
-    <v-row v-if="searched" no-gutters class="pa-3 result-info">
+  <div :class="$style['main-results-div']">
+    <v-row v-if="searched" no-gutters :class="['pa-3', $style['result-info']]">
       <v-col v-if="totalResultsLength !== 0">
         {{ totalResultsLength }} registrations found |
         <b>{{ exactMatchesLength }} exact matches</b> |
@@ -15,7 +15,8 @@
         <v-row no-gutters>
           <v-col cols="12">
             <v-data-table v-if="results"
-                          class="results-table"
+                          id="search-results-table"
+                          :class="$style['results-table']"
                           height="20rem"
                           hide-default-footer
                           fixed
@@ -37,7 +38,7 @@
       </v-container>
     </v-row>
     <v-row v-else no-gutters justify="center" class="pa-3">
-      <div class="no-results-info white">
+      <div id="search-no-results-info" :class="$style['no-results-info']">
         <v-row no-gutters justify="center" class="pt-10">
           No registrations were found for the Serial Number:
         </v-row>
@@ -50,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, useCssModule, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
 import { tableHeaders } from '@/resources'
@@ -74,6 +75,7 @@ export default defineComponent({
     }
   },
   setup (props) {
+    const style = useCssModule()
     const { getSearchResults } = useGetters<any>([props.resultsGetter])
     const localState = reactive({
       searched: false,
@@ -111,9 +113,9 @@ export default defineComponent({
     })
     const getClass = (item:SearchResultIF):string => {
       if (item.matchType === MatchTypes.EXACT) {
-        return 'exact-match'
+        return style['exact-match']
       }
-      return 'normal-match'
+      return style['normal-match']
     }
     watch(() => localState.results, (results) => {
       const selectedExactMatches = []
@@ -131,13 +133,14 @@ export default defineComponent({
 
     return {
       ...toRefs(localState),
-      getClass
+      getClass,
+      style
     }
   }
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .exact-match td {
   color: $gray9 !important;

@@ -1,4 +1,4 @@
-import { SearchResponseIF, StateModelIF } from '@/interfaces'
+import { StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   tombstone: {
@@ -12,6 +12,7 @@ export const stateModel: StateModelIF = {
     label: '',
     type: ''
   },
-  searching: false,
-  searchResults: null
+  searchResults: null,
+  searchedType: null,
+  searchedValue: ''
 }

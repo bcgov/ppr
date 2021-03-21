@@ -2,7 +2,8 @@
   <v-container fluid no-gutters>
     <v-row no-gutters>
       <v-col cols="3">
-        <v-select id="search-type-select"
+        <v-select :id="$style['search-type-select']"
+                  class="search-bar-type-select"
                   :error-messages="categoryMessage ? categoryMessage : ''"
                   filled
                   :items="searchTypes"
@@ -20,9 +21,10 @@
                    transition="fade-transition"
                    :value="showSearchPopUp && searchPopUp">
           <template v-slot:activator="scope" & v-on="scope.on">
-            <v-text-field :error-messages="searchMessage ? searchMessage : ''"
-                          autocomplete="off"
+            <v-text-field autocomplete="off"
+                          class="search-bar-text-field"
                           :disabled="!selectedSearchType"
+                          :error-messages="searchMessage ? searchMessage : ''"
                           filled
                           :hint="searchHint"
                           :hide-details="hideDetails"
@@ -43,13 +45,13 @@
       </v-col>
       <v-col cols="2" class="pl-3 pt-3">
         <v-row no-gutters>
-          <v-btn id="search-btn" @click="searchAction">
+          <v-btn :id="$style['search-btn']" class="search-bar-btn" @click="searchAction">
             Search
             <v-icon right>mdi-magnify</v-icon>
           </v-btn>
         </v-row>
         <v-row no-gutters class="pl-1">
-          <span id="search-btn-info">
+          <span :id="$style['search-btn-info']">
             Each search incurs a fee
           </span>
         </v-row>
@@ -126,12 +128,18 @@ export default defineComponent({
     }
     const searchAction = async () => {
       localState.validations = validateSearchAction(localState)
-      if (localState.validations) return
-      else emit('search-data', null) // clear any current results
+      if (localState.validations) {
+        localState.autoCompleteIsActive = false
+        return
+      } else emit('search-data', null) // clear any current results
       const apiHelper = new PPRApiHelper()
       const resp: SearchResponseIF = await apiHelper.search(getSearchApiParams())
       if (resp?.errors) emit('search-error', resp.errors)
-      else emit('search-data', resp)
+      else {
+        emit('searched-type', localState.selectedSearchType)
+        emit('searched-value', localState.searchValue)
+        emit('search-data', resp)
+      }
     }
     const setHideDetails = (hideDetails: boolean) => {
       localState.hideDetails = hideDetails
@@ -147,7 +155,7 @@ export default defineComponent({
           localState.autoCompleteIsActive) {
         localState.autoCompleteSearchValue = val
       }
-      // show autocomplete results there is a searchValue and if no error messages
+      // show autocomplete results when there is a searchValue and if no error messages
       localState.autoCompleteIsActive = !localState.validations && val !== ''
     })
     watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
@@ -168,22 +176,15 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 #search-btn {
+  color: white;
+  background-color: $primary-blue;
   width: 9rem;
 }
 #search-btn-info {
   color: $gray8;
   font-size: 0.725rem;
-}
-::v-deep {
-  .v-select-list {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .v-select__selections {
-    line-height: 1.5rem !important;
-  }
 }
 </style>

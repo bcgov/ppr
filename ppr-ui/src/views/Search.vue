@@ -17,10 +17,48 @@
           </v-col>
         </v-row>
         <v-row>
-          <search-bar @searched-type="setSearchedType"
-                      @searched-value="setSearchedValue"
-                      @search-data="setSearchResults"
-                      @search-error="emitError"/>
+          <!-- v-if reason: setting the props to null will cause the select to display 'null' -->
+          <search-bar v-if="getSearchedType"
+                      :defaultSearchValue="getSearchedValue"
+                      :defaultSelectedSearchType="getSearchedType"
+                      @search-error="emitError"
+                      @search-data="setSearchResults"/>
+          <search-bar v-else
+                      @search-error="emitError"
+                      @search-data="setSearchResults"/>
+        </v-row>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-row no-gutters>
+          <v-col cols="12" :class="$style['search-title']">
+            <b>Search Results</b> <span :id="$style['search-time']"> {{ searchTime }}</span>
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col cols="12" :class="[$style['search-info'], 'pt-4']">
+            <span v-if="!getSearchResults">
+              Your search results will display below.
+            </span>
+            <span v-else-if="totalResultsLength !== 0">
+              Select the registrations you want to download in a printable PDF.
+              Your search results, selected registrations, and PDF are automatically saved to My Searches.
+            </span>
+            <span v-else>
+              Your search results and PDF are automatically saved to My Searches.
+            </span>
+          </v-col>
+        </v-row>
+        <v-row v-if="getSearchResults" no-gutters justify="end" class="pt-5">
+          <v-col cols="auto" class="pl-3">
+            <v-btn :id="$style['done-btn']" color="outlined" class="search-done-btn" @click="submit">
+              Done
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row v-if="getSearchResults">
+          <result :data="getSearchResults"/>
         </v-row>
       </v-col>
     </v-row>
@@ -34,21 +72,23 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, convertDate } from '@/utils'
+import { Result } from '@/components/results'
 import { SearchBar } from '@/components/search'
-import { ActionBindingIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ActionBindingIF, SearchResponseIF, SearchTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { RouteNames } from '@/enums'
 
 @Component({
   components: {
-    SearchBar
+    SearchBar,
+    Result
   }
 })
 export default class Dashboard extends Vue {
   @Getter getSearchResults: SearchResponseIF
+  @Getter getSearchedValue: string
+  @Getter getSearchedType: SearchTypeIF
 
-  @Action setSearchedType: ActionBindingIF
-  @Action setSearchedValue: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
 
   /** Whether App is ready. */
@@ -61,15 +101,32 @@ export default class Dashboard extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  mounted () {
-    // clear search data in the store
-    this.setSearchedType(null)
-    this.setSearchedValue('')
-    this.setSearchResults(null)
-  }
-
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get searchTime (): string {
+    // return formatted date
+    const searchResult = this.getSearchResults
+    if (searchResult) {
+      const searchDate = new Date(searchResult.searchDateTime)
+      return convertDate(searchDate)
+    }
+    return ''
+  }
+
+  private get totalResultsLength (): number {
+    const searchResult = this.getSearchResults
+    if (searchResult) {
+      return searchResult.totalResultsSize
+    }
+    return 0
+  }
+
+  private downloadReport (): void {
+    this.$router.push({
+      name: RouteNames.DASHBOARD
+    })
   }
 
   private emitError (error) {
@@ -84,6 +141,12 @@ export default class Dashboard extends Vue {
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
+  }
+
+  private submit (): void {
+    this.$router.push({
+      name: RouteNames.DASHBOARD
+    })
   }
 
   /** Called when App is ready and this component can load its data. */
@@ -109,16 +172,6 @@ export default class Dashboard extends Vue {
     }
   }
 
-  @Watch('getSearchResults')
-  private onSearch (val: SearchResponseIF): void {
-    // navigate to search page if not null/reset
-    if (val) {
-      this.$router.push({
-        name: RouteNames.SEARCH
-      })
-    }
-  }
-
   /** Emits Fetch Error event. */
   @Emit('fetchError')
   private emitFetchError (message: string = ''): void { }
@@ -137,6 +190,12 @@ export default class Dashboard extends Vue {
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+#done-btn {
+  font-size: 0.825rem !important;
+}
+#download-report-btn {
+  font-size: 0.825rem !important;
+}
 #search-time {
   font-size: 0.825rem;
   color: $gray8;

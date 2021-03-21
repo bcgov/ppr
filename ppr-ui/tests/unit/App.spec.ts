@@ -15,6 +15,7 @@ import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 
 // Other
 import mockRouter from './MockRouter'
+import { Dashboard } from '@/views'
 
 Vue.use(Vuetify)
 

@@ -35,6 +35,7 @@
 .v-btn.outlined {
   color: $primary-blue !important;
   background-color: white !important;
+  border: 1px solid $primary-blue !important;
 }
 
 // Text Inputs
@@ -142,4 +143,16 @@
   border-left: 10px solid transparent !important;
   border-right: 10px solid transparent !important;
   border-bottom: 8px solid RGBA(73,80,87,0.95) !important;
+}
+
+.v-select-list {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.v-select__selections {
+  line-height: 1.5rem !important;
+}
+
+.v-simple-checkbox .theme--light.v-icon{
+  color: $primary-blue;
 }

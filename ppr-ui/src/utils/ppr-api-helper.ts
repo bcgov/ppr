@@ -4,6 +4,7 @@ import { axios } from '@/utils/axios-ppr'
 
 // Interfaces
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
+import { mockedSearchResponse } from '../../tests/unit/test-data'
 
 const HttpStatus = require('http-status-codes')
 

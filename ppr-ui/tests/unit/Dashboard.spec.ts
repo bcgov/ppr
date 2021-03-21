@@ -10,7 +10,9 @@ import { Dashboard } from '@/views'
 
 // Other
 import mockRouter from './MockRouter'
-import { Search } from '@/components/search'
+import { SearchBar } from '@/components/search'
+import { mockedSearchResponse } from './test-data'
+import { UISearchTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -20,7 +22,7 @@ const store = getVuexStore()
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 
-describe('App component', () => {
+describe('Dashboard component', () => {
   let wrapper: any
   const { assign } = window.location
 
@@ -44,6 +46,11 @@ describe('App component', () => {
 
   it('renders Dashboard View', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
-    expect(wrapper.findComponent(Search).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
+  })
+  it('routes to search after getting a search response', async () => {
+    wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    await Vue.nextTick()
+    expect(wrapper.vm.$route.name).toBe('search')
   })
 })

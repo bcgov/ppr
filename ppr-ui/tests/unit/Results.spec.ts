@@ -9,8 +9,8 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { Result } from '@/components/results'
 
 // Other
-import { SearchTypes, tableHeaders } from '@/resources'
-import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import { tableHeaders } from '@/resources'
+import { SearchResponseIF } from '@/interfaces'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { mockedSearchResponse } from './test-data'
 
@@ -35,13 +35,13 @@ const noResults: SearchResponseIF = {
 }
 
 // Input field selectors / buttons
-const resultsTable: string = '.results-table'
-const noResultsDiv: string = '.no-results-info'
+const resultsTable: string = '#search-results-table'
+const noResultsDiv: string = '#search-no-results-info'
 
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<Search> object with the given parameters.
+ * @returns a Wrapper<Result> object with the given parameters.
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()

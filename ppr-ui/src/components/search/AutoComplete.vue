@@ -1,21 +1,31 @@
 <template>
-  <v-card v-if="showAutoComplete" class="mt-1 auto-complete-card" elevation="5">
-    <v-row no-gutters justify="center">
-      <v-col no-gutters cols="11">
-        <v-list class="pl-3 pt-3">
+  <v-card v-if="showAutoComplete" :class="['mt-1', $style['auto-complete-card']]" elevation="5">
+    <v-row no-gutters justify="end" :class="$style['close-btn-row']">
+      <v-col cols="auto" justify="end" class="pt-0">
+        <v-btn append
+               icon
+               x-small
+               right
+               :id="$style['auto-complete-close-btn']"
+               class="auto-complete-close-btn"
+               @click="autoCompleteIsActive=false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row no-gutters justify="center" class="pl-2 pr-5">
+      <v-col no-gutters cols="auto">
+        <v-list class="pt-0">
           <v-list-item-group v-model="autoCompleteSelected">
-            <v-list-item v-for="(result, i) in autoCompleteResults" :key="i" class="pt-0 pb-0 pl-1 auto-complete-item">
+            <v-list-item v-for="(result, i) in autoCompleteResults"
+                         :key="i"
+                         :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]">
               <v-list-item-content class="pt-2 pb-2">
                 <v-list-item-title v-text="result.value"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
         </v-list>
-      </v-col>
-      <v-col cols="1">
-        <v-btn append icon x-small class="auto-complete-close-btn" @click="autoCompleteIsActive=false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
       </v-col>
     </v-row>
   </v-card>
@@ -82,9 +92,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.auto-complete-close-btn {
+#auto-complete-close-btn {
   color: $gray5 !important;
   background-color: transparent !important;
 }
@@ -93,8 +103,10 @@ export default defineComponent({
 }
 .auto-complete-card {
   max-width: 30rem;
-  min-width: 225px;
   position: absolute;
   z-index: 3;
+}
+.close-btn-row {
+  height: 1rem;
 }
 </style>
