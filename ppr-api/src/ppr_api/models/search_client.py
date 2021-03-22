@@ -21,103 +21,14 @@ from __future__ import annotations
 from enum import Enum
 from http import HTTPStatus
 import json
-import copy
 
 from flask import current_app
-from registry_schemas.example_data.ppr import SEARCH_QUERY_RESULT
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
+from ppr_api.models import search_utils
 
 from .db import db
-
-
-# Serial number search base where clause
-SERIAL_SEARCH_BASE = \
-    "SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts," + \
-            "sc.serial_type_cd,sc.serial_number,sc.year,sc.make,sc.model," + \
-            "r.registration_number AS base_registration_num," + \
-            "DECODE(serial_number, '?', 'EXACT', 'SIMILAR') AS match_type," + \
-            "fs.expire_date,fs.state_type_cd,sc.serial_id AS vehicle_id  " + \
-      "FROM registration r, financing_statement fs, serial_collateral sc " + \
-     "WHERE r.financing_id = fs.financing_id " + \
-       "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
-       "AND r.base_reg_number IS NULL " + \
-       "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
-       "AND NOT EXISTS (SELECT r3.registration_id " + \
-                         "FROM registration r3 " + \
-                        "WHERE r3.financing_id = fs.financing_id " + \
-                          "AND r3.registration_type_cl = 'DISCHARGE' " + \
-                          "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
-      "AND sc.financing_id = fs.financing_id " + \
-      "AND sc.registration_id_end IS NULL "
-
-# Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
-REG_NUM_QUERY = \
-    "SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts," + \
-            "r.registration_number AS base_registration_num," + \
-            "'EXACT' AS match_type,fs.state_type_cd, fs.expire_date " + \
-      "FROM registration r, financing_statement fs, registration r2 " + \
-     "WHERE r2.financing_id = r.financing_id " + \
-       "AND r.financing_id = fs.financing_id " + \
-       "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
-       "AND r.base_reg_number IS NULL " + \
-       "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
-       "AND NOT EXISTS (SELECT r3.registration_id " + \
-                         "FROM registration r3 " + \
-                        "WHERE r3.financing_id = fs.financing_id " + \
-                          "AND r3.registration_type_cl = 'DISCHARGE' " + \
-                          "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
-      "AND r2.registration_number = '?'"
-
-# Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
-MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
-                 "AND sc.serial_type_cd = 'MH' " + \
-                 "AND sc.srch_vin = search_key_pkg.mhr('?') " + \
-            "ORDER BY r.registration_ts ASC " + \
-         "FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
-# Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
-SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
-                     "AND sc.serial_type_cd NOT IN ('AC', 'AF') " + \
-                     "AND sc.srch_vin = search_key_pkg.vehicle('?') " + \
-                "ORDER BY match_type, sc.serial_number " + \
-             "FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
-
-# Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
-#                    "AND UPPER(REGEXP_REPLACE(sc.serial_number,'\s|-','')) = UPPER(REGEXP_REPLACE('?','\s|-','')) " + \
-# pylint: disable=anomalous-backslash-in-string
-AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
-                    "AND sc.serial_type_cd IN ('AC', 'AF') " + \
-                    "AND sc.srch_vin = search_key_pkg.aircraft('?') " + \
-               "ORDER BY match_type, sc.serial_number " + \
-            "FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
-
-BUSINESS_NAME_QUERY = \
-"SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts, " + \
-       "p.business_name, " + \
-       "r.registration_number AS base_registration_num, " + \
-       "DECODE(p.business_name, '?', 'EXACT', 'SIMILAR') AS match_type, " + \
-       "fs.expire_date,fs.state_type_cd, p.party_id " + \
-  "FROM registration r, financing_statement fs, party p " + \
- "WHERE r.financing_id = fs.financing_id " + \
-   "AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN') " + \
-   "AND r.base_reg_number IS NULL " + \
-   "AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
-   "AND NOT EXISTS (SELECT r3.registration_id " + \
-                     "FROM registration r3 " + \
-                    "WHERE r3.financing_id = fs.financing_id " + \
-                      "AND r3.registration_type_cl = 'DISCHARGE' " + \
-                      "AND r3.registration_ts < ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30)) " + \
-  "AND p.financing_id = fs.financing_id " + \
-  "AND p.registration_id_end IS NULL " + \
-  "AND p.party_type_cd = 'DB' " + \
-  "AND UTL_MATCH.JARO_WINKLER_SIMILARITY(p.business_srch_key, SEARCH_KEY_PKG.businame('?')) >= " + \
-      "NVL((SELECT MAX(JARO_VALUE) " + \
-             "FROM THESAURUS A, JARO  B " + \
-            "WHERE REGEXP_LIKE(SEARCH_KEY_PKG.businame('?'),WORD,'i') " + \
-              "AND A.WORD_ID = B.WORD_ID), 85) " + \
-"ORDER BY match_type, p.business_name " + \
-"FETCH FIRST " + str(model_utils.SEARCH_RESULTS_MAX_SIZE) + " ROWS ONLY"
 
 
 class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -128,7 +39,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Render an Enum of the search types."""
         AIRCRAFT_AIRFRAME_DOT = 'AC'
         BUSINESS_DEBTOR = 'BS'
-        INDIVISUAL_DEBTOR = 'IS'
+        INDIVIDUAL_DEBTOR = 'IS'
         REGISTRATION_NUM = 'RG'
         SERIAL_NUM = 'SS'
         MANUFACTURED_HOME_NUM = 'MH'
@@ -166,7 +77,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             'searchDateTime': model_utils.format_ts(self.search_ts),
             'totalResultsSize': self.total_results_size,
             'returnedResultsSize': self.returned_results_size,
-            'maxResultsSize': model_utils.SEARCH_RESULTS_MAX_SIZE,
+            'maxResultsSize': search_utils.SEARCH_RESULTS_MAX_SIZE,
             'searchQuery': json.loads(self.search_criteria)
         }
         if self.search_response:
@@ -193,10 +104,15 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
+    def update_search_selection(self, search_json):
+        """Support UI search selection autosave: replace search response."""
+        self.search_response = json.dumps(search_json)
+        self.save()
+
     def search_by_registration_number(self):
         """Execute a search by registration number query."""
         reg_num = self.request_json['criteria']['value']
-        query = REG_NUM_QUERY.replace('?', reg_num)
+        query = search_utils.REG_NUM_QUERY.replace('?', reg_num)
         result = db.session.execute(query)
         row = result.first()
         if row is not None:
@@ -223,11 +139,12 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_serial_type(self):
         """Execute a search query for either an aircraft DOT, MHR number, or serial number search type."""
         search_value = self.request_json['criteria']['value']
-        query = SERIAL_NUM_QUERY
+        query = search_utils.SERIAL_NUM_QUERY
         if self.search_type_cd == 'MH':
-            query = MHR_NUM_QUERY
+            query = search_utils.MHR_NUM_QUERY
+            query = query.replace('DECODE(serial_number', 'DECODE(mhr_number')
         elif self.search_type_cd == 'AC':
-            query = AIRCRAFT_DOT_QUERY
+            query = search_utils.AIRCRAFT_DOT_QUERY
 
         query = query.replace('?', search_value)
         result = db.session.execute(query)
@@ -253,8 +170,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                     collateral['model'] = str(value)
                 match_type = str(values[8])
                 if self.search_type_cd == 'MH':
-                    collateral['manufacturedHomeRegistrationNumber'] = search_value
-                    match_type = 'EXACT'
+                    collateral['manufacturedHomeRegistrationNumber'] = str(values[12])
                 result_json = {
                     'baseRegistrationNumber': str(values[7]),
                     'matchType': match_type,
@@ -262,7 +178,6 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                     'registrationType': registration_type,
                     'vehicleCollateral': collateral
                 }
-
                 results_json.append(result_json)
 
             self.returned_results_size = len(results_json)
@@ -276,7 +191,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_business_name(self):
         """Execute a search query debtor business_name search type."""
         search_value = self.request_json['criteria']['debtorName']['business']
-        query = BUSINESS_NAME_QUERY.replace('?', search_value.strip().upper())
+        query = search_utils.BUSINESS_NAME_QUERY.replace('?', search_value.strip().upper())
         result = db.session.execute(query)
         rows = result.fetchall()
         if rows is not None:
@@ -306,8 +221,70 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = 0
             self.total_results_size = 0
 
+    def search_by_individual_name(self):
+        """Execute a search query debtor individual name search type."""
+        last_name = self.request_json['criteria']['debtorName']['last']
+        first_name = self.request_json['criteria']['debtorName']['first']
+        query = search_utils.INDIVIDUAL_NAME_QUERY.replace('LNAME?', last_name.strip().upper())
+        query = query.replace('FNAME?', first_name.strip().upper())
+        result = db.session.execute(query)
+        rows = result.fetchall()
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                values = row.values()
+                registration_type = str(values[0])
+                timestamp = values[1]
+                person = {
+                    'last': str(values[2]),
+                    'first': str(values[3])
+                }
+                middle = str(values[4])
+                if middle:
+                    person['middle'] = middle
+                debtor = {
+                    'personName': person,
+                    'partyId': int(values[5])
+                }
+                result_json = {
+                    'baseRegistrationNumber': str(values[6]),
+                    'matchType': str(values[7]),
+                    'createDateTime': model_utils.format_ts(timestamp),
+                    'registrationType': registration_type,
+                    'debtor': debtor
+                }
+                results_json.append(result_json)
+
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            if self.returned_results_size > 0:
+                self.search_response = json.dumps(results_json)
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
+    def get_total_count(self):
+        """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
+        count_query = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type_cd]
+        if count_query:
+            if self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
+                search_value = self.request_json['criteria']['debtorName']['business']
+                count_query = count_query.replace('?', search_value.strip().upper())
+            elif self.search_type_cd == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
+                last_name = self.request_json['criteria']['debtorName']['last']
+                first_name = self.request_json['criteria']['debtorName']['first']
+                count_query = count_query.replace('LNAME?', last_name.strip().upper())
+                count_query = count_query.replace('FNAME?', first_name.strip().upper())
+            else:
+                count_query = count_query.replace('?', self.request_json['criteria']['value'])
+
+            result = db.session.execute(count_query)
+            row = result.first()
+            values = row.values()
+            self.total_results_size = int(values[0])
+
     def search(self):
-        """Execute a search by the previously set search type and criteria."""
+        """Execute a search with the previously set search type and criteria."""
         if self.search_type_cd == self.SearchTypes.REGISTRATION_NUM.value:
             self.search_by_registration_number()
         elif self.search_type_cd in (self.SearchTypes.SERIAL_NUM.value,
@@ -316,11 +293,12 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.search_by_serial_type()
         elif self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
             self.search_by_business_name()
-        # temporary until individual debtor search implemented
         else:
-            self.search_response = json.dumps(copy.deepcopy(SEARCH_QUERY_RESULT))
-            self.returned_results_size = 1
-            self.total_results_size = 1
+            self.search_by_individual_name()
+
+        if self.returned_results_size == search_utils.SEARCH_RESULTS_MAX_SIZE:
+            # Actual result size exceeds limit: need to get total match count
+            self.get_total_count()
 
         self.save()
 
@@ -334,13 +312,35 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def find_all_by_account_id(cls, account_id: str = None):
-        """Return a search history summary list belonging to an account."""
+        """Return a search history summary list of searches executed by an account."""
         history_list = None
         if account_id:
-            history_list = db.session.query(SearchClient). \
-                            filter(SearchClient.account_id == account_id).\
-                            order_by(SearchClient.search_ts.desc()).\
-                            limit(model_utils.ACCOUNT_SEARCH_HISTORY_MAX_SIZE).all()
+            query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace('?', account_id)
+            if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
+                query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY.replace('?', account_id)
+
+            result = db.session.execute(query)
+            rows = result.fetchall()
+            if rows is not None:
+                history_list = []
+                for row in rows:
+                    values = row.values()
+                    search = {
+                        'searchId': str(values[0]),
+                        'searchDateTime': model_utils.format_ts(values[1]),
+                        'searchQuery': json.loads(values[2]),
+                        'totalResultsSize': int(values[3]),
+                        'returnedResultsSize': int(values[4])
+                    }
+                    exact_value = values[5]
+                    if exact_value is not None:
+                        search['exactResultsSize'] = int(exact_value)
+                    similar_value = values[6]
+                    if similar_value is not None:
+                        search['selectedResultsSize'] = (int(similar_value) + int(exact_value))
+                    else:
+                        search['selectedResultsSize'] = int(exact_value)
+                    history_list.append(search)
 
         if not history_list:
             raise BusinessException(
@@ -348,11 +348,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        results_json = []
-        for result in history_list:
-            results_json.append(result.json)
-
-        return results_json
+        return history_list
 
     @staticmethod
     def create_from_json(search_json,
@@ -366,7 +362,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         new_search.search_ts = model_utils.now_ts()
         if account_id:
             new_search.account_id = account_id
-        if 'clientReferenceId' in search_json:
+        if 'clientReferenceId' in search_json and search_json['clientReferenceId'].strip() != '':
             new_search.client_reference_id = search_json['clientReferenceId']
 
         return new_search

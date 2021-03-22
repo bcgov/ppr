@@ -25,10 +25,11 @@ from .registration import Registration
 from .search_client import SearchClient
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
+from .type_tables import RegistrationType
 from .vehicle_collateral import VehicleCollateral
 
 
 __all__ = ('db',
            'Address', 'ClientParty', 'CourtOrder', 'Draft', 'FinancingStatement',
-           'GeneralCollateral', 'Party', 'Registration', 'SearchClient',
+           'GeneralCollateral', 'Party', 'Registration', 'RegistrationType', 'SearchClient',
            'SearchResult', 'TrustIndenture', 'VehicleCollateral')

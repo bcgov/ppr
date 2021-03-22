@@ -64,7 +64,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     type_claim = db.Column('type_claim', db.String(2), nullable=True)
     crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
     crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
-    prev_reg_type = db.Column('prev_reg_type', db.Integer, nullable=True)
+    prev_reg_type = db.Column('prev_reg_type', db.String(30), nullable=True)
     prev_reg_cr_nbr = db.Column('prev_reg_cr_nbr', db.String(7), nullable=True)
     prev_reg_cr_date = db.Column('prev_reg_cr_date', db.String(7), nullable=True)
     prev_reg_cb_nbr = db.Column('prev_reg_cb_nbr', db.String(10), nullable=True)
@@ -77,10 +77,19 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     # Relationships
     registration = db.relationship('Registration', order_by='asc(Registration.registration_ts)',
                                    back_populates='financing_statement')
-    parties = db.relationship('Party', back_populates='financing_statement')
-    vehicle_collateral = db.relationship('VehicleCollateral', back_populates='financing_statement')
-    general_collateral = db.relationship('GeneralCollateral', back_populates='financing_statement')
+    parties = db.relationship('Party', order_by='asc(Party.party_id)', back_populates='financing_statement')
+    vehicle_collateral = db.relationship('VehicleCollateral',
+                                         order_by='asc(VehicleCollateral.vehicle_id)',
+                                         back_populates='financing_statement')
+    general_collateral = db.relationship('GeneralCollateral',
+                                         order_by='asc(GeneralCollateral.collateral_id)',
+                                         back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
+
+    # Use to indicate if a party or collateral is not in the original financing statement
+    mark_update_json = False
+    # Use to specify if generated json content is current state or original financing statement. 
+    current_view_json = True
 
     @property
     def json(self) -> dict:
@@ -93,6 +102,10 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             registration_id = reg.registration_id
             statement['type'] = reg.registration_type_cd
             statement['baseRegistrationNumber'] = reg.registration_num
+            if reg.registration_type:
+                statement['registrationDescription'] = reg.registration_type.registration_desc
+                statement['registrationAct'] = reg.registration_type.registration_act
+
             statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
 
             if reg.client_reference_id:
@@ -101,38 +114,17 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 #            if reg.document_number:
 #                statement['documentId'] = reg.document_number
 
-            if self.parties:
-                debtors = []
-                secured = []
-                for party in self.parties:
-                    if party.party_type_cd == 'RG' and party.registration_id == registration_id:
-                        statement['registeringParty'] = party.json
-                    elif party.party_type_cd == 'SP' and not party.registration_id_end:
-                        secured.append(party.json)
-                    elif (party.party_type_cd == 'DB' or party.party_type_cd == 'DI') and \
-                            not party.registration_id_end:
-                        debtors.append(party.json)
+            statement['registeringParty'] = self.party_json(Party.PartyTypes.REGISTERING_PARTY.value, registration_id)
+            statement['securedParties'] = self.party_json(Party.PartyTypes.SECURED_PARTY.value, registration_id)
+            statement['debtors'] = self.party_json(Party.PartyTypes.DEBTOR_COMPANY.value, registration_id)
 
-                statement['securedParties'] = secured
-                statement['debtors'] = debtors
+            general_collateral = self.general_collateral_json(registration_id)
+            if general_collateral:
+                statement['generalCollateral'] = general_collateral
 
-            if self.general_collateral:
-                gen_collateral = []
-                for collateral in self.general_collateral:
-                    if not collateral.registration_id_end:
-                        gen_collateral.append(collateral.json)
-
-                if gen_collateral:
-                    statement['generalCollateral'] = gen_collateral
-
-            if self.vehicle_collateral:
-                v_collateral = []
-                for collateral in self.vehicle_collateral:
-                    if not collateral.registration_id_end:
-                        v_collateral.append(collateral.json)
-
-                if v_collateral:
-                    statement['vehicleCollateral'] = v_collateral
+            vehicle_collateral = self.vehicle_collateral_json(registration_id)
+            if vehicle_collateral:
+                statement['vehicleCollateral'] = vehicle_collateral
 
             if reg.registration_type_cd == model_utils.REG_TYPE_REPAIRER_LIEN:
                 if reg.lien_value:
@@ -159,6 +151,71 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             statement['expiryDate'] = model_utils.format_ts(self.expire_date)
 
         return statement
+
+    def party_json(self, party_type, registration_id):
+        """Build party JSON: current_view_json determines if current or original data is included."""
+        if party_type == Party.PartyTypes.REGISTERING_PARTY.value:
+            for party in self.parties:
+                if party.party_type_cd == party_type and registration_id == party.registration_id:
+                    return party.json
+
+        parties = []
+        for party in self.parties:
+            party_json = None
+            if party.party_type_cd == party_type or \
+               (party_type == Party.PartyTypes.DEBTOR_COMPANY.value and
+                party.party_type_cd == Party.PartyTypes.DEBTOR_INDIVIDUAL.value):
+                if not self.current_view_json and party.registration_id == registration_id:
+                    party_json = party.json
+                elif self.current_view_json and not party.registration_id_end:
+                    party_json = party.json
+                    if self.mark_update_json and party.registration_id != registration_id:
+                        party_json['added'] = True
+
+            if party_json:
+                parties.append(party_json)
+        
+        return parties
+
+    def general_collateral_json(self, registration_id):
+        """Build general collateral JSON: current_view_json determines if current or original data is included."""
+        if not self.general_collateral:
+            return None
+
+        collateral_list = []
+        for collateral in self.general_collateral:
+            collateral_json = None
+            if not self.current_view_json and collateral.registration_id == registration_id:
+                collateral_json = collateral.json
+            elif self.current_view_json and not collateral.registration_id_end:
+                collateral_json = collateral.json
+                if self.mark_update_json and collateral.registration_id != registration_id:
+                    collateral_json['added'] = True
+
+            if collateral_json:
+                collateral_list.append(collateral_json)
+        
+        return collateral_list
+
+    def vehicle_collateral_json(self, registration_id):
+        """Build vehicle collateral JSON: current_view_json determines if current or original data is included."""
+        if not self.vehicle_collateral:
+            return None
+
+        collateral_list = []
+        for collateral in self.vehicle_collateral:
+            collateral_json = None
+            if not self.current_view_json and collateral.registration_id == registration_id:
+                collateral_json = collateral.json
+            elif self.current_view_json and not collateral.registration_id_end:
+                collateral_json = collateral.json
+                if self.mark_update_json and collateral.registration_id != registration_id:
+                    collateral_json['added'] = True
+
+            if collateral_json:
+                collateral_list.append(collateral_json)
+        
+        return collateral_list
 
     def validate_base_debtor(self, base_debtor_json, staff: bool = False):
         """Verify supplied base debtor when registering non-financing statements. Bypass the check for staff."""

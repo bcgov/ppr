@@ -1620,6 +1620,52 @@
 					"response": []
 				},
 				{
+					"name": "Update Search Selection",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"baseRegistrationNumber\": \"TEST0002\",\n        \"createDateTime\": \"2021-03-12T01:48:53+00:00\",\n        \"matchType\": \"EXACT\",\n        \"registrationType\": \"RL\",\n        \"vehicleCollateral\": {\n            \"make\": \"HYUNDAI\",\n            \"model\": \"TUSCON\",\n            \"serialNumber\": \"KX8J3CA46JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2014\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"TEST0003\",\n        \"createDateTime\": \"2021-03-12T01:48:53+00:00\",\n        \"matchType\": \"EXACT\",\n        \"registrationType\": \"RL\",\n        \"vehicleCollateral\": {\n            \"make\": \"HYUNDAI\",\n            \"model\": \"TUSCON\",\n            \"serialNumber\": \"KX8J3CA46JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2014\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"TEST0004\",\n        \"createDateTime\": \"2021-03-12T01:48:53+00:00\",\n        \"matchType\": \"SIMILAR\",\n        \"registrationType\": \"SA\",\n        \"vehicleCollateral\": {\n            \"make\": \"HONDA\",\n            \"model\": \"CIVIC\",\n            \"serialNumber\": \"JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2018\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"TEST0001\",\n        \"createDateTime\": \"2021-03-12T01:48:53+00:00\",\n        \"matchType\": \"SIMILAR\",\n        \"registrationType\": \"SA\",\n        \"vehicleCollateral\": {\n            \"make\": \"BMW\",\n            \"model\": \"Z4\",\n            \"serialNumber\": \"JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2014\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"200519B\",\n        \"createDateTime\": \"2021-03-09T22:45:22+00:00\",\n        \"matchType\": \"SIMILAR\",\n        \"registrationType\": \"SA\",\n        \"selected\": false,\n        \"vehicleCollateral\": {\n            \"make\": \"HYUNDAI\",\n            \"model\": \"TUCSON\",\n            \"serialNumber\": \"KM8J3CA46JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2018\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"TEST0001\",\n        \"createDateTime\": \"2021-03-12T01:48:53+00:00\",\n        \"matchType\": \"SIMILAR\",\n        \"registrationType\": \"SA\",\n        \"selected\": false,\n        \"vehicleCollateral\": {\n            \"make\": \"HYUNDAI\",\n            \"model\": \"TUSCON\",\n            \"serialNumber\": \"KM8J3CA46JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2018\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"200520B\",\n        \"createDateTime\": \"2021-03-09T22:59:10+00:00\",\n        \"matchType\": \"SIMILAR\",\n        \"selected\": false,\n        \"registrationType\": \"SA\",\n        \"vehicleCollateral\": {\n            \"make\": \"HYUNDAI\",\n            \"model\": \"TUCSON\",\n            \"serialNumber\": \"KM8J3CA46JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2018\n        }\n    },\n    {\n        \"baseRegistrationNumber\": \"TEST0005\",\n        \"createDateTime\": \"2021-03-12T01:48:54+00:00\",\n        \"matchType\": \"SIMILAR\",\n        \"registrationType\": \"SA\",\n        \"selected\": true,\n        \"vehicleCollateral\": {\n            \"make\": \"TESLA\",\n            \"model\": \"MODEL 3\",\n            \"serialNumber\": \"YJ46JU622994\",\n            \"type\": \"MV\",\n            \"year\": 2018\n        }\n    }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches/1047",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches",
+								"1047"
+							]
+						},
+						"description": "Update search step 1 selection of financing statemetns to fetch detailed information on. Executes after search step 1 and before search step 2. Added for UI autosave."
+					},
+					"response": []
+				},
+				{
 					"name": "Search Step 1 Query by Serial Num No Match",
 					"request": {
 						"method": "POST",
@@ -2413,7 +2459,7 @@
 				{
 					"name": "Search Select Results Step 2 Exact",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Accept",
@@ -2441,15 +2487,15 @@
 							"raw": "[\n  {\n    \"matchType\": \"EXACT\",\n    \"registrationType\": \"SA\",\n    \"baseRegistrationNumber\": \"023001B\",\n    \"createDateTime\": \"2020-02-21T18:56:20Z\"\n  }\n]"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/searches/1294371",
+							"raw": "{{base_url}}/api/v1/search-results/294371",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"searches",
-								"1294371"
+								"search-results",
+								"294371"
 							]
 						},
 						"description": "Select Financing Statements to retrieve details exact match example."
@@ -2459,7 +2505,7 @@
 				{
 					"name": "Search Select Results Step 2 Similar",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Accept",
@@ -2487,23 +2533,169 @@
 							"raw": "[\n  {\n    \"matchType\": \"EXACT\",\n    \"baseRegistrationNumber\": \"013739B\",\n    \"createDateTime\": \"2020-08-10T18:56:20Z\",\n    \"registrationType\": \"SA\"\n  },\n  {\n    \"matchType\": \"SIMILAR\",\n    \"baseRegistrationNumber\": \"013600B\",\n    \"createDateTime\": \"2020-08-03T10:12:20Z\",\n    \"registrationType\": \"SA\"\n  },\n  {\n    \"matchType\": \"SIMILAR\",\n    \"baseRegistrationNumber\": \"013699B\",\n    \"createDateTime\": \"2020-08-08T10:12:20Z\",\n    \"registrationType\": \"SA\"\n  }\n]"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/searches/1294376",
+							"raw": "{{base_url}}/api/v1/search-results/1294376",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"searches",
+								"search-results",
 								"1294376"
 							]
 						},
 						"description": "Select Financing Statements to retrieve details similar Debtor business name match example."
 					},
 					"response": []
+				},
+				{
+					"name": "Get Completed Search Details Similar",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"matchType\": \"EXACT\",\n    \"registrationType\": \"SA\",\n    \"baseRegistrationNumber\": \"023001B\",\n    \"createDateTime\": \"2020-02-21T18:56:20Z\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/1294376",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"1294376"
+							]
+						},
+						"description": "Retrieve (again) details for a previously completed search which includes at least one similar match."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Completed Search Details Exact",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"matchType\": \"EXACT\",\n    \"registrationType\": \"SA\",\n    \"baseRegistrationNumber\": \"023001B\",\n    \"createDateTime\": \"2020-02-21T18:56:20Z\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/1294371",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"1294371"
+							]
+						},
+						"description": "Retrieve (again) details for a previously completed search which contains only exact matches."
+					},
+					"response": []
 				}
 			],
 			"description": "Search step 2 get financing statement details/history."
+		},
+		{
+			"name": "Get account search history",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Account-Id",
+						"type": "text",
+						"value": "{{account_id}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/search-history",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"search-history"
+					]
+				},
+				"description": "Fetch search history for the account - the most recent 500 entries."
+			},
+			"response": []
 		}
 	],
 	"auth": {

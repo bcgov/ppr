@@ -24,9 +24,9 @@ INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, regist
            null, 200000017)
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id)
-    VALUES(200000039, 'DI', 200000015, 200000008, null, null, 'TEST IND', '14', 'DEBTOR', null,
-           null, 200000017)
+                  middle_name, last_name, business_name, birth_date, address_id, first_name_key, last_name_key)
+    VALUES(200000039, 'DI', 200000015, 200000008, null, null, 'TEST IND DEBTOR', '14', 'ZZZZZ99', null,
+           null, 200000017, search_key_pkg.lastname('TEST IND DEBTOR'), search_key_pkg.lastname('ZZZZZ99'))
 ;
 INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, business_srch_key)

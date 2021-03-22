@@ -16,11 +16,18 @@ from __future__ import annotations
 
 from enum import Enum
 
+from sqlalchemy import event
+
 from ppr_api.models import utils as model_utils
 
 from .db import db
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_party import ClientParty  # noqa: F401 pylint: disable=unused-import
+
+
+BUS_SEARCH_KEY_SP = "select search_key_pkg.businame('?') from dual"
+FIRST_NAME_KEY_SP = "select search_key_pkg.firstname('?') from dual"
+LAST_NAME_KEY_SP = "select search_key_pkg.lastname('?') from dual"
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -50,12 +57,9 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     # Moved by Bob to client_party
     # email_id = db.Column('email_id', db.String(250), nullable=True)
     birth_date = db.Column('birth_date', db.DateTime, nullable=True)
-
-    first_name_first = db.Column('first_name_first', db.String(50), nullable=True)
-    first_name_second = db.Column('first_name_second', db.String(50), nullable=True)
-    first_name_third = db.Column('first_name_third', db.String(50), nullable=True)
-    last_name_first = db.Column('last_name_first', db.String(50), nullable=True)
-    last_name_second = db.Column('last_name_second', db.String(50), nullable=True)
+    # Search keys
+    first_name_key = db.Column('first_name_key', db.String(50), nullable=True)
+    last_name_key = db.Column('last_name_key', db.String(50), nullable=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True)
     # Legacy only
     block_number = db.Column('block_number', db.Integer, nullable=True)
@@ -265,26 +269,15 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return False
 
-#    @property
-#    def valid_party_type_data(self) -> bool:
-#        """Validate the model based on the party type (DB/DI/RG/SP)."""
-#        if self.party_type == Party.PartyTypes.ORGANIZATION.value:
-#            if not self.organization_name or self.first_name or self.middle_initial or self.last_name:
-#                return False
 
-#        elif self.party_type == Party.PartyTypes.PERSON.value:
-#            if self.organization_name or not (self.first_name or self.middle_initial or self.last_name):
-#                return False
-#        return True
-
-# @event.listens_for(Party, 'before_insert')
-# @event.listens_for(Party, 'before_update')
-# def receive_before_change(mapper, connection, target):  # pylint: disable=unused-argument
-#    """Run checks/updates before adding/changing the party model data."""
-#    party = target
-
-#    if not party.valid_party_type_data:
-#        raise BusinessException(
-#            error=f'Attempt to change/add {party.party_type} had invalid data.',
-#            status_code=HTTPStatus.BAD_REQUEST
-#        )
+@event.listens_for(Party, 'before_insert')
+def party_before_insert_listener(mapper, connection, target):   # pylint: disable=unused-argument; don't use mapper
+    """Conditionally set debtor search key values."""
+    if target.party_type_cd == target.PartyTypes.DEBTOR_COMPANY.value:
+        sp_call = BUS_SEARCH_KEY_SP.replace('?', target.business_name)
+        target.business_search_key = connection.scalar(sp_call)
+    elif target.party_type_cd == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
+        sp_call_firstname = FIRST_NAME_KEY_SP.replace('?', target.first_name)
+        sp_call_lastname = LAST_NAME_KEY_SP.replace('?', target.last_name)
+        target.first_name_key = connection.scalar(sp_call_firstname)
+        target.last_name_key = connection.scalar(sp_call_lastname)
