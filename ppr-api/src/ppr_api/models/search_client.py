@@ -337,7 +337,9 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                         search['exactResultsSize'] = int(exact_value)
                     similar_value = values[6]
                     if similar_value is not None:
-                        search['similarResultsSize'] = int(similar_value)
+                        search['selectedResultsSize'] = (int(similar_value) + int(exact_value))
+                    else:
+                        search['selectedResultsSize'] = int(exact_value)
                     history_list.append(search)
 
         if not history_list:
