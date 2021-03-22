@@ -28,7 +28,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                               primary_key=True)
     description = db.Column('description', db.String(4000), nullable=False)
     # Legacy only
-    block_number = db.Column('block_number', db.Integer, nullable=True)
+    status = db.Column('status', db.String(1), nullable=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer,

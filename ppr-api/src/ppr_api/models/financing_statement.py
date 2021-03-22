@@ -64,7 +64,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     type_claim = db.Column('type_claim', db.String(2), nullable=True)
     crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
     crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
-    prev_reg_type = db.Column('prev_reg_type', db.Integer, nullable=True)
+    prev_reg_type = db.Column('prev_reg_type', db.String(30), nullable=True)
     prev_reg_cr_nbr = db.Column('prev_reg_cr_nbr', db.String(7), nullable=True)
     prev_reg_cr_date = db.Column('prev_reg_cr_date', db.String(7), nullable=True)
     prev_reg_cb_nbr = db.Column('prev_reg_cb_nbr', db.String(10), nullable=True)

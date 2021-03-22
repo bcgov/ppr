@@ -132,6 +132,7 @@ INSERT INTO SEARCH_TYPE(search_type_cd, search_type_desc) VALUES('SS', 'SERIAL N
 -- Serial type codes
 INSERT INTO SERIAL_TYPE(serial_type_cd, serial_type_desc) VALUES('AC', 'AIRCRAFT');
 INSERT INTO SERIAL_TYPE(serial_type_cd, serial_type_desc) VALUES('AF', 'AIRCRAFT AIRFRAME');
+INSERT INTO SERIAL_TYPE(serial_type_cd, serial_type_desc) VALUES('AP', 'AIRPLANE');
 INSERT INTO SERIAL_TYPE(serial_type_cd, serial_type_desc) VALUES('BO', 'BOAT');
 INSERT INTO SERIAL_TYPE(serial_type_cd, serial_type_desc) VALUES('EV', 'ELECTRIC MOTOR VEHICLE');
 INSERT INTO SERIAL_TYPE(serial_type_cd, serial_type_desc) VALUES('MH', 'MANUFACTURED HOME');
