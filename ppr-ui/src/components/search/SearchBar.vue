@@ -1,15 +1,35 @@
 <template>
-  <v-container fluid no-gutters class="white pl-6 pt-6">
-    <v-row no-gutters>
-      <v-col cols="12" :class="[$style['search-info']]">
+  <v-container fluid no-gutters class="white pa-6">
+    <v-row no-gutters class="pt-2">
+      <v-col v-if="searchTitle" :class="$style['search-title']">
+        <b>{{ searchTitle }}</b>
+      </v-col>
+      <v-col v-else :class="[$style['search-info']]">
         <span>
           Select a search category and then enter a value to search.
-          <b>Note:</b>
-          Each search incurs a fee (including searches that return no results).
+          Each search incurs a
         </span>
+        <v-tooltip class="pa-2 pt-2"
+                   content-class="top-tooltip"
+                   top
+                   transition="fade-transition">
+          <template v-slot:activator="{ on, attrs }">
+            <span v-bind="attrs" v-on="on" :class="$style['fee-info']"> fee of $8.50.</span>
+          </template>
+          <v-row no-gutters class="pt-2 pb-2">
+            <span>
+              Each search will incur a fee of $8.50,
+              including searches that return no results.
+            </span>
+          </v-row>
+        </v-tooltip>
       </v-col>
+      <v-col align-self="end" cols="3">
+        <folio-number :defaultFolioNumber="folioNumber" @folio-number="updateFolioNumber"/>
+      </v-col>
+      <v-col align-self="end" cols="1" class="pl-3"/>
     </v-row>
-    <v-row no-gutters class="pt-3">
+    <v-row no-gutters class="pt-1">
       <v-col cols="3">
         <v-select :id="$style['search-type-select']"
                   class="search-bar-type-select"
@@ -23,9 +43,10 @@
                   v-model="selectedSearchType">
         </v-select>
       </v-col>
-      <v-col cols="7" class="pl-3">
+      <v-col v-if="!isIndividualDebtor" cols="8" class="pl-3">
         <v-tooltip content-class="bottom-tooltip"
-                   bottom :open-on-hover="false"
+                   bottom
+                   :open-on-hover="false"
                    :disabled="!searchPopUp"
                    transition="fade-transition"
                    :value="showSearchPopUp && searchPopUp">
@@ -39,8 +60,7 @@
                           :hide-details="hideDetails"
                           persistent-hint
                           :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
-                          v-model="searchValue">
-            </v-text-field>
+                          v-model="searchValue"/>
           </template>
           <v-row v-for="(line, index) in searchPopUp" :key="index" class="pt-2 pl-3">
             {{ line }}
@@ -52,16 +72,49 @@
                        @hide-details="setHideDetails">
         </auto-complete>
       </v-col>
-      <v-col cols="2" class="pl-3 pt-3">
+      <v-col v-else cols="8" class="pl-3">
         <v-row no-gutters>
-          <v-btn :id="$style['search-btn']" class="search-bar-btn" @click="searchAction">
-            Search
-            <v-icon right>mdi-magnify</v-icon>
+          <v-col cols="4">
+            <v-text-field id="first-name-field"
+                          autocomplete="off"
+                          :error-messages="searchMessageFirst ? searchMessageFirst : ''"
+                          filled
+                          :hint="searchHintFirst"
+                          persistent-hint
+                          placeholder="First Name"
+                          v-model="searchValueFirst"/>
+          </v-col>
+          <v-col cols="4" class="pl-3">
+            <v-text-field id="second-name-field"
+                          autocomplete="off"
+                          :error-messages="searchMessageSecond ? searchMessageSecond : ''"
+                          filled
+                          :hint="searchHintSecond"
+                          persistent-hint
+                          placeholder="Middle Name (Optional)"
+                          v-model="searchValueSecond"/>
+          </v-col>
+          <v-col cols="4" class="pl-3">
+            <v-text-field id="last-name-field"
+                          autocomplete="off"
+                          :error-messages="searchMessageLast ? searchMessageLast : ''"
+                          filled
+                          :hint="searchHintLast"
+                          persistent-hint
+                          placeholder="Last Name"
+                          v-model="searchValueLast"/>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="1" class="pl-3 pt-2">
+        <v-row no-gutters>
+          <v-btn :id="$style['search-btn']" class="search-bar-btn primary" @click="searchAction">
+            <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-row>
-        <v-row no-gutters class="pl-1">
-          <span :id="$style['search-btn-info']">
-            Each search incurs a fee
+        <v-row no-gutters>
+          <span :id="$style['search-btn-info']" class="pl-1 pt-2">
+            $8.50 fee
           </span>
         </v-row>
       </v-col>
@@ -75,6 +128,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes } from '@/resources'
 import {
+  IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchCriteriaIF, // eslint-disable-line no-unused-vars
   SearchTypeIF, // eslint-disable-line no-unused-vars
   SearchValidationIF // eslint-disable-line no-unused-vars
@@ -82,26 +136,43 @@ import {
 import { UISearchTypes } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
+import { FolioNumber } from '@/components/common'
 
 export default defineComponent({
   components: {
-    AutoComplete
+    AutoComplete,
+    FolioNumber
   },
   props: {
+    defaultDebtor: {
+      type: Object as () => IndividualNameIF
+    },
+    defaultFolioNumber: {
+      type: String,
+      default: ''
+    },
     defaultSelectedSearchType: {
       type: Object as () => SearchTypeIF
     },
     defaultSearchValue: {
       type: String
+    },
+    searchTitle: {
+      type: String,
+      default: 'Search'
     }
   },
   setup (props, { emit }) {
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
+      folioNumber: props.defaultFolioNumber,
       hideDetails: false,
       searchTypes: SearchTypes,
       searchValue: props.defaultSearchValue,
+      searchValueFirst: props.defaultDebtor?.first,
+      searchValueSecond: props.defaultDebtor?.second,
+      searchValueLast: props.defaultDebtor?.last,
       searchTypeLabel: 'Select a search category',
       selectedSearchType: props.defaultSelectedSearchType,
       showSearchPopUp: true,
@@ -109,30 +180,67 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
+      isIndividualDebtor: computed((): boolean => {
+        if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) {
+          return true
+        }
+        return false
+      }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
+      }),
+      searchMessageFirst: computed((): string => {
+        return localState.validations?.searchValue?.messageFirst || ''
+      }),
+      searchMessageSecond: computed((): string => {
+        return localState.validations?.searchValue?.messageSecond || ''
+      }),
+      searchMessageLast: computed((): string => {
+        return localState.validations?.searchValue?.messageLast || ''
       }),
       searchHint: computed((): string => {
         if (localState.searchMessage) return ''
         else return localState.selectedSearchType?.hints?.searchValue || ''
       }),
+      searchHintFirst: computed((): string => {
+        if (localState.searchMessageFirst) return ''
+        else return localState.selectedSearchType?.hints?.searchValueFirst || ''
+      }),
+      searchHintSecond: computed((): string => {
+        if (localState.searchMessageSecond) return ''
+        else return localState.selectedSearchType?.hints?.searchValueSecond || ''
+      }),
+      searchHintLast: computed((): string => {
+        if (localState.searchMessageLast) return ''
+        else return localState.selectedSearchType?.hints?.searchValueLast || ''
+      }),
       searchPopUp: computed((): Array<string> | boolean => {
         return localState.validations?.searchValue?.popUp || false
       })
     })
-    const getSearchApiParams = (): SearchCriteriaIF => {
-      let cleanedSearchValue = localState.searchValue?.trim()
-      if (localState.selectedSearchType.searchTypeUI === UISearchTypes.AIRCRAFT) {
-        // replaceAll fails in jest so use regex
-        const dash = /-/g
-        cleanedSearchValue = cleanedSearchValue?.replace(dash, '')
+    const getCriteria = () => {
+      if (localState.isIndividualDebtor) {
+        const first = localState.searchValueFirst?.trim()
+        const second = localState.searchValueSecond?.trim()
+        const last = localState.searchValueLast?.trim()
+        return { debtorName: { first: first, second: second, last: last } }
+      } else if (localState.selectedSearchType.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR) {
+        return { debtorName: { business: localState.searchValue?.trim() } }
+      } else {
+        let cleanedSearchValue = localState.searchValue?.trim()
+        if (localState.selectedSearchType.searchTypeUI === UISearchTypes.AIRCRAFT) {
+          // replaceAll fails in jest so use regex
+          const dash = /-/g
+          cleanedSearchValue = cleanedSearchValue?.replace(dash, '')
+        }
+        return { value: cleanedSearchValue }
       }
+    }
+    const getSearchApiParams = (): SearchCriteriaIF => {
       return {
         type: localState.selectedSearchType.searchTypeAPI,
-        criteria: {
-          value: cleanedSearchValue
-        },
-        clientReferenceId: 'T-S-MHR-001'
+        criteria: getCriteria(),
+        clientReferenceId: localState.folioNumber
       }
     }
     const searchAction = async () => {
@@ -145,7 +253,13 @@ export default defineComponent({
       if (resp?.error) emit('search-error', resp.error.statusCode)
       else {
         emit('searched-type', localState.selectedSearchType)
-        emit('searched-value', localState.searchValue)
+        if (localState.isIndividualDebtor) {
+          emit('debtor-name', {
+            first: localState.searchValueFirst,
+            second: localState.searchValueSecond,
+            last: localState.searchValueLast
+          })
+        } else emit('searched-value', localState.searchValue)
         emit('search-data', resp)
       }
     }
@@ -156,6 +270,9 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValue
     }
+    const updateFolioNumber = (folioNumber: string) => {
+      localState.folioNumber = folioNumber
+    }
     watch(() => localState.searchValue, (val: string) => {
       if (!val) localState.validations = null
       else localState.validations = validateSearchRealTime(localState)
@@ -165,6 +282,18 @@ export default defineComponent({
       }
       // show autocomplete results when there is a searchValue and if no error messages
       localState.autoCompleteIsActive = !localState.validations && val !== ''
+    })
+    watch(() => localState.searchValueFirst, (val: string) => {
+      if (!val) localState.validations = null
+      else localState.validations = validateSearchRealTime(localState)
+    })
+    watch(() => localState.searchValueSecond, (val: string) => {
+      if (!val) localState.validations = null
+      else localState.validations = validateSearchRealTime(localState)
+    })
+    watch(() => localState.searchValueLast, (val: string) => {
+      if (!val) localState.validations = null
+      else localState.validations = validateSearchRealTime(localState)
     })
     watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
       localState.validations = null
@@ -178,7 +307,8 @@ export default defineComponent({
       getSearchApiParams,
       searchAction,
       setHideDetails,
-      setSearchValue
+      setSearchValue,
+      updateFolioNumber
     }
   }
 })
@@ -187,16 +317,55 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 #search-btn {
-  color: white;
   background-color: $primary-blue;
-  width: 9rem;
+  color: white;
+  height: 2.85rem;
+  min-width: 0 !important;
+  width: 3.5rem;
 }
 #search-btn-info {
   color: $gray8;
   font-size: 0.725rem;
 }
 .search-info {
-  font-size: 0.825rem;
   color: $gray8;
+  font-size: 0.875rem;
+}
+.search-title {
+  color: $gray9;
+  font-size: 1rem;
+}
+.fee-info {
+  border-bottom: 1px dotted $gray9;
+}
+.folio-btn {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+  font-size: 0.825rem !important;
+}
+.folio-btn::before {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+}
+.folio-close-btn {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+  position: absolute;
+}
+.folio-close-btn::before {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+}
+.folio-edit-card {
+  width: 15rem;
+  position: absolute;
+  z-index: 3;
+}
+.folio-header {
+  color: $gray9;
+}
+.folio-info {
+  color: $gray7;
+  font-size: 0.875rem;
 }
 </style>

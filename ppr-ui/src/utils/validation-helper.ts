@@ -1,8 +1,15 @@
 import { UISearchTypes } from '@/enums'
-import { SearchTypeIF, SearchValidationIF } from '@/interfaces'
+import { IndividualNameIF, SearchTypeIF, SearchValidationIF } from '@/interfaces'
 
 // subset of the localState that includes what the validator needs
-type partialSearchState = { searchValue: string, selectedSearchType: SearchTypeIF }
+type partialSearchState = {
+  debtorName?: IndividualNameIF
+  searchValue?: string,
+  searchValueFirst?: string,
+  searchValueSecond?: string,
+  searchValueLast?: string,
+  selectedSearchType: SearchTypeIF
+}
 
 const specialCharsStrict = /[!@#$%^&*(),.?"{}|<>`~_;:'/\\[\]-]/
 const specialCharsLax = /[!@#$%^*(),?"{}|<>`~_[\]]/
@@ -19,6 +26,9 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
     searchValue: {}
   }
   let searchValue:string = searchState?.searchValue?.trim()
+  const first = searchState?.searchValueFirst?.trim()
+  const second = searchState?.searchValueSecond?.trim()
+  const last = searchState?.searchValueLast?.trim()
   if (!searchState?.selectedSearchType) {
     validation.category.message = 'Please select a category'
     return validation
@@ -27,6 +37,21 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
     case UISearchTypes.SERIAL_NUMBER:
       if (!searchValue) {
         validation.searchValue.message = 'Enter a serial number to search'
+      }
+      break
+    case UISearchTypes.INDIVIDUAL_DEBTOR:
+      if (!first) {
+        validation.searchValue.messageFirst = 'Enter a first name'
+      } else if (first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
+      }
+      if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
+      }
+      if (!last) {
+        validation.searchValue.messageLast = 'Enter a last name'
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case UISearchTypes.BUSINESS_DEBTOR:
@@ -83,6 +108,9 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
     searchValue: {}
   }
   let searchValue = searchState?.searchValue?.trim()
+  const first = searchState?.searchValueFirst?.trim()
+  const second = searchState?.searchValueSecond?.trim()
+  const last = searchState?.searchValueLast?.trim()
   switch (searchState?.selectedSearchType?.searchTypeUI) {
     case UISearchTypes.SERIAL_NUMBER:
       if (searchValue && specialCharsStrict.test(searchValue)) {
@@ -94,6 +122,23 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
           'You can search using this number but you might not obtain any results (the search fee will be applied).',
           'Select "Search" to continue with this serial number.'
         ]
+      }
+      break
+    case UISearchTypes.INDIVIDUAL_DEBTOR:
+      if (first && specialCharsLax.test(first)) {
+        validation.searchValue.messageFirst = "Names don't normally contain special characters"
+      } else if (first && first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
+      }
+      if (second && specialCharsLax.test(second)) {
+        validation.searchValue.messageSecond = "Names don't normally contain special characters"
+      } else if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
+      }
+      if (last && specialCharsLax.test(last)) {
+        validation.searchValue.messageLast = "Names don't normally contain special characters"
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case UISearchTypes.BUSINESS_DEBTOR:

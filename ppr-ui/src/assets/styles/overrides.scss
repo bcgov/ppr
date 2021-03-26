@@ -20,19 +20,19 @@ td {
 
 // Buttons
 .v-btn {
-  background-color: $primary-blue !important;
-  color: white !important;
-  font-size: 1rem !important;
+  font-size: 1rem;
   font-weight: 500;
   letter-spacing: normal;
-  min-width: 0;
   padding: inherit 28px !important;
   text-transform: none;
-
-  .v-icon + span,
-  span + .v-icon {
-    margin-left: 0.25rem;
-  }
+    .v-icon + span,
+    span + .v-icon {
+      margin-left: 0.25rem;
+    }
+}
+.v-btn .primary {
+  background-color: $primary-blue !important;
+  color: white !important;
 }
 .sbc-header {
   .v-btn {
@@ -174,4 +174,8 @@ td {
 }
 .v-simple-checkbox .theme--light.v-icon{
   color: $primary-blue;
+}
+
+.folio-edit-txt .v-messages {
+  text-align: end !important;
 }

@@ -1,6 +1,6 @@
 // Enums and Interfaces
 import { AccountTypes, MatchTypes } from '@/enums'
-import { SearchResponseIF, SearchTypeIF, StateIF } from '@/interfaces'
+import { IndividualNameIF, SearchResponseIF, SearchTypeIF, StateIF } from '@/interfaces'
 
 /** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: any): boolean => {
@@ -53,6 +53,10 @@ export const getUserRoles = (state: any): any => {
 /** The current user's username. */
 export const getUserUsername = (state: any): any => {
   return state.stateModel.tombstone.userInfo?.username
+}
+
+export const getDebtorName = (state: any): IndividualNameIF => {
+  return state.stateModel.debtorName
 }
 
 export const getSearchResults = (state: StateIF): SearchResponseIF => {
