@@ -7,13 +7,12 @@ export function format12HourTime (date: Date): string {
   const ampm = hours < 12 ? 'am' : 'pm'
   hours = hours < 12 ? hours : hours - 12
 
-  let hour = `0${hours}`
   let min = `0${date.getMinutes()}`
   let sec = `0${date.getSeconds()}`
-  if (hour.length > 2) hour = hour.slice(1)
   if (min.length > 2) min = min.slice(1)
   if (sec.length > 2) sec = sec.slice(1)
-  return `${hour}:${min}:${sec} ${ampm}`
+
+  return `${hours}:${min}:${sec} ${ampm}`
 }
 
 /** Converts date to display format. */

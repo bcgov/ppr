@@ -5,14 +5,18 @@
         <!-- v-if reason: setting the props to null will cause the select to display 'null' -->
         <search-bar v-if="getSearchedType"
                     class="soft-corners"
+                    :defaultDebtor="getDebtorName"
+                    :defaultFolioNumber="folioNumber"
                     :defaultSearchValue="getSearchedValue"
                     :defaultSelectedSearchType="getSearchedType"
+                    @debtor-name="setDebtorName"
                     @searched-type="setSearchedType"
                     @searched-value="setSearchedValue"
                     @search-error="emitError"
                     @search-data="setSearchResults"/>
         <search-bar v-else
                     class="soft-corners"
+                    @debtor-name="setDebtorName"
                     @searched-type="setSearchedType"
                     @searched-value="setSearchedValue"
                     @search-error="emitError"
@@ -33,7 +37,7 @@
         </v-row>
         <v-row v-else no-gutters class="pt-2">
           <v-col>
-            <v-row no-gutters>
+            <v-row no-gutters id="search-meta-info">
               <p>
                 <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
                 <span :class="$style['search-time']">{{ searchTime }}</span>
@@ -41,13 +45,13 @@
             </v-row>
             <v-row no-gutters>
               <v-col cols="8" :class="$style['search-info']">
-                <span v-if="totalResultsLength !== 0">
+                <span v-if="totalResultsLength !== 0" id="results-info">
                   Select the registrations you want to include in a printable search report.
                   This report will contain the full record of each selected registration and will be
                   automatically saved to your PPR Dashboard.
                   A general record of your search results will also be saved.
                 </span>
-                <span v-else>
+                <span v-else id="no-results-info">
                   No Registrations were found. Your search results and a printable PDF have been automatically
                   saved to My Searches on your PPR Dashboard.
                 </span>
@@ -56,14 +60,14 @@
           </v-col>
         </v-row>
         <v-row v-if="getSearchResults" no-gutters justify="end" class="pt-5">
-          <v-col v-if="folioNumber" align-self="start">
+          <v-col v-if="folioNumber" id="results-folio-header" align-self="start">
             <p class="pt-3 mb-0">
               <b :class="$style['search-table-title']">Folio Number: </b>
               <span :class="$style['search-info']">{{ folioNumber }}</span>
             </p>
           </v-col>
           <v-col cols="auto" class="pl-3">
-            <v-btn :id="$style['done-btn']" class="search-done-btn pl-7 pr-7" @click="submit">
+            <v-btn :id="$style['done-btn']" class="search-done-btn pl-7 pr-7 primary" @click="submit">
               Done
             </v-btn>
           </v-col>
@@ -88,7 +92,7 @@ import { convertDate, getFeatureFlag, submitSelected, updateSelected } from '@/u
 import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, // eslint-disable-line no-unused-vars
   SearchResultIF, // eslint-disable-line no-unused-vars
   SearchTypeIF // eslint-disable-line no-unused-vars
@@ -102,10 +106,12 @@ import { RouteNames } from '@/enums'
   }
 })
 export default class Search extends Vue {
+  @Getter getDebtorName: IndividualNameIF
   @Getter getSearchResults: SearchResponseIF
   @Getter getSearchedValue: string
   @Getter getSearchedType: SearchTypeIF
 
+  @Action setDebtorName: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
@@ -141,14 +147,24 @@ export default class Search extends Vue {
   }
 
   private get searchType (): string {
-    return this.getSearchedType.searchTypeUI || ''
+    return this.getSearchedType?.searchTypeUI || ''
   }
 
   private get searchValue (): string {
     const searchResult = this.getSearchResults
     if (searchResult) {
       // will put in more logic when doing individual debtor
-      return searchResult.searchQuery?.criteria?.value || ''
+      const first = searchResult.searchQuery?.criteria?.debtorName?.first
+      const second = searchResult.searchQuery?.criteria?.debtorName?.second
+      const last = searchResult.searchQuery?.criteria?.debtorName?.last
+      const business = searchResult.searchQuery?.criteria?.debtorName?.business
+      if (first && last) {
+        if (second) {
+          return `${first} ${second} ${last}`
+        }
+        return `${first} ${last}`
+      }
+      return business || searchResult.searchQuery?.criteria?.value || ''
     }
     return ''
   }

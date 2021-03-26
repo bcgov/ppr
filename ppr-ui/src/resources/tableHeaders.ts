@@ -28,21 +28,39 @@ export const searchTableHeaders: TableHeadersIF = {
   ],
   [APISearchTypes.INDIVIDUAL_DEBTOR]: [
     {
+      sortable: false,
+      text: '',
+      value: 'data-table-select',
+      width: '11rem'
+    },
+    {
       text: 'Debtor Name',
-      value: 'debtor.personalName'
+      value: 'debtor.personName'
     },
     {
       text: 'Birthdate',
-      value: ''
+      value: 'debtor.birthDate'
     }
   ],
   [APISearchTypes.BUSINESS_DEBTOR]: [
+    {
+      sortable: false,
+      text: '',
+      value: 'data-table-select',
+      width: '11rem'
+    },
     {
       text: 'Debtor Name',
       value: 'debtor.businessName'
     }
   ],
   [APISearchTypes.MHR_NUMBER]: [
+    {
+      sortable: false,
+      text: '',
+      value: 'data-table-select',
+      width: '11rem'
+    },
     {
       text: 'Manufactured Home Registration Number',
       value: 'vehicleCollateral.manufacturedHomeRegistrationNumber'
@@ -62,6 +80,12 @@ export const searchTableHeaders: TableHeadersIF = {
   ],
   [APISearchTypes.AIRCRAFT]: [
     {
+      sortable: false,
+      text: '',
+      value: 'data-table-select',
+      width: '11rem'
+    },
+    {
       text: 'Serial Number',
       value: 'vehicleCollateral.serialNumber'
     },
@@ -75,6 +99,12 @@ export const searchTableHeaders: TableHeadersIF = {
     }
   ],
   [APISearchTypes.REGISTRATION_NUMBER]: [
+    {
+      sortable: false,
+      text: '',
+      value: 'data-table-select',
+      width: '11rem'
+    },
     {
       text: 'Registration Number',
       value: 'registrationNumber'
@@ -116,13 +146,13 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-sm',
     sortable: false,
     text: 'Exact Matches',
-    value: ''
+    value: 'exactResultsSize'
   },
   {
     class: 'column-sm',
     sortable: false,
     text: 'Results Selected',
-    value: ''
+    value: 'selectedResultsSize'
   },
   {
     class: 'column-sm',

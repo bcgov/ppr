@@ -75,7 +75,6 @@ describe('Test result table with no results', () => {
     const noResultsInfo = wrapper.findAll(noResultsDiv)
     expect(noResultsInfo.length).toBe(1)
     expect(noResultsInfo.at(0).text()).toContain('Nil Result 0 registrations | 0 exact matches')
-    expect(noResultsInfo.at(0).text()).toContain(noResults.searchQuery.criteria.value)
   })
 })
 
@@ -265,8 +264,8 @@ describe('Registration number results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(2)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
+    expect(wrapper.vm.$data.exactMatchesLength).toBe(1)
+    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0]])
   })
 
   it('displays results in the table', async () => {

@@ -7,17 +7,22 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { Dashboard } from '@/views'
+import { SearchBar } from '@/components/search'
+import { SearchHistory } from '@/components/tables'
 
 // Other
 import mockRouter from './MockRouter'
-import { SearchBar } from '@/components/search'
-import { mockedSearchResponse } from './test-data'
+import { mockedSearchResponse, mockedSearchHistory } from './test-data'
 import { UISearchTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
+
+// selectors
+const searchHeader: string = '#search-header'
+const historyHeader: string = '#search-history-header'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -47,6 +52,29 @@ describe('Dashboard component', () => {
   it('renders Dashboard View', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+  })
+  it('displays the search header', () => {
+    const header = wrapper.findAll(searchHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('Personal Property Search')
+  })
+  it('displays default search history header', () => {
+    expect(wrapper.vm.getSearchHistory).toBeNull
+    expect(wrapper.vm.searchHistoryLength).toBe(0)
+    const header = wrapper.findAll(historyHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('My Searches (0)')
+  })
+  it('updates the search history header based on history data', async () => {
+    wrapper.vm.setSearchHistory(mockedSearchHistory.searches)
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.vm.getSearchHistory?.length).toBe(5)
+    expect(wrapper.vm.searchHistoryLength).toBe(5)
+    const header = wrapper.findAll(historyHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('My Searches (5)')
   })
   it('routes to search after getting a search response', async () => {
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])

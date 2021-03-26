@@ -71,6 +71,12 @@
           <template v-slot:[`item.vehicleCollateral.make`]="{ item }">
             {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
           </template>
+          <template v-slot:[`item.debtor.personName`]="{ item }">
+            {{ item.debtor.personName.first }} {{ item.debtor.personName.second }} {{ item.debtor.personName.last }}
+          </template>
+          <template v-slot:[`item.debtor.birthDate`]="{ item }">
+            {{ displayDate(item.debtor.birthDate) }}
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
@@ -96,6 +102,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { searchTableHeaders } from '@/resources'
 import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MatchTypes } from '@/enums'
+import { convertDate } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -149,6 +156,10 @@ export default defineComponent({
         }
       })
     })
+    const displayDate = (dateString:string) => {
+      const date = new Date(dateString)
+      return convertDate(date, false)
+    }
     const getClass = (item:SearchResultIF):string => {
       if (item.matchType === MatchTypes.EXACT) {
         return style['exact-match']
@@ -190,6 +201,7 @@ export default defineComponent({
 
     return {
       ...toRefs(localState),
+      displayDate,
       getClass,
       selectAll,
       style

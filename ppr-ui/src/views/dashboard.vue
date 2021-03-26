@@ -2,13 +2,15 @@
   <v-container fluid class="pa-10">
     <v-row no-gutters>
       <v-col>
-        <v-row no-gutters :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+        <v-row no-gutters id="search-header" :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
           <v-col cols="auto">
             <b>Personal Property Search</b>
           </v-col>
         </v-row>
         <v-row no-gutters>
           <search-bar class="soft-corners-bottom"
+                      :searchTitle="''"
+                      @debtor-name="setDebtorName"
                       @searched-type="setSearchedType"
                       @searched-value="setSearchedValue"
                       @search-data="setSearchResults"
@@ -18,7 +20,7 @@
     </v-row>
     <v-row no-gutters class='pt-12'>
       <v-col>
-        <v-row no-gutters :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+        <v-row no-gutters id="search-history-header" :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
           <v-col cols="auto">
             <b>My Searches</b> ({{ searchHistoryLength }})
           </v-col>
@@ -55,6 +57,7 @@ export default class Dashboard extends Vue {
   @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchResults: SearchResponseIF
 
+  @Action setDebtorName: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF

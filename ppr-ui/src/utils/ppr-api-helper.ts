@@ -5,6 +5,8 @@ import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
 import { SearchCriteriaIF, SearchResponseIF, SearchResultIF } from '@/interfaces'
+import { mockedSearchResponse } from '../../tests/unit/test-data'
+import { APISearchTypes, UISearchTypes } from '@/enums'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
 /**

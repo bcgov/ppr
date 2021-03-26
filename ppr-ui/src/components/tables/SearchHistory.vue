@@ -14,6 +14,9 @@
                       sort-by="searchDateTime"
                       sort-desc
                       return-object>
+          <template v-slot:[`item.searchQuery.criteria.value`]="{ item }">
+            {{ displaySearchValue(item.searchQuery) }}
+          </template>
           <template v-slot:[`item.UISearchType`]="{ item }">
             {{ displayType(item.searchQuery.type) }}
           </template>
@@ -36,7 +39,7 @@
 import { computed, defineComponent, reactive, toRefs, useCssModule } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
-import { SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { searchHistroyTableHeaders, SearchTypes } from '@/resources'
 import { convertDate } from '@/utils'
 
@@ -59,6 +62,19 @@ export default defineComponent({
       const date = new Date(searchDate)
       return convertDate(date, false)
     }
+    const displaySearchValue = (query: SearchCriteriaIF): string => {
+      const first = query?.criteria?.debtorName?.first
+      const second = query?.criteria?.debtorName?.second
+      const last = query?.criteria?.debtorName?.last
+      const business = query?.criteria?.debtorName?.business
+      if (first && last) {
+        if (second) {
+          return `${first} ${second} ${last}`
+        }
+        return `${first} ${last}`
+      }
+      return business || query?.criteria?.value || ''
+    }
     const displayType = (APISearchType: string): string => {
       let UISearchType = ''
       for (let i = 0; i < SearchTypes.length; i++) {
@@ -72,6 +88,7 @@ export default defineComponent({
     return {
       ...toRefs(localState),
       displayDate,
+      displaySearchValue,
       displayType,
       style
     }
