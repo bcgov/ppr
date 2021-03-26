@@ -86,16 +86,20 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                          back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
 
-    # Use to indicate if a party or collateral is not in the original financing statement
+    # Use to indicate if a party or collateral is not in the original financing statement.
     mark_update_json = False
-    # Use to specify if generated json content is current state or original financing statement. 
+    # Use to specify if generated json content is current state or original financing statement.
     current_view_json = True
 
     @property
     def json(self) -> dict:
         """Return the financing statement as a json object."""
         statement = {
+            'statusType': self.state_type_cd
         }
+        if self.state_type_cd == 'HDC':
+            index = len(self.registration) - 1
+            statement['dischargedDateTime'] = model_utils.format_ts(self.registration[index].registration_ts)
 
         if self.registration and self.registration[0]:
             reg = self.registration[0]
@@ -174,7 +178,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
             if party_json:
                 parties.append(party_json)
-        
+
         return parties
 
     def general_collateral_json(self, registration_id):
@@ -194,7 +198,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
             if collateral_json:
                 collateral_list.append(collateral_json)
-        
+
         return collateral_list
 
     def vehicle_collateral_json(self, registration_id):
@@ -214,7 +218,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
             if collateral_json:
                 collateral_list.append(collateral_json)
-        
+
         return collateral_list
 
     def validate_base_debtor(self, base_debtor_json, staff: bool = False):

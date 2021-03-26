@@ -1,0 +1,99 @@
+<div class="container pt-4">
+    {% if searchQuery.type in ('INDIVIDUAL_DEBTOR', 'BUSINESS_DEBTOR') %}
+    <table class="selected-debtor-table mt-4" role="presentation">
+      <tr class="solid-row-separator selected-debtor-table-header no-page-break">
+         <td class="top-align"></td>
+         <td class="top-align">Base Registration</td>
+         <td class="top-align">Debtor Name</td>
+         <td class="top-align">Type</td>
+        </tr>
+        {% for result in selected %}
+        {% if result.matchType == 'EXACT' %}
+        <tr class="no-page-break bold">
+        {% else %}
+        <tr class="no-page-break">
+        {% endif %}
+            <td>{{loop.index}}</td>
+            <td>{{result.baseRegistrationNumber}}</td>
+            <td>
+                {% if result.debtor.businessName is defined %}
+                    {{ result.debtor.businessName }}
+                {% else %}
+                    {{ result.debtor.personName.last }},
+                    {{ result.debtor.personName.first }}
+                    {% if result.debtor.personName.middle is defined %}&nbsp;{{ result.debtor.personName.middle }}{% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %} Individual {% else %} Business{% endif %}
+            </td>
+         </tr>
+         <tr class="solid-row-separator no-page-break">
+            <td colspan="4" style="height:1px"/>
+         </tr>
+      {% endfor %}
+    </table>
+    {% elif searchQuery.type != 'MHR_NUMBER' %}
+    <table class="selected-serial-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-serial-table-header no-page-break">
+            <td class="top-align"></td>
+            <td class="top-align">Base Registration</td>
+            <td class="top-align">Serial Number</td>
+            <td class="top-align">Type</td>
+            <td class="top-align">Year</td>
+            <td class="right-align top-align">Make/Model</td>
+        </tr>
+        {% for result in selected %}
+            {% if result.matchType == 'EXACT' %}
+            <tr class="no-page-break bold">
+            {% else %}
+            <tr class="no-page-break">
+            {% endif %}
+                <td>{{loop.index}}</td>
+                <td>{{result.baseRegistrationNumber}}</td>
+                <td>{{result.vehicleCollateral.serialNumber}}</td>
+                <td>{{result.vehicleCollateral.type}}</td>
+                <td>{{result.vehicleCollateral.year}}</td>
+                <td class="right-align">{{result.vehicleCollateral.make}} 
+                    {% if result.vehicleCollateral.model is defined %} / {{result.vehicleCollateral.model}}{% endif %}
+                </td>
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+                <td colspan="6" style="height:1px"/>
+            </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+            <td class="top-align"></td>
+            <td class="top-align">Base Registration</td>
+            <td class="top-align">Serial Number</td>
+            <td class="top-align">Type</td>
+            <td class="top-align">Year</td>
+            <td class="right-align top-align">Make/Model</td>
+            <td class="right-align top-align">MHR Number</td>
+        </tr>
+        {% for result in selected %}
+            {% if result.matchType == 'EXACT' %}
+            <tr class="no-page-break bold">
+            {% else %}
+            <tr class="no-page-break">
+            {% endif %}
+                <td>{{loop.index}}</td>
+                <td>{{result.baseRegistrationNumber}}</td>
+                <td>{{result.vehicleCollateral.serialNumber}}</td>
+                <td>{{result.vehicleCollateral.type}}</td>
+                <td>{{result.vehicleCollateral.year}}</td>
+                <td class="right-align">{{result.vehicleCollateral.make}} 
+                    {% if result.vehicleCollateral.model is defined %} / {{result.vehicleCollateral.model}}{% endif %}
+                </td>
+                <td class="right-align">{{result.vehicleCollateral.manufacturedHomeRegistrationNumber}}</td>
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+                <td colspan="7" style="height:1px"/>
+            </tr>
+        {% endfor %}
+    </table>  
+    {% endif %}
+</div>

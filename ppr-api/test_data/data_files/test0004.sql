@@ -45,7 +45,7 @@ INSERT INTO draft(draft_id, document_number, account_id, create_ts, registration
 INSERT INTO registration(registration_id, financing_id, registration_number, base_reg_number, registration_type_cd,
                          registration_type_cl, registration_ts, document_number, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
-    VALUES(200000004, 200000003, 'TEST00D4', 'TEST0004', 'DC', 'DISCHARGE', sysdate, 'D-T-00D4', 0,
+    VALUES(200000004, 200000003, 'TEST00D4', 'TEST0004', 'DC', 'DISCHARGE', sysdate + 1, 'D-T-00D4', 0,
            null, null, 'PS12345', 'TEST-DIS-0004', null, null)
 ;
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)

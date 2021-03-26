@@ -1,0 +1,122 @@
+{
+  "details": [
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0005", 
+        "changes": [
+          {
+            "baseRegistrationNumber": "TEST0005", 
+            "clientReferenceId": "TEST-REN-0005", 
+            "createDateTime": "2021-03-16T15:39:38+00:00", 
+            "expiryDate": "2023-03-16T15:34:38+00:00", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00R5", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-RENEWAL", 
+                "last": "REGISTERING", 
+                "middle": "5"
+              }
+            }, 
+            "renewalRegistrationNumber": "TEST00R5", 
+            "statementType": "RENEWAL_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-SA-0005", 
+        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0005", 
+              "streetAdditional": "line 2"
+            }, 
+            "partyId": 200000016, 
+            "personName": {
+              "first": "TEST IND", 
+              "last": "DEBTOR", 
+              "middle": "5"
+            }
+          }
+        ], 
+        "expiryDate": "2023-03-16T15:34:38+00:00", 
+        "lifeYears": 2, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0005", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "5"
+          }
+        }, 
+        "registrationAct": "PPSA SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0005", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 5 SECURED PARTY", 
+            "partyId": 200000017
+          }
+        ], 
+        "statusType": "ACT", 
+        "trustIndenture": false, 
+        "type": "SA", 
+        "vehicleCollateral": [
+          {
+            "make": "TESLA", 
+            "model": "MODEL 3", 
+            "serialNumber": "YJ46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000005, 
+            "year": 2018
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }
+  ], 
+  "exactResultsSize": 1, 
+  "payment": {
+    "invoiceId": "1000001", 
+    "receipt": "/api/v1/payment-requests/1000001/receipts"
+  }, 
+  "searchDateTime": "2021-03-25T15:48:28+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "T-S-RN-005D", 
+    "criteria": {
+      "value": "TEST0005"
+    }, 
+    "type": "REGISTRATION_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0005", 
+      "matchType": "EXACT"
+    }
+  ], 
+  "similarResultsSize": 0, 
+  "totalResultsSize": 1
+}

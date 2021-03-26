@@ -1,0 +1,50 @@
+<div class="business-details-container">
+  <div class="financing-type">{{ detail.financingStatement.registrationDescription }}</div>
+  <div class="financing-act">{{ detail.financingStatement.registrationAct }}</div>
+    <div class="business-name-header">
+    <span class="lbl-business-name">Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}</span>
+    {% if detail.financingStatement.statusType == 'HDC' %} 
+      <span class="lbl-business-name-gold">DISCHARGED</span>
+    {% elif detail.financingStatement.statusType == 'HEX' %} 
+      <span class="lbl-business-name-gold">EXPIRED</span>
+    {% endif %}
+  </div>
+  <table class="business-details-table" role="presentation">
+    <tr>
+      <td>
+        <div class="bold pt-2">Base Registration Date and Time:</div>
+        {% if detail.financingStatement.dischargedDateTime is defined %}
+          <div class="bold pt-2">Discharge Date and Time:</div>
+        {% endif %}
+        <div class="bold pt-2">Current Expiry Date and Time:</div>
+      </td>
+      <td>
+        <div class="pt-2">{{detail.financingStatement.createDateTime}}</div>
+        {% if detail.financingStatement.dischargedDateTime is defined %}
+          <div class="pt-2">{{detail.financingStatement.dischargedDateTime}}</div>
+        {% endif %}
+        <div class="pt-2">{% if lifeInfinite is defined and lifeInfinite %} 
+                            Never
+                          {% else %}
+                            {{detail.financingStatement.expiryDate}}
+                          {% endif %}</div>
+        <div class="business-details-note pt-2">Expiry date includes subsequent registered renewal(s)</div>
+      </td>
+    </tr>
+  </table>
+</div>
+  
+<div class="container pt-4">
+  <div class="no-page-break">
+    <div class="separator mt-4"></div>
+    <div class="section-statement mt-4">Current Registration Information as of {{searchDateTime}}</div>
+    <div class="separator mt-4"></div>
+  </div>
+
+  [[search-result/securedParties.html]]
+  [[search-result/debtors.html]]
+  [[search-result/registeringParty.html]]
+  [[search-result/vehicleCollateral.html]]
+  [[search-result/generalCollateral.html]]
+
+</div>

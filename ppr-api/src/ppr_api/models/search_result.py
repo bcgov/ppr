@@ -56,7 +56,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         result = None
         if self.search_response:
             result = json.loads(self.search_response)
-
+            if self.search_select:
+                result['selected'] = json.loads(self.search_select)
         return result
 
     def save(self):
@@ -81,7 +82,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             'searchDateTime': model_utils.format_ts(self.search.search_ts),
             'exactResultsSize': self.exact_match_count,
             'similarResultsSize': self.similar_match_count,
-            'totalResultsSize': self.search.total_results_size,
             'searchQuery': json.loads(self.search.search_criteria),
             'details': []
         }
@@ -120,6 +120,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         # Update summary information and save.
         detail_response['exactResultsSize'] = self.exact_match_count
         detail_response['similarResultsSize'] = self.similar_match_count
+        detail_response['totalResultsSize'] = (self.exact_match_count + self.similar_match_count)
         detail_response['details'] = new_results
         self.search_response = json.dumps(detail_response)
         self.save()

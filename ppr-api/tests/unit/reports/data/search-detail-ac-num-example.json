@@ -1,0 +1,114 @@
+{
+  "details": [
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0011", 
+        "clientReferenceId": "TEST-SA-0011", 
+        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0011", 
+              "streetAdditional": "line 2"
+            }, 
+            "partyId": 200000029, 
+            "personName": {
+              "first": "TEST IND", 
+              "last": "DEBTOR", 
+              "middle": "11"
+            }
+          }
+        ], 
+        "expiryDate": "2022-03-16T15:34:38+00:00", 
+        "lifeYears": 1, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0011", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "11"
+          }
+        }, 
+        "registrationAct": "PPSA SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0011", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 11 SECURED PARTY", 
+            "partyId": 200000030
+          }
+        ], 
+        "statusType": "ACT", 
+        "trustIndenture": true, 
+        "type": "SA", 
+        "vehicleCollateral": [
+          {
+            "make": "HOMCO IND. LTD DIPLOMAT", 
+            "manufacturedHomeRegistrationNumber": "220000", 
+            "serialNumber": "999999", 
+            "type": "MH", 
+            "vehicleId": 200000009, 
+            "year": 2012
+          }, 
+          {
+            "make": "CESSNA", 
+            "model": "172R SKYHAWK", 
+            "serialNumber": "CFYXW", 
+            "type": "AC", 
+            "vehicleId": 200000010, 
+            "year": 1998
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }
+  ], 
+  "exactResultsSize": 1, 
+  "payment": {
+    "invoiceId": "1000001", 
+    "receipt": "/api/v1/payment-requests/1000001/receipts"
+  }, 
+  "searchDateTime": "2021-03-25T16:47:45+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "T-S-AC-002", 
+    "criteria": {
+      "value": "CFYXW"
+    }, 
+    "type": "AIRCRAFT_DOT"
+  }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0011", 
+      "createDateTime": "2021-03-16T15:34:38+00:00", 
+      "matchType": "EXACT", 
+      "registrationType": "SA", 
+      "vehicleCollateral": {
+        "make": "CESSNA", 
+        "model": "172R SKYHAWK", 
+        "serialNumber": "CFYXW", 
+        "type": "AC", 
+        "year": 1998
+      }
+    }
+  ], 
+  "similarResultsSize": 0, 
+  "totalResultsSize": 1
+}

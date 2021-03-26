@@ -100,3 +100,12 @@ def test_today_ts_offset():
     assert test_today_ts.minute == 0
     assert test_today_ts.second == 0
     assert test_today_ts < test_now_ts
+
+
+def test_expiry_dt_add_years():
+    """Assert that adding years to an expiry date is performing as expected."""
+    expiry_ts = model_utils.expiry_dt_from_years(1)
+    add_ts = model_utils.expiry_dt_add_years(expiry_ts, 4)
+    print('Initial expiry: ' + model_utils.format_ts(expiry_ts))
+    print('Updated expiry: ' + model_utils.format_ts(add_ts))
+    assert (add_ts.year - expiry_ts.year) == 4

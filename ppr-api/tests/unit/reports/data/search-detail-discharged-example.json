@@ -1,0 +1,125 @@
+{
+  "details": [
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST00D4", 
+        "changes": [
+          {
+            "baseRegistrationNumber": "TEST0004", 
+            "clientReferenceId": "TEST-DIS-0004", 
+            "createDateTime": "2021-03-16T15:34:38+00:00", 
+            "dischargeRegistrationNumber": "TEST00D4", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00D4", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-DISCHARGE", 
+                "last": "REGISTERING", 
+                "middle": "4"
+              }
+            }, 
+            "statementType": "DISCHARGE_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-DIS-0004", 
+        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "debtors": [
+          {
+            "added": true, 
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0004", 
+              "streetAdditional": "line 2"
+            }, 
+            "partyId": 200000012, 
+            "personName": {
+              "first": "TEST IND", 
+              "last": "DEBTOR", 
+              "middle": "4"
+            }
+          }
+        ], 
+        "dischargedDateTime": "2021-03-16T15:34:38+00:00", 
+        "expiryDate": "2023-03-16T15:34:38+00:00", 
+        "lifeYears": 2, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-00D4", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST-DISCHARGE", 
+            "last": "REGISTERING", 
+            "middle": "4"
+          }
+        }, 
+        "registrationAct": "PPSA SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "added": true, 
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0004", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 4 SECURED PARTY", 
+            "partyId": 200000013
+          }
+        ], 
+        "statusType": "HDC", 
+        "trustIndenture": true, 
+        "type": "SA", 
+        "vehicleCollateral": [
+          {
+            "added": true, 
+            "make": "HONDA", 
+            "model": "CIVIC", 
+            "serialNumber": "JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000004, 
+            "year": 2018
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }
+  ], 
+  "exactResultsSize": 1, 
+  "payment": {
+    "invoiceId": "1000001", 
+    "receipt": "/api/v1/payment-requests/1000001/receipts"
+  }, 
+  "searchDateTime": "2021-03-25T15:42:51+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "T-S-RN-004D", 
+    "criteria": {
+      "value": "TEST0004"
+    }, 
+    "type": "REGISTRATION_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0004", 
+      "matchType": "EXACT"
+    }
+  ], 
+  "similarResultsSize": 0, 
+  "totalResultsSize": 1
+}
