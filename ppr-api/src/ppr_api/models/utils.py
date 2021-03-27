@@ -183,7 +183,7 @@ def expiry_dt_from_years(life_years: int):
 def expiry_dt_add_years(current_expiry, add_years: int):
     """For renewals add years to the existing expiry timestamp."""
     if current_expiry and add_years and add_years > 0:
-        return current_expiry.replace(year = current_expiry.year + add_years)
+        return current_expiry.replace(year=current_expiry.year + add_years)
 
     return current_expiry
 

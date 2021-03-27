@@ -155,8 +155,8 @@ def test_search_query_staff_missing_account_201(session, client, jwt):
     assert rv.status_code == HTTPStatus.CREATED
 
 
-def test_search_query_no_result_422(session, client, jwt):
-    """Assert that a valid search request with no results returns a 422 status."""
+def test_search_query_no_result_200(session, client, jwt):
+    """Assert that a valid search request with no results returns a 201 status."""
     # setup
     json_data = {
         'type': 'REGISTRATION_NUMBER',
@@ -173,7 +173,8 @@ def test_search_query_no_result_422(session, client, jwt):
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    assert rv.status_code == HTTPStatus.CREATED
+    assert 'results' not in rv.json
 
 
 def test_search_query_nonstaff_unauthorized_404(session, client, jwt):

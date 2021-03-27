@@ -47,6 +47,9 @@ SEARCH_RESULT_DISCHARGED_REQUESTFILE = 'tests/unit/reports/data/search-detail-di
 SEARCH_RESULT_RENEWED_DATAFILE = 'tests/unit/reports/data/search-detail-renewed-example.json'
 SEARCH_RESULT_RENEWED_REQUESTFILE = 'tests/unit/reports/data/search-detail-renewed-request.json'
 
+SEARCH_RESULT_NO_RESULTS_DATAFILE = 'tests/unit/reports/data/search-detail-no-results-example.json'
+SEARCH_RESULT_NO_RESULTS_REQUESTFILE = 'tests/unit/reports/data/search-detail-no-results-request.json'
+
 TEST_REPORT_DATA = [
     ('RG', SEARCH_RESULT_RG_DATAFILE, SEARCH_RESULT_RG_REQUESTFILE),
     ('AC', SEARCH_RESULT_AC_DATAFILE, SEARCH_RESULT_AC_REQUESTFILE),
@@ -55,7 +58,8 @@ TEST_REPORT_DATA = [
     ('IS', SEARCH_RESULT_IS_DATAFILE, SEARCH_RESULT_IS_REQUESTFILE),
     ('BS', SEARCH_RESULT_BS_DATAFILE, SEARCH_RESULT_BS_REQUESTFILE),
     ('DISCHARGED', SEARCH_RESULT_DISCHARGED_DATAFILE, SEARCH_RESULT_DISCHARGED_REQUESTFILE),
-    ('RENEWED', SEARCH_RESULT_RENEWED_DATAFILE, SEARCH_RESULT_RENEWED_REQUESTFILE)
+    ('RENEWED', SEARCH_RESULT_RENEWED_DATAFILE, SEARCH_RESULT_RENEWED_REQUESTFILE),
+    ('NO_RESULTS', SEARCH_RESULT_NO_RESULTS_DATAFILE, SEARCH_RESULT_NO_RESULTS_REQUESTFILE),
 ]
 
 TEST_DATETIME_DATA = [
@@ -90,8 +94,9 @@ def test_search_result_config(client, jwt, type, json_data_file, report_data_fil
     assert report_data['meta_account_id']
     assert report_data['environment']
     assert report_data['searchDateTime'].endswith('Pacific Time')
-    financing = report_data['details'][0]['financingStatement']
-    assert financing['registeringParty']['address']['country'] == 'Canada'
+    if type != 'NO_RESULTS':
+        financing = report_data['details'][0]['financingStatement']
+        assert financing['registeringParty']['address']['country'] == 'Canada'
 
 
 @pytest.mark.parametrize('test_value,expected_value,is_date_time', TEST_DATETIME_DATA)

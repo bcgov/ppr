@@ -77,6 +77,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
         Remove any original similar match financing statements that are not in the current search query selection.
         """
+        # Nothing to do if search had no results.
+        if self.search.total_results_size < 1:
+            return
+
         # Build default summary information
         detail_response = {
             'searchDateTime': model_utils.format_ts(self.search.search_ts),
@@ -149,10 +153,32 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         return search_detail
 
     @staticmethod
+    def create_from_search_query_no_results(search_query):
+        """Create a search detail object from the inital search query which retured no results."""
+        search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
+        detail_response = {
+            'searchDateTime': model_utils.format_ts(search_query.search_ts),
+            'exactResultsSize': search_result.exact_match_count,
+            'similarResultsSize': search_result.similar_match_count,
+            'totalResultsSize': 0,
+            'searchQuery': json.loads(search_query.search_criteria)
+        }
+        if search_query.pay_invoice_id and search_query.pay_path:
+            payment = {
+                'invoiceId': str(search_query.pay_invoice_id),
+                'receipt': search_query.pay_path
+            }
+            detail_response['payment'] = payment
+        search_result.search_response = json.dumps(detail_response)
+        return search_result
+
+    @staticmethod
     def create_from_search_query(search_query, mark_added: bool = True):
         """Create a search detail object from the inital search query with no search selection criteria."""
+        if search_query.total_results_size == 0:  # A search query with no results: build minimal details.
+            return SearchResult.create_from_search_query_no_results(search_query)
+
         search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
-        # search_result.search_id = search_query.search_id
         query_results = json.loads(search_query.search_response)
         detail_results = []
         for result in query_results:

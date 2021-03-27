@@ -235,7 +235,7 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key in (ReportTypes.CHANGE_STATEMENT_REPORT.value,
                                   ReportTypes.AMENDMENT_STATEMENT_REPORT.value):
             self._set_amend_change_addresses(self._report_data)
-        else:
+        elif self._report_key != ReportTypes.SEARCH_DETAIL_REPORT.value:
             self._format_address(self._report_data['registeringParty']['address'])
 
     def _set_financing_addresses(self, statement):
@@ -335,13 +335,14 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value and self._report_data['totalResultsSize'] > 0:
+        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value:
             self._report_data['searchDateTime'] = Report._to_report_datetime(self._report_data['searchDateTime'])
-            for detail in self._report_data['details']:
-                Report._set_financing_date_time(detail['financingStatement'])
-                if 'changes' in detail['financingStatement']:
-                    for change in detail['financingStatement']['changes']:
-                        Report._set_change_date_time(change)
+            if self._report_data['totalResultsSize'] > 0:
+                for detail in self._report_data['details']:
+                    Report._set_financing_date_time(detail['financingStatement'])
+                    if 'changes' in detail['financingStatement']:
+                        for change in detail['financingStatement']['changes']:
+                            Report._set_change_date_time(change)
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
             Report._set_financing_date_time(self._report_data)
         else:

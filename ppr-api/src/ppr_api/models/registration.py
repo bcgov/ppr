@@ -324,7 +324,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
                     registration.life = new_expiry_date.year - registration.financing_statement.expiry_date.year
                     registration.financing_statement.expiry_date = new_expiry_date
-                    
+
             # TODO: verify this is updated.
             registration.financing_statement.life = registration.life
 

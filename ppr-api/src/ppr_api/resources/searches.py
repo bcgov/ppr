@@ -75,11 +75,11 @@ class SearchResource(Resource):
                 query.pay_invoice_id = int(invoice_id)
                 query.pay_path = pay_ref['receipt']
 
-            # Execute the search query: if no results return a 422 status.
+            # Execute the search query: treat no results as a success.
             try:
                 query.search()
-                if not query.search_response or query.returned_results_size == 0:
-                    return resource_utils.unprocessable_error_response('search query')
+                # if not query.search_response or query.returned_results_size == 0:
+                #   return resource_utils.unprocessable_error_response('search query')
 
                 # Now save the initial detail results in the search_result table with no
                 # search selection criteria (the absence indicates an incomplete search).
