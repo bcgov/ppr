@@ -404,7 +404,7 @@ class Report:  # pylint: disable=too-few-public-methods
             return 'DEV'
         if namespace.endswith('test'):
             return 'TEST'
-        if namespace.endswith('sandbox'):
+        if namespace.endswith('tools'):
             return 'SANDBOX'
         return ''
 
