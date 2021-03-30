@@ -14,10 +14,10 @@ export const SearchTypes: Array<SearchTypeIF> = [
   },
   {
     divider: false,
-    selectDisabled: true,
+    selectDisabled: false,
     searchTypeUI: UISearchTypes.INDIVIDUAL_DEBTOR,
     searchTypeAPI: APISearchTypes.INDIVIDUAL_DEBTOR,
-    textLabel: 'tbd',
+    textLabel: '',
     hints: null
   },
   {

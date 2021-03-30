@@ -4,4 +4,5 @@ import { IndividualNameIF } from '@/interfaces'
 export interface SearchNameIF {
   businessName?: string, // Conditional: returned with debtor business name search.
   personName?: IndividualNameIF // Conditional: returned with debtor individual name search.
+  birthDate?: string // Conditional: returned with debtor individual name search.
 }

@@ -90,7 +90,7 @@ import * as Dialogs from '@/components/dialogs'
 import * as Views from '@/views'
 
 // Mixins, interfaces, etc
-import { AuthMixin, DateMixin } from '@/mixins'
+import { AuthMixin } from '@/mixins'
 import { ActionBindingIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 // Enums and Constants
@@ -105,7 +105,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
     ...Views
   }
 })
-export default class App extends Mixins(AuthMixin, DateMixin) {
+export default class App extends Mixins(AuthMixin) {
   // Global getters
   @Getter getUserEmail!: string
   @Getter getUserFirstName!: string

@@ -72,3 +72,35 @@
     }
   }
 }
+
+.column-lg {
+  width: 15rem;
+}
+
+.column-md {
+  width: 10.5rem;
+}
+
+.column-mdl {
+  width: 13rem;
+}
+
+.column-mds {
+  width: 8rem;
+}
+
+.column-sm {
+  width: 6rem;
+}
+
+.soft-corners {
+  border-radius: 5px 5px 5px 5px;
+}
+
+.soft-corners-top {
+  border-radius: 5px 5px 0 0;
+}
+
+.soft-corners-bottom {
+  border-radius: 0 0 5px 5px;
+}

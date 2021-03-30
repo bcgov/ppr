@@ -142,6 +142,103 @@ describe('Serial number validation', () => {
   })
 })
 
+describe('Individual debtor validation', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    wrapper = createComponent(SearchTypes)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('prevents searching and gives validation when first name or last name is empty', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.searchValue).toBeNull()
+    expect(wrapper.vm.$data.searchValueFirst).toBeUndefined()
+    expect(wrapper.vm.$data.searchValueSecond).toBeUndefined()
+    expect(wrapper.vm.$data.searchValueLast).toBeUndefined()
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.messageFirst).toBeDefined()
+    expect(wrapper.vm.$data.validations.searchValue?.messageSecond).toBeUndefined()
+    expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeDefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(2)
+    expect(messages.at(0).text()).toBe('Enter a first name')
+    expect(messages.at(1).text()).toBe('Enter a last name')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  })
+
+  it('prevents searching and gives validation when first name is above max characters', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValueFirst = '1234567890123456'
+    wrapper.vm.$data.searchValueLast = 'last'
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.messageFirst).toBeDefined()
+    expect(wrapper.vm.$data.validations.searchValue?.messageSecond).toBeUndefined()
+    expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeUndefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Maximum 15 characters')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  })
+
+  it('prevents searching and gives validation when last name is above max characters', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValueFirst = 'first'
+    wrapper.vm.$data.searchValueLast = '12345678901234567890123456'
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.messageFirst).toBeUndefined()
+    expect(wrapper.vm.$data.validations.searchValue?.messageSecond).toBeUndefined()
+    expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeDefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Maximum 25 characters')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  })
+
+  it('gives validation messages/hints as user types', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
+    // hint
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    const hints = wrapper.findAll('.v-messages__message')
+    expect(hints.length).toBe(1)
+    expect(hints.at(0).text()).toContain('Serial numbers normally contain')
+    // popup
+    wrapper.vm.$data.searchValue = 'F10'
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations?.searchValue?.popUp).toBeDefined()
+    await Vue.nextTick()
+    const popUpMessages = wrapper.findAll('.v-tooltip__content')
+    expect(popUpMessages.length).toBe(1)
+    expect(popUpMessages.at(0).text()).toContain('This may not be a valid serial')
+    // special chars
+    wrapper.vm.$data.searchValue = 'F10@'
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
+    await Vue.nextTick()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toContain("don't normally contain special characters")
+  })
+})
+
 describe('Business debtor validation', () => {
   let wrapper: Wrapper<any>
 

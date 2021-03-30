@@ -1,4 +1,4 @@
-import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import { IndividualNameIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 
 export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {
@@ -17,8 +17,12 @@ export const setAccountInformation: ActionIF = ({ commit }, accountInformation):
   commit('mutateAccountInformation', accountInformation)
 }
 
-export const setSearching: ActionIF = ({ commit }, searching: boolean): void => {
-  commit('mutateSearching', searching)
+export const setDebtorName: ActionIF = ({ commit }, debtorName: IndividualNameIF): void => {
+  commit('mutateDebtorName', debtorName)
+}
+
+export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<SearchResponseIF>): void => {
+  commit('mutateSearchHistory', searchHistory)
 }
 
 export const setSearchResults: ActionIF = ({ commit }, searchResults: SearchResponseIF): void => {

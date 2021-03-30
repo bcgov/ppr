@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 // Libraries
-import { PPRApiHelper } from '@/utils'
 import { SearchCriteriaIF, SearchResponseIF, SearchResultIF } from '@/interfaces'
+import { search } from '@/utils'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -24,8 +24,7 @@ describe('PPR API Helper Tests', () => {
         value: 'JU622994'
       }
     }
-    const pprApiHelper = new PPRApiHelper()
-    const searchResponse:SearchResponseIF = await pprApiHelper.search(criteria)
+    const searchResponse:SearchResponseIF = await search(criteria)
     // console.log(JSON.stringify(searchResponse))
     expect(searchResponse.searchId).toBeDefined()
     expect(searchResponse.searchDateTime).toBeDefined()

@@ -12,6 +12,8 @@ export const stateModel: StateModelIF = {
     label: '',
     type: ''
   },
+  debtorName: null,
+  searchHistory: null,
   searchResults: null,
   searchedType: null,
   searchedValue: ''

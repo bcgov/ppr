@@ -1,26 +1,32 @@
 <template>
   <v-container fluid class="pa-10">
-    <v-row>
+    <v-row no-gutters>
       <v-col>
-        <v-row no-gutters>
-          <v-col cols="12" :class="$style['search-title']">
-            <b>Search</b>
+        <v-row no-gutters id="search-header" :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-col cols="auto">
+            <b>Personal Property Search</b>
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="12" :class="[$style['search-info'], 'pt-2']">
-            <span>
-              Select a search category and then enter a value to search.
-              <b>Note:</b>
-              Each search incurs a fee (including searches that return no results).
-            </span>
-          </v-col>
-        </v-row>
-        <v-row>
-          <search-bar @searched-type="setSearchedType"
+          <search-bar class="soft-corners-bottom"
+                      :searchTitle="''"
+                      @debtor-name="setDebtorName"
+                      @searched-type="setSearchedType"
                       @searched-value="setSearchedValue"
                       @search-data="setSearchResults"
                       @search-error="emitError"/>
+        </v-row>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class='pt-12'>
+      <v-col>
+        <v-row no-gutters id="search-history-header" :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-col cols="auto">
+            <b>My Searches</b> ({{ searchHistoryLength }})
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <search-history class="soft-corners-bottom"/>
         </v-row>
       </v-col>
     </v-row>
@@ -31,25 +37,31 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
+import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, searchHistory } from '@/utils'
+import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { ActionBindingIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { RouteNames } from '@/enums'
 
 @Component({
   components: {
+    SearchHistory,
     SearchBar
   }
 })
 export default class Dashboard extends Vue {
+  @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchResults: SearchResponseIF
 
+  @Action setDebtorName: ActionBindingIF
+  @Action setSearchHistory: ActionBindingIF
+  @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
-  @Action setSearchResults: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -72,12 +84,21 @@ export default class Dashboard extends Vue {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  private emitError (error) {
-    // temporary until we know what errors to define
-    if (error === 'payment') {
-      this.emitPaymentError(error)
+  private get searchHistoryLength (): number {
+    return this.getSearchHistory?.length || 0
+  }
+
+  private emitError (statusCode: number): void {
+    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
+    if (statusCode === StatusCodes.PAYMENT_REQUIRED) {
+      this.emitPaymentError()
+    } else if (saveErrorCodes.includes(statusCode)) {
+      this.emitSaveSearchError()
+    } else if (statusCode === StatusCodes.UNAUTHORIZED) {
+      this.emitAuthenticationError()
     } else {
-      this.emitSaveSearchError(error)
+      // temporary catch all (should be a more generic dialogue)
+      this.emitSaveSearchError()
     }
   }
 
@@ -99,14 +120,14 @@ export default class Dashboard extends Vue {
       return
     }
 
-    // try to fetch data TBD
-    try {
-      // tell App that we're finished loading
-      this.emitHaveData()
-    } catch (err) {
-      console.log(err) // eslint-disable-line no-console
-      this.emitFetchError(err)
+    // get/set search history
+    const resp = await searchHistory()
+    if (!resp || resp?.error) this.emitFetchError()
+    else {
+      this.setSearchHistory(resp?.searches)
     }
+    // tell App that we're finished loading
+    this.emitHaveData()
   }
 
   @Watch('getSearchResults')
@@ -119,7 +140,9 @@ export default class Dashboard extends Vue {
     }
   }
 
-  /** Emits Fetch Error event. */
+  @Emit('authenticationError')
+  private emitAuthenticationError (message: string = ''): void { }
+
   @Emit('fetchError')
   private emitFetchError (message: string = ''): void { }
 
@@ -137,16 +160,9 @@ export default class Dashboard extends Vue {
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-#search-time {
-  font-size: 0.825rem;
-  color: $gray8;
-}
-.search-title {
+.dashboard-title {
   font-size: 1rem;
   color: $gray9;
-}
-.search-info {
-  font-size: 0.825rem;
-  color: $gray8;
+  background-color: $BCgovBlue0;
 }
 </style>

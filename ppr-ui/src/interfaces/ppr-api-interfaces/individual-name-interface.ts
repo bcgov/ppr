@@ -3,5 +3,5 @@
 export interface IndividualNameIF {
   first: string, // One of VehicleTypes
   last: string,
-  middle?: string // Optional
+  second?: string // Optional
 }

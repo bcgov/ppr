@@ -6,10 +6,10 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { Result } from '@/components/results'
+import { SearchedResult } from '@/components/tables'
 
 // Other
-import { tableHeaders } from '@/resources'
+import { searchTableHeaders } from '@/resources'
 import { SearchResponseIF } from '@/interfaces'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { mockedSearchResponse } from './test-data'
@@ -41,14 +41,14 @@ const noResultsDiv: string = '#search-no-results-info'
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<Result> object with the given parameters.
+ * @returns a Wrapper<SearchedResult> object with the given parameters.
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Result, {
+  return mount(SearchedResult, {
     localVue,
     store,
     vuetify
@@ -66,7 +66,7 @@ describe('Test result table with no results', () => {
   })
 
   it('doesnt display table if there are no results', async () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(noResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(noResults.totalResultsSize)
@@ -74,8 +74,7 @@ describe('Test result table with no results', () => {
     expect(datatable.length).toBe(0)
     const noResultsInfo = wrapper.findAll(noResultsDiv)
     expect(noResultsInfo.length).toBe(1)
-    expect(noResultsInfo.at(0).text()).toContain('No registrations were found for the Serial Number:')
-    expect(noResultsInfo.at(0).text()).toContain(noResults.searchQuery.criteria.value)
+    expect(noResultsInfo.at(0).text()).toContain('Nil Result 0 registrations | 0 exact matches')
   })
 })
 
@@ -92,10 +91,10 @@ describe('Serial number results', () => {
   })
 
   it('renders Results Component with serial number results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.SERIAL_NUMBER)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.SERIAL_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -134,10 +133,10 @@ describe('Business debtor results', () => {
   })
 
   it('renders Results Component with business debtor name results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.BUSINESS_DEBTOR)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.BUSINESS_DEBTOR)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -172,10 +171,10 @@ describe('Manufactured home results', () => {
   })
 
   it('renders Results Component with manufactured home results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.MHR_NUMBER)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.MHR_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -215,10 +214,10 @@ describe('Aircraft results', () => {
   })
 
   it('renders Results Component with aircraft results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.AIRCRAFT_DOT)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.AIRCRAFT_DOT)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
@@ -256,17 +255,17 @@ describe('Registration number results', () => {
   })
 
   it('renders Results Component with registration number results data', () => {
-    expect(wrapper.findComponent(Result).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(tableHeaders.REGISTRATION_NUMBER)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.REGISTRATION_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(2)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
+    expect(wrapper.vm.$data.exactMatchesLength).toBe(1)
+    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0]])
   })
 
   it('displays results in the table', async () => {

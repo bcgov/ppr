@@ -7,10 +7,10 @@ export enum APISearchTypes {
   SERIAL_NUMBER = 'SERIAL_NUMBER'
 }
 export enum UISearchTypes {
-  AIRCRAFT = 'Aircraft airframe D.O.T. number',
-  BUSINESS_DEBTOR = 'Business debtor name',
-  INDIVIDUAL_DEBTOR = 'Individual debtor name',
-  MHR_NUMBER = 'Manufactured home registration number',
-  REGISTRATION_NUMBER = 'Registration number',
-  SERIAL_NUMBER = 'Serial number'
+  AIRCRAFT = 'Aircraft Airframe D.O.T. Number',
+  BUSINESS_DEBTOR = 'Business Debtor Name',
+  INDIVIDUAL_DEBTOR = 'Individual Debtor Name',
+  MHR_NUMBER = 'Manufactured Home Registration Number',
+  REGISTRATION_NUMBER = 'Registration Number',
+  SERIAL_NUMBER = 'Serial Number'
 }

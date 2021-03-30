@@ -1,21 +1,38 @@
 // Vuetify Overrides
 @import "theme.scss";
 
+// tables
+table {
+  table-layout: fixed;
+}
+th {
+  color: $gray9 !important;
+  font-size: 0.875rem !important;
+}
+td {
+  color: $gray7 !important;
+  font-size: 0.875rem !important;
+  min-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // Buttons
 .v-btn {
-  background-color: $primary-blue !important;
-  color: white !important;
-  font-size: 1rem !important;
+  font-size: 1rem;
   font-weight: 500;
   letter-spacing: normal;
-  min-width: 0;
   padding: inherit 28px !important;
   text-transform: none;
-
-  .v-icon + span,
-  span + .v-icon {
-    margin-left: 0.25rem;
-  }
+    .v-icon + span,
+    span + .v-icon {
+      margin-left: 0.25rem;
+    }
+}
+.v-btn .primary {
+  background-color: $primary-blue !important;
+  color: white !important;
 }
 .sbc-header {
   .v-btn {
@@ -145,6 +162,9 @@
   border-bottom: 8px solid RGBA(73,80,87,0.95) !important;
 }
 
+.v-data-table__selected {
+  background: $blueSelected !important;
+}
 .v-select-list {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -152,7 +172,10 @@
 .v-select__selections {
   line-height: 1.5rem !important;
 }
-
 .v-simple-checkbox .theme--light.v-icon{
   color: $primary-blue;
+}
+
+.folio-edit-txt .v-messages {
+  text-align: end !important;
 }
