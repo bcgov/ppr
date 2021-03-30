@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="px-0 py-0 pb-7 white">
+  <v-container fluid class="px-0 py-0 pb-7 white" style="max-width: none;">
     <v-row no-gutters align="center" :class="[$style['breadcrumb-row'], 'px-15', 'py-2']">
       <v-col cols="auto" class="pr-3" style="border-right: thin solid #ced4da">
         <v-btn id="tombstone-back-btn" :class="$style['back-btn']" exact :href="backURL" icon small>

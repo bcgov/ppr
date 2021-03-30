@@ -51,7 +51,7 @@
 
     <div class="app-body">
       <main v-if="!isErrorDialog">
-        <v-container class="view-container pa-0">
+        <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">
               <router-view

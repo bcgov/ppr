@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-0">
+  <v-container fluid class="pa-0 ma-0" style="max-width: none;">
     <v-row no-gutters>
       <tombstone :backURL="registryUrl" :header="'My PPR Dashboard'" :setItems="breadcrumbs"/>
     </v-row>
