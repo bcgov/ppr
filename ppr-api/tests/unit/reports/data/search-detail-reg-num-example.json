@@ -2,127 +2,7 @@
   "details": [
     {
       "financingStatement": {
-        "statusType": "HDC",
         "baseRegistrationNumber": "TEST0001", 
-        "clientReferenceId": "TEST-SA-0001", 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0001", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST BUS 2 DEBTOR", 
-            "partyId": 200000002,
-            "birthDate": "1990-06-15T01:48:53+00:00"
-          }, 
-          {
-            "added": true, 
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-00C8", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 8 TRANSFER DEBTOR", 
-            "partyId": 200000024
-          }
-        ], 
-        "expiryDate": "2023-03-16T15:34:38+00:00", 
-        "generalCollateral": [
-          {
-            "collateralId": 200000000, 
-            "description": "TEST0001 GC 1"
-          }, 
-          {
-            "added": true, 
-            "collateralId": 200000003, 
-            "description": "TEST GENERAL COLLATERAL CHANGE ADD."
-          }
-        ], 
-        "lifeYears": 2, 
-        "registeringParty": {
-          "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0001", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "1"
-          }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
-        "securedParties": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST 200000000", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST SECURED PARTY", 
-            "code": "200000000", 
-            "emailAddress": "test-sp-client@gmail.com", 
-            "partyId": 200000004
-          }, 
-          {
-            "added": true, 
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-00C9", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
-            "partyId": 200000026
-          }
-        ], 
-        "trustIndenture": true, 
-        "type": "SA", 
-        "vehicleCollateral": [
-          {
-            "make": "HYUNDAI", 
-            "model": "TUSCON", 
-            "serialNumber": "KM8J3CA46JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000000, 
-            "year": 2018
-          }, 
-          {
-            "added": true, 
-            "make": "BMW", 
-            "model": "Z4", 
-            "serialNumber": "JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000007, 
-            "year": 2014
-          }, 
-          {
-            "added": true, 
-            "make": "HOMCO IND. LTD DIPLOMAT", 
-            "manufacturedHomeRegistrationNumber": "220000", 
-            "serialNumber": "999999", 
-            "type": "MH", 
-            "vehicleId": 200000008, 
-            "year": 2012
-          }
-        ],
         "changes": [
           {
             "addGeneralCollateral": [
@@ -234,8 +114,7 @@
             ], 
             "amendmentRegistrationNumber": "TEST0007", 
             "baseRegistrationNumber": "TEST0001", 
-            "changeType": "CO",
-            "description": "Description of court order.", 
+            "changeType": "CO", 
             "clientReferenceId": "TEST-AM-0007", 
             "courtOrderInformation": {
               "courtName": "Supreme Court of British Columbia", 
@@ -293,6 +172,7 @@
                 "year": 2001
               }
             ], 
+            "description": "Description of court order.", 
             "registeringParty": {
               "address": {
                 "city": "city", 
@@ -412,7 +292,133 @@
             }, 
             "statementType": "CHANGE_STATEMENT"
           }
-        ] 
+        ], 
+        "clientReferenceId": "TEST-SA-0001", 
+        "courtOrderInformation": {
+          "courtName": "Supreme Court of British Columbia", 
+          "courtRegistry": "Victoria", 
+          "effectOfOrder": "Court Order to change something.", 
+          "fileNumber": "BC123495", 
+          "orderDate": "2021-10-02T15:34:38+00:00"
+        }, 
+        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0001", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST BUS 2 DEBTOR", 
+            "partyId": 200000002
+          }, 
+          {
+            "added": true, 
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-00C8", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 8 TRANSFER DEBTOR", 
+            "partyId": 200000024
+          }
+        ], 
+        "expiryDate": "2023-03-16T15:34:38+00:00", 
+        "generalCollateral": [
+          {
+            "collateralId": 200000000, 
+            "description": "TEST0001 GC 1"
+          }, 
+          {
+            "added": true, 
+            "collateralId": 200000003, 
+            "description": "TEST GENERAL COLLATERAL CHANGE ADD."
+          }
+        ], 
+        "lifeYears": 2, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0001", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "1"
+          }
+        }, 
+        "registrationAct": "PPSA SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST 200000000", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST SECURED PARTY", 
+            "code": "200000000", 
+            "emailAddress": "test-sp-client@gmail.com", 
+            "partyId": 200000004
+          }, 
+          {
+            "added": true, 
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-00C9", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
+            "partyId": 200000026
+          }
+        ], 
+        "statusType": "ACT", 
+        "trustIndenture": true, 
+        "type": "SA", 
+        "vehicleCollateral": [
+          {
+            "make": "HYUNDAI", 
+            "model": "TUSCON", 
+            "serialNumber": "KM8J3CA46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000000, 
+            "year": 2018
+          }, 
+          {
+            "added": true, 
+            "make": "BMW", 
+            "model": "Z4", 
+            "serialNumber": "JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000007, 
+            "year": 2014
+          }, 
+          {
+            "added": true, 
+            "make": "HOMCO IND. LTD DIPLOMAT", 
+            "manufacturedHomeRegistrationNumber": "220000", 
+            "serialNumber": "999999", 
+            "type": "MH", 
+            "vehicleId": 200000008, 
+            "year": 2012
+          }
+        ]
       }, 
       "matchType": "EXACT"
     }
@@ -422,14 +428,20 @@
     "invoiceId": "1000001", 
     "receipt": "/api/v1/payment-requests/1000001/receipts"
   }, 
-  "searchDateTime": "2021-03-19T00:21:12+00:00", 
+  "searchDateTime": "2021-03-29T17:36:56+00:00", 
   "searchQuery": {
-    "clientReferenceId": "T-S-RN-004", 
+    "clientReferenceId": "T-S-RN-005", 
     "criteria": {
       "value": "TEST0001"
     }, 
     "type": "REGISTRATION_NUMBER"
   }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0001", 
+      "matchType": "EXACT"
+    }
+  ], 
   "similarResultsSize": 0, 
   "totalResultsSize": 1
 }

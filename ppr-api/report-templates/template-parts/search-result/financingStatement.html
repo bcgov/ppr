@@ -1,13 +1,18 @@
 <div class="business-details-container">
   <div class="financing-type">{{ detail.financingStatement.registrationDescription }}</div>
   <div class="financing-act">{{ detail.financingStatement.registrationAct }}</div>
-    <div class="business-name-header">
-    <span class="lbl-business-name">Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}</span>
-    {% if detail.financingStatement.statusType == 'HDC' %} 
-      <span class="lbl-business-name-gold">DISCHARGED</span>
-    {% elif detail.financingStatement.statusType == 'HEX' %} 
-      <span class="lbl-business-name-gold">EXPIRED</span>
-    {% endif %}
+{#
+  <div class="business-name-header" id="{{ detail.financingStatement.baseRegistrationNumber }}">
+#}
+  <div class="business-name-header">
+    <h2 id="{{ detail.financingStatement.baseRegistrationNumber }}" class="lbl-business-name">
+      Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}
+      {% if detail.financingStatement.statusType == 'HDC' %} 
+        <span class="lbl-business-name-gold">DISCHARGED</span>
+      {% elif detail.financingStatement.statusType == 'HEX' %} 
+        <span class="lbl-business-name-gold">EXPIRED</span>
+      {% endif %}
+    </h2>
   </div>
   <table class="business-details-table" role="presentation">
     <tr>
@@ -46,5 +51,7 @@
   [[search-result/registeringParty.html]]
   [[search-result/vehicleCollateral.html]]
   [[search-result/generalCollateral.html]]
-
+  {% if detail.financingStatement.courtOrderInformation is defined %}
+    [[search-result/courtOrderInformation.html]]
+  {% endif %}
 </div>

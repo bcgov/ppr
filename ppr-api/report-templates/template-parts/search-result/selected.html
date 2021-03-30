@@ -6,6 +6,7 @@
          <td class="top-align">Base Registration</td>
          <td class="top-align">Debtor Name</td>
          <td class="top-align">Type</td>
+         <td class="top-align">Page Number</td>
         </tr>
         {% for result in selected %}
         {% if result.matchType == 'EXACT' %}
@@ -14,7 +15,7 @@
         <tr class="no-page-break">
         {% endif %}
             <td>{{loop.index}}</td>
-            <td>{{result.baseRegistrationNumber}}</td>
+            <td><a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a></td>
             <td>
                 {% if result.debtor.businessName is defined %}
                     {{ result.debtor.businessName }}
@@ -26,6 +27,9 @@
             </td>
             <td>
                 {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %} Individual {% else %} Business{% endif %}
+            </td>
+            <td class="right-align">
+                <a href="#{{result.baseRegistrationNumber}}" class="tocpagenr"></a>
             </td>
          </tr>
          <tr class="solid-row-separator no-page-break">
@@ -41,7 +45,8 @@
             <td class="top-align">Serial Number</td>
             <td class="top-align">Type</td>
             <td class="top-align">Year</td>
-            <td class="right-align top-align">Make/Model</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">Page Number</td>
         </tr>
         {% for result in selected %}
             {% if result.matchType == 'EXACT' %}
@@ -50,16 +55,19 @@
             <tr class="no-page-break">
             {% endif %}
                 <td>{{loop.index}}</td>
-                <td>{{result.baseRegistrationNumber}}</td>
+                <td><a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a></td>
                 <td>{{result.vehicleCollateral.serialNumber}}</td>
                 <td>{{result.vehicleCollateral.type}}</td>
                 <td>{{result.vehicleCollateral.year}}</td>
-                <td class="right-align">{{result.vehicleCollateral.make}} 
+                <td>{{result.vehicleCollateral.make}} 
                     {% if result.vehicleCollateral.model is defined %} / {{result.vehicleCollateral.model}}{% endif %}
+                </td>
+                <td class="right-align">
+                    <a href="#{{result.baseRegistrationNumber}}" class="tocpagenr"></a>
                 </td>
             </tr>
             <tr class="solid-row-separator no-page-break">
-                <td colspan="6" style="height:1px"/>
+                <td colspan="7" style="height:1px"/>
             </tr>
         {% endfor %}
     </table>
@@ -71,8 +79,9 @@
             <td class="top-align">Serial Number</td>
             <td class="top-align">Type</td>
             <td class="top-align">Year</td>
-            <td class="right-align top-align">Make/Model</td>
-            <td class="right-align top-align">MHR Number</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">MHR Number</td>
+            <td class="top-align">Page Number</td>
         </tr>
         {% for result in selected %}
             {% if result.matchType == 'EXACT' %}
@@ -81,14 +90,17 @@
             <tr class="no-page-break">
             {% endif %}
                 <td>{{loop.index}}</td>
-                <td>{{result.baseRegistrationNumber}}</td>
+                <td><a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a></td>
                 <td>{{result.vehicleCollateral.serialNumber}}</td>
                 <td>{{result.vehicleCollateral.type}}</td>
                 <td>{{result.vehicleCollateral.year}}</td>
-                <td class="right-align">{{result.vehicleCollateral.make}} 
+                <td>{{result.vehicleCollateral.make}} 
                     {% if result.vehicleCollateral.model is defined %} / {{result.vehicleCollateral.model}}{% endif %}
                 </td>
-                <td class="right-align">{{result.vehicleCollateral.manufacturedHomeRegistrationNumber}}</td>
+                <td>{{result.vehicleCollateral.manufacturedHomeRegistrationNumber}}</td>
+                <td class="right-align">
+                    <a href="#{{result.baseRegistrationNumber}}" class="tocpagenr"></a>
+                </td>
             </tr>
             <tr class="solid-row-separator no-page-break">
                 <td colspan="7" style="height:1px"/>

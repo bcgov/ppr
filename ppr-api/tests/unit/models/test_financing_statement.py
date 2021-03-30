@@ -116,6 +116,8 @@ def test_find_by_registration_number_valid(session):
     assert result['expiryDate']
     assert result['lifeYears']
     assert result['trustIndenture']
+    if statement.current_view_json:
+        assert result['courtOrderInformation']
 
 
 def test_find_by_id(session):

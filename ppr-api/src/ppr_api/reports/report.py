@@ -11,7 +11,6 @@
 """Produces a PDF output based on templates and JSON messages."""
 import base64
 import json
-import os
 from http import HTTPStatus
 from pathlib import Path
 from enum import Enum
@@ -172,10 +171,10 @@ class Report:  # pylint: disable=too-few-public-methods
         template_parts = [
             'footer',
             'style',
+            'stylePage',
+            'stylePageDraft',
             'logo',
             'macros',
-            'common/style',
-            'common/logo',
             'search-result/selected',
             'search-result/financingStatement',
             'search-result/amendmentStatement',
@@ -306,6 +305,9 @@ class Report:  # pylint: disable=too-few-public-methods
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'])
         if 'dischargedDateTime' in statement:
             statement['dischargedDateTime'] = Report._to_report_datetime(statement['dischargedDateTime'])
+        if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
+            order_date = Report._to_report_datetime(statement['courtOrderInformation']['orderDate'], False)
+            statement['courtOrderInformation']['orderDate'] = order_date
 
         for debtor in statement['debtors']:
             if 'birthDate' in debtor:
@@ -370,7 +372,7 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_meta_info(self):
         """Identify environment in report if non-production."""
-        self._report_data['environment'] = f'{self._get_environment()} ID #{self._get_report_id()}'.lstrip()
+        self._report_data['environment'] = f'{self._get_environment()}'.lstrip()
         self._report_data['meta_account_id'] = self._account_id
         # Get source ???
         # Appears in the Description section of the PDF Document Properties as Title.
@@ -397,11 +399,13 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _get_environment():
         """Identify environment in report if non-production."""
-        namespace = os.getenv('POD_NAMESPACE', '').lower()
+        namespace = current_app.config.get('POD_NAMESPACE').lower()
         if namespace.endswith('dev'):
             return 'DEV'
         if namespace.endswith('test'):
             return 'TEST'
+        if namespace.endswith('sandbox'):
+            return 'SANDBOX'
         return ''
 
     @staticmethod

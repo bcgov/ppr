@@ -6,7 +6,12 @@
     <title>{{ meta_title }}</title>
     <meta charset="UTF-8">
     <meta name="author" content="BC Registries and Online Services">
-    [[common/style.html]]
+    {% if environment == '' %}
+      [[stylePage.html]]
+    {% else %}
+      [[stylePageDraft.html]]
+    {% endif %}
+    [[style.html]]
   </head>
   <body>
     <div class="header">
@@ -16,7 +21,7 @@
             [[logo.html]]
           </td>
           <td>
-            <div class="report-type">{{ meta_title }}</div>
+            <div class="report-type">{{ environment }} {{ meta_title }}</div>
             <div class="report-type-desc">BC Registries and Online Services</div>
           </td>
         </tr>
@@ -61,14 +66,27 @@
         [[search-result/financingStatement.html]]
 
         {% if detail.financingStatement.changes is defined %}
-          <div class="no-page-break">
-            <div class="separator mt-4"></div>
-            <div class="section-statement mt-4">History</div>
-            <div class="separator mt-4"></div>
+          <p style="page-break-before: always" ></p>
+
+          <div class="separator-strong mt-4"></div>
+          <div class="section-statement mt-4">History</div>
+          <div class="separator-strong mt-4"></div>
+
+          <div class="container pt-4">
+            {% for change in detail.financingStatement.changes %}
+              {% if change.statementType == 'RENEWAL_STATEMENT' %}
+                [[search-result/renewalStatement.html]]
+              {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+                [[search-result/amendmentStatement.html]]
+              {% elif change.statementType == 'CHANGE_STATEMENT' %}
+                [[search-result/changeStatement.html]]
+              {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+                [[search-result/dischargeStatement.html]]
+              {% endif %}
+            {% endfor %}
           </div>
         {% endif %} 
       {% endfor %}
-
 
     {% endif %}
   

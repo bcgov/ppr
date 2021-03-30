@@ -154,7 +154,15 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         if self.expire_date:
             statement['expiryDate'] = model_utils.format_ts(self.expire_date)
 
+        self.set_court_order_json(statement)
         return statement
+
+    def set_court_order_json(self, statement):
+        """Add court order info to the statement json if generating the current view and court order info exists."""
+        if self.current_view_json:
+            for registration in self.registration:
+                if registration.court_order:
+                    statement['courtOrderInformation'] = registration.court_order.json
 
     def party_json(self, party_type, registration_id):
         """Build party JSON: current_view_json determines if current or original data is included."""

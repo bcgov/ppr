@@ -67,6 +67,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     REPORT_SVC_URL = os.getenv('REPORT_SVC_URL', 'http://')
     REPORT_TEMPLATE_PATH = os.getenv('REPORT_TEMPLATE_PATH', 'report-templates')
 
+    POD_NAMESPACE = os.getenv('POD_NAMESPACE', '')
+
 #    GO_LIVE_DATE = os.getenv('GO_LIVE_DATE')
 
 #    SENTRY_DSN = os.getenv('SENTRY_DSN', None)
