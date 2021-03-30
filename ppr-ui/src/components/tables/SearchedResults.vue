@@ -158,7 +158,7 @@ export default defineComponent({
     })
     const displayDate = (dateString:string) => {
       const date = new Date(dateString)
-      return convertDate(date, false)
+      return convertDate(date, true, false)
     }
     const getClass = (item:SearchResultIF):string => {
       if (item.matchType === MatchTypes.EXACT) {

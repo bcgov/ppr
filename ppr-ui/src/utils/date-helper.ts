@@ -16,7 +16,9 @@ export function format12HourTime (date: Date): string {
 }
 
 /** Converts date to display format. */
-export function convertDate (date: Date, includeTz: boolean): string {
+export function convertDate (date: Date, includeTime: boolean, includeTz: boolean): string {
+  if (!includeTime) return moment(date).format('MMMM D, Y')
+
   // add 'Pacific Time' to end if pacific timezone
   let timezone = ''
   if ((date.toString()).includes('Pacific')) timezone = 'Pacific Time'

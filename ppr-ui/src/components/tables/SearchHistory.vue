@@ -60,7 +60,7 @@ export default defineComponent({
     })
     const displayDate = (searchDate: string): string => {
       const date = new Date(searchDate)
-      return convertDate(date, false)
+      return convertDate(date, true, false)
     }
     const displaySearchValue = (query: SearchCriteriaIF): string => {
       const first = query?.criteria?.debtorName?.first

@@ -36,13 +36,13 @@ export const getUserEmail = (state: any): string => {
 }
 
 /** The current user's first name. */
-export const getUserFirstName = (state: any): any => {
-  return state.stateModel.tombstone.userInfo?.firstname
+export const getUserFirstName = (state: any): string => {
+  return state.stateModel.tombstone.userInfo?.firstname || ''
 }
 
 /** The current user's last name. */
-export const getUserLastName = (state: any): any => {
-  return state.stateModel.tombstone.userInfo?.lastname
+export const getUserLastName = (state: any): string => {
+  return state.stateModel.tombstone.userInfo?.lastname || ''
 }
 
 /** The current user's roles. */
@@ -51,8 +51,8 @@ export const getUserRoles = (state: any): any => {
 }
 
 /** The current user's username. */
-export const getUserUsername = (state: any): any => {
-  return state.stateModel.tombstone.userInfo?.username
+export const getUserUsername = (state: any): string => {
+  return state.stateModel.tombstone.userInfo?.username || ''
 }
 
 export const getDebtorName = (state: any): IndividualNameIF => {
