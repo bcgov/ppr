@@ -29,7 +29,7 @@
          </tr>
     {% endfor %}
     </table>
-{% elif change.addSecuredParties is defined or change.deleteSecuredParties is defined %}
+{% elif change is defined and (change.addSecuredParties is defined or change.deleteSecuredParties is defined) %}
     <table class="section-data section-data-table mt-4" role="presentation">
     {% if change.addSecuredParties is defined %}
         {% for party in change.addSecuredParties %}
@@ -44,7 +44,17 @@
                             {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
                         {% endif %}
                     </div>
-                    <div><span class="label">Added</span></div>
+                    <div>
+                        <span class="label">
+                            {% if party.name_change is defined %}
+                                Name Changed
+                            {% elif party.address_change is defined %}
+                                Address Changed
+                            {% else %}
+                                Added
+                            {% endif %}
+                        </span>
+                    </div>
                 </td>
                 <td class="col-33">
                     <div class="section-sub-title">Address</div>
@@ -60,29 +70,31 @@
     {% endif %}
     {% if change.deleteSecuredParties is defined %}
         {% for party in change.deleteSecuredParties %}
-        <tr class="no-page-break">
-            <td class="col-33">
-                <div class="section-sub-title">
-                    {% if party.businessName is defined %}
-                        {{ party.businessName }}
-                    {% else %}
-                        {{ party.personName.last }},
-                        {{ party.personName.first }}
-                        {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
-                    {% endif %}
-                </div>
-                <div><span class="label">Removed</span></div>
-            </td>
-            <td class="col-33">
-                <div class="section-sub-title">Address</div>
-                <div class="pt-2">{{ party.address.street }}</div>
-                <div>{{ party.address.streetAdditional }}</div>
-                <div>{{ party.address.city }} {{ party.address.region }}</div>
-                <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-            </td>
-            <td class="col-33">
-            </td>
-         </tr>
+            {% if party.edit is not defined %}
+            <tr class="no-page-break">
+                <td class="col-33">
+                    <div class="section-sub-title">
+                        {% if party.businessName is defined %}
+                            {{ party.businessName }}
+                        {% else %}
+                            {{ party.personName.last }},
+                            {{ party.personName.first }}
+                            {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                        {% endif %}
+                    </div>
+                    <div><span class="label">Removed</span></div>
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Address</div>
+                    <div class="pt-2">{{ party.address.street }}</div>
+                    <div>{{ party.address.streetAdditional }}</div>
+                    <div>{{ party.address.city }} {{ party.address.region }}</div>
+                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                </td>
+                <td class="col-33">
+                </td>
+            </tr>
+            {% endif %}
         {% endfor %}
     {% endif %}
     </table>

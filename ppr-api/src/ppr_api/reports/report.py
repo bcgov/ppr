@@ -224,15 +224,18 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._set_financing_addresses(detail['financingStatement'])
                 if 'changes' in detail['financingStatement']:
                     for change in detail['financingStatement']['changes']:
-                        if change['statementType'] in ('CHANGE_STATEMENT', 'AMENDMENT_STATEMENT'):
+                        if change['statementType'] == 'CHANGE_STATEMENT':
                             self._set_amend_change_addresses(change)
+                        elif change['statementType'] == 'AMENDMENT_STATEMENT':
+                            self._set_amend_party_addresses(change)
                         else:
                             self._format_address(change['registeringParty']['address'])
 
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
             self._set_financing_addresses(self._report_data)
-        elif self._report_key in (ReportTypes.CHANGE_STATEMENT_REPORT.value,
-                                  ReportTypes.AMENDMENT_STATEMENT_REPORT.value):
+        elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value:
+            self._set_amend_party_addresses(self._report_data)
+        elif self._report_key == ReportTypes.CHANGE_STATEMENT_REPORT.value:
             self._set_amend_change_addresses(self._report_data)
         elif self._report_key != ReportTypes.SEARCH_DETAIL_REPORT.value:
             self._format_address(self._report_data['registeringParty']['address'])
@@ -264,6 +267,17 @@ class Report:  # pylint: disable=too-few-public-methods
                 desc = TO_VEHICLE_TYPE_DESCRIPTION[add_collateral['type']]
                 add_collateral['type'] = desc
 
+    @staticmethod
+    def _set_amend_vehicle_collateral(statement):
+        """Replace amendment statement vehicle collateral type code with description. Set if change is an edit."""
+        Report._set_amend_change_vehicle_collateral(statement)
+        if 'deleteVehicleCollateral' in statement and 'addVehicleCollateral' in statement:
+            for add in statement['addVehicleCollateral']:
+                for delete in statement['deleteVehicleCollateral']:
+                    if add['serialNumber'] == delete['serialNumber']:
+                        add['edit'] = True
+                        delete['edit'] = True
+
     def _set_vehicle_collateral(self):
         """Replace vehicle collateral type code with description."""
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value and self._report_data['totalResultsSize'] > 0:
@@ -271,12 +285,15 @@ class Report:  # pylint: disable=too-few-public-methods
                 Report._set_financing_vehicle_collateral(detail['financingStatement'])
                 if 'changes' in detail['financingStatement']:
                     for change in detail['financingStatement']['changes']:
-                        if change['statementType'] in ('CHANGE_STATEMENT', 'AMENDMENT_STATEMENT'):
+                        if change['statementType'] == 'CHANGE_STATEMENT':
                             Report._set_amend_change_vehicle_collateral(change)
+                        elif change['statementType'] == 'AMENDMENT_STATEMENT':
+                            Report._set_amend_vehicle_collateral(change)
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
             Report._set_financing_vehicle_collateral(self._report_data)
-        elif self._report_key in (ReportTypes.CHANGE_STATEMENT_REPORT.value,
-                                  ReportTypes.AMENDMENT_STATEMENT_REPORT.value):
+        elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value:
+            Report._set_amend_vehicle_collateral(self._report_data)
+        elif self._report_key == ReportTypes.CHANGE_STATEMENT_REPORT.value:
             Report._set_amend_change_vehicle_collateral(self._report_data)
 
     def _set_amend_change_addresses(self, statement):
@@ -294,6 +311,38 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'addDebtors' in statement:
             for add_debtor in statement['addDebtors']:
                 self._format_address(add_debtor['address'])
+
+    def _set_amend_party_addresses(self, statement):
+        """Replace amendment statement address country code with description. Set if party edited."""
+        self._set_amend_change_addresses(statement)
+        if 'deleteSecuredParties' in statement and 'addSecuredParties' in statement:            
+            for add_secured in statement['addSecuredParties']:
+                for delete_secured in statement['deleteSecuredParties']:
+                    if add_secured['address'] == delete_secured['address']:
+                        add_secured['name_change'] = True
+                        delete_secured['edit'] = True
+                    elif 'businessName' in add_secured and 'businessName' in delete_secured and \
+                            add_secured['businessName'] == delete_secured['businessName']:
+                        add_secured['address_change'] = True
+                        delete_secured['edit'] = True
+                    elif 'personName' in add_secured and 'personName' in delete_secured and \
+                            add_secured['personName'] == delete_secured['personName']:
+                        add_secured['address_change'] = True
+                        delete_secured['edit'] = True
+        if 'deleteDebtors' in statement and 'addDebtors' in statement:            
+            for add in statement['addDebtors']:
+                for delete in statement['deleteDebtors']:
+                    if add['address'] == delete['address']:
+                        add['name_change'] = True
+                        delete['edit'] = True
+                    elif 'businessName' in add and 'businessName' in delete and \
+                            add['businessName'] == delete['businessName']:
+                        add['name_change'] = True
+                        delete['edit'] = True
+                    elif 'personName' in add and 'personName' in delete and \
+                            add['personName'] == delete['personName']:
+                        add['name_change'] = True
+                        delete['edit'] = True
 
     @staticmethod
     def _set_financing_date_time(statement):
