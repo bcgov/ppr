@@ -315,7 +315,7 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_amend_party_addresses(self, statement):
         """Replace amendment statement address country code with description. Set if party edited."""
         self._set_amend_change_addresses(statement)
-        if 'deleteSecuredParties' in statement and 'addSecuredParties' in statement:            
+        if 'deleteSecuredParties' in statement and 'addSecuredParties' in statement:
             for add_secured in statement['addSecuredParties']:
                 for delete_secured in statement['deleteSecuredParties']:
                     if add_secured['address'] == delete_secured['address']:
@@ -329,7 +329,7 @@ class Report:  # pylint: disable=too-few-public-methods
                             add_secured['personName'] == delete_secured['personName']:
                         add_secured['address_change'] = True
                         delete_secured['edit'] = True
-        if 'deleteDebtors' in statement and 'addDebtors' in statement:            
+        if 'deleteDebtors' in statement and 'addDebtors' in statement:
             for add in statement['addDebtors']:
                 for delete in statement['deleteDebtors']:
                     if add['address'] == delete['address']:

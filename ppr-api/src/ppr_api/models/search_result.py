@@ -202,7 +202,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 # Build an array of changes
                 changes = []
                 if financing.registration:
-                    for reg in financing.registration:
+                    for reg in reversed(financing.registration):
                         if reg.registration_num != financing.registration_num:
                             statement_json = reg.json
                             statement_json['statementType'] = \

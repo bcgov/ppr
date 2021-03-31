@@ -25,17 +25,44 @@ from ppr_api.models import SearchResult, SearchClient
 from ppr_api.exceptions import BusinessException
 
 
-def test_search_single(session):
-    """Assert that a search detail results on a registration with updates returns the expected result."""
-    # setup
-    json_data = [{
-        'baseRegistrationNumber': 'TEST0001',
-        'matchType': 'EXACT',
-        'registrationType': 'SA'
-    }]
+# Valid test data
+SINGLE_JSON = [{
+    'baseRegistrationNumber': 'TEST0001',
+    'matchType': 'EXACT',
+    'registrationType': 'SA'
+}]
 
+SINGLE_NO_HISTORY_JSON = [{
+    'baseRegistrationNumber': 'TEST0012',
+    'matchType': 'EXACT',
+    'registrationType': 'SA'
+}]
+
+SINGLE_RENEWAL_JSON = [{
+    'baseRegistrationNumber': 'TEST0002',
+    'matchType': 'EXACT',
+    'registrationType': 'SA'
+}]
+
+# testdata pattern is ({description}, {JSON data}, {search id}, {has history}, {first statement type})
+TEST_VALID_DATA = [
+    ('Match with history', SINGLE_JSON, 200000001, True, None),
+    ('Match with no history', SINGLE_NO_HISTORY_JSON, 200000002, False, None),
+    ('Match with renewal', SINGLE_RENEWAL_JSON, 200000003, True, 'RENEWAL_STATEMENT')
+]
+
+# testdata pattern is ({description}, {JSON data}, {search id}, {has history}, {first statement type})
+TEST_INVALID_DATA = [
+    ('Invalid search id', SINGLE_JSON, 390000001, True, None),
+    ('Invalid search completed', SINGLE_JSON, 200000000, True, None)
+]
+
+
+@pytest.mark.parametrize('desc,json_data,search_id,has_history,statement_type', TEST_VALID_DATA)
+def test_search(session, desc, json_data, search_id, has_history, statement_type):
+    """Assert that search detail results on registration matches returns the expected result."""
     # test
-    search_detail = SearchResult.validate_search_select(json_data, 200000001)
+    search_detail = SearchResult.validate_search_select(json_data, search_id)
     search_detail.update_selection(json_data)
     result = search_detail.json
 
@@ -49,86 +76,21 @@ def test_search_single(session):
     assert result['details']
     assert len(result['details']) == 1
     assert result['details'][0]['financingStatement']
-    assert 'changes' in result['details'][0]['financingStatement']
-    assert len(result['details'][0]['financingStatement']['changes']) > 0
+    if has_history:
+        assert 'changes' in result['details'][0]['financingStatement']
+        assert len(result['details'][0]['financingStatement']['changes']) > 0
+        if statement_type:
+            assert result['details'][0]['financingStatement']['changes'][0]['statementType'] == statement_type
+    else:
+        assert 'changes' not in result['details'][0]['financingStatement']
 
 
-def test_search_single_financing_only(session):
-    """Assert that search details for a financing statement with no registrations returns the expected result."""
-    # setup
-    json_data = [{
-        'baseRegistrationNumber': 'TEST0012',
-        'matchType': 'EXACT',
-        'registrationType': 'SA'
-    }]
-
-    # test
-    search_detail = SearchResult.validate_search_select(json_data, 200000002)
-    search_detail.update_selection(json_data)
-    result = search_detail.json
-
-    # check
-    # print(result)
-    assert result['details']
-    assert len(result['details']) == 1
-    assert result['details'][0]['financingStatement']
-    assert 'changes' not in result['details'][0]['financingStatement']
-
-
-def test_search_single_renewal(session):
-    """Assert that a search detail results on a renewal statement registration returns the expected result."""
-    # setup
-    json_data = [{
-        'baseRegistrationNumber': 'TEST0002',
-        'matchType': 'EXACT',
-        'registrationType': 'SA'
-    }]
-
-    # test
-    search_detail = SearchResult.validate_search_select(json_data, 200000003)
-    search_detail.update_selection(json_data)
-    result = search_detail.json
-
-    # check
-    # print(result)
-    assert len(result['details']) == 1
-    assert result['details'][0]['financingStatement']
-    assert 'changes' in result['details'][0]['financingStatement']
-    assert len(result['details'][0]['financingStatement']['changes']) >= 1
-    assert result['details'][0]['financingStatement']['changes'][0]['statementType'] == 'RENEWAL_STATEMENT'
-
-
-def test_search_id_invalid(session, client, jwt):
-    """Assert that validation of an invalid search ID throws a BusinessException."""
-    # setup
-    json_data = [{
-        'baseRegistrationNumber': 'TEST0001',
-        'matchType': 'EXACT',
-        'registrationType': 'SA'
-    }]
-
+@pytest.mark.parametrize('desc,json_data,search_id,has_history,statement_type', TEST_INVALID_DATA)
+def test_search_invalid(session, desc, json_data, search_id, has_history, statement_type):
+    """Assert that search detail results on invalid requests returns the expected result."""
     # test
     with pytest.raises(BusinessException) as bad_request_err:
-        SearchResult.validate_search_select(json_data, 300000000)
-
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)
-
-
-def test_search_id_invalid_used(session, client, jwt):
-    """Assert that validation of a search ID that has already been submitted throws a BusinessException."""
-    # setup
-    json_data = [{
-        'baseRegistrationNumber': 'TEST0001',
-        'matchType': 'EXACT',
-        'registrationType': 'SA'
-    }]
-
-    # test
-    with pytest.raises(BusinessException) as bad_request_err:
-        SearchResult.validate_search_select(json_data, 200000000)
+        SearchResult.validate_search_select(json_data, search_id)
 
     # check
     assert bad_request_err
@@ -211,3 +173,31 @@ def test_search_detail_full_create(session, client, jwt):
     # print(details_json)
     for detail in details_json['details']:
         assert detail['financingStatement']['baseRegistrationNumber'] not in ('TEST0002', 'TEST0003')
+
+
+def test_search_history_sort(session, client, jwt):
+    """Assert that search results history sort order works as expected."""
+    # setup
+    json_data = {
+        'type': 'REGISTRATION_NUMBER',
+        'criteria': {
+            'value': 'TEST0001'
+        }
+    }
+    search_query = SearchClient.create_from_json(json_data, 'PS12345')
+
+    # test
+    search_query.search()
+    search_detail = SearchResult.create_from_search_query(search_query)
+    search_detail.save()
+
+    # check
+    assert search_detail.search_id == search_query.search_id
+    result = search_detail.json
+    # print(details_json)
+    history = result[0]['financingStatement']['changes']
+    assert len(history) == 4
+    assert history[0]['changeRegistrationNumber'] == 'TEST0009'
+    assert history[1]['changeRegistrationNumber'] == 'TEST0008'
+    assert history[2]['amendmentRegistrationNumber'] == 'TEST0007'
+    assert history[3]['changeRegistrationNumber'] == 'TEST0010'
