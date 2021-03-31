@@ -1,0 +1,56 @@
+name: PPR API CI
+
+on:
+  pull_request:
+    types: [assigned, synchronize]
+    paths:
+      - "ppr-api/**"
+
+jobs:
+  ppr-api-ci:
+    env:
+      IMAGE_NAME: ppr-api
+      NATS_SERVERS: "nats://nats:4222"
+      NATS_CLIENT_NAME: entity.ppr_api
+      NATS_CLUSTER_ID: test-cluster
+      NATS_FILER_SUBJECT: entity.ppr.pay
+      NATS_QUEUE: ppr-worker
+      JWT_OIDC_JWKS_CACHE_TIMEOUT: 300
+
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./ppr-api
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
+
+    services:
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          make setup
+      - name: Lint
+        run: |
+          make lint
+      - name: Test with pytest
+        run: |
+          make test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./ppr-api/coverage.xml
+          flags: ppr-api
+          name: codecov-ppr-api
+          fail_ci_if_error: true
+      - name: build to check strictness
+        run: |
+          make build-nc

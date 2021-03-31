@@ -1,6 +1,10 @@
 FROM python:3.8.6-buster
 USER root
 
+# install ssh services in disabled mode
+RUN apt-get update && apt-get install -y openssh-server openssh-client sudo \
+    && systemctl disable ssh \
+    && sed -i 's/#GatewayPorts no/GatewayPorts clientspecified/g' /etc/ssh/sshd_config
 
 # Installing Oracle instant client
 WORKDIR    /opt/oracle
