@@ -11,13 +11,13 @@ LABEL org.label-schema.vcs-ref=${VCS_REF} \
     org.label-schema.build-date=${BUILD_DATE}
     
 # install ssh services in disabled mode
-RUN apt-get update && apt-get install -y openssh-server openssh-client sudo \
+RUN apt-get update && apt-get install -y apt-utils openssh-server openssh-client sudo \
     && systemctl disable ssh \
     && sed -i 's/#GatewayPorts no/GatewayPorts clientspecified/g' /etc/ssh/sshd_config
 
 # Installing Oracle instant client
 WORKDIR    /opt/oracle
-RUN        apt-get update && apt-get install -y libaio1 wget unzip \
+RUN        apt-get update && apt-get install -y apt-utils libaio1 wget unzip \
     && wget https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip \
     && wget https://download.oracle.com/otn_software/linux/instantclient/instantclient-sqlplus-linuxx64.zip \
     && unzip instantclient-basiclite-linuxx64.zip \
