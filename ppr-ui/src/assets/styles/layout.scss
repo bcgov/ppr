@@ -40,6 +40,7 @@
 .view-container {
   display: flex;
   flex-flow: column nowrap;
+  max-width: none;
   padding-top: 2.5rem;
   padding-bottom: 2.5rem;
 

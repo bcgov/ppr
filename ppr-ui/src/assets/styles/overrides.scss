@@ -162,6 +162,10 @@ td {
   border-bottom: 8px solid RGBA(73,80,87,0.95) !important;
 }
 
+.v-breadcrumbs__divider {
+  padding: 0 !important;
+}
+
 .v-data-table__selected {
   background: $blueSelected !important;
 }

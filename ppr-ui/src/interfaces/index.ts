@@ -1,3 +1,4 @@
+export * from './breadcrumb-interface'
 export * from './data-table-interfaces'
 export * from './ppr-api-interfaces'
 export * from './search-interfaces'

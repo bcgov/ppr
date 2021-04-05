@@ -1,4 +1,4 @@
-import { AccountInformationIF, IndividualNameIF, SearchResponseIF, SearchTypeIF, StateIF } from '@/interfaces'
+import { AccountInformationIF, IndividualNameIF, SearchResponseIF, SearchTypeIF, StateIF, UserInfoIF } from '@/interfaces'
 
 export const mutateKeycloakRoles = (state: any, keyCloakRoles: Array<string>) => {
   state.stateModel.tombstone.keycloakRoles = keyCloakRoles
@@ -8,7 +8,7 @@ export const mutateAuthRoles = (state: any, authRoles: Array<string>) => {
   state.stateModel.tombstone.authRoles = authRoles
 }
 
-export const mutateUserInfo = (state: any, userInfo: any) => {
+export const mutateUserInfo = (state: any, userInfo: UserInfoIF) => {
   state.stateModel.tombstone.userInfo = userInfo
 }
 
