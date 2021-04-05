@@ -14,12 +14,8 @@ on:
         default: "dev"
 
 jobs:
-  business-create-ui-cd:
+  ppr-ui-cd:
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./ppr-ui
     if: github.repository == 'bcgov/ppr'
     steps:
       - uses: actions/checkout@v2
@@ -34,7 +30,7 @@ jobs:
 
       - uses: pwei1018/bcrs-cd-action@versioning
         with:
-          WORKING_DIRECTORY: "."
+          WORKING_DIRECTORY: "ppr-ui"
           APP_NAME: "ppr-ui"
           VAULTS: ""
           SKIP_OP: "true"
@@ -52,7 +48,7 @@ jobs:
         if: failure()
         with:
           type: ${{ job.status }}
-          job_name: "*Business Create UI Built and Deployed to ${{env.TAG_NAME}}*"
+          job_name: "*PPR UI Built and Deployed to ${{env.TAG_NAME}}*"
           channel: "#registries-bot"
           url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
           commit: true
