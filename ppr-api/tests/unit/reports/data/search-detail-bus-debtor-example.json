@@ -1,0 +1,564 @@
+{
+  "details": [
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0001", 
+        "changes": [
+          {
+            "addGeneralCollateral": [
+              {
+                "collateralId": 200000003, 
+                "description": "TEST GENERAL COLLATERAL CHANGE ADD."
+              }
+            ], 
+            "addVehicleCollateral": [
+              {
+                "make": "BMW", 
+                "model": "Z4", 
+                "serialNumber": "JU622994", 
+                "type": "MV", 
+                "vehicleId": 200000007, 
+                "year": 2014
+              }, 
+              {
+                "make": "HOMCO IND. LTD DIPLOMAT", 
+                "manufacturedHomeRegistrationNumber": "220000", 
+                "serialNumber": "999999", 
+                "type": "MH", 
+                "vehicleId": 200000008, 
+                "year": 2012
+              }
+            ], 
+            "baseRegistrationNumber": "TEST0001", 
+            "changeRegistrationNumber": "TEST0010", 
+            "changeType": "SU", 
+            "clientReferenceId": "TEST-CH-0010", 
+            "createDateTime": "2021-03-12T01:48:54+00:00", 
+            "deleteGeneralCollateral": [
+              {
+                "collateralId": 200000002, 
+                "description": "TEST GENERAL COLLATERAL AMEND ADD."
+              }
+            ], 
+            "deleteVehicleCollateral": [
+              {
+                "make": "FORD", 
+                "model": "FIESTA", 
+                "serialNumber": "T346JU622994", 
+                "type": "MV", 
+                "vehicleId": 200000006, 
+                "year": 2018
+              }
+            ], 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-0010", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-CHANGE-SU", 
+                "last": "REGISTERING", 
+                "middle": "10"
+              }
+            }, 
+            "statementType": "CHANGE_STATEMENT"
+          }, 
+          {
+            "addDebtors": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00A7", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 7 AMEND DEBTOR", 
+                "partyId": 200000021
+              }
+            ], 
+            "addGeneralCollateral": [
+              {
+                "collateralId": 200000002, 
+                "description": "TEST GENERAL COLLATERAL AMEND ADD."
+              }
+            ], 
+            "addSecuredParties": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00A7", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 7 AMEND SECURED PARTY", 
+                "partyId": 200000022
+              }
+            ], 
+            "addVehicleCollateral": [
+              {
+                "make": "FORD", 
+                "model": "FIESTA", 
+                "serialNumber": "T346JU622994", 
+                "type": "MV", 
+                "vehicleId": 200000006, 
+                "year": 2018
+              }
+            ], 
+            "amendmentRegistrationNumber": "TEST0007", 
+            "baseRegistrationNumber": "TEST0001", 
+            "changeType": "CO", 
+            "clientReferenceId": "TEST-AM-0007", 
+            "courtOrderInformation": {
+              "courtName": "Supreme Court of British Columbia", 
+              "courtRegistry": "Victoria", 
+              "effectOfOrder": "Court Order to change something.", 
+              "fileNumber": "BC123495", 
+              "orderDate": "2021-09-28T01:48:54+00:00"
+            }, 
+            "createDateTime": "2021-03-12T01:53:54+00:00", 
+            "deleteDebtors": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-0001", 
+                  "streetAdditional": "line 2"
+                }, 
+                "partyId": 200000001, 
+                "personName": {
+                  "first": "TEST IND", 
+                  "last": "DEBTOR", 
+                  "middle": "1"
+                }
+              }
+            ], 
+            "deleteGeneralCollateral": [
+              {
+                "collateralId": 200000001, 
+                "description": "TEST0001 GC 2"
+              }
+            ], 
+            "deleteSecuredParties": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-0001", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 1 SECURED PARTY", 
+                "partyId": 200000003
+              }
+            ], 
+            "deleteVehicleCollateral": [
+              {
+                "make": "HOMCO IND. LTD DIPLOMAT", 
+                "manufacturedHomeRegistrationNumber": "21324", 
+                "serialNumber": "9407", 
+                "type": "MH", 
+                "vehicleId": 200000001, 
+                "year": 2001
+              }
+            ], 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00A7", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-AMEND-CO", 
+                "last": "REGISTERING", 
+                "middle": "7"
+              }
+            }, 
+            "statementType": "AMENDMENT_STATEMENT"
+          }, 
+          {
+            "addDebtors": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00C8", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 8 TRANSFER DEBTOR", 
+                "partyId": 200000024
+              }
+            ], 
+            "baseRegistrationNumber": "TEST0001", 
+            "changeRegistrationNumber": "TEST0008", 
+            "changeType": "DT", 
+            "clientReferenceId": "TEST-CH-0008", 
+            "createDateTime": "2021-03-12T01:58:54+00:00", 
+            "deleteDebtors": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00A7", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 7 AMEND DEBTOR", 
+                "partyId": 200000021
+              }
+            ], 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00C8", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-CHANGE-DT", 
+                "last": "REGISTERING", 
+                "middle": "8"
+              }
+            }, 
+            "statementType": "CHANGE_STATEMENT"
+          }, 
+          {
+            "addSecuredParties": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00C9", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
+                "partyId": 200000026
+              }
+            ], 
+            "baseRegistrationNumber": "TEST0001", 
+            "changeRegistrationNumber": "TEST0009", 
+            "changeType": "ST", 
+            "clientReferenceId": "TEST-CH-0009", 
+            "createDateTime": "2021-03-12T02:03:54+00:00", 
+            "deleteSecuredParties": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00A7", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 7 AMEND SECURED PARTY", 
+                "partyId": 200000022
+              }
+            ], 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00C9", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-CHANGE-DT", 
+                "last": "REGISTERING", 
+                "middle": "9"
+              }
+            }, 
+            "statementType": "CHANGE_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-SA-0001", 
+        "createDateTime": "2021-03-12T01:48:53+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0001", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST BUS 2 DEBTOR", 
+            "partyId": 200000002
+          }, 
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-00C8", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 8 TRANSFER DEBTOR", 
+            "partyId": 200000024
+          }
+        ], 
+        "expiryDate": "2023-03-12T01:48:53+00:00", 
+        "generalCollateral": [
+          {
+            "collateralId": 200000003, 
+            "description": "TEST GENERAL COLLATERAL CHANGE ADD."
+          }, 
+          {
+            "collateralId": 200000000, 
+            "description": "TEST0001 GC 1"
+          }
+        ], 
+        "lifeYears": 2, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0001", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "1"
+          }
+        }, 
+        "registrationAct": "PPSA SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST 200000000", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST SECURED PARTY", 
+            "code": "200000000", 
+            "emailAddress": "test-sp-client@gmail.com", 
+            "partyId": 200000004
+          }, 
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-00C9", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
+            "partyId": 200000026
+          }
+        ], 
+        "trustIndenture": true, 
+        "type": "SA", 
+        "vehicleCollateral": [
+          {
+            "make": "BMW", 
+            "model": "Z4", 
+            "serialNumber": "JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000007, 
+            "year": 2014
+          }, 
+          {
+            "make": "HOMCO IND. LTD DIPLOMAT", 
+            "manufacturedHomeRegistrationNumber": "220000", 
+            "serialNumber": "999999", 
+            "type": "MH", 
+            "vehicleId": 200000008, 
+            "year": 2012
+          }, 
+          {
+            "make": "HYUNDAI", 
+            "model": "TUSCON", 
+            "serialNumber": "KM8J3CA46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000000, 
+            "year": 2018
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }, 
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0002", 
+        "changes": [
+          {
+            "baseRegistrationNumber": "TEST0002", 
+            "clientReferenceId": "TEST-REN-0006", 
+            "courtOrderInformation": {
+              "courtName": "Supreme Court of British Columbia", 
+              "courtRegistry": "Victoria", 
+              "effectOfOrder": "Court Order to renew Repairer's Lien.", 
+              "fileNumber": "BC123495", 
+              "orderDate": "2021-09-28T01:48:54+00:00"
+            }, 
+            "createDateTime": "2021-03-12T01:53:54+00:00", 
+            "expiryDate": "2021-06-10T01:48:54+00:00", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00R6", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-RENEWAL-RL", 
+                "last": "REGISTERING", 
+                "middle": "6"
+              }
+            }, 
+            "renewalRegistrationNumber": "TEST00R6", 
+            "statementType": "RENEWAL_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-RL-0001", 
+        "createDateTime": "2021-03-12T01:48:53+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0002", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST BUS 2 DEBTOR", 
+            "partyId": 200000006
+          }
+        ], 
+        "expiryDate": "2021-06-10T01:48:54+00:00", 
+        "lienAmount": "2000.00", 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0002", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "2"
+          }
+        }, 
+        "registrationAct": "REPAIRERS LIEN ACT", 
+        "registrationDescription": "REPAIRER'S LIEN", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST 200000000", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST SECURED PARTY", 
+            "code": "200000000", 
+            "emailAddress": "test-sp-client@gmail.com", 
+            "partyId": 200000007
+          }
+        ], 
+        "surrenderDate": "2021-06-10T01:48:53+00:00", 
+        "trustIndenture": false, 
+        "type": "RL", 
+        "vehicleCollateral": [
+          {
+            "make": "HYUNDAI", 
+            "model": "TUSCON", 
+            "serialNumber": "KX8J3CA46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000002, 
+            "year": 2014
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }
+  ], 
+  "exactResultsSize": 2, 
+  "payment": {
+    "invoiceId": "1000001", 
+    "receipt": "/api/v1/payment-requests/1000001/receipts"
+  }, 
+  "searchDateTime": "2021-03-15T21:33:46+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "T-S-DB-002", 
+    "criteria": {
+      "debtorName": {
+        "business": "TEST BUS 2 DEBTOR"
+      }
+    }, 
+    "type": "BUSINESS_DEBTOR"
+  }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0001", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "debtor": {
+        "businessName": "TEST BUS 2 DEBTOR", 
+        "partyId": 200000002
+      }, 
+      "matchType": "EXACT", 
+      "registrationType": "SA"
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0002", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "debtor": {
+        "businessName": "TEST BUS 2 DEBTOR", 
+        "partyId": 200000006
+      }, 
+      "matchType": "EXACT", 
+      "registrationType": "RL"
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0003", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "debtor": {
+        "businessName": "TEST BUS 3 DEBTOR", 
+        "partyId": 200000009
+      }, 
+      "matchType": "SIMILAR", 
+      "registrationType": "RL", 
+      "selected": false
+    }
+  ], 
+  "similarResultsSize": 0, 
+  "totalResultsSize": 2
+}

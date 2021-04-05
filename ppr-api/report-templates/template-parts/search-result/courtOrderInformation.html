@@ -1,0 +1,47 @@
+<div class="no-page-break">
+    <div class="section-title mt-4">Court Order Information</div>
+
+    {% if detail.financingStatement.courtOrderInformation is defined and change is not defined %}
+    <table class="business-details-table" role="presentation">
+        <tr>
+            <td>
+                <div class="bold pt-2">Name of Court:</div>
+                <div class="bold pt-2">Registry:</div>
+                <div class="bold pt-2">Date of Order:</div>
+                <div class="bold pt-2">File Number:</div>
+            </td>
+            <td>
+                <div class="pt-2">{{ detail.financingStatement.courtOrderInformation.courtName }}</div>
+                <div class="pt-2">{{ detail.financingStatement.courtOrderInformation.courtRegistry }}</div>
+                <div class="pt-2">{{ detail.financingStatement.courtOrderInformation.orderDate }}</div>
+                <div class="pt-2">{{ detail.financingStatement.courtOrderInformation.fileNumber }}</div>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="2">{{ detail.financingStatement.courtOrderInformation.effectOfOrder }}</td>
+        </tr>
+    </table>
+    {% elif change.courtOrderInformation is defined  %}
+    <table class="business-details-table" role="presentation">
+        <tr>
+            <td>
+                <div class="bold pt-2">Name of Court:</div>
+                <div class="bold pt-2">Registry:</div>
+                <div class="bold pt-2">Date of Order:</div>
+                <div class="bold pt-2">File Number:</div>
+            </td>
+            <td>
+                <div class="pt-2">{{ change.courtOrderInformation.courtName }}</div>
+                <div class="pt-2">{{ change.courtOrderInformation.courtRegistry }}</div>
+                <div class="pt-2">{{ change.courtOrderInformation.orderDate }}</div>
+                <div class="pt-2">{{ change.courtOrderInformation.fileNumber }}</div>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="2">{{ change.courtOrderInformation.effectOfOrder }}</td>
+         </tr>
+    </table>
+    {% endif %}
+
+</div>
+ 

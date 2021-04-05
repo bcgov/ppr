@@ -1,0 +1,399 @@
+{
+  "details": [
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0002", 
+        "changes": [
+          {
+            "baseRegistrationNumber": "TEST0002", 
+            "clientReferenceId": "TEST-REN-0006", 
+            "courtOrderInformation": {
+              "courtName": "Supreme Court of British Columbia", 
+              "courtRegistry": "Victoria", 
+              "effectOfOrder": "Court Order to renew Repairer's Lien.", 
+              "fileNumber": "BC123495", 
+              "orderDate": "2021-09-28T01:48:54+00:00"
+            }, 
+            "createDateTime": "2021-03-12T01:53:54+00:00", 
+            "expiryDate": "2021-06-10T01:48:54+00:00", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00R6", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-RENEWAL-RL", 
+                "last": "REGISTERING", 
+                "middle": "6"
+              }
+            }, 
+            "renewalRegistrationNumber": "TEST00R6", 
+            "statementType": "RENEWAL_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-RL-0001", 
+        "createDateTime": "2021-03-12T01:48:53+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0002", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST BUS 2 DEBTOR", 
+            "partyId": 200000006
+          }
+        ], 
+        "expiryDate": "2021-06-10T01:48:54+00:00", 
+        "lienAmount": "2000.00", 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0002", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "2"
+          }
+        }, 
+        "registrationAct": "REPAIRERS LIEN ACT", 
+        "registrationDescription": "REPAIRER'S LIEN", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST 200000000", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST SECURED PARTY", 
+            "code": "200000000", 
+            "emailAddress": "test-sp-client@gmail.com", 
+            "partyId": 200000007
+          }
+        ], 
+        "surrenderDate": "2021-06-10T01:48:53+00:00", 
+        "trustIndenture": false, 
+        "type": "RL", 
+        "vehicleCollateral": [
+          {
+            "make": "HYUNDAI", 
+            "model": "TUSCON", 
+            "serialNumber": "KX8J3CA46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000002, 
+            "year": 2014
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }, 
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0003", 
+        "clientReferenceId": "TEST-RL-0002", 
+        "createDateTime": "2021-03-12T01:48:53+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0002", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST BUS 3 DEBTOR", 
+            "partyId": 200000009
+          }
+        ], 
+        "expiryDate": "2021-06-10T01:48:53+00:00", 
+        "lienAmount": "2000.00", 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0002", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "3"
+          }
+        }, 
+        "registrationAct": "REPAIRERS LIEN ACT", 
+        "registrationDescription": "REPAIRER'S LIEN", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST 200000000", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST SECURED PARTY", 
+            "code": "200000000", 
+            "emailAddress": "test-sp-client@gmail.com", 
+            "partyId": 200000010
+          }
+        ], 
+        "surrenderDate": "2021-03-02T01:48:53+00:00", 
+        "trustIndenture": false, 
+        "type": "RL", 
+        "vehicleCollateral": [
+          {
+            "make": "HYUNDAI", 
+            "model": "TUSCON", 
+            "serialNumber": "KX8J3CA46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000003, 
+            "year": 2014
+          }
+        ]
+      }, 
+      "matchType": "EXACT"
+    }, 
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0005", 
+        "changes": [
+          {
+            "baseRegistrationNumber": "TEST0005", 
+            "clientReferenceId": "TEST-REN-0005", 
+            "createDateTime": "2021-03-12T01:53:54+00:00", 
+            "expiryDate": "2023-03-12T01:48:54+00:00", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00R5", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-RENEWAL", 
+                "last": "REGISTERING", 
+                "middle": "5"
+              }
+            }, 
+            "renewalRegistrationNumber": "TEST00R5", 
+            "statementType": "RENEWAL_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-SA-0005", 
+        "createDateTime": "2021-03-12T01:48:54+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0005", 
+              "streetAdditional": "line 2"
+            }, 
+            "partyId": 200000016, 
+            "personName": {
+              "first": "TEST IND", 
+              "last": "DEBTOR", 
+              "middle": "5"
+            }
+          }
+        ], 
+        "expiryDate": "2023-03-12T01:48:54+00:00", 
+        "lifeYears": 2, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0005", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "5"
+          }
+        }, 
+        "registrationAct": "PPSA SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0005", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 5 SECURED PARTY", 
+            "partyId": 200000017
+          }
+        ], 
+        "trustIndenture": false, 
+        "type": "SA", 
+        "vehicleCollateral": [
+          {
+            "make": "TESLA", 
+            "model": "MODEL 3", 
+            "serialNumber": "YJ46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000005, 
+            "year": 2018
+          }
+        ]
+      }, 
+      "matchType": "SIMILAR"
+    }
+  ], 
+  "exactResultsSize": 2, 
+  "payment": {
+    "invoiceId": "1000001", 
+    "receipt": "/api/v1/payment-requests/1000001/receipts"
+  }, 
+  "searchDateTime": "2021-03-15T22:34:52+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "PT-SQ-SS-2", 
+    "criteria": {
+      "value": "KX8J3CA46JU622994"
+    }, 
+    "type": "SERIAL_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0002", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "matchType": "EXACT", 
+      "registrationType": "RL", 
+      "vehicleCollateral": {
+        "make": "HYUNDAI", 
+        "model": "TUSCON", 
+        "serialNumber": "KX8J3CA46JU622994", 
+        "type": "MV", 
+        "year": 2014
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0003", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "matchType": "EXACT", 
+      "registrationType": "RL", 
+      "vehicleCollateral": {
+        "make": "HYUNDAI", 
+        "model": "TUSCON", 
+        "serialNumber": "KX8J3CA46JU622994", 
+        "type": "MV", 
+        "year": 2014
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0004", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "matchType": "SIMILAR", 
+      "registrationType": "SA", 
+      "selected": false, 
+      "vehicleCollateral": {
+        "make": "HONDA", 
+        "model": "CIVIC", 
+        "serialNumber": "JU622994", 
+        "type": "MV", 
+        "year": 2018
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0001", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "matchType": "SIMILAR", 
+      "registrationType": "SA", 
+      "selected": false, 
+      "vehicleCollateral": {
+        "make": "BMW", 
+        "model": "Z4", 
+        "serialNumber": "JU622994", 
+        "type": "MV", 
+        "year": 2014
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "200519B", 
+      "createDateTime": "2021-03-09T22:45:22+00:00", 
+      "matchType": "SIMILAR", 
+      "registrationType": "SA", 
+      "selected": false, 
+      "vehicleCollateral": {
+        "make": "HYUNDAI", 
+        "model": "TUCSON", 
+        "serialNumber": "KM8J3CA46JU622994", 
+        "type": "MV", 
+        "year": 2018
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0001", 
+      "createDateTime": "2021-03-12T01:48:53+00:00", 
+      "matchType": "SIMILAR", 
+      "registrationType": "SA", 
+      "selected": false, 
+      "vehicleCollateral": {
+        "make": "HYUNDAI", 
+        "model": "TUSCON", 
+        "serialNumber": "KM8J3CA46JU622994", 
+        "type": "MV", 
+        "year": 2018
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "200520B", 
+      "createDateTime": "2021-03-09T22:59:10+00:00", 
+      "matchType": "SIMILAR", 
+      "registrationType": "SA", 
+      "selected": false, 
+      "vehicleCollateral": {
+        "make": "HYUNDAI", 
+        "model": "TUCSON", 
+        "serialNumber": "KM8J3CA46JU622994", 
+        "type": "MV", 
+        "year": 2018
+      }
+    }, 
+    {
+      "baseRegistrationNumber": "TEST0005", 
+      "createDateTime": "2021-03-12T01:48:54+00:00", 
+      "matchType": "SIMILAR", 
+      "registrationType": "SA", 
+      "selected": true, 
+      "vehicleCollateral": {
+        "make": "TESLA", 
+        "model": "MODEL 3", 
+        "serialNumber": "YJ46JU622994", 
+        "type": "MV", 
+        "year": 2018
+      }
+    }
+  ], 
+  "similarResultsSize": 1, 
+  "totalResultsSize": 8
+}

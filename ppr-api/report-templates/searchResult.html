@@ -1,0 +1,94 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if environment == '' %}
+      [[stylePage.html]]
+    {% else %}
+      [[stylePageDraft.html]]
+    {% endif %}
+    [[style.html]]
+  </head>
+  <body>
+    <div class="header">
+      <table class="header-table" role="presentation">
+        <tr class="no-page-break">
+          <td>
+            [[logo.html]]
+          </td>
+          <td>
+            <div class="report-type">{{ environment }} {{ meta_title }}</div>
+            <div class="report-type-desc">BC Registries and Online Services</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="business-details-container">
+      <div class="business-name-header">
+        <span class="lbl-business-name">{{ meta_subject }}</span>
+      </div>
+  
+      <table class="business-details-table" role="presentation">
+        <tr>
+          <td>
+            <div class="bold pt-2">Search Date and Time:</div>
+            <div class="bold pt-2">Account Number:</div>
+          </td>
+          <td>
+            <div class="pt-2">{{searchDateTime}}</div>
+            <div class="pt-2">{{meta_account_id}}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  
+    <div class="container pt-4">
+      <table class="header-table mt-4" role="presentation">
+        <tr>
+            <td class="section-sub-title col-50">Registrations in this Search Result: {{ totalResultsSize }}</td>
+            <td class="section-data right-align col-50"><span id="pagesCounter"></span> pages</td>
+        </tr>
+      </table>
+    </div>
+      
+    {% if totalResultsSize > 0 %}
+      {% if selected is defined and searchQuery.type != "REGISTRATION_NUMBER" %}
+        [[search-result/selected.html]]
+      {% endif %}
+
+      {% for detail in details %}
+        <p style="page-break-before: always" ></p>
+        [[search-result/financingStatement.html]]
+
+        {% if detail.financingStatement.changes is defined %}
+          <p style="page-break-before: always" ></p>
+
+          <div class="separator-strong mt-4"></div>
+          <div class="section-statement mt-4">History</div>
+          <div class="separator-strong mt-4"></div>
+
+          <div class="container pt-4">
+            {% for change in detail.financingStatement.changes %}
+              {% if change.statementType == 'RENEWAL_STATEMENT' %}
+                [[search-result/renewalStatement.html]]
+              {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+                [[search-result/amendmentStatement.html]]
+              {% elif change.statementType == 'CHANGE_STATEMENT' %}
+                [[search-result/changeStatement.html]]
+              {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+                [[search-result/dischargeStatement.html]]
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %} 
+      {% endfor %}
+
+    {% endif %}
+  
+  </body>
+</html>

@@ -19,14 +19,15 @@ from http import HTTPStatus
 
 from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
-
 from registry_schemas import utils as schema_utils
+
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
 from ppr_api.models import SearchResult
 from ppr_api.resources import utils as resource_utils
+from ppr_api.reports import ReportTypes, get_pdf
 
 
 API = Namespace('search-results', description='Endpoints for PPR search details (Search step 2).')
@@ -72,8 +73,8 @@ class SearchResultsResource(Resource):
 
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
-                # TODO: if request header Accept MIME type is application/pdf, format as pdf.
-                return response_data, HTTPStatus.OK
+                # If request header Accept MIME type is application/pdf, format as pdf.
+                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value)
 
             return jsonify(response_data), HTTPStatus.OK
 
@@ -107,7 +108,10 @@ class SearchResultsResource(Resource):
                 return resource_utils.not_found_error_response('searchId', search_id)
 
             response_data = search_detail.json
-            # TODO: if request header Accept MIME type is application/pdf, format as pdf.
+            if resource_utils.is_pdf(request):
+                # If request header Accept MIME type is application/pdf, format as pdf.
+                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value)
+
             return jsonify(response_data), HTTPStatus.OK
 
         except BusinessException as exception:

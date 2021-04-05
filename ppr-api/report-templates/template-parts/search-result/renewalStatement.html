@@ -1,0 +1,54 @@
+<div class="container pt-4 no-page-break">
+
+    <div class="section-title mt-4">Renewal</div>
+
+    <table class="business-details-table" role="presentation">
+        <tr>
+            <td>
+                <div class="bold pt-2">Registration Date and Time:</div>
+                <div class="bold pt-2">Registration Number:</div>
+                <div class="bold pt-2">Registration Life:</div>
+                <div class="bold pt-2">New Expiration Date and Time:</div>
+            </td>
+            <td>
+                <div class="pt-2">{{change.createDateTime}}</div>
+                <div class="pt-2">{{change.renewalRegistrationNumber}}</div>
+                {% if change.lifeYears is defined %}
+                <div class="pt-2">{{change.lifeYears}} {% if change.lifeYears > 1 %} Years {% else %} Year {% endif %}</div>
+                {% endif %}
+                <div class="pt-2">{{change.expiryDate}}</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="height:5px"></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="bold pt-2">Base Registration Type:</div>
+                <div class="bold pt-2">Base Registration Number:</div>
+                <div class="bold pt-2">Base Registration Date and Time:</div>
+            </td>
+            <td>
+                <div class="pt-2">{{detail.financingStatement.registrationDescription}}</div>
+                <div class="pt-2">{{ detail.financingStatement.baseRegistrationNumber }}</div>
+                <div class="pt-2">{{detail.financingStatement.createDateTime}}</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+{% if change.courtOrderInformation is defined %}
+<div class="container pt-4">
+
+    [[search-result/courtOrderInformation.html]]
+
+</div>
+{% endif %}
+
+<div class="container pt-4">
+
+  [[search-result/registeringParty.html]]
+
+</div>
+
+<div class="separator mt-4"></div> 

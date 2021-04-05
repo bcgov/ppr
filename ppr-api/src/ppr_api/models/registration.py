@@ -103,6 +103,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration['renewalRegistrationNumber'] = self.registration_num
         elif self.registration_type_cd in (model_utils.REG_TYPE_AMEND, model_utils.REG_TYPE_AMEND_COURT):
             registration['amendmentRegistrationNumber'] = self.registration_num
+            if self.detail_description:
+                registration['description'] = self.detail_description
         else:
             registration['changeRegistrationNumber'] = self.registration_num
 
@@ -128,6 +130,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.registration_type_cd == model_utils.REG_TYPE_RENEWAL and \
                 self.financing_statement.expire_date:
             registration['expiryDate'] = model_utils.format_ts(self.financing_statement.expire_date)
+            if self.life is not None:
+                registration['lifeYears'] = self.life
 
         if self.court_order:
             registration['courtOrderInformation'] = self.court_order.json
@@ -281,6 +285,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.registration_type_cd = json_data['changeType']
             if registration.registration_type_cd == model_utils.REG_TYPE_AMEND_COURT:
                 registration.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
+            if 'description' in json_data:
+                registration.detail_description = json_data['description']
         if registration_type_cl == model_utils.REG_CLASS_RENEWAL:
             registration.registration_type_cd = model_utils.REG_TYPE_RENEWAL
         elif registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
@@ -306,14 +312,21 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.financing_statement.state_type_cd = model_utils.STATE_DISCHARGED
             registration.financing_statement.discharged = 'Y'
         elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
-            registration.life = model_utils.REPAIRER_LIEN_YEARS
-            registration.financing_statement.life = registration.life
             if financing_reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+                registration.life = model_utils.REPAIRER_LIEN_YEARS
                 registration.financing_statement.expiry_date = \
                     model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
-            elif 'expiryDate' in json_data:
-                registration.financing_statement.expiry_date = \
-                    model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
+            else:
+                if 'lifeYears' in json_data:
+                    registration.life = json_data['lifeYears']
+                    registration.financing_statement.expiry_date = model_utils.expiry_dt_from_years(registration.life)
+                elif 'expiryDate' in json_data:
+                    new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
+                    registration.life = new_expiry_date.year - registration.financing_statement.expiry_date.year
+                    registration.financing_statement.expiry_date = new_expiry_date
+
+            # TODO: verify this is updated.
+            registration.financing_statement.life = registration.life
 
         # Repairer's lien renewal or amendment can have court order information.
         if (registration.registration_type_cd == model_utils.REG_TYPE_AMEND_COURT or
