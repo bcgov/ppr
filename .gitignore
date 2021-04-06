@@ -131,3 +131,5 @@ dmypy.json
 # Mac OS X
 .DS_Store
 
+# History (vscode)
+.history
