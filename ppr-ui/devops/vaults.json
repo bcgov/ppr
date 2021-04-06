@@ -1,0 +1,16 @@
+[
+    {
+        "vault": "keycloak",
+        "application": [
+            "base",
+            "web-base",
+            "ppr-web"
+        ]
+    },
+    {
+        "vault": "ppr",
+        "application": [
+            "ppr-ui"
+        ]
+    }
+]

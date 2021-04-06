@@ -12,7 +12,7 @@ on:
         default: "dev"
 
 jobs:
-  name-request-ui-cd:
+  ppr-ui-cd:
     runs-on: ubuntu-20.04
 
     defaults:
@@ -47,7 +47,7 @@ jobs:
           OPENSHIFT_DOCKER_REGISTRY: ${{ secrets.OPENSHIFT4_DOCKER_REGISTRY }}
           OPENSHIFT_SA_NAME: ${{ secrets.OPENSHIFT4_SA_NAME }}
           OPENSHIFT_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
-          OPENSHIFT_REPOSITORY: ${{ secrets.OPENSHIFT4_REPOSITORY }}
+          OPENSHIFT_REPOSITORY: ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}
           TAG_NAME: ${{ env.TAG_NAME }}
         run: |
           make cd
@@ -55,7 +55,7 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }}-${{ env.TAG_NAME }} -n ${{ secrets.OPENSHIFT4_REPOSITORY }}-${{ env.TAG_NAME }} -w
+          oc rollout status dc/${{ env.APP_NAME }}-${{ env.TAG_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
       - name: Rocket.Chat Notification
         uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
