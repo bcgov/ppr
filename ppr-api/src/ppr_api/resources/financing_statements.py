@@ -70,7 +70,7 @@ class FinancingResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
     @staticmethod
@@ -105,7 +105,7 @@ class FinancingResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
 
@@ -140,7 +140,7 @@ class GetFinancingResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
 
@@ -201,7 +201,7 @@ class AmendmentResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
 
@@ -262,7 +262,7 @@ class ChangeResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
 
@@ -323,7 +323,7 @@ class RenewalResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
 
@@ -383,5 +383,5 @@ class DischargeResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)

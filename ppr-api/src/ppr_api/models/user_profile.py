@@ -65,7 +65,7 @@ class UserProfile(db.Model):
             db.session.add(self)
             db.session.commit()
             current_app.logger.debug('Created/updated user profile: {}'.format(self.json))
-        except Exception as db_exception:
+        except Exception as db_exception:   # noqa: B902; just logging and wrapping
             current_app.logger.error('DB user_profile save exception: ' + repr(db_exception))
             raise BusinessException(
                 error='Database user_profile save failed: ' + repr(db_exception),

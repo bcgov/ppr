@@ -148,7 +148,7 @@ class Report:  # pylint: disable=too-few-public-methods
             template_code = Path(f'{template_path}/{self._get_template_filename()}').read_text()
             # substitute template parts
             template_code = self._substitute_template_parts(template_code)
-        except Exception as err:
+        except Exception as err:  # noqa: B902; just logging
             current_app.logger.error(err)
             raise err
         return template_code

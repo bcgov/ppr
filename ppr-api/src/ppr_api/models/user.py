@@ -118,7 +118,7 @@ class User(db.Model):
                 user = User.create_from_jwt_token(jwt_oidc_token, account_id)
 
             return user
-        except Exception as err:
+        except Exception as err:  # noqa: B902; just logging and wrapping as BusinessException
             current_app.logger.error(err.with_traceback(None))
             raise BusinessException('unable_to_get_or_create_user',
                                     '{"code": "unable_to_get_or_create_user",'

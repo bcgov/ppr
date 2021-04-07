@@ -65,7 +65,7 @@ class DraftResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
     @staticmethod
@@ -98,7 +98,7 @@ class DraftResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
 
@@ -132,7 +132,7 @@ class MaintainDraftResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
     @staticmethod
@@ -167,7 +167,7 @@ class MaintainDraftResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)
 
     @staticmethod
@@ -195,5 +195,5 @@ class MaintainDraftResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)

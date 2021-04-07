@@ -69,7 +69,7 @@ class UserProfileResource(Resource):
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             current_app.logger.error(f'Get user profile {account_id} failed: ' + repr(default_exception))
             return resource_utils.default_exception_response(default_exception)
 
@@ -111,6 +111,6 @@ class UserProfileResource(Resource):
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             current_app.logger.error(f'Get user profile {account_id} failed: ' + repr(default_exception))
             return resource_utils.default_exception_response(default_exception)
