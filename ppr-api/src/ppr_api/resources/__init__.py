@@ -31,6 +31,7 @@ from .search_history import API as SEARCH_HISTORY_API
 from .search_results import API as SEARCH_RESULTS_API
 from .party_codes import API as CLIENT_PARTY_API
 from .financing_statements import API as STATEMENT_API
+from .user_profile import API as USER_PROFILE_API
 
 
 __all__ = ('API_BLUEPRINT', 'OPS_BLUEPRINT')
@@ -72,3 +73,4 @@ API.add_namespace(SEARCH_API, path='/searches')
 API.add_namespace(STATEMENT_API, path='/financing-statements')
 API.add_namespace(SEARCH_HISTORY_API, path='/search-history')
 API.add_namespace(SEARCH_RESULTS_API, path='/search-results')
+API.add_namespace(USER_PROFILE_API, path='/user-profile')

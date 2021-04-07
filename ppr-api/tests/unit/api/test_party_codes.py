@@ -22,7 +22,7 @@ from ppr_api.services.authz import STAFF_ROLE, PPR_ROLE, COLIN_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
 
-def test_party_non_existent_404(client, jwt):
+def test_party_non_existent_404(session, client, jwt):
     """Assert that a party code for a non-existent party returns a 404 error."""
     # no setup
 
@@ -33,7 +33,7 @@ def test_party_non_existent_404(client, jwt):
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_party_valid_200(client, jwt):
+def test_party_valid_200(session, client, jwt):
     """Assert that a valid party code for returns a clientParty schema object."""
     # no setup
 
@@ -49,7 +49,7 @@ def test_party_valid_200(client, jwt):
     assert 'businessName' in rv.json
 
 
-def test_party_nonstaff_missing_account_400(client, jwt):
+def test_party_nonstaff_missing_account_400(session, client, jwt):
     """Assert that a get client party request with a non-staff jwt and no account ID returns a 400 status."""
     # setup
 
@@ -61,7 +61,7 @@ def test_party_nonstaff_missing_account_400(client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_party_staff_missing_account_200(client, jwt):
+def test_party_staff_missing_account_200(session, client, jwt):
     """Assert that a get client party request with a staff jwt and no account ID returns a 200 status."""
     # setup
 
@@ -73,7 +73,7 @@ def test_party_staff_missing_account_200(client, jwt):
     assert rv.status_code == HTTPStatus.OK
 
 
-def test_party_nonstaff_unauthorized_404(client, jwt):
+def test_party_nonstaff_unauthorized_404(session, client, jwt):
     """Assert that a get client party request with a non-ppr role and account ID returns a 404 status."""
     # setup
 

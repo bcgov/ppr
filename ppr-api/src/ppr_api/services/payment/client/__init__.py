@@ -123,10 +123,7 @@ class BaseClient:
     def __init__(self, jwt=None, account_id=None, api_key=None):
         """Set the API URL from the env variables PAYMENT_SVC_PREFIX and PAYMENT_SVC_URL."""
         service_url = current_app.config.get('PAYMENT_SVC_URL')
-        service_prefix = current_app.config.get('PAYMENT_SVC_PREFIX')
-        self.api_prefix = service_prefix + '/' if service_prefix[-1] != '/' else service_prefix
         self.api_url = service_url + '/' if service_url[-1] != '/' else service_url
-        self.api_url += self.api_prefix
         self.jwt = jwt
         self.account_id = account_id
         self.api_key = api_key
@@ -199,9 +196,12 @@ class SBCPaymentClient(BaseClient):
     def create_payment(self, transaction_type, quantity=1, ppr_id=None, client_reference_id=None):
         """Submit a payment request for the PPR API transaction."""
         data = SBCPaymentClient.create_payment_data(transaction_type, quantity, ppr_id, client_reference_id)
+        # current_app.logger.debug('create paymnent payload:')
+        # current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
         invoice_id = str(invoice_data['id'])
-        receipt_path = '/' + self.api_prefix + PATH_RECEIPT.format(invoice_id=invoice_id)
+        receipt_path = self.api_url.replace('https://', '')
+        receipt_path = receipt_path[receipt_path.find('/'): None] + PATH_RECEIPT.format(invoice_id=invoice_id)
         # Return the pay reference to include in the API response.
         pay_reference = {
             'invoiceId': invoice_id,

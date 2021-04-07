@@ -535,7 +535,7 @@ def test_find_by_account_id(session):
     assert history[0]['exactResultsSize']
     assert history[0]['selectedResultsSize']
     assert history[0]['searchQuery']
-    assert len(history) >= 2
+    assert len(history) >= 1
 
 
 def test_find_by_account_id_no_result(session):
