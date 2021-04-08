@@ -64,7 +64,7 @@ class Payment:
             current_app.logger.debug(api_response)
             return api_response
 
-        except Exception as err:
+        except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err)
 
     def cancel_payment(self, invoice_id):
@@ -79,5 +79,5 @@ class Payment:
             api_response = api_instance.cancel_payment(invoice_id)
             return api_response
 
-        except Exception as err:
+        except Exception as err:   # noqa: B902; wrapping exception
             raise SBCPaymentException(err)

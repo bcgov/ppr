@@ -16,6 +16,7 @@
 from .db import db  # noqa: I001
 from .address import Address
 from .client_party import ClientParty
+from .client_party_branch import ClientPartyBranch
 from .court_order import CourtOrder
 from .draft import Draft
 from .financing_statement import FinancingStatement
@@ -26,10 +27,12 @@ from .search_client import SearchClient
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
 from .type_tables import RegistrationType
+from .user import User
+from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
 
 
 __all__ = ('db',
-           'Address', 'ClientParty', 'CourtOrder', 'Draft', 'FinancingStatement',
+           'Address', 'ClientParty', 'ClientPartyBranch', 'CourtOrder', 'Draft', 'FinancingStatement',
            'GeneralCollateral', 'Party', 'Registration', 'RegistrationType', 'SearchClient',
-           'SearchResult', 'TrustIndenture', 'VehicleCollateral')
+           'SearchResult', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')

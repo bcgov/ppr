@@ -21,7 +21,7 @@ from flask import request
 from flask_restx import Namespace, Resource, cors
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import ClientParty
+from ppr_api.models import ClientPartyBranch
 from ppr_api.services.authz import is_staff, authorized
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
@@ -58,7 +58,7 @@ class ClientPartyResource(Resource):
                 return unauthorized_error_response(account_id)
 
             # Try to fetch client party by code
-            party = ClientParty.find_by_code(code)
+            party = ClientPartyBranch.find_by_code(code)
             if not party:
                 return not_found_error_response('party', code)
 
@@ -66,5 +66,5 @@ class ClientPartyResource(Resource):
 
         except BusinessException as exception:
             return business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return default_exception_response(default_exception)

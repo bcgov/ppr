@@ -61,8 +61,6 @@ class _Config():  # pylint: disable=too-few-public-methods
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
     PAYMENT_SVC_URL = os.getenv('PAYMENT_SVC_URL', 'http://')
-    PAYMENT_SVC_PREFIX = os.getenv('PAYMENT_SVC_PREFIX', 'api/v1/')
-
     AUTH_SVC_URL = os.getenv('AUTH_SVC_URL', 'http://')
     REPORT_SVC_URL = os.getenv('REPORT_SVC_URL', 'http://')
     REPORT_TEMPLATE_PATH = os.getenv('REPORT_TEMPLATE_PATH', 'report-templates')

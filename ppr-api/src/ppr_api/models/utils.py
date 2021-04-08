@@ -171,7 +171,7 @@ def expiry_dt_from_years(life_years: int):
 
     Adjusted by the life_years number of years in the future.
     """
-    today = date.today()
+    today = now_ts()
     year = today.year + life_years
     month = today.month
     day = today.day

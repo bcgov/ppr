@@ -65,7 +65,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         try:
             db.session.add(self)
             db.session.commit()
-        except Exception as db_exception:
+        except Exception as db_exception:  # noqa: B902; just logging
             current_app.logger.error('DB search_result save exception: ' + repr(db_exception))
             raise BusinessException(
                 error='Database search_result save failed: ' + repr(db_exception),

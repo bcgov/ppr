@@ -80,7 +80,7 @@ class SearchResultsResource(Resource):
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
     @staticmethod
@@ -116,5 +116,5 @@ class SearchResultsResource(Resource):
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)

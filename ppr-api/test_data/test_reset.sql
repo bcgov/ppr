@@ -22,6 +22,8 @@ DELETE FROM financing_statement
   WHERE financing_id >= 200000000;
 DELETE FROM draft
   WHERE draft_id >= 200000000;
+DELETE FROM client_party_branch
+  WHERE client_party_id >= 200000000;
 DELETE FROM client_party
   WHERE client_party_id >= 200000000;
 DELETE FROM address_ppr

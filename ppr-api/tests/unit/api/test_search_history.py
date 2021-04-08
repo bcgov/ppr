@@ -23,7 +23,7 @@ from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
 
-def test_search_history_valid_200(client, jwt):
+def test_search_history_valid_200(session, client, jwt):
     """Assert that valid search history account with some records returns a 200 status."""
     # no setup
 

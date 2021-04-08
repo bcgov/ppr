@@ -314,16 +314,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
             if financing_reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
                 registration.life = model_utils.REPAIRER_LIEN_YEARS
-                registration.financing_statement.expiry_date = \
+                registration.financing_statement.expire_date = \
                     model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
             else:
                 if 'lifeYears' in json_data:
                     registration.life = json_data['lifeYears']
-                    registration.financing_statement.expiry_date = model_utils.expiry_dt_from_years(registration.life)
+                    registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
                 elif 'expiryDate' in json_data:
                     new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
-                    registration.life = new_expiry_date.year - registration.financing_statement.expiry_date.year
-                    registration.financing_statement.expiry_date = new_expiry_date
+                    registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
+                    registration.financing_statement.expire_date = new_expiry_date
 
             # TODO: verify this is updated.
             registration.financing_statement.life = registration.life

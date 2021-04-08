@@ -1257,6 +1257,92 @@
 			]
 		},
 		{
+			"name": "user-profile",
+			"item": [
+				{
+					"name": "Get user profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/user-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user-profile"
+							]
+						},
+						"description": "Get user profile based on the request JWT example."
+					},
+					"response": []
+				},
+				{
+					"name": "Update user profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"defaultDropDowns\": true,\n    \"defaultTableFilters\": true,\n    \"paymentConfirmationDialog\": false,\n    \"selectConfirmationDialog\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/user-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user-profile"
+							]
+						},
+						"description": "Update user profile UI preferences for a user identified by the JWT example."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "search queries",
 			"item": [
 				{

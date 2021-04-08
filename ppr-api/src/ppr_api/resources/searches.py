@@ -86,12 +86,12 @@ class SearchResource(Resource):
                 search_result = SearchResult.create_from_search_query(query)
                 search_result.save()
 
-            except Exception as db_exception:
+            except Exception as db_exception:   # noqa: B902; handle all db related errors.
                 current_app.logger.error(f'Search {account_id} db save failed: ' + repr(db_exception))
                 current_app.logger.error(f'Search {account_id} rolling back payment for invoice {invoice_id}.')
                 try:
                     payment.cancel_payment(invoice_id)
-                except Exception as cancel_exception:
+                except Exception as cancel_exception:   # noqa: B902; log exception
                     current_app.logger.error(f'Search {account_id} payment refund failed for invoice {invoice_id}: ' +
                                              repr(cancel_exception))
 
@@ -103,7 +103,7 @@ class SearchResource(Resource):
             return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
 
@@ -147,5 +147,5 @@ class SearchDetailResource(Resource):
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
-        except Exception as default_exception:
+        except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
