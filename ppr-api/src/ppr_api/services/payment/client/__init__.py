@@ -15,13 +15,13 @@
 # pylint: disable=too-few-public-methods
 
 """The simple pay-api client is defined here."""
+import copy
+import json
 from enum import Enum
 from functools import wraps
-import json
-import copy
 
-from flask import current_app
 import requests
+from flask import current_app
 
 
 MSG_CLIENT_CREDENTIALS_REQ_FAILED = 'Client credentials request failed'
