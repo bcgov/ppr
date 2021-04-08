@@ -45,7 +45,7 @@ def test_search_detail_valid_200(session, client, jwt):
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                       content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []
@@ -168,7 +168,7 @@ def test_search_detail_no_duplicates_200(session, client, jwt):
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                       content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []

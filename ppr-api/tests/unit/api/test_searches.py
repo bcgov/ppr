@@ -95,7 +95,7 @@ def test_search_valid(session, client, jwt, search_type, json_data):
     """Assert that valid search criteria returns a 201 status."""
     rv = client.post('/api/v1/searches',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
@@ -169,7 +169,7 @@ def test_search_query_no_result_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/searches',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
 
     # check
