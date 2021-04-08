@@ -22,7 +22,7 @@ from ppr_api.models import utils as model_utils
 
 from .db import db
 from .address import Address  # noqa: F401 pylint: disable=unused-import
-from .client_party import ClientParty  # noqa: F401 pylint: disable=unused-import
+from .client_party_branch import ClientPartyBranch  # noqa: F401 pylint: disable=unused-import
 
 
 BUS_SEARCH_KEY_SP = "select search_key_pkg.businame('?') from dual"
@@ -54,8 +54,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     last_name = db.Column('last_name', db.String(50), nullable=True)
     # or party business
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
-    # Moved by Bob to client_party
-    # email_id = db.Column('email_id', db.String(250), nullable=True)
     birth_date = db.Column('birth_date', db.DateTime, nullable=True)
     # Search keys
     first_name_key = db.Column('first_name_key', db.String(50), nullable=True)
@@ -67,7 +65,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
     client_party_id = db.Column('client_party_id', db.Integer,
-                                db.ForeignKey('client_party.client_party_id'), nullable=True)
+                                db.ForeignKey('client_party_branch.client_party_id'), nullable=True)
     registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
     financing_id = db.Column('financing_id', db.Integer,
@@ -80,8 +78,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                               back_populates='party', cascade='all, delete')
 
     # Relationships - ClientParty
-    client_party = db.relationship('ClientParty', foreign_keys=[client_party_id], uselist=False,
-                                   back_populates='party')
+    client_party_branch = db.relationship('ClientPartyBranch', foreign_keys=[client_party_id],
+                                          uselist=False, back_populates='party')
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -100,18 +98,17 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.party_type_cd != model_utils.PARTY_REGISTERING:
             party['partyId'] = self.party_id
 
-        if self.client_party:
-            if self.client_party_id:
-                party['code'] = str(self.client_party_id)
-            if self.client_party.business_name:
-                party['businessName'] = self.client_party.business_name
+        if self.client_party_branch and self.client_party_id and self.client_party_branch.client_party:
+            party['code'] = str(self.client_party_id)
+            if self.client_party_branch.client_party.business_name:
+                party['businessName'] = self.client_party_branch.client_party.business_name
 
-            if self.client_party.address:
-                cp_address = self.client_party.address.json
+            if self.client_party_branch.address:
+                cp_address = self.client_party_branch.address.json
                 party['address'] = cp_address
 
-            if self.client_party.email_id:
-                party['emailAddress'] = self.client_party.email_id
+            if self.client_party_branch.email_id:
+                party['emailAddress'] = self.client_party_branch.email_id
         else:
             if self.business_name:
                 party['businessName'] = self.business_name
@@ -264,7 +261,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def verify_party_code(code: str):
         """Verify registering party or secured party code is legitimate."""
-        if code and ClientParty.find_by_code(code):
+        if code and ClientPartyBranch.find_by_code(code):
             return True
 
         return False

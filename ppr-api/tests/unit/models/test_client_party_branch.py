@@ -12,38 +12,56 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests to assure the ClientParty Model.
+"""Tests to assure the ClientPartyBranch Model.
 
-Test-Suite to ensure that the ClientParty Model is working as expected.
+Test-Suite to ensure that the ClientPartyBranch Model is working as expected.
 """
 
-from ppr_api.models import ClientParty
+from ppr_api.models import ClientPartyBranch
 
 
 def test_find_by_code(session):
     """Assert that find client party by code contains all expected elements."""
-    party = ClientParty.find_by_code('200000000')
+    party = ClientPartyBranch.find_by_code('200000000')
     assert party
     assert party['code'] == '200000000'
+    assert party['address']
+    assert party['address']['street']
+    assert party['address']['city']
+    assert party['address']['region']
+    assert party['address']['postalCode']
+    assert party['contact']
+    assert party['contact']['name']
+    assert party['contact']['areaCode']
+    assert party['contact']['phoneNumber']
     assert party['businessName']
+    assert party['emailAddress']
 
 
 def test_find_by_code_invalid(session):
     """Assert that find client party by non-existent code returns the expected result."""
-    party = ClientParty.find_by_code('12345')
+    party = ClientPartyBranch.find_by_code('12345')
     assert not party
 
 
 def test_client_party_json(session):
     """Assert that the client party model renders to a json format correctly."""
-    party = ClientParty(
+    party = ClientPartyBranch(
         client_party_id=1000,
-        business_name='BUSINESS'
+        contact_name='CONTACT',
+        contact_area_cd='250',
+        contact_phone_number='1234567',
+        email_id='test@gmail.com'
     )
 
     party_json = {
         'code': '1000',
-        'businessName': party.business_name
+        'contact': {
+            'name': party.contact_name,
+            'phoneNumber': party.contact_phone_number,
+            'areaCode': party.contact_area_cd
+        },
+        'emailAddress': party.email_id
     }
 
     assert party.json == party_json
