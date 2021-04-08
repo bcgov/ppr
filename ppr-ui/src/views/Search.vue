@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-0">
+  <v-container fluid class="pa-0" style="max-width: none;">
     <confirmation-dialog
       :attach="attachDialog"
       :options="options"

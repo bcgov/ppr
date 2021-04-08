@@ -71,6 +71,7 @@ import { AuthMixin } from '@/mixins'
 import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
 import { getKeycloakRoles, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
+import { RouteNames } from '@/enums'
 import { ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
 
 @Component({
@@ -175,6 +176,11 @@ export default class App extends Mixins(AuthMixin) {
     // if we are already authenticated then go right to init
     // (since we won't get the event from Signin component)
     if (this.isAuthenticated) this.onProfileReady(true)
+    else {
+      this.$router.push({
+        name: RouteNames.SIGN_IN
+      })
+    }
   }
 
   /** Called when profile is ready -- we can now init app. */
@@ -211,6 +217,7 @@ export default class App extends Mixins(AuthMixin) {
       this.setKeycloakRoles(keycloakRoles)
     } catch (error) {
       console.log('Keycloak error =', error) // eslint-disable-line no-console
+      this.haveData = true
       this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
     }
@@ -220,6 +227,7 @@ export default class App extends Mixins(AuthMixin) {
       await this.loadAuth()
     } catch (error) {
       console.log('Auth error =', error) // eslint-disable-line no-console
+      this.haveData = true
       this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
     }
@@ -229,6 +237,7 @@ export default class App extends Mixins(AuthMixin) {
       await this.loadUserInfo()
     } catch (error) {
       console.log('User info error =', error) // eslint-disable-line no-console
+      this.haveData = true
       this.handleError({ statusCode: StatusCodes.NOT_FOUND })
       return
     }
@@ -302,8 +311,7 @@ export default class App extends Mixins(AuthMixin) {
       this.setUserInfo(userInfo)
       if (!settings || settings?.error) {
         // error popup -> user may still continue
-        if (settings?.error) this.handleError(settings.error)
-        else this.handleError({ statusCode: StatusCodes.NOT_FOUND })
+        throw new Error('Invalid user settings')
       }
     } else {
       throw new Error('Invalid user info')

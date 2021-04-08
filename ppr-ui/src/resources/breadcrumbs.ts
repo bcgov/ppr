@@ -21,7 +21,7 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: window.location.origin + '/dashboard',
+    href: sessionStorage.getItem('BASE_URL') + '/dashboard',
     text: 'My PPR Dashboard'
   },
   {
