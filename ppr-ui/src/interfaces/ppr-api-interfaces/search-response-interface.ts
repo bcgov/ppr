@@ -1,5 +1,5 @@
 import { SearchCriteriaIF, SearchResultIF } from '@/interfaces'
-import { ErrorIF } from './error-interface';
+import { ErrorIF } from './error-interface'
 
 // Search Query response (search step 1) interface.
 export interface SearchResponseIF {

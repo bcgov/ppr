@@ -1,33 +1,11 @@
 <template>
   <v-app class="app-container" id="app">
     <!-- Dialogs -->
-    <account-authorization-dialog
+    <error-dialog
       attach="#app"
-      :dialog="accountAuthorizationDialog"
-      @retry="initApp()"
-    />
-
-    <fetch-error-dialog
-      attach="#app"
-      :dialog="fetchErrorDialog"
-      @exit="closeErrorDialogues()"
-      @retry="initApp()"
-    />
-
-    <payment-error-dialog
-      attach="#app"
-      :dialog="paymentErrorDialog"
-      @exit="closeErrorDialogues()"
-      @retry="initApp()"
-    />
-
-    <save-error-dialog
-      attach="#app"
-      :dialog="saveErrorDialog"
-      :errors="saveErrors"
-      :warnings="saveWarnings"
-      @exit="initApp()"
-      @okay="saveErrorDialog = false"
+      :display="errorDialog"
+      :options="dialogOptions"
+      @proceed="proceedAfterError"
     />
 
     <!-- Initial Page Load Transition -->
@@ -59,9 +37,7 @@
                 :isJestRunning=isJestRunning
                 :registryUrl=registryUrl
                 @profileReady="profileReady = true"
-                @fetchError="fetchErrorDialog = true"
-                @paymentError="paymentErrorDialog = true"
-                @saveSearchError="saveErrorDialog = true"
+                @error="handleError"
                 @haveData="haveData = true"
               />
             </v-col>
@@ -75,26 +51,27 @@
 </template>
 
 <script lang="ts">
-// Libraries
+// External
 import { Component, Watch, Mixins } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
-import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { StatusCodes } from 'http-status-codes'
-import { getKeycloakRoles, updateLdUser } from '@/utils'
 
-// Components
+// BC Registry
+import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
+import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
+
+// local Components
 import * as Dialogs from '@/components/dialogs'
 import * as Views from '@/views'
-
-// Mixins, interfaces, etc
+// local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { ActionBindingIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-
-// Enums and Constants
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
+import { getKeycloakRoles, getPPRUserSettings, updateLdUser } from '@/utils'
+// local Enums, Constants, Interfaces
+import { ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
 
 @Component({
   components: {
@@ -121,12 +98,8 @@ export default class App extends Mixins(AuthMixin) {
   @Action setUserInfo: ActionBindingIF
 
   // Local Properties
-  private accountAuthorizationDialog: boolean = false
-  private fetchErrorDialog: boolean = false
-  private paymentErrorDialog: boolean = false
-  private saveErrorDialog: boolean = false
-  private saveErrors: Array<object> = []
-  private saveWarnings: Array<object> = []
+  private errorDialog: boolean = false
+  private dialogOptions: DialogOptionsIF = loginError
 
   // FUTURE: change profileReady/appReady/haveData to a state machine?
 
@@ -164,12 +137,7 @@ export default class App extends Mixins(AuthMixin) {
 
   /** True if an error dialog is displayed. */
   private get isErrorDialog (): boolean {
-    return (
-      this.accountAuthorizationDialog ||
-      this.fetchErrorDialog ||
-      this.paymentErrorDialog ||
-      this.saveErrorDialog
-    )
+    return this.errorDialog
   }
 
   /** True if Jest is running the code. */
@@ -204,30 +172,9 @@ export default class App extends Mixins(AuthMixin) {
       }
     }
 
-    // listen for save error events
-    this.$root.$on('save-error-event', async error => {
-      // save errors/warnings
-      this.saveErrors = error?.response?.data?.errors || []
-      this.saveWarnings = error?.response?.data?.warnings || []
-
-      if (error?.response?.status === StatusCodes.PAYMENT_REQUIRED) {
-        // changes were not saved if a 402 is received
-        this.paymentErrorDialog = true
-      } else {
-        console.log('save error =', error) // eslint-disable-line no-console
-        this.saveErrorDialog = true
-      }
-    })
-
     // if we are already authenticated then go right to init
     // (since we won't get the event from Signin component)
     if (this.isAuthenticated) this.onProfileReady(true)
-  }
-
-  /** Called when component is destroyed. */
-  private destroyed (): void {
-    // stop listening for custom events
-    this.$root.$off('save-error-event')
   }
 
   /** Called when profile is ready -- we can now init app. */
@@ -264,7 +211,8 @@ export default class App extends Mixins(AuthMixin) {
       this.setKeycloakRoles(keycloakRoles)
     } catch (error) {
       console.log('Keycloak error =', error) // eslint-disable-line no-console
-      this.accountAuthorizationDialog = true
+      this.haveData = true
+      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
     }
 
@@ -273,7 +221,8 @@ export default class App extends Mixins(AuthMixin) {
       await this.loadAuth()
     } catch (error) {
       console.log('Auth error =', error) // eslint-disable-line no-console
-      this.accountAuthorizationDialog = true
+      this.haveData = true
+      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
     }
 
@@ -282,7 +231,8 @@ export default class App extends Mixins(AuthMixin) {
       await this.loadUserInfo()
     } catch (error) {
       console.log('User info error =', error) // eslint-disable-line no-console
-      this.accountAuthorizationDialog = true
+      this.haveData = true
+      this.handleError({ statusCode: StatusCodes.NOT_FOUND })
       return
     }
 
@@ -328,17 +278,7 @@ export default class App extends Mixins(AuthMixin) {
   private resetFlags (): void {
     this.appReady = false
     this.haveData = false
-    this.closeErrorDialogues()
-  }
-
-  /** Resets error dialogue flags */
-  private closeErrorDialogues (): void {
-    this.accountAuthorizationDialog = false
-    this.fetchErrorDialog = false
-    this.paymentErrorDialog = false
-    this.saveErrorDialog = false
-    this.saveErrors = []
-    this.saveWarnings = []
+    this.errorDialog = false
   }
 
   /** Fetches authorizations and verifies and stores roles. */
@@ -355,11 +295,18 @@ export default class App extends Mixins(AuthMixin) {
 
   /** Fetches current user info and stores it. */
   private async loadUserInfo (): Promise<any> {
-    // NB: will throw if API error
+    // auth api user info
     const response = await this.fetchCurrentUser()
-    const userInfo = response?.data
+    const userInfo: UserInfoIF = response?.data
     if (userInfo) {
+      // ppr api user settings
+      const settings: UserSettingsIF = await getPPRUserSettings()
+      userInfo.settings = settings
       this.setUserInfo(userInfo)
+      if (!settings || settings?.error) {
+        // error popup -> user may still continue
+        throw new Error('Invalid user settings')
+      }
     } else {
       throw new Error('Invalid user info')
     }
@@ -385,6 +332,34 @@ export default class App extends Mixins(AuthMixin) {
     const custom: any = { roles: this.getUserRoles?.slice(1, -1).split(',') }
 
     await updateLdUser(key, email, firstName, lastName, custom)
+  }
+
+  private handleError (error: ErrorIF): void {
+    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
+    if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+      this.dialogOptions = paymentError
+      this.errorDialog = true
+    } else if (saveErrorCodes.includes(error.statusCode)) {
+      this.dialogOptions = saveSearchError
+      this.errorDialog = true
+    } else if (error.statusCode === StatusCodes.NOT_FOUND) {
+      this.dialogOptions = fetchError
+      this.errorDialog = true
+    } else if (error.statusCode === StatusCodes.UNAUTHORIZED) {
+      this.dialogOptions = loginError
+      this.errorDialog = true
+    } else {
+      // temporary catch all (should be a more generic dialogue)
+      this.dialogOptions = saveSearchError
+      this.errorDialog = true
+    }
+  }
+
+  private proceedAfterError (proceed: boolean): void {
+    this.errorDialog = false
+    // still need to fill this out more
+    // for now just refresh app
+    if (proceed) this.initApp()
   }
 }
 </script>

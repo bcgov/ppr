@@ -9,7 +9,9 @@
       <v-col cols="auto" class="pl-3">
         <v-breadcrumbs class="pa-0" :items="breadcrumbs">
           <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="item.href">
-            <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">{{ item.text }}</span>
+            <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
+              {{ item.text }}
+            </span>
             <span v-else :class="$style['breadcrumb-text']">{{ item.text }}</span>
           </v-breadcrumbs-item>
           <v-breadcrumbs-divider class="px-1" slot="divider">
@@ -61,7 +63,8 @@ export default defineComponent({
     setItems: Array as () => Array<BreadcrumbIF>
   },
   setup (props) {
-    const { getUserFirstName, getUserLastName, getUserUsername } = useGetters<any>(['getUserFirstName', 'getUserLastName', 'getUserUsername'])
+    const { getUserFirstName, getUserLastName, getUserUsername } = useGetters<any>(
+      ['getUserFirstName', 'getUserLastName', 'getUserUsername'])
     const localState = reactive({
       accountName: computed((): string => {
         return `${getUserFirstName.value} ${getUserLastName.value}`

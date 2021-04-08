@@ -1,5 +1,12 @@
 <template>
-  <v-container fluid class="pa-0">
+  <v-container fluid class="pa-0" style="max-width: none;">
+    <confirmation-dialog
+      :attach="attachDialog"
+      :options="options"
+      :display="confirmationDialog"
+      :settingOption="settingOption"
+      @proceed="submit"
+    />
     <v-row no-gutters>
         <tombstone :backURL="dashboardURL" :header="'My Personal Property Registry'" :setItems="breadcrumbs"/>
     </v-row>
@@ -72,7 +79,7 @@
                 </p>
               </v-col>
               <v-col cols="auto" class="pl-3">
-                <v-btn :id="$style['done-btn']" class="search-done-btn pl-7 pr-7 primary" @click="submit">
+                <v-btn :id="$style['done-btn']" class="search-done-btn pl-7 pr-7 primary" @click="submitCheck">
                   Done
                 </v-btn>
               </v-col>
@@ -95,20 +102,22 @@ import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums'
+import { RouteNames, SettingOptions } from '@/enums'
 import {
-  ActionBindingIF, BreadcrumbIF, IndividualNameIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, BreadcrumbIF, DialogOptionsIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { tombstoneBreadcrumbSearch } from '@/resources'
+import { selectionConfirmaionDialog, tombstoneBreadcrumbSearch } from '@/resources'
 import { convertDate, getFeatureFlag, submitSelected, updateSelected } from '@/utils'
 // local components
 import { Tombstone } from '@/components/common'
+import { ConfirmationDialog } from '@/components/dialogs'
 import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 
 @Component({
   components: {
+    ConfirmationDialog,
     SearchBar,
     SearchedResult,
     Tombstone
@@ -129,13 +138,22 @@ export default class Search extends Vue {
   @Prop({ default: false })
   private appReady: boolean
 
+  @Prop({ default: '#app' })
+  private attachDialog: string
+
   @Prop({ default: false })
   private isJestRunning: boolean
 
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
+  private confirmationDialog: boolean = false
+
+  private options: DialogOptionsIF = selectionConfirmaionDialog
+
   private selectedMatches: Array<SearchResultIF> = []
+
+  private settingOption: string = SettingOptions.SELECT_CONFIRMATION_DIALOG
 
   private get breadcrumbs (): Array<BreadcrumbIF> {
     return tombstoneBreadcrumbSearch
@@ -194,31 +212,26 @@ export default class Search extends Vue {
     return 0
   }
 
-  private emitError (statusCode: number): void {
-    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
-    if (statusCode === StatusCodes.PAYMENT_REQUIRED) {
-      this.emitPaymentError()
-    } else if (saveErrorCodes.includes(statusCode)) {
-      this.emitSaveSearchError()
-    } else if (statusCode === StatusCodes.UNAUTHORIZED) {
-      this.emitAuthenticationError()
-    } else {
-      // temporary catch all (should be a more generic dialogue)
-      this.emitSaveSearchError()
-    }
-  }
-
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
   }
 
-  private async submit (): Promise<void> {
-    const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
-    if (statusCode !== StatusCodes.CREATED) {
-      this.emitError(statusCode)
-    } else {
-      this.$router.push({ name: RouteNames.DASHBOARD })
+  private submitCheck (): void {
+    this.options = selectionConfirmaionDialog
+    this.options.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
+    this.confirmationDialog = true
+  }
+
+  private async submit (proceed: boolean): Promise<void> {
+    this.confirmationDialog = false
+    if (proceed) {
+      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+      if (statusCode !== StatusCodes.CREATED) {
+        this.emitError({ statusCode: statusCode })
+      } else {
+        this.$router.push({ name: RouteNames.DASHBOARD })
+      }
     }
   }
 
@@ -226,7 +239,7 @@ export default class Search extends Vue {
     this.selectedMatches = matches
     const statusCode = await updateSelected(this.getSearchResults.searchId, matches)
     if (statusCode !== StatusCodes.ACCEPTED) {
-      this.emitError(statusCode)
+      this.emitError({ statusCode: statusCode })
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
@@ -246,17 +259,10 @@ export default class Search extends Vue {
     this.emitHaveData()
   }
 
-  @Emit('authenticationError')
-  private emitAuthenticationError (message: string = ''): void { }
-
-  @Emit('fetchError')
-  private emitFetchError (message: string = ''): void { }
-
-  @Emit('paymentError')
-  private emitPaymentError (message: string = ''): void { }
-
-  @Emit('saveSearchError')
-  private emitSaveSearchError (message: string = ''): void { }
+  @Emit('error')
+  private emitError (error: ErrorIF): void {
+    console.error(error)
+  }
 
   /** Emits Have Data event. */
   @Emit('haveData')

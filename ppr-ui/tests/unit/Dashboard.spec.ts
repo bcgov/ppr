@@ -62,7 +62,7 @@ describe('Dashboard component', () => {
     expect(header.at(0).text()).toContain('Personal Property Search')
   })
   it('displays default search history header', () => {
-    expect(wrapper.vm.getSearchHistory).toBeNull
+    expect(wrapper.vm.getSearchHistory).toBeNull // eslint-disable-line no-unused-expressions
     expect(wrapper.vm.searchHistoryLength).toBe(0)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)

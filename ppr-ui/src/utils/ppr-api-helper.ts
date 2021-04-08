@@ -1,11 +1,10 @@
-/* eslint-disable no-useless-constructor */
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
-import { SearchCriteriaIF, SearchResponseIF, SearchResultIF } from '@/interfaces'
-import { mockedSearchResponse } from '../../tests/unit/test-data'
+import { SearchCriteriaIF, SearchResponseIF, SearchResultIF, UserSettingsIF } from '@/interfaces'
+import { mockedSearchResponse, mockedDefaultUserSettingsResponse } from '../../tests/unit/test-data'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
@@ -36,7 +35,6 @@ export async function search (searchCriteria: SearchCriteriaIF): Promise<SearchR
       }
       return data
     }).catch(error => {
-      console.error(error)
       return {
         searchId: 'error',
         maxResultsSize: 0,
@@ -77,7 +75,6 @@ export async function submitSelected (searchId: string, selected: Array<SearchRe
       response => { return response.status }
     ).catch(
       error => {
-        console.error(error)
         return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
       }
     )
@@ -98,7 +95,6 @@ export async function searchPDF (searchId: string): Promise<any> {
       }
     ).catch(
       error => {
-        console.error(error)
         return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
       }
     )
@@ -119,9 +115,62 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
       }
     ).catch(
       error => {
-        console.error(error)
         return {
           searches: null,
+          error: {
+            statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+            message: error?.response?.data?.message
+          }
+        }
+      }
+    )
+}
+
+// Get current user settings (404 if user not created in PPR yet)
+export async function getPPRUserSettings (): Promise<UserSettingsIF> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
+  return axios.get('user-profile', config)
+    .then(
+      response => {
+        const data: UserSettingsIF = response?.data
+        if (!data) {
+          throw new Error('Invalid API response')
+        }
+        return data
+      }
+    ).catch(
+      error => {
+        return {
+          paymentConfirmationDialog: true,
+          selectConfirmationDialog: true,
+          error: {
+            statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+            message: error?.response?.data?.message
+          }
+        }
+      }
+    )
+}
+
+// Update user setting
+export async function updateUserSettings (setting: string, settingValue: boolean): Promise<UserSettingsIF> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
+  return axios.patch('user-profile', { [`${setting}`]: settingValue }, config)
+    .then(
+      response => {
+        const data: UserSettingsIF = response?.data
+        if (!data) {
+          throw new Error('Invalid API response')
+        }
+        return data
+      }
+    ).catch(
+      error => {
+        return {
+          paymentConfirmationDialog: true,
+          selectConfirmationDialog: true,
           error: {
             statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
             message: error?.response?.data?.message

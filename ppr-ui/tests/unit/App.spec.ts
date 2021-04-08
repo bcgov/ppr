@@ -6,6 +6,7 @@ import flushPromises from 'flush-promises'
 import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { axios } from '@/utils/axios-auth'
+import { axios as axiosPPR } from '@/utils/axios-ppr'
 import sinon from 'sinon'
 
 // Components
@@ -15,6 +16,7 @@ import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 
 // Other
 import mockRouter from './MockRouter'
+import { mockedDisableAllUserSettingsResponse } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -38,14 +40,22 @@ describe('App component', () => {
     window.location = { assign: jest.fn() } as any
 
     const get = sinon.stub(axios, 'get')
+    const getSettings = sinon.stub(axiosPPR, 'get')
 
     // GET current user
     get.withArgs('users/@me')
       .returns(new Promise((resolve) => resolve({
         data:
         {
-          email: 'test@example.com'
+          firstname: 'first',
+          lastname: 'last',
+          username: 'username'
         }
+      })))
+
+    getSettings.withArgs('user-profile')
+      .returns(new Promise((resolve) => resolve({
+        data: mockedDisableAllUserSettingsResponse
       })))
 
     // create a Local Vue and install router on it
@@ -70,9 +80,13 @@ describe('App component', () => {
     expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)
   })
 
-  it('gets auth and user info properly', () => {
-    expect(store.state.stateModel.tombstone.userInfo).not.toBeNull()
-    expect(store.state.stateModel.tombstone.userInfo.email).toBe('test@example.com')
+  it('gets auth and user info/settings properly', () => {
+    expect(wrapper.vm.$store.state.stateModel.userInfo).not.toBeNull()
+    expect(wrapper.vm.$store.state.stateModel.userInfo.firstname).toBe('first')
+    expect(wrapper.vm.$store.state.stateModel.userInfo.lastname).toBe('last')
+    expect(wrapper.vm.$store.state.stateModel.userInfo.username).toBe('username')
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.selectConfirmationDialog).toBe(false)
     // verify no redirection
     expect(window.location.assign).not.toHaveBeenCalled()
   })

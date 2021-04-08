@@ -1,14 +1,14 @@
-import { AccountInformationIF, SearchResponseIF, TombStoneIF, SearchTypeIF } from '@/interfaces'
-import { IndividualNameIF } from '../ppr-api-interfaces';
+import { AccountInformationIF, AuthorizationIF, SearchResponseIF, SearchTypeIF, UserInfoIF } from '@/interfaces'
+import { IndividualNameIF } from '../ppr-api-interfaces'
 
 // State model example
 export interface StateModelIF {
-  tombstone: TombStoneIF
   accountInformation: AccountInformationIF
+  authorization: AuthorizationIF
   debtorName: IndividualNameIF
   searchHistory: Array<SearchResponseIF>
-  // results from current search
   searchResults: SearchResponseIF
   searchedType: SearchTypeIF
   searchedValue: string
+  userInfo: UserInfoIF
 }
