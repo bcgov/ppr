@@ -227,7 +227,7 @@ export default class Search extends Vue {
     this.confirmationDialog = false
     if (proceed) {
       const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
-      if (statusCode !== StatusCodes.CREATED) {
+      if (statusCode !== StatusCodes.OK) {
         this.emitError({ statusCode: statusCode })
       } else {
         this.$router.push({ name: RouteNames.DASHBOARD })
@@ -238,7 +238,7 @@ export default class Search extends Vue {
   private async updateSelectedMatches (matches:Array<SearchResultIF>): Promise<void> {
     this.selectedMatches = matches
     const statusCode = await updateSelected(this.getSearchResults.searchId, matches)
-    if (statusCode !== StatusCodes.ACCEPTED) {
+    if (statusCode !== StatusCodes.OK) {
       this.emitError({ statusCode: statusCode })
       this.$router.push({ name: RouteNames.DASHBOARD })
     }

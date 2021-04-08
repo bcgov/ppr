@@ -17,8 +17,10 @@
         <v-col v-if="options.acceptText" cols="auto">
           <v-btn id="accept-btn" class="primary dialog-btn" @click="proceed(true)">{{ options.acceptText }}</v-btn>
         </v-col>
-        <v-col v-if="options.cancelText" cols="auto" class="pl-3">
-          <v-btn id="cancel-btn" class="outlined dialog-btn" outlined @click="proceed(false)">
+        <v-col v-if="options.cancelText" cols="auto" :class="options.acceptText? 'pl-3' : ''">
+          <v-btn id="cancel-btn"
+                 :class="options.acceptText? 'outlined dialog-btn' : 'primary dialog-btn'"
+                 @click="proceed(false)">
             {{ options.cancelText }}
           </v-btn>
         </v-col>

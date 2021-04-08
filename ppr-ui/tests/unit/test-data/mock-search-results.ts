@@ -13,6 +13,7 @@ type mockSearchResults = {
 export const mockedSearchResults: mockSearchResults = {
   [UISearchTypes.SERIAL_NUMBER]: [
     {
+      id: 1,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023001B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -26,6 +27,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 2,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023001C',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -39,6 +41,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 3,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023002D',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -52,6 +55,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 4,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023003E',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -65,6 +69,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 5,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023002F',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -78,6 +83,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 6,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023003G',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -91,6 +97,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 7,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023002H',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -104,6 +111,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 8,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023003I',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -119,6 +127,7 @@ export const mockedSearchResults: mockSearchResults = {
   ],
   [UISearchTypes.INDIVIDUAL_DEBTOR]: [
     {
+      id: 1,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '013739B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -132,6 +141,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 2,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '014739B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -146,6 +156,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 3,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023739B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -159,6 +170,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 4,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '113739B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -174,6 +186,7 @@ export const mockedSearchResults: mockSearchResults = {
   ],
   [UISearchTypes.BUSINESS_DEBTOR]: [
     {
+      id: 1,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '013739B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -183,6 +196,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 2,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '123001C',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -192,6 +206,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 3,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '223002D',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -201,6 +216,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 4,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '223003E',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -212,6 +228,7 @@ export const mockedSearchResults: mockSearchResults = {
   ],
   [UISearchTypes.MHR_NUMBER]: [
     {
+      id: 1,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023021B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -226,6 +243,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 2,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023021C',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -240,6 +258,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 3,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023032D',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -254,6 +273,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 4,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023013E',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -270,6 +290,7 @@ export const mockedSearchResults: mockSearchResults = {
   ],
   [UISearchTypes.AIRCRAFT]: [
     {
+      id: 1,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023101B',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -283,6 +304,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 2,
       matchType: MatchTypes.EXACT,
       baseRegistrationNumber: '023201C',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -296,6 +318,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 3,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023302D',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -309,6 +332,7 @@ export const mockedSearchResults: mockSearchResults = {
       }
     },
     {
+      id: 4,
       matchType: MatchTypes.SIMILAR,
       baseRegistrationNumber: '023403E',
       createDateTime: '2020-02-21T18:56:20Z',
@@ -324,6 +348,7 @@ export const mockedSearchResults: mockSearchResults = {
   ],
   [UISearchTypes.REGISTRATION_NUMBER]: [
     {
+      id: 1,
       matchType: MatchTypes.EXACT,
       registrationNumber: '223456A',
       baseRegistrationNumber: '123456A',
@@ -331,6 +356,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA'
     },
     {
+      id: 2,
       matchType: MatchTypes.SIMILAR,
       registrationNumber: '223456B',
       baseRegistrationNumber: '123456B',
@@ -338,6 +364,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA'
     },
     {
+      id: 3,
       matchType: MatchTypes.SIMILAR,
       registrationNumber: '223455A',
       baseRegistrationNumber: '123455A',
@@ -345,6 +372,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA'
     },
     {
+      id: 4,
       matchType: MatchTypes.SIMILAR,
       registrationNumber: '223454A',
       baseRegistrationNumber: '123454A',

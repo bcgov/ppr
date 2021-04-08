@@ -155,7 +155,7 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
     value: 'selectedResultsSize'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: false,
     text: 'Download Report',
     value: 'pdf'

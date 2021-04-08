@@ -4,8 +4,6 @@ import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
 import { SearchCriteriaIF, SearchResponseIF, SearchResultIF, UserSettingsIF } from '@/interfaces'
-import { mockedSearchResponse, mockedDefaultUserSettingsResponse } from '../../tests/unit/test-data'
-import { APISearchTypes, UISearchTypes } from '@/enums'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
 /**
@@ -26,13 +24,17 @@ import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-
 // Submit a search query (search step 1) request.
 export async function search (searchCriteria: SearchCriteriaIF): Promise<SearchResponseIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios.post<SearchResponseIF>('searches', searchCriteria, config)
     .then(response => {
       const data = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }
+      // need a unique value for the data table (can't use the index in the list)
+      const results = data.results
+      results.forEach((item, index) => { item.id = index + 1 })
+      data.results = results
       return data
     }).catch(error => {
       return {
@@ -53,13 +55,13 @@ export async function search (searchCriteria: SearchCriteriaIF): Promise<SearchR
 // Update selected matches in search response (search step 2a)
 export async function updateSelected (searchId: string, selected: Array<SearchResultIF>): Promise<number> {
   const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
-  return axios.put(`search-result/${searchId}`, selected, config)
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios.put(`searches/${searchId}`, selected, config)
     .then(
       response => { return response.status }
     ).catch(
       error => {
-        console.error(error)
+        console.log(error)
         return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
       }
     )
@@ -69,8 +71,8 @@ export async function updateSelected (searchId: string, selected: Array<SearchRe
 export async function submitSelected (searchId: string, selected: Array<SearchResultIF>): Promise<number> {
   const url = sessionStorage.getItem('PPR_API_URL')
   // change to application/pdf to get the pdf right away
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
-  return axios.post(`search-result/${searchId}`, selected, config)
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios.post(`search-results/${searchId}`, selected, config)
     .then(
       response => { return response.status }
     ).catch(
@@ -83,19 +85,24 @@ export async function submitSelected (searchId: string, selected: Array<SearchRe
 // Get pdf for a previous search
 export async function searchPDF (searchId: string): Promise<any> {
   const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/pdf' } }
-  return axios.get(`search-result/${searchId}`, config)
+  const config = { baseURL: url, headers: { Accept: 'application/pdf' }, responseType: 'blob' as 'json' }
+  return axios.get(`search-results/${searchId}`, config)
     .then(
       response => {
         const data = response?.data
-        if (data) {
+        console.log(data)
+        if (!data) {
           throw new Error('Invalid API response')
         }
         return data
       }
     ).catch(
       error => {
-        return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
+        return {
+          error: {
+            statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+          }
+        }
       }
     )
 }
@@ -103,7 +110,7 @@ export async function searchPDF (searchId: string): Promise<any> {
 // Get user search history
 export async function searchHistory (): Promise<SearchHistoryResponseIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/pdf' } }
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios.get<Array<SearchResponseIF>>('search-history', config)
     .then(
       response => {
@@ -129,7 +136,7 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
 // Get current user settings (404 if user not created in PPR yet)
 export async function getPPRUserSettings (): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios.get('user-profile', config)
     .then(
       response => {
@@ -156,7 +163,7 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
 // Update user setting
 export async function updateUserSettings (setting: string, settingValue: boolean): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { 'Content-Type': 'application/json' } }
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios.patch('user-profile', { [`${setting}`]: settingValue }, config)
     .then(
       response => {

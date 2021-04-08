@@ -12,9 +12,6 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row v-else>
-          <b>{{ totalResultsLength }}</b> registrations found
-      </v-row>
     </v-row>
     <v-row v-if="totalResultsLength !== 0" no-gutters class="pt-4">
       <v-col cols="12">
@@ -28,7 +25,8 @@
                       hide-default-footer
                       :items="results"
                       :item-class="getClass"
-                      item-key="baseRegistrationNumber"
+                      item-key="id"
+                      :items-per-page="-1"
                       multi-sort
                       return-object
                       show-select
