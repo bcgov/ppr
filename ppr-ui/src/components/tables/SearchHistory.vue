@@ -11,6 +11,7 @@
                       height="20rem"
                       :items="searchHistory"
                       item-key="searchId"
+                      :items-per-page="-1"
                       sort-by="searchDateTime"
                       sort-desc
                       return-object>
@@ -23,10 +24,19 @@
           <template v-slot:[`item.searchDateTime`]="{ item }">
             {{ displayDate(item.searchDateTime) }}
           </template>
+          <template v-slot:[`item.pdf`]="{ item }">
+            <v-btn :class="[$style['pdf-btn'], 'pa-0']"
+                   depressed
+                   :loading="item.searchId === loadingPDF"
+                   @click="downloadPDF(item.searchId)">
+              <v-icon class="ma-0" left small>mdi-file-pdf-outline</v-icon>
+              <span :class="[$style['pdf-btn-text'], 'ma-0']">PDF</span>
+            </v-btn>
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row v-else no-gutters id="no-history-info" justify="center" :class="[$style['no-results-info'], 'pt-3']">
+    <v-row v-else no-gutters justify="center" id="no-history-info" :class="[$style['no-results-info'], 'pa-5']">
       <v-col cols="auto">
         Your search history will display here
       </v-col>
@@ -41,13 +51,15 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { searchHistroyTableHeaders, SearchTypes } from '@/resources'
-import { convertDate } from '@/utils'
+import { convertDate, searchPDF } from '@/utils'
+import { StatusCodes } from 'http-status-codes'
 
 export default defineComponent({
-  setup () {
+  setup (props, { emit }) {
     const style = useCssModule()
     const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
     const localState = reactive({
+      loadingPDF: '',
       headers: searchHistroyTableHeaders,
       historyLength: computed((): number => {
         return localState.searchHistory?.length || 0
@@ -85,11 +97,43 @@ export default defineComponent({
       }
       return UISearchType
     }
+    const downloadPDF = async (searchId: string): Promise<any> => {
+      localState.loadingPDF = searchId
+      const pdf = await searchPDF(searchId)
+      if (!pdf || pdf?.error) {
+        emit('error', { statusCode: StatusCodes.NOT_FOUND })
+      } else {
+        /* solution from https://github.com/axios/axios/issues/1392 */
+
+        // it is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        const blob = new Blob([pdf], { type: 'application/pdf' })
+
+        // IE doesn't allow using a blob object directly as link href
+        // instead it is necessary to use msSaveOrOpenBlob
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, searchId)
+        } else {
+          // for other browsers, create a link pointing to the ObjectURL containing the blob
+          const url = window.URL.createObjectURL(blob)
+          const a = window.document.createElement('a')
+          window.document.body.appendChild(a)
+          a.setAttribute('style', 'display: none')
+          a.href = url
+          a.download = searchId
+          a.click()
+          window.URL.revokeObjectURL(url)
+          a.remove()
+        }
+      }
+      localState.loadingPDF = ''
+    }
     return {
       ...toRefs(localState),
       displayDate,
       displaySearchValue,
       displayType,
+      downloadPDF,
       style
     }
   }
@@ -104,5 +148,17 @@ export default defineComponent({
 .no-history-info {
   color: $gray9 !important;
   font-size: 0.825rem;
+}
+.pdf-btn {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+  justify-content: start;
+}
+.pdf-btn::before {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+}
+.pdf-btn-text {
+  text-decoration: underline;
 }
 </style>

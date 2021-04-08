@@ -35,7 +35,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <search-history class="soft-corners-bottom"/>
+              <search-history class="soft-corners-bottom" @error="emitError"/>
             </v-row>
           </v-col>
         </v-row>
@@ -93,6 +93,7 @@ export default class Dashboard extends Vue {
     this.setSearchedType(null)
     this.setSearchedValue('')
     this.setSearchResults(null)
+    this.onAppReady(this.appReady)
   }
 
   private get isAuthenticated (): boolean {
