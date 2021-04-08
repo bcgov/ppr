@@ -7,7 +7,9 @@
       <v-container fluid class="px-15 py-10">
         <v-row no-gutters>
           <v-col>
-            <v-row no-gutters id="search-header" :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+            <v-row no-gutters
+                   id="search-header"
+                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
               <v-col cols="auto">
                 <b>Personal Property Search</b>
               </v-col>
@@ -25,7 +27,9 @@
         </v-row>
         <v-row no-gutters class='pt-12'>
           <v-col>
-            <v-row no-gutters id="search-history-header" :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+            <v-row no-gutters
+                   id="search-history-header"
+                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
               <v-col cols="auto">
                 <b>My Searches</b> ({{ searchHistoryLength }})
               </v-col>
@@ -49,7 +53,7 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
-import { ActionBindingIF, BreadcrumbIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ActionBindingIF, BreadcrumbIF, ErrorIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line
 import { tombstoneBreadcrumbDashboard } from '@/resources'
 import { getFeatureFlag, searchHistory } from '@/utils'
 // local components
@@ -103,20 +107,6 @@ export default class Dashboard extends Vue {
     return tombstoneBreadcrumbDashboard
   }
 
-  private emitError (statusCode: number): void {
-    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
-    if (statusCode === StatusCodes.PAYMENT_REQUIRED) {
-      this.emitPaymentError()
-    } else if (saveErrorCodes.includes(statusCode)) {
-      this.emitSaveSearchError()
-    } else if (statusCode === StatusCodes.UNAUTHORIZED) {
-      this.emitAuthenticationError()
-    } else {
-      // temporary catch all (should be a more generic dialogue)
-      this.emitSaveSearchError()
-    }
-  }
-
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
@@ -137,8 +127,9 @@ export default class Dashboard extends Vue {
 
     // get/set search history
     const resp = await searchHistory()
-    if (!resp || resp?.error) this.emitFetchError()
-    else {
+    if (!resp || resp?.error) {
+      this.emitError({ statusCode: StatusCodes.NOT_FOUND })
+    } else {
       this.setSearchHistory(resp?.searches)
     }
     // tell App that we're finished loading
@@ -155,17 +146,10 @@ export default class Dashboard extends Vue {
     }
   }
 
-  @Emit('authenticationError')
-  private emitAuthenticationError (message: string = ''): void { }
-
-  @Emit('fetchError')
-  private emitFetchError (message: string = ''): void { }
-
-  @Emit('paymentError')
-  private emitPaymentError (message: string = ''): void { }
-
-  @Emit('saveSearchError')
-  private emitSaveSearchError (message: string = ''): void { }
+  @Emit('error')
+  private emitError (error: ErrorIF): void {
+    console.error(error)
+  }
 
   /** Emits Have Data event. */
   @Emit('haveData')

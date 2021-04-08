@@ -1,5 +1,12 @@
 <template>
   <v-container fluid no-gutters class="white pa-6">
+    <confirmation-dialog
+      :attach="attachDialog"
+      :options="paymentConfirmaionDialog"
+      :display="confirmationDialog"
+      :setting-option="settingOption"
+      @proceed="searchAction"
+    />
     <v-row no-gutters class="pt-2">
       <v-col v-if="searchTitle" :class="$style['search-title']">
         <b>{{ searchTitle }}</b>
@@ -108,7 +115,7 @@
       </v-col>
       <v-col cols="1" class="pl-3 pt-2">
         <v-row no-gutters>
-          <v-btn :id="$style['search-btn']" class="search-bar-btn primary" @click="searchAction">
+          <v-btn :id="$style['search-btn']" class="search-bar-btn primary" @click="searchCheck">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-row>
@@ -124,26 +131,34 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 
 import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
-import { SearchTypes } from '@/resources'
+import { SearchTypes, paymentConfirmaionDialog } from '@/resources'
 import {
   IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchCriteriaIF, // eslint-disable-line no-unused-vars
   SearchTypeIF, // eslint-disable-line no-unused-vars
-  SearchValidationIF // eslint-disable-line no-unused-vars
+  SearchValidationIF, // eslint-disable-line no-unused-vars
+  UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { UISearchTypes } from '@/enums'
+import { SettingOptions, UISearchTypes } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
+import { ConfirmationDialog } from '@/components/dialogs'
 
 export default defineComponent({
   components: {
     AutoComplete,
+    ConfirmationDialog,
     FolioNumber
   },
   props: {
+    attachDialog: {
+      type: String,
+      default: '#app'
+    },
     defaultDebtor: {
       type: Object as () => IndividualNameIF
     },
@@ -163,9 +178,11 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    const { getUserSettings } = useGetters<any>(['getUserSettings'])
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
+      confirmationDialog: false,
       folioNumber: props.defaultFolioNumber,
       hideDetails: false,
       searchTypes: SearchTypes,
@@ -175,6 +192,7 @@ export default defineComponent({
       searchValueLast: props.defaultDebtor?.last,
       searchTypeLabel: 'Select a search category',
       selectedSearchType: props.defaultSelectedSearchType,
+      settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       validations: Object as SearchValidationIF,
       categoryMessage: computed((): string => {
@@ -216,6 +234,10 @@ export default defineComponent({
       }),
       searchPopUp: computed((): Array<string> | boolean => {
         return localState.validations?.searchValue?.popUp || false
+      }),
+      showConfirmationDialog: computed((): boolean => {
+        const settings: UserSettingsIF = getUserSettings.value
+        return settings?.paymentConfirmationDialog
       })
     })
     const getCriteria = () => {
@@ -243,24 +265,33 @@ export default defineComponent({
         clientReferenceId: localState.folioNumber
       }
     }
-    const searchAction = async () => {
+    const searchAction = async (proceed: boolean) => {
+      localState.confirmationDialog = false
+      if (proceed) {
+        emit('search-data', null) // clear any current results
+        const resp = await search(getSearchApiParams())
+        if (resp?.error) emit('search-error', resp.error)
+        else {
+          emit('searched-type', localState.selectedSearchType)
+          if (localState.isIndividualDebtor) {
+            emit('debtor-name', {
+              first: localState.searchValueFirst,
+              second: localState.searchValueSecond,
+              last: localState.searchValueLast
+            })
+          } else emit('searched-value', localState.searchValue)
+          emit('search-data', resp)
+        }
+      }
+    }
+    const searchCheck = async () => {
       localState.validations = validateSearchAction(localState)
       if (localState.validations) {
         localState.autoCompleteIsActive = false
-        return
-      } else emit('search-data', null) // clear any current results
-      const resp = await search(getSearchApiParams())
-      if (resp?.error) emit('search-error', resp.error.statusCode)
-      else {
-        emit('searched-type', localState.selectedSearchType)
-        if (localState.isIndividualDebtor) {
-          emit('debtor-name', {
-            first: localState.searchValueFirst,
-            second: localState.searchValueSecond,
-            last: localState.searchValueLast
-          })
-        } else emit('searched-value', localState.searchValue)
-        emit('search-data', resp)
+      } else if (localState.showConfirmationDialog) {
+        localState.confirmationDialog = true
+      } else {
+        searchAction(true)
       }
     }
     const setHideDetails = (hideDetails: boolean) => {
@@ -269,6 +300,9 @@ export default defineComponent({
     const setSearchValue = (searchValue: string) => {
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValue
+    }
+    const togglePaymentConfirmation = (showDialog: boolean) => {
+      emit('togglePaymentDialog', showDialog)
     }
     const updateFolioNumber = (folioNumber: string) => {
       localState.folioNumber = folioNumber
@@ -305,9 +339,12 @@ export default defineComponent({
     return {
       ...toRefs(localState),
       getSearchApiParams,
+      paymentConfirmaionDialog,
       searchAction,
+      searchCheck,
       setHideDetails,
       setSearchValue,
+      togglePaymentConfirmation,
       updateFolioNumber
     }
   }

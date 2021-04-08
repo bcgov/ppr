@@ -158,6 +158,6 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-sm',
     sortable: false,
     text: 'Download Report',
-    value: ''
+    value: 'pdf'
   }
 ]

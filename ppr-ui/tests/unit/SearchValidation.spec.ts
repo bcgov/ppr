@@ -11,6 +11,7 @@ import { SearchBar } from '@/components/search'
 // Other
 import { SearchTypes } from '@/resources'
 import { SearchTypeIF } from '@/interfaces'
+import { getLastEvent } from './utils'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -24,23 +25,6 @@ const searchData: string = 'search-data'
 
 // Input field selectors / buttons
 const searchButtonSelector: string = '.search-bar-btn'
-
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
 
 /**
  * Creates and mounts a component, so that it can be tested.

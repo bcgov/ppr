@@ -9,14 +9,21 @@ import { axios } from '@/utils/axios-ppr'
 import { axios as vonAxios } from '@/utils/axios-von'
 
 // Components
+import { ConfirmationDialog } from '@/components/dialogs'
 import { SearchBar } from '@/components/search'
 
 // Other
 import { SearchTypes } from '@/resources'
 import { AutoCompleteResponseIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
-import { mockedSearchResponse, mockedVonResponse } from './test-data'
+import {
+  mockedDefaultUserSettingsResponse,
+  mockedDisableAllUserSettingsResponse,
+  mockedSearchResponse,
+  mockedVonResponse
+} from './test-data'
 import { UISearchTypes } from '@/enums'
 import { FolioNumber } from '@/components/common'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -28,26 +35,12 @@ const searchError: string = 'search-error'
 const searchData: string = 'search-data'
 
 // Input field selectors / buttons
+const dialogCheckbox: string = '.dialog-checkbox'
+const dialogText: string = '.dialog-text'
+const dialogTitle: string = '.dialog-title'
 const searchButtonSelector: string = '.search-bar-btn'
 const searchDropDown: string = '.search-bar-type-select'
 const searchTextField: string = '.search-bar-text-field'
-
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -55,6 +48,7 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
 function createComponent (
+  attachDialog: string,
   searchTypes: Array<SearchTypeIF>
 ): Wrapper<any> {
   const localVue = createLocalVue()
@@ -63,7 +57,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(SearchBar, {
     localVue,
-    propsData: { searchTypes },
+    propsData: { attachDialog, searchTypes },
     store,
     vuetify
   })
@@ -73,7 +67,13 @@ describe('SearchBar component', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -86,6 +86,51 @@ describe('SearchBar component', () => {
     expect(wrapper.find(searchDropDown).exists()).toBe(true)
     expect(wrapper.find(searchTextField).exists()).toBe(true)
     expect(wrapper.find(searchButtonSelector).exists()).toBe(true)
+  })
+})
+
+describe('Payment confirmation popup', () => {
+  let wrapper: Wrapper<any>
+  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
+  const select: SearchTypeIF = SearchTypes[0]
+
+  beforeEach(async () => {
+    // GET search data
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDefaultUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('pops up with payment confirmation modal before searching', async () => {
+    expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'F100'
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Serial numbers normally contain')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation enabled, otherwise it would skip the modal
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+    expect(wrapper.findComponent(ConfirmationDialog).exists()).toBe(true)
+    expect(wrapper.findComponent(ConfirmationDialog).isVisible()).toBe(true)
+    expect(wrapper.find(dialogTitle).exists()).toBe(true)
+    expect(wrapper.find(dialogText).exists()).toBe(true)
+    expect(wrapper.find(dialogCheckbox).exists()).toBe(true)
   })
 })
 
@@ -104,7 +149,13 @@ describe('Serial number search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     sandbox.restore()
@@ -126,6 +177,8 @@ describe('Serial number search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -145,7 +198,13 @@ describe('Individual debtor search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     sandbox.restore()
@@ -178,6 +237,8 @@ describe('Individual debtor search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('Middle name is optional', async () => {
@@ -205,6 +266,8 @@ describe('Individual debtor search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -230,7 +293,13 @@ describe('Business debtor search', () => {
     get.returns(new Promise(resolve => resolve({
       data: vonResp
     })))
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     sandbox.restore()
@@ -254,6 +323,8 @@ describe('Business debtor search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('shows von api results while typing', async () => {
@@ -311,7 +382,13 @@ describe('MHR search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     sandbox.restore()
@@ -333,6 +410,8 @@ describe('MHR search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -352,7 +431,13 @@ describe('Aircraft search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     sandbox.restore()
@@ -374,6 +459,8 @@ describe('Aircraft search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -393,7 +480,13 @@ describe('Registration number search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    wrapper = createComponent(SearchTypes)
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent('', SearchTypes)
   })
   afterEach(() => {
     sandbox.restore()
@@ -415,6 +508,8 @@ describe('Registration number search', () => {
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })

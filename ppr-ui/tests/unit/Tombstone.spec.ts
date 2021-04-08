@@ -10,7 +10,6 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { Tombstone } from '@/components/common'
 
 // Other
-import mockRouter from './MockRouter'
 import { BreadcrumbIF, UserInfoIF } from '@/interfaces'
 import { tombstoneBreadcrumbSearch } from '@/resources'
 
@@ -48,7 +47,11 @@ describe('Tombstone component', () => {
   const userInfo: UserInfoIF = {
     firstname: 'test',
     lastname: 'tester',
-    username: '123Test'
+    username: '123Test',
+    settings: {
+      paymentConfirmationDialog: true,
+      selectConfirmationDialog: true
+    }
   }
   const testHeader = 'Test'
 

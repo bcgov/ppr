@@ -134,6 +134,26 @@ p {
   text-align: right !important;
 }
 
+// dialog styles
+.dialog-btn {
+  min-width: 6rem !important;
+}
+
+.dialog-checkbox {
+  color: $gray9;
+}
+
+.dialog-title {
+  color: $gray9;
+  font-size: 1.5rem;
+}
+
+.dialog-text {
+  color: $gray7;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
 // Loading Indicator
 .loading-container {
   display: flex;
