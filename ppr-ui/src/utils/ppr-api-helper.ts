@@ -33,8 +33,10 @@ export async function search (searchCriteria: SearchCriteriaIF): Promise<SearchR
       }
       // need a unique value for the data table (can't use the index in the list)
       const results = data.results
-      results.forEach((item, index) => { item.id = index + 1 })
-      data.results = results
+      if (results) {
+        results.forEach((item, index) => { item.id = index + 1 })
+        data.results = results
+      }
       return data
     }).catch(error => {
       return {
@@ -61,7 +63,6 @@ export async function updateSelected (searchId: string, selected: Array<SearchRe
       response => { return response.status }
     ).catch(
       error => {
-        console.log(error)
         return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
       }
     )
@@ -90,7 +91,6 @@ export async function searchPDF (searchId: string): Promise<any> {
     .then(
       response => {
         const data = response?.data
-        console.log(data)
         if (!data) {
           throw new Error('Invalid API response')
         }
