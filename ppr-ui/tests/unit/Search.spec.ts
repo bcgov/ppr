@@ -113,7 +113,7 @@ describe('Search component', () => {
     expect(searchMetaDisplay.length).toBe(1)
     expect(searchMetaDisplay.at(0).text()).toContain(wrapper.vm.searchType)
     expect(searchMetaDisplay.at(0).text()).toContain(wrapper.vm.searchValue)
-    expect(searchMetaDisplay.at(0).text()).toContain(wrapper.vm.searchTime)
+    expect(searchMetaDisplay.at(0).text()).toContain(wrapper.vm.searchTime.trim())
     expect(wrapper.find(resultsInfo).exists()).toBe(false)
     const noResultInfoDisplay = wrapper.findAll(noResultsInfo)
     expect(noResultInfoDisplay.length).toBe(1)
