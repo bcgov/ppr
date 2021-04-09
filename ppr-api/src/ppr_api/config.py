@@ -23,6 +23,9 @@ import os
 import sys
 
 from dotenv import find_dotenv, load_dotenv
+from sqlalchemy.pool import NullPool
+
+from ppr_api.resources.db import OracleDB
 
 
 # this will load all the envars from a .env file located in the project root (api)
@@ -82,14 +85,40 @@ class _Config():  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv('DATABASE_HOST', '')
 #    DB_PORT = os.getenv('DATABASE_PORT', '5432')
     DB_PORT = os.getenv('DATABASE_PORT', '1521')
+    # Don't need a configured URI: using oracle connection pool configured in resources/db.py using above settings.
 #    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
-    SQLALCHEMY_DATABASE_URI = 'oracle://{user}:{password}@{host}:{port}/{name}'.format(
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=int(DB_PORT),
-        name=DB_NAME,
-    )
+#    SQLALCHEMY_DATABASE_URI = 'oracle://{user}:{password}@{host}:{port}/{name}'.format(
+#        user=DB_USER,
+#        password=DB_PASSWORD,
+#        host=DB_HOST,
+#        port=int(DB_PORT),
+#        name=DB_NAME,
+#    )
+    # Connection pool settings
+    DB_MIN_POOL_SIZE = os.getenv('DATABASE_MIN_POOL_SIZE', '5')
+    DB_MAX_POOL_SIZE = os.getenv('DATABASE_MAX_POOL_SIZE', '20')
+    DB_CONN_WAIT_TIMEOUT = os.getenv('DATABASE_CONN_WAIT_TIMEOUT', '1500')
+    DB_CONN_TIMEOUT = os.getenv('DATABASE_CONN_TIMEOUT', '3600')
+
+    SQLALCHEMY_DATABASE_URI = 'oracle://'
+    # .bcgov will be appended to DB_NAME if the name contains no domain.
+    DB_POOL_CONFIG = {
+        'user': DB_USER,
+        'password': DB_PASSWORD,
+        'host': DB_HOST,
+        'port': int(DB_PORT),
+        'name': DB_NAME,
+        'min_pool_size': int(DB_MIN_POOL_SIZE),
+        'max_pool_size': int(DB_MAX_POOL_SIZE),
+        'wait_timeout': int(DB_CONN_WAIT_TIMEOUT),
+        'timeout': int(DB_CONN_TIMEOUT)
+    }
+    DB_POOL = OracleDB.create_engine_pool(DB_POOL_CONFIG)
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'creator': DB_POOL.acquire,
+        'poolclass': NullPool
+    }
 
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
@@ -147,14 +176,41 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv('DATABASE_TEST_HOST', '')
 #    DB_PORT = os.getenv('DATABASE_TEST_PORT', '5432')
     DB_PORT = os.getenv('DATABASE_TEST_PORT', '1521')
+    # Don't need the URI: using oracle connection pool configured in resources/db.py using above settings.
 #    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
-    SQLALCHEMY_DATABASE_URI = 'oracle://{user}:{password}@{host}:{port}/{name}'.format(
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=int(DB_PORT),
-        name=DB_NAME,
-    )
+#    SQLALCHEMY_DATABASE_URI = 'oracle://{user}:{password}@{host}:{port}/{name}'.format(
+#        user=DB_USER,
+#        password=DB_PASSWORD,
+#        host=DB_HOST,
+#        port=int(DB_PORT),
+#        name=DB_NAME,
+#    )
+
+    # Connection pool settings
+    DB_MIN_POOL_SIZE = os.getenv('DATABASE_MIN_POOL_SIZE', '2')
+    DB_MAX_POOL_SIZE = os.getenv('DATABASE_MAX_POOL_SIZE', '5')
+    DB_CONN_WAIT_TIMEOUT = os.getenv('DATABASE_CONN_WAIT_TIMEOUT', '1500')
+    DB_CONN_TIMEOUT = os.getenv('DATABASE_CONN_TIMEOUT', '3600')
+
+    SQLALCHEMY_DATABASE_URI = 'oracle://'
+    # .bcgov will be appended to DB_NAME if the name contains no domain.
+    DB_POOL_CONFIG = {
+        'user': DB_USER,
+        'password': DB_PASSWORD,
+        'host': DB_HOST,
+        'port': int(DB_PORT),
+        'name': DB_NAME,
+        'min_pool_size': int(DB_MIN_POOL_SIZE),
+        'max_pool_size': int(DB_MAX_POOL_SIZE),
+        'wait_timeout': int(DB_CONN_WAIT_TIMEOUT),
+        'timeout': int(DB_CONN_TIMEOUT)
+    }
+    DB_POOL = OracleDB.create_engine_pool(DB_POOL_CONFIG)
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'creator': DB_POOL.acquire,
+        'poolclass': NullPool
+    }
 
     # JWT OIDC settings
     # JWT_OIDC_TEST_MODE will set jwt_manager to use
