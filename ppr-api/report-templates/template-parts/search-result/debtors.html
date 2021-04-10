@@ -10,7 +10,7 @@
                 <div class="section-sub-title">
                     {% if party.businessName is defined %}
                         {{ party.businessName }}
-                    {% else %}
+                    {% elif party.personName is defined %}
                         {{ party.personName.last }},
                         {{ party.personName.first }}
                         {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
@@ -40,7 +40,7 @@
                     <div class="section-sub-title">
                         {% if party.businessName is defined %}
                             {{ party.businessName }}
-                        {% else %}
+                        {% elif party.personName is defined %}
                             {{ party.personName.last }},
                             {{ party.personName.first }}
                             {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
@@ -80,7 +80,7 @@
                     <div class="section-sub-title">
                         {% if party.businessName is defined %}
                             {{ party.businessName }}
-                        {% else %}
+                        {% elif party.personName is defined %}
                             {{ party.personName.last }},
                             {{ party.personName.first }}
                             {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
