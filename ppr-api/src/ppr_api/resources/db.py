@@ -91,8 +91,6 @@ class OracleDB:
             cursor = conn.cursor()
             cursor.execute("alter session set TIME_ZONE = 'UTC'")
         database_name = db_pool_config['name']
-        if database_name.find('.') < 1:
-            database_name += '.bcgov'
         return cx_Oracle.SessionPool(user=db_pool_config['user'],  # pylint:disable=c-extension-no-member
                                      password=db_pool_config['password'],
                                      dsn='{0}:{1}/{2}'.format(db_pool_config['host'],
