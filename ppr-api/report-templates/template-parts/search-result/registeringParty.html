@@ -7,7 +7,7 @@
                 <div class="section-sub-title">
                     {% if detail.financingStatement.registeringParty.businessName is defined %}
                         {{ detail.financingStatement.registeringParty.businessName }}
-                    {% else %}
+                    {% elif detail.financingStatement.registeringParty.personName is defined %}
                         {{ detail.financingStatement.registeringParty.personName.last }},
                         {{ detail.financingStatement.registeringParty.personName.first }}
                         {% if detail.financingStatement.registeringParty.personName.middle is defined %}
@@ -39,7 +39,7 @@
                 <div class="section-sub-title">
                     {% if change.registeringParty.businessName is defined %}
                         {{ change.registeringParty.businessName }}
-                    {% else %}
+                    {% elif change.registeringParty.personName is defined %}
                         {{ change.registeringParty.personName.last }},
                         {{ change.registeringParty.personName.first }}
                         {% if change.registeringParty.personName.middle is defined %}
