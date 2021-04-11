@@ -100,14 +100,14 @@ class OracleDB:
                                      dsn='{0}:{1}/{2}'.format(db_pool_config['host'],
                                                               db_pool_config['port'],
                                                               database_name),
-                                     min=1,
-                                     max=10,
+                                     min=db_pool_config['min_pool_size'],
+                                     max=db_pool_config['max_pool_size'],
                                      increment=1,
                                      connectiontype=cx_Oracle.Connection,  # pylint:disable=c-extension-no-member
                                      threaded=True,
                                      getmode=cx_Oracle.SPOOL_ATTRVAL_NOWAIT,  # pylint:disable=c-extension-no-member
-                                     waitTimeout=1500,
-                                     timeout=3600,
+                                     waitTimeout=db_pool_config['wait_timeout'],
+                                     timeout=db_pool_config['timeout'],
                                      sessionCallback=init_session,
                                      encoding='UTF-8',
                                      nencoding='UTF-8')
