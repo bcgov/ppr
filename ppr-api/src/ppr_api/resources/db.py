@@ -91,19 +91,23 @@ class OracleDB:
             cursor = conn.cursor()
             cursor.execute("alter session set TIME_ZONE = 'UTC'")
         database_name = db_pool_config['name']
+        if database_name.find('.') < 1:
+            database_name += '.bcgov'
+        print('create_engine_pool: user@p= {0}/{1}'.format(db_pool_config['user'], db_pool_config['password']))
+        print('create_engine_pool: dsn= {0}:{1}/{2}'.format(db_pool_config['host'], db_pool_config['port'], database_name))
         return cx_Oracle.SessionPool(user=db_pool_config['user'],  # pylint:disable=c-extension-no-member
                                      password=db_pool_config['password'],
                                      dsn='{0}:{1}/{2}'.format(db_pool_config['host'],
                                                               db_pool_config['port'],
                                                               database_name),
-                                     min=db_pool_config['min_pool_size'],
-                                     max=db_pool_config['max_pool_size'],
+                                     min=1,
+                                     max=10,
                                      increment=1,
                                      connectiontype=cx_Oracle.Connection,  # pylint:disable=c-extension-no-member
                                      threaded=True,
                                      getmode=cx_Oracle.SPOOL_ATTRVAL_NOWAIT,  # pylint:disable=c-extension-no-member
-                                     waitTimeout=db_pool_config['wait_timeout'],
-                                     timeout=db_pool_config['timeout'],
+                                     waitTimeout=1500,
+                                     timeout=3600,
                                      sessionCallback=init_session,
                                      encoding='UTF-8',
                                      nencoding='UTF-8')
