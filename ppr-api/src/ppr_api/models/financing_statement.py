@@ -306,14 +306,14 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                        Registration.registration_ts > days_ago).\
                                 order_by(FinancingStatement.financing_id).all()
 
-        if not statement_list:
-            raise BusinessException(
-                error=f'No Financing Statements found for Account ID {account_id}.',
-                status_code=HTTPStatus.NOT_FOUND
-            )
-
         results_json = []
-        # only staff may view historical
+        if not statement_list:
+            return results_json
+        #    raise BusinessException(
+        #        error=f'No Financing Statements found for Account ID {account_id}.',
+        #        status_code=HTTPStatus.NOT_FOUND
+        #    )
+
         for statement in statement_list:
             if staff or statement.state_type_cd == model_utils.STATE_ACTIVE:
                 statement_json = {
@@ -325,12 +325,11 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 results_json.append(statement_json)
 
         # Non-staff, all historical/discharged
-        if not results_json:
-            raise BusinessException(
-                error=f'No active Financing Statements found for Account ID {account_id}.',
-                status_code=HTTPStatus.NOT_FOUND
-            )
-
+        # if not results_json:
+        #    raise BusinessException(
+        #        error=f'No active Financing Statements found for Account ID {account_id}.',
+        #        status_code=HTTPStatus.NOT_FOUND
+        #    )
         return results_json
 
     @classmethod

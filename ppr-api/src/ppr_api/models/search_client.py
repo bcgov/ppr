@@ -313,7 +313,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def find_all_by_account_id(cls, account_id: str = None):
         """Return a search history summary list of searches executed by an account."""
-        history_list = None
+        history_list = []
         if account_id:
             query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace('?', account_id)
             if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
@@ -322,7 +322,6 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             result = db.session.execute(query)
             rows = result.fetchall()
             if rows is not None:
-                history_list = []
                 for row in rows:
                     values = row.values()
                     search = {
@@ -342,11 +341,11 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                         search['selectedResultsSize'] = int(exact_value)
                     history_list.append(search)
 
-        if not history_list:
-            raise BusinessException(
-                error=f'No search history found for Account ID {account_id}.',
-                status_code=HTTPStatus.NOT_FOUND
-            )
+        # if not history_list:
+        #   raise BusinessException(
+        #       error=f'No search history found for Account ID {account_id}.',
+        #       status_code=HTTPStatus.NOT_FOUND
+        #    )
 
         return history_list
 

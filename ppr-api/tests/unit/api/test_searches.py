@@ -266,7 +266,7 @@ def test_search_selection_update_valid(session, client, jwt):
                     headers=create_header_account(jwt, [PPR_ROLE]),
                     content_type='application/json')
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.ACCEPTED
     assert rv.json[2]['selected'] == json_data[2]['selected']
 
 

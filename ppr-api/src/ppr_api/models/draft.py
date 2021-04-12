@@ -91,13 +91,14 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                             filter(Draft.account_id == account_id,
                                    Draft.registration_id == None).order_by(Draft.draft_id).all()  # noqa: E711
 
-        if not draft_list:
-            raise BusinessException(
-                error=f'No Draft Statements found for Account ID {account_id}.',
-                status_code=HTTPStatus.NOT_FOUND
-            )
-
         drafts_json = []
+        if not draft_list:
+            return drafts_json
+        #    raise BusinessException(
+        #        error=f'No Draft Statements found for Account ID {account_id}.',
+        #        status_code=HTTPStatus.NOT_FOUND
+        #    )
+
         for draft in draft_list:
             draft_json = {
                 'createDateTime': model_utils.format_ts(draft.create_ts),

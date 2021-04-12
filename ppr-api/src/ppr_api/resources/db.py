@@ -94,7 +94,8 @@ class OracleDB:
         if database_name.find('.') < 1:
             database_name += '.bcgov'
         print('create_engine_pool: user@p= {0}/{1}'.format(db_pool_config['user'], db_pool_config['password']))
-        print('create_engine_pool: dsn= {0}:{1}/{2}'.format(db_pool_config['host'], db_pool_config['port'], database_name))
+        print('create_engine_pool: dsn= {0}:{1}/{2}'.format(db_pool_config['host'], db_pool_config['port'],
+              database_name))
         return cx_Oracle.SessionPool(user=db_pool_config['user'],  # pylint:disable=c-extension-no-member
                                      password=db_pool_config['password'],
                                      dsn='{0}:{1}/{2}'.format(db_pool_config['host'],
