@@ -143,7 +143,7 @@ class SearchDetailResource(Resource):
 
             # Save the updated search selection.
             search_client.update_search_selection(request_json)
-            return jsonify(json.loads(search_client.search_response)), HTTPStatus.OK
+            return jsonify(json.loads(search_client.search_response)), HTTPStatus.ACCEPTED
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)

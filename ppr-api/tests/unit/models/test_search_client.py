@@ -526,7 +526,7 @@ def test_search_enddatatetime_invalid(session, client, jwt):
 def test_find_by_account_id(session):
     """Assert that the account search history list first item contains all expected elements."""
     history = SearchClient.find_all_by_account_id('PS12345')
-    print(history)
+    # print(history)
     assert history
     assert history[0]['searchId']
     assert history[0]['searchDateTime']
@@ -539,13 +539,10 @@ def test_find_by_account_id(session):
 
 
 def test_find_by_account_id_no_result(session):
-    """Assert that the find draft statement by invalid account ID returns the expected result."""
-    with pytest.raises(BusinessException) as not_found_err:
-        SearchClient.find_all_by_account_id('X12345X')
-
+    """Assert that the find search history by invalid account ID returns the expected result."""
+    history = SearchClient.find_all_by_account_id('XXXX345')
     # check
-    assert not_found_err
-    assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
+    assert len(history) == 0
 
 
 def test_create_from_json(session):

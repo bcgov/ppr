@@ -59,7 +59,7 @@ def test_search_history_unauthorized_401(session, client, jwt):
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
 
 
-def test_search_history_not_found_404(session, client, jwt):
+def test_search_history_not_no_result(session, client, jwt):
     """Assert that a search history request with an unknown account ID returns a 404 status."""
     # no setup
 
@@ -69,4 +69,5 @@ def test_search_history_not_found_404(session, client, jwt):
 
     # check
     # print(rv.json)
-    assert rv.status_code == HTTPStatus.NOT_FOUND
+    assert rv.status_code == HTTPStatus.OK
+    assert len(rv.json) == 0

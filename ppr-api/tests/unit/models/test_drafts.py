@@ -75,14 +75,12 @@ def test_find_by_document_id_amendment(session):
     assert json_data['amendmentStatement']['changeType']
 
 
-def test_find_by_account_id_invalid(session):
+def test_find_by_account_id_no_result(session):
     """Assert that the find draft statement by invalid account ID returns the expected result."""
-    with pytest.raises(BusinessException) as not_found_err:
-        Draft.find_all_by_account_id('X12345X')
+    drafts = Draft.find_all_by_account_id('X12345X')
 
     # check
-    assert not_found_err
-    assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
+    assert len(drafts) == 0
 
 
 def test_find_by_document_id_invalid(session):

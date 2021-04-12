@@ -90,14 +90,11 @@ def test_find_all_by_account_id(session):
     assert statement_list[0]['createDateTime']
 
 
-def test_find_all_by_account_id_invalid(session):
+def test_find_all_by_account_id_no_result(session):
     """Assert that the financing statement summary list by invalid account id works as expected."""
-    with pytest.raises(BusinessException) as not_found_err:
-        FinancingStatement.find_all_by_account_id('XX12345', True)
+    statement_list = FinancingStatement.find_all_by_account_id('XXXXX45', True)
 
-    # check
-    assert not_found_err
-    assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
+    assert len(statement_list) == 0
 
 
 def test_find_by_registration_number_valid(session):

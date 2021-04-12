@@ -89,9 +89,16 @@ class Report:  # pylint: disable=too-few-public-methods
             'Content-Type': 'application/json'
         }
         data = self._setup_report_data()
-        response = requests.post(url=current_app.config.get('REPORT_SVC_URL'), headers=headers, data=json.dumps(data))
+        url = current_app.config.get('REPORT_SVC_URL')
+        current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
+                                 .format(self._account_id, self._report_key, url))
+        response = requests.post(url=url, headers=headers, data=json.dumps(data))
+        current_app.logger.debug('Account {0} report type {1} response status: {2}.'
+                                 .format(self._account_id, self._report_key, response.status_code))
 
         if response.status_code != HTTPStatus.OK:
+            current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response.status_code, str(response.content)))
             return jsonify(message=str(response.content)), response.status_code
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
 
