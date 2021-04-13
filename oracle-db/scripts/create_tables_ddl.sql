@@ -254,7 +254,7 @@ CREATE TABLE CLIENT_PARTY_BRANCH
   CONTACT_PHONE_NUMBER      VARCHAR2(15 BYTE),
   EMAIL_ID                  VARCHAR2(256 BYTE),
   ID                        NUMBER,
-  USERID                    VARCHAR2(7 BYTE),
+  USER_ID                   VARCHAR2(7 BYTE),
   UPDATE_TS                 DATE
 )
 ;

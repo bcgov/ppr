@@ -34,7 +34,7 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
     contact_area_cd = db.Column('contact_area_cd', db.String(3), nullable=True)
     contact_phone_number = db.Column('contact_phone_number', db.String(15), nullable=False)
     email_id = db.Column('email_id', db.String(250), nullable=True)
-    user_id = db.Column('userid', db.String(7), nullable=True)
+    user_id = db.Column('user_id', db.String(7), nullable=True)
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
 
     # parent keys
