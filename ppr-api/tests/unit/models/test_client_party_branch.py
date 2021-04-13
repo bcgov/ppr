@@ -47,7 +47,7 @@ def test_find_by_code_invalid(session):
 def test_client_party_json(session):
     """Assert that the client party model renders to a json format correctly."""
     party = ClientPartyBranch(
-        client_party_id=1000,
+        client_party_branch_id=1000,
         contact_name='CONTACT',
         contact_area_cd='250',
         contact_phone_number='1234567',

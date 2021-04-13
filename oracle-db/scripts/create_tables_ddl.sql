@@ -245,32 +245,34 @@ ALTER TABLE client_party
 
 CREATE TABLE CLIENT_PARTY_BRANCH
 (
-  CLIENT_PARTY_ID      NUMBER NOT NULL,
-  BRANCH_CODE          NUMBER NOT NULL,
-  ADDRESS_ID           NUMBER NOT NULL,
-  BCONLINE_ACCOUNT     NUMBER,
-  CONTACT_NAME         VARCHAR2(100 BYTE),
-  CONTACT_AREA_CD      CHAR(3 BYTE),
-  CONTACT_PHONE_NUMBER VARCHAR2(15 BYTE),
-  EMAIL_ID             VARCHAR2(256 BYTE),
-  ID                   NUMBER,
-  USERID               VARCHAR2(7 BYTE),
-  UPDATE_TS            DATE
+  CLIENT_PARTY_BRANCH_ID    NUMBER NOT NULL,
+  CLIENT_PARTY_ID           NUMBER NOT NULL,
+  ADDRESS_ID                NUMBER NOT NULL,
+  BCONLINE_ACCOUNT          NUMBER,
+  CONTACT_NAME              VARCHAR2(100 BYTE),
+  CONTACT_AREA_CD           CHAR(3 BYTE),
+  CONTACT_PHONE_NUMBER      VARCHAR2(15 BYTE),
+  EMAIL_ID                  VARCHAR2(256 BYTE),
+  ID                        NUMBER,
+  USERID                    VARCHAR2(7 BYTE),
+  UPDATE_TS                 DATE
 )
 ;
-
+ALTER TABLE CLIENT_PARTY_BRANCH
+  ADD CONSTRAINT client_party_branch_pk PRIMARY KEY (client_party_branch_id)
+  using index
+  tablespace PPR_INDEX
+;
 ALTER TABLE CLIENT_PARTY_BRANCH
   ADD CONSTRAINT branch_party_id_fk FOREIGN KEY (client_party_id)
   REFERENCES client_party(client_party_id)
   ON DELETE CASCADE
 ;
-
 ALTER TABLE CLIENT_PARTY_BRANCH
   ADD CONSTRAINT branch_user_id_fk FOREIGN KEY (id)
   REFERENCES users(id)
   ON DELETE CASCADE
 ;
-
 ALTER TABLE client_party_branch
   ADD CONSTRAINT branch_address_id_fk FOREIGN KEY (address_id)
   REFERENCES address_ppr(address_id)
@@ -286,7 +288,7 @@ CREATE TABLE PARTY
   PARTY_TYPE_CD        CHAR(2 BYTE) NOT NULL, 
   REGISTRATION_ID      NUMBER NOT NULL,
   FINANCING_ID         NUMBER NOT NULL, 
-  CLIENT_PARTY_ID      NUMBER,
+  CLIENT_PARTY_BRANCH_ID NUMBER,
   BUSINESS_NAME        VARCHAR2(150 BYTE),
   LAST_NAME            VARCHAR2(50 BYTE),
   FIRST_NAME           VARCHAR2(50 BYTE),
@@ -316,9 +318,9 @@ ALTER TABLE party
   ADD CONSTRAINT party_address_fk FOREIGN KEY (address_id)
   REFERENCES address_ppr(address_id)
 ;
-ALTER TABLE party
-  ADD CONSTRAINT party_client_party_fk FOREIGN KEY (client_party_id)
-  REFERENCES client_party(client_party_id)
+ALTER TABLE PARTY
+  ADD CONSTRAINT party_client_branch_fk FOREIGN KEY (client_party_branch_id)
+  REFERENCES client_party_branch(client_party_branch_id)
 ;
 ALTER TABLE party
   ADD CONSTRAINT party_reg_id_fk FOREIGN KEY (registration_id)

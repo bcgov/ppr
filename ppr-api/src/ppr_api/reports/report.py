@@ -11,12 +11,13 @@
 """Produces a PDF output based on templates and JSON messages."""
 import base64
 import json
+from datetime import datetime
+from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
-from enum import Enum
-from datetime import datetime
 
 import pycountry
+import pytz
 import requests
 from flask import current_app, jsonify
 
@@ -470,7 +471,8 @@ class Report:  # pylint: disable=too-few-public-methods
     def _to_report_datetime(date_time: str, include_time: bool = True):
         """Convert ISO formatted date time or date string to report format."""
         utc_datetime = datetime.fromisoformat(date_time)
-        local_datetime = datetime.fromtimestamp(utc_datetime.timestamp())
+        # local_datetime = datetime.fromtimestamp(utc_datetime.timestamp())
+        local_datetime = utc_datetime.astimezone(pytz.timezone('Canada/Pacific'))
         if include_time:
             return local_datetime.strftime('%B %d, %Y %I:%M:%S %p Pacific Time')
 

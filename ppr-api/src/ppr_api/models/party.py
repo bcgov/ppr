@@ -64,8 +64,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
-    client_party_id = db.Column('client_party_id', db.Integer,
-                                db.ForeignKey('client_party_branch.client_party_id'), nullable=True)
+    client_party_branch_id = db.Column('client_party_branch_id', db.Integer,
+                                       db.ForeignKey('client_party_branch.client_party_branch_id'), nullable=True)
     registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
     financing_id = db.Column('financing_id', db.Integer,
@@ -78,7 +78,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                               back_populates='party', cascade='all, delete')
 
     # Relationships - ClientParty
-    client_party_branch = db.relationship('ClientPartyBranch', foreign_keys=[client_party_id],
+    client_party_branch = db.relationship('ClientPartyBranch', foreign_keys=[client_party_branch_id],
                                           uselist=False, back_populates='party')
 
     # Relationships - Registration
@@ -98,8 +98,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.party_type_cd != model_utils.PARTY_REGISTERING:
             party['partyId'] = self.party_id
 
-        if self.client_party_branch and self.client_party_id and self.client_party_branch.client_party:
-            party['code'] = str(self.client_party_id)
+        if self.client_party_branch and self.client_party_branch_id and self.client_party_branch.client_party:
+            party['code'] = str(self.client_party_branch_id)
             if self.client_party_branch.client_party.business_name:
                 party['businessName'] = self.client_party_branch.client_party.business_name
 
@@ -183,7 +183,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party.party_type_cd = model_utils.PARTY_DEBTOR_IND
 
         if party_type != model_utils.PARTY_DEBTOR_BUS and 'code' in json_data:
-            party.client_party_id = int(json_data['code'])
+            party.client_party_branch_id = int(json_data['code'])
         else:
             if party_type == model_utils.PARTY_DEBTOR_BUS and 'birthDate' in json_data:
                 party.birth_date = model_utils.ts_from_date_iso_format(json_data['birthDate'])
