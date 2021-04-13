@@ -34,7 +34,7 @@ def test_find_by_id(session):
     assert party.middle_name
     assert party.last_name
     assert party.registration_id
-    assert not party.client_party_id
+    assert not party.client_party_branch_id
     assert not party.business_name
     assert not party.birth_date
     assert not party.registration_id_end
@@ -203,7 +203,7 @@ def test_create_from_financing_json(session):
     assert len(parties) == 3
     for party in parties:
         assert party.party_type_cd
-        if not party.client_party_id:
+        if not party.client_party_branch_id:
             assert party.address
 
 

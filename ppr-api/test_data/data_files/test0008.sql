@@ -11,12 +11,12 @@ INSERT INTO registration(registration_id, financing_id, registration_number, bas
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
   VALUES(200000011, 'TEST-00C8', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000023, 'RG', 200000009, 200000000, null, null, 'TEST-CHANGE-DT', '8', 'REGISTERING', null,
            null, 200000011)
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
     VALUES(200000024, 'DB', 200000009, 200000000, null, null, null, null, null, 'TEST 8 TRANSFER DEBTOR',
            null, 200000011, search_key_pkg.businame('TEST 8 TRANSFER DEBTOR'))

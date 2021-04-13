@@ -27,7 +27,7 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
 
     __tablename__ = 'client_party_branch'
 
-    branch_code = db.Column('branch_code', db.Integer, nullable=False)
+    client_party_branch_id = db.Column('client_party_branch_id', db.Integer, primary_key=True, nullable=False)
     bconline_account = db.Column('bconline_account', db.Integer, nullable=True)
     # contact info
     contact_name = db.Column('contact_name', db.String(100), nullable=False)
@@ -38,7 +38,6 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
 
     # parent keys
-    # Temporary PK otherwise sqlalchemy complains
     client_party_id = db.Column('client_party_id', db.Integer,
                                 db.ForeignKey('client_party.client_party_id'), primary_key=True, nullable=False)
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
@@ -55,7 +54,7 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
     def json(self) -> dict:
         """Return the client party branch as a json object."""
         party = {
-            'code': str(self.client_party_id),
+            'code': str(self.client_party_branch_id),
             'contact': {
                 'name': self.contact_name,
                 'phoneNumber': self.contact_phone_number
@@ -78,7 +77,7 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
         """Return a client party branch json object by client code."""
         party = None
         if code:
-            party = cls.query.filter(ClientPartyBranch.client_party_id == int(code)).one_or_none()
+            party = cls.query.filter(ClientPartyBranch.client_party_branch_id == int(code)).one_or_none()
 
         if party:
             return party.json
