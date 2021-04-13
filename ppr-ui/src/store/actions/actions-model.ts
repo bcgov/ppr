@@ -1,11 +1,13 @@
-import { IndividualNameIF, SearchResponseIF, SearchTypeIF, UserInfoIF, UserSettingsIF } from '@/interfaces'
+import {
+  AccountInformationIF, IndividualNameIF, SearchResponseIF, SearchTypeIF, UserInfoIF, UserSettingsIF
+} from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 
-export const setAccountInformation: ActionIF = ({ commit }, accountInformation): void => {
-  commit('mutateAccountInformation', accountInformation)
+export const setAccountInformation: ActionIF = ({ commit }, account: AccountInformationIF): void => {
+  commit('mutateAccountInformation', account)
 }
 
-export const setAuthRoles: ActionIF = ({ commit }, authRoles): void => {
+export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): void => {
   commit('mutateAuthRoles', authRoles)
 }
 
@@ -31,6 +33,10 @@ export const setSearchedType: ActionIF = ({ commit }, searchedType: SearchTypeIF
 
 export const setSearchedValue: ActionIF = ({ commit }, searchedValue: string): void => {
   commit('mutateSearchedValue', searchedValue)
+}
+
+export const setSearching: ActionIF = ({ commit }, searching: boolean): void => {
+  commit('mutateSearching', searching)
 }
 
 export const setShowPaymentConfirmation: ActionIF = ({ commit }, showDialog: boolean): void => {

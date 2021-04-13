@@ -10,5 +10,6 @@ export interface StateModelIF {
   searchResults: SearchResponseIF
   searchedType: SearchTypeIF
   searchedValue: string
+  searching: boolean
   userInfo: UserInfoIF
 }

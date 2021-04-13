@@ -6,6 +6,7 @@ export function format12HourTime (date: Date): string {
   let hours = date.getHours()
   const ampm = hours < 12 ? 'am' : 'pm'
   hours = hours < 12 ? hours : hours - 12
+  hours = hours !== 0 ? hours : 12
 
   let min = `0${date.getMinutes()}`
   let sec = `0${date.getSeconds()}`

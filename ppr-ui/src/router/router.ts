@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter, { Route } from 'vue-router'
 import { routes } from './routes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { Dictionary } from 'vue-router/types/router'
 
 /**
  * Configures and returns Vue Router.

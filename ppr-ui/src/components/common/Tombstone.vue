@@ -27,10 +27,10 @@
       <v-col cols="10">
         <v-row no-gutters>
           <v-col cols="auto" class="pr-3" style="border-right: thin solid #dee2e6">
-            {{ accountName }}
+            {{ userName }}
           </v-col>
           <v-col cols="auto" class="pl-3">
-            {{ username }}
+            {{ accountName }}
           </v-col>
         </v-row>
       </v-col>
@@ -63,16 +63,16 @@ export default defineComponent({
     setItems: Array as () => Array<BreadcrumbIF>
   },
   setup (props) {
-    const { getUserFirstName, getUserLastName, getUserUsername } = useGetters<any>(
-      ['getUserFirstName', 'getUserLastName', 'getUserUsername'])
+    const { getAccountLabel, getUserFirstName, getUserLastName } = useGetters<any>(
+      ['getAccountLabel', 'getUserFirstName', 'getUserLastName'])
     const localState = reactive({
-      accountName: computed((): string => {
+      userName: computed((): string => {
         return `${getUserFirstName.value} ${getUserLastName.value}`
       }),
       date: '',
       breadcrumbs: props.setItems,
-      username: computed((): string => {
-        return getUserUsername.value
+      accountName: computed((): string => {
+        return getAccountLabel.value
       })
     })
     onMounted(() => {

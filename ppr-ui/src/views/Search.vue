@@ -98,17 +98,16 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
-import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, SettingOptions } from '@/enums'
 import {
   ActionBindingIF, BreadcrumbIF, DialogOptionsIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
-  SearchResponseIF, SearchResultIF, SearchTypeIF // eslint-disable-line no-unused-vars
+  SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { selectionConfirmaionDialog, tombstoneBreadcrumbSearch } from '@/resources'
-import { convertDate, getFeatureFlag, submitSelected, updateSelected } from '@/utils'
+import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
 // local components
 import { Tombstone } from '@/components/common'
 import { ConfirmationDialog } from '@/components/dialogs'
@@ -128,6 +127,7 @@ export default class Search extends Vue {
   @Getter getSearchResults: SearchResponseIF
   @Getter getSearchedValue: string
   @Getter getSearchedType: SearchTypeIF
+  @Getter getUserSettings: UserSettingsIF
 
   @Action setDebtorName: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
@@ -218,16 +218,20 @@ export default class Search extends Vue {
   }
 
   private submitCheck (): void {
-    this.options = selectionConfirmaionDialog
-    this.options.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
-    this.confirmationDialog = true
+    if (this.getUserSettings?.selectConfirmationDialog && this.totalResultsLength > 0) {
+      this.options = { ...selectionConfirmaionDialog }
+      this.options.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
+      this.confirmationDialog = true
+    } else {
+      this.submit(true)
+    }
   }
 
   private async submit (proceed: boolean): Promise<void> {
     this.confirmationDialog = false
     if (proceed) {
       const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
-      if (statusCode !== StatusCodes.OK) {
+      if (!successfulPPRResponses.includes(statusCode)) {
         this.emitError({ statusCode: statusCode })
       } else {
         this.$router.push({ name: RouteNames.DASHBOARD })
@@ -238,7 +242,7 @@ export default class Search extends Vue {
   private async updateSelectedMatches (matches:Array<SearchResultIF>): Promise<void> {
     this.selectedMatches = matches
     const statusCode = await updateSelected(this.getSearchResults.searchId, matches)
-    if (statusCode !== StatusCodes.OK) {
+    if (!successfulPPRResponses.includes(statusCode)) {
       this.emitError({ statusCode: statusCode })
       this.$router.push({ name: RouteNames.DASHBOARD })
     }

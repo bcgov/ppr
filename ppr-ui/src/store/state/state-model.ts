@@ -16,7 +16,9 @@ export const stateModel: StateModelIF = {
   searchResults: null,
   searchedType: null,
   searchedValue: '',
+  searching: false,
   userInfo: {
+    contacts: [],
     firstname: '',
     lastname: '',
     username: '',
