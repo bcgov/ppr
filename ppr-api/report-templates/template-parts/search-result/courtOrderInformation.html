@@ -21,7 +21,7 @@
             <td colspan="2">{{ detail.financingStatement.courtOrderInformation.effectOfOrder }}</td>
         </tr>
     </table>
-    {% elif change.courtOrderInformation is defined  %}
+    {% elif change is defined and change.courtOrderInformation is defined  %}
     <table class="business-details-table" role="presentation">
         <tr>
             <td>

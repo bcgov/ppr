@@ -12,7 +12,7 @@
          </tr>
       {% endfor %}
    </table>
-{% elif change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
+{% elif change is defined and (change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined) %}
    {% if change.addGeneralCollateral is defined %}
    <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in change.addGeneralCollateral %}
