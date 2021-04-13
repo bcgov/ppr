@@ -10,8 +10,8 @@ import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-
  * Actions that provide integration with the ppr api.
  *
  * Successful responses
- * 200 GET search histroy / PDF
- * 201 POST search / final result selection
+ * 200 GET search histroy / PDF / final result selection
+ * 201 POST search
  * 202 PUT result select update
  * 422 POST search (but no results found) -- hopefully we can change this to 201 with response
  *
@@ -20,6 +20,8 @@ import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-
  * 401 NOT_AUTHORIZED
  * 500 INTERNAL_SERVER_ERROR
  */
+
+export const successfulPPRResponses = [StatusCodes.OK, StatusCodes.CREATED, StatusCodes.ACCEPTED]
 
 // Submit a search query (search step 1) request.
 export async function search (searchCriteria: SearchCriteriaIF): Promise<SearchResponseIF> {

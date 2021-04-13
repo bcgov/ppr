@@ -61,8 +61,8 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
       if (searchValue?.length > 70) {
         validation.searchValue.message = 'Maximum 70 characters'
       }
-      if (searchValue?.length < 3) {
-        validation.searchValue.message = 'Must contain more than 2 characters'
+      if (searchValue?.length < 2) {
+        validation.searchValue.message = 'Must contain more than 1 character'
       }
       break
     case UISearchTypes.MHR_NUMBER:

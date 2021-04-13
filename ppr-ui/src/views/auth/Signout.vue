@@ -1,10 +1,10 @@
 <template>
-  <sbc-signout :redirect-url="registryUrl" />
+  <sbc-signout :redirect-url="logoutURL" />
 </template>
 
 <script lang="ts">
 // Libraries
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 
 // Components
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
@@ -15,8 +15,11 @@ import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
   }
 })
 export default class Signout extends Vue {
-  @Prop({ default: 'https://bcregistry.ca' })
-  private registryUrl: string
+  private get logoutURL (): string {
+    const url = sessionStorage.getItem('AUTH_URL')
+    if (url) return url
+    return null
+  }
 }
 </script>
 

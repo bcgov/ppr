@@ -10,7 +10,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { Tombstone } from '@/components/common'
 
 // Other
-import { BreadcrumbIF, UserInfoIF } from '@/interfaces'
+import { AccountInformationIF, BreadcrumbIF, UserInfoIF } from '@/interfaces'
 import { tombstoneBreadcrumbSearch } from '@/resources'
 
 Vue.use(Vuetify)
@@ -44,10 +44,26 @@ function createComponent (backURL: string, header: string, setItems: Array<Bread
 describe('Tombstone component', () => {
   let wrapper: any
   const { assign } = window.location
+  const accountInfo: AccountInformationIF = {
+    accountType: '',
+    id: 1,
+    label: 'testPPR',
+    type: ''
+  }
   const userInfo: UserInfoIF = {
+    contacts: [
+      {
+        created: '',
+        createdBy: '',
+        email: '',
+        modified: '',
+        phone: '',
+        phoneExtension: ''
+      }
+    ],
     firstname: 'test',
     lastname: 'tester',
-    username: '123Test',
+    username: '123d3crr3',
     settings: {
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
@@ -60,6 +76,7 @@ describe('Tombstone component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
 
+    await store.dispatch('setAccountInformation', accountInfo)
     await store.dispatch('setUserInfo', userInfo)
     wrapper = createComponent('http://test/dashboard', testHeader, tombstoneBreadcrumbSearch)
   })
@@ -84,7 +101,7 @@ describe('Tombstone component', () => {
     expect(userInfoDisplay.length).toBe(1)
     expect(userInfoDisplay.at(0).text()).toContain(userInfo.firstname)
     expect(userInfoDisplay.at(0).text()).toContain(userInfo.lastname)
-    expect(userInfoDisplay.at(0).text()).toContain(userInfo.username)
+    expect(userInfoDisplay.at(0).text()).toContain(accountInfo.label)
     expect(wrapper.find(backBtn).exists()).toBe(true)
   })
 })

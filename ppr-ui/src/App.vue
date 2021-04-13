@@ -22,8 +22,8 @@
         class="sbc-header"
         :inAuth="false"
         :redirectOnLoginSuccess="baseUrl"
-        :redirectUrlLoginFail="registryUrl"
-        :redirectOnLogout="registryUrl"
+        :redirectUrlLoginFail="loginURL"
+        :redirectOnLogout="loginURL"
         :showActions="true"
       />
 
@@ -115,11 +115,17 @@ export default class App extends Mixins(AuthMixin) {
   /** Whether the token refresh service is initialized. */
   private tokenService: boolean = false
 
-  private loggedOut: boolean = false
-
   /** The base URL that auth will redirect to. */
   private get baseUrl (): string {
     return sessionStorage.getItem('BASE_URL')
+  }
+
+  /** The login URL. */
+  private get loginURL (): string {
+    // if AUTH_URL does not exist this will return 'undefined'. Needs to be null or str
+    const url = sessionStorage.getItem('AUTH_URL')
+    if (url) return url
+    return null
   }
 
   /** The registry URL. */
@@ -329,7 +335,7 @@ export default class App extends Mixins(AuthMixin) {
     const firstName: string = this.getUserFirstName
     const lastName: string = this.getUserLastName
     // remove leading { and trailing } and tokenize string
-    const custom: any = { roles: this.getUserRoles?.slice(1, -1).split(',') }
+    const custom: any = { roles: this.getUserRoles }
 
     await updateLdUser(key, email, firstName, lastName, custom)
   }

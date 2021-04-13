@@ -115,7 +115,10 @@
       </v-col>
       <v-col cols="1" class="pl-3 pt-2">
         <v-row no-gutters>
-          <v-btn :id="$style['search-btn']" class="search-bar-btn primary" @click="searchCheck">
+          <v-btn :id="$style['search-btn']"
+                 class="search-bar-btn primary"
+                 :loading="searching"
+                 @click="searchCheck">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-row>
@@ -131,7 +134,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 
 import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes, paymentConfirmaionDialog } from '@/resources'
@@ -178,7 +181,8 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { getUserSettings } = useGetters<any>(['getUserSettings'])
+    const { setSearching } = useActions<any>(['setSearching'])
+    const { getUserSettings, isSearching } = useGetters<any>(['getUserSettings', 'isSearching'])
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -203,6 +207,9 @@ export default defineComponent({
           return true
         }
         return false
+      }),
+      searching: computed((): boolean => {
+        return isSearching.value
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
@@ -268,6 +275,7 @@ export default defineComponent({
     const searchAction = async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
+        setSearching(true)
         emit('search-data', null) // clear any current results
         const resp = await search(getSearchApiParams())
         if (resp?.error) emit('search-error', resp.error)
@@ -282,6 +290,7 @@ export default defineComponent({
           } else emit('searched-value', localState.searchValue)
           emit('search-data', resp)
         }
+        setSearching(false)
       }
     }
     const searchCheck = async () => {

@@ -260,7 +260,7 @@ describe('Business debtor validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Must contain more than 2 characters')
+    expect(messages.at(0).text()).toBe('Must contain more than 1 character')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()

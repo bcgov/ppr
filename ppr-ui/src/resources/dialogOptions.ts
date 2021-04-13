@@ -34,7 +34,7 @@ export const paymentConfirmaionDialog: DialogOptionsIF = {
   acceptText: 'Accept',
   cancelText: 'Cancel',
   title: 'Payment Confirmation',
-  text: 'Each search incurs a fee, even if the search returns no results.' +
+  text: 'Each search incurs a fee, even if the search returns no results. ' +
         'Your BC Online Account will be debited $8.50 for this transaction.'
 }
 
@@ -42,8 +42,8 @@ export const selectionConfirmaionDialog = {
   acceptText: 'Accept',
   cancelText: 'Change Selected Registrations',
   title: 'Confirm Selections',
-  text: 'registrations will be included in your PDF search results report' +
-        'along with an overview of the search results. Click the <i>Change' +
-        'Selected Registrations</i> button if you would like to edit your' +
+  text: 'registrations will be included in your PDF search results report ' +
+        'along with an overview of the search results. Click the <i>Change ' +
+        'Selected Registrations</i> button if you would like to edit your ' +
         'selection before returning to the dashboard.'
 }
