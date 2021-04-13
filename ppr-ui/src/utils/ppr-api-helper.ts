@@ -13,7 +13,6 @@ import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-
  * 200 GET search histroy / PDF / final result selection
  * 201 POST search
  * 202 PUT result select update
- * 422 POST search (but no results found) -- hopefully we can change this to 201 with response
  *
  * Possible errors include:
  * 400 BAD_REQUEST
