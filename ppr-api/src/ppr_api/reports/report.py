@@ -89,6 +89,8 @@ class Report:  # pylint: disable=too-few-public-methods
             'Content-Type': 'application/json'
         }
         data = self._setup_report_data()
+        current_app.logger.debug('Account {0} report type {1} setting up report data.'
+                                 .format(self._account_id, self._report_key))
         url = current_app.config.get('REPORT_SVC_URL')
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))

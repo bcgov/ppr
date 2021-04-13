@@ -70,8 +70,9 @@ class User(db.Model):
         return cls.query.filter_by(id=submitter_id).one_or_none()
 
     @classmethod
-    def find_by_jwt_token(cls, token: dict):
+    def find_by_jwt_token(cls, token: dict, account_id: str = None):
         """Return a User if they exist and match the provided JWT."""
+        current_app.logger.debug(f'Running query to look up user profile for account {account_id}.')
         return cls.query.filter_by(sub=token['sub']).one_or_none()
 
     @classmethod

@@ -54,10 +54,11 @@ class UserProfileResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
 
             token = g.jwt_oidc_token_info
-            current_app.logger.debug(f'Getting user profile for {account_id} with token: {token}')
+            current_app.logger.debug(f'Getting user profile for account {account_id} with token: {token}')
 
             # Try to fetch existing user from JWT.
-            user = User.find_by_jwt_token(token)
+            user = User.find_by_jwt_token(token, account_id)
+            current_app.logger.debug(f'User profile query completed for account {account_id}.')
             if not user:
                 # If user does not exist, create user and user profile with the default settings.
                 current_app.logger.debug(f'No user found for {account_id} request token: creating records.')
