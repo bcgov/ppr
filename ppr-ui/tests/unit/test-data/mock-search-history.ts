@@ -5,6 +5,7 @@ import { mockedSearchResponse } from './mock-search-responses'
 export const mockedSearchHistory: SearchHistoryResponseIF = {
   searches: [
     mockedSearchResponse[UISearchTypes.SERIAL_NUMBER],
+    mockedSearchResponse[UISearchTypes.INDIVIDUAL_DEBTOR],
     mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR],
     mockedSearchResponse[UISearchTypes.MHR_NUMBER],
     mockedSearchResponse[UISearchTypes.AIRCRAFT],

@@ -1,3 +1,4 @@
+import APP from '@/App.vue'
 import { Dashboard, Search, Signin, Signout } from '@/views'
 import { RouteNames } from '@/enums'
 
@@ -14,7 +15,7 @@ export const routes = [
   },
   {
     // SbcHeader.logout() redirects here:
-    path: '/signout/:redirectUrl',
+    path: '/signout',
     name: RouteNames.SIGN_OUT,
     component: Signout,
     props: true,

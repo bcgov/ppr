@@ -72,6 +72,7 @@ import { fetchError, loginError, paymentError, saveSearchError } from '@/resourc
 import { getKeycloakRoles, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
 import { ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
+import { RouteNames } from './enums'
 
 @Component({
   components: {
@@ -111,6 +112,9 @@ export default class App extends Mixins(AuthMixin) {
 
   /** Whether the views have loaded their data and the spinner can be hidden. */
   private haveData: boolean = false
+
+  /** Whether the app is in the process of logging out or not */
+  private loggedOut: boolean = false
 
   /** Whether the token refresh service is initialized. */
   private tokenService: boolean = false
@@ -166,21 +170,28 @@ export default class App extends Mixins(AuthMixin) {
    * NB: User may not be authed yet.
    */
   private created (): void {
-    // before unloading this page, if there are changes then prompt user
-    window.onbeforeunload = (event) => {
-      // add condition once we know what to look for
-      if (false) { // eslint-disable-line no-constant-condition
-        // cancel closing the page
-        event.preventDefault()
-        // pop up confirmation dialog
-        // NB: custom text is not supported in all browsers
-        event.returnValue = 'You have unsaved changes. Are you sure you want to leave?'
+    if (this.$route?.query?.logout) {
+      this.loggedOut = true
+      sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
+      this.$router.push(`${window.location.origin}`)
+    } else {
+      this.loggedOut = false
+      // before unloading this page, if there are changes then prompt user
+      window.onbeforeunload = (event) => {
+        // add condition once we know what to look for
+        if (false) { // eslint-disable-line no-constant-condition
+          // cancel closing the page
+          event.preventDefault()
+          // pop up confirmation dialog
+          // NB: custom text is not supported in all browsers
+          event.returnValue = 'You have unsaved changes. Are you sure you want to leave?'
+        }
       }
-    }
 
-    // if we are already authenticated then go right to init
-    // (since we won't get the event from Signin component)
-    if (this.isAuthenticated) this.onProfileReady(true)
+      // if we are already authenticated then go right to init
+      // (since we won't get the event from Signin component)
+      if (this.isAuthenticated) this.onProfileReady(true)
+    }
   }
 
   /** Called when profile is ready -- we can now init app. */
@@ -189,8 +200,7 @@ export default class App extends Mixins(AuthMixin) {
     //
     // do the one-time things here
     //
-
-    if (val) {
+    if (val && !this.loggedOut) {
       // start KC token service
       await this.startTokenService()
 
@@ -341,23 +351,25 @@ export default class App extends Mixins(AuthMixin) {
   }
 
   private handleError (error: ErrorIF): void {
-    const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
-    if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-      this.dialogOptions = paymentError
-      this.errorDialog = true
-    } else if (saveErrorCodes.includes(error.statusCode)) {
-      this.dialogOptions = saveSearchError
-      this.errorDialog = true
-    } else if (error.statusCode === StatusCodes.NOT_FOUND) {
-      this.dialogOptions = fetchError
-      this.errorDialog = true
-    } else if (error.statusCode === StatusCodes.UNAUTHORIZED) {
-      this.dialogOptions = loginError
-      this.errorDialog = true
-    } else {
-      // temporary catch all (should be a more generic dialogue)
-      this.dialogOptions = saveSearchError
-      this.errorDialog = true
+    if (!this.loggedOut && this.$route?.path !== `/${RouteNames.SIGN_OUT}`) {
+      const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
+      if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+        this.dialogOptions = paymentError
+        this.errorDialog = true
+      } else if (saveErrorCodes.includes(error.statusCode)) {
+        this.dialogOptions = saveSearchError
+        this.errorDialog = true
+      } else if (error.statusCode === StatusCodes.NOT_FOUND) {
+        this.dialogOptions = fetchError
+        this.errorDialog = true
+      } else if (error.statusCode === StatusCodes.UNAUTHORIZED) {
+        this.dialogOptions = loginError
+        this.errorDialog = true
+      } else {
+        // temporary catch all (should be a more generic dialogue)
+        this.dialogOptions = saveSearchError
+        this.errorDialog = true
+      }
     }
   }
 

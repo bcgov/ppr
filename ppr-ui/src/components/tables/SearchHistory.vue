@@ -25,7 +25,8 @@
             {{ displayDate(item.searchDateTime) }}
           </template>
           <template v-slot:[`item.pdf`]="{ item }">
-            <v-btn :class="[$style['pdf-btn'], 'pa-0']"
+            <v-btn :id="`pdf-btn-${item.searchId}`"
+                   :class="[$style['pdf-btn'], 'pa-0']"
                    depressed
                    :loading="item.searchId === loadingPDF"
                    @click="downloadPDF(item.searchId)">

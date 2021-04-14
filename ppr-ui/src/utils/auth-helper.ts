@@ -1,5 +1,4 @@
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { axios } from '@/utils'
 
 /** Gets Keycloak JWT and parses it. */
 function getJWT (): any {
