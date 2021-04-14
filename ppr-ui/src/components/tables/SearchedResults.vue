@@ -154,7 +154,10 @@ export default defineComponent({
         }
       })
     })
-    const displayDate = (dateString:string) => {
+    const displayDate = (dateString:string):string => {
+      if (!dateString) {
+        return ''
+      }
       const date = new Date(dateString)
       return convertDate(date, true, false)
     }

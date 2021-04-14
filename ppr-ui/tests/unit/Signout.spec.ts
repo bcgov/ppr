@@ -10,7 +10,6 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 import { Signout } from '@/views'
 
-
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
@@ -21,11 +20,10 @@ document.body.setAttribute('data-app', 'true')
 
 describe('Signout component', () => {
   let wrapper: any
-  const authUrl = 'myhost/basePath/auth/'
-  sessionStorage.setItem('AUTH_URL', authUrl)
+  const baseURL = 'myhost/basePath'
+  sessionStorage.setItem('BASE_URL', baseURL)
 
   beforeEach(async () => {
-
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper = mount(Signout, { localVue, store, vuetify })
@@ -39,7 +37,7 @@ describe('Signout component', () => {
   })
 
   it('renders with signout component', () => {
-    expect(wrapper.vm.logoutURL).toBe(authUrl)
+    expect(wrapper.vm.logoutURL).toBe(`${baseURL}?logout=true`)
     expect(wrapper.findComponent(Signout).exists()).toBe(true)
     expect(wrapper.findComponent(SbcSignout).exists()).toBe(true)
   })

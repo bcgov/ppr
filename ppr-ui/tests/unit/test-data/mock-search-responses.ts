@@ -31,7 +31,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
   },
   [UISearchTypes.INDIVIDUAL_DEBTOR]: {
     searchId: '12235',
-    searchDateTime: '2021-03-23T18:43:32Z',
+    searchDateTime: '2021-03-20T18:43:32Z',
     exactResultsSize: 3,
     selectedResultsSize: 4,
     returnedResultsSize: mockedSearchResults[UISearchTypes.INDIVIDUAL_DEBTOR].length,
@@ -70,7 +70,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
   },
   [UISearchTypes.MHR_NUMBER]: {
     searchId: '12237',
-    searchDateTime: '2020-05-17T21:08:32Z',
+    searchDateTime: '2020-05-15T21:08:32Z',
     exactResultsSize: 2,
     selectedResultsSize: 3,
     returnedResultsSize: mockedSearchResults[UISearchTypes.MHR_NUMBER].length,
@@ -87,7 +87,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
   },
   [UISearchTypes.AIRCRAFT]: {
     searchId: '12238',
-    searchDateTime: '2020-05-18T21:08:32Z',
+    searchDateTime: '2020-05-14T21:08:32Z',
     exactResultsSize: 2,
     selectedResultsSize: 3,
     returnedResultsSize: mockedSearchResults[UISearchTypes.AIRCRAFT].length,
@@ -104,7 +104,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
   },
   [UISearchTypes.REGISTRATION_NUMBER]: {
     searchId: '12239',
-    searchDateTime: '2020-05-19T21:08:32Z',
+    searchDateTime: '2020-05-13T21:08:32Z',
     exactResultsSize: 1,
     selectedResultsSize: 1,
     returnedResultsSize: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER].length,
