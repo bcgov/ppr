@@ -151,8 +151,7 @@ export const mockedSearchResults: mockSearchResults = {
           first: 'test',
           second: 'test',
           last: 'tester'
-        },
-        birthDate: '1994-02-11T19:10:30+01:00'
+        }
       }
     },
     {

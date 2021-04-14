@@ -120,6 +120,54 @@ describe('Serial number results', () => {
   })
 })
 
+describe('Individual debtor results', () => {
+  let wrapper: Wrapper<any>
+  const testResults = mockedSearchResponse[UISearchTypes.INDIVIDUAL_DEBTOR]
+
+  beforeEach(async () => {
+    await store.dispatch('setSearchResults', testResults)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders Results Component with individual debtor name results data', () => {
+    expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
+    expect(wrapper.vm.$data.searched).toBeTruthy()
+    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.INDIVIDUAL_DEBTOR)
+    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+  })
+
+  it('preselects exact results', () => {
+    expect(wrapper.vm.$data.exactMatchesLength).toBe(3)
+    expect(wrapper.vm.$data.selected).toStrictEqual(
+      [testResults.results[0], testResults.results[1], testResults.results[2]])
+  })
+
+  it('displays results in the table', async () => {
+    const datatable = wrapper.findAll(resultsTable)
+    expect(datatable.length).toBe(1)
+    const rows = wrapper.findAll('tr')
+    // includes header so add 1
+    expect(rows.length).toBe(testResults.results.length + 1)
+    for (let i; i < testResults.results; i++) {
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].debtor.personName.first)
+      if (testResults.results[i].debtor.personName.second) {
+        expect(rows.at(i + 1).text()).toContain(testResults.results[i].debtor.personName.second)
+      }
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].debtor.personName.last)
+      if (testResults.results[i].debtor.birthDate) {
+        expect(rows.at(i + 1).text()).toContain(testResults.results[i].debtor.birthDate)
+      } else {
+        expect(rows.at(i + 1).text().includes('Invalid Date')).toBe(false)
+      }
+    }
+  })
+})
+
 describe('Business debtor results', () => {
   let wrapper: Wrapper<any>
   const testResults = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]

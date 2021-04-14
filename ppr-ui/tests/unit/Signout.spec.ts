@@ -10,7 +10,6 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 import { Signout } from '@/views'
 
-
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
@@ -25,7 +24,6 @@ describe('Signout component', () => {
   sessionStorage.setItem('BASE_URL', baseURL)
 
   beforeEach(async () => {
-
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper = mount(Signout, { localVue, store, vuetify })
