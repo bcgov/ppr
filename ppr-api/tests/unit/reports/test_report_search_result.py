@@ -78,7 +78,7 @@ def test_search_result_config(client, jwt, type, json_data_file, report_data_fil
         data_file.close()
     # print(text_data)
     json_data = json.loads(text_data)
-    report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT.value)
+    report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT.value, 'Account Name')
 
     # test
     request_data = report._setup_report_data()

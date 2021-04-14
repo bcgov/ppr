@@ -72,14 +72,14 @@ class ReportTypes(Enum):
 
 
 class Report:  # pylint: disable=too-few-public-methods
-    # TODO review pylint warning and alter as required
     """Service to create report outputs."""
 
-    def __init__(self, report_data, account_id, report_type=None):
+    def __init__(self, report_data, account_id, report_type=None, account_name=None):
         """Create the Report instance."""
         self._report_data = report_data
         self._report_key = report_type
         self._account_id = account_id
+        self._account_name = account_name
 
     def get_pdf(self, report_type=None):
         """Render a pdf for the report type and report data."""
@@ -433,6 +433,9 @@ class Report:  # pylint: disable=too-few-public-methods
         """Identify environment in report if non-production."""
         self._report_data['environment'] = f'{self._get_environment()}'.lstrip()
         self._report_data['meta_account_id'] = self._account_id
+        if self._account_name:
+            self._report_data['meta_account_name'] = self._account_name
+
         # Get source ???
         # Appears in the Description section of the PDF Document Properties as Title.
         self._report_data['meta_title'] = ReportMeta.reports[self._report_key]['metaTitle']

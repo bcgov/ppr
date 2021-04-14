@@ -1,7 +1,5 @@
 <div class="no-page-break">
     <div class="section-title mt-4">Secured Party Information</div>
- </div>
- 
 {% if detail.financingStatement.securedParties is defined and change is not defined %}
     <table class="section-data section-data-table mt-4" role="presentation">
     {% for party in detail.financingStatement.securedParties %}
@@ -99,3 +97,4 @@
     {% endif %}
     </table>
 {% endif %}
+</div>
