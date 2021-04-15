@@ -37,11 +37,21 @@
         <tr>
           <td>
             <div class="bold pt-2">Search Date and Time:</div>
-            <div class="bold pt-2">Account Number:</div>
+            {% if meta_account_name is defined %}
+              <div class="bold pt-2">Account Name:</div>
+            {% endif %}
+            {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+              <div class="bold pt-2">Folio Number:</div>
+            {% endif %}
           </td>
           <td>
             <div class="pt-2">{{searchDateTime}}</div>
-            <div class="pt-2">{{meta_account_id}}</div>
+            {% if meta_account_name is defined %}
+              <div class="pt-2">{{meta_account_name}}</div>
+            {% endif %}
+            {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+              <div class="pt-2">{{searchQuery.clientReferenceId}}</div>
+            {% endif %}
           </td>
         </tr>
       </table>

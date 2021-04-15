@@ -17,10 +17,10 @@ from flask_babel import _
 from .report import Report, ReportTypes
 
 
-def get_pdf(report_data, account_id, report_type=None):
+def get_pdf(report_data, account_id, report_type=None, account_name=None):
     """Generate a PDF of the provided report type using the provided data."""
     try:
-        return Report(report_data, account_id, report_type).get_pdf()
+        return Report(report_data, account_id, report_type, account_name).get_pdf()
     except FileNotFoundError:
         # We don't have a template for it, so it must only be available on paper.
         return jsonify({'message': _('No PDF report found.')}), HTTPStatus.NOT_FOUND
