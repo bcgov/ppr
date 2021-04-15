@@ -307,7 +307,8 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query matching the id."""
         search = None
         if search_id:
-            search = cls.query.get(search_id)
+            # search = cls.query.get(search_id)
+            search = db.session.query(SearchClient).filter(SearchClient.search_id == search_id).one_or_none()
         return search
 
     @classmethod

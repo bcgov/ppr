@@ -337,7 +337,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement object by financing ID."""
         statement = None
         if financing_id:
-            statement = cls.query.get(financing_id)
+            # statement = cls.query.get(financing_id)
+            statement = db.session.query(FinancingStatement).\
+                        filter(FinancingStatement.financing_id == financing_id).one_or_none()
 
         return statement
 
@@ -348,9 +350,13 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
-            statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
-                                         Registration.registration_num == registration_num,
-                                         Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
+            # statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
+            #                            Registration.registration_num == registration_num,
+            #                            Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
+            statement = db.session.query(FinancingStatement).\
+                        filter(FinancingStatement.financing_id == Registration.financing_id,
+                               Registration.registration_num == registration_num,
+                               Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
 
         if not statement:
             raise BusinessException(
@@ -371,8 +377,11 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by financing statement ID."""
         statement = None
         if financing_id:
-            statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
-                                         FinancingStatement.financing_id == financing_id).one_or_none()
+            # statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
+            #                            FinancingStatement.financing_id == financing_id).one_or_none()
+            statement = db.session.query(FinancingStatement).\
+                        filter(FinancingStatement.financing_id == Registration.financing_id,
+                               FinancingStatement.financing_id == financing_id).one_or_none()
 
         return statement
 

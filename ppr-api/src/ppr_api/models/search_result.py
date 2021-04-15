@@ -135,10 +135,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         search_detail = None
         error_msg = ''
         if search_id and not limit_by_date:
-            search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
+            # search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
+            search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
         elif search_id and limit_by_date:
             min_allowed_date = model_utils.today_ts_offset(GET_DETAIL_DAYS_LIMIT, False)
-            search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
+            # search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
+            search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
             if search_detail and search_detail.search and \
                     search_detail.search.search_ts.timestamp() < min_allowed_date.timestamp():
                 min_ts = model_utils.format_ts(min_allowed_date)
@@ -174,7 +176,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def create_from_search_query(search_query, mark_added: bool = True):
-        """Create a search detail object from the inital search query with no search selection criteria."""
+        """Create a search detail object from the initial search query with no search selection criteria."""
         if search_query.total_results_size == 0:  # A search query with no results: build minimal details.
             return SearchResult.create_from_search_query_no_results(search_query)
 

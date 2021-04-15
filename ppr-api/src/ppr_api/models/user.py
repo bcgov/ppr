@@ -67,13 +67,15 @@ class User(db.Model):
     @classmethod
     def find_by_id(cls, submitter_id: int = None):
         """Return a User if they exist and match the provided submitter id."""
-        return cls.query.filter_by(id=submitter_id).one_or_none()
+        # return cls.query.filter_by(id=submitter_id).one_or_none()
+        return db.session.query(User).filter(User.id == submitter_id).one_or_none()
 
     @classmethod
     def find_by_jwt_token(cls, token: dict, account_id: str = None):
         """Return a User if they exist and match the provided JWT."""
         current_app.logger.debug(f'Running query to look up user profile for account {account_id}.')
-        return cls.query.filter_by(sub=token['sub']).one_or_none()
+        # return cls.query.filter_by(sub=token['sub']).one_or_none()
+        return db.session.query(User).filter(User.sub == token['sub']).one_or_none()
 
     @classmethod
     def create_from_jwt_token(cls, token: dict, account_id: str = None):
@@ -129,12 +131,14 @@ class User(db.Model):
     @classmethod
     def find_by_username(cls, username):
         """Return the oldest User record for the provided username."""
-        return cls.query.filter_by(username=username).order_by(User.creation_date.desc()).first()
+        # return cls.query.filter_by(username=username).order_by(User.creation_date.desc()).first()
+        return db.session.query(User).filter(User.username == username).order_by(User.creation_date.desc()).first()
 
     @classmethod
     def find_by_sub(cls, sub):
         """Return a User based on the unique sub field."""
-        return cls.query.filter_by(sub=sub).one_or_none()
+        # return cls.query.filter_by(sub=sub).one_or_none()
+        return db.session.query(User).filter(User.sub == sub).one_or_none()
 
     def save(self):
         """Store the User into the local cache."""
