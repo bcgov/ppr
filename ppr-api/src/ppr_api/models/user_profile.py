@@ -94,7 +94,8 @@ class UserProfile(db.Model):
         """Return the user profile record matching the id."""
         user_profile = None
         if profile_id:
-            user_profile = cls.query.filter(UserProfile.id == profile_id).one_or_none()
+            # user_profile = cls.query.filter(UserProfile.id == profile_id).one_or_none()
+            user_profile = db.session.query(UserProfile).filter(UserProfile.id == profile_id).one_or_none()
 
         return user_profile
 
