@@ -95,13 +95,13 @@ class _Config():  # pylint: disable=too-few-public-methods
     DB_MIN_POOL_SIZE = os.getenv('DATABASE_MIN_POOL_SIZE', '5')
     DB_MAX_POOL_SIZE = os.getenv('DATABASE_MAX_POOL_SIZE', '5')
     DB_CONN_WAIT_TIMEOUT = os.getenv('DATABASE_CONN_WAIT_TIMEOUT', '5')
-    DB_CONN_TIMEOUT = os.getenv('DATABASE_CONN_TIMEOUT', '3600')
+    DB_CONN_TIMEOUT = os.getenv('DATABASE_CONN_TIMEOUT', '900')
 
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_size': int(DB_MIN_POOL_SIZE),
         'max_overflow': (int(DB_MAX_POOL_SIZE) - int(DB_MIN_POOL_SIZE)),
-        # 'pool_recycle': int(DB_CONN_TIMEOUT),
+        'pool_recycle': int(DB_CONN_TIMEOUT),
         'pool_timeout': int(DB_CONN_WAIT_TIMEOUT)
     }
 
