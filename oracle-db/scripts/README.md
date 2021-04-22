@@ -1,6 +1,10 @@
 # Scripts to create the ppr_mgr schema
 
 Connect as sys with the sysdba role to create the tablespaces and ppr_mgr schema user.
+1. docker exec -it ORCLCDB bash (get into the orable container)
+2. copy the scripts to where oracle is looking!
+3. sqlplus sys/Oradoc_db1 as sysdba @?/create-table-space-schema.sql (the question mark tells you where it is looking)
+
 Run the script create-table-space-schema.sql
 
 Run the rest of the scripts as the ppr_mgr user in the following order.
