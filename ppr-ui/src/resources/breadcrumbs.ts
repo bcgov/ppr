@@ -30,3 +30,20 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
     text: 'Search Results'
   }
 ]
+export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + '/dashboard',
+    text: 'My PPR Dashboard'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: 'New Registration'
+  }
+]

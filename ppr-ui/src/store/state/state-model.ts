@@ -11,7 +11,15 @@ export const stateModel: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
+  currentStep: 1,
   debtorName: null,
+  feeSummary: {
+    feeAmount: 0,
+    serviceFee: 1.50,
+    quantity: 0,
+    feeCode: ''
+  },
+  registrationType: null,
   searchHistory: null,
   searchResults: null,
   searchedType: null,
@@ -26,5 +34,22 @@ export const stateModel: StateModelIF = {
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
+  },
+  lengthTrustStep: {
+    valid: false,
+    lifeYears: 0,
+    lifeInfinite: false,
+    trustIndenture: false
+  },
+  addSecuredPartiesAndDebtorsStep: {
+    valid: false,
+    registeringParty: null,
+    securedParties: [],
+    debtors: []
+  },
+  addCollateralStep: {
+    valid: false,
+    vehicleCollateral: [],
+    generalCollateral: ''
   }
 }

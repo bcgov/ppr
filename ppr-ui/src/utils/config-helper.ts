@@ -92,4 +92,8 @@ export async function fetchConfig (): Promise<any> {
   const baseUrl = windowLocationOrigin + vueRouterBase
   sessionStorage.setItem('BASE_URL', baseUrl)
   console.info('Set Base URL to: ' + baseUrl)
+
+  const podNamespace = response.data.POD_NAMESPACE
+  sessionStorage.setItem('POD_NAMESPACE', podNamespace)
+  console.log('POD_NAMESPACE: ' + podNamespace)
 }

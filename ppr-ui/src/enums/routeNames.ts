@@ -6,5 +6,9 @@ export enum RouteNames {
     SIGN_IN = 'signin',
     SIGN_OUT = 'signout',
     DASHBOARD = 'dashboard',
-    SEARCH = 'search'
+    SEARCH = 'search',
+    LENGTH_TRUST = 'length-trust',
+    ADD_SECUREDPARTIES_AND_DEBTORS = 'add-securedparties-debtors',
+    ADD_COLLATERAL = 'add-collateral',
+    REVIEW_CONFIRM = 'review-confirm'
 }

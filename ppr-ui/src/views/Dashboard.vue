@@ -1,5 +1,10 @@
 <template>
   <v-container fluid class="pa-0 ma-0" style="max-width: none;">
+    <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: gold;" align="center" justify="center">
+      <v-col :class="$style['env-info']">
+        This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
+      </v-col>
+    </v-row>
     <v-row no-gutters>
       <tombstone :backURL="registryUrl" :header="'My PPR Dashboard'" :setItems="breadcrumbs"/>
     </v-row>
@@ -39,6 +44,22 @@
             </v-row>
           </v-col>
         </v-row>
+        <v-row no-gutters class='pt-12'>
+          <v-col>
+            <v-row no-gutters
+                   id="registration-header"
+                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+              <v-col cols="auto">
+                <b>My Registrations</b>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <registration-bar class="soft-corners-bottom"
+                          :registrationTitle="''"
+                          @selected-registration-type="setSelectedRegistrationType"/>
+              </v-row>
+          </v-col>
+        </v-row>
       </v-container>
     </v-row>
   </v-container>
@@ -53,16 +74,19 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
-import { ActionBindingIF, BreadcrumbIF, ErrorIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line
+import { ActionBindingIF, BreadcrumbIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
+         SearchResponseIF } from '@/interfaces' // eslint-disable-line
 import { tombstoneBreadcrumbDashboard } from '@/resources'
 import { getFeatureFlag, searchHistory } from '@/utils'
 // local components
 import { Tombstone } from '@/components/common'
 import { SearchBar } from '@/components/search'
 import { SearchHistory } from '@/components/tables'
+import { RegistrationBar } from '@/components/registration'
 
 @Component({
   components: {
+    RegistrationBar,
     SearchHistory,
     SearchBar,
     Tombstone
@@ -71,8 +95,10 @@ import { SearchHistory } from '@/components/tables'
 export default class Dashboard extends Vue {
   @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchResults: SearchResponseIF
+  @Getter getRegistrationType: RegistrationTypeIF
 
   @Action setDebtorName: ActionBindingIF
+  @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
@@ -90,6 +116,7 @@ export default class Dashboard extends Vue {
 
   mounted () {
     // clear search data in the store
+    this.setRegistrationType(null)
     this.setSearchedType(null)
     this.setSearchedValue('')
     this.setSearchResults(null)
@@ -98,6 +125,14 @@ export default class Dashboard extends Vue {
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get isProd (): boolean {
+    var env = sessionStorage.getItem('POD_NAMESPACE')
+    if (env != null && env.trim().length > 0) {
+      return Boolean(env.toLowerCase().endsWith('prod'))
+    }
+    return Boolean(false)
   }
 
   private get searchHistoryLength (): number {
@@ -137,6 +172,17 @@ export default class Dashboard extends Vue {
     this.emitHaveData()
   }
 
+  @Watch('getRegistrationType')
+  private startRegistration (val: RegistrationTypeIF): void {
+    // navigate to registration page if not null/reset
+    if (val) {
+      // alert(val.registrationTypeAPI)
+      this.$router.push({
+        name: RouteNames.LENGTH_TRUST
+      })
+    }
+  }
+
   @Watch('getSearchResults')
   private onSearch (val: SearchResponseIF): void {
     // navigate to search page if not null/reset
@@ -164,5 +210,11 @@ export default class Dashboard extends Vue {
   font-size: 1rem;
   color: $gray9;
   background-color: $BCgovBlue0;
+}
+.env-info {
+  font-size: 16px;
+  text-align: center;
+  color: #212529;
+  background-color: $BCgovGold3;
 }
 </style>
