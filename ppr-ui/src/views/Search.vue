@@ -212,13 +212,28 @@ export default class Search extends Vue {
     return 0
   }
 
+  /** Use to conditionally display selection confirmation dialog. */
+  private get similarResultsLength (): number {
+    const searchResult = this.getSearchResults
+    var similarCount = 0
+    if (searchResult) {
+      for (var result of searchResult.results) {
+        if (result.matchType !== 'EXACT') {
+          similarCount += 1
+        }
+      }
+    }
+    return similarCount
+  }
+
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
   }
 
   private submitCheck (): void {
-    if (this.getUserSettings?.selectConfirmationDialog && this.totalResultsLength > 0) {
+    if (this.getUserSettings?.selectConfirmationDialog && this.totalResultsLength > 0 &&
+                             this.similarResultsLength > 0) {
       this.options = { ...selectionConfirmaionDialog }
       this.options.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
       this.confirmationDialog = true

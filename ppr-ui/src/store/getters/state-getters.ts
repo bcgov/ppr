@@ -1,6 +1,17 @@
 // Enums and Interfaces
-import { AccountTypes } from '@/enums'
-import { IndividualNameIF, SearchResponseIF, SearchTypeIF, StateIF, UserSettingsIF } from '@/interfaces'
+import { AccountTypes, RouteNames } from '@/enums'
+import {
+  AddCollateralIF,
+  AddPartiesIF,
+  FeeSummaryIF,
+  IndividualNameIF,
+  LengthTrustIF,
+  RegistrationTypeIF,
+  SearchResponseIF,
+  SearchTypeIF,
+  StateIF,
+  UserSettingsIF
+} from '@/interfaces'
 
 /** The current account id. */
 export const getAccountId = (state: StateIF): number => {
@@ -12,9 +23,34 @@ export const getAccountLabel = (state: StateIF): string => {
   return state.stateModel.accountInformation?.label
 }
 
+/** The registration collateral object. */
+export const getAddCollateral = (state: StateIF): AddCollateralIF => {
+  return state.stateModel.addCollateralStep
+}
+
+/** The registration parties object. */
+export const getAddSecuredPartiesAndDebtors = (state: StateIF): AddPartiesIF => {
+  return state.stateModel.addSecuredPartiesAndDebtorsStep
+}
+
 /** The search value for ppr search when search type is individual debtor. */
 export const getDebtorName = (state: StateIF): IndividualNameIF => {
   return state.stateModel.debtorName
+}
+
+/** The registration fee summary object. */
+export const getFeeSummary = (state: StateIF): FeeSummaryIF => {
+  return state.stateModel.feeSummary
+}
+
+/** The registration life and trust indenture object. */
+export const getLengthTrust = (state: StateIF): LengthTrustIF => {
+  return state.stateModel.lengthTrustStep
+}
+
+/** The selected new registration type object. */
+export const getRegistrationType = (state: StateIF): RegistrationTypeIF => {
+  return state.stateModel.registrationType
 }
 
 /** The api response for ppr search. */
@@ -91,4 +127,74 @@ export const isRoleStaff = (state: StateIF): boolean => {
 /** Whether the app is processing a search request or not. */
 export const isSearching = (state: StateIF): boolean => {
   return state.stateModel.searching
+}
+
+/**
+ * Returns the array of steps.
+ */
+export const getSteps = (state: any, getters: any): Array<any> => {
+  const steps: Array<any> = [{
+    id: 'step-1-btn',
+    step: 1,
+    icon: 'mdi-domain',
+    text: 'Length and\nTrust Indenture',
+    to: RouteNames.LENGTH_TRUST,
+    disabled: getters.isBusySaving,
+    valid: state.stateModel.lengthTrustStep.valid,
+    component: 'length-trust'
+  },
+  {
+    id: 'step-2-btn',
+    step: 2,
+    icon: 'mdi-account-multiple-plus',
+    text: 'Add Secured Parties\nand Debtors',
+    to: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+    disabled: getters.isBusySaving,
+    valid: state.stateModel.addSecuredPartiesAndDebtorsStep.valid,
+    component: 'add-securedparties-debtors'
+  },
+  {
+    id: 'step-3-btn',
+    step: 3,
+    icon: 'mdi-car',
+    text: 'Add Collateral',
+    to: RouteNames.ADD_COLLATERAL,
+    disabled: getters.isBusySaving,
+    valid: state.stateModel.addCollateralStep.valid,
+    component: 'add-collateral'
+  },
+  {
+    id: 'step-4-btn',
+    step: 4,
+    icon: 'mdi-text-box-check-outline', // 'mdi-text-box-multiple'
+    text: 'Review\nand Confirm',
+    to: RouteNames.REVIEW_CONFIRM,
+    disabled: getters.isBusySaving,
+    valid: getters.isRegistrationValid,
+    component: 'review-confirm'
+  }]
+  return steps
+}
+
+/**
+ * Returns the maximum step number.
+ */
+export const getMaxStep = (state: any, getters: any): number => {
+  return getters.getSteps ? getters.getSteps.filter(step => step.step !== -1).length : -1
+}
+
+/**
+ * Whether app is busy saving or resuming.
+ */
+export const isBusySaving = (state: any): boolean => {
+  return false // (state.stateModel.isSaving || state.stateModel.isSavingResuming || state.stateModel.isFilingPaying)
+}
+
+/**
+ * Whether all the registration steps are valid.
+ */
+export const isRegistrationValid = (state: any): boolean => {
+  // return (state.stateModel.lengthTrustStep.valid && state.stateModel.addSecuredPartiesAndDebtorsStep.valid &&
+  //  state.stateModel.addCollateralStep.valid)
+  return false
 }
