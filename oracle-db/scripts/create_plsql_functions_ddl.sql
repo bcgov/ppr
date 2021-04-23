@@ -1,23 +1,46 @@
-DROP FUNCTION get_draft_document_number;
+declare
+   c int;
+begin
+       select count(*) into c from user_procedures where object_type = 'FUNCTION' and object_name = 'GET_DRAFT_DOCUMENT_NUMBER';
+       if c = 1 then
+          execute immediate 'DROP FUNCTION get_draft_document_number';
+       end if;
+end;
+/
 CREATE FUNCTION get_draft_document_number
   RETURN VARCHAR2
   IS
   BEGIN
     RETURN 'D'||to_char(DOCUMENT_NUMBER_SEQ.nextval);
-  END
-; 
+  END; 
+/
 
-DROP FUNCTION get_registration_num;
+declare
+   d int;
+begin
+       select count(*) into d from user_procedures where object_type = 'FUNCTION' and object_name = 'GET_REGISTRATION_NUM';
+       if d = 1 then
+          execute immediate 'DROP FUNCTION get_registration_num';
+       end if;
+end;
+/
 CREATE FUNCTION get_registration_num
   RETURN VARCHAR2
   IS
   BEGIN
     RETURN to_char(registration_num_seq.nextval) || 'B';
-  END
-;
+  END;
+/
 
-
-DROP FUNCTION match_individual_name;
+declare
+   e int;
+begin
+       select count(*) into e from user_procedures where object_type = 'FUNCTION' and object_name = 'MATCH_INDIVIDUAL_NAME';
+       if e = 1 then
+          execute immediate 'DROP FUNCTION match_individual_name';
+       end if;
+end;
+/
 CREATE FUNCTION match_individual_name(lastname IN VARCHAR2, firstname IN VARCHAR2)
   RETURN SYS.ODCINUMBERLIST
   IS
@@ -132,5 +155,5 @@ CREATE FUNCTION match_individual_name(lastname IN VARCHAR2, firstname IN VARCHAR
   );
   
     RETURN V_IDS;
-  END
-;
+  END;
+/
