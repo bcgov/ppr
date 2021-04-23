@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
 import { FeeSummaryIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -55,6 +55,9 @@ export default defineComponent({
     defaultRegistrationType: {
       type: String,
       default: 'Security Agreement'
+    },
+    updatedFeeSummary: {
+      type: Object as () => FeeSummaryIF
     }
   },
   setup (props) {
@@ -76,9 +79,18 @@ export default defineComponent({
         return localState.feeAmount * localState.quantity
       })
     })
+    const updateFeeSummary = (feeSummary: FeeSummaryIF) => {
+      localState.feeAmount = feeSummary.feeAmount
+      localState.quantity = feeSummary.quantity
+    }
+    watch(() => props.updatedFeeSummary, (val: FeeSummaryIF) => {
+      localState.feeAmount = feeSummary.feeAmount
+      localState.quantity = feeSummary.quantity
+    }, { immediate: true, deep: true })
 
     return {
-      ...toRefs(localState)
+      ...toRefs(localState),
+      updateFeeSummary
     }
   }
 })

@@ -109,6 +109,9 @@ export default defineComponent({
           feeSummary.quantity = life
           feeSummary.feeAmount = 5.00
           setFeeSummary(feeSummary)
+          if (feeSummary.quantity > 0 && feeSummary.feeAmount > 0) {
+            emit('updated-fee-summary', feeSummary)
+          }
         }
       }
     })
@@ -119,12 +122,13 @@ export default defineComponent({
     watch(() => localState.lifeInfinite, (val: boolean) => {
       // localState.lifeYearsDisabled = localState.lifeInfinite
       lengthTrust.lifeInfinite = val
-      if (localState.lifeInfinite) {
+      if (lengthTrust.lifeInfinite) {
         localState.lifeYearsEdit = ''
         lengthTrust.lifeYears = 0
         feeSummary.quantity = 1
         feeSummary.feeAmount = 500.00
         setFeeSummary(feeSummary)
+        emit('updated-fee-summary', feeSummary)
       }
       setLengthTrust(lengthTrust)
     })

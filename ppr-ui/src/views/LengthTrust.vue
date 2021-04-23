@@ -27,7 +27,7 @@
           <v-col cols="1">
           </v-col>
           <v-col align-self="end" cols="3">
-            <registration-fee :defaultRegistrationType="registrationTypeUI"/>
+            <registration-fee :defaultRegistrationType="registrationTypeUI" :updatedFeeSummary="updatedFeeSummary"/>
           </v-col>
         </v-row>
         <v-row no-gutters class='pt-6'>
@@ -43,7 +43,8 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="6">
-            <registration-length-trust :defaultRegistrationType="registrationType"/>
+            <registration-length-trust :defaultRegistrationType="registrationType"
+                                       @updated-fee-summary="updateFeeSummary"/>
           </v-col>
         </v-row>
       </v-container>
@@ -92,7 +93,7 @@
 
 <script lang="ts">
 // external
-import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -131,6 +132,8 @@ export default class Registration extends Vue {
 
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
+
+  private updatedFeeSummary: FeeSummaryIF = null
 
   private get breadcrumbs (): Array<BreadcrumbIF> {
     const registrationBreadcrumb = tombstoneBreadcrumbRegistration
@@ -197,6 +200,13 @@ export default class Registration extends Vue {
   private submitSaveResume (): void {
     // Save draft
     alert('Soon')
+  }
+
+  @Watch('updatedFeeSummary')
+  private updateFeeSummary (val: FeeSummaryIF): void {
+    if (val) {
+      this.updatedFeeSummary = val
+    }
   }
 
   @Emit('error')
