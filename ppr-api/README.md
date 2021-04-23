@@ -62,7 +62,7 @@ To use the mock pay-api service for local testing, set the .env variable:
 1. Open the ppr-api directory in VS Code to treat it as a project (or WSL projec). To prevent version clashes, set up a virtual environment to install the Python packages used by this project.
 1. Run `make setup`
 1. Run `pip install .`
-1. See [Oracle DB README](./oracle-db/README.md) on running a local Docker Oracle PPR database.
+1. See [Oracle DB README](https://github.com/bcgov/ppr/tree/main/oracle-db/README.md) on running a local Docker Oracle PPR database.
 1. Update the .env file to add your local environment variables including the database configuration. A sample .env file is provided.
 1. See [test data README](./test_data/README.md) for instructions to set up unit test data.
 
