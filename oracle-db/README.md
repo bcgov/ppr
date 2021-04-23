@@ -32,7 +32,7 @@ Starting an Oracle database server instance is as simple as executing
 	
 	(optional - start it with a defined directory)
 	
-	$ docker run -d -it --name <Oracle-DB>-v /mnt/c/Users/username/Containers/bcregistry/oradata/OracleDBData:/ORCL store/oracle/database-enterprise:12.2.0.1
+	$ docker run -d -it --name <Oracle-DB> -v /mnt/c/Users/username/Containers/bcregistry/oradata/OracleDBData:/ORCL store/oracle/database-enterprise:12.2.0.1
 
 where <Oracle-DB> is the name of the container and 12.2.0.1 is the Docker image tag.
 
