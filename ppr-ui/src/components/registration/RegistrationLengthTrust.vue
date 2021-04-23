@@ -23,7 +23,7 @@
                         autocomplete="off"
                         :error-messages="lifeYearsMessage || ''"
                         filled
-                        :disabled="lifeYearsDisabled"
+                        :readonly="lifeYearsDisabled"
                         :hint="lifeYearsHint"
                         persistent-hint
                         placeholder="Length (years)"
@@ -84,7 +84,7 @@ export default defineComponent({
     const localState = reactive({
       registrationType: props.defaultRegistrationType,
       trustIndenture: lengthTrust.trustIndenture,
-      lifeYearsDisabled: false,
+      lifeYearsDisabled: lengthTrust.lifeInfinite,
       lifeInfinite: lengthTrust.lifeInfinite,
       lifeYearsEdit: (lengthTrust.lifeYears > 0) ? lengthTrust.lifeYears.toString() : '',
       lifeYearsMessage: '',
@@ -101,10 +101,19 @@ export default defineComponent({
         var life = parseInt(val)
         if (isNaN(life)) {
           localState.lifeYearsMessage = 'Registration length must be a number between 1 and 25.'
+          if (lengthTrust.valid) {
+            lengthTrust.valid = false
+            setLengthTrust(lengthTrust)
+          }
         } else if (life < 1 || life > 25) {
           localState.lifeYearsMessage = 'Registration length must be between 1 and 25.'
+          if (lengthTrust.valid) {
+            lengthTrust.valid = false
+            setLengthTrust(lengthTrust)
+          }
         } else {
           lengthTrust.lifeYears = life
+          lengthTrust.valid = true
           setLengthTrust(lengthTrust)
           feeSummary.quantity = life
           feeSummary.feeAmount = 5.00
@@ -113,6 +122,9 @@ export default defineComponent({
             emit('updated-fee-summary', feeSummary)
           }
         }
+      } else if (lengthTrust.valid && !lengthTrust.lifeInfinite) {
+        lengthTrust.valid = false
+        setLengthTrust(lengthTrust)
       }
     })
     watch(() => localState.trustIndenture, (val: boolean) => {
@@ -120,17 +132,23 @@ export default defineComponent({
       setLengthTrust(lengthTrust)
     })
     watch(() => localState.lifeInfinite, (val: boolean) => {
-      // localState.lifeYearsDisabled = localState.lifeInfinite
-      lengthTrust.lifeInfinite = val
+      lengthTrust.lifeInfinite = (String(val) === 'true')
+      localState.lifeYearsDisabled = lengthTrust.lifeInfinite
       if (lengthTrust.lifeInfinite) {
         localState.lifeYearsEdit = ''
         lengthTrust.lifeYears = 0
+        lengthTrust.valid = true
         feeSummary.quantity = 1
         feeSummary.feeAmount = 500.00
-        setFeeSummary(feeSummary)
-        emit('updated-fee-summary', feeSummary)
+      } else {
+        lengthTrust.valid = false
+        lengthTrust.lifeYears = 0
+        feeSummary.feeAmount = 0
+        feeSummary.quantity = 0
       }
       setLengthTrust(lengthTrust)
+      setFeeSummary(feeSummary)
+      emit('updated-fee-summary', feeSummary)
     })
 
     return {
