@@ -99,6 +99,7 @@ class _Config():  # pylint: disable=too-few-public-methods
 
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
+        'echo_pool': 'debug',
         'pool_size': int(DB_MIN_POOL_SIZE),
         'max_overflow': (int(DB_MAX_POOL_SIZE) - int(DB_MIN_POOL_SIZE)),
         'pool_recycle': int(DB_CONN_TIMEOUT),
