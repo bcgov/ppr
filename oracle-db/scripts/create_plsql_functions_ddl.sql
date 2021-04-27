@@ -1,5 +1,4 @@
-DROP FUNCTION get_draft_document_number;
-CREATE FUNCTION get_draft_document_number
+CREATE OR REPLACE FUNCTION get_draft_document_number
   RETURN VARCHAR2
   IS
   BEGIN
@@ -7,8 +6,7 @@ CREATE FUNCTION get_draft_document_number
   END
 ; 
 
-DROP FUNCTION get_registration_num;
-CREATE FUNCTION get_registration_num
+CREATE OR REPLACE FUNCTION get_registration_num
   RETURN VARCHAR2
   IS
   BEGIN
@@ -17,8 +15,7 @@ CREATE FUNCTION get_registration_num
 ;
 
 
-DROP FUNCTION match_individual_name;
-CREATE FUNCTION match_individual_name(lastname IN VARCHAR2, firstname IN VARCHAR2)
+CREATE OR REPLACE FUNCTION match_individual_name(lastname IN VARCHAR2, firstname IN VARCHAR2)
   RETURN SYS.ODCINUMBERLIST
   IS
     V_LAST_NAME   VARCHAR2(50);
