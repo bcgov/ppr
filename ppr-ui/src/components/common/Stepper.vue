@@ -49,7 +49,7 @@ export default class Stepper extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 
 #step-buttons-container {
