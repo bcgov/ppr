@@ -27,7 +27,7 @@
           <v-col cols="1">
           </v-col>
            <v-col align-self="end" cols="3">
-            <registration-fee :defaultRegistrationType="registrationTypeUI"/>
+            <registration-fee :registrationType="registrationTypeUI"/>
           </v-col>
         </v-row>
         <v-row no-gutters class='pt-6'>
@@ -113,7 +113,7 @@ import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
     Tombstone
   }
 })
-export default class Registration extends Vue {
+export default class AddParties extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getFeeSummary: FeeSummaryIF
 
@@ -191,7 +191,7 @@ export default class Registration extends Vue {
 
   private submitSaveResume (): void {
     // Save draft
-    alert('Soon')
+    // alert('Soon')
   }
 
   @Emit('error')

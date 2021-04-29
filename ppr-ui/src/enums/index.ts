@@ -1,4 +1,5 @@
 export * from './accountTypes'
+export * from './feeCodes'
 export * from './matchTypes'
 export * from './routeNames'
 export * from './searchTypes'

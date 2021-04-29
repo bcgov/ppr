@@ -51,9 +51,12 @@
 </template>
 
 <script lang="ts">
+// external
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { LengthTrustIF, FeeSummaryIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+// local
+import { LengthTrustIF, FeeSummaryIF, FeeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { getFinancingFee } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -81,15 +84,20 @@ export default defineComponent({
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
     const lengthTrust: LengthTrustIF = getLengthTrust.value
     const feeSummary: FeeSummaryIF = getFeeSummary.value
+    const feeInfoYears = getFinancingFee(false)
+    const feeInfoInfinite = getFinancingFee(true)
+
     const localState = reactive({
       registrationType: props.defaultRegistrationType,
       trustIndenture: lengthTrust.trustIndenture,
       lifeYearsDisabled: lengthTrust.lifeInfinite,
       lifeInfinite: lengthTrust.lifeInfinite,
+      maxYears: feeInfoYears.quantityMax.toString(),
       lifeYearsEdit: (lengthTrust.lifeYears > 0) ? lengthTrust.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
-      lifeYearsHint: 'Minimum 1 year, Maximum 25 years ($5.00 per year)',
+      lifeYearsHint: 'Minimum 1 year, Maximum ' + feeInfoYears.quantityMax.toString() + ' years ($' +
+                     feeInfoYears.feeAmount.toFixed(2) + ' per year)',
       showTrustIndenture: computed((): boolean => {
         return (localState.registrationType === '' || localState.registrationType === 'SA' ||
                 localState.registrationType === 'SG')
@@ -100,13 +108,14 @@ export default defineComponent({
       if (val.length > 0) {
         var life = parseInt(val)
         if (isNaN(life)) {
-          localState.lifeYearsMessage = 'Registration length must be a number between 1 and 25.'
+          localState.lifeYearsMessage = 'Registration length must be a number between 1 and ' +
+                                        localState.maxYears + '.'
           if (lengthTrust.valid) {
             lengthTrust.valid = false
             setLengthTrust(lengthTrust)
           }
-        } else if (life < 1 || life > 25) {
-          localState.lifeYearsMessage = 'Registration length must be between 1 and 25.'
+        } else if (life < 1 || life > feeInfoYears.quantityMax) {
+          localState.lifeYearsMessage = 'Registration length must be between 1 and ' + localState.maxYears + '.'
           if (lengthTrust.valid) {
             lengthTrust.valid = false
             setLengthTrust(lengthTrust)
@@ -116,7 +125,7 @@ export default defineComponent({
           lengthTrust.valid = true
           setLengthTrust(lengthTrust)
           feeSummary.quantity = life
-          feeSummary.feeAmount = 5.00
+          feeSummary.feeAmount = feeInfoYears.feeAmount
           setFeeSummary(feeSummary)
           if (feeSummary.quantity > 0 && feeSummary.feeAmount > 0) {
             emit('updated-fee-summary', feeSummary)
@@ -125,6 +134,10 @@ export default defineComponent({
       } else if (lengthTrust.valid && !lengthTrust.lifeInfinite) {
         lengthTrust.valid = false
         setLengthTrust(lengthTrust)
+        feeSummary.feeAmount = 0
+        feeSummary.quantity = 0
+        setFeeSummary(feeSummary)
+        emit('updated-fee-summary', feeSummary)
       }
     })
     watch(() => localState.trustIndenture, (val: boolean) => {
@@ -138,8 +151,8 @@ export default defineComponent({
         localState.lifeYearsEdit = ''
         lengthTrust.lifeYears = 0
         lengthTrust.valid = true
-        feeSummary.quantity = 1
-        feeSummary.feeAmount = 500.00
+        feeSummary.quantity = feeInfoInfinite.quantityMin
+        feeSummary.feeAmount = feeInfoInfinite.feeAmount
       } else {
         lengthTrust.valid = false
         lengthTrust.lifeYears = 0

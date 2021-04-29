@@ -27,7 +27,9 @@
           <v-col cols="1">
           </v-col>
           <v-col align-self="end" cols="3">
-            <registration-fee :defaultRegistrationType="registrationTypeUI" :updatedFeeSummary="updatedFeeSummary"/>
+            <registration-fee :registrationType="registrationTypeUI"
+                              :updatedFeeSummary="updatedFeeSummary"
+                              :hint="feeHint"/>
           </v-col>
         </v-row>
         <v-row no-gutters class='pt-6'>
@@ -44,7 +46,7 @@
         <v-row no-gutters>
           <v-col cols="6">
             <registration-length-trust :defaultRegistrationType="registrationType"
-                                       @updated-fee-summary="updateFeeSummary"/>
+                                        @updated-fee-summary="updateFeeSummary"/>
           </v-col>
         </v-row>
       </v-container>
@@ -98,9 +100,10 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
+import { getFinancingFee } from '@/utils'
 import { RouteNames } from '@/enums'
 import {
-  ActionBindingIF, BreadcrumbIF, FeeSummaryIF, ErrorIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, BreadcrumbIF, FeeIF, FeeSummaryIF, ErrorIF, LengthTrustIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { tombstoneBreadcrumbRegistration } from '@/resources'
@@ -116,7 +119,7 @@ import { RegistrationLengthTrust } from '@/components/registration'
     Tombstone
   }
 })
-export default class Registration extends Vue {
+export default class LengthTrust extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getLengthTrust: LengthTrustIF
   @Getter getFeeSummary: FeeSummaryIF
@@ -147,6 +150,10 @@ export default class Registration extends Vue {
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get feeHint (): string {
+    return getFinancingFee(false).hint
   }
 
   private get feeSummary (): FeeSummaryIF {
@@ -199,7 +206,7 @@ export default class Registration extends Vue {
 
   private submitSaveResume (): void {
     // Save draft
-    alert('Soon')
+    // alert('Soon')
   }
 
   @Watch('updatedFeeSummary')

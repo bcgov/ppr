@@ -1,6 +1,7 @@
 export * from './breadcrumb-interface'
 export * from './data-table-interfaces'
 export * from './dialog-inerfaces'
+export * from './fee-interface'
 export * from './ppr-api-interfaces'
 export * from './registration-interfaces'
 export * from './search-interfaces'

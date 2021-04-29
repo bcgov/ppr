@@ -10,11 +10,12 @@ import { Dashboard } from '@/views'
 import { Tombstone } from '@/components/common'
 import { SearchBar } from '@/components/search'
 import { SearchHistory } from '@/components/tables'
+import { RegistrationBar } from '@/components/registration'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedSearchResponse, mockedSearchHistory } from './test-data'
-import { UISearchTypes } from '@/enums'
+import { mockedSearchResponse, mockedSearchHistory, mockedSelectSecurityAgreement } from './test-data'
+import { RouteNames, UISearchTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -53,6 +54,7 @@ describe('Dashboard component', () => {
   it('renders Dashboard View with child components', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
   })
@@ -82,5 +84,10 @@ describe('Dashboard component', () => {
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe('search')
+  })
+  it('routes to new registration after selecting registration type', async () => {
+    wrapper.vm.setRegistrationType(mockedSelectSecurityAgreement)
+    await Vue.nextTick()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
   })
 })
