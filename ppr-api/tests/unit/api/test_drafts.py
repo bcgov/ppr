@@ -32,8 +32,8 @@ SAMPLE_JSON_CHANGE = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
 SAMPLE_JSON_AMENDMENT = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)
 
 
-def test_draft_create_invalid_type_400(session, client, jwt):
-    """Assert that create draft  with an invalid type returns a 400 error."""
+def test_draft_create_invalid_type(session, client, jwt):
+    """Assert that create draft  with an invalid type returns a 404 error."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
     json_data['type'] = 'INVALID_TYPE'
@@ -44,7 +44,7 @@ def test_draft_create_invalid_type_400(session, client, jwt):
                      headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
+    assert rv.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def test_draft_create_valid_financing_201(session, client, jwt):
@@ -146,8 +146,8 @@ def test_draft_invalid_get_statement_404(session, client, jwt):
     assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_draft_update_invalid_type_400(session, client, jwt):
-    """Assert that an update draft financing statement request with an invalid type returns a 400 error."""
+def test_draft_update_invalid_type_404(session, client, jwt):
+    """Assert that an update draft financing statement request with an invalid type returns a 404."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
     json_data['financingStatement']['type'] = 'XA'
@@ -158,7 +158,7 @@ def test_draft_update_invalid_type_400(session, client, jwt):
                     headers=create_header_account(jwt, [PPR_ROLE]),
                     content_type='application/json')
     # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
+    assert rv.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_draft_update_valid_financing_200(session, client, jwt):

@@ -19,7 +19,6 @@ from http import HTTPStatus
 
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, cors
-from registry_schemas import utils as schema_utils
 
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
@@ -27,9 +26,8 @@ from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
 from ppr_api.models import Draft
 
-from .utils import get_account_id, account_required_response, validation_error_response, \
-                   business_exception_response, default_exception_response
-from .utils import unauthorized_error_response, path_param_error_response
+from .utils import get_account_id, account_required_response, business_exception_response, \
+                   default_exception_response, unauthorized_error_response, path_param_error_response
 
 
 API = Namespace('drafts', description='Endpoints for maintaining draft statements.')
@@ -85,10 +83,10 @@ class DraftResource(Resource):
                 return unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
-            # Validate schema.
-            valid_format, errors = schema_utils.validate(request_json, 'draft', 'ppr')
-            if not valid_format:
-                return validation_error_response(errors, VAL_ERROR)
+            # Disable schema validation: draft may be partial/incomplele.
+            # valid_format, errors = schema_utils.validate(request_json, 'draft', 'ppr')
+            # if not valid_format:
+            #   return validation_error_response(errors, VAL_ERROR)
 
             # Save new draft statement: BusinessException raised if failure.
             draft = Draft.create_from_json(request_json, account_id)
@@ -154,10 +152,10 @@ class MaintainDraftResource(Resource):
                 return unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
-            # Validate schema.
-            valid_format, errors = schema_utils.validate(request_json, 'draft', 'ppr')
-            if not valid_format:
-                return validation_error_response(errors, VAL_ERROR)
+            # Disable schema validation: draft may be partial/incomplele.
+            # valid_format, errors = schema_utils.validate(request_json, 'draft', 'ppr')
+            # if not valid_format:
+            #   return validation_error_response(errors, VAL_ERROR)
 
             # Save draft statement update: BusinessException raised if failure.
             draft = Draft.update(request_json, document_id)

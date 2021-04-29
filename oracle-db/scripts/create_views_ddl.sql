@@ -9,7 +9,7 @@ SELECT r.registration_type_cd,
   FROM registration r, financing_statement fs, registration r2
  WHERE r2.financing_id = r.financing_id
    AND r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -37,7 +37,7 @@ SELECT r.registration_type_cd,
        sc.srch_vin
   FROM registration r, financing_statement fs, serial_collateral sc
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -67,7 +67,7 @@ SELECT r.registration_type_cd,
        sc.srch_vin
   FROM registration r, financing_statement fs, serial_collateral sc
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -96,7 +96,7 @@ SELECT r.registration_type_cd,
        sc.srch_vin
   FROM registration r, financing_statement fs, serial_collateral sc
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id

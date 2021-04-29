@@ -41,7 +41,7 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
         fs.expire_date,fs.state_type_cd,sc.serial_id AS vehicle_id, sc.mhr_number
   FROM registration r, financing_statement fs, serial_collateral sc 
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id 
@@ -61,7 +61,7 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
   FROM registration r, financing_statement fs, registration r2
  WHERE r2.financing_id = r.financing_id
    AND r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -98,7 +98,7 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
        fs.expire_date,fs.state_type_cd,p.party_id
   FROM registration r, financing_statement fs, party p
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -126,7 +126,7 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
        fs.expire_date,fs.state_type_cd
   FROM registration r, financing_statement fs, party p
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -146,7 +146,7 @@ BUSINESS_NAME_TOTAL_COUNT = """
 SELECT COUNT(r.registration_id)
   FROM registration r, financing_statement fs, party p
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -168,7 +168,7 @@ INDIVIDUAL_NAME_TOTAL_COUNT = """
 SELECT COUNT(r.registration_id)
   FROM registration r, financing_statement fs, party p
  WHERE r.financing_id = fs.financing_id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
    AND NOT EXISTS (SELECT r3.registration_id
@@ -186,7 +186,7 @@ SERIAL_SEARCH_COUNT_BASE = """
 SELECT COUNT(r.registration_id)
   FROM registration r, financing_statement fs, serial_collateral sc
   WHERE r.financing_id = fs.financing_id
-    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN')
+    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
     AND r.base_reg_number IS NULL
     AND (fs.expire_date IS NULL OR fs.expire_date > ((SYSTIMESTAMP AT TIME ZONE 'UTC') - 30))
     AND NOT EXISTS (SELECT r3.registration_id
