@@ -56,6 +56,10 @@ PAYMENT_REQUEST_TEMPLATE = {
     }
 }
 
+PAYMENT_REFUND_TEMPLATE = {
+    'reason': 'Immediate transaction rollback.'
+}
+
 PATH_PAYMENT = 'payment-requests'
 PATH_REFUND = 'payment-requests/{invoice_id}/refunds'
 PATH_INVOICE = 'payment-requests/{invoice_id}'
@@ -88,21 +92,17 @@ class ApiRequestError(Exception):
 
     def __init__(self, response=None, message='API request failed'):
         """Set up the exception."""
-        self.status_code = response.status_code
-        info = json.loads(response.text)
-        self.detail = detail = info.get('detail')
-        self.title = title = info.get('title')
-        self.invalid_params = info.get('invalidParams')
-
-        error_msg = None
-        if title and detail and (title != detail):
-            error_msg = '{title}: {detail}'.format(title=self.title, detail=self.detail)
-        if title and not detail or (title and title == detail):
-            error_msg = '{title}'.format(title=title)
+        if response:
+            self.status_code = response.status_code
+            info = json.loads(response.text)
+            self.detail = info.get('detail')
+            self.title = info.get('title')
+            self.invalid_params = info.get('invalidParams')
+            self.message = message + ': ' + str(response.statuscode) + ': ' + info
         else:
-            error_msg = message
+            self.message = message
 
-        super().__init__(error_msg)
+        super().__init__(self.message)
 
 
 class HttpVerbs(Enum):
@@ -128,11 +128,11 @@ class BaseClient:
         self.account_id = account_id
         self.api_key = api_key
 
-    def call_api(self, method, relative_path, data=None):
+    def call_api(self, method, relative_path, data=None, token=None):
         """Call the Pay API."""
         try:
             headers = {
-                'Authorization': 'Bearer ' + self.jwt,
+                'Authorization': 'Bearer ' + token if token is not None else self.jwt,
                 'Content-Type': 'application/json'
             }
             if self.account_id:
@@ -166,7 +166,7 @@ class BaseClient:
             return json.loads(response.text)
 
         except (ApiRequestError) as err:
-            current_app.logger.error(repr(err))
+            current_app.logger.error(err.message)
             raise err
 
 
@@ -212,25 +212,48 @@ class SBCPaymentClient(BaseClient):
 
     def cancel_payment(self, invoice_id):
         """Immediately cancel or refund the transaction payment as a state rollback."""
-        invoice_data = self.get_payment(invoice_id)
-
-        if invoice_data['statusCode'] == STATUS_PAID:
-            current_app.logger.info('Calling pay api to refund payment')
-            return self.refund_payment(invoice_id, invoice_data)
-
-        if invoice_data['statusCode'] in (STATUS_APPROVED, STATUS_CREATED, STATUS_COMPLETED):
-            current_app.logger.info('Calling pay api to cancel payment')
-            request_path = PATH_INVOICE.format(invoice_id=invoice_id)
-            return self.call_api(HttpVerbs.DELETE, request_path)
-
-        return None
+        # Payment status does not matter with immediate refunds: always use the refund endpoint.
+        current_app.logger.info('Calling pay api to refund payment')
+        request_path = PATH_REFUND.format(invoice_id=invoice_id)
+        return self.call_api(HttpVerbs.POST,
+                             request_path,
+                             data=PAYMENT_REFUND_TEMPLATE,
+                             token=SBCPaymentClient.get_sa_token())
 
     def get_payment(self, invoice_id):
         """Fetch the current state of the payment invoice."""
         request_path = PATH_INVOICE.format(invoice_id=invoice_id)
         return self.call_api(HttpVerbs.GET, request_path)
 
-    def refund_payment(self, invoice_id, invoice_data):
-        """Refund the transaction payment. Invoice_data returned by get_payment."""
-        request_path = PATH_REFUND.format(invoice_id=invoice_id)
-        return self.call_api(HttpVerbs.POST, request_path, data=invoice_data)
+    @staticmethod
+    def get_sa_token():
+        """Refunds must be submitted with a PPR service account token. Request one from the OIDC service."""
+        oidc_token_url = current_app.config.get('JWT_OIDC_TOKEN_URL')
+        client_id = current_app.config.get('ACCOUNT_SVC_CLIENT_ID')
+        client_secret = current_app.config.get('ACCOUNT_SVC_CLIENT_SECRET')
+        current_app.logger.info(f'Calling OIDC api to get token: URL = {oidc_token_url}, client_id={client_id}.')
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            data = f'grant_type=client_credentials&scope=openid&client_id={client_id}&client_secret={client_secret}'
+            response = requests.request(
+                HttpVerbs.POST.value,
+                oidc_token_url,
+                data=data,
+                params=None,
+                headers=headers
+            )
+
+            if not response or not response.ok:
+                raise ApiRequestError(response)
+
+            response_json = json.loads(response.text)
+            token = response_json['access_token']
+            current_app.logger.info('Have new sa token from OIDC.')
+            return token
+
+        except (ApiRequestError) as err:
+            current_app.logger.error(err.message)
+            raise err
