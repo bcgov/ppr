@@ -2,7 +2,7 @@ import {
   AccountInformationIF, AuthorizationIF, FeeSummaryIF, RegistrationTypeIF, SearchResponseIF,
   SearchTypeIF, UserInfoIF
 } from '@/interfaces'
-import { IndividualNameIF } from '../ppr-api-interfaces'
+import { DraftIF, IndividualNameIF } from '../ppr-api-interfaces'
 import { AddPartiesIF, AddCollateralIF, LengthTrustIF } from '../registration-interfaces'
 
 // State model example
@@ -11,6 +11,7 @@ export interface StateModelIF {
   authorization: AuthorizationIF
   currentStep: number,
   debtorName: IndividualNameIF
+  draft: DraftIF,
   feeSummary: FeeSummaryIF
   registrationType: RegistrationTypeIF
   searchHistory: Array<SearchResponseIF>

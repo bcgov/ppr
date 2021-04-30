@@ -1,5 +1,9 @@
+export * from './address-interface'
 export * from './error-interface'
+export * from './general-collateral-interface'
 export * from './individual-name-interface'
+export * from './party-interface'
+export * from './registration-interfaces' // Includes payment and draft
 export * from './search-history-response-interface'
 export * from './search-criteria-interface'
 export * from './search-result-interface'

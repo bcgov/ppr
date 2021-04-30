@@ -6,5 +6,6 @@ export interface VehicleCollateralIF {
   year?: number, // Optional
   make?: string, // Optional
   model?: string, // Optional
-  manufacturedHomeRegistrationNumber?: string // Conditional: only returned on MHR number search.
+  manufacturedHomeRegistrationNumber?: string, // Conditional: only returned on MHR number search.
+  vehicleId?: number // System generated used for amendment/change registrations.
 }

@@ -13,6 +13,12 @@ export const stateModel: StateModelIF = {
   },
   currentStep: 1,
   debtorName: null,
+  draft: {
+    type: '',
+    financingStatement: null,
+    createDateTime: null,
+    lastUpdateDateTime: null
+  },
   feeSummary: {
     feeAmount: 0,
     serviceFee: 1.50,
