@@ -178,3 +178,17 @@ def test_payment_apikey(client, jwt):
         assert pay_data
         assert pay_data['invoiceId']
         assert pay_data['receipt']
+
+
+def test_sa_get_token(client, jwt):
+    """Assert that an OIDC get token request with valid SA credentials works as expected."""
+    # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345')
+
+    # test
+    jwt = pay_client.get_sa_token()
+
+    # check
+    assert jwt
+    assert len(jwt) > 0

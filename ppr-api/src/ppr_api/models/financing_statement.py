@@ -292,7 +292,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                                   FinancingStatement.state_type_cd).\
                                 filter(FinancingStatement.financing_id == Registration.financing_id,
                                        Registration.account_id == account_id,
-                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).\
+                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
                                 order_by(FinancingStatement.financing_id).all()
             else:
                 days_ago = model_utils.now_ts_offset(10, False)
@@ -302,7 +302,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                                   FinancingStatement.state_type_cd).\
                                 filter(FinancingStatement.financing_id == Registration.financing_id,
                                        Registration.account_id == account_id,
-                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN']),
+                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN']),
                                        Registration.registration_ts > days_ago).\
                                 order_by(FinancingStatement.financing_id).all()
 
@@ -356,7 +356,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             statement = db.session.query(FinancingStatement).\
                         filter(FinancingStatement.financing_id == Registration.financing_id,
                                Registration.registration_num == registration_num,
-                               Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
+                               Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
+                               one_or_none()
 
         if not statement:
             raise BusinessException(
