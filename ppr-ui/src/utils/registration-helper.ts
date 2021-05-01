@@ -21,7 +21,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   // console.log('draft: ' + JSON.stringify(draft))
   draft.type = DraftTypes.FINANCING_STATEMENT
   var statement:FinancingStatementIF = draft.financingStatement
-  console.log('statement: ' + JSON.stringify(statement))
+  // console.log('statement: ' + JSON.stringify(statement))
   if (statement === undefined || statement === null) {
     statement = {
       type: registrationType.registrationTypeAPI,

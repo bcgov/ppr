@@ -85,21 +85,23 @@ describe('API save, update draft Tests', () => {
     const apiResponse:DraftIF = await updateDraft(draft)
     expect(apiResponse.error).toBeDefined()
   })
-  it('API call to create draft unauthorized endpoint', async () => {
-    sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-dev.apigee.net/ppr/api/v1/')
+/*
+  it('API call to create draft with an unknown endpoint', async () => {
+    sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/ppr/api/v6/')
     const draft:DraftIF = JSON.parse(JSON.stringify(mockedDraftFinancingStatementAll))
     const apiResponse:DraftIF = await createDraft(draft)
     sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/ppr/api/v1/')
     expect(apiResponse.error).toBeDefined()
   })
-  it('API call to update existing draft unauthorized endpoint', async () => {
-    sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-dev.apigee.net/ppr/api/v1/')
+  it('API call to update existing draft with an unknown endpoint', async () => {
+    sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/ppr/api/v6/')
     const draft:DraftIF = JSON.parse(JSON.stringify(mockedDraftFinancingStatementAll))
     draft.financingStatement.documentId = 'D0034001'
     const apiResponse:DraftIF = await updateDraft(draft)
     sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/ppr/api/v1/')
     expect(apiResponse.error).toBeDefined()
   })
+*/
 })
 
 describe('Financing Statement registration helper save, update draft Tests', () => {
