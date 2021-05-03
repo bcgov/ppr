@@ -132,7 +132,7 @@ class BaseClient:
         """Call the Pay API."""
         try:
             headers = {
-                'Authorization': 'Bearer ' + token if token is not None else self.jwt,
+                'Authorization': 'Bearer ' + token if token is not None else 'Bearer ' + self.jwt,
                 'Content-Type': 'application/json'
             }
             if self.account_id:
@@ -140,9 +140,11 @@ class BaseClient:
             if self.api_key:
                 headers['x-apikey'] = self.api_key
 
+            # current_app.logger.debug(json.dumps(headers))
             url = self.api_url + relative_path
-            # current_app.logger.debug('url=' + url)
+            # current_app.logger.debug(method.value + ' url=' + url)
             if data:
+                # current_app.logger.debug(json.dumps(data))
                 response = requests.request(
                     method.value,
                     url,
