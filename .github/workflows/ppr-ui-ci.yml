@@ -39,6 +39,7 @@ jobs:
           make test
         env:
           CI: true
+          PPR_API_KEY: ${{ secrets.PPR_API_KEY }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
