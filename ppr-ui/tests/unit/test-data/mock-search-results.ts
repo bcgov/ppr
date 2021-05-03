@@ -19,6 +19,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 1,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU622994',
         year: 2018,
@@ -33,6 +34,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 2,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU622995',
         year: 2017,
@@ -47,6 +49,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 3,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU622996',
         year: 2017,
@@ -61,6 +64,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 4,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU622997',
         year: 2017,
@@ -75,6 +79,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 5,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU622998',
         year: 2017,
@@ -89,6 +94,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 6,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU622999',
         year: 2017,
@@ -103,6 +109,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 7,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU623000',
         year: 2017,
@@ -117,6 +124,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 8,
         type: 'MV',
         serialNumber: 'KM8J3CA46JU623001',
         year: 2017,
@@ -233,6 +241,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 1,
         type: 'MH',
         serialNumber: 'KM8J3CA46JU622914',
         year: 2018,
@@ -248,6 +257,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 2,
         type: 'MH',
         serialNumber: 'KM8J3CA46JU622925',
         year: 2017,
@@ -263,6 +273,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 3,
         type: 'MH',
         serialNumber: 'KM8J3CA46JU622936',
         year: 2017,
@@ -278,6 +289,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 4,
         type: 'MH',
         serialNumber: 'KM8J3CA46JU622947',
         year: 2017,
@@ -295,6 +307,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 1,
         type: 'AC',
         serialNumber: 'KM8J3CA46JU622194',
         year: 1998,
@@ -309,6 +322,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 2,
         type: 'AC',
         serialNumber: 'KM8J3CA46JU622295',
         year: 2017,
@@ -323,6 +337,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 3,
         type: 'AC',
         serialNumber: 'KM8J3CA46JU622396',
         year: 2017,
@@ -337,6 +352,7 @@ export const mockedSearchResults: mockSearchResults = {
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA',
       vehicleCollateral: {
+        id: 4,
         type: 'AC',
         serialNumber: 'KM8J3CA46JU622497',
         year: 2017,

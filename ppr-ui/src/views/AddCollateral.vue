@@ -15,14 +15,6 @@
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <template>
-              <component
-                v-for="step in getSteps"
-                v-show="isRouteName(step.to)"
-                :is="step.component"
-                :key="step.step"
-              />
-            </template>
           </v-col>
           <v-col cols="1">
           </v-col>
@@ -40,12 +32,10 @@
             Add the collateral for this registration.
           </v-col>
         </v-row>
-      </v-container>
-    </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="auto">Content</v-col>
+        <v-row no-gutters>
+          <v-col cols="auto">
+            <collateral />
+          </v-col>
         </v-row>
       </v-container>
     </v-row>
@@ -105,12 +95,14 @@ import {
 import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
 import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { Collateral } from '@/components/collateral'
 
 @Component({
   components: {
     RegistrationFee,
     Stepper,
-    Tombstone
+    Tombstone,
+    Collateral
   }
 })
 export default class AddCollateral extends Vue {
@@ -127,6 +119,8 @@ export default class AddCollateral extends Vue {
 
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
+
+  private generalCollateral: string = ''
 
   private get breadcrumbs (): Array<BreadcrumbIF> {
     const registrationBreadcrumb = tombstoneBreadcrumbRegistration
