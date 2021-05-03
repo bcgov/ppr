@@ -3,16 +3,16 @@ CREATE OR REPLACE FUNCTION get_draft_document_number
   IS
   BEGIN
     RETURN 'D'||to_char(DOCUMENT_NUMBER_SEQ.nextval);
-  END; 
-/
+  END
+; 
 
 CREATE OR REPLACE FUNCTION get_registration_num
   RETURN VARCHAR2
   IS
   BEGIN
     RETURN to_char(registration_num_seq.nextval) || 'B';
-  END;
-/
+  END
+;
 
 
 CREATE OR REPLACE FUNCTION match_individual_name(lastname IN VARCHAR2, firstname IN VARCHAR2)
@@ -129,5 +129,5 @@ CREATE OR REPLACE FUNCTION match_individual_name(lastname IN VARCHAR2, firstname
   );
   
     RETURN V_IDS;
-  END;
-/
+  END
+;
