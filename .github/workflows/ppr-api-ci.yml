@@ -40,6 +40,8 @@ jobs:
         run: |
           make lint
       - name: Test with pytest
+        env:
+            PPR_API_KEY: ${{ secrets.PPR_API_KEY }}
         run: |
           make test
       - name: Upload coverage to Codecov
