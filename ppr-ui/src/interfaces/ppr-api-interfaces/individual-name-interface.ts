@@ -1,7 +1,8 @@
 
 // Individual name interface.
 export interface IndividualNameIF {
-  first: string, // One of VehicleTypes
+  first: string,
   last: string,
-  second?: string // Optional
+  second?: string, // Optional
+  middle?: string, // Optional search debtor uses second; everywhere else uses middle.
 }

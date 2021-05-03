@@ -2,6 +2,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  DraftIF,
   FeeSummaryIF,
   LengthTrustIF,
   IndividualNameIF,
@@ -39,6 +40,10 @@ export const setCurrentStep: ActionIF = ({ commit }, currentStep): void => {
 
 export const setDebtorName: ActionIF = ({ commit }, debtorName: IndividualNameIF): void => {
   commit('mutateDebtorName', debtorName)
+}
+
+export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {
+  commit('mutateDraft', draft)
 }
 
 export const setFeeSummary: ActionIF = ({ commit }, feeSummary: FeeSummaryIF): void => {

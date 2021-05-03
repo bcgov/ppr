@@ -3,6 +3,7 @@ import { AccountTypes, RouteNames } from '@/enums'
 import {
   AddCollateralIF,
   AddPartiesIF,
+  DraftIF,
   FeeSummaryIF,
   IndividualNameIF,
   LengthTrustIF,
@@ -10,6 +11,7 @@ import {
   SearchResponseIF,
   SearchTypeIF,
   StateIF,
+  StateModelIF,
   UserSettingsIF
 } from '@/interfaces'
 
@@ -36,6 +38,11 @@ export const getAddSecuredPartiesAndDebtors = (state: StateIF): AddPartiesIF => 
 /** The search value for ppr search when search type is individual debtor. */
 export const getDebtorName = (state: StateIF): IndividualNameIF => {
   return state.stateModel.debtorName
+}
+
+/** The current draft of a registration. */
+export const getDraft = (state: StateIF): DraftIF => {
+  return state.stateModel.draft
 }
 
 /** The registration fee summary object. */
@@ -71,6 +78,11 @@ export const getSearchedValue = (state: StateIF): string => {
 /** The list of past search responses for this account. */
 export const getSearchHistory = (state: StateIF): Array<SearchResponseIF> => {
   return state.stateModel.searchHistory
+}
+
+/** Convenient when there is a need to access several properties. */
+export const getStateModel = (state: StateIF): StateModelIF => {
+  return state.stateModel
 }
 
 /** The current user's email. */

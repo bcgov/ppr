@@ -2,6 +2,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  DraftIF,
   FeeSummaryIF,
   LengthTrustIF,
   IndividualNameIF,
@@ -35,6 +36,10 @@ export const mutateCurrentStep = (state: any, currentStep: boolean) => {
 
 export const mutateDebtorName = (state: StateIF, debtorName: IndividualNameIF) => {
   state.stateModel.debtorName = debtorName
+}
+
+export const mutateDraft = (state: StateIF, draft: DraftIF) => {
+  state.stateModel.draft = draft
 }
 
 export const mutateFeeSummary = (state: StateIF, feeSummary: FeeSummaryIF) => {

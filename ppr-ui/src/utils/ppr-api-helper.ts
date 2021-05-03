@@ -3,7 +3,7 @@ import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
-import { SearchCriteriaIF, SearchResponseIF, SearchResultIF, UserSettingsIF } from '@/interfaces'
+import { DraftIF, SearchCriteriaIF, SearchResponseIF, SearchResultIF, UserSettingsIF } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
 /**
@@ -186,4 +186,55 @@ export async function updateUserSettings (setting: string, settingValue: boolean
         }
       }
     )
+}
+
+// Create default request base URL and headers.
+function getDefaultConfig (): Object {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return config
+}
+
+// Save a new draft.
+export async function createDraft (draft: DraftIF): Promise<DraftIF> {
+  return axios.post<DraftIF>('drafts', draft, getDefaultConfig())
+    .then(response => {
+      const data: DraftIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    }).catch(error => {
+      draft.error = {
+        statusCode: error?.response?.status,
+        message: error?.response?.data?.message
+      }
+      return draft
+    })
+}
+
+// Update an existing draft.
+export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
+  var documentId = draft.financingStatement?.documentId
+  if (documentId === undefined || documentId === '') {
+    draft.error = {
+      statusCode: StatusCodes.BAD_REQUEST,
+      message: 'Draft update request invalid: no document ID. Use createDraft instead.'
+    }
+    return draft
+  }
+  return axios.put<DraftIF>(('drafts/' + documentId), draft, getDefaultConfig())
+    .then(response => {
+      const data: DraftIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    }).catch(error => {
+      draft.error = {
+        statusCode: error?.response?.status,
+        message: error?.response?.data?.message
+      }
+      return draft
+    })
 }
