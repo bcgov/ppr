@@ -37,7 +37,7 @@
                       filled
                       label="Vehicle Type"
                       v-model="vehicle.type"
-                      id="v-type"
+                      id="txt-type"
                     >
                       <template slot="item" slot-scope="data">
                         <span class="list-item">
@@ -52,7 +52,7 @@
                       filled
                       label="Year"
                       v-model="vehicle.year"
-                      id="v-years"
+                      id="txt-years"
                     >
                     </v-select>
                   </v-col>
@@ -62,7 +62,7 @@
                     <v-text-field
                       filled
                       label="Make"
-                      id="txt-serial"
+                      id="txt-make"
                       v-model="vehicle.make"
                       persistent-hint
                     />
@@ -73,7 +73,7 @@
                     <v-text-field
                       filled
                       label="Model"
-                      id="txt-serial"
+                      id="txt-model"
                       v-model="vehicle.model"
                       persistent-hint
                     />
@@ -187,7 +187,6 @@ export default defineComponent({
     }
 
     const resetFormAndData = (emitEvent: boolean): void => {
-      // localState.vehicle = { id: -1, type: '', year: 2021, make: '', model: '', serialNumber: '' }
       if (emitEvent) {
         context.emit('resetEvent')
       }

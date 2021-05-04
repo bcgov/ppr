@@ -51,6 +51,7 @@
             <tr
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
+              class="vehicle-row"
             >
               <td
                 class="list-item__title"
