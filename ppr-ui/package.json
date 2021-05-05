@@ -51,15 +51,14 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
-    "node-sass": "^5.0.0",
-    "sass": "^1.26.5",
+    "sass": "^1.32.12",
     "sass-loader": "^8.0.2",
     "typescript": "~3.9.3",
     "vue-class-component": "^7.2.3",
     "vue-cli-plugin-vuetify": "^2.1.0",
     "vue-template-compiler": "^2.6.11",
-    "vuex-module-decorators": "^0.16.1",
-    "vue-test-utils-helpers": "git://github.com/bcgov/vue-test-utils-helpers.git"
+    "vue-test-utils-helpers": "git://github.com/bcgov/vue-test-utils-helpers.git",
+    "vuex-module-decorators": "^0.16.1"
   },
   "eslintConfig": {
     "root": true,
