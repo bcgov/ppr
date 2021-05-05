@@ -1,6 +1,7 @@
 export * from './accountTypes'
 export * from './draftTypes'
 export * from './feeCodes'
+export * from './actionTypes'
 export * from './matchTypes'
 export * from './routeNames'
 export * from './searchTypes'

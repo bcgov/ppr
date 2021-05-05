@@ -1,4 +1,4 @@
-import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, VehicleTypes } from '@/enums'
+import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, APIVehicleTypes } from '@/enums'
 import {
   AddPartiesIF,
   AddCollateralIF,
@@ -36,19 +36,24 @@ export const mockedAddress1: AddressIF = {
   postalCode: 'V8R1L2'
 }
 
-export const mockedGeneralCollateral1: Array<GeneralCollateralIF> = [
-  {
-    description: 'TEST1 GENERAL COLLATERAL'
-  }
-]
+export const mockedGeneralCollateral1: string = 'TEST1 GENERAL COLLATERAL'
 
 export const mockedVehicleCollateral1: Array<VehicleCollateralIF> = [
   {
-    type: VehicleTypes.MOTOR_VEHICLE,
+    id: 1,
+    type: APIVehicleTypes.MOTOR_VEHICLE,
     serialNumber: 'KM8J3CA46JU622994',
     year: 2018,
     make: 'HYUNDAI',
     model: 'TUSCON'
+  },
+  {
+    id: 2,
+    type: APIVehicleTypes.BOAT,
+    serialNumber: '123456789',
+    year: 2010,
+    make: 'CREST LINER',
+    model: '1700 VISION'
   }
 ]
 

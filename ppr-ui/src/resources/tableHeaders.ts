@@ -161,3 +161,41 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
     value: 'pdf'
   }
 ]
+
+export const vehicleTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Vehicle Type',
+    value: 'vehicle.type'
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Year',
+    value: 'vehicle.year'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Make',
+    value: 'vehicle.make'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Model',
+    value: 'vehicle.model'
+  },
+  {
+    class: 'column-lg',
+    text: 'Serial / VIN Number',
+    value: 'vehicle.serial'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]
