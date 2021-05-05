@@ -36,7 +36,7 @@
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="auto">
+          <v-col cols="6">
             Review the information in your registration. If you need to change anything,
             return to the step to make the necessary change.
           </v-col>
@@ -44,46 +44,40 @@
       </v-container>
     </v-row>
     <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="auto">Content</v-col>
+      <v-container fluid class="pa-1">
+        <v-row no-gutters class='pt-1'>
+          <v-col cols="6">
+            <registration-length-trust :isSummary="true"/>
+          </v-col>
         </v-row>
       </v-container>
     </v-row>
     <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="auto">
-            <v-divider></v-divider>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="2">
-            <v-btn id='reg-cancel-btn' :class="$style['reg-default-btn']" @click="submitCancel">
-              <b>Cancel</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-save-btn' :class="$style['reg-default-btn']" @click="submitSave">
+      <v-container fluid class="pl-6 pt-30 pb-60">
+        <v-row no-gutters>
+          <v-col cols="6"  class="align=left pa-0">
+            <span class="pr-3">
+              <v-btn id='reg-cancel-btn' outlined color="accent" @click="submitCancel">
+                <b>Cancel</b>
+              </v-btn>
+            </span>
+            <span class="pr-3">
+              <v-btn id='reg-save-resume-btn' outlined color="accent" @click="submitSaveResume">
+                <b>Save and Resume Later</b>
+              </v-btn>
+            </span>
+            <v-btn id='reg-save-btn' outlined color="accent" @click="submitSave">
               <b>Save</b>
             </v-btn>
           </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-save-resume-btn' :class="$style['reg-default-btn']" @click="submitSaveResume">
-              <b>Save and Resume Later</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="2">
-            <v-divider vertical></v-divider>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
-              <b>Back</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="1">
+          <v-col cols="6" class="align=right">
+            <span class="pr-3">
+              <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
+                <b>&lt; Back</b>
+              </v-btn>
+            </span>
             <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-              <b>Register and Pay</b>
+              <b>Register and Pay ></b>
             </v-btn>
           </v-col>
         </v-row>
@@ -106,10 +100,12 @@ import {
 import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
 import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { RegistrationLengthTrust } from '@/components/registration'
 
 @Component({
   components: {
     RegistrationFee,
+    RegistrationLengthTrust,
     Stepper,
     Tombstone
   }

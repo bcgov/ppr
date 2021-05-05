@@ -38,7 +38,7 @@
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="auto" class='pt-2 pb-6'>
+          <v-col cols="6" class='pt-2 pb-6'>
             Enter the length of time you want the {{ registrationTypeUI }} to be in effect. You can
             renew the registration in the future (for a fee).
           </v-col>
@@ -52,39 +52,37 @@
       </v-container>
     </v-row>
     <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="auto">
-            <v-divider></v-divider>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="2">
-            <v-btn id='reg-cancel-btn' :class="$style['reg-default-btn']" @click="submitCancel">
-              <b>Cancel</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-save-btn' :class="$style['reg-default-btn']" @click="submitSave">
+      <v-container fluid class="pl-6 pt-30 pb-60">
+        <v-row no-gutters>
+          <v-col cols="6"  class="align=left pa-0">
+            <span class="pr-3">
+              <v-btn id='reg-cancel-btn' outlined color="accent" @click="submitCancel">
+                <b>Cancel</b>
+              </v-btn>
+            </span>
+            <span class="pr-3">
+              <v-btn id='reg-save-resume-btn' outlined color="accent" @click="submitSaveResume">
+                <b>Save and Resume Later</b>
+              </v-btn>
+            </span>
+            <v-btn id='reg-save-btn' outlined color="accent" @click="submitSave">
               <b>Save</b>
             </v-btn>
           </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-save-resume-btn' :class="$style['reg-default-btn']" @click="submitSaveResume">
-              <b>Save and Resume Later</b>
-            </v-btn>
-          </v-col>
+<!--
           <v-col cols="2">
-            <v-divider vertical></v-divider>
           </v-col>
           <v-col cols="1">
+          </v-col>
+          <v-col cols="5" class="align=right">
             <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
-              <b>Back</b>
+              <b>< Back</b>
             </v-btn>
           </v-col>
-          <v-col cols="1">
+-->
+          <v-col cols="6" class="align=right">
             <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-              <b>Add Secured Parties <br>and Debtors</b>
+              <b>Add Secured Parties and Debtors ></b>
             </v-btn>
           </v-col>
         </v-row>

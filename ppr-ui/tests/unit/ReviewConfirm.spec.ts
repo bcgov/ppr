@@ -8,11 +8,14 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 // Components
 import { ReviewConfirm } from '@/views'
 import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { RegistrationLengthTrust } from '@/components/registration'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedError } from './test-data'
+import { mockedNewRegStep1, mockedSelectSecurityAgreement } from './test-data'
 import { RouteNames } from '@/enums'
+// Other
+import { DraftIF, LengthTrustIF } from '@/interfaces'
 
 Vue.use(Vuetify)
 
@@ -25,6 +28,8 @@ const saveBtn: string = '#reg-save-btn'
 const saveResumeBtn: string = '#reg-save-resume-btn'
 const backBtn: string = '#reg-back-btn'
 const nextBtn: string = '#reg-next-btn'
+const registrationLengthTrust: string = '#registration-length-trust'
+const errorLinkLengthTrust: string = '#router-link-length-trust'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -78,9 +83,6 @@ describe('ReviewConfirm new registration component', () => {
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
   })
-  it('Review Confirm emitError', async () => {
-    wrapper.vm.emitError(mockedError)
-  })
   it('Review Confirm submitCancel', async () => {
     wrapper.vm.submitCancel()
     await Vue.nextTick()
@@ -104,5 +106,89 @@ describe('ReviewConfirm new registration component', () => {
   it('Review Confirm submitSaveResume', async () => {
     wrapper.vm.submitSaveResume()
     await Vue.nextTick()
+  })
+})
+
+describe('ReviewConfirm step 1 tests', () => {
+  let wrapper: any
+  const { assign } = window.location
+
+  beforeEach(async () => {
+    // reset the store data
+    await store.dispatch('resetNewRegistration')
+    const resetDraft:DraftIF = {
+      type: '',
+      financingStatement: null,
+      createDateTime: null,
+      lastUpdateDateTime: null
+    }
+    await store.dispatch('setDraft', resetDraft)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+
+    // mock the window.location.assign function
+    delete window.location
+    window.location = { assign: jest.fn() } as any
+
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = mockRouter.mock()
+    await router.push({ name: 'length-trust' })
+    wrapper = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
+  })
+
+  afterEach(() => {
+    window.location.assign = assign
+    wrapper.destroy()
+  })
+
+  it('Review Confirm View with invalid step 1', async () => {
+    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedNewRegStep1))
+    await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
+    expect(wrapper.findComponent(Stepper).exists()).toBe(true)
+    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
+    // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(true)
+    // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('Not entered')
+    // expect(wrapper.findComponent(RegistrationLengthTrust).trustIndentureSummary).toBe('No')
+  })
+
+  it('Review Confirm View with invalid step 1', async () => {
+    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedNewRegStep1))
+    lengthTrust.valid = true
+    lengthTrust.lifeInfinite = false
+    lengthTrust.lifeYears = 3
+    lengthTrust.trustIndenture = true
+    await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
+    expect(wrapper.findComponent(Stepper).exists()).toBe(true)
+    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
+    // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(false)
+    // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('3')
+    // expect(wrapper.findComponent(RegistrationLengthTrust).trustIndentureSummary).toBe('Yes')
   })
 })

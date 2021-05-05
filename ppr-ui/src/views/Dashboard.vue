@@ -54,10 +54,8 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <registration-bar class="soft-corners-bottom"
-                          :registrationTitle="''"
-                          @selected-registration-type="setSelectedRegistrationType"/>
-              </v-row>
+              <registration-bar class="soft-corners-bottom" :registrationTitle="''"/>
+            </v-row>
           </v-col>
         </v-row>
       </v-container>

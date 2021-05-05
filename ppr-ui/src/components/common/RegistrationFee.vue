@@ -14,8 +14,8 @@
 -->
     <v-row no-gutters class="pa-2">
       <v-col cols="8">
-        <div><b>{{registrationType}}</b></div>
-        <div v-if="!isComplete">{{hint}}</div>
+        <div><b>{{registrationTypeFee}}</b></div>
+        <div v-if="!isComplete">{{hintFee}}</div>
       </v-col>
       <v-col cols="4">
         <div v-if="isComplete" class="float-right">${{totalFees.toFixed(2)}}</div>
@@ -87,10 +87,10 @@ export default defineComponent({
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
     const feeSummary: FeeSummaryIF = getFeeSummary.value
     const localState = reactive({
-      attach: props.attach,
-      display: props.display,
-      registrationType: props.registrationType,
-      hint: props.hint,
+      attachFee: props.attach,
+      displayFee: props.display,
+      registrationTypeFee: props.registrationType,
+      hintFee: props.hint,
       feeAmount: feeSummary.feeAmount || 0,
       quantity: feeSummary.quantity || 0,
       feeCode: feeSummary.feeCode || '',

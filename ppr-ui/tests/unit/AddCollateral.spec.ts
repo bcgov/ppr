@@ -11,7 +11,6 @@ import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedError } from './test-data'
 import { RouteNames } from '@/enums'
 
 Vue.use(Vuetify)
@@ -77,9 +76,6 @@ describe('AddCollateral new registration component', () => {
   it('Add Collateral next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
-  })
-  it('Add Collateral emitError', async () => {
-    wrapper.vm.emitError(mockedError)
   })
   it('Add Collateral submitCancel', async () => {
     wrapper.vm.submitCancel()
