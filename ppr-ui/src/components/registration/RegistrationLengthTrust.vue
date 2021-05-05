@@ -2,9 +2,9 @@
   <v-container fluid no-gutters class="white pa-0"  v-if="summaryView">
     <v-card flat id="length-trust-summary">
       <v-row no-gutters :class="[$style['length-trust-summary-header'], pa-2]">
-        <v-col cols="auto">
+        <v-col cols="auto" class="pa-2">
           <v-icon color="#38598A">mdi-calendar-clock</v-icon>
-          <label class="length-trust-title pl-3"><strong>Registration Length and Trust Indenture</strong></label>
+          <label class="pl-3"><strong>Registration Length and Trust Indenture</strong></label>
         </v-col>
       </v-row>
       <v-row no-gutters v-if="showErrorSummary" :class="[$style['length-trust-invalid-message'], 'pa-6']">
@@ -238,10 +238,6 @@ export default defineComponent({
 .length-trust-summary-header {
   display: flex;
   background-color: $gray3;
-  padding: 1.25rem;
-  .length-trust-title {
-    padding-left: 0.5rem;
-  }
 }
 .length-trust-invalid-message {
   font-size: 16px;
