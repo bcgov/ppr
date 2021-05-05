@@ -12,7 +12,6 @@ import { RegistrationLengthTrust } from '@/components/registration'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedError } from './test-data'
 import { RouteNames } from '@/enums'
 
 Vue.use(Vuetify)
@@ -59,51 +58,44 @@ describe('Length and Trust Indenture new registration component', () => {
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
   })
-  it('Add Parties cancel button event', async () => {
+  it('Length Trust cancel button event', async () => {
     wrapper.find(cancelBtn).trigger('click')
     await Vue.nextTick()
     // expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
-  it('Add Parties save button event', async () => {
+  it('Length Trust save button event', async () => {
     wrapper.find(saveBtn).trigger('click')
     await Vue.nextTick()
   })
-  it('Add Parties save and resume button event', async () => {
+  it('Length Trust save and resume button event', async () => {
     wrapper.find(saveResumeBtn).trigger('click')
     await Vue.nextTick()
   })
-  it('Add Parties back button event', async () => {
-    wrapper.find(backBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Add Parties next button event', async () => {
+  it('Length Trust next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
   })
-  it('Add Parties emitError', async () => {
-    wrapper.vm.emitError(mockedError)
-  })
-  it('Add Parties submitCancel', async () => {
+  it('Length Trust submitCancel', async () => {
     wrapper.vm.submitCancel()
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
-  it('Add Parties submitBack', async () => {
+  it('Length Trust submitBack', async () => {
     wrapper.vm.submitBack()
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
-  it('Add Parties submitNext', async () => {
+  it('Length Trust submitNext', async () => {
     wrapper.vm.submitNext()
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
   })
-  it('Add Parties submitSave', async () => {
+  it('Length Trust submitSave', async () => {
     wrapper.vm.submitSave()
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
-  it('Add Parties submitSaveResume', async () => {
+  it('Length Trust submitSaveResume', async () => {
     wrapper.vm.submitSaveResume()
     await Vue.nextTick()
   })

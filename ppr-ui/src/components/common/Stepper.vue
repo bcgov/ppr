@@ -18,9 +18,17 @@
           <v-icon class="step__btn2" size="30" color="green darken-1" v-show=step.valid>
             mdi-check-circle
           </v-icon>
+          <v-icon class="step__btn2" size="30" color="#D3272C" v-show=showInvalid(step)>
+            mdi-alpha-x-circle
+          </v-icon>
         </div>
-        <v-btn class="step__label pre-line" text color="primary" :ripple="false" :disabled=step.disabled>
-          {{ step.text }}
+        <v-btn class="step__label pre-line" text color="primary" :ripple="false" :disabled=step.disabled
+               v-show=!isCurrentStep(step)>
+          <span class="step__label__text">{{ step.text }}</span>
+        </v-btn>
+        <v-btn class="step__label__current pre-line" text color="primary" :ripple="false" :disabled=step.disabled
+               v-show=isCurrentStep(step)>
+          <span class="step__label__text__current">{{ step.text }}</span>
         </v-btn>
       </div>
     </template>
@@ -45,6 +53,10 @@ export default class Stepper extends Vue {
 
   private isCurrentStep (step): boolean {
     return this.$route.name === step.to
+  }
+
+  private showInvalid (step): boolean {
+    return (this.$route.name === 'review-confirm' && this.$route.name !== step.to && !step.valid)
   }
 }
 </script>
@@ -86,7 +98,7 @@ export default class Stepper extends Vue {
   }
 
   .step__icon {
-    color: $BCgovInputBG;
+    color: $primary-blue;
     background: inherit;
   }
 }
@@ -109,9 +121,9 @@ export default class Stepper extends Vue {
   position: absolute;
   top: 50%;
   left: 0;
-  height: 2px;
+  height: 1px;
   width: 100%;
-  background-color: $gray5;
+  background-color: $gray3;
   transform: translateX(-50%);
 }
 
@@ -142,4 +154,28 @@ export default class Stepper extends Vue {
   margin-top: 10px;
   text-align: center;
 }
+
+.step__label__current {
+  margin-top: 10px;
+  text-align: center;
+  border-bottom: 3px solid $primary-blue !important;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.step__label__text {
+  margin-bottom: 2px;
+  text-align: center;
+  color: $primary-blue !important;
+  font-size: 14px !important;
+}
+
+.step__label__text__current {
+  margin-bottom: 2px;
+  text-align: center;
+  color: #212529 !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+}
+
 </style>

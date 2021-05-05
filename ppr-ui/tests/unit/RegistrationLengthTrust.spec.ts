@@ -75,7 +75,7 @@ describe('RegistrationLengthTrust SA tests', () => {
   it('renders with default values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(true)
-    expect(wrapper.vm.lifeInfinite).toBe(false)
+    expect(wrapper.vm.lifeInfinite).toBe('')
     expect(wrapper.vm.trustIndenture).toBe(false)
     expect(wrapper.vm.lifeYearsEdit).toBe('')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
@@ -119,7 +119,7 @@ describe('RegistrationLengthTrust RL tests', () => {
   it('renders with RL values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(false)
-    expect(wrapper.vm.lifeInfinite).toBe(true)
+    expect(wrapper.vm.lifeInfinite).toBe('true')
     expect(wrapper.vm.lifeYearsEdit).toBe('')
     expect(wrapper.vm.lifeYearsDisabled).toBe(true)
   })
@@ -148,7 +148,7 @@ describe('RegistrationLengthTrust SG tests', () => {
   it('renders with SG values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(true)
-    expect(wrapper.vm.lifeInfinite).toBe(false)
+    expect(wrapper.vm.lifeInfinite).toBe('')
     expect(wrapper.vm.lifeYearsEdit).toBe('3')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
     expect(wrapper.vm.trustIndenture).toBe(true)

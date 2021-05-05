@@ -11,7 +11,6 @@
                   item-text="registrationTypeUI"
                   :label="selectedRegistrationType ? '' : registrationTypeLabel"
                   return-object
-                  @change="newRegistration"
                   v-model="selectedRegistrationType">
         </v-select>
       </v-col>

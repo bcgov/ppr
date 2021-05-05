@@ -1,5 +1,40 @@
 <template>
-  <v-container fluid no-gutters class="white pa-6">
+  <v-container fluid no-gutters class="white pa-0"  v-if="summaryView">
+    <v-card flat id="length-trust-summary">
+      <v-row no-gutters :class="[$style['length-trust-summary-header'], pa-2]">
+        <v-col cols="auto">
+          <v-icon color="#38598A">mdi-calendar-clock</v-icon>
+          <label class="length-trust-title pl-3"><strong>Registration Length and Trust Indenture</strong></label>
+        </v-col>
+      </v-row>
+      <v-row no-gutters v-if="showErrorSummary" :class="[$style['length-trust-invalid-message'], 'pa-6']">
+        <v-col cols="auto">
+          <v-icon color="#D3272C">mdi-information-outline</v-icon>
+          This step is unfinished
+          <router-link id="router-link-length-trust" class="length-trust-invalid-link" :to="{ path: '/length-trust' }">
+            Return to this step to complete it.
+          </router-link>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="length-trust-content pa-4">
+        <v-col cols="4" class="length-trust-title">
+          <strong>Registration Length</strong>
+        </v-col>
+        <v-col cols="auto">
+          {{lengthSummary}}
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="length-trust-content pl-4 pb-2">
+        <v-col cols="4" class="length-trust-title">
+          <strong>Trust Indenture</strong>
+        </v-col>
+        <v-col cols="auto">
+          {{trustIndentureSummary}}
+        </v-col>
+      </v-row>
+    </v-card>
+  </v-container>
+  <v-container fluid no-gutters class="white pa-6"  v-else>
     <v-row no-gutters>
       <v-col cols="2" :class="$style[length-trust-label]">
         Registration Length
@@ -75,6 +110,10 @@ export default defineComponent({
     defaultRegistrationType: {
       type: String,
       default: ''
+    },
+    isSummary: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -88,10 +127,11 @@ export default defineComponent({
     const feeInfoInfinite = getFinancingFee(true)
 
     const localState = reactive({
+      summaryView: props.isSummary,
       registrationType: props.defaultRegistrationType,
       trustIndenture: lengthTrust.trustIndenture,
       lifeYearsDisabled: lengthTrust.lifeInfinite,
-      lifeInfinite: lengthTrust.lifeInfinite,
+      lifeInfinite: lengthTrust.valid ? lengthTrust.lifeInfinite.toString() : '',
       maxYears: feeInfoYears.quantityMax.toString(),
       lifeYearsEdit: (lengthTrust.lifeYears > 0) ? lengthTrust.lifeYears.toString() : '',
       lifeYearsMessage: '',
@@ -101,6 +141,24 @@ export default defineComponent({
       showTrustIndenture: computed((): boolean => {
         return (localState.registrationType === '' || localState.registrationType === 'SA' ||
                 localState.registrationType === 'SG')
+      }),
+      showErrorSummary: computed((): boolean => {
+        return (!lengthTrust.valid)
+      }),
+      lengthSummary: computed((): string => {
+        if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
+          return 'Not entered'
+        }
+        if (lengthTrust.lifeInfinite) {
+          return 'Infinite'
+        }
+        if (lengthTrust.lifeYears === 1) {
+          return (lengthTrust.lifeYears.toString() + ' Year')
+        }
+        return lengthTrust.lifeYears.toString() + ' Years'
+      }),
+      trustIndentureSummary: computed((): string => {
+        return (lengthTrust.trustIndenture ? 'Yes' : 'No')
       })
     })
     watch(() => localState.lifeYearsEdit, (val: string) => {
@@ -144,7 +202,7 @@ export default defineComponent({
       lengthTrust.trustIndenture = val
       setLengthTrust(lengthTrust)
     })
-    watch(() => localState.lifeInfinite, (val: boolean) => {
+    watch(() => localState.lifeInfinite, (val: string) => {
       lengthTrust.lifeInfinite = (String(val) === 'true')
       localState.lifeYearsDisabled = lengthTrust.lifeInfinite
       if (lengthTrust.lifeInfinite) {
@@ -176,4 +234,55 @@ export default defineComponent({
 .length-trust-label {
   font-size: 0.875rem;
 }
+
+.length-trust-summary-header {
+  display: flex;
+  background-color: $gray3;
+  padding: 1.25rem;
+  .length-trust-title {
+    padding-left: 0.5rem;
+  }
+}
+.length-trust-invalid-message {
+  font-size: 16px;
+  color: #D3272C !important;
+  border-left: 3px solid #D3272C;
+}
+.length-trust-invalid-link {
+  padding: 1.25rem;
+  font-weight: bold;
+  font-size: 16px;
+  color: #1669BB;
+}
+.length-trust-header {
+  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+.length-trust-content {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
+  border-top: 1px solid $gray1;
+  font-size: 0.875rem;
+  .length-trust-title {
+    color: $gray7;
+  }
+}
+.v-list-item {
+  min-height: 0;
+  padding: 0 1rem 0 0.5rem;
+}
+.col {
+  padding: 0.25rem;
+  .col-roles {
+    padding: 0 !important;
+  }
+}
+.warning-text {
+  position: relative;
+  top: 2px;
+  left: 2px;
+  color: $BCgovGold9;
+}
+
 </style>
