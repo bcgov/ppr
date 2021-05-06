@@ -51,66 +51,35 @@
         </v-row>
       </v-container>
     </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="pl-6 pt-30 pb-60">
-        <v-row no-gutters>
-          <v-col cols="6"  class="align=left pa-0">
-            <span class="pr-3">
-              <v-btn id='reg-cancel-btn' outlined color="accent" @click="submitCancel">
-                <b>Cancel</b>
-              </v-btn>
-            </span>
-            <span class="pr-3">
-              <v-btn id='reg-save-resume-btn' outlined color="accent" @click="submitSaveResume">
-                <b>Save and Resume Later</b>
-              </v-btn>
-            </span>
-            <v-btn id='reg-save-btn' outlined color="accent" @click="submitSave">
-              <b>Save</b>
-            </v-btn>
-          </v-col>
-<!--
-          <v-col cols="2">
-          </v-col>
-          <v-col cols="1">
-          </v-col>
-          <v-col cols="5" class="align=right">
-            <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
-              <b>< Back</b>
-            </v-btn>
-          </v-col>
--->
-          <v-col cols="6" class="align=right">
-            <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-              <b>Add Secured Parties and Debtors ></b>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+    <v-row no-gutters class='pt-15'>
+      <v-col cols="12">
+        <button-footer :currentStatementType="statementType" :currentStepName="stepName" :router="this.$router"/>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 // external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { getFinancingFee } from '@/utils'
-import { RouteNames } from '@/enums'
 import {
-  ActionBindingIF, BreadcrumbIF, FeeIF, FeeSummaryIF, ErrorIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, BreadcrumbIF, FeeSummaryIF, LengthTrustIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
-import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
+import { RouteNames, StatementTypes } from '@/enums'
 
 @Component({
   components: {
+    ButtonFooter,
     RegistrationFee,
     RegistrationLengthTrust,
     Stepper,
@@ -123,7 +92,6 @@ export default class LengthTrust extends Vue {
   @Getter getFeeSummary: FeeSummaryIF
 
   @Action setLengthTrust: ActionBindingIF
-  @Action resetNewRegistration: ActionBindingIF
 
   @Prop({ default: '#app' })
   private attachDialog: string
@@ -166,6 +134,14 @@ export default class LengthTrust extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
 
+  private get statementType (): string {
+    return StatementTypes.FINANCING_STATEMENT
+  }
+
+  private get stepName (): string {
+    return RouteNames.LENGTH_TRUST
+  }
+
   private get trustIndenture (): boolean {
     return this.getLengthTrust?.trustIndenture || false
   }
@@ -175,48 +151,11 @@ export default class LengthTrust extends Vue {
     window.location.assign(this.registryUrl)
   }
 
-  private submitNext (): void {
-    // validate and if no errors navigate to add parties
-    this.$router.push({
-      name: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
-    })
-  }
-
-  private submitCancel (): void {
-    // clear all state set data
-    this.resetNewRegistration(null)
-    // navigate to dashboard
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private submitBack (): void {
-    this.submitCancel()
-  }
-
-  private submitSave (): void {
-    // Save and return to dashboard
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private submitSaveResume (): void {
-    // Save draft
-    // alert('Soon')
-  }
-
   @Watch('updatedFeeSummary')
   private updateFeeSummary (val: FeeSummaryIF): void {
     if (val) {
       this.updatedFeeSummary = val
     }
-  }
-
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
   }
 }
 </script>

@@ -7,7 +7,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { AddCollateral } from '@/views'
-import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 
 // Other
 import mockRouter from './MockRouter'
@@ -55,50 +55,6 @@ describe('AddCollateral new registration component', () => {
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
-  })
-  it('Add Collateral cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
-    // expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Add Collateral save button event', async () => {
-    wrapper.find(saveBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Add Collateral save and resume button event', async () => {
-    wrapper.find(saveResumeBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Add Collateral back button event', async () => {
-    wrapper.find(backBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Add Collateral next button event', async () => {
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Add Collateral submitCancel', async () => {
-    wrapper.vm.submitCancel()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Add Collateral submitBack', async () => {
-    wrapper.vm.submitBack()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
-  })
-  it('Add Collateral submitNext', async () => {
-    wrapper.vm.submitNext()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
-  })
-  it('Add Collateral submitSave', async () => {
-    wrapper.vm.submitSave()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Add Collateral submitSaveResume', async () => {
-    wrapper.vm.submitSaveResume()
-    await Vue.nextTick()
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
   })
 })

@@ -52,36 +52,10 @@
         </v-row>
       </v-container>
     </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="pl-6 pt-30 pb-60">
-        <v-row no-gutters>
-          <v-col cols="6"  class="align=left pa-0">
-            <span class="pr-3">
-              <v-btn id='reg-cancel-btn' outlined color="accent" @click="submitCancel">
-                <b>Cancel</b>
-              </v-btn>
-            </span>
-            <span class="pr-3">
-              <v-btn id='reg-save-resume-btn' outlined color="accent" @click="submitSaveResume">
-                <b>Save and Resume Later</b>
-              </v-btn>
-            </span>
-            <v-btn id='reg-save-btn' outlined color="accent" @click="submitSave">
-              <b>Save</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="6" class="align=right">
-            <span class="pr-3">
-              <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
-                <b>&lt; Back</b>
-              </v-btn>
-            </span>
-            <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-              <b>Register and Pay ></b>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+    <v-row no-gutters class='pt-15'>
+      <v-col cols="12">
+        <button-footer :currentStatementType="statementType" :currentStepName="stepName" :router="this.$router"/>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -93,17 +67,18 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums'
+import { RouteNames, StatementTypes } from '@/enums'
 import {
   ActionBindingIF, BreadcrumbIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
-import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 
 @Component({
   components: {
+    ButtonFooter,
     RegistrationFee,
     RegistrationLengthTrust,
     Stepper,
@@ -156,39 +131,12 @@ export default class ReviewConfirm extends Vue {
     window.location.assign(this.registryUrl)
   }
 
-  private submitNext (): void {
-    // validate and if no errors navigate to add parties
-    this.$router.push({
-      name: RouteNames.LENGTH_TRUST
-    })
+  private get statementType (): string {
+    return StatementTypes.FINANCING_STATEMENT
   }
 
-  private submitCancel (): void {
-    // clear all state set data
-    this.resetNewRegistration(null)
-    // navigate to dashboard
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private submitBack (): void {
-    // navigate to dashboard
-    this.$router.push({
-      name: RouteNames.ADD_COLLATERAL
-    })
-  }
-
-  private submitSave (): void {
-    // Save and return to dashboard
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private submitSaveResume (): void {
-    // Save draft
-    // alert('Soon')
+  private get stepName (): string {
+    return RouteNames.REVIEW_CONFIRM
   }
 
   @Emit('error')

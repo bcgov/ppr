@@ -7,7 +7,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { ReviewConfirm } from '@/views'
-import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 
 // Other
@@ -61,51 +61,7 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
-  })
-  it('Review Confirm cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
-    // expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Review Confirm save button event', async () => {
-    wrapper.find(saveBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Review Confirm save and resume button event', async () => {
-    wrapper.find(saveResumeBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Review Confirm back button event', async () => {
-    wrapper.find(backBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Review Confirm next button event', async () => {
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Review Confirm submitCancel', async () => {
-    wrapper.vm.submitCancel()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Review Confirm submitBack', async () => {
-    wrapper.vm.submitBack()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)
-  })
-  it('Review Confirm submitNext', async () => {
-    wrapper.vm.submitNext()
-    await Vue.nextTick()
-    // expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Review Confirm submitSave', async () => {
-    wrapper.vm.submitSave()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Review Confirm submitSaveResume', async () => {
-    wrapper.vm.submitSaveResume()
-    await Vue.nextTick()
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
   })
 })
 
@@ -133,7 +89,7 @@ describe('ReviewConfirm step 1 tests', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = mockRouter.mock()
-    await router.push({ name: 'length-trust' })
+    await router.push({ name: 'review-confirm' })
     wrapper = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
   })
 
@@ -145,15 +101,6 @@ describe('ReviewConfirm step 1 tests', () => {
   it('Review Confirm View with invalid step 1', async () => {
     const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedNewRegStep1))
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-    await Vue.nextTick()
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-    await Vue.nextTick()
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-    await Vue.nextTick()
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
@@ -165,22 +112,13 @@ describe('ReviewConfirm step 1 tests', () => {
     // expect(wrapper.findComponent(RegistrationLengthTrust).trustIndentureSummary).toBe('No')
   })
 
-  it('Review Confirm View with invalid step 1', async () => {
+  it('Review Confirm View with valid step 1', async () => {
     const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedNewRegStep1))
     lengthTrust.valid = true
     lengthTrust.lifeInfinite = false
     lengthTrust.lifeYears = 3
     lengthTrust.trustIndenture = true
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-    await Vue.nextTick()
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-    await Vue.nextTick()
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-    await Vue.nextTick()
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)

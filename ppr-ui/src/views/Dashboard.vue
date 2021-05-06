@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="pa-0 ma-0" style="max-width: none;">
-    <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: gold;" align="center" justify="center">
+    <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: #FCBA19;" align="center" justify="center">
       <v-col :class="$style['env-info']">
         This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
       </v-col>
@@ -213,6 +213,6 @@ export default class Dashboard extends Vue {
   font-size: 16px;
   text-align: center;
   color: #212529;
-  background-color: $BCgovGold3;
+  background-color: #FCBA19;
 }
 </style>
