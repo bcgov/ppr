@@ -7,7 +7,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { LengthTrust } from '@/views'
-import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 
 // Other
@@ -56,47 +56,7 @@ describe('Length and Trust Indenture new registration component', () => {
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
-  })
-  it('Length Trust cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
-    // expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Length Trust save button event', async () => {
-    wrapper.find(saveBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Length Trust save and resume button event', async () => {
-    wrapper.find(saveResumeBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Length Trust next button event', async () => {
-    wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
-  })
-  it('Length Trust submitCancel', async () => {
-    wrapper.vm.submitCancel()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Length Trust submitBack', async () => {
-    wrapper.vm.submitBack()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Length Trust submitNext', async () => {
-    wrapper.vm.submitNext()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
-  })
-  it('Length Trust submitSave', async () => {
-    wrapper.vm.submitSave()
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-  })
-  it('Length Trust submitSaveResume', async () => {
-    wrapper.vm.submitSaveResume()
-    await Vue.nextTick()
   })
 })

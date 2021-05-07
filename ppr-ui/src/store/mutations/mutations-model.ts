@@ -69,6 +69,12 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.addSecuredPartiesAndDebtorsStep.registeringParty = null
   state.stateModel.addSecuredPartiesAndDebtorsStep.securedParties = []
   state.stateModel.addSecuredPartiesAndDebtorsStep.debtors = []
+  state.stateModel.draft = {
+    type: '',
+    financingStatement: null,
+    createDateTime: null,
+    lastUpdateDateTime: null
+  }
 }
 
 export const mutateRegistrationType = (state: StateIF, registrationType: RegistrationTypeIF) => {

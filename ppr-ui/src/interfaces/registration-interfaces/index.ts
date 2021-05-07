@@ -1,6 +1,7 @@
 export * from './actionable-item-interface'
 export * from './add-collateral-interface'
 export * from './add-parties-interface'
+export * from './button-config-interface'
 export * from './length-trust-interface'
 export * from './registration-type-interface'
 export * from './vehicle-type-interface'

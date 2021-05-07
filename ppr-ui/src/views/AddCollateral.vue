@@ -39,66 +39,34 @@
         </v-row>
       </v-container>
     </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="auto">
-            <v-divider></v-divider>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="2">
-            <v-btn id='reg-cancel-btn' :class="$style['reg-default-btn']" @click="submitCancel">
-              <b>Cancel</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-save-btn' :class="$style['reg-default-btn']" @click="submitSave">
-              <b>Save</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-save-resume-btn' :class="$style['reg-default-btn']" @click="submitSaveResume">
-              <b>Save and Resume Later</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="2">
-            <v-divider vertical></v-divider>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
-              <b>Back</b>
-            </v-btn>
-          </v-col>
-          <v-col cols="1">
-            <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-              <b>Review and Confirm</b>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+    <v-row no-gutters class='pt-15'>
+      <v-col cols="12">
+        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
+                       :router="this.$router" @draft-save-error="saveDraftError"/>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 // external
-import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums'
+import { RouteNames, StatementTypes } from '@/enums'
 import {
   ActionBindingIF, BreadcrumbIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
-import { RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 import { Collateral } from '@/components/collateral'
 
 @Component({
   components: {
+    ButtonFooter,
     RegistrationFee,
     Stepper,
     Tombstone,
@@ -153,46 +121,25 @@ export default class AddCollateral extends Vue {
     window.location.assign(this.registryUrl)
   }
 
-  private submitNext (): void {
-    // validate and if no errors navigate to add parties
-    this.$router.push({
-      name: RouteNames.REVIEW_CONFIRM
-    })
+  private get statementType (): string {
+    return StatementTypes.FINANCING_STATEMENT
   }
 
-  private submitCancel (): void {
-    // clear all state set data
-    this.resetNewRegistration(null)
-    // navigate to dashboard
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private submitBack (): void {
-    // navigate to dashboard
-    this.$router.push({
-      name: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
-    })
-  }
-
-  private submitSave (): void {
-    // Save and return to dashboard
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-  }
-
-  private submitSaveResume (): void {
-    // Save draft
-    // alert('Soon')
+  private get stepName (): string {
+    return RouteNames.ADD_COLLATERAL
   }
 
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
   }
+
+  @Watch('draftSaveError')
+  private saveDraftError (val: ErrorIF): void {
+    alert('Error saving draft. Replace when design complete.')
+  }
 }
+
 </script>
 
 <style lang="scss" module>

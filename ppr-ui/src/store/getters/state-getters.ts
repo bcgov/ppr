@@ -3,6 +3,7 @@ import { AccountTypes, RouteNames } from '@/enums'
 import {
   AddCollateralIF,
   AddPartiesIF,
+  ButtonConfigIF,
   DraftIF,
   FeeSummaryIF,
   IndividualNameIF,
@@ -186,6 +187,57 @@ export const getSteps = (state: any, getters: any): Array<any> => {
     component: 'review-confirm'
   }]
   return steps
+}
+
+/**
+ * Returns the array of new financing statement registration buttons.
+ */
+export const getFinancingButtons = (state: any): Array<ButtonConfigIF> => {
+  const buttons: Array<ButtonConfigIF> = [{
+    stepName: RouteNames.LENGTH_TRUST,
+    showCancel: true,
+    showSave: true,
+    showSaveResume: true,
+    showBack: false,
+    showNext: true,
+    backRouteName: '',
+    nextText: 'Add Secured Parties and Debtors',
+    nextRouteName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
+  },
+  {
+    stepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+    showCancel: true,
+    showSave: true,
+    showSaveResume: true,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.LENGTH_TRUST,
+    nextText: 'Add Collateral',
+    nextRouteName: RouteNames.ADD_COLLATERAL
+  },
+  {
+    stepName: RouteNames.ADD_COLLATERAL,
+    showCancel: true,
+    showSave: true,
+    showSaveResume: true,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+    nextText: 'Review and Confirm',
+    nextRouteName: RouteNames.REVIEW_CONFIRM
+  },
+  {
+    stepName: RouteNames.REVIEW_CONFIRM,
+    showCancel: true,
+    showSave: true,
+    showSaveResume: true,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.ADD_COLLATERAL,
+    nextText: 'Register and Pay',
+    nextRouteName: RouteNames.DASHBOARD
+  }]
+  return buttons
 }
 
 /**

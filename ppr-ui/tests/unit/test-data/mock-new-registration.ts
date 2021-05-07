@@ -38,6 +38,12 @@ export const mockedAddress1: AddressIF = {
 
 export const mockedGeneralCollateral1: string = 'TEST1 GENERAL COLLATERAL'
 
+export const mockedGeneralCollateral2: Array<GeneralCollateralIF> = [
+  {
+    description: 'TEST1 GENERAL COLLATERAL'
+  }
+]
+
 export const mockedVehicleCollateral1: Array<VehicleCollateralIF> = [
   {
     id: 1,
@@ -113,7 +119,7 @@ export const mockedFinancingStatementAll: FinancingStatementIF = {
   securedParties: mockedSecuredParties1,
   debtors: mockedDebtors1,
   vehicleCollateral: mockedVehicleCollateral1,
-  generalCollateral: mockedGeneralCollateral1,
+  generalCollateral: mockedGeneralCollateral2,
   lifeYears: 5,
   trustIndenture: false,
   lifeInfinite: false
@@ -151,7 +157,7 @@ export const mockedFinancingStatementStep3: FinancingStatementIF = {
   securedParties: [],
   debtors: [],
   vehicleCollateral: mockedVehicleCollateral1,
-  generalCollateral: mockedGeneralCollateral1,
+  generalCollateral: mockedGeneralCollateral2,
   trustIndenture: true,
   lifeYears: 2,
   lifeInfinite: false
