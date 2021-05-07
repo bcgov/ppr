@@ -44,7 +44,10 @@
             </v-row>
           </v-col>
         </v-row>
-        <v-row no-gutters class='pt-12'>
+        <v-row class="pt-3" no-gutters>
+              <registration-bar class="soft-corners-bottom" :registrationTitle="''"/>
+        </v-row>
+        <v-row no-gutters class='pt-3'>
           <v-col>
             <v-row no-gutters
                    id="registration-header"
@@ -53,9 +56,7 @@
                 <b>My Registrations</b>
               </v-col>
             </v-row>
-            <v-row no-gutters>
-              <registration-bar class="soft-corners-bottom" :registrationTitle="''"/>
-            </v-row>
+            <v-row no-gutters class="white" style="height:100px"></v-row>
           </v-col>
         </v-row>
       </v-container>

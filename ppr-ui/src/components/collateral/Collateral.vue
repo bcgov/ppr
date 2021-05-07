@@ -1,8 +1,29 @@
 <template>
-  <v-container fluid no-gutters>
+<v-container fluid no-gutters class="white pa-0"  v-if="summaryView">
+    <v-card flat id="collateral-summary">
+      <v-row no-gutters class="summary-header pa-2">
+        <v-col cols="auto" class="pa-2">
+          <v-icon color="#38598A">mdi-car</v-icon>
+          <label class="pl-3"><strong>Collateral</strong></label>
+        </v-col>
+      </v-row>
+      <v-container :class="{'invalid-message': showErrorSummary}">
+      <v-row no-gutters v-if="showErrorSummary" class="pa-6">
+        <v-col cols="auto">
+          <v-icon color="#D3272C">mdi-information-outline</v-icon>
+          This step is unfinished
+          <router-link id="router-link-collateral" class="invalid-link" :to="{ path: '/add-collateral' }">
+            Return to this step to complete it.
+          </router-link>
+        </v-col>
+      </v-row>
+      </v-container>
+    </v-card>
+  </v-container>
+  <v-container fluid no-gutters v-else class="pa-0">
     <v-row no-gutters>
       <v-container fluid>
-        <v-row no-gutters class='pt-12'>
+        <v-row no-gutters>
           <v-col cols="auto">Your registration must include one of the following:</v-col>
         </v-row>
         <v-row no-gutters class='pt-6'>
@@ -26,7 +47,7 @@
         </v-row>
       </v-container>
     </v-row>
-    <div class="col-9" :class="{'invalid-section': invalidSection}">
+    <div :class="{'invalid-section': invalidSection}">
       <v-expand-transition>
         <v-card flat class="add-collateral-container" v-if="showAddVehicle">
           <edit-collateral
@@ -38,7 +59,7 @@
       </v-expand-transition>
     </div>
     <v-row no-gutters>
-      <v-col cols="9">
+      <v-col>
         <v-data-table
           class="collateral-table"
           :headers="headers"
@@ -149,7 +170,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddCollateralIF, VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -161,6 +183,12 @@ export default defineComponent({
     EditCollateral //,
     // ActionTypes
   },
+  props: {
+    isSummary: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup (props, { emit }) {
     const { setAddCollateral } = useActions<any>(['setAddCollateral'])
     const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
@@ -168,6 +196,7 @@ export default defineComponent({
     const collateral: AddCollateralIF = getAddCollateral.value
 
     const localState = reactive({
+      summaryView: props.isSummary,
       headers: vehicleTableHeaders,
       showAddVehicle: false,
       addEditInProgress: false,
@@ -175,12 +204,16 @@ export default defineComponent({
       activeIndex: -1,
       showEditVehicle: [false],
       vehicleCollateral: collateral.vehicleCollateral,
-      generalCollateral: collateral.generalCollateral
+      generalCollateral: collateral.generalCollateral,
+      showErrorSummary: computed((): boolean => {
+        return (!collateral.valid)
+      })
     })
 
     watch(() => localState.generalCollateral, (val: string) => {
       collateral.generalCollateral = val
       setAddCollateral(collateral)
+      setValid()
     })
 
     const removeVehicle = (index: number): void => {
@@ -188,6 +221,7 @@ export default defineComponent({
       localState.vehicleCollateral.splice(index, 1)
       collateral.vehicleCollateral = localState.vehicleCollateral
       setAddCollateral(collateral)
+      setValid()
     }
 
     const initEdit = (index: number) => {
@@ -201,6 +235,15 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddVehicle = false
       localState.showEditVehicle = [false]
+    }
+
+    const setValid = () => {
+      if ((collateral.generalCollateral) || (collateral.vehicleCollateral.length > 0)) {
+        collateral.valid = true
+      } else {
+        collateral.valid = false
+      }
+      setAddCollateral(collateral)
     }
 
     return {
