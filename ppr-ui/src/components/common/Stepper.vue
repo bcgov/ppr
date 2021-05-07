@@ -1,7 +1,13 @@
 <template>
-  <v-container id="step-buttons-container">
+  <v-container id="step-buttons-container" pb-0>
     <template v-for="(step, index) in getSteps">
-      <div class="step" :key="index" @click="goTo(step)" v-on:keyup.tab="goTo(step)">
+      <div
+        class="step"
+        :class="{ 'step__border__current': isCurrentStep(step) }"
+        :key="index"
+        @click="goTo(step)"
+        v-on:keyup.tab="goTo(step)"
+        >
         <div class="step__indicator">
           <div class="step__line"></div>
           <v-btn
@@ -68,7 +74,7 @@ export default class Stepper extends Vue {
   display: flex;
   justify-content: space-evenly;
   margin: 0;
-  padding: 2rem 0;
+  padding: 2rem 0 0 0;
   background: $BCgovInputBG;
 }
 
@@ -82,6 +88,7 @@ export default class Stepper extends Vue {
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
+  padding-bottom: 2rem;
 }
 
 .step:hover {
@@ -158,7 +165,6 @@ export default class Stepper extends Vue {
 .step__label__current {
   margin-top: 10px;
   text-align: center;
-  border-bottom: 3px solid $primary-blue !important;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
@@ -176,6 +182,10 @@ export default class Stepper extends Vue {
   color: #212529 !important;
   font-size: 14px !important;
   font-weight: bold !important;
+}
+
+.step__border__current {
+  border-bottom: 3px solid $primary-blue !important;
 }
 
 </style>
