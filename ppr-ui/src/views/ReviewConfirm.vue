@@ -5,49 +5,48 @@
     </v-row>
     <v-row no-gutters>
       <v-container fluid class="pt-4">
-        <v-row no-gutters>
-          <v-col cols="6">
+        <v-row>
+          <v-col cols="9">
             <v-row no-gutters
                    id="registration-header"
-                   :class="[$style['length-trust-header'], 'pt-3', 'pb-3', 'soft-corners-top']">
+                   class="length-trust-header pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
                 <b>{{ registrationTypeUI }}</b>
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <template>
-              <component
-                v-for="step in getSteps"
-                v-show="isRouteName(step.to)"
-                :is="step.component"
-                :key="step.step"
-              />
-            </template>
+            <v-row class='pt-6'>
+              <v-col cols="auto" class="sub-header ps-4">
+                Review and Confirm
+              </v-col>
+            </v-row>
+            <v-row class="pa-2">
+              <v-col>
+                Review the information in your registration. If you need to change anything,
+                return to the step to make the necessary change.
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="pa-1">
+                <v-row no-gutters class='pt-1'>
+                  <v-col>
+                    <registration-length-trust :isSummary="true"/>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="pa-1">
+                <v-row no-gutters class='pt-1'>
+                  <v-col>
+                    <collateral :isSummary="true"/>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-row>
           </v-col>
-          <v-col cols="1">
-          </v-col>
-          <v-col align-self="end" cols="3">
+          <v-col cols="3">
             <registration-fee :registrationType="registrationTypeUI"/>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-6'>
-          <v-col cols="auto">
-            <b>Review and Confirm</b>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="6">
-            Review the information in your registration. If you need to change anything,
-            return to the step to make the necessary change.
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="pa-1">
-        <v-row no-gutters class='pt-1'>
-          <v-col cols="6">
-            <registration-length-trust :isSummary="true"/>
           </v-col>
         </v-row>
       </v-container>
@@ -76,6 +75,7 @@ import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
 import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
+import { Collateral } from '@/components/collateral'
 
 @Component({
   components: {
@@ -83,7 +83,8 @@ import { RegistrationLengthTrust } from '@/components/registration'
     RegistrationFee,
     RegistrationLengthTrust,
     Stepper,
-    Tombstone
+    Tombstone,
+    Collateral
   }
 })
 export default class ReviewConfirm extends Vue {
@@ -152,7 +153,7 @@ export default class ReviewConfirm extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .step-container {
   margin-top: 1rem;

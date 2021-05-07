@@ -5,49 +5,41 @@
     </v-row>
     <v-row no-gutters>
       <v-container fluid class="pt-4">
-        <v-row no-gutters>
-          <v-col cols="6">
+        <v-row>
+          <v-col cols="9" class="ps-8">
             <v-row no-gutters
                    id="registration-header"
-                   :class="[$style['length-trust-header'], 'pt-3', 'pb-3', 'soft-corners-top']">
+                   class="length-trust-header pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
                 <b>{{ registrationTypeUI }}</b>
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <template>
-              <component
-                v-for="step in getSteps"
-                v-show="isRouteName(step.to)"
-                :is="step.component"
-                :key="step.step"
-              />
-            </template>
+            <v-row class='pt-6'>
+              <v-col cols="auto" class="sub-header ps-4">
+                Add Secured Parties and Debtors
+              </v-col>
+            </v-row>
+            <v-row class="pa-2">
+              <v-col cols="auto">
+                Add the people and businesses who have an interest in this registration.
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="pa-10">
+                <v-row no-gutters class='pt-12'>
+                  <v-col cols="auto">Content</v-col>
+                </v-row>
+              </v-container>
+            </v-row>
+        </v-col>
+        <v-col cols="3" class="pt-10">
+            <registration-fee
+              :registrationType="registrationTypeUI"
+            />
           </v-col>
-          <v-col cols="1">
-          </v-col>
-           <v-col align-self="end" cols="3">
-            <registration-fee :registrationType="registrationTypeUI"/>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-6'>
-          <v-col cols="auto">
-            <b>Add Secured Parties and Debtors</b>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="auto">
-            Add the people and businesses who have an interest in this registration.
-          </v-col>
-        </v-row>
-      </v-container>
     </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters class='pt-12'>
-          <v-col cols="auto">Content</v-col>
-        </v-row>
-      </v-container>
+    </v-container>
     </v-row>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
@@ -147,7 +139,7 @@ export default class AddParties extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .step-container {
   margin-top: 1rem;

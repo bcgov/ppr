@@ -179,7 +179,7 @@ export const getSteps = (state: any, getters: any): Array<any> => {
   {
     id: 'step-4-btn',
     step: 4,
-    icon: 'mdi-text-box-check', // 'mdi-text-box-multiple'
+    icon: 'mdi-checkbox-multiple-marked', // 'mdi-text-box-multiple'
     text: 'Review\nand Confirm',
     to: RouteNames.REVIEW_CONFIRM,
     disabled: getters.isBusySaving,
