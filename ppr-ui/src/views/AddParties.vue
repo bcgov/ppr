@@ -51,7 +51,8 @@
     </v-row>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName" :router="this.$router"/>
+        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
+                       :router="this.$router" @draft-save-error="saveDraftError"/>
       </v-col>
     </v-row>
   </v-container>
@@ -59,7 +60,7 @@
 
 <script lang="ts">
 // external
-import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -137,6 +138,11 @@ export default class AddParties extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
+  }
+
+  @Watch('draftSaveError')
+  private saveDraftError (val: ErrorIF): void {
+    alert('Error saving draft. Replace when design complete.')
   }
 }
 </script>

@@ -207,7 +207,7 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
     }).catch(error => {
       draft.error = {
         statusCode: error?.response?.status,
-        message: error?.response?.data?.message
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause
       }
       return draft
     })
@@ -233,7 +233,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
     }).catch(error => {
       draft.error = {
         statusCode: error?.response?.status,
-        message: error?.response?.data?.message
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause
       }
       return draft
     })

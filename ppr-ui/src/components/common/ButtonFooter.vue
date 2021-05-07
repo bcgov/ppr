@@ -79,9 +79,6 @@ export default defineComponent({
         return null
       })
     })
-    const emitError = (error: ErrorIF) => {
-      console.error(error)
-    }
     const submitCancel = () => {
       // clear all state set data
       resetNewRegistration(null)
@@ -96,8 +93,9 @@ export default defineComponent({
       const draft:DraftIF = await saveFinancingStatementDraft(stateModel)
       setDraft(draft)
       if (draft.error !== undefined) {
-        // Display error message.
-        emitError(draft.error)
+        console.log('saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message)
+        // Emit error message.
+        emit('draft-save-error', draft.error)
         return false
       }
       return true
@@ -142,7 +140,11 @@ export default defineComponent({
         })
       } else {
         // emit registation incomplete error
-        emit('registration-incomplete', null) // possibly add message?
+        const error:ErrorIF = {
+          statusCode: 400,
+          message: 'Registration incomplete: one or more steps is invalid.'
+        }
+        emit('registration-incomplete', error)
       }
     }
 

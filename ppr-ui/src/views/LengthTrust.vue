@@ -53,7 +53,8 @@
     </v-row>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName" :router="this.$router"/>
+        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
+                       :router="this.$router" @draft-save-error="saveDraftError"/>
       </v-col>
     </v-row>
   </v-container>
@@ -68,7 +69,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { getFinancingFee } from '@/utils'
 import {
-  ActionBindingIF, BreadcrumbIF, FeeSummaryIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, BreadcrumbIF, ErrorIF, FeeSummaryIF, LengthTrustIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { tombstoneBreadcrumbRegistration } from '@/resources'
@@ -156,6 +157,11 @@ export default class LengthTrust extends Vue {
     if (val) {
       this.updatedFeeSummary = val
     }
+  }
+
+  @Watch('draftSaveError')
+  private saveDraftError (val: ErrorIF): void {
+    alert('Error saving draft. Replace when design complete.')
   }
 }
 </script>
