@@ -1,24 +1,24 @@
 <template>
   <v-footer class="white pa-0">
     <v-row no-gutters class="pl-16 pt-8 pb-15">
-      <v-col cols="6"  class="align=left pl-12">
+      <v-col cols="9"  class="align=left pl-12">
         <span class="pr-3" v-if="buttonConfig.showCancel">
-          <v-btn id='reg-cancel-btn' outlined color="accent" @click="submitCancel">
+          <v-btn id='reg-cancel-btn' outlined color="primary" @click="submitCancel">
             <b>Cancel</b>
           </v-btn>
         </span>
         <span class="pr-3" v-if="buttonConfig.showSaveResume">
-          <v-btn id='reg-save-resume-btn' outlined color="accent" @click="submitSaveResume">
+          <v-btn id='reg-save-resume-btn' outlined color="primary" @click="submitSaveResume">
             <b>Save and Resume Later</b>
           </v-btn>
         </span>
-        <v-btn id='reg-save-btn' outlined color="accent" @click="submitSave" v-if="buttonConfig.showSave">
+        <v-btn id='reg-save-btn' outlined color="primary" @click="submitSave" v-if="buttonConfig.showSave">
           <b>Save</b>
         </v-btn>
       </v-col>
-      <v-col cols="6" class="align=right">
+      <v-col cols="3" class="align=right">
         <span class="pr-3" v-if="buttonConfig.showBack">
-          <v-btn id='reg-back-btn' outlined color="accent" @click="submitBack">
+          <v-btn id='reg-back-btn' outlined color="primary" @click="submitBack">
             <b>&lt; Back</b>
           </v-btn>
         </span>

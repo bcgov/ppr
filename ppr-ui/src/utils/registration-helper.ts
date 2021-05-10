@@ -7,6 +7,7 @@ import {
   ErrorIF,
   FinancingStatementIF,
   LengthTrustIF,
+  GeneralCollateralIF,
   RegistrationTypeIF,
   StateModelIF
 } from '@/interfaces'
@@ -29,7 +30,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
       securedParties: [],
       debtors: [],
       vehicleCollateral: [],
-      generalCollateral: ''
+      generalCollateral: []
     }
   } else {
     statement.type = registrationType.registrationTypeAPI
@@ -48,9 +49,10 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   const collateral:AddCollateralIF = stateModel.addCollateralStep
   statement.vehicleCollateral = collateral.vehicleCollateral
   if (collateral.generalCollateral !== null && collateral.generalCollateral !== '') {
-    statement.generalCollateral = collateral.generalCollateral
+    var generalCollateral: GeneralCollateralIF = { description: collateral.generalCollateral }
+    statement.generalCollateral = [generalCollateral]
   } else {
-    statement.generalCollateral = ''
+    statement.generalCollateral = []
   }
   // Now save the draft.
   draft.financingStatement = statement

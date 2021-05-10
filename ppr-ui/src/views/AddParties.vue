@@ -33,7 +33,7 @@
               </v-container>
             </v-row>
         </v-col>
-        <v-col cols="3" class="pt-10">
+        <v-col cols="3">
             <registration-fee
               :registrationType="registrationTypeUI"
             />
@@ -41,7 +41,7 @@
     </v-row>
     </v-container>
     </v-row>
-    <v-row no-gutters class='pt-15'>
+    <v-row no-gutters class='pt-10'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
                        :router="this.$router" @draft-save-error="saveDraftError"/>

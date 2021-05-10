@@ -308,10 +308,13 @@ ul.list {
   font-weight: bold;
 }
 
-.invalid-message {
+.v-application div.invalid-message {
+  border-left: 3px solid #D3272C !important;
+}
+
+span.invalid-message {
   font-size: 16px;
   color: #D3272C !important;
-  border-left: 3px solid #D3272C;
 }
 
 .invalid-link {

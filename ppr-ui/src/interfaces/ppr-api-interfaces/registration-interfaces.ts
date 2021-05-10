@@ -18,7 +18,7 @@ export interface FinancingStatementIF {
   securedParties: PartyIF[],
   debtors: PartyIF[],
   vehicleCollateral?: VehicleCollateralIF[], // Either vehicle or general collatera is required.
-  generalCollateral?: string, // Max length 4000, currently only 1 for a new registration.
+  generalCollateral?: GeneralCollateralIF[], // Max length 4000, currently only 1 for a new registration.
   trustIndenture?: boolean, // Conditionally required by registration type.
   lifeInfinite?: boolean,
   lifeYears?: number, // 1..25 if not lifeInfinite, otherwise 0.

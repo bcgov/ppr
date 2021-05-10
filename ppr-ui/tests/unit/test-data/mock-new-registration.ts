@@ -132,7 +132,7 @@ export const mockedFinancingStatementStep1: FinancingStatementIF = {
   securedParties: [],
   debtors: [],
   vehicleCollateral: [],
-  generalCollateral: '',
+  generalCollateral: [],
   lifeYears: 5,
   trustIndenture: false,
   lifeInfinite: false
@@ -145,7 +145,7 @@ export const mockedFinancingStatementStep2: FinancingStatementIF = {
   securedParties: mockedSecuredParties1,
   debtors: mockedDebtors1,
   vehicleCollateral: [],
-  generalCollateral: '',
+  generalCollateral: [],
   trustIndenture: true,
   lifeInfinite: true
 }

@@ -43,7 +43,7 @@
 
 <script lang="ts">
 // Libraries
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
 
 // Interfaces
@@ -52,6 +52,9 @@ import { GetterIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 @Component({})
 export default class Stepper extends Vue {
   @Getter getSteps!: GetterIF
+
+  @Prop({ default: false })
+  private showStepErrors: boolean
 
   private goTo (step) {
     this.$router.push(step.to).catch(error => error)
@@ -62,7 +65,8 @@ export default class Stepper extends Vue {
   }
 
   private showInvalid (step): boolean {
-    return (this.$route.name === 'review-confirm' && this.$route.name !== step.to && !step.valid)
+    return (this.$route.name === 'review-confirm' && this.showStepErrors &&
+      this.$route.name !== step.to && !step.valid)
   }
 }
 </script>

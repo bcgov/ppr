@@ -14,7 +14,7 @@
                 <b>{{ registrationTypeUI }}</b>
               </v-col>
             </v-row>
-            <stepper class="mt-4" />
+            <stepper class="mt-4" :showStepErrors="showStepErrors"/>
             <v-row class='pt-6'>
               <v-col cols="auto" class="sub-header ps-4">
                 Review and Confirm
@@ -54,7 +54,8 @@
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                       :router="this.$router" @draft-save-error="saveDraftError"/>
+                       :router="this.$router"
+                       @draft-save-error="saveDraftError" @registration-incomplete="registrationIncomplete" />
       </v-col>
     </v-row>
   </v-container>
@@ -102,6 +103,8 @@ export default class ReviewConfirm extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
+  private showStepErrors: boolean = false
+
   private get breadcrumbs (): Array<BreadcrumbIF> {
     const registrationBreadcrumb = tombstoneBreadcrumbRegistration
     registrationBreadcrumb[2].text = this.getRegistrationType?.registrationTypeUI || 'New Registration'
@@ -146,8 +149,14 @@ export default class ReviewConfirm extends Vue {
     console.error(error)
   }
 
-  @Watch('draftSaveError')
+  @Watch('saveDraftError')
   private saveDraftError (val: ErrorIF): void {
+    alert('Error saving draft. Replace when design complete.')
+  }
+
+  @Watch('registrationIncomplete')
+  private registrationIncomplete (): void {
+    this.showStepErrors = true
     alert('Error saving draft. Replace when design complete.')
   }
 }
