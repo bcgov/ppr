@@ -76,10 +76,22 @@ describe('RegistrationBar select tests', () => {
     expect(wrapper.find(registrationButton).exists()).toBe(true)
     expect(wrapper.vm.selectedRegistrationType).toBe(selectedRegistrationType)
   })
-  it('renders all selected registration types', async () => {
-    for (var registrationType of RegistrationTypes) {
-      wrapper.vm.selectedRegistrationType = registrationType
-      await Vue.nextTick()
-    }
+  it('renders all selected registration types and allows you to click on one', async () => {
+
+    wrapper.find('.actions__more-actions__btn').trigger('click')
+
+    await Vue.nextTick()
+
+    // Verify list of other registration types
+    expect(wrapper.find('.actions__more-actions').exists()).toBeTruthy()
+
+    const registrationTypes = wrapper.findAll('.actions__more-actions .v-list-item')
+    expect(registrationTypes.at(0).exists()).toBeTruthy()
+
+    registrationTypes.at(0).trigger('click')
+
+    const events = wrapper.emitted('selected-registration-type')
+    expect(events.length).toBe(1)
+
   })
 })
