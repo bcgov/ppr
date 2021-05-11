@@ -22,10 +22,14 @@ DELETE FROM financing_statement
   WHERE financing_id >= 200000000;
 DELETE FROM draft
   WHERE draft_id >= 200000000;
-DELETE FROM client_party_branch
-  WHERE client_party_id >= 200000000;
-DELETE FROM client_party
-  WHERE client_party_id >= 200000000;
+DELETE FROM client_code_historical
+  WHERE HISTORICAL_HEAD_ID >= 200000000;
+DELETE FROM client_code
+  WHERE branch_id >= 200000000;
 DELETE FROM address_ppr
   WHERE address_id >= 200000000;
+DELETE FROM client_code
+  WHERE branch_id BETWEEN 29990001 AND 29990004;
+DELETE FROM address_ppr
+  WHERE address_id BETWEEN 29990001 AND 29990004;
 -- Delete test data end

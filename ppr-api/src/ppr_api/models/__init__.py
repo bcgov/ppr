@@ -15,8 +15,8 @@
 """This exports all of the models and schemas used by the application."""
 from .db import db  # noqa: I001
 from .address import Address
-from .client_party import ClientParty
-from .client_party_branch import ClientPartyBranch
+from .client_code import ClientCode
+from .client_code_historical import ClientCodeHistorical
 from .court_order import CourtOrder
 from .draft import Draft
 from .financing_statement import FinancingStatement
@@ -33,6 +33,6 @@ from .vehicle_collateral import VehicleCollateral
 
 
 __all__ = ('db',
-           'Address', 'ClientParty', 'ClientPartyBranch', 'CourtOrder', 'Draft', 'FinancingStatement',
+           'Address', 'ClientCode', 'ClientCodeHistorical', 'CourtOrder', 'Draft', 'FinancingStatement',
            'GeneralCollateral', 'Party', 'Registration', 'RegistrationType', 'SearchClient',
            'SearchResult', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')

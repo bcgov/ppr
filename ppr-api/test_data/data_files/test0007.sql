@@ -11,17 +11,17 @@ INSERT INTO registration(registration_id, financing_id, registration_number, bas
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
   VALUES(200000010, 'TEST-00A7', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000020, 'RG', 200000008, 200000000, null, null, 'TEST-AMEND-CO', '7', 'REGISTERING', null,
            null, 200000010)
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
     VALUES(200000021, 'DB', 200000008, 200000000, null, null, null, null, null, 'TEST 7 AMEND DEBTOR',
            null, 200000010, search_key_pkg.businame('TEST 7 AMEND DEBTOR'))
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000022, 'SP', 200000008, 200000000, null, null, null, null, null, 'TEST 7 AMEND SECURED PARTY',
            null, 200000010)

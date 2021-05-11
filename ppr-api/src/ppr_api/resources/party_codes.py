@@ -17,21 +17,19 @@
 
 from http import HTTPStatus
 
-from flask import request
+from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import ClientPartyBranch
+from ppr_api.models import ClientCode
+from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import is_staff, authorized
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 
-from .utils import get_account_id, account_required_response, business_exception_response
-from .utils import unauthorized_error_response, not_found_error_response
-from .utils import path_param_error_response, default_exception_response
-
 
 API = Namespace('party-codes', description='Endpoints for maintaining client registering and secured parties.')
+FUZZY_NAME_SEARCH_PARAM = 'fuzzyNameSearch'
 
 
 @cors_preflight('GET,OPTIONS')
@@ -46,25 +44,63 @@ class ClientPartyResource(Resource):
         """Get a preset registering or secured party by client code."""
         try:
             if code is None:
-                return path_param_error_response('code')
+                return resource_utils.path_param_error_response('code')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch client party by code
-            party = ClientPartyBranch.find_by_code(code)
+            current_app.logger.debug(f'Getting party code for account {account_id} with code = {code}.')
+            party = ClientCode.find_by_code(code)
             if not party:
-                return not_found_error_response('party', code)
+                return resource_utils.not_found_error_response('party', code)
 
             return party, HTTPStatus.OK
 
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/head-offices/<path:name_or_code>', methods=['GET', 'OPTIONS'])
+class ClientPartyHeadOfficeResource(Resource):
+    """Resource for looking up client parties belonging to a head office."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(name_or_code):
+        """Get a list of client parties (registering or secured parties) associated with a head office code or name."""
+        try:
+            if name_or_code is None:
+                return resource_utils.path_param_error_response('nameOrCode')
+            fuzzy_param = request.args.get(FUZZY_NAME_SEARCH_PARAM)
+
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if not is_staff(jwt) and account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch client parties: no results is an empty list.
+            current_app.logger.debug(f'Getting {account_id} head office party codes searching on {name_or_code}.')
+            parties = ClientCode.find_by_head_office(name_or_code, fuzzy_param)
+            # if not parties:
+            #    return resource_utils.not_found_error_response('party', code)
+            return jsonify(parties), HTTPStatus.OK
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)

@@ -18,27 +18,27 @@ INSERT INTO trust_indenture(trust_id, registration_id, financing_id, trust_inden
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
   VALUES(200000002, 'TEST-0001', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000000, 'RG', 200000000, 200000000, null, null, 'TEST', '1', 'REGISTERING', null,
            null, 200000002)
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, first_name_key, last_name_key)
     VALUES(200000001, 'DI', 200000000, 200000000, null, null, 'TEST IND', '1', 'DEBTOR', null,
            null, 200000002, search_key_pkg.lastname('TEST IND'), search_key_pkg.lastname('DEBTOR'))
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, business_srch_key)
     VALUES(200000002, 'DB', 200000000, 200000000, null, null, null, null, null, 'TEST BUS 2 DEBTOR',
            null, 200000002, search_key_pkg.businame('TEST BUS 2 DEBTOR'))
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000003, 'SP', 200000000, 200000000, null, null, null, null, null, 'TEST 1 SECURED PARTY',
            null, 200000002)
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000004, 'SP', 200000000, 200000000, null, 200000000, null, null, null, null,
            null, 200000002)

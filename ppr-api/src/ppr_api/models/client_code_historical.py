@@ -11,50 +11,62 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This module holds data for client party branck (reusable registering parties, secured parties).
+"""This module holds data for maintaining client party address and name change history.
 
-Currently the API only selects client parties. There are no create, update, delete requests.
+Client parties are reusable registering parties and secured parties.
 """
 from __future__ import annotations
+
+from enum import Enum
 
 # Needed by the SQLAlchemy relationship
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .db import db
 
 
-class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attributes
-    """This class maintains client party information (registering and secured parties)."""
+class ClientCodeHistorical(db.Model):  # pylint: disable=too-many-instance-attributes
+    """This class maintains client party information: history of name and address changes."""
 
-    __tablename__ = 'client_party_branch'
+    class HistoricalTypes(Enum):
+        """Render an Enum of the historical types."""
 
-    client_party_branch_id = db.Column('client_party_branch_id', db.Integer, primary_key=True, nullable=False)
+        ADDRESS = 'A'
+        BOTH = 'B'
+        NAME = 'N'
+
+    __tablename__ = 'client_code_historical'
+    historical_head_id = db.Column('historical_head_id', db.Integer,
+                                   db.Sequence('historical_head_id_seq'), primary_key=True)
+    head_id = db.Column('head_id', db.Integer, index=True, nullable=False)
+    name = db.Column('name', db.String(150), index=True, nullable=False)
+    historical_type_cd = db.Column('historical_type_cd', db.String(1), nullable=False)
     bconline_account = db.Column('bconline_account', db.Integer, nullable=True)
     # contact info
     contact_name = db.Column('contact_name', db.String(100), nullable=False)
     contact_area_cd = db.Column('contact_area_cd', db.String(3), nullable=True)
     contact_phone_number = db.Column('contact_phone_number', db.String(15), nullable=False)
-    email_id = db.Column('email_id', db.String(250), nullable=True)
+    email_id = db.Column('email_addresss', db.String(250), nullable=True)
     user_id = db.Column('user_id', db.String(7), nullable=True)
-    update_ts = db.Column('update_ts', db.DateTime, nullable=True)
+    date_ts = db.Column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    client_party_id = db.Column('client_party_id', db.Integer,
-                                db.ForeignKey('client_party.client_party_id'), primary_key=True, nullable=False)
+    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), primary_key=True,
+                          nullable=False)
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
     id = db.Column('id', db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Relationships
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
-                              back_populates='client_party_branch', cascade='all, delete')
-    client_party = db.relationship('ClientParty', foreign_keys=[client_party_id],
-                                   uselist=False, back_populates='client_party_branch')
-    party = db.relationship('Party', uselist=True, back_populates='client_party_branch')
+                              back_populates='client_code_historical', cascade='all, delete')
+    client_code = db.relationship('ClientCode', foreign_keys=[branch_id], uselist=False,
+                                  back_populates='client_code_historical')
 
     @property
     def json(self) -> dict:
         """Return the client party branch as a json object."""
         party = {
-            'code': str(self.client_party_branch_id),
+            'code': str(self.branch_id),
+            'businessName': self.name,
             'contact': {
                 'name': self.contact_name,
                 'phoneNumber': self.contact_phone_number
@@ -64,8 +76,6 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
             party['contact']['areaCode'] = self.contact_area_cd
         if self.email_id:
             party['emailAddress'] = self.email_id
-        if self.client_party and self.client_party.business_name:
-            party['businessName'] = self.client_party.business_name
         if self.address:
             cp_address = self.address.json
             party['address'] = cp_address
@@ -73,11 +83,13 @@ class ClientPartyBranch(db.Model):  # pylint: disable=too-many-instance-attribut
         return party
 
     @classmethod
-    def find_by_code(cls, code: str = None):
-        """Return a client party branch json object by client code."""
+    def find_by_id(cls, historical_id: int = None):
+        """Return a code historical json object by primary key."""
         party = None
-        if code:
-            party = cls.query.filter(ClientPartyBranch.client_party_branch_id == int(code)).one_or_none()
+        if historical_id:
+            party = db.session.query(ClientCodeHistorical).\
+                                     filter(ClientCodeHistorical.historical_head_id == historical_id).\
+                                     one_or_none()
 
         if party:
             return party.json
