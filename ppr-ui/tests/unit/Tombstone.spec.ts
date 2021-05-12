@@ -11,7 +11,7 @@ import { Tombstone } from '@/components/common'
 
 // Other
 import { AccountInformationIF, BreadcrumbIF, UserInfoIF } from '@/interfaces'
-import { tombstoneBreadcrumbSearch } from '@/resources'
+import { tombstoneBreadcrumbSearch, tombstoneBreadcrumbRegistration } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -78,7 +78,6 @@ describe('Tombstone component', () => {
 
     await store.dispatch('setAccountInformation', accountInfo)
     await store.dispatch('setUserInfo', userInfo)
-    wrapper = createComponent('http://test/dashboard', testHeader, tombstoneBreadcrumbSearch)
   })
 
   afterEach(() => {
@@ -87,6 +86,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component with breadcrumb', async () => {
+    wrapper = createComponent('http://test/dashboard', testHeader, tombstoneBreadcrumbSearch)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
@@ -103,5 +103,20 @@ describe('Tombstone component', () => {
     expect(userInfoDisplay.at(0).text()).toContain(userInfo.lastname)
     expect(userInfoDisplay.at(0).text()).toContain(accountInfo.label)
     expect(wrapper.find(backBtn).exists()).toBe(true)
+  })
+
+  it('renders registration Tombstone component with breadcrumb', async () => {
+    wrapper = createComponent('http://test/dashboard', testHeader, tombstoneBreadcrumbRegistration)
+    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
+    }
+    const header = wrapper.findAll(tombstoneHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain(testHeader)
+
   })
 })

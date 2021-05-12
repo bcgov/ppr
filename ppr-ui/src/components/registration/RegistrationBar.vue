@@ -22,7 +22,7 @@
           <template v-slot:activator="{ on }">
             <v-btn
               color="primary"
-              :class="$style['actions__more-actions__btn']"
+              :class="[$style['actions__more-actions__btn'], 'more-actions-btn']"
               class="px-0"
               v-on="on"
               id="menu-activator"
@@ -30,7 +30,7 @@
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
-          <v-list :class="$style['actions__more-actions']">
+          <v-list :class="[$style['actions__more-actions'], 'more-actions']">
             <v-list-item
               id="btn-reparers"
               @click="newRegistration(registrationTypeValues.REPAIRERS_LIEN)"
