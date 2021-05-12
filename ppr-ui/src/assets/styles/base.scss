@@ -295,3 +295,40 @@ ul.list {
 .vue-affix {
   width: 282px;
 }
+
+.length-trust-header {
+  color: #212529;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sub-header {
+  color: #212529;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.v-application div.invalid-message {
+  border-left: 3px solid #D3272C !important;
+}
+
+span.invalid-message {
+  font-size: 16px;
+  color: #D3272C !important;
+}
+
+.invalid-link {
+  padding: 1.25rem;
+  font-size: 16px;
+  color: #1669BB;
+}
+
+.summary-header {
+  display: flex;
+  background-color: $gray3;
+}
+
+.theme--light.v-list-item.v-list-item--link:hover {
+  background-color: $gray3;
+  color: $primary-blue !important;
+}

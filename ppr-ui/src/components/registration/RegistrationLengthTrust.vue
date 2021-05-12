@@ -1,43 +1,47 @@
 <template>
   <v-container fluid no-gutters class="white pa-0"  v-if="summaryView">
     <v-card flat id="length-trust-summary">
-      <v-row no-gutters :class="[$style['length-trust-summary-header'], pa-2]">
+      <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
           <v-icon color="#38598A">mdi-calendar-clock</v-icon>
           <label class="pl-3"><strong>Registration Length and Trust Indenture</strong></label>
         </v-col>
       </v-row>
-      <v-row no-gutters v-if="showErrorSummary" :class="[$style['length-trust-invalid-message'], 'pa-6']">
+      <v-container :class="{'invalid-message': showErrorSummary}">
+      <v-row no-gutters v-if="showErrorSummary" class="pa-6">
         <v-col cols="auto">
+          <span :class="{'invalid-message': showErrorSummary}">
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
           This step is unfinished
-          <router-link id="router-link-length-trust" class="length-trust-invalid-link" :to="{ path: '/length-trust' }">
+          </span>
+          <span id="router-link-length-trust" :class="$style['invalid-link']" @click="goToLengthTrust()">
             Return to this step to complete it.
-          </router-link>
+          </span>
         </v-col>
       </v-row>
-      <v-row no-gutters class="length-trust-content pa-4">
-        <v-col cols="4" class="length-trust-title">
-          <strong>Registration Length</strong>
+      <v-row no-gutters class="ps-6 pb-3">
+        <v-col cols="3" :class="$style['length-trust-label']">
+          Registration Length
         </v-col>
-        <v-col cols="auto">
+        <v-col :class="$style['summary-text']">
           {{lengthSummary}}
         </v-col>
       </v-row>
-      <v-row no-gutters class="length-trust-content pl-4 pb-2">
-        <v-col cols="4" class="length-trust-title">
-          <strong>Trust Indenture</strong>
+      <v-row no-gutters class="ps-6 pb-3">
+        <v-col cols="3" :class="$style['length-trust-label']">
+          Trust Indenture
         </v-col>
-        <v-col cols="auto">
+        <v-col :class="$style['summary-text']">
           {{trustIndentureSummary}}
         </v-col>
       </v-row>
+      </v-container>
     </v-card>
   </v-container>
-  <v-container fluid no-gutters class="white pa-6"  v-else>
+  <v-container fluid no-gutters class="white pa-6" :class="{'invalid-message': showErrorComponent}" v-else>
     <v-row no-gutters>
-      <v-col cols="2" :class="$style[length-trust-label]">
-        Registration Length
+      <v-col cols="3" :class="$style['length-trust-label']">
+        <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
       </v-col>
       <v-col cols="1">
         <v-radio-group v-model="lifeInfinite">
@@ -53,7 +57,7 @@
             </v-radio>
         </v-radio-group>
       </v-col>
-      <v-col cols="auto">
+      <v-col cols="8">
         <v-text-field id="life-years-field"
                         autocomplete="off"
                         :error-messages="lifeYearsMessage || ''"
@@ -65,9 +69,10 @@
                         v-model="lifeYearsEdit"/>
         <div class="pt-5">Infinite ($500.00 non-refundable)</div>
       </v-col>
+      <v-divider class="mx-4" />
     </v-row>
     <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
-      <v-col cols="2" :class="$style[length-trust-label]">
+      <v-col cols="3" :class="$style['length-trust-label']">
         Trust Indenture
       </v-col>
       <v-col cols="1">
@@ -78,8 +83,13 @@
                     v-model="trustIndenture">
         </v-checkbox>
       </v-col>
-      <v-col cols="auto">
-        Trust Indenture (Optional)
+      <v-col cols="8">
+        <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <span v-on="on" class="trust-indenture">Trust Indenture</span>
+            </template>
+            <span class="trust-indenture">Helper top tip text will go here</span>
+          </v-tooltip>
       </v-col>
     </v-row>
   </v-container>
@@ -116,7 +126,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup (props, context) {
     const { setLengthTrust } = useActions<any>(['setLengthTrust'])
     const { setFeeSummary } = useActions<any>(['setFeeSummary'])
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
@@ -125,6 +135,7 @@ export default defineComponent({
     const feeSummary: FeeSummaryIF = getFeeSummary.value
     const feeInfoYears = getFinancingFee(false)
     const feeInfoInfinite = getFinancingFee(true)
+    const router = context.root.$router
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -145,6 +156,9 @@ export default defineComponent({
       showErrorSummary: computed((): boolean => {
         return (!lengthTrust.valid)
       }),
+      showErrorComponent: computed((): boolean => {
+        return (lengthTrust.showInvalid)
+      }),
       lengthSummary: computed((): string => {
         if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
           return 'Not entered'
@@ -161,6 +175,12 @@ export default defineComponent({
         return (lengthTrust.trustIndenture ? 'Yes' : 'No')
       })
     })
+    const goToLengthTrust = (): void => {
+      lengthTrust.showInvalid = true
+      setLengthTrust(lengthTrust)
+      router.push({ path: '/length-trust' })
+    }
+
     watch(() => localState.lifeYearsEdit, (val: string) => {
       localState.lifeYearsMessage = ''
       if (val.length > 0) {
@@ -181,12 +201,13 @@ export default defineComponent({
         } else {
           lengthTrust.lifeYears = life
           lengthTrust.valid = true
+          lengthTrust.showInvalid = false
           setLengthTrust(lengthTrust)
           feeSummary.quantity = life
           feeSummary.feeAmount = feeInfoYears.feeAmount
           setFeeSummary(feeSummary)
           if (feeSummary.quantity > 0 && feeSummary.feeAmount > 0) {
-            emit('updated-fee-summary', feeSummary)
+            context.emit('updated-fee-summary', feeSummary)
           }
         }
       } else if (lengthTrust.valid && !lengthTrust.lifeInfinite) {
@@ -195,7 +216,7 @@ export default defineComponent({
         feeSummary.feeAmount = 0
         feeSummary.quantity = 0
         setFeeSummary(feeSummary)
-        emit('updated-fee-summary', feeSummary)
+        context.emit('updated-fee-summary', feeSummary)
       }
     })
     watch(() => localState.trustIndenture, (val: boolean) => {
@@ -219,10 +240,11 @@ export default defineComponent({
       }
       setLengthTrust(lengthTrust)
       setFeeSummary(feeSummary)
-      emit('updated-fee-summary', feeSummary)
+      context.emit('updated-fee-summary', feeSummary)
     })
 
     return {
+      goToLengthTrust,
       ...toRefs(localState)
     }
   }
@@ -232,38 +254,23 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .length-trust-label {
-  font-size: 0.875rem;
+  color: $gray9;
+  font-weight: bold;
 }
 
-.length-trust-summary-header {
-  display: flex;
-  background-color: $gray3;
-}
-.length-trust-invalid-message {
+.summary-text{
   font-size: 16px;
-  color: #D3272C !important;
-  border-left: 3px solid #D3272C;
+  color: $gray7;
 }
-.length-trust-invalid-link {
+
+.invalid-link {
   padding: 1.25rem;
-  font-weight: bold;
   font-size: 16px;
   color: #1669BB;
+  text-decoration: underline;
+  cursor: pointer;
 }
-.length-trust-header {
-  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
-  font-size: 0.875rem;
-  margin-top: 1rem;
-}
-.length-trust-content {
-  margin-top: 0.5rem;
-  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
-  border-top: 1px solid $gray1;
-  font-size: 0.875rem;
-  .length-trust-title {
-    color: $gray7;
-  }
-}
+
 .v-list-item {
   min-height: 0;
   padding: 0 1rem 0 0.5rem;
@@ -279,6 +286,10 @@ export default defineComponent({
   top: 2px;
   left: 2px;
   color: $BCgovGold9;
+}
+
+::v-deep .theme--light.v-input.error--text input {
+  color: #d3272c
 }
 
 </style>

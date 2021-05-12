@@ -5,29 +5,23 @@
     </v-row>
     <v-row no-gutters>
       <v-container fluid class="pt-4">
-        <v-row no-gutters>
-          <v-col cols="6">
+        <v-row>
+          <v-col cols="9" class="ps-8">
             <v-row no-gutters
                    id="registration-header"
-                   :class="[$style['length-trust-header'], 'pt-3', 'pb-3', 'soft-corners-top']">
+                   class="length-trust-header pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
                 <b>{{ registrationTypeUI }}</b>
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-          </v-col>
-          <v-col cols="1">
-          </v-col>
-           <v-col align-self="end" cols="3">
-            <registration-fee :registrationType="registrationTypeUI"/>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-6'>
-          <v-col cols="auto">
-            <b>Add Collateral</b>
+
+        <v-row class='pt-6'>
+          <v-col cols="auto" class="sub-header p4-6">
+            Add Collateral
           </v-col>
         </v-row>
-        <v-row no-gutters>
+        <v-row class="pa-2">
           <v-col cols="auto">
             Add the collateral for this registration.
           </v-col>
@@ -37,13 +31,18 @@
             <collateral />
           </v-col>
         </v-row>
-      </v-container>
+        </v-col>
+      <v-col cols="3">
+            <registration-fee :registrationType="registrationTypeUI"/>
+          </v-col>
     </v-row>
-    <v-row no-gutters class='pt-15'>
+    <v-row no-gutters class='pt-10'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
                        :router="this.$router" @draft-save-error="saveDraftError"/>
       </v-col>
+    </v-row>
+  </v-container>
     </v-row>
   </v-container>
 </template>
@@ -144,42 +143,4 @@ export default class AddCollateral extends Vue {
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.step-container {
-  margin-top: 1rem;
-  padding: 1.25rem;
-}
-.meta-container {
-  display: flex;
-  flex-flow: column nowrap;
-  position: relative;
-
-  > label:first-child {
-    font-weight: 700;
-  }
-}
-@media (min-width: 768px) {
-  .meta-container {
-    flex-flow: row nowrap;
-    > label:first-child {
-      flex: 0 0 auto;
-      padding-right: 2rem;
-      width: 12rem;
-    }
-  }
-}
-
-.collateral-header {
-  color: $gray9;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.reg-default-btn {
-  background-color: $gray3 !important;
-}
-
-.reg-default-btn::before {
-  background-color: transparent !important;
-}
-
 </style>

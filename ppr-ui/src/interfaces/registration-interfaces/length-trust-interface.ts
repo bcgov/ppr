@@ -4,5 +4,6 @@ export interface LengthTrustIF {
   valid: boolean,
   trustIndenture: boolean,
   lifeInfinite: boolean,
-  lifeYears: number // 1..25 if not lifeInfinite, otherwise 0.
+  lifeYears: number, // 1..25 if not lifeInfinite, otherwise 0.
+  showInvalid?: boolean // show the invalid component
 }

@@ -1,57 +1,58 @@
 <template>
-  <v-container fluid class="pa-0" style="max-width: none;">
+  <v-container fluid class="pa-0" style="max-width: none">
     <v-row no-gutters>
-        <tombstone :backURL="dashboardURL" :header="'My Personal Property Registry'" :setItems="breadcrumbs"/>
+      <tombstone
+        :backURL="dashboardURL"
+        :header="'My Personal Property Registry'"
+        :setItems="breadcrumbs"
+      />
     </v-row>
     <v-row no-gutters>
       <v-container fluid class="pt-4">
-        <v-row no-gutters>
-          <v-col cols="6">
-            <v-row no-gutters
-                   id="registration-header"
-                   :class="[$style['length-trust-header'], 'pt-3', 'pb-3', 'soft-corners-top']">
+        <v-row>
+          <v-col cols="9" class="ps-8">
+            <v-row
+              no-gutters
+              id="registration-header"
+              class="length-trust-header pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
                 <b>{{ registrationTypeUI }}</b>
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <template>
-              <component
-                v-for="step in getSteps"
-                v-show="isRouteName(step.to)"
-                :is="step.component"
-                :key="step.step"
-              />
-            </template>
+            <v-row no-gutters class="pt-6">
+              <v-col cols="auto" class="sub-header">
+                Registration Length and Trust Indenture
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col class="pt-2 pb-6">
+                Enter the length of time you want the
+                {{ registrationTypeUI }} to be in effect. You can renew the
+                registration in the future (for a fee).
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <registration-length-trust
+                  :defaultRegistrationType="registrationType"
+                  @updated-fee-summary="updateFeeSummary"
+                />
+              </v-col>
+            </v-row>
           </v-col>
-          <v-col cols="1">
-          </v-col>
-          <v-col align-self="end" cols="3">
-            <registration-fee :registrationType="registrationTypeUI"
-                              :updatedFeeSummary="updatedFeeSummary"
-                              :hint="feeHint"/>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-6'>
-          <v-col cols="auto" class="$style['length-title']">
-            <b>Registration Length and Trust Indenture</b>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="6" class='pt-2 pb-6'>
-            Enter the length of time you want the {{ registrationTypeUI }} to be in effect. You can
-            renew the registration in the future (for a fee).
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="6">
-            <registration-length-trust :defaultRegistrationType="registrationType"
-                                        @updated-fee-summary="updateFeeSummary"/>
+          <v-col cols="3">
+            <registration-fee
+              :registrationType="registrationTypeUI"
+              :updatedFeeSummary="updatedFeeSummary"
+              :hint="feeHint"
+            />
           </v-col>
         </v-row>
       </v-container>
     </v-row>
-    <v-row no-gutters class='pt-15'>
+    <v-row no-gutters class='pt-10'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
                        :router="this.$router" @draft-save-error="saveDraftError"/>
@@ -107,7 +108,8 @@ export default class LengthTrust extends Vue {
 
   private get breadcrumbs (): Array<BreadcrumbIF> {
     const registrationBreadcrumb = tombstoneBreadcrumbRegistration
-    registrationBreadcrumb[2].text = this.getRegistrationType?.registrationTypeUI || 'New Registration'
+    registrationBreadcrumb[2].text =
+      this.getRegistrationType?.registrationTypeUI || 'New Registration'
     return registrationBreadcrumb
   }
 
@@ -167,7 +169,7 @@ export default class LengthTrust extends Vue {
 </script>
 
 <style lang="scss" module>
-@import '@/assets/styles/theme.scss';
+@import "@/assets/styles/theme.scss";
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;
@@ -190,16 +192,6 @@ export default class LengthTrust extends Vue {
       width: 12rem;
     }
   }
-}
-.length-trust-header {
-  color: $gray9;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.length-title {
-  color: $gray9;
-  font-size: 1rem;
 }
 
 .reg-default-btn {

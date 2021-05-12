@@ -1,56 +1,43 @@
 <template>
-  <v-container fluid no-gutters class="white pa-1">
-    <v-row no-gutters class="pt-0">
-      <v-col cols="12">
-        <v-card color="primary">
-          <v-card-title><div class="header">Fee Summary</div></v-card-title>
-        </v-card>
-      </v-col>
-    </v-row>
-<!--
-  <v-dialog permanent :attach="attach" v-model="display" width="350">
-    <v-card>
-      <v-card-title><div class="header">Fee Summary</div></v-card-title>
--->
-    <v-row no-gutters class="pa-2">
-      <v-col cols="8">
-        <div><b>{{registrationTypeFee}}</b></div>
-        <div v-if="!isComplete">{{hintFee}}</div>
-      </v-col>
-      <v-col cols="4">
-        <div v-if="isComplete" class="float-right">${{totalFees.toFixed(2)}}</div>
-        <div v-else class="float-right"><b>-</b></div>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="pa-2">
-      <v-col cols="8">
-        <div><b>Service fee</b></div>
-      </v-col>
-      <v-col cols="4">
-        <div class="float-right">${{serviceFee.toFixed(2)}}</div>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="pa-2">
-        <v-col cols="6">
-          <div class="payment-total">Total Fees</div>
-        </v-col>
-        <v-col cols="2">
-          <div class="fee-currency">CAD</div>
-        </v-col>
-        <v-col cols="4">
-          <div class="payment-total">
-              <v-slide-y-reverse-transition name="slide" mode="out-in">
-              <div v-if="isComplete" class="float-right"><b>${{totalAmount.toFixed(2)}}</b></div>
-              <div v-else class="float-right"><b>-</b></div>
-              </v-slide-y-reverse-transition>
+  <v-card class="mt-8">
+    <header class="font-weight-bold px-3 py-3">
+      <slot name="header">Fee Summary</slot>
+    </header>
+    <v-slide-y-transition group tag="ul" :class="$style['fee-list']">
+      <template>
+        <li :class="[$style['fee-container'], $style['fee-list__item']]"
+          :key="registrationTypeFee"
+          >
+          <div :class="$style['fee-list__item-name']" class="pl-3">{{registrationTypeFee}}</div>
+          <div :class="$style['fee-list__item-value']" v-if="!isComplete">
+            -
           </div>
-        </v-col>
-    </v-row>
-<!--
-    </v-card>
-  </v-dialog>
--->
-  </v-container>
+          <div :class="$style['fee-list__item-value']" v-else>
+            ${{totalFees.toFixed(2)}}
+          </div>
+        </li>
+        <li :class="[$style['fee-container'], $style['fee-list__hint']]" :key="hintFee" v-if="!isComplete">
+          <div class="fee-list__hint pl-3">{{hintFee}}</div>
+        </li>
+        <li :class="[$style['fee-container'], $style['fee-list__item']]"
+          :key="serviceFee"
+          >
+          <div :class="$style['fee-list__item-name']" class="pl-3">Service Fee</div>
+          <div :class="$style['fee-list__item-value']">${{serviceFee.toFixed(2)}}</div>
+        </li>
+      </template>
+    </v-slide-y-transition>
+    <div :class="[$style['fee-container'], $style['fee-total']]">
+      <div :class="$style['fee-total__name']">Total Fees</div>
+      <div :class="$style['fee-total__currency']">CAD</div>
+      <div :class="$style['fee-total__value']">
+        <v-slide-y-reverse-transition name="slide" mode="out-in">
+          <div v-if="isComplete" class="float-right"><b>${{totalAmount.toFixed(2)}}</b></div>
+          <div v-else class="float-right"><b>-</b></div>
+        </v-slide-y-reverse-transition>
+      </div>
+    </div>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -121,25 +108,73 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.payment-fee {
-  background-color: $gray1;
+
+header {
+  color: #fff;
+  background: $BCgovBlue5;
 }
 
-.fee-currency {
-  color: $gray6;
+.fee-container {
+  display: flex;
+  flex-flow: row nowrap;
+  line-height: 1.2rem;
+  font-size: 0.875rem;
+  padding: 1em;
 }
 
 .fee-list {
-  padding-left: 0 !important;
-  border-bottom: 1px solid $gray4;
+  border-bottom: 1px solid $gray3;
+  padding-left: 0px;
 }
 
-.payment-total {
-  font-weight: bold;
+.fee-list__hint {
+  color: $gray7;
+  font-size: 14px;
+  font-weight: normal;
+  padding: 5px;
 }
 
-.header {
-  color: white;
-  font-size: 1.125rem;
+.fee-list__item {
+  &-name, &-value {
+    font-weight: 700;
+  }
+
+  &-name {
+    flex: 1 1 auto;
+    margin-right: 2rem;
+  }
+
+  &-value {
+    flex: 0 0 auto;
+    text-align: right;
+  }
 }
+
+.fee-list__item + .fee-list__item {
+  border-top: 1px solid $gray3;
+}
+
+.fee-total {
+  align-items: center;
+  letter-spacing: -0.01rem;
+  line-height: auto;
+
+  &__name {
+    flex: 1 1 auto;
+    margin-right: auto;
+    font-weight: 700;
+  }
+
+  &__currency {
+    margin-right: 0.5rem;
+    color: $gray5;
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: 1.65rem;
+    font-weight: 700;
+  }
+}
+
 </style>

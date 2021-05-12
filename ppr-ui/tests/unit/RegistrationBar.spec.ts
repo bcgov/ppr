@@ -19,7 +19,7 @@ const store = getVuexStore()
 // Events
 
 // Input field selectors / buttons
-const selectDropDown: string = '.registration-bar-type-select'
+const registrationButton: string = '.registration-bar-btn'
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
@@ -73,13 +73,25 @@ describe('RegistrationBar select tests', () => {
 
   it('renders with selected registration type', async () => {
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
-    expect(wrapper.find(selectDropDown).exists()).toBe(true)
+    expect(wrapper.find(registrationButton).exists()).toBe(true)
     expect(wrapper.vm.selectedRegistrationType).toBe(selectedRegistrationType)
   })
-  it('renders all selected registration types', async () => {
-    for (var registrationType of RegistrationTypes) {
-      wrapper.vm.selectedRegistrationType = registrationType
-      await Vue.nextTick()
-    }
+  it('renders all selected registration types and allows you to click on one', async () => {
+
+    wrapper.find('.more-actions-btn').trigger('click')
+
+    await Vue.nextTick()
+
+    // Verify list of other registration types
+    expect(wrapper.find('.more-actions').exists()).toBeTruthy()
+
+    const registrationTypes = wrapper.findAll('.more-actions .v-list-item')
+    expect(registrationTypes.at(0).exists()).toBeTruthy()
+
+    registrationTypes.at(0).trigger('click')
+
+    const events = wrapper.emitted('selected-registration-type')
+    expect(events.length).toBe(1)
+
   })
 })

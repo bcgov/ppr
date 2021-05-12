@@ -1,34 +1,41 @@
 <template>
-  <v-container id="step-buttons-container">
+  <v-container id="step-buttons-container" :class="$style['step-buttons-container']" pb-0>
     <template v-for="(step, index) in getSteps">
-      <div class="step" :key="index" @click="goTo(step)" v-on:keyup.tab="goTo(step)">
-        <div class="step__indicator">
-          <div class="step__line"></div>
+      <div
+        :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
+        :key="index"
+        @click="goTo(step)"
+        v-on:keyup.tab="goTo(step)"
+        >
+        <div :class="$style['step__indicator']">
+          <div :class="$style['step__line']"></div>
           <v-btn
             outlined fab
             color="primary"
             :id=step.id
-            class="step__btn"
+            :class="isCurrentStep(step) ? [$style['selected-btn'], $style['step__btn']] : $style['step__btn']"
             tabindex="-1"
             :disabled=step.disabled
-            :ripple="false"
-            :class="{ 'selected-btn': isCurrentStep(step) }">
-            <v-icon class="step__icon" :class="{ 'selected-icon': isCurrentStep(step) }">{{ step.icon }}</v-icon>
+            :ripple="false">
+            <v-icon :class="isCurrentStep(step) ?
+              [$style['selected-icon'], $style['step__icon']]: $style['step__icon']">
+              {{ step.icon }}
+            </v-icon>
           </v-btn>
-          <v-icon class="step__btn2" size="30" color="green darken-1" v-show=step.valid>
+          <v-icon :class="$style['step__btn2']" size="30" color="green darken-1" v-show=step.valid>
             mdi-check-circle
           </v-icon>
-          <v-icon class="step__btn2" size="30" color="#D3272C" v-show=showInvalid(step)>
+          <v-icon :class="$style['step__btn2']" size="30" color="#D3272C" v-show=showInvalid(step)>
             mdi-alpha-x-circle
           </v-icon>
         </div>
-        <v-btn class="step__label pre-line" text color="primary" :ripple="false" :disabled=step.disabled
-               v-show=!isCurrentStep(step)>
-          <span class="step__label__text">{{ step.text }}</span>
+        <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
+          :disabled=step.disabled v-show=!isCurrentStep(step)>
+          <span :class="$style['step__label__text']">{{ step.text }}</span>
         </v-btn>
-        <v-btn class="step__label__current pre-line" text color="primary" :ripple="false" :disabled=step.disabled
-               v-show=isCurrentStep(step)>
-          <span class="step__label__text__current">{{ step.text }}</span>
+        <v-btn :class="[$style['step__label__current'], $style['pre-line']]" text color="primary" :ripple="false"
+          :disabled=step.disabled v-show=isCurrentStep(step)>
+          <span :class="$style['step__label__text__current']">{{ step.text }}</span>
         </v-btn>
       </div>
     </template>
@@ -37,7 +44,7 @@
 
 <script lang="ts">
 // Libraries
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
 
 // Interfaces
@@ -46,6 +53,9 @@ import { GetterIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 @Component({})
 export default class Stepper extends Vue {
   @Getter getSteps!: GetterIF
+
+  @Prop({ default: false })
+  private showStepErrors: boolean
 
   private goTo (step) {
     this.$router.push(step.to).catch(error => error)
@@ -56,19 +66,20 @@ export default class Stepper extends Vue {
   }
 
   private showInvalid (step): boolean {
-    return (this.$route.name === 'review-confirm' && this.$route.name !== step.to && !step.valid)
+    return (this.$route.name === 'review-confirm' && this.showStepErrors &&
+      this.$route.name !== step.to && !step.valid)
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 
-#step-buttons-container {
+.step-buttons-container {
   display: flex;
   justify-content: space-evenly;
   margin: 0;
-  padding: 2rem 0;
+  padding: 2rem 0 0 0;
   background: $BCgovInputBG;
 }
 
@@ -82,6 +93,7 @@ export default class Stepper extends Vue {
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
+  padding-bottom: 2rem;
 }
 
 .step:hover {
@@ -158,7 +170,6 @@ export default class Stepper extends Vue {
 .step__label__current {
   margin-top: 10px;
   text-align: center;
-  border-bottom: 3px solid $primary-blue !important;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
@@ -176,6 +187,10 @@ export default class Stepper extends Vue {
   color: #212529 !important;
   font-size: 14px !important;
   font-weight: bold !important;
+}
+
+.step__border__current {
+  border-bottom: 3px solid $primary-blue !important;
 }
 
 </style>
