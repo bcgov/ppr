@@ -213,8 +213,4 @@ export default defineComponent({
   border-bottom-left-radius: 0;
   box-shadow: none;
 }
-:v-deep .v-list-item:hover {
-  background-color: $gray3;
-  color: $primary-blue;
-}
 </style>

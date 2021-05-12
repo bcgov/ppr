@@ -327,3 +327,8 @@ span.invalid-message {
   display: flex;
   background-color: $gray3;
 }
+
+.theme--light.v-list-item.v-list-item--link:hover {
+  background-color: $gray3;
+  color: $primary-blue !important;
+}
