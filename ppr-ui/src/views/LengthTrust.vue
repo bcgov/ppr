@@ -168,7 +168,7 @@ export default class LengthTrust extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import "@/assets/styles/theme.scss";
 .step-container {
   margin-top: 1rem;

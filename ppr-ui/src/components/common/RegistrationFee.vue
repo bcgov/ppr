@@ -3,34 +3,34 @@
     <header class="font-weight-bold px-3 py-3">
       <slot name="header">Fee Summary</slot>
     </header>
-    <v-slide-y-transition group tag="ul" class="fee-list">
+    <v-slide-y-transition group tag="ul" :class="$style['fee-list']">
       <template>
-        <li class="fee-container fee-list__item"
+        <li :class="[$style['fee-container'], $style['fee-list__item']]"
           :key="registrationTypeFee"
           >
-          <div class="fee-list__item-name pl-3">{{registrationTypeFee}}</div>
-          <div class="fee-list__item-value" v-if="!isComplete">
+          <div :class="$style['fee-list__item-name']" class="pl-3">{{registrationTypeFee}}</div>
+          <div :class="$style['fee-list__item-value']" v-if="!isComplete">
             -
           </div>
-          <div class="fee-list__item-value" v-else>
+          <div :class="$style['fee-list__item-value']" v-else>
             ${{totalFees.toFixed(2)}}
           </div>
         </li>
-        <li class="fee-container fee-list__hint" :key="hintFee" v-if="!isComplete">
+        <li :class="[$style['fee-container'], $style['fee-list__hint']]" :key="hintFee" v-if="!isComplete">
           <div class="fee-list__hint pl-3">{{hintFee}}</div>
         </li>
-        <li class="fee-container fee-list__item"
+        <li :class="[$style['fee-container'], $style['fee-list__item']]"
           :key="serviceFee"
           >
-          <div class="fee-list__item-name pl-3">Service Fee</div>
-          <div class="fee-list__item-value">${{serviceFee.toFixed(2)}}</div>
+          <div :class="$style['fee-list__item-name']" class="pl-3">Service Fee</div>
+          <div :class="$style['fee-list__item-value']">${{serviceFee.toFixed(2)}}</div>
         </li>
       </template>
     </v-slide-y-transition>
-    <div class="fee-container fee-total">
-      <div class="fee-total__name">Total Fees</div>
-      <div class="fee-total__currency">CAD</div>
-      <div class="fee-total__value">
+    <div :class="[$style['fee-container'], $style['fee-total']]">
+      <div :class="$style['fee-total__name']">Total Fees</div>
+      <div :class="$style['fee-total__currency']">CAD</div>
+      <div :class="$style['fee-total__value']">
         <v-slide-y-reverse-transition name="slide" mode="out-in">
           <div v-if="isComplete" class="float-right"><b>${{totalAmount.toFixed(2)}}</b></div>
           <div v-else class="float-right"><b>-</b></div>
@@ -106,7 +106,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 
 header {

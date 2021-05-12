@@ -14,24 +14,24 @@
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
           This step is unfinished
           </span>
-          <span id="router-link-length-trust" class="invalid-link" @click="goToLengthTrust()">
+          <span id="router-link-length-trust" :class="$style['invalid-link']" @click="goToLengthTrust()">
             Return to this step to complete it.
           </span>
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" class="length-trust-label">
+        <v-col cols="3" :class="$style['length-trust-label']">
           Registration Length
         </v-col>
-        <v-col class="summary-text">
+        <v-col :class="$style['summary-text']">
           {{lengthSummary}}
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" class="length-trust-label">
+        <v-col cols="3" :class="$style['length-trust-label']">
           Trust Indenture
         </v-col>
-        <v-col class="summary-text">
+        <v-col :class="$style['summary-text']">
           {{trustIndentureSummary}}
         </v-col>
       </v-row>
@@ -40,7 +40,7 @@
   </v-container>
   <v-container fluid no-gutters class="white pa-6" :class="{'invalid-message': showErrorComponent}" v-else>
     <v-row no-gutters>
-      <v-col cols="3" class="length-trust-label">
+      <v-col cols="3" :class="$style['length-trust-label']">
         <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
       </v-col>
       <v-col cols="1">
@@ -72,7 +72,7 @@
       <v-divider class="mx-4" />
     </v-row>
     <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
-      <v-col cols="3" class="length-trust-label">
+      <v-col cols="3" :class="$style['length-trust-label']">
         Trust Indenture
       </v-col>
       <v-col cols="1">
@@ -251,9 +251,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-::v-deep .length-trust-label {
+.length-trust-label {
   color: $gray9;
   font-weight: bold;
 }
@@ -271,20 +271,6 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.length-trust-header {
-  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
-  font-size: 0.875rem;
-  margin-top: 1rem;
-}
-.length-trust-content {
-  margin-top: 0.5rem;
-  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
-  border-top: 1px solid $gray1;
-  font-size: 0.875rem;
-  .length-trust-title {
-    color: $gray7;
-  }
-}
 .v-list-item {
   min-height: 0;
   padding: 0 1rem 0 0.5rem;

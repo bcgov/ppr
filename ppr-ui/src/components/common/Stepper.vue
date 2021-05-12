@@ -1,40 +1,41 @@
 <template>
-  <v-container id="step-buttons-container" pb-0>
+  <v-container id="step-buttons-container" :class="$style['step-buttons-container']" pb-0>
     <template v-for="(step, index) in getSteps">
       <div
-        class="step"
-        :class="{ 'step__border__current': isCurrentStep(step) }"
+        :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
         :key="index"
         @click="goTo(step)"
         v-on:keyup.tab="goTo(step)"
         >
-        <div class="step__indicator">
-          <div class="step__line"></div>
+        <div :class="$style['step__indicator']">
+          <div :class="$style['step__line']"></div>
           <v-btn
             outlined fab
             color="primary"
             :id=step.id
-            class="step__btn"
+            :class="isCurrentStep(step) ? [$style['selected-btn'], $style['step__btn']] : $style['step__btn']"
             tabindex="-1"
             :disabled=step.disabled
-            :ripple="false"
-            :class="{ 'selected-btn': isCurrentStep(step) }">
-            <v-icon class="step__icon" :class="{ 'selected-icon': isCurrentStep(step) }">{{ step.icon }}</v-icon>
+            :ripple="false">
+            <v-icon :class="isCurrentStep(step) ?
+              [$style['selected-icon'], $style['step__icon']]: $style['step__icon']">
+              {{ step.icon }}
+            </v-icon>
           </v-btn>
-          <v-icon class="step__btn2" size="30" color="green darken-1" v-show=step.valid>
+          <v-icon :class="$style['step__btn2']" size="30" color="green darken-1" v-show=step.valid>
             mdi-check-circle
           </v-icon>
-          <v-icon class="step__btn2" size="30" color="#D3272C" v-show=showInvalid(step)>
+          <v-icon :class="$style['step__btn2']" size="30" color="#D3272C" v-show=showInvalid(step)>
             mdi-alpha-x-circle
           </v-icon>
         </div>
-        <v-btn class="step__label pre-line" text color="primary" :ripple="false" :disabled=step.disabled
-               v-show=!isCurrentStep(step)>
-          <span class="step__label__text">{{ step.text }}</span>
+        <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
+          :disabled=step.disabled v-show=!isCurrentStep(step)>
+          <span :class="$style['step__label__text']">{{ step.text }}</span>
         </v-btn>
-        <v-btn class="step__label__current pre-line" text color="primary" :ripple="false" :disabled=step.disabled
-               v-show=isCurrentStep(step)>
-          <span class="step__label__text__current">{{ step.text }}</span>
+        <v-btn :class="[$style['step__label__current'], $style['pre-line']]" text color="primary" :ripple="false"
+          :disabled=step.disabled v-show=isCurrentStep(step)>
+          <span :class="$style['step__label__text__current']">{{ step.text }}</span>
         </v-btn>
       </div>
     </template>
@@ -71,10 +72,10 @@ export default class Stepper extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 
-#step-buttons-container {
+.step-buttons-container {
   display: flex;
   justify-content: space-evenly;
   margin: 0;

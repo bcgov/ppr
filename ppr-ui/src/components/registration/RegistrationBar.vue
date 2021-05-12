@@ -4,7 +4,7 @@
       <v-col cols="4">
         <div class="actions">
         <v-btn
-          class="registration-bar-btn"
+          :class="$style['registration-bar-btn']"
           color="primary"
           :error-messages="categoryMessage ? categoryMessage : ''"
           :disabled="selectDisabled"
@@ -22,14 +22,15 @@
           <template v-slot:activator="{ on }">
             <v-btn
               color="primary"
-              class="actions__more-actions__btn px-0"
+              :class="$style['actions__more-actions__btn']"
+              class="px-0"
               v-on="on"
               id="menu-activator"
             >
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
-          <v-list class="actions__more-actions">
+          <v-list :class="$style['actions__more-actions']">
             <v-list-item
               id="btn-reparers"
               @click="newRegistration(registrationTypeValues.REPAIRERS_LIEN)"
@@ -193,10 +194,10 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import "@/assets/styles/theme.scss";
 
-::v-deep .registration-bar-btn {
+.registration-bar-btn {
   min-width: 0 !important;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -206,34 +207,13 @@ export default defineComponent({
   font-weight: normal;
   box-shadow: none;
 }
-::v-deep .actions__more-actions__btn {
+.actions__more-actions__btn {
   width: 40;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   box-shadow: none;
 }
-
-#search-btn-info {
-  color: $gray8;
-  font-size: 0.725rem;
-}
-.registration-info {
-  color: $gray8;
-  font-size: 0.875rem;
-}
-.registration-title {
-  color: $gray9;
-  font-size: 1rem;
-}
-.registration-select {
-  background-color: $BCgovBlue3;
-  color: white;
-}
-::v-deep .v-list-item .v-list-item__title {
-  font-size: 0.875rem;
-  color: $gray9;
-}
-::v-deep .v-list-item:hover {
+:v-deep .v-list-item:hover {
   background-color: $gray3;
   color: $primary-blue;
 }

@@ -141,44 +141,6 @@ export default class AddCollateral extends Vue {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.step-container {
-  margin-top: 1rem;
-  padding: 1.25rem;
-}
-.meta-container {
-  display: flex;
-  flex-flow: column nowrap;
-  position: relative;
-
-  > label:first-child {
-    font-weight: 700;
-  }
-}
-@media (min-width: 768px) {
-  .meta-container {
-    flex-flow: row nowrap;
-    > label:first-child {
-      flex: 0 0 auto;
-      padding-right: 2rem;
-      width: 12rem;
-    }
-  }
-}
-
-.collateral-header {
-  color: $gray9;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.reg-default-btn {
-  background-color: $gray3 !important;
-}
-
-.reg-default-btn::before {
-  background-color: transparent !important;
-}
-
 </style>

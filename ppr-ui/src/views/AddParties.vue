@@ -139,12 +139,8 @@ export default class AddParties extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.step-container {
-  margin-top: 1rem;
-  padding: 1.25rem;
-}
 .meta-container {
   display: flex;
   flex-flow: column nowrap;
@@ -164,19 +160,4 @@ export default class AddParties extends Vue {
     }
   }
 }
-
-.parties-header {
-  color: $gray9;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.reg-default-btn {
-  background-color: $gray3 !important;
-}
-
-.reg-default-btn::before {
-  background-color: transparent !important;
-}
-
 </style>
