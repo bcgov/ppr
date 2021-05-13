@@ -22,7 +22,7 @@ from ppr_api.models import utils as model_utils
 
 from .db import db
 from .address import Address  # noqa: F401 pylint: disable=unused-import
-from .client_party_branch import ClientPartyBranch  # noqa: F401 pylint: disable=unused-import
+from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
 BUS_SEARCH_KEY_SP = "select search_key_pkg.businame('?') from dual"
@@ -64,8 +64,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
-    client_party_branch_id = db.Column('client_party_branch_id', db.Integer,
-                                       db.ForeignKey('client_party_branch.client_party_branch_id'), nullable=True)
+    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), nullable=True)
     registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)
     financing_id = db.Column('financing_id', db.Integer,
@@ -77,9 +76,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
                               back_populates='party', cascade='all, delete')
 
-    # Relationships - ClientParty
-    client_party_branch = db.relationship('ClientPartyBranch', foreign_keys=[client_party_branch_id],
-                                          uselist=False, back_populates='party')
+    # Relationships - ClientCode
+    client_code = db.relationship('ClientCode', foreign_keys=[branch_id], uselist=False, back_populates='party')
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -98,17 +96,17 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.party_type_cd != model_utils.PARTY_REGISTERING:
             party['partyId'] = self.party_id
 
-        if self.client_party_branch and self.client_party_branch_id and self.client_party_branch.client_party:
-            party['code'] = str(self.client_party_branch_id)
-            if self.client_party_branch.client_party.business_name:
-                party['businessName'] = self.client_party_branch.client_party.business_name
+        if self.client_code and self.branch_id:
+            party['code'] = str(self.branch_id)
+            if self.client_code.name:
+                party['businessName'] = self.client_code.name
 
-            if self.client_party_branch.address:
-                cp_address = self.client_party_branch.address.json
+            if self.client_code.address:
+                cp_address = self.client_code.address.json
                 party['address'] = cp_address
 
-            if self.client_party_branch.email_id:
-                party['emailAddress'] = self.client_party_branch.email_id
+            if self.client_code.email_id:
+                party['emailAddress'] = self.client_code.email_id
         else:
             if self.business_name:
                 party['businessName'] = self.business_name
@@ -183,7 +181,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             party.party_type_cd = model_utils.PARTY_DEBTOR_IND
 
         if party_type != model_utils.PARTY_DEBTOR_BUS and 'code' in json_data:
-            party.client_party_branch_id = int(json_data['code'])
+            party.branch_id = int(json_data['code'])
         else:
             if party_type == model_utils.PARTY_DEBTOR_BUS and 'birthDate' in json_data:
                 party.birth_date = model_utils.ts_from_date_iso_format(json_data['birthDate'])
@@ -261,7 +259,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def verify_party_code(code: str):
         """Verify registering party or secured party code is legitimate."""
-        if code and ClientPartyBranch.find_by_code(code):
+        if code and ClientCode.find_by_code(code):
             return True
 
         return False

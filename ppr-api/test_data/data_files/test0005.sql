@@ -18,17 +18,17 @@ INSERT INTO trust_indenture(trust_id, registration_id, financing_id, trust_inden
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
   VALUES(200000007, 'TEST-0005', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000015, 'RG', 200000005, 200000004, null, null, 'TEST', '5', 'REGISTERING', null,
            null, 200000007)
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id, first_name_key, last_name_key)
     VALUES(200000016, 'DI', 200000005, 200000004, null, null, 'TEST IND', '5', 'DEBTOR', null,
            null, 200000007, search_key_pkg.lastname('TEST IND'), search_key_pkg.lastname('DEBTOR'))
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000017, 'SP', 200000005, 200000004, null, null, null, null, null, 'TEST 5 SECURED PARTY',
            null, 200000007)
@@ -51,7 +51,7 @@ INSERT INTO registration(registration_id, financing_id, registration_number, bas
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
   VALUES(200000008, 'TEST-00R5', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000018, 'RG', 200000006, 200000004, null, null, 'TEST-RENEWAL', '5', 'REGISTERING', null,
            null, 200000008)

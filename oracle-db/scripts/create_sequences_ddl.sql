@@ -21,8 +21,6 @@ CREATE SEQUENCE financing_id_seq INCREMENT BY 1 START WITH 1;
 CREATE SEQUENCE address_id_seq INCREMENT BY 1 START WITH 1;
 -- party table PK party_id Psequence
 CREATE SEQUENCE party_id_seq INCREMENT BY 1 START WITH 1;
--- client_party table PK client_party_id sequence
-CREATE SEQUENCE client_party_id_seq INCREMENT BY 1 START WITH 1;
 -- serial_collateral table PK serial_collateral_id sequence
 CREATE SEQUENCE VEHICLE_ID_SEQ
   START WITH 1
@@ -78,4 +76,21 @@ CREATE SEQUENCE USER_ID_SEQ
   NOORDER
   NOKEEP
   GLOBAL;  
-
+-- generates the head office portion of a branch code value
+CREATE SEQUENCE CODE_BRANCH_ID_SEQ
+  START WITH 7162
+  MAXVALUE 8999
+  MINVALUE 7162
+  NOCYCLE
+  NOCACHE
+  NOORDER
+  NOKEEP
+  GLOBAL;
+-- client_code_historical table PK HISTORICAL_HEAD_ID sequence
+CREATE SEQUENCE HISTORICAL_HEAD_ID_SEQ
+  START WITH 1
+  NOCYCLE
+  NOCACHE
+  NOORDER
+  NOKEEP
+  GLOBAL;  

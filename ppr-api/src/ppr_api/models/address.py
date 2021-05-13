@@ -35,7 +35,8 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
 
     # relationships
     party = db.relationship('Party', uselist=False, back_populates='address')
-    client_party_branch = db.relationship('ClientPartyBranch', uselist=False, back_populates='address')
+    client_code = db.relationship('ClientCode', uselist=False, back_populates='address')
+    client_code_historical = db.relationship('ClientCodeHistorical', uselist=False, back_populates='address')
 
     def save(self):
         """Save the object to the database immediately. Only used for unit testing."""

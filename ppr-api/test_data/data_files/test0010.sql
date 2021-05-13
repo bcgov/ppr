@@ -11,7 +11,7 @@ INSERT INTO registration(registration_id, financing_id, registration_number, bas
 INSERT INTO address_ppr(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
   VALUES(200000013, 'TEST-0010', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, client_party_branch_id, first_name,
+INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_name, last_name, business_name, birth_date, address_id)
     VALUES(200000027, 'RG', 200000011, 200000000, null, null, 'TEST-CHANGE-SU', '10', 'REGISTERING', null,
            null, 200000013)
