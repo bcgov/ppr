@@ -50,8 +50,7 @@ class ClientCodeHistorical(db.Model):  # pylint: disable=too-many-instance-attri
     date_ts = db.Column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), primary_key=True,
-                          nullable=False)
+    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), nullable=False)
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
     id = db.Column('id', db.Integer, db.ForeignKey('users.id'), nullable=True)
 

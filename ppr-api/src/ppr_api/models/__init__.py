@@ -26,13 +26,15 @@ from .registration import Registration
 from .search_client import SearchClient
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
-from .type_tables import RegistrationType
+from .type_tables import CountryType, ProvinceType, PartyType, RegistrationType, RegistrationTypeClass,\
+                         SearchType, StateType, SerialType
 from .user import User
 from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
 
 
 __all__ = ('db',
-           'Address', 'ClientCode', 'ClientCodeHistorical', 'CourtOrder', 'Draft', 'FinancingStatement',
-           'GeneralCollateral', 'Party', 'Registration', 'RegistrationType', 'SearchClient',
-           'SearchResult', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')
+           'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft', 'FinancingStatement',
+           'GeneralCollateral', 'Party', 'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
+           'RegistrationTypeClass', 'SearchClient', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
+           'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')

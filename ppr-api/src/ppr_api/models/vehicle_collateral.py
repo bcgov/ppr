@@ -47,8 +47,8 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     vehicle_id = db.Column('serial_id', db.Integer,
                            db.Sequence('vehicle_id_seq'),
                            primary_key=True)
-    vehicle_type_cd = db.Column('serial_type_cd', db.String(2), nullable=False)
-    # , db.ForeignKey('serial_type.serial_type_cd'))
+    vehicle_type_cd = db.Column('serial_type_cd', db.String(2),
+                                db.ForeignKey('serial_type.serial_type_cd'), nullable=False)
     year = db.Column('year', db.Integer, nullable=True)
     make = db.Column('make', db.String(60), nullable=True)
     model = db.Column('model', db.String(60), nullable=True)
@@ -76,6 +76,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
                                           back_populates='vehicle_collateral', cascade='all, delete',
                                           uselist=False)
+    # Relationships - SerialType
+    serial_type = db.relationship('SerialType', foreign_keys=[vehicle_type_cd],
+                                  back_populates='vehicle_collateral', cascade='all, delete', uselist=False)
 
     def save(self):
         """Save the object to the database immediately."""

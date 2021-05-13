@@ -50,8 +50,8 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 #    search_id = db.Column('search_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     search_id = db.Column('search_id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
     search_ts = db.Column('search_ts', db.DateTime, nullable=False)
-    search_type_cd = db.Column('search_type_cd', db.String(2), nullable=False)
-    # , db.ForeignKey('search_type.search_type_cd'))
+    search_type_cd = db.Column('search_type_cd', db.String(2),
+                               db.ForeignKey('search_type.search_type_cd'), nullable=False)
     search_criteria = db.Column('api_criteria', db.String(1000), nullable=False)
     search_response = db.Column('search_response', db.Text, nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True)
@@ -66,6 +66,9 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
     # Relationships - SearchResult
     search_result = db.relationship('SearchResult', back_populates='search', uselist=False)
+    # Relationships - SearchType
+    search_type = db.relationship('SearchType', foreign_keys=[search_type_cd],
+                                  back_populates='search_client', cascade='all, delete', uselist=False)
 
     request_json = {}
 
