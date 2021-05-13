@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """This exports all of the models and schemas used by the application."""
-from .db import db  # noqa: I001
 from .address import Address
 from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
 from .court_order import CourtOrder
+from .db import db  # noqa: I001
 from .draft import Draft
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
@@ -26,8 +26,16 @@ from .registration import Registration
 from .search_client import SearchClient
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
-from .type_tables import CountryType, ProvinceType, PartyType, RegistrationType, RegistrationTypeClass,\
-                         SearchType, StateType, SerialType
+from .type_tables import (
+    CountryType,
+    PartyType,
+    ProvinceType,
+    RegistrationType,
+    RegistrationTypeClass,
+    SearchType,
+    SerialType,
+    StateType,
+)
 from .user import User
 from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
