@@ -164,7 +164,7 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
 
 export const vehicleTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-sm',
+    class: 'column-md',
     sortable: false,
     text: 'Vehicle Type',
     value: 'vehicle.type'

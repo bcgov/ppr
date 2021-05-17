@@ -20,7 +20,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" :class="$style['length-trust-label']">
+        <v-col cols="3" class="generic-label">
           Registration Length
         </v-col>
         <v-col :class="$style['summary-text']">
@@ -28,7 +28,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" :class="$style['length-trust-label']">
+        <v-col cols="3" class="generic-label">
           Trust Indenture
         </v-col>
         <v-col :class="$style['summary-text']">
@@ -40,7 +40,7 @@
   </v-container>
   <v-container fluid no-gutters class="white pa-6" :class="{'invalid-message': showErrorComponent}" v-else>
     <v-row no-gutters>
-      <v-col cols="3" :class="$style['length-trust-label']">
+      <v-col cols="3" class="generic-label">
         <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
       </v-col>
       <v-col cols="1">
@@ -72,7 +72,7 @@
       <v-divider class="mx-4" />
     </v-row>
     <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
-      <v-col cols="3" :class="$style['length-trust-label']">
+      <v-col cols="3" class="generic-label">
         Trust Indenture
       </v-col>
       <v-col cols="1">
@@ -253,11 +253,6 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  color: $gray9;
-  font-weight: bold;
-}
-
 .summary-text{
   font-size: 16px;
   color: $gray7;

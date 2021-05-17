@@ -13,6 +13,8 @@
     "@sentry/browser": "^6.0.4",
     "@sentry/integrations": "^6.0.4",
     "@vue/composition-api": "^1.0.0-rc.1",
+    "@vuelidate/core": "^2.0.0-alpha.16",
+    "@vuelidate/validators": "^2.0.0-alpha.13",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "flush-promises": "^1.0.2",
@@ -24,7 +26,6 @@
     "vue-affix": "^0.5.2",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
-    "vuelidate": "^0.7.6",
     "vuetify": "2.3.10",
     "vuetify-loader": "^1.7.1",
     "vuex": "^3.4.0",
@@ -58,8 +59,8 @@
     "vue-class-component": "^7.2.3",
     "vue-cli-plugin-vuetify": "^2.1.0",
     "vue-template-compiler": "^2.6.11",
-    "vuex-module-decorators": "^0.16.1",
-    "vue-test-utils-helpers": "https://github.com/bcgov/vue-test-utils-helpers.git"
+    "vue-test-utils-helpers": "https://github.com/bcgov/vue-test-utils-helpers.git",
+    "vuex-module-decorators": "^0.16.1"
   },
   "eslintConfig": {
     "root": true,

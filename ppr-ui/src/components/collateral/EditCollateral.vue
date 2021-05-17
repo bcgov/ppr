@@ -1,63 +1,63 @@
 <template>
   <div id="edit-vehicle" class="white pa-6">
     <v-expand-transition>
-      <ul class="list add-vehicle">
-        <li class="add-vehicle-container">
-          <div class="meta-container">
+      <v-row no-gutters>
+        <v-col cols="3">
             <label
-              class="add-vehicle-header"
+              class="add-vehicle-header general-label"
               :class="{ 'error-text': invalidSection }"
             >
               <span v-if="activeIndex === -1" class="pl-5"> Add Vehicle </span>
               <span v-else>Edit Vehicle</span>
             </label>
-
-            <div class="meta-container__inner">
+        </v-col>
+        <v-col cols="9">
               <v-form
                 ref="vehicleForm"
                 class="vehicle-form"
                 v-on:submit.prevent="addVehicle"
               >
-                <v-row>
+                <v-row no-gutters>
+                    <v-col>
+                      <v-select
+                        :items="vehicleTypes"
+                        filled
+                        label="Vehicle Type"
+                        v-model="vehicle.type"
+                        id="txt-type"
+                      >
+                        <template slot="item" slot-scope="data">
+                          <span class="list-item">
+                            {{ data.item.text }}
+                          </span>
+                        </template>
+                      </v-select>
+                    </v-col>
+                </v-row>
+                <v-row no-gutters>
                   <v-col>
                     <v-text-field
                       filled
-                      label="Serial / VIN / DOT/ MH Number"
-                      hint="17 characters; no letters O,Q or "
+                      :label="getSerialLabel"
+                      :disabled="getSerialDisabled"
                       id="txt-serial"
                       v-model="vehicle.serialNumber"
                       persistent-hint
                     />
                   </v-col>
                 </v-row>
-                <v-row>
-                  <v-col cols="8">
-                    <v-select
-                      :items="vehicleTypes"
-                      filled
-                      label="Vehicle Type"
-                      v-model="vehicle.type"
-                      id="txt-type"
-                    >
-                      <template slot="item" slot-scope="data">
-                        <span class="list-item">
-                          {{ data.item.text }}
-                        </span>
-                      </template>
-                    </v-select>
-                  </v-col>
+                <v-row no-gutters>
                   <v-col cols="4">
-                    <v-select
-                      :items="getYears"
+                    <v-text-field
                       filled
                       label="Year"
-                      v-model="vehicle.year"
                       id="txt-years"
-                    >
-                    </v-select>
+                      v-model="vehicle.year"
+                      persistent-hint
+                    />
                   </v-col>
                 </v-row>
-                <v-row>
+                <v-row no-gutters>
                   <v-col>
                     <v-text-field
                       filled
@@ -68,7 +68,7 @@
                     />
                   </v-col>
                 </v-row>
-                <v-row>
+                <v-row no-gutters>
                   <v-col>
                     <v-text-field
                       filled
@@ -97,7 +97,7 @@
                       id="done-btn"
                       class="m1-auto"
                       color="primary"
-                      @click="validateForm()"
+                      @click="validateCollateralForm()"
                     >
                       Done
                     </v-btn>
@@ -115,10 +115,8 @@
                   </v-col>
                 </v-row>
               </v-form>
-            </div>
-          </div>
-        </li>
-      </ul>
+        </v-col>
+      </v-row>
     </v-expand-transition>
   </div>
 </template>
@@ -133,6 +131,7 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { VehicleTypes } from '@/resources'
+import { useCollateralForm } from '@/composables/useCollateralForm'
 
 export default defineComponent({
   props: {
@@ -150,16 +149,24 @@ export default defineComponent({
     console.log(props.activeIndex)
     const { setAddCollateral } = useActions<any>(['setAddCollateral'])
     const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
-
+    const { vehicle, errors, handleBlur, isValidForm, formErrors } = useCollateralForm(props.activeIndex) // eslint-disable-line 
     const localState = reactive({
       // eslint-disable-line
       vehicleTypes: VehicleTypes,
-      vehicle: computed(() => {
-        const vehicles: VehicleCollateralIF[] = getAddCollateral.value.vehicleCollateral
-        if (props.activeIndex >= 0) {
-          return vehicles[props.activeIndex]
+      vehicle,
+      getSerialLabel: computed(function () {
+        if (vehicle.type === '') {
+          return 'Select a vehicle type first'
+        } else {
+          return 'Serial or VIN Number'
         }
-        return { id: -1, type: '', year: 2021, make: '', model: '', serialNumber: '' }
+      }),
+      getSerialDisabled: computed(function () {
+        if (vehicle.type === '') {
+          return true
+        } else {
+          return false
+        }
       })
     })
     const getYears = computed(function () {
@@ -170,20 +177,25 @@ export default defineComponent({
       ).reverse()
     })
 
-    const validateForm = () => {
-      let collateral = getAddCollateral.value // eslint-disable-line
-      let newList: VehicleCollateralIF[] = collateral.vehicleCollateral // eslint-disable-line
-      // New vehicle
-      if (props.activeIndex === -1) {
-        localState.vehicle.id = newList.length + 1
-        newList.push(localState.vehicle)
+    const validateCollateralForm = () => {
+      const valid = isValidForm()
+      if (valid) {
+        let collateral = getAddCollateral.value // eslint-disable-line
+        let newList: VehicleCollateralIF[] = collateral.vehicleCollateral // eslint-disable-line
+        // New vehicle
+        if (props.activeIndex === -1) {
+          vehicle.id = newList.length + 1
+          newList.push(vehicle)
+        } else {
+          // Edit vehicle
+          newList.splice(props.activeIndex, 1, vehicle)
+        }
+        collateral.vehicleCollateral = newList
+        setAddCollateral(collateral)
+        context.emit('resetEvent')
       } else {
-        // Edit vehicle
-        newList.splice(props.activeIndex, 1, localState.vehicle)
+        let errors = formErrors() // eslint-disable-line 
       }
-      collateral.vehicleCollateral = newList
-      setAddCollateral(collateral)
-      context.emit('resetEvent')
     }
 
     const resetFormAndData = (emitEvent: boolean): void => {
@@ -198,7 +210,7 @@ export default defineComponent({
 
     return {
       getYears,
-      validateForm,
+      validateCollateralForm,
       resetFormAndData,
       removeVehicle,
       ...toRefs(localState)

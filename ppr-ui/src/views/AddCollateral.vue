@@ -16,14 +16,14 @@
             </v-row>
             <stepper class="mt-4" />
 
-        <v-row class='pt-6'>
-          <v-col cols="auto" class="sub-header p4-6">
+        <v-row class='pt-6 pl-2'>
+          <v-col cols="auto" class="header">
             Add Collateral
           </v-col>
         </v-row>
         <v-row class="pa-2">
           <v-col cols="auto">
-            Add the collateral for this registration.
+            Add the collateral for this {{ registrationTypeUI }}.
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -36,13 +36,13 @@
             <registration-fee :registrationType="registrationTypeUI"/>
           </v-col>
     </v-row>
+      </v-container>
+    </v-row>
     <v-row no-gutters class='pt-10'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
                        :router="this.$router" @draft-save-error="saveDraftError"/>
       </v-col>
-    </v-row>
-  </v-container>
     </v-row>
   </v-container>
 </template>

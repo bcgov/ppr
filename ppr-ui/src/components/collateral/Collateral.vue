@@ -22,31 +22,29 @@
   </v-container>
   <v-container fluid no-gutters v-else class="pa-0">
     <v-row no-gutters>
-      <v-container fluid>
-        <v-row no-gutters>
-          <v-col cols="auto">Your registration must include one of the following:</v-col>
+
+          <v-col cols="auto"><b>Your registration must include one of the following:</b></v-col>
         </v-row>
         <v-row no-gutters class='pt-6'>
           <v-col cols="auto">
-            <b>At least one form of collateral (vehicle or general)</b>
+            <ul><li>At least one form of collateral (vehicle or general)</li></ul>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row no-gutters class="pb-4 pt-4">
           <v-col>
             <v-btn
                 id="btn-add-collateral"
                 outlined
                 color="primary"
-                class="ml-2"
                 @click="showAddVehicle=true"
               >
-                <v-icon>mdi-domain-plus</v-icon>
+                <v-icon>mdi-plus</v-icon>
                 <span>Add Vehicle Collateral</span>
             </v-btn>
           </v-col>
         </v-row>
-      </v-container>
-    </v-row>
+     <v-row no-gutters>
+      <v-col>
     <div :class="{'invalid-section': invalidSection}">
       <v-expand-transition>
         <v-card flat class="add-collateral-container" v-if="showAddVehicle">
@@ -58,7 +56,9 @@
         </v-card>
       </v-expand-transition>
     </div>
-    <v-row no-gutters>
+      </v-col>
+     </v-row>
+    <v-row no-gutters class="pt-4">
       <v-col>
         <v-data-table
           class="collateral-table"
@@ -145,22 +145,30 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row no-gutters class='pt-6'>
-          <v-col cols="auto">
+    <v-row>
+      <v-col>
+    <v-card flat id="general-collateral">
+      <v-container fluid no-gutters class="pa-0">
+        <v-row no-gutters class='pt-6'>
+          <v-col cols="3" class="generic-label pa-4">
             General Collateral:
           </v-col>
+            <v-col cols="9" class="pr-4">
+                <v-textarea
+                  v-model="generalCollateral"
+                  id="generalCollateral"
+                  auto-grow
+                  counter="4000"
+                  filled
+                  height="250"
+                  class="white pt-2 text-input-field"
+                >
+              </v-textarea>
+            </v-col>
         </v-row>
-    <v-row no-gutters>
-        <v-col cols="9">
-            <v-text-field
-              v-model="generalCollateral"
-              id="generalCollateral"
-              class="white pt-2 text-input-field"
-              hint="0 of xxxx characters"
-              persistent-hint
-            >
-          </v-text-field>
-        </v-col>
+      </v-container>
+    </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>

@@ -4,26 +4,26 @@
       <v-col cols="9"  class="align=left pl-12">
         <span class="pr-3" v-if="buttonConfig.showCancel">
           <v-btn id='reg-cancel-btn' outlined color="primary" @click="submitCancel">
-            <b>Cancel</b>
+            Cancel
           </v-btn>
         </span>
         <span class="pr-3" v-if="buttonConfig.showSaveResume">
           <v-btn id='reg-save-resume-btn' outlined color="primary" @click="submitSaveResume">
-            <b>Save and Resume Later</b>
+            Save and Resume Later
           </v-btn>
         </span>
         <v-btn id='reg-save-btn' outlined color="primary" @click="submitSave" v-if="buttonConfig.showSave">
-          <b>Save</b>
+          Save
         </v-btn>
       </v-col>
       <v-col cols="3" class="align=right">
         <span class="pr-3" v-if="buttonConfig.showBack">
           <v-btn id='reg-back-btn' outlined color="primary" @click="submitBack">
-            <b>&lt; Back</b>
+            &lt; Back
           </v-btn>
         </span>
         <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-          <b>{{buttonConfig.nextText}} ></b>
+          {{buttonConfig.nextText}} >
         </v-btn>
       </v-col>
     </v-row>

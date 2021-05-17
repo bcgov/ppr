@@ -302,6 +302,13 @@ ul.list {
   font-weight: bold;
 }
 
+.header {
+  color: #212529;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+
 .sub-header {
   color: #212529;
   font-size: 16px;
@@ -331,4 +338,9 @@ span.invalid-message {
 .theme--light.v-list-item.v-list-item--link:hover {
   background-color: $gray3;
   color: $primary-blue !important;
+}
+
+.generic-label {
+  color: $gray9;
+  font-weight: bold;
 }
