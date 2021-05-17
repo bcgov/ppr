@@ -55,9 +55,9 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
     birth_date = db.Column('birth_date', db.DateTime, nullable=True)
     # Search keys
-    first_name_key = db.Column('first_name_key', db.String(50), nullable=True)
-    last_name_key = db.Column('last_name_key', db.String(50), nullable=True)
-    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True)
+    first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
+    last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
+    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
     # Legacy only
     block_number = db.Column('block_number', db.Integer, nullable=True)
 

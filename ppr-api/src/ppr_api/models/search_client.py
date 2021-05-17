@@ -49,12 +49,12 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
 #    search_id = db.Column('search_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     search_id = db.Column('search_id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
-    search_ts = db.Column('search_ts', db.DateTime, nullable=False)
+    search_ts = db.Column('search_ts', db.DateTime, nullable=False, index=True)
     search_type_cd = db.Column('search_type_cd', db.String(2),
                                db.ForeignKey('search_type.search_type_cd'), nullable=False)
     search_criteria = db.Column('api_criteria', db.String(1000), nullable=False)
     search_response = db.Column('search_response', db.Text, nullable=True)
-    account_id = db.Column('account_id', db.String(20), nullable=True)
+    account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
     client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
     total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
     returned_results_size = db.Column('returned_results_size', db.Integer, nullable=True)

@@ -54,7 +54,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     model = db.Column('model', db.String(60), nullable=True)
     serial_number = db.Column('serial_number', db.String(30), nullable=True)
     mhr_number = db.Column('mhr_number', db.String(7), nullable=True)
-    search_vin = db.Column('srch_vin', db.String(6), nullable=True)
+    search_vin = db.Column('srch_vin', db.String(6), nullable=True, index=True)
     # Legacy only
     block_number = db.Column('block_number', db.Integer, nullable=True)
 
