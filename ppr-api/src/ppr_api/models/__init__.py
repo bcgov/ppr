@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """This exports all of the models and schemas used by the application."""
+from .db import db
 from .address import Address
 from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
 from .court_order import CourtOrder
-from .db import db  # noqa: I001
 from .draft import Draft
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
