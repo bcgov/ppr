@@ -10,9 +10,10 @@
     "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --testPathPattern --no-cache --watch --runInBand"
   },
   "dependencies": {
+    "@lemoncode/fonk": "^1.5.1",
     "@sentry/browser": "^6.0.4",
     "@sentry/integrations": "^6.0.4",
-    "@vue/composition-api": "^1.0.0-rc.1",
+    "@vue/composition-api": "^1.0.0-rc.8",
     "@vuelidate/core": "^2.0.0-alpha.16",
     "@vuelidate/validators": "^2.0.0-alpha.13",
     "axios": "^0.21.1",

@@ -23,7 +23,7 @@
                         :items="vehicleTypes"
                         filled
                         label="Vehicle Type"
-                        v-model="vehicle.type"
+                        v-model="type"
                         id="txt-type"
                       >
                         <template slot="item" slot-scope="data">
@@ -41,7 +41,7 @@
                       :label="getSerialLabel"
                       :disabled="getSerialDisabled"
                       id="txt-serial"
-                      v-model="vehicle.serialNumber"
+                      v-model="serialNumber"
                       persistent-hint
                     />
                   </v-col>
@@ -52,7 +52,7 @@
                       filled
                       label="Year"
                       id="txt-years"
-                      v-model="vehicle.year"
+                      v-model="year"
                       persistent-hint
                     />
                   </v-col>
@@ -63,9 +63,11 @@
                       filled
                       label="Make"
                       id="txt-make"
-                      v-model="vehicle.make"
+                      v-model="make"
                       persistent-hint
+                      @blur="validateInput('make')"
                     />
+                    <span>{{ errors.make.message }}</span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters>
@@ -74,7 +76,7 @@
                       filled
                       label="Model"
                       id="txt-model"
-                      v-model="vehicle.model"
+                      v-model="model"
                       persistent-hint
                     />
                   </v-col>
@@ -126,12 +128,15 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs
+  toRefs,
+  onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { VehicleTypes } from '@/resources'
-import { useCollateralForm } from '@/composables/useCollateralForm'
+import { createDefaultValidationResult } from '@lemoncode/fonk'
+import { formValidation } from '@/composables/collateralFormValidator'
+// import { useCollateralForm } from '@/composables/useCollateralForm'  // eslint-disable-line
 
 export default defineComponent({
   props: {
@@ -146,56 +151,74 @@ export default defineComponent({
   },
   emits: ['addEditVehicle', 'resetEvent'],
   setup (props, context) {
-    console.log(props.activeIndex)
     const { setAddCollateral } = useActions<any>(['setAddCollateral'])
     const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
-    const { vehicle, errors, handleBlur, isValidForm, formErrors } = useCollateralForm(props.activeIndex) // eslint-disable-line 
+
+    let vehicleState = reactive({} as VehicleCollateralIF)
+
+    const getVehicle = () => {
+      const vehicles: VehicleCollateralIF[] = getAddCollateral.value.vehicleCollateral
+      if (props.activeIndex >= 0) {
+        vehicleState = vehicles[props.activeIndex]
+      }
+    }
+
+    onMounted(getVehicle)
+
+    const createEmptyErrors = () => ({
+      type: createDefaultValidationResult(),
+      year: createDefaultValidationResult(),
+      make: createDefaultValidationResult(),
+      model: createDefaultValidationResult(),
+      serialNumber: createDefaultValidationResult()
+    })
+
+    // const { vehicle, errors, handleBlur, isValidForm, formErrors } = useCollateralForm(props.activeIndex)
     const localState = reactive({
-      // eslint-disable-line
+      errors: createEmptyErrors(),
       vehicleTypes: VehicleTypes,
-      vehicle,
       getSerialLabel: computed(function () {
-        if (vehicle.type === '') {
+        if (vehicleState.type === '') {
           return 'Select a vehicle type first'
         } else {
           return 'Serial or VIN Number'
         }
       }),
       getSerialDisabled: computed(function () {
-        if (vehicle.type === '') {
+        if (vehicleState.type === '') {
           return true
         } else {
           return false
         }
       })
     })
-    const getYears = computed(function () {
-      const year = new Date().getFullYear()
-      return Array.from(
-        { length: year - 1900 },
-        (value, index) => 1901 + index
-      ).reverse()
-    })
 
-    const validateCollateralForm = () => {
-      const valid = isValidForm()
-      if (valid) {
+    const validateCollateralForm = async () => {
+      const validationResult = await formValidation.validateForm(vehicleState)
+      localState.errors = { ...localState.errors, ...validationResult.fieldErrors }
+      if (validationResult.succeeded) {
         let collateral = getAddCollateral.value // eslint-disable-line
         let newList: VehicleCollateralIF[] = collateral.vehicleCollateral // eslint-disable-line
         // New vehicle
         if (props.activeIndex === -1) {
-          vehicle.id = newList.length + 1
-          newList.push(vehicle)
+          vehicleState.id = newList.length + 1
+          newList.push(vehicleState)
         } else {
           // Edit vehicle
-          newList.splice(props.activeIndex, 1, vehicle)
+          newList.splice(props.activeIndex, 1, vehicleState)
         }
         collateral.vehicleCollateral = newList
         setAddCollateral(collateral)
         context.emit('resetEvent')
       } else {
-        let errors = formErrors() // eslint-disable-line 
+        // let errors = formErrors() // eslint-disable-line 
       }
+    }
+
+    const validateInput = fieldName => {
+      const value = event.target
+      formValidation.validateField(fieldName, value)
+        .then(validationResult => (localState.errors[fieldName] = validationResult))
     }
 
     const resetFormAndData = (emitEvent: boolean): void => {
@@ -209,11 +232,12 @@ export default defineComponent({
     }
 
     return {
-      getYears,
       validateCollateralForm,
       resetFormAndData,
       removeVehicle,
-      ...toRefs(localState)
+      validateInput,
+      ...toRefs(localState),
+      ...toRefs(vehicleState)
     }
   }
 })

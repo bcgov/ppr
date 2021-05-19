@@ -1,7 +1,8 @@
 <template>
   <v-footer class="white pa-0">
     <v-row no-gutters class="pl-16 pt-8 pb-15">
-      <v-col cols="9"  class="align=left pl-12">
+      <v-col cols="3"></v-col>
+      <v-col cols="9" class="align=left pl-12">
         <span class="pr-3" v-if="buttonConfig.showCancel">
           <v-btn id='reg-cancel-btn' outlined color="primary" @click="submitCancel">
             Cancel
@@ -16,7 +17,7 @@
           Save
         </v-btn>
       </v-col>
-      <v-col cols="3" class="align=right">
+      <v-col cols="3">
         <span class="pr-3" v-if="buttonConfig.showBack">
           <v-btn id='reg-back-btn' outlined color="primary" @click="submitBack">
             &lt; Back

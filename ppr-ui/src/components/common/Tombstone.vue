@@ -1,6 +1,8 @@
 <template>
   <v-container fluid class="px-0 py-0 pb-7 white" style="max-width: none;">
+
     <v-row no-gutters align="center" :class="[$style['breadcrumb-row'], 'px-15', 'py-2']">
+      <v-container fluid class="pt-4">
       <v-col cols="auto" class="pr-3" style="border-right: thin solid #ced4da">
         <v-btn id="tombstone-back-btn" :class="$style['back-btn']" exact :href="backURL" icon small>
           <v-icon>mdi-arrow-left</v-icon>
@@ -19,11 +21,15 @@
           </v-breadcrumbs-divider>
         </v-breadcrumbs>
       </v-col>
+      </v-container>
     </v-row>
     <v-row no-gutters id="tombstone-header" class="px-15 pt-7">
+      <v-container fluid class="pt-4">
       <span :class="$style['tombstone-header']"><b>{{ header }}</b></span>
+      </v-container>
     </v-row>
     <v-row no-gutters id="tombstone-user-info" :class="[$style['tombstone-sub-header'], 'px-15', 'pt-3']">
+      <v-container fluid class="pt-4">
       <v-col cols="10">
         <v-row no-gutters>
           <v-col cols="auto" class="pr-3" style="border-right: thin solid #dee2e6">
@@ -39,7 +45,9 @@
           {{ date }}
         </v-row>
       </v-col>
+      </v-container>
     </v-row>
+
   </v-container>
 </template>
 <script lang="ts">
