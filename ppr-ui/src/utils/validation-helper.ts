@@ -94,7 +94,7 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
         validation.searchValue.message = 'Enter a registration number to search'
       }
       if (searchValue && searchValue.length !== 7) {
-        validation.searchValue.message = 'Must contain 7 letters oe numbers'
+        validation.searchValue.message = 'Registration numbers contain 7 characters'
       }
       break
   }
@@ -182,7 +182,7 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
       break
     case UISearchTypes.REGISTRATION_NUMBER:
       if (searchValue && searchValue.length !== 7) {
-        validation.searchValue.message = 'Must contain 7 letters or numbers'
+        validation.searchValue.message = 'Registration numbers contain 7 characters'
       }
       break
   }
