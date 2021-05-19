@@ -93,7 +93,7 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
       if (!searchValue) {
         validation.searchValue.message = 'Enter a registration number to search'
       }
-      if (searchValue.length !== 7) {
+      if (searchValue && searchValue.length !== 7) {
         validation.searchValue.message = 'Must contain 7 letters oe numbers'
       }
       break
