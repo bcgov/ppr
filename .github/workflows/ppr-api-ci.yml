@@ -6,22 +6,24 @@ on:
     paths:
       - "ppr-api/**"
 
-jobs:
-  ppr-api-ci:
-    env:
-      IMAGE_NAME: ppr-api
-      NATS_SERVERS: "nats://nats:4222"
-      NATS_CLIENT_NAME: entity.ppr_api
-      NATS_CLUSTER_ID: test-cluster
-      NATS_FILER_SUBJECT: entity.ppr.pay
-      NATS_QUEUE: ppr-worker
-      JWT_OIDC_JWKS_CACHE_TIMEOUT: 300
+defaults:
+  run:
+    shell: bash
+    working-directory: ./ppr-api
 
+jobs:
+  setup-job:
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./ppr-api
+
+    if: github.repository == 'bcgov/ppr'
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: "true"
+
+  linting:
+    needs: setup-job
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
@@ -36,12 +38,39 @@ jobs:
       - name: Install dependencies
         run: |
           make setup
-      - name: Lint
+      - name: Lint with pylint
+        id: pylint
         run: |
-          make lint
+          make pylint
+      - name: Lint with flake8
+        id: flake8
+        run: |
+          make flake8
+
+  testing:
+    needs: setup-job
+    env:
+      IMAGE_NAME: ppr-api
+      NATS_SERVERS: "nats://nats:4222"
+      NATS_CLIENT_NAME: entity.ppr_api
+      NATS_CLUSTER_ID: test-cluster
+      NATS_FILER_SUBJECT: entity.ppr.pay
+      NATS_QUEUE: ppr-worker
+      JWT_OIDC_JWKS_CACHE_TIMEOUT: 300
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          make setup
       - name: Test with pytest
-        env:
-            PPR_API_KEY: ${{ secrets.PPR_API_KEY }}
+        id: test
         run: |
           make test
       - name: Upload coverage to Codecov
@@ -51,6 +80,14 @@ jobs:
           flags: ppr-api
           name: codecov-ppr-api
           fail_ci_if_error: true
+
+  build-check:
+    needs: setup-job
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
       - name: build to check strictness
+        id: build
         run: |
           make build-nc
