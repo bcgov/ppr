@@ -53,8 +53,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 #    financing_id = db.Column('financing_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     financing_id = db.Column('financing_id', db.Integer,
                              db.Sequence('financing_id_seq'), primary_key=True)
-    state_type_cd = db.Column('state_type_cd', db.String(3), nullable=False)
-    # , db.ForeignKey('state_type.state_type_cd'))
+    state_type_cd = db.Column('state_type_cd', db.String(3), db.ForeignKey('state_type.state_type_cd'), nullable=False)
     registration_num = db.Column('registration_number', db.String(10), nullable=False)
     life = db.Column('life', db.Integer, nullable=True)
     expire_date = db.Column('expire_date', db.DateTime, nullable=True)
@@ -85,6 +84,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                          order_by='asc(GeneralCollateral.collateral_id)',
                                          back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
+    # Relationships - StateType
+    state_type = db.relationship('StateType', foreign_keys=[state_type_cd],
+                                 back_populates='financing_statement', cascade='all, delete', uselist=False)
 
     # Use to indicate if a party or collateral is not in the original financing statement.
     mark_update_json = False
@@ -170,6 +172,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             for party in self.parties:
                 if party.party_type_cd == party_type and registration_id == party.registration_id:
                     return party.json
+            # No registering party record: legacy data.
+            return {}
 
         parties = []
         for party in self.parties:

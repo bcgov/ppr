@@ -44,14 +44,14 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
 
 #    draft_id = db.Column('draft_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     draft_id = db.Column('draft_id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
-    document_number = db.Column('document_number', db.String(10), nullable=False,
+    document_number = db.Column('document_number', db.String(10), nullable=False, unique=True,
                                 default=db.func.get_draft_document_number())
-    account_id = db.Column('account_id', db.String(20), nullable=False)
-    create_ts = db.Column('create_ts', db.DateTime, nullable=False)
+    account_id = db.Column('account_id', db.String(20), nullable=False, index=True)
+    create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
     registration_type_cl = db.Column('registration_type_cl', db.String(10), nullable=False)
     registration_type_cd = db.Column('registration_type_cd', db.String(2), nullable=False)
     draft = db.Column('draft', db.Text, nullable=False)
-    registration_number = db.Column('registration_number', db.String(10), nullable=False)
+    registration_number = db.Column('registration_number', db.String(10), nullable=True)
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
 
     # parent keys

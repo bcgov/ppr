@@ -46,8 +46,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
 #    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     party_id = db.Column('party_id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
-    party_type_cd = db.Column('party_type_cd', db.String(3), nullable=False)
-    # , db.ForeignKey('party_type.party_type_cd'))
+    party_type_cd = db.Column('party_type_cd', db.String(3), db.ForeignKey('party_type.party_type_cd'), nullable=False)
     # party person
     first_name = db.Column('first_name', db.String(50), nullable=True)
     middle_name = db.Column('middle_name', db.String(50), nullable=True)
@@ -56,9 +55,9 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
     birth_date = db.Column('birth_date', db.DateTime, nullable=True)
     # Search keys
-    first_name_key = db.Column('first_name_key', db.String(50), nullable=True)
-    last_name_key = db.Column('last_name_key', db.String(50), nullable=True)
-    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True)
+    first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
+    last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
+    business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
     # Legacy only
     block_number = db.Column('block_number', db.Integer, nullable=True)
 
@@ -87,6 +86,9 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
                                           back_populates='parties', cascade='all, delete',
                                           uselist=False)
+    # Relationships - PartyType
+    party_type = db.relationship('PartyType', foreign_keys=[party_type_cd],
+                                 back_populates='party', cascade='all, delete', uselist=False)
 
     @property
     def json(self) -> dict:

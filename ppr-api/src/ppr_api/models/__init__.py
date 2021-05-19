@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """This exports all of the models and schemas used by the application."""
-from .db import db  # noqa: I001
+from .db import db
 from .address import Address
 from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
@@ -26,13 +26,23 @@ from .registration import Registration
 from .search_client import SearchClient
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
-from .type_tables import RegistrationType
+from .type_tables import (
+    CountryType,
+    PartyType,
+    ProvinceType,
+    RegistrationType,
+    RegistrationTypeClass,
+    SearchType,
+    SerialType,
+    StateType,
+)
 from .user import User
 from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
 
 
 __all__ = ('db',
-           'Address', 'ClientCode', 'ClientCodeHistorical', 'CourtOrder', 'Draft', 'FinancingStatement',
-           'GeneralCollateral', 'Party', 'Registration', 'RegistrationType', 'SearchClient',
-           'SearchResult', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')
+           'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft', 'FinancingStatement',
+           'GeneralCollateral', 'Party', 'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
+           'RegistrationTypeClass', 'SearchClient', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
+           'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')
