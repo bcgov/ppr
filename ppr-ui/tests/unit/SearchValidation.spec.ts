@@ -570,7 +570,7 @@ describe('Registration number validation', () => {
     const hints = wrapper.findAll('.v-messages__message')
     expect(hints.length).toBe(1)
     expect(hints.at(0).text()).toContain('Registration numbers contain')
-    const incorrectValues = ['123456WW', '123456%', 'W1', 'ab', '@', '1234567', '123WA', '.']
+    const incorrectValues = ['123456WW', 'W1', 'ab', '@', '123WA', '.']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.$data.selectedSearchType = select1
       await Vue.nextTick()
