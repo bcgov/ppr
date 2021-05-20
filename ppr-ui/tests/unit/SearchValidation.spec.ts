@@ -544,7 +544,7 @@ describe('Registration number validation', () => {
 
   it('prevents searching when search value is in incorrect format', async () => {
     const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[6]
-    const incorrectValues = ['123456WW', '12345W', '123456%', '123', 'abc', 'abcdef1', '1234567']
+    const incorrectValues = ['123456WW', '12345W', '123', 'abc']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.$data.selectedSearchType = select1
       await Vue.nextTick()
@@ -555,7 +555,7 @@ describe('Registration number validation', () => {
       expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
       const messages1 = wrapper.findAll('.v-messages__message')
       expect(messages1.length).toBe(1)
-      expect(messages1.at(0).text()).toBe('Must contain 6 digits followed by 1 letter, e.g., 123456A')
+      expect(messages1.at(0).text()).toBe('Registration numbers contain 7 characters')
       await Vue.nextTick()
       expect(getLastEvent(wrapper, searchError)).toBeNull()
       expect(getLastEvent(wrapper, searchData)).toBeNull()
@@ -570,7 +570,7 @@ describe('Registration number validation', () => {
     const hints = wrapper.findAll('.v-messages__message')
     expect(hints.length).toBe(1)
     expect(hints.at(0).text()).toContain('Registration numbers contain')
-    const incorrectValues = ['123456WW', '123456%', 'W1', 'ab', '@', '1234567', '123WA', '.']
+    const incorrectValues = ['123456WW', 'W1', 'ab', '@', '123WA', '.']
     for (let i = 0; i < incorrectValues.length; i++) {
       wrapper.vm.$data.selectedSearchType = select1
       await Vue.nextTick()
@@ -580,7 +580,7 @@ describe('Registration number validation', () => {
       await Vue.nextTick()
       const messages1 = wrapper.findAll('.v-messages__message')
       expect(messages1.length).toBe(1)
-      expect(messages1.at(0).text()).toBe('Must contain 6 digits followed by 1 letter, e.g., 123456A')
+      expect(messages1.at(0).text()).toBe('Registration numbers contain 7 characters')
     }
   })
 })
