@@ -169,8 +169,8 @@ def session(app, db):  # pylint: disable=redefined-outer-name, invalid-name
 
         db.session = sess
 
-#        sql = text('select 1')
-        sql = text('select 1 from dual')
+        sql = text('select 1')
+        # sql = text('select 1 from dual')
         sess.execute(sql)
 
         yield sess

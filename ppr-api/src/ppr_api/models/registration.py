@@ -45,8 +45,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'registration'
 
-#    registration_id = db.Column('registration_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-#    registration_id = db.Column('registration_id', db.Integer, db.Sequence('registration_id_seq'), primary_key=True)
     # Always use get_generated_values() to generate PK.
     registration_id = db.Column('registration_id', db.Integer, primary_key=True)
     registration_type_cl = db.Column('registration_type_cl', db.String(10), nullable=False)
@@ -66,15 +64,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     user_id = db.Column('user_id', db.String(1000), nullable=True)
     detail_description = db.Column('detail_description', db.String(180), nullable=True)
-    sp_number = db.Column('sp_number', db.Integer, nullable=True)
-    de_number = db.Column('de_number', db.Integer, nullable=True)
-    ve_number = db.Column('ve_number', db.Integer, nullable=True)
 
     # parent keys
     financing_id = db.Column('financing_id', db.Integer,
                              db.ForeignKey('financing_statement.financing_id'), nullable=False)
-    document_number = db.Column('document_number', db.String(10),
-                                db.ForeignKey('draft.document_number'), nullable=False)
+    draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('draft.draft_id'), nullable=False)
     registration_type_cd = db.Column('registration_type_cd', db.String(2),
                                      db.ForeignKey('registration_type.registration_type_cd'), nullable=False)
 
@@ -86,9 +80,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     parties = db.relationship('Party', back_populates='registration')
     general_collateral = db.relationship('GeneralCollateral', back_populates='registration')
     vehicle_collateral = db.relationship('VehicleCollateral', back_populates='registration')
-    draft = db.relationship('Draft', foreign_keys=[document_number], uselist=False)
+    draft = db.relationship('Draft', foreign_keys=[draft_id], uselist=False)
     trust_indenture = db.relationship('TrustIndenture', back_populates='registration', uselist=False)
     court_order = db.relationship('CourtOrder', back_populates='registration', uselist=False)
+
+    document_number: str = None
 
     @property
     def json(self) -> dict:
@@ -108,9 +104,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         else:
             registration['changeRegistrationNumber'] = self.registration_num
 
-#        if self.registration_type_cd != model_utils.REG_TYPE_DISCHARGE and \
+#        if self.draft and self.registration_type_cd != model_utils.REG_TYPE_DISCHARGE and \
 #               self.registration_type_cd != model_utils.REG_TYPE_RENEWAL:
-#            registration['documentId'] = self.document_number
+#            registration['documentId'] = self.draft.document_number
 
         if self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
                                          model_utils.REG_CLASS_AMEND_COURT,
@@ -275,8 +271,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not draft:
             registration.document_number = reg_vals.document_number
             draft = Draft.create_from_registration(registration, json_data)
-        else:
-            registration.document_number = draft.document_number
         registration.draft = draft
         registration.registration_type_cl = registration_type_cl
         if registration_type_cl in (model_utils.REG_CLASS_AMEND,
@@ -384,8 +378,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not draft:
             registration.document_number = reg_vals.document_number
             draft = Draft.create_from_registration(registration, json_data)
-        else:
-            registration.document_number = draft.document_number
         registration.draft = draft
 
         return registration
@@ -586,9 +578,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration = Registration()
 
         # generate reg id, reg number. If not existing draft also generate doc number
-        query = 'select registration_id_seq.nextval, get_registration_num(), get_draft_document_number() from dual'
+        query = "select nextval('registration_id_seq'), get_registration_num(), get_draft_document_number()"
         if draft:
-            query = 'select registration_id_seq.nextval, get_registration_num() from dual'
+            query = "select nextval('registration_id_seq'), get_registration_num()"
 
         result = db.session.execute(query)
         row = result.first()

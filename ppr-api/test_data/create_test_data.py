@@ -63,13 +63,11 @@ with app.app_context():
     options = dict(bind=conn, binds={})
     session = db.create_scoped_session(options=options)
 
-    execute_script(session, 'test_data/test_reset.sql')
-    execute_script(session, 'test_data/create_first.sql')
-    filenames = os.listdir(os.path.join(os.getcwd(), 'test_data/data_files'))
+    execute_script(session, 'test_data/postgres_test_reset.sql')
+    execute_script(session, 'test_data/postgres_create_first.sql')
+    filenames = os.listdir(os.path.join(os.getcwd(), 'test_data/postgres_data_files'))
     sorted_names =  sorted(filenames)
     for filename in sorted_names:
-        execute_script(session, os.path.join(os.getcwd(), ('test_data/data_files/' + filename)))
+        execute_script(session, os.path.join(os.getcwd(), ('test_data/postgres_data_files/' + filename)))
 
     conn.close()
-
-

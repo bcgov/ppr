@@ -34,7 +34,7 @@ class User(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     username = db.Column(db.String(1000), index=True, nullable=False)
     sub = db.Column(db.String(36), unique=True, nullable=False)
-    account_id = db.Column(db.String(20), nullable=False)
+    account_id = db.Column(db.String(20), nullable=True)
     firstname = db.Column(db.String(1000), nullable=True)
     lastname = db.Column(db.String(1000), nullable=True)
     email = db.Column(db.String(1024), nullable=True)

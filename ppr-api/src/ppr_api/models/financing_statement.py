@@ -50,11 +50,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
     __tablename__ = 'financing_statement'
 
-#    financing_id = db.Column('financing_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
     financing_id = db.Column('financing_id', db.Integer,
                              db.Sequence('financing_id_seq'), primary_key=True)
     state_type_cd = db.Column('state_type_cd', db.String(3), db.ForeignKey('state_type.state_type_cd'), nullable=False)
-    registration_num = db.Column('registration_number', db.String(10), nullable=False)
     life = db.Column('life', db.Integer, nullable=True)
     expire_date = db.Column('expire_date', db.DateTime, nullable=True)
     discharged = db.Column('discharged', db.String(1), nullable=True)
@@ -63,13 +61,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     type_claim = db.Column('type_claim', db.String(2), nullable=True)
     crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
     crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
-    prev_reg_type = db.Column('prev_reg_type', db.String(30), nullable=True)
-    prev_reg_cr_nbr = db.Column('prev_reg_cr_nbr', db.String(7), nullable=True)
-    prev_reg_cr_date = db.Column('prev_reg_cr_date', db.String(7), nullable=True)
-    prev_reg_cb_nbr = db.Column('prev_reg_cb_nbr', db.String(10), nullable=True)
-    prev_reg_cb_date = db.Column('prev_reg_cb_date', db.String(7), nullable=True)
-    prev_reg_mh_nbr = db.Column('prev_reg_mh_nbr', db.String(7), nullable=True)
-    prev_reg_mh_date = db.Column('prev_reg_mh_date', db.String(7), nullable=True)
 
     # Parent keys
 
@@ -341,7 +332,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement object by financing ID."""
         statement = None
         if financing_id:
-            # statement = cls.query.get(financing_id)
             statement = db.session.query(FinancingStatement).\
                         filter(FinancingStatement.financing_id == financing_id).one_or_none()
 
@@ -354,9 +344,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
-            # statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
-            #                            Registration.registration_num == registration_num,
-            #                            Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
             statement = db.session.query(FinancingStatement).\
                         filter(FinancingStatement.financing_id == Registration.financing_id,
                                Registration.registration_num == registration_num,
@@ -417,7 +404,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 statement.expire_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
 
         statement.registration = [Registration.create_financing_from_json(json_data, account_id)]
-        statement.registration_num = statement.registration[0].registration_num
+        # statement.registration_num = statement.registration[0].registration_num
         registration_id = statement.registration[0].registration_id
         statement.trust_indenture = TrustIndenture.create_from_json(json_data, registration_id)
         if 'vehicleCollateral' in json_data:

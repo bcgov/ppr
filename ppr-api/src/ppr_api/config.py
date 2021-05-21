@@ -74,23 +74,31 @@ class _Config():  # pylint: disable=too-few-public-methods
 #    SECRET_KEY = 'a secret'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-#    ALEMBIC_INI = 'migrations/alembic.ini'
-    # POSTGRESQL
+    ALEMBIC_INI = 'migrations/alembic.ini'
+
     DB_USER = os.getenv('DATABASE_USERNAME', '')
     DB_PASSWORD = os.getenv('DATABASE_PASSWORD', '')
     DB_NAME = os.getenv('DATABASE_NAME', '')
     DB_HOST = os.getenv('DATABASE_HOST', '')
-#    DB_PORT = os.getenv('DATABASE_PORT', '5432')
-    DB_PORT = os.getenv('DATABASE_PORT', '1521')
-    # Don't need a configured URI: using oracle connection pool configured in resources/db.py using above settings.
-#    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
-    SQLALCHEMY_DATABASE_URI = 'oracle+cx_oracle://{user}:{password}@{host}:{port}/{name}'.format(
+    DB_PORT = os.getenv('DATABASE_PORT', '5432')  # POSTGRESQL
+    # POSTGRESQL
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
         user=DB_USER,
         password=DB_PASSWORD,
         host=DB_HOST,
         port=int(DB_PORT),
         name=DB_NAME,
     )
+
+    # ORACLE
+    # SQLALCHEMY_DATABASE_URI = 'oracle+cx_oracle://{user}:{password}@{host}:{port}/{name}'.format(
+    #    user=DB_USER,
+    #    password=DB_PASSWORD,
+    #    host=DB_HOST,
+    #    port=int(DB_PORT),
+    #    name=DB_NAME,
+    # )
+
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv('DATABASE_MIN_POOL_SIZE', '5')
     DB_MAX_POOL_SIZE = os.getenv('DATABASE_MAX_POOL_SIZE', '5')

@@ -121,7 +121,7 @@ def test_find_by_id(session):
     """Assert that find financing statement by ID contains all expected elements."""
     result = FinancingStatement.find_by_id(200000000)
     assert result
-    assert result.registration_num
+    assert result.financing_id
     if result:
         json_data = result.json
         assert json_data['type'] == 'SA'
@@ -138,7 +138,7 @@ def test_find_by_financing_id(session):
     """Assert that find financing statement by financing statement ID contains all expected elements."""
     result = FinancingStatement.find_by_financing_id(200000000)
     assert result
-    assert result.registration_num
+    assert result.financing_id
     if result:
         result.mark_update_json = True
         json_data = result.json

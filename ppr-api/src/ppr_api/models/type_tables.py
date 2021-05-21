@@ -21,7 +21,7 @@ from .db import db
 class CountryType(db.Model):  # pylint: disable=too-few-public-methods
     """This class defines the model for the country_type table."""
 
-    __tablename__ = 'country_types'
+    __tablename__ = 'country_type'
 
     country_type_cd = db.Column('country_type_cd', db.String(2), primary_key=True)
     country_desc = db.Column('country_desc', db.String(75), nullable=False)
@@ -35,11 +35,11 @@ class CountryType(db.Model):  # pylint: disable=too-few-public-methods
 class ProvinceType(db.Model):  # pylint: disable=too-few-public-methods
     """This class defines the model for the province_type table."""
 
-    __tablename__ = 'province_types'
+    __tablename__ = 'province_type'
 
     province_type_cd = db.Column('province_type_cd', db.String(2), primary_key=True)
     country_type_cd = db.Column('country_type_cd', db.String(2),
-                                db.ForeignKey('country_types.country_type_cd'), nullable=False)
+                                db.ForeignKey('country_type.country_type_cd'), nullable=False)
     province_desc = db.Column('province_desc', db.String(75), nullable=False)
 
     # parent keys

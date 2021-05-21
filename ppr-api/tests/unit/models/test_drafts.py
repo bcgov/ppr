@@ -17,7 +17,6 @@
 Test-Suite to ensure that the Draft Model is working as expected.
 """
 from http import HTTPStatus
-import json
 import copy
 
 import pytest
@@ -36,6 +35,8 @@ def test_find_all_by_account_id(session):
     assert draft_list[0]['registrationType']
     assert draft_list[0]['path']
     assert draft_list[0]['createDateTime']
+    for draft in draft_list:
+        assert draft['documentId'] != 'D-T-0001'
 
 
 def test_find_by_document_id_financing(session):
@@ -163,7 +164,7 @@ def test_draft_json(session):
         create_ts=now_ts(),
         registration_type_cd=json_data['changeStatement']['changeType'],
         registration_type_cl='CHANGE',
-        draft=json.dumps(json_data),
+        draft=json_data,  # json.dumps(json_data),
         registration_number=json_data['changeStatement']['baseRegistrationNumber']
     )
 

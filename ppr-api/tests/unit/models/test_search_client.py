@@ -17,7 +17,7 @@
 Test-Suite to ensure that the Search Model is working as expected.
 """
 from http import HTTPStatus
-import json
+import copy
 
 import pytest
 
@@ -326,7 +326,7 @@ TEST_INVALID_DATA = [
 
 # testdata pattern is ({search type}, {JSON data}, {expected # of results})
 TEST_VALID_DATA_COUNT = [
-    ('SS', SERIAL_NUMBER_JSON, 7),
+    ('SS', SERIAL_NUMBER_JSON, 6),
     ('IS', INDIVIDUAL_DEBTOR_JSON, 4),
     ('BS', BUSINESS_DEBTOR_JSON, 2)
 ]
@@ -567,7 +567,7 @@ def test_search_autosave(session):
     """Assert that a valid search query selection update works as expected."""
     query = SearchClient.find_by_id(200000000)
     assert query.search_response
-    update_data = json.loads(query.search_response)
+    update_data = copy.deepcopy(query.search_response)  # json.loads(query.search_response)
     if update_data[0]['matchType'] == 'EXACT':
         update_data[0]['matchType'] = 'SIMILAR'
     else:

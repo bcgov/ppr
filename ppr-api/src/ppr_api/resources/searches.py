@@ -16,7 +16,6 @@
 # pylint: disable=too-many-return-statements
 
 from http import HTTPStatus
-import json
 
 from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
@@ -143,7 +142,7 @@ class SearchDetailResource(Resource):
 
             # Save the updated search selection.
             search_client.update_search_selection(request_json)
-            return jsonify(json.loads(search_client.search_response)), HTTPStatus.ACCEPTED
+            return jsonify(search_client.search_response), HTTPStatus.ACCEPTED
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)

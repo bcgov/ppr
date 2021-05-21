@@ -40,7 +40,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     date_ts = db.Column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address.address_id'), nullable=False)
     id = db.Column('id', db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Relationships

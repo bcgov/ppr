@@ -25,9 +25,9 @@ from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
-BUS_SEARCH_KEY_SP = "select search_key_pkg.businame('?') from dual"
-FIRST_NAME_KEY_SP = "select search_key_pkg.firstname('?') from dual"
-LAST_NAME_KEY_SP = "select search_key_pkg.lastname('?') from dual"
+BUS_SEARCH_KEY_SP = "select searchkey_business_name('?')"
+FIRST_NAME_KEY_SP = "select searchkey_first_name('?')"
+LAST_NAME_KEY_SP = "select searchkey_last_name('?')"
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -58,11 +58,9 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
     last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
-    # Legacy only
-    block_number = db.Column('block_number', db.Integer, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address.address_id'), nullable=True)
     branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), nullable=True)
     registration_id = db.Column('registration_id', db.Integer,
                                 db.ForeignKey('registration.registration_id'), nullable=False)

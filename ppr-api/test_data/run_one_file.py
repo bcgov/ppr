@@ -58,7 +58,7 @@ with app.app_context():
     options = dict(bind=conn, binds={})
     session = db.create_scoped_session(options=options)
 
-    execute_file(session, 'test_data/data_files/test0001.sql')
+    execute_file(session, 'test_data/postgres_test_reset.sql')
 
     conn.close()
 

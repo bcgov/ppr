@@ -20,17 +20,17 @@ from .db import db
 class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the registry addresses."""
 
-    __tablename__ = 'address_ppr'
+    __tablename__ = 'address'
 
     address_id = db.Column('address_id', db.Integer, db.Sequence('address_id_seq'), primary_key=True)
     street = db.Column('street_line_1', db.String(50), nullable=False)  # index=True)
     street_additional = db.Column('street_line_2', db.String(50), nullable=True)
     city = db.Column('city', db.String(30), nullable=False)
     region = db.Column('province_type_cd', db.String(2),
-                       db.ForeignKey('province_types.province_type_cd'), nullable=False)
+                       db.ForeignKey('province_type.province_type_cd'), nullable=False)
     postal_code = db.Column('postal_cd', db.String(15), nullable=False)
     country = db.Column('country_type_cd', db.String(2),
-                        db.ForeignKey('country_types.country_type_cd'), nullable=True)
+                        db.ForeignKey('country_type.country_type_cd'), nullable=True)
 #    delivery_instructions = db.Column('delivery_instructions', db.String(4096))
 
     # parent keys
