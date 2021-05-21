@@ -7,7 +7,7 @@
           <label class="pl-3"><strong>Registration Length and Trust Indenture</strong></label>
         </v-col>
       </v-row>
-      <v-container :class="{'invalid-message': showErrorSummary}">
+      <v-container class="pt-10 px-8" :class="{'invalid-message': showErrorSummary}">
       <v-row no-gutters v-if="showErrorSummary" class="pa-6">
         <v-col cols="auto">
           <span :class="{'invalid-message': showErrorSummary}">
@@ -20,7 +20,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" class="generic-label">
+        <v-col cols="3" class="pt-4 generic-label">
           Registration Length
         </v-col>
         <v-col :class="$style['summary-text']">
@@ -43,7 +43,7 @@
       <v-col cols="3" class="generic-label">
         <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
       </v-col>
-      <v-col cols="1">
+      <v-col cols="auto">
         <v-radio-group v-model="lifeInfinite">
             <v-radio class="years-radio pa-0 ma-0"
                         :hide-details="false"
@@ -65,7 +65,7 @@
                         :readonly="lifeYearsDisabled"
                         :hint="lifeYearsHint"
                         persistent-hint
-                        placeholder="Length (years)"
+                        label="Length in years"
                         v-model="lifeYearsEdit"/>
         <div class="pt-5">Infinite ($500.00 non-refundable)</div>
       </v-col>
@@ -75,7 +75,7 @@
       <v-col cols="3" class="generic-label">
         Trust Indenture
       </v-col>
-      <v-col cols="1">
+      <v-col cols="auto">
         <v-checkbox class="trust-checkbox pa-0 ma-0"
                     :hide-details="false"
                     :hint="trustIndentureHint"

@@ -344,3 +344,16 @@ span.invalid-message {
   color: $gray9;
   font-weight: bold;
 }
+
+.v-btn:not(.v-btn--round).v-size--default {
+  height: 44px;
+}
+
+.v-btn--outlined, .v-btn--text {
+  font-weight: normal;
+}
+
+.v-data-table__empty-wrapper {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}

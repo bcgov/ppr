@@ -6,10 +6,7 @@
       </v-col>
     </v-row>
     <v-row no-gutters>
-      <tombstone :backURL="registryUrl" :header="'My PPR Dashboard'" :setItems="breadcrumbs"/>
-    </v-row>
-    <v-row no-gutters>
-      <v-container fluid class="px-15 py-10">
+      <v-container fluid class="py-10">
         <v-row no-gutters>
           <v-col>
             <v-row no-gutters

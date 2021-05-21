@@ -46,17 +46,13 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { FeeSummaryIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { getServiceFee } from '@/utils'
+import { getServiceFee, getFinancingFee } from '@/utils'
 
 export default defineComponent({
   props: {
     registrationType: {
       type: String,
       default: 'Security Agreement'
-    },
-    hint: {
-      type: String,
-      default: ''
     },
     updatedFeeSummary: {
       type: Object as () => FeeSummaryIF
@@ -77,10 +73,12 @@ export default defineComponent({
       attachFee: props.attach,
       displayFee: props.display,
       registrationTypeFee: props.registrationType,
-      hintFee: props.hint,
       feeAmount: feeSummary.feeAmount || 0,
       quantity: feeSummary.quantity || 0,
       feeCode: feeSummary.feeCode || '',
+      hintFee: computed((): string => {
+        return getFinancingFee(false).hint
+      }),
       isComplete: computed((): boolean => {
         return (localState.quantity > 0 && localState.feeAmount > 0)
       }),
@@ -131,7 +129,6 @@ header {
   color: $gray7;
   font-size: 14px;
   font-weight: normal;
-  padding: 5px;
 }
 
 .fee-list__item {
@@ -167,7 +164,7 @@ header {
 
   &__currency {
     margin-right: 0.5rem;
-    color: $gray5;
+    color: $gray7;
     font-weight: 500;
   }
 

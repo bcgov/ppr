@@ -116,6 +116,9 @@
                 )
               "
             >
+            <div :class="$style['divider']">
+              <div :class="$style['line']"></div>
+            </div>
               <v-list-item-title>{{
                 registrationTypes.MISCELLANEOUS_REGISTRATION
               }}</v-list-item-title>
@@ -182,7 +185,6 @@ export default defineComponent({
           }
         })
       setRegistrationType(reg)
-      console.log(reg)
       emit('selected-registration-type', reg)
     }
 
@@ -212,5 +214,13 @@ export default defineComponent({
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   box-shadow: none;
+}
+.divider {
+  display: flex;
+  flex: 1 1 100%;
+  position: relative;
+}
+.line {
+  border-bottom: 1px solid $gray3;
 }
 </style>

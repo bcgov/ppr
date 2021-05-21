@@ -22,7 +22,7 @@
               {{ step.icon }}
             </v-icon>
           </v-btn>
-          <v-icon :class="$style['step__btn2']" size="30" color="green darken-1" v-show=step.valid>
+          <v-icon :class="$style['step__btn2']" size="30" color="green darken-3" v-show=step.valid>
             mdi-check-circle
           </v-icon>
           <v-icon :class="$style['step__btn2']" size="30" color="#D3272C" v-show=showInvalid(step)>
@@ -31,11 +31,11 @@
         </div>
         <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
           :disabled=step.disabled v-show=!isCurrentStep(step)>
-          <span :class="$style['step__label__text']">{{ step.text }}</span>
+          <span :class="$style['step__label__text']" v-html="step.text"></span>
         </v-btn>
         <v-btn :class="[$style['step__label__current'], $style['pre-line']]" text color="primary" :ripple="false"
           :disabled=step.disabled v-show=isCurrentStep(step)>
-          <span :class="$style['step__label__text__current']">{{ step.text }}</span>
+          <span :class="$style['step__label__text__current']" v-html="step.text"></span>
         </v-btn>
       </div>
     </template>
@@ -81,6 +81,8 @@ export default class Stepper extends Vue {
   margin: 0;
   padding: 2rem 0 0 0;
   background: $BCgovInputBG;
+  border-radius: 4px;
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
 }
 
 .v-btn:before {
@@ -106,7 +108,7 @@ export default class Stepper extends Vue {
   }
 
   .v-btn:before {
-    background-color: #1976d2;
+    background-color: $primary-blue;
   }
 
   .step__icon {
@@ -116,7 +118,7 @@ export default class Stepper extends Vue {
 }
 
 .selected-btn {
-  background-color: #1976d2 !important;
+  background-color: $primary-blue !important;
 }
 
 .selected-icon {
@@ -148,7 +150,7 @@ export default class Stepper extends Vue {
   background-color: $BCgovInputBG;
   z-index: 2;
   .step__icon {
-    color: #1976d2;
+    color: $primary-blue;
     background-color: inherit;
   }
 }

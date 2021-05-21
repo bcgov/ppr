@@ -8,9 +8,6 @@
       @proceed="submit"
     />
     <v-row no-gutters>
-        <tombstone :backURL="dashboardURL" :header="'My Personal Property Registry'" :setItems="breadcrumbs"/>
-    </v-row>
-    <v-row no-gutters>
       <v-container fluid class="pa-10">
         <v-row no-gutters>
           <v-col>
@@ -103,13 +100,12 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, SettingOptions } from '@/enums'
 import {
-  ActionBindingIF, BreadcrumbIF, DialogOptionsIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, DialogOptionsIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { selectionConfirmaionDialog, tombstoneBreadcrumbSearch } from '@/resources'
+import { selectionConfirmaionDialog } from '@/resources'
 import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
 // local components
-import { Tombstone } from '@/components/common'
 import { ConfirmationDialog } from '@/components/dialogs'
 import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
@@ -118,8 +114,7 @@ import { SearchBar } from '@/components/search'
   components: {
     ConfirmationDialog,
     SearchBar,
-    SearchedResult,
-    Tombstone
+    SearchedResult
   }
 })
 export default class Search extends Vue {
@@ -154,14 +149,6 @@ export default class Search extends Vue {
   private selectedMatches: Array<SearchResultIF> = []
 
   private settingOption: string = SettingOptions.SELECT_CONFIRMATION_DIALOG
-
-  private get breadcrumbs (): Array<BreadcrumbIF> {
-    return tombstoneBreadcrumbSearch
-  }
-
-  private get dashboardURL (): string {
-    return window.location.origin + '/dashboard'
-  }
 
   private get folioNumber (): string {
     return this.getSearchResults?.searchQuery?.clientReferenceId || ''

@@ -189,7 +189,7 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-lg',
-    text: 'Serial / VIN Number',
+    text: 'Serial/VIN/D.O.T. Number',
     value: 'vehicle.serial'
   },
   {

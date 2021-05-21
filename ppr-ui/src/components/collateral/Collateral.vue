@@ -30,7 +30,7 @@
             <ul><li>At least one form of collateral (vehicle or general)</li></ul>
           </v-col>
         </v-row>
-        <v-row no-gutters class="pb-4 pt-4">
+        <v-row no-gutters class="pb-4 pt-10">
           <v-col>
             <v-btn
                 id="btn-add-collateral"
@@ -67,6 +67,7 @@
           disable-pagination
           disable-sort
           hide-default-footer
+          no-data-text="No vehicle collateral yet."
         >
           <template v-slot:item="row" class="vehicle-data-table">
             <tr
@@ -85,6 +86,7 @@
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
               <td>{{ row.item.serialNumber }}</td>
+              <td v-if="getMH">{{ row.item.manufacturedHomeRegistrationNumber }}</td>
 
               <!-- Action Btns -->
               <td class="actions-cell pt-4">
@@ -131,7 +133,7 @@
             <tr v-if="showEditVehicle[row.index]">
               <td colspan="6" :class="{'invalid-section': invalidSection}">
                 <v-expand-transition>
-                  <div class="edit-vehicle-container col-9">
+                  <div class="edit-vehicle-container col-12">
                     <edit-collateral
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
@@ -160,6 +162,7 @@
                   auto-grow
                   counter="4000"
                   filled
+                  label="Description of General Collateral"
                   height="250"
                   class="white pt-2 text-input-field"
                 >
@@ -188,8 +191,7 @@ import { vehicleTableHeaders } from '@/resources'
 
 export default defineComponent({
   components: {
-    EditCollateral //,
-    // ActionTypes
+    EditCollateral
   },
   props: {
     isSummary: {
@@ -205,7 +207,6 @@ export default defineComponent({
 
     const localState = reactive({
       summaryView: props.isSummary,
-      headers: vehicleTableHeaders,
       showAddVehicle: false,
       addEditInProgress: false,
       invalidSection: false,
@@ -215,6 +216,23 @@ export default defineComponent({
       generalCollateral: collateral.generalCollateral,
       showErrorSummary: computed((): boolean => {
         return (!collateral.valid)
+      }),
+      getMH: computed(function () {
+        return collateral.vehicleCollateral.find(obj => obj.type === 'MH')
+      }),
+      headers: computed(function () {
+        const headersToShow = [...vehicleTableHeaders]
+        if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
+          const editRow = headersToShow.pop()
+          headersToShow.push({
+            class: 'column-md',
+            sortable: false,
+            text: 'MH Number',
+            value: 'vehicle.manufacturedHomeRegistrationNumber'
+          })
+          headersToShow.push(editRow)
+        }
+        return headersToShow
       })
     })
 
