@@ -21,4 +21,6 @@ from .searchkey_business_name import searchkey_business_name
 from .searchkey_first_name import searchkey_first_name
 from .searchkey_last_name import searchkey_last_name
 from .searchkey_mhr import searchkey_mhr
+from .searchkey_name_match import searchkey_name_match
+from .searchkey_nickname_match import searchkey_nickname_match
 from .searchkey_vehicle import searchkey_vehicle

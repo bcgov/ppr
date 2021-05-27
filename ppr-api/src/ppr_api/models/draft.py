@@ -28,9 +28,9 @@ from .db import db
 
 ACCOUNT_QUERY = """
 SELECT d.create_ts, d.registration_type_cl, d.registration_type_cd, d.document_number, d.registration_number
-  FROM draft d
+  FROM drafts d
  WHERE d.account_id = '?'
-   AND NOT EXISTS (SELECT r.draft_id FROM registration r WHERE r.draft_id = d.draft_id)
+   AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
 """
 
 
@@ -47,9 +47,9 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         REG_CLASS_DISCHARGE = 'DISCHARGE'
         REG_CLASS_RENEWAL = 'RENEWAL'
 
-    __tablename__ = 'draft'
+    __tablename__ = 'drafts'
 
-    draft_id = db.Column('draft_id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('draft_id_seq'), primary_key=True)
     document_number = db.Column('document_number', db.String(10), nullable=False, unique=True,
                                 default=db.func.get_draft_document_number())
     account_id = db.Column('account_id', db.String(20), nullable=False, index=True)

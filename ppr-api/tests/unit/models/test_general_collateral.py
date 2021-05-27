@@ -27,7 +27,7 @@ def test_find_by_id(session):
     """Assert that find general collateral by collateral ID contains all expected elements."""
     collateral = GeneralCollateral.find_by_id(200000000)
     assert collateral
-    assert collateral.collateral_id == 200000000
+    assert collateral.id == 200000000
     assert collateral.registration_id == 200000000
     assert collateral.financing_id == 200000000
     assert collateral.description
@@ -42,11 +42,11 @@ def test_find_by_registration_id(session):
     collateral = GeneralCollateral.find_by_registration_id(200000000)
     assert collateral
     assert len(collateral) == 2
-    assert collateral[0].collateral_id
+    assert collateral[0].id
     assert collateral[0].registration_id
     assert collateral[0].financing_id
     assert collateral[0].description
-    assert collateral[1].collateral_id
+    assert collateral[1].id
     assert collateral[1].registration_id
     assert collateral[1].financing_id
     assert collateral[1].description
@@ -57,11 +57,11 @@ def test_find_by_financing_id(session):
     collateral = GeneralCollateral.find_by_financing_id(200000000)
     assert collateral
     assert len(collateral) >= 2
-    assert collateral[0].collateral_id
+    assert collateral[0].id
     assert collateral[0].registration_id
     assert collateral[0].financing_id
     assert collateral[0].description
-    assert collateral[1].collateral_id
+    assert collateral[1].id
     assert collateral[1].registration_id
     assert collateral[1].financing_id
     assert collateral[1].description
@@ -88,12 +88,12 @@ def test_find_by_reg_id_invalid(session):
 def test_general_collateral_json(session):
     """Assert that the general collateral model renders to a json format correctly."""
     collateral = GeneralCollateral(
-        collateral_id=1000,
+        id=1000,
         description='TEST'
     )
 
     collateral_json = {
-        'collateralId': collateral.collateral_id,
+        'collateralId': collateral.id,
         'description': collateral.description
     }
 

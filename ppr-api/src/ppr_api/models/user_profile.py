@@ -34,7 +34,7 @@ BOOLEAN_TO_DB_VALUE = {
 class UserProfile(db.Model):
     """This class maintains user profile UI settings."""
 
-    __tablename__ = 'user_profile'
+    __tablename__ = 'user_profiles'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True, nullable=False)
     payment_confirmation = db.Column(db.String(1), nullable=False)

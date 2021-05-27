@@ -18,6 +18,8 @@ from database.postgres_functions import (
     searchkey_first_name,
     searchkey_last_name,
     searchkey_mhr,
+    searchkey_name_match,
+    searchkey_nickname_match,
     searchkey_vehicle
 )
 
@@ -49,6 +51,8 @@ target_metadata = current_app.extensions['migrate'].db.metadata
 # Registering db functions here
 register_entities([get_draft_document_number,
                    get_registration_num,
+                   searchkey_name_match,
+                   searchkey_nickname_match,
                    match_individual_name,
                    searchkey_aircraft,
                    searchkey_business_name,

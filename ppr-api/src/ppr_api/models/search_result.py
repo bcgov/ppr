@@ -30,9 +30,9 @@ from .search_utils import GET_DETAIL_DAYS_LIMIT
 class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search results detail (search step 2) information."""
 
-    __tablename__ = 'search_result'
+    __tablename__ = 'search_results'
 
-    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_client.search_id'),
+    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_clients.id'),
                           primary_key=True, nullable=False)
     search_select = db.Column('api_result', db.JSON, nullable=True)
     search_response = db.Column('registrations', db.JSON, nullable=False)
@@ -131,11 +131,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         search_detail = None
         error_msg = ''
         if search_id and not limit_by_date:
-            # search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
             search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
         elif search_id and limit_by_date:
             min_allowed_date = model_utils.today_ts_offset(GET_DETAIL_DAYS_LIMIT, False)
-            # search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
             search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
             if search_detail and search_detail.search and \
                     search_detail.search.search_ts.timestamp() < min_allowed_date.timestamp():
@@ -153,7 +151,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def create_from_search_query_no_results(search_query):
         """Create a search detail object from the inital search query which retured no results."""
-        search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
+        search_result = SearchResult(search_id=search_query.id, exact_match_count=0, similar_match_count=0)
         detail_response = {
             'searchDateTime': model_utils.format_ts(search_query.search_ts),
             'exactResultsSize': search_result.exact_match_count,
@@ -176,7 +174,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         if search_query.total_results_size == 0:  # A search query with no results: build minimal details.
             return SearchResult.create_from_search_query_no_results(search_query)
 
-        search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
+        search_result = SearchResult(search_id=search_query.id, exact_match_count=0, similar_match_count=0)
         query_results = search_query.search_response
         detail_results = []
         for result in query_results:

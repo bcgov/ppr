@@ -19,7 +19,7 @@ from .db import db
 class Nickname(db.Model):
     """This class manages all of name search nicknames referenced by a database function. Managed by Alembic."""
 
-    __tablename__ = 'nickname'
+    __tablename__ = 'nicknames'
 
     name_id = db.Column('name_id', db.Integer, nullable=False, index=True)
     name = db.Column('name', db.String(25), nullable=False, index=True)

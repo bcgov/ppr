@@ -1,29 +1,29 @@
 -- TEST0009 Change Statement secured party transfer on TEST0001. 
-INSERT INTO draft(draft_id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
                   registration_number, update_ts, draft)
   VALUES(200000013, 'D-T-00C9', 'PS12345', CURRENT_TIMESTAMP, 'CHANGE', 'ST', 'TEST0001', null, '{}');
-INSERT INTO registration(registration_id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000010, 200000000, 'TEST0009', 'TEST0001', 'ST', 'CHANGE', CURRENT_TIMESTAMP + interval '15 minutes', 200000013, null,
            null, null, 'PS12345', 'TEST-CH-0009', null, null)
 ;
-INSERT INTO address(address_id, street_line_1, street_line_2, city, province_type_cd, postal_cd, country_type_cd)
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(200000012, 'TEST-00C9', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id)
+INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
+                  middle_initial, last_name, business_name, birth_date, address_id)
     VALUES(200000025, 'RG', 200000010, 200000000, null, null, 'TEST-CHANGE-DT', '9', 'REGISTERING', null,
            null, 200000012)
 ;
-INSERT INTO party(party_id, party_type_cd, registration_id, financing_id, registration_id_end, branch_id, first_name,
-                  middle_name, last_name, business_name, birth_date, address_id)
+INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
+                  middle_initial, last_name, business_name, birth_date, address_id)
     VALUES(200000026, 'SP', 200000010, 200000000, null, null, null, null, null, 'TEST 9 CHANGE TRANSFER SECURED PARTY',
            null, 200000012)
 ;
-UPDATE party
+UPDATE parties
    SET registration_id_end = 200000010
- WHERE party_id = 200000022
-   AND party_type_cd = 'SP'
+ WHERE id = 200000022
+   AND party_type = 'SP'
 ;
 -- TEST0009 end

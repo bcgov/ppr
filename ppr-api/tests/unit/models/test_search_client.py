@@ -364,7 +364,7 @@ def test_search_no_account(session):
     query = SearchClient.create_from_json(json_data, None)
     query.search()
 
-    assert query.search_id
+    assert query.id
     assert query.search_response
 
 
@@ -376,7 +376,7 @@ def test_search_valid(session, search_type, json_data):
 
     result = query.json
 #    print(result)
-    assert query.search_id
+    assert query.id
     assert query.search_response
     assert result['searchId']
     assert result['searchQuery']
@@ -428,7 +428,7 @@ def test_search_no_results(session, search_type, json_data):
     query = SearchClient.create_from_json(json_data, None)
     query.search()
 
-    assert query.search_id
+    assert query.id
     assert not query.search_response
     assert query.returned_results_size == 0
 

@@ -143,7 +143,7 @@ def test_search_detail_full_create(session, client, jwt):
     search_detail.save()
 
     # check
-    assert search_detail.search_id == search_query.search_id
+    assert search_detail.search_id == search_query.id
     assert not search_detail.search_select
     assert search_detail.exact_match_count > 0
     assert search_detail.similar_match_count > 0
@@ -192,7 +192,7 @@ def test_search_history_sort(session, client, jwt):
     search_detail.save()
 
     # check
-    assert search_detail.search_id == search_query.search_id
+    assert search_detail.search_id == search_query.id
     result = search_detail.json
     # print(details_json)
     history = result[0]['financingStatement']['changes']

@@ -38,18 +38,18 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
         sc.serial_type_cd,sc.serial_number,sc.year,sc.make,sc.model,
         r.registration_number AS base_registration_num,
         CASE WHEN serial_number = '?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-        fs.expire_date,fs.state_type_cd,sc.serial_id AS vehicle_id, sc.mhr_number
-  FROM registration r, financing_statement fs, serial_collateral sc 
- WHERE r.financing_id = fs.financing_id
+        fs.expire_date,fs.state_type_cd,sc.id AS vehicle_id, sc.mhr_number
+  FROM registrations r, financing_statements fs, serial_collateral sc 
+ WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.registration_id 
-                     FROM registration r3
-                    WHERE r3.financing_id = fs.financing_id
+   AND NOT EXISTS (SELECT r3.id 
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND sc.financing_id = fs.financing_id
+   AND sc.financing_id = fs.id
    AND sc.registration_id_end IS NULL
 """
 
@@ -58,15 +58,15 @@ REG_NUM_QUERY = """
 SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
         r.registration_number AS base_registration_num,
         'EXACT' AS match_type,fs.state_type_cd, fs.expire_date
-  FROM registration r, financing_statement fs, registration r2
+  FROM registrations r, financing_statements fs, registrations r2
  WHERE r2.financing_id = r.financing_id
-   AND r.financing_id = fs.financing_id
+   AND r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.registration_id
-                     FROM registration r3
-                    WHERE r3.financing_id = fs.financing_id
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
    AND r2.registration_number = '?'
@@ -95,20 +95,20 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
        CASE WHEN p.business_name = '?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type_cd,p.party_id
-  FROM registration r, financing_statement fs, party p
- WHERE r.financing_id = fs.financing_id
+       fs.expire_date,fs.state_type_cd,p.id
+  FROM registrations r, financing_statements fs, parties p
+ WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.registration_id
-                     FROM registration r3
-                    WHERE r3.financing_id = fs.financing_id
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.financing_id
+   AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
-   AND p.party_type_cd = 'DB'
+   AND p.party_type = 'DB'
    AND p.business_srch_key = searchkey_business_name('?')
 ORDER BY match_type, p.business_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
@@ -122,43 +122,43 @@ ORDER BY match_type, p.business_name
 
 INDIVIDUAL_NAME_QUERY = """
 SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
-       p.last_name,p.first_name,p.middle_name,p.party_id,
+       p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = 'LNAME?' AND p.first_name = 'FNAME?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type_cd
-  FROM registration r, financing_statement fs, party p
- WHERE r.financing_id = fs.financing_id
+  FROM registrations r, financing_statements fs, parties p
+ WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.registration_id
-                     FROM registration r3
-                    WHERE r3.financing_id = fs.financing_id
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.financing_id
+   AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
-   AND p.party_type_cd = 'DI'
-   AND p.party_id IN (SELECT * FROM unnest(match_individual_name('LNAME?', 'FNAME?'))) 
+   AND p.party_type = 'DI'
+   AND p.id IN (SELECT * FROM unnest(match_individual_name('LNAME?', 'FNAME?'))) 
 ORDER BY match_type, p.last_name, p.first_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Total result count queries for serial number, debtor name searches:
 BUSINESS_NAME_TOTAL_COUNT = """
-SELECT COUNT(r.registration_id)
-  FROM registration r, financing_statement fs, party p
- WHERE r.financing_id = fs.financing_id
+SELECT COUNT(r.id)
+  FROM registrations r, financing_statements fs, parties p
+ WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.registration_id
-                     FROM registration r3
-                    WHERE r3.financing_id = fs.financing_id
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.financing_id
+   AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
-   AND p.party_type_cd = 'DB'
+   AND p.party_type = 'DB'
    AND p.business_srch_key = searchkey_business_name('?')
 """
 
@@ -170,36 +170,36 @@ SELECT COUNT(r.registration_id)
 #               AND A.WORD_ID = B.WORD_ID), 85)
 
 INDIVIDUAL_NAME_TOTAL_COUNT = """
-SELECT COUNT(r.registration_id)
-  FROM registration r, financing_statement fs, party p
- WHERE r.financing_id = fs.financing_id
+SELECT COUNT(r.id)
+  FROM registrations r, financing_statements fs, parties p
+ WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.registration_id
-                     FROM registration r3
-                    WHERE r3.financing_id = fs.financing_id
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.financing_id
+   AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
-   AND p.party_type_cd = 'DI'
-   AND p.party_id IN (SELECT * FROM unnest(match_individual_name('LNAME?', 'FNAME?')))
+   AND p.party_type = 'DI'
+   AND p.id IN (SELECT * FROM unnest(match_individual_name('LNAME?', 'FNAME?')))
 """
 
 SERIAL_SEARCH_COUNT_BASE = """
-SELECT COUNT(r.registration_id)
-  FROM registration r, financing_statement fs, serial_collateral sc
-  WHERE r.financing_id = fs.financing_id
+SELECT COUNT(r.id)
+  FROM registrations r, financing_statements fs, serial_collateral sc
+  WHERE r.financing_id = fs.id
     AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
     AND r.base_reg_number IS NULL
     AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-    AND NOT EXISTS (SELECT r3.registration_id
-                      FROM registration r3
-                     WHERE r3.financing_id = fs.financing_id
+    AND NOT EXISTS (SELECT r3.id
+                      FROM registrations r3
+                     WHERE r3.financing_id = fs.id
                        AND r3.registration_type_cl = 'DISCHARGE'
                        AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-    AND sc.financing_id = fs.financing_id
+    AND sc.financing_id = fs.id
     AND sc.registration_id_end IS NULL 
 """
 
@@ -224,20 +224,20 @@ COUNT_QUERY_FROM_SEARCH_TYPE = {
 }
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
-'SELECT sc.search_id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
+'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
        'sr.exact_match_count, sr.similar_match_count ' + \
-  'FROM search_client sc, search_result sr ' + \
- 'WHERE sc.search_id = sr.search_id ' + \
+  'FROM search_clients sc, search_results sr ' + \
+ 'WHERE sc.id = sr.search_id ' + \
    "AND sc.account_id = '?' " + \
    "AND sc.search_ts > ((now() at time zone 'utc') - interval '" + str(GET_HISTORY_DAYS_LIMIT) + " days') " + \
 'ORDER BY sc.search_ts DESC ' + \
 'FETCH FIRST ' + str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE) + ' ROWS ONLY'
 
 ACCOUNT_SEARCH_HISTORY_QUERY = \
-'SELECT sc.search_id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
+'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
        'sr.exact_match_count, sr.similar_match_count ' + \
-  'FROM search_client sc, search_result sr ' + \
- 'WHERE sc.search_id = sr.search_id ' + \
+  'FROM search_clients sc, search_results sr ' + \
+ 'WHERE sc.id = sr.search_id ' + \
    "AND sc.account_id = '?' " + \
 'ORDER BY sc.search_ts DESC ' + \
 'FETCH FIRST ' + str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE) + ' ROWS ONLY'

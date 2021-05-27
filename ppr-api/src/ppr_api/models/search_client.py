@@ -43,13 +43,13 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         SERIAL_NUM = 'SS'
         MANUFACTURED_HOME_NUM = 'MH'
 
-    __tablename__ = 'search_client'
+    __tablename__ = 'search_clients'
 
 
-    search_id = db.Column('search_id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
     search_ts = db.Column('search_ts', db.DateTime, nullable=False, index=True)
     search_type_cd = db.Column('search_type_cd', db.String(2),
-                               db.ForeignKey('search_type.search_type_cd'), nullable=False)
+                               db.ForeignKey('search_types.search_type_cd'), nullable=False)
     search_criteria = db.Column('api_criteria', db.JSON, nullable=False)
     search_response = db.Column('search_response', db.JSON, nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
@@ -74,7 +74,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the search query results as a json object."""
         result = {
-            'searchId': str(self.search_id),
+            'searchId': str(self.id),
             'searchDateTime': model_utils.format_ts(self.search_ts),
             'totalResultsSize': self.total_results_size,
             'returnedResultsSize': self.returned_results_size,
@@ -308,8 +308,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query matching the id."""
         search = None
         if search_id:
-            # search = cls.query.get(search_id)
-            search = db.session.query(SearchClient).filter(SearchClient.search_id == search_id).one_or_none()
+            search = db.session.query(SearchClient).filter(SearchClient.id == search_id).one_or_none()
         return search
 
     @classmethod

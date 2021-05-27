@@ -42,13 +42,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
     __tablename__ = 'serial_collateral'
 
-
-#    vehicle_id = db.Column('serial_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    vehicle_id = db.Column('serial_id', db.Integer,
-                           db.Sequence('vehicle_id_seq'),
-                           primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('vehicle_id_seq'), primary_key=True)
     vehicle_type_cd = db.Column('serial_type_cd', db.String(2),
-                                db.ForeignKey('serial_type.serial_type_cd'), nullable=False)
+                                db.ForeignKey('serial_types.serial_type_cd'), nullable=False)
     year = db.Column('year', db.Integer, nullable=True)
     make = db.Column('make', db.String(60), nullable=True)
     model = db.Column('model', db.String(60), nullable=True)
@@ -58,9 +54,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registration.registration_id'), nullable=False)
+                                db.ForeignKey('registrations.id'), nullable=False)
     financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statement.financing_id'), nullable=False)
+                             db.ForeignKey('financing_statements.id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
@@ -87,7 +83,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     def json(self) -> dict:
         """Return the genreal collateral as a json object."""
         collateral = {
-            'vehicleId': self.vehicle_id,
+            'vehicleId': self.id,
             'type': self.vehicle_type_cd
         }
         if self.year:
@@ -118,7 +114,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         collateral = None
         if registration_id:
             collateral = cls.query.filter(VehicleCollateral.registration_id == registration_id) \
-                               .order_by(VehicleCollateral.vehicle_id).all()
+                                  .order_by(VehicleCollateral.id).all()
 
         return collateral
 
@@ -128,7 +124,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         collateral = None
         if financing_id:
             collateral = cls.query.filter(VehicleCollateral.financing_id == financing_id) \
-                                  .order_by(VehicleCollateral.vehicle_id).all()
+                                  .order_by(VehicleCollateral.id).all()
 
         return collateral
 
@@ -189,8 +185,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             return None
 
         statement = SEARCH_VIN_STATEMENT.replace('?', serial_number)
-        if vehicle_type in (VehicleCollateral.SerialTypes.AIRCRAFT.value,
-                            VehicleCollateral.SerialTypes.AIRCRAFT_AIRFRAME.value):
+        if vehicle_type == VehicleCollateral.SerialTypes.AIRCRAFT.value:
             statement = SEARCH_VIN_STATEMENT_AC.replace('?', serial_number)
         elif vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
             statement = SEARCH_VIN_STATEMENT_MH.replace('?', serial_number)
