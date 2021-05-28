@@ -7,7 +7,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { LengthTrust } from '@/views'
-import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 
 // Other
@@ -54,7 +54,6 @@ describe('Length and Trust Indenture new registration component', () => {
   it('renders Length Trust View with child components', () => {
     expect(wrapper.findComponent(LengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)

@@ -4,16 +4,42 @@ export const serialNumberValidator = ({ values }) => {
   let minLen = 1
   let maxLen = 25
   let message = 'Maximum 25 letters'
-  if (values.type === 'MH') {
-    if (!numbersOnly.test(values.serialNumber)) {
-      succeeded = false
-    }
-    message = 'Manufactured home registration number must contain 6 digits'
+  let emptyMessage = ''
+
+  switch (values.type) {
+    case 'AC':
+      emptyMessage = 'Enter the Aircraft Airframe D.O.T Number'
+      break
+    case 'AF':
+      emptyMessage = 'Enter the Aircraft Airframe D.O.T Number'
+      break
+    case 'BO':
+      emptyMessage = 'Enter the Boat Serial Number'
+      break
+    case 'MH':
+      if (!numbersOnly.test(values.serialNumber)) {
+        succeeded = false
+      }
+      minLen = 6
+      maxLen = 6
+      emptyMessage = 'Enter the Manufactured Home Registration Number'
+      message = 'Manufactured home registration number must contain 6 digits'
+      break
+    case 'MV':
+      emptyMessage = 'Enter the Serial / VIN Number'
+      break
+    case 'OM':
+      emptyMessage = 'Enter the Outboard Motor Serial Number'
+      break
+    case 'TR':
+      emptyMessage = 'Enter the Trailer Serial Number'
+      break
   }
-  if (values.type === 'BO') {
-    minLen = 6
-    maxLen = 6
+
+  if (values.serialNumber.length === 0) {
+    message = emptyMessage
   }
+
   if (values.serialNumber.length < minLen) {
     succeeded = false
   }

@@ -7,14 +7,51 @@
           <label class="pl-3"><strong>Collateral</strong></label>
         </v-col>
       </v-row>
-      <v-container :class="{'invalid-message': showErrorSummary}">
-      <v-row no-gutters v-if="showErrorSummary" class="pa-6">
+      <v-container v-if="showErrorSummary" :class="{'invalid-message': showErrorSummary}">
+      <v-row no-gutters class="pa-6">
         <v-col cols="auto">
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
-          This step is unfinished
+          <span class="invalid-message">This step is unfinished.</span>
           <router-link id="router-link-collateral" class="invalid-link" :to="{ path: '/add-collateral' }">
             Return to this step to complete it.
           </router-link>
+        </v-col>
+      </v-row>
+      </v-container>
+      <v-container v-else>
+      <v-row no-gutters class="ps-6 pb-3">
+        <v-col cols="3" class="pt-4 generic-label">
+          Vehicle Collateral
+        </v-col>
+        <v-col class="pa-6">
+          <v-data-table
+          class="collateral-table"
+          :headers="headers"
+          :items="vehicleCollateral"
+          disable-pagination
+          disable-sort
+          hide-default-footer
+          no-data-text="No vehicle collateral"
+        >
+          <template v-slot:item="row" class="vehicle-data-table">
+            <tr :key="row.item.id" class="vehicle-row">
+              <td>{{ getVehicleDescription(row.item.type) }} ({{ row.item.type }})</td>
+              <td>{{ row.item.year }}</td>
+              <td>{{ row.item.make }}</td>
+              <td>{{ row.item.model }}</td>
+              <td>{{ row.item.serialNumber }}</td>
+              <td v-if="getMH">{{ row.item.manufacturedHomeRegistrationNumber }}</td>
+            </tr>
+          </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="ps-6 pb-3">
+        <v-col cols="3" class="generic-label">
+          General Collateral
+        </v-col>
+        <v-col :class="[$style['summary-text'], 'pa-6']">
+          {{ generalCollateral }}
         </v-col>
       </v-row>
       </v-container>
@@ -187,7 +224,7 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddCollateralIF, VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditCollateral from './EditCollateral.vue'
-import { vehicleTableHeaders } from '@/resources'
+import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 
 export default defineComponent({
   components: {
@@ -222,14 +259,16 @@ export default defineComponent({
       }),
       headers: computed(function () {
         const headersToShow = [...vehicleTableHeaders]
+        const editRow = headersToShow.pop()
         if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
-          const editRow = headersToShow.pop()
           headersToShow.push({
             class: 'column-md',
             sortable: false,
             text: 'MH Number',
             value: 'vehicle.manufacturedHomeRegistrationNumber'
           })
+        }
+        if (!props.isSummary) {
           headersToShow.push(editRow)
         }
         return headersToShow
@@ -248,6 +287,11 @@ export default defineComponent({
       collateral.vehicleCollateral = localState.vehicleCollateral
       setAddCollateral(collateral)
       setValid()
+    }
+
+    const getVehicleDescription = (code: string): string => {
+      const vehicle = VehicleTypes.find(obj => obj.value === code)
+      return vehicle.text
     }
 
     const initEdit = (index: number) => {
@@ -276,6 +320,7 @@ export default defineComponent({
       removeVehicle,
       initEdit,
       resetData,
+      getVehicleDescription,
       ...toRefs(localState)
     }
   }
@@ -286,5 +331,9 @@ export default defineComponent({
 @import "@/assets/styles/theme.scss";
 .length-trust-label {
   font-size: 0.875rem;
+}
+.summary-text{
+  font-size: 14px;
+  color: $gray7;
 }
 </style>

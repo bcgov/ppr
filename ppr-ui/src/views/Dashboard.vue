@@ -53,7 +53,7 @@
                 <b>My Registrations</b>
               </v-col>
             </v-row>
-            <v-row no-gutters class="white" style="height:100px"></v-row>
+            <v-row no-gutters class="white" style="height:500px"></v-row>
           </v-col>
         </v-row>
       </v-container>

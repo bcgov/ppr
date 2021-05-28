@@ -55,6 +55,8 @@
                       id="txt-serial"
                       v-model="currentVehicle.serialNumber"
                       :error-messages="errors.serialNumber.message ? errors.serialNumber.message : ''"
+                      :hint="getSerialHint"
+                      @blur="onBlur('serialNumber')"
                       persistent-hint
                     />
                   </v-col>
@@ -66,6 +68,7 @@
                       label="Year"
                       id="txt-years"
                       v-model="currentVehicle.year"
+                      @blur="onBlur('year')"
                       persistent-hint
                       :error-messages="errors.year.message ? errors.year.message : ''"
                     />
@@ -79,7 +82,7 @@
                       id="txt-make"
                       v-model="currentVehicle.make"
                       persistent-hint
-                      @blur="validateInput('make')"
+                      @blur="onBlur('make')"
                       :error-messages="errors.make.message ? errors.make.message : ''"
                     />
                   </v-col>
@@ -91,6 +94,7 @@
                       label="Model"
                       id="txt-model"
                       v-model="currentVehicle.model"
+                      @blur="onBlur('model')"
                       persistent-hint
                       :error-messages="errors.model.message ? errors.model.message : ''"
                     />
@@ -161,10 +165,16 @@ export default defineComponent({
   emits: ['addEditVehicle', 'resetEvent'],
   setup (props, context) {
     const {
+      // @ts-ignore - returned by toRef
       currentVehicle,
+      // @ts-ignore - returned by toRef
       vehicleTypes,
+      // @ts-ignore - returned by toRef
       getSerialLabel,
+      // @ts-ignore - returned by toRef
       getSerialDisabled,
+      // @ts-ignore - returned by toRef
+      getSerialHint,
       getVehicle,
       resetFormAndData,
       removeVehicle,
@@ -176,23 +186,27 @@ export default defineComponent({
     const onSubmitForm = async () => {
       const isValid = await validateCollateralForm(currentVehicle.value)
       if (!isValid) {
-        // let errors = formErrors() // eslint-disable-line
         return
       }
 
       addVehicle()
     }
 
+    const onBlur = (fieldname) => {
+      validateInput(fieldname, currentVehicle.value[fieldname])
+    }
+
     return {
       onSubmitForm,
       resetFormAndData,
       removeVehicle,
-      validateInput,
+      onBlur,
       errors,
       currentVehicle,
       vehicleTypes,
       getSerialLabel,
-      getSerialDisabled
+      getSerialDisabled,
+      getSerialHint
     }
   }
 })

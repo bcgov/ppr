@@ -7,12 +7,12 @@
           <label class="pl-3"><strong>Registration Length and Trust Indenture</strong></label>
         </v-col>
       </v-row>
-      <v-container class="pt-10 px-8" :class="{'invalid-message': showErrorSummary}">
+      <v-container class="pt-4 px-4" :class="{'invalid-message': showErrorSummary}">
       <v-row no-gutters v-if="showErrorSummary" class="pa-6">
         <v-col cols="auto">
           <span :class="{'invalid-message': showErrorSummary}">
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
-          This step is unfinished
+          This step is unfinished.
           </span>
           <span id="router-link-length-trust" :class="$style['invalid-link']" @click="goToLengthTrust()">
             Return to this step to complete it.
@@ -20,14 +20,14 @@
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" class="pt-4 generic-label">
+        <v-col cols="3" class="generic-label">
           Registration Length
         </v-col>
         <v-col :class="$style['summary-text']">
           {{lengthSummary}}
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pb-3">
+      <v-row no-gutters class="ps-6 pb-6">
         <v-col cols="3" class="generic-label">
           Trust Indenture
         </v-col>
@@ -84,11 +84,11 @@
         </v-checkbox>
       </v-col>
       <v-col cols="8">
-        <v-tooltip top>
+        <v-tooltip top content-class="top-tooltip" transition="fade-transition">
             <template v-slot:activator="{ on }">
               <span v-on="on" class="trust-indenture">Trust Indenture</span>
             </template>
-            <span class="trust-indenture">Helper top tip text will go here</span>
+            <p>Helper top tip text will go here</p>
           </v-tooltip>
       </v-col>
     </v-row>
@@ -257,9 +257,8 @@ export default defineComponent({
   font-size: 16px;
   color: $gray7;
 }
-
 .invalid-link {
-  padding: 1.25rem;
+  padding: 0.25rem;
   font-size: 16px;
   color: #1669BB;
   text-decoration: underline;

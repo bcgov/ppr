@@ -12,6 +12,8 @@ import { Tombstone } from '@/components/common'
 // Other
 import { AccountInformationIF, BreadcrumbIF, UserInfoIF } from '@/interfaces'
 import { tombstoneBreadcrumbSearch, tombstoneBreadcrumbRegistration } from '@/resources'
+import { mockedSelectSecurityAgreement } from './test-data'
+import mockRouter from './MockRouter'
 
 Vue.use(Vuetify)
 
@@ -28,15 +30,20 @@ const tombstoneUserInfo: string = '#tombstone-user-info'
  *
  * @returns a Wrapper<SearchedResult> object with the given parameters.
  */
-function createComponent (backURL: string, header: string, setItems: Array<BreadcrumbIF>): Wrapper<any> {
+function createComponent(backURL: string, mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
+  localVue.use(VueRouter)
+  const router = mockRouter.mock()
+  router.push({ name: mockRoute })
+
   return mount(Tombstone, {
     localVue,
-    propsData: { backURL, header, setItems },
+    propsData: { backURL },
     store,
+    router,
     vuetify
   })
 }
@@ -69,7 +76,6 @@ describe('Tombstone component', () => {
       selectConfirmationDialog: true
     }
   }
-  const testHeader = 'Test'
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -78,6 +84,7 @@ describe('Tombstone component', () => {
 
     await store.dispatch('setAccountInformation', accountInfo)
     await store.dispatch('setUserInfo', userInfo)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
   })
 
   afterEach(() => {
@@ -86,17 +93,16 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component with breadcrumb', async () => {
-    wrapper = createComponent('http://test/dashboard', testHeader, tombstoneBreadcrumbSearch)
+    wrapper = createComponent('http://test/dashboard', 'dashboard')
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
-    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbSearch.length)
-    for (let i = 0; i < tombstoneBreadcrumbSearch.length; i++) {
+    for (let i = 0; i < tombstoneBreadcrumbSearch.length - 1; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbSearch[i].text)
     }
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain(testHeader)
+    expect(header.at(0).text()).toContain('My PPR Dashboard')
     const userInfoDisplay = wrapper.findAll(tombstoneUserInfo)
     expect(userInfoDisplay.length).toBe(1)
     expect(userInfoDisplay.at(0).text()).toContain(userInfo.firstname)
@@ -106,7 +112,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders registration Tombstone component with breadcrumb', async () => {
-    wrapper = createComponent('http://test/dashboard', testHeader, tombstoneBreadcrumbRegistration)
+    wrapper = createComponent('http://test/dashboard', 'length-trust')
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
@@ -116,7 +122,6 @@ describe('Tombstone component', () => {
     }
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain(testHeader)
-
+    expect(header.at(0).text()).toContain('My Personal Property Registry')
   })
 })

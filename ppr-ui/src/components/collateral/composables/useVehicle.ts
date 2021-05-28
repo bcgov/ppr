@@ -10,16 +10,41 @@ export const useVehicle = (props, context) => {
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
     getSerialLabel: computed(function () {
-      if (localState.currentVehicle.type === '') {
-        return 'Select a vehicle type first'
-      } else if (localState.currentVehicle.type === 'MH') {
-        return 'Serial Number (if MHR number is not available)'
-      } else {
-        return 'Serial or VIN Number'
+      switch (localState.currentVehicle.type) {
+        case '':
+          return 'Select a vehicle type first'
+        case 'MH':
+          return 'Serial Number (if MHR number is not available)'
+        case 'BO':
+          return 'Boat Serial Number'
+        case 'AF':
+        case 'AC':
+          return 'Aircraft Airframe D.O.T number'
+        case 'OM':
+          return 'Outboard Motor Serial Number'
+        case 'TR':
+          return 'Trailer Serial Number'
+        default:
+          return 'Serial or VIN Number'
       }
     }),
     getSerialDisabled: computed(function () {
       return localState.currentVehicle.type === ''
+    }),
+    getSerialHint: computed(function () {
+      let hint = 'Up to 25 characters'
+      switch (localState.currentVehicle.type) {
+        case '':
+          hint = 'Select a vehicle type first'
+          break
+        case 'AC':
+          hint = 'Up to 25 letters'
+          break
+        case 'MH':
+          hint = 'Must contain 6 digits'
+          break
+      }
+      return hint
     })
   })
 

@@ -26,7 +26,7 @@
             mdi-check-circle
           </v-icon>
           <v-icon :class="$style['step__btn2']" size="30" color="#D3272C" v-show=showInvalid(step)>
-            mdi-alpha-x-circle
+            mdi-close-circle
           </v-icon>
         </div>
         <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
@@ -102,7 +102,7 @@ export default class Stepper extends Vue {
   cursor: pointer;
 
   .step__btn {
-    background: linear-gradient(rgba(25,118,210, .8), rgba(25,118,210, .8)),
+    background: linear-gradient($primary-blue, $primary-blue),
                 linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)); // first bg is layered on top
     color: $BCgovInputBG;
   }
@@ -112,7 +112,7 @@ export default class Stepper extends Vue {
   }
 
   .step__icon {
-    color: $primary-blue;
+    color: #fff;
     background: inherit;
   }
 }

@@ -20,8 +20,8 @@ const createEmptyErrors = () => ({
 export const useCollateralValidation = () => {
   const errors = ref(createEmptyErrors())
 
-  const validateInput = fieldName => {
-    const value = event.target
+  const validateInput = (fieldName, value) => {
+    console.log(value)
     formValidation.validateField(fieldName, value)
       .then(validationResult => (errors.value[fieldName] = validationResult))
   }

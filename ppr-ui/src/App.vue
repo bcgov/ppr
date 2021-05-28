@@ -70,10 +70,16 @@ import { Tombstone } from '@/components/common'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
+import {
+  fetchError, loginError, paymentError, saveSearchError
+} from '@/resources'
+
 import { getKeycloakRoles, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
-import { ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
+import {
+  ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, // eslint-disable-line
+  UserSettingsIF, BreadcrumbIF, RegistrationTypeIF // eslint-disable-line
+  } from '@/interfaces' // eslint-disable-line
 import { RouteNames } from './enums'
 
 @Component({

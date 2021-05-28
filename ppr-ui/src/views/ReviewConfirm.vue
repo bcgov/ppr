@@ -33,7 +33,7 @@
               </v-container>
             </v-row>
             <v-row no-gutters>
-              <v-container fluid class="pa-1">
+              <v-container fluid class="ps-1 pt-8">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
                     <collateral :isSummary="true"/>

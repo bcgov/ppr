@@ -7,8 +7,9 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { ReviewConfirm } from '@/views'
-import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
+import { Collateral } from '@/components/collateral'
 
 // Other
 import mockRouter from './MockRouter'
@@ -59,7 +60,6 @@ describe('ReviewConfirm new registration component', () => {
   it('renders Review Confirm View with child components', () => {
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
   })
@@ -103,9 +103,9 @@ describe('ReviewConfirm step 1 tests', () => {
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('Not entered')
@@ -121,9 +121,9 @@ describe('ReviewConfirm step 1 tests', () => {
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(false)
     // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('3')

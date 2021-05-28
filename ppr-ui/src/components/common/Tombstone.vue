@@ -77,7 +77,8 @@ export default defineComponent({
       date: '',
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
         console.log(root.$route.name)
-        if (root.$route.name === 'dashboard') {
+        if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
+        (root.$route.name === 'search')) {
           return tombstoneBreadcrumbDashboard
         } else {
           const registrationBreadcrumb = tombstoneBreadcrumbRegistration
@@ -86,7 +87,8 @@ export default defineComponent({
         }
       }),
       header: computed((): string => {
-        if (root.$route.name === 'dashboard') {
+        if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
+        (root.$route.name === 'search')) {
           return 'My PPR Dashboard'
         } else {
           return 'My Personal Property Registry'

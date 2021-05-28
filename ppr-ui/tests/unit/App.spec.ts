@@ -13,6 +13,7 @@ import sinon from 'sinon'
 import App from '@/App.vue'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
+import { Tombstone } from '@/components/common'
 
 // Other
 import mockRouter from './MockRouter'
@@ -62,6 +63,7 @@ describe('App component', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = mockRouter.mock()
+    router.push({ name: 'dashboard' })
     wrapper = shallowMount(App, { localVue, store, router, vuetify, stubs: { Affix: true } })
 
     // wait for all queries to complete
@@ -78,6 +80,7 @@ describe('App component', () => {
     expect(wrapper.findComponent(App).exists()).toBe(true)
     expect(wrapper.findComponent(SbcHeader).exists()).toBe(true)
     expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)
+    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
   })
 
   it('gets auth and user info/settings properly', () => {
