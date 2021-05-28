@@ -35,7 +35,7 @@ export const paymentConfirmaionDialog: DialogOptionsIF = {
   cancelText: 'Cancel',
   title: 'Payment Confirmation',
   text: 'Each search incurs a fee, even if the search returns no results. ' +
-        'Your BC Online Account will be debited $8.50 for this transaction.'
+    'Your account will be debited $8.50 for this transaction.'
 }
 
 export const selectionConfirmaionDialog = {
