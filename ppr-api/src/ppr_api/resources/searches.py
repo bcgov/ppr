@@ -25,7 +25,7 @@ from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import SearchClient, SearchResult
+from ppr_api.models import SearchRequest, SearchResult
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
 from ppr_api.resources import utils as resource_utils
@@ -63,8 +63,8 @@ class SearchResource(Resource):
             if not valid_format:
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
             # Perform any extra data validation such as start and end dates here
-            SearchClient.validate_query(request_json)
-            query = SearchClient.create_from_json(request_json, account_id)
+            SearchRequest.validate_query(request_json)
+            query = SearchRequest.create_from_json(request_json, account_id)
 
             # Charge a search fee.
             if account_id:
@@ -136,13 +136,13 @@ class SearchDetailResource(Resource):
             if not valid_format:
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
 
-            search_client = SearchClient.find_by_id(search_id)
-            if not search_client:
+            search_request = SearchRequest.find_by_id(search_id)
+            if not search_request:
                 return resource_utils.not_found_error_response('searchId', search_id)
 
             # Save the updated search selection.
-            search_client.update_search_selection(request_json)
-            return jsonify(search_client.search_response), HTTPStatus.ACCEPTED
+            search_request.update_search_selection(request_json)
+            return jsonify(search_request.search_response), HTTPStatus.ACCEPTED
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)

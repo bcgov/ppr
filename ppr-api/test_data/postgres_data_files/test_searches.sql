@@ -1,5 +1,5 @@
 -- Existing completed registration number search on TEST0001 (search step 1 and 2)
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000000, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-001"}',
@@ -13,7 +13,7 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 ;
 
 -- Existing incomplete registration number search on TEST0001 (search step only)
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000001, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
@@ -26,7 +26,7 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 ;
 
 -- Existing registration number search on TEST0012 (search step only). A financing statement with no other registrations
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000002, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0012"}, "clientReferenceId": "T-S-RG-003"}',
@@ -39,7 +39,7 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 ;
 
 -- Existing registration number search on TEST0002 (search step only). A financing statement with a renewal.
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000003, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0002"}, "clientReferenceId": "T-S-RG-004"}',
@@ -53,7 +53,7 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 
 -- Existing Business debtor search for autosave search selection update testing.
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000004, CURRENT_TIMESTAMP, 'BS',
          '{"type": "BUSINESS_DEBTOR", "criteria": {"debtorName": {"business": "TEST BUS 2 DEBTOR"}}, "clientReferenceId": "T-S-DB-001"}',
@@ -63,7 +63,7 @@ INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_r
 
 
 -- Completed registration number search on TEST0012 to test get details: search ts in the future.
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000005, CURRENT_TIMESTAMP + interval '365 days', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0012"}, "clientReferenceId": "T-S-RG-003"}',
@@ -159,7 +159,7 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 
 -- Completed registration number search on TEST0012 to test get details: search ts too far in the past.
-INSERT INTO search_clients(id, search_ts, search_type_cd, api_criteria, search_response,
+INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
                          account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
   VALUES(200000006, CURRENT_TIMESTAMP - interval '32 days', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0012"}, "clientReferenceId": "T-S-RG-003"}',

@@ -27,7 +27,7 @@ from .db import db
 
 
 ACCOUNT_QUERY = """
-SELECT d.create_ts, d.registration_type_cl, d.registration_type_cd, d.document_number, d.registration_number
+SELECT d.create_ts, d.registration_type_cl, d.registration_type, d.document_number, d.registration_number
   FROM drafts d
  WHERE d.account_id = '?'
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
@@ -54,13 +54,15 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                                 default=db.func.get_draft_document_number())
     account_id = db.Column('account_id', db.String(20), nullable=False, index=True)
     create_ts = db.Column('create_ts', db.DateTime, nullable=False, index=True)
-    registration_type_cl = db.Column('registration_type_cl', db.String(10), nullable=False)
-    registration_type_cd = db.Column('registration_type_cd', db.String(2), nullable=False)
     draft = db.Column('draft', db.JSON, nullable=False)
     registration_number = db.Column('registration_number', db.String(10), nullable=True)
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
 
     # parent keys
+    registration_type = db.Column('registration_type', db.String(2),
+                                  db.ForeignKey('registration_types.registration_type_cd'), nullable=False)
+    registration_type_cl = db.Column('registration_type_cl', db.String(10),
+                                     db.ForeignKey('registration_type_classes.registration_type_cl'), nullable=False)
 
     # Relationships - Registration
     registration = db.relationship('Registration', back_populates='draft', uselist=False)
@@ -171,15 +173,15 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                 else:
                     draft.registration_type_cl = 'AMENDMENT'
 
-                draft.registration_type_cd = request_json['amendmentStatement']['changeType']
+                draft.registration_type = request_json['amendmentStatement']['changeType']
                 draft.registration_number = request_json['amendmentStatement']['baseRegistrationNumber']
             elif request_json['type'] == 'CHANGE_STATEMENT':
                 draft.registration_type_cl = 'CHANGE'
-                draft.registration_type_cd = request_json['changeStatement']['changeType']
+                draft.registration_type = request_json['changeStatement']['changeType']
                 draft.registration_number = request_json['changeStatement']['baseRegistrationNumber']
             else:
                 draft.registration_type_cl = 'PPSALIEN'
-                draft.registration_type_cd = request_json['financingStatement']['type']
+                draft.registration_type = request_json['financingStatement']['type']
 
         return draft
 
@@ -193,13 +195,13 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'amendmentStatement' in json_data and 'courtOrderInformation' in json_data['amendmentStatement']:
             draft.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
         if draft_type == model_utils.DRAFT_TYPE_AMENDMENT:
-            draft.registration_type_cd = json_data['amendmentStatement']['changeType']
+            draft.registration_type = json_data['amendmentStatement']['changeType']
             draft.registration_number = json_data['amendmentStatement']['baseRegistrationNumber']
         elif draft_type == model_utils.DRAFT_TYPE_CHANGE:
-            draft.registration_type_cd = json_data['changeStatement']['changeType']
+            draft.registration_type = json_data['changeStatement']['changeType']
             draft.registration_number = json_data['changeStatement']['baseRegistrationNumber']
         else:
-            draft.registration_type_cd = json_data['financingStatement']['type']
+            draft.registration_type = json_data['financingStatement']['type']
 
         # Not null constraint: should be removed if staff can submit requests without an account id.
         if not account_id:
@@ -218,7 +220,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         draft.registration_number = registration.registration_num
         draft.document_number = registration.document_number
         draft.registration_type_cl = registration.registration_type_cl
-        draft.registration_type_cd = registration.registration_type_cd
+        draft.registration_type = registration.registration_type
         draft.draft = json_data
         # Not null constraint: should be removed.
         if not draft.account_id:

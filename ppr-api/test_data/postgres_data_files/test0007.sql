@@ -1,8 +1,8 @@
 -- TEST0007 Amendment on TEST0001. Update all possible entities.
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000011, 'D-T-00A7', 'PS12345', CURRENT_TIMESTAMP, 'AMENDMENT', 'CO', 'TEST0001', null, '{}');
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path, detail_description)
     VALUES(200000008, 200000000, 'TEST0007', 'TEST0001', 'CO', 'AMENDMENT', CURRENT_TIMESTAMP + interval '5 minutes', 200000011, null,
@@ -26,7 +26,7 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
     VALUES(200000022, 'SP', 200000008, 200000000, null, null, null, null, null, 'TEST 7 AMEND SECURED PARTY',
            null, 200000010)
 ;
-INSERT INTO serial_collateral(id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000006, 'MV', 200000008, 200000000, null, 2018, 'FORD', 'FIESTA', 'T346JU622994', null,
          searchkey_vehicle('T346JU622994'))

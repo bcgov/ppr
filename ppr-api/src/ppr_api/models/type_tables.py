@@ -89,7 +89,7 @@ class RegistrationType(db.Model):  # pylint: disable=too-few-public-methods
     # parent keys
 
     # Relationships - Registration
-    registration = db.relationship('Registration', back_populates='registration_type')
+    registration = db.relationship('Registration', back_populates='reg_type')
 
 
 class SearchType(db.Model):  # pylint: disable=too-few-public-methods
@@ -102,8 +102,8 @@ class SearchType(db.Model):  # pylint: disable=too-few-public-methods
 
     # parent keys
 
-    # Relationships - SearchClient
-    search_client = db.relationship('SearchClient', back_populates='search_type')
+    # Relationships - SearchRequest
+    search_request = db.relationship('SearchRequest', back_populates='search_request_type')
 
 
 class StateType(db.Model):  # pylint: disable=too-few-public-methods
@@ -117,7 +117,7 @@ class StateType(db.Model):  # pylint: disable=too-few-public-methods
     # parent keys
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship('FinancingStatement', back_populates='state_type')
+    financing_statement = db.relationship('FinancingStatement', back_populates='fin_state_type')
 
 
 class SerialType(db.Model):  # pylint: disable=too-few-public-methods

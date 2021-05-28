@@ -1,12 +1,12 @@
 -- TEST0004 discharge financing statement base test: create financing statement, then discharge statement
 -- draft statement CLOB empty for testing.
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000006, 'D-T-0004', 'PS12345', CURRENT_TIMESTAMP, 'PPSALIEN', 'SA', 'TEST0004', null, '{}');
-INSERT INTO financing_statements(id, state_type_cd, expire_date, life, discharged, renewed)
+INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
   VALUES(200000003, 'ACT', CURRENT_TIMESTAMP + interval '730 days', 2, null , null)
 ;
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000003, 200000003, 'TEST0004', null, 'SA', 'PPSALIEN', CURRENT_TIMESTAMP, 200000006, 2,
@@ -33,16 +33,16 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
     VALUES(200000013, 'SP', 200000003, 200000003, null, null, null, null, null, 'TEST 4 SECURED PARTY',
            null, 200000005)
 ;
-INSERT INTO serial_collateral(id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000004, 'MV', 200000003, 200000003, null, 2018, 'HONDA', 'CIVIC', 'JU622994', null,
          searchkey_vehicle('JU622994'))
 ;
 -- Create discharge
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000007, 'D-T-00D4', 'PS12345', CURRENT_TIMESTAMP, 'DISCHARGE', 'DC', 'TEST0004', null, '{}');
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000004, 200000003, 'TEST00D4', 'TEST0004', 'DC', 'DISCHARGE', CURRENT_TIMESTAMP + interval '1 day', 200000007, 0,
@@ -57,7 +57,7 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
            null, 200000006)
 ;
 UPDATE financing_statements
-   SET state_type_cd = 'HDC', discharged = 'Y'
+   SET state_type = 'HDC', discharged = 'Y'
  WHERE id = 200000003
 ;
 -- TEST0004 end

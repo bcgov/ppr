@@ -140,7 +140,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), sa.Sequence('historical_head_id_seq'), nullable=False),
     sa.Column('head_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=150), nullable=False),
-    sa.Column('historical_type_cd', sa.String(length=1), nullable=False),
+    sa.Column('historical_type', sa.String(length=1), nullable=False),
     sa.Column('bconline_account', sa.Integer(), nullable=True),
     sa.Column('contact_name', sa.String(length=100), nullable=False),
     sa.Column('contact_area_cd', sa.String(length=3), nullable=True),
@@ -164,10 +164,12 @@ def upgrade():
     sa.Column('account_id', sa.String(length=20), nullable=False),
     sa.Column('create_ts', sa.DateTime(), nullable=False),
     sa.Column('registration_type_cl', sa.String(length=10), nullable=False),
-    sa.Column('registration_type_cd', sa.String(length=2), nullable=False),
+    sa.Column('registration_type', sa.String(length=2), nullable=False),
     sa.Column('draft', sa.JSON(), nullable=False),
     sa.Column('registration_number', sa.String(length=10), nullable=True),
     sa.Column('update_ts', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['registration_type'], ['registration_types.registration_type_cd'], ),
+    sa.ForeignKeyConstraint(['registration_type_cl'], ['registration_type_classes.registration_type_cl'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('document_number'),
     sa.UniqueConstraint('document_number')
@@ -176,7 +178,7 @@ def upgrade():
     op.create_index(op.f('ix_drafts_create_ts'), 'drafts', ['create_ts'], unique=False)
     op.create_table('financing_statements',
     sa.Column('id', sa.Integer(), sa.Sequence('financing_id_seq'), nullable=False),
-    sa.Column('state_type_cd', sa.String(length=3), nullable=False),
+    sa.Column('state_type', sa.String(length=3), nullable=False),
     sa.Column('life', sa.Integer(), nullable=True),
     sa.Column('expire_date', sa.DateTime(), nullable=True),
     sa.Column('discharged', sa.String(length=1), nullable=True),
@@ -184,7 +186,7 @@ def upgrade():
     sa.Column('type_claim', sa.String(length=2), nullable=True),
     sa.Column('crown_charge_type', sa.String(length=2), nullable=True),
     sa.Column('crown_charge_other', sa.String(length=70), nullable=True),
-    sa.ForeignKeyConstraint(['state_type_cd'], ['state_types.state_type_cd'], ),
+    sa.ForeignKeyConstraint(['state_type'], ['state_types.state_type_cd'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('registrations',
@@ -205,10 +207,11 @@ def upgrade():
     sa.Column('detail_description', sa.String(length=180), nullable=True),
     sa.Column('financing_id', sa.Integer(), nullable=False),
     sa.Column('draft_id', sa.Integer(), nullable=False),
-    sa.Column('registration_type_cd', sa.String(length=2), nullable=False),
+    sa.Column('registration_type', sa.String(length=2), nullable=False),
     sa.ForeignKeyConstraint(['draft_id'], ['drafts.id'], ),
     sa.ForeignKeyConstraint(['financing_id'], ['financing_statements.id'], ),
-    sa.ForeignKeyConstraint(['registration_type_cd'], ['registration_types.registration_type_cd'], ),
+    sa.ForeignKeyConstraint(['registration_type'], ['registration_types.registration_type_cd'], ),
+    sa.ForeignKeyConstraint(['registration_type_cl'], ['registration_type_classes.registration_type_cl'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_registrations_account_id'), 'registrations', ['account_id'], unique=False)
@@ -239,7 +242,7 @@ def upgrade():
     )
     op.create_table('serial_collateral',
     sa.Column('id', sa.Integer(), sa.Sequence('vehicle_id_seq'), nullable=False),
-    sa.Column('serial_type_cd', sa.String(length=2), nullable=False),
+    sa.Column('serial_type', sa.String(length=2), nullable=False),
     sa.Column('year', sa.Integer(), nullable=True),
     sa.Column('make', sa.String(length=60), nullable=True),
     sa.Column('model', sa.String(length=60), nullable=True),
@@ -251,7 +254,7 @@ def upgrade():
     sa.Column('registration_id_end', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['financing_id'], ['financing_statements.id'], ),
     sa.ForeignKeyConstraint(['registration_id'], ['registrations.id'], ),
-    sa.ForeignKeyConstraint(['serial_type_cd'], ['serial_types.serial_type_cd'], ),
+    sa.ForeignKeyConstraint(['serial_type'], ['serial_types.serial_type_cd'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_serial_collateral_srch_vin'), 'serial_collateral', ['srch_vin'], unique=False)
@@ -292,10 +295,10 @@ def upgrade():
     op.create_index(op.f('ix_parties_business_srch_key'), 'parties', ['business_srch_key'], unique=False)
     op.create_index(op.f('ix_parties_first_name_key'), 'parties', ['first_name_key'], unique=False)
     op.create_index(op.f('ix_parties_last_name_key'), 'parties', ['last_name_key'], unique=False)
-    op.create_table('search_clients',
+    op.create_table('search_requests',
     sa.Column('id', sa.Integer(), sa.Sequence('search_id_seq'), nullable=False),
     sa.Column('search_ts', sa.DateTime(), nullable=False),
-    sa.Column('search_type_cd', sa.String(length=2), nullable=False),
+    sa.Column('search_type', sa.String(length=2), nullable=False),
     sa.Column('api_criteria', sa.JSON(), nullable=False),
     sa.Column('search_response', sa.JSON(), nullable=True),
     sa.Column('account_id', sa.String(length=20), nullable=True),
@@ -304,11 +307,11 @@ def upgrade():
     sa.Column('returned_results_size', sa.Integer(), nullable=True),
     sa.Column('pay_invoice_id', sa.Integer(), nullable=True),
     sa.Column('pay_path', sa.String(length=256), nullable=True),
-    sa.ForeignKeyConstraint(['search_type_cd'], ['search_types.search_type_cd'], ),
+    sa.ForeignKeyConstraint(['search_type'], ['search_types.search_type_cd'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_search_clients_account_id'), 'search_clients', ['account_id'], unique=False)
-    op.create_index(op.f('ix_search_clients_search_ts'), 'search_clients', ['search_ts'], unique=False)
+    op.create_index(op.f('ix_search_requests_account_id'), 'search_requests', ['account_id'], unique=False)
+    op.create_index(op.f('ix_search_requests_search_ts'), 'search_requests', ['search_ts'], unique=False)
     op.create_table('user_profiles',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('payment_confirmation', sa.String(length=1), nullable=False),
@@ -325,7 +328,7 @@ def upgrade():
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('exact_match_count', sa.Integer(), nullable=True),
     sa.Column('similar_match_count', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['search_id'], ['search_clients.id'], ),
+    sa.ForeignKeyConstraint(['search_id'], ['search_requests.id'], ),
     sa.PrimaryKeyConstraint('search_id')
     )
     public_get_draft_document_number = PGFunction(
@@ -5413,9 +5416,9 @@ def downgrade():
     op.drop_index(op.f('ix_client_codes_head_id'), table_name='client_codes')
     op.drop_table('search_results')
     op.drop_table('user_profiles')
-    op.drop_index(op.f('ix_search_clients_search_ts'), table_name='search_clients')
-    op.drop_index(op.f('ix_search_clients_account_id'), table_name='search_clients')
-    op.drop_table('search_clients')
+    op.drop_index(op.f('ix_search_requests_search_ts'), table_name='search_requests')
+    op.drop_index(op.f('ix_search_requests_account_id'), table_name='search_requests')
+    op.drop_table('search_requests')
     op.drop_index(op.f('ix_client_codes_historical_name'), table_name='client_codes_historical')
     op.drop_index(op.f('ix_client_codes_historical_head_id'), table_name='client_codes_historical')
     op.drop_table('client_codes_historical')

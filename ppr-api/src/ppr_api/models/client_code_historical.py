@@ -38,7 +38,7 @@ class ClientCodeHistorical(db.Model):  # pylint: disable=too-many-instance-attri
     id = db.Column('id', db.Integer, db.Sequence('historical_head_id_seq'), primary_key=True)
     head_id = db.Column('head_id', db.Integer, index=True, nullable=False)
     name = db.Column('name', db.String(150), index=True, nullable=False)
-    historical_type_cd = db.Column('historical_type_cd', db.String(1), nullable=False)
+    historical_type = db.Column('historical_type', db.String(1), nullable=False)
     bconline_account = db.Column('bconline_account', db.Integer, nullable=True)
     # contact info
     contact_name = db.Column('contact_name', db.String(100), nullable=False)

@@ -34,7 +34,7 @@ def test_find_by_id(session):
     assert registration
     assert registration.id == 200000000
     assert registration.registration_num == 'TEST0001'
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -46,7 +46,7 @@ def test_find_by_id_as(session):
     assert registration
     assert registration.id == 200000008
     assert registration.registration_num
-    assert registration.registration_type_cd == 'CO'
+    assert registration.registration_type == 'CO'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'CO'
@@ -76,7 +76,7 @@ def test_find_by_id_cs_dt(session):
     assert registration
     assert registration.id == 200000009
     assert registration.registration_num
-    assert registration.registration_type_cd == 'DT'
+    assert registration.registration_type == 'DT'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'DT'
@@ -99,7 +99,7 @@ def test_find_by_id_cs_st(session):
     assert registration
     assert registration.id == 200000010
     assert registration.registration_num
-    assert registration.registration_type_cd == 'ST'
+    assert registration.registration_type == 'ST'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'ST'
@@ -121,7 +121,7 @@ def test_find_by_id_cs_su(session):
     assert registration
     assert registration.id == 200000011
     assert registration.registration_num
-    assert registration.registration_type_cd == 'SU'
+    assert registration.registration_type == 'SU'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'SU'
@@ -145,7 +145,7 @@ def test_find_by_registration_num_fs(session):
     assert registration
     assert registration.id == 200000000
     assert registration.registration_num == 'TEST0001'
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -157,7 +157,7 @@ def test_find_by_registration_num_ds(session):
     assert registration
     assert registration.id == 200000004
     assert registration.registration_num == 'TEST00D4'
-    assert registration.registration_type_cd == 'DC'
+    assert registration.registration_type == 'DC'
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -206,7 +206,7 @@ def test_save_discharge(session):
     assert registration.financing_id == 200000003
     assert registration.id
     assert registration.registration_num
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -241,7 +241,7 @@ def test_save_renewal(session):
     assert registration.financing_id == 200000004
     assert registration.id
     assert registration.registration_num
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -276,7 +276,7 @@ def test_save_renewal_rl(session):
     assert registration.financing_id == 200000001
     assert registration.id
     assert registration.registration_num
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id

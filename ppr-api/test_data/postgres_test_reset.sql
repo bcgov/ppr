@@ -1,7 +1,7 @@
 -- Delete all test data created with the scripts in this directory.
 DELETE FROM search_results
   WHERE search_id >= 200000000;
-DELETE FROM search_clients
+DELETE FROM search_requests
   WHERE id >= 200000000;
 DELETE FROM serial_collateral
   WHERE financing_id >= 200000000;

@@ -1,8 +1,8 @@
 -- TEST0008 Change Statement debtor transfer on TEST0001. 
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000012, 'D-T-00C8', 'PS12345', CURRENT_TIMESTAMP, 'CHANGE', 'DT', 'TEST0001', null, '{}');
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000009, 200000000, 'TEST0008', 'TEST0001', 'DT', 'CHANGE', CURRENT_TIMESTAMP + interval '10 minutes', 200000012, null,

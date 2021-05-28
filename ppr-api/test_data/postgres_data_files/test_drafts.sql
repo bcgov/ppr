@@ -1,5 +1,5 @@
 -- Unregistered draft financing statement
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000003, 'D-T-FS01', 'PS12345', CURRENT_TIMESTAMP, 'PPSALIEN', 'SA', 'NA', null, 
 '{
@@ -59,7 +59,7 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
 }');
 
 -- Unregistered draft amendment statement
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000004, 'D-T-AM01', 'PS12345', CURRENT_TIMESTAMP, 'AMENDMENT', 'AM', 'TEST0001', null, 
 '{
@@ -107,7 +107,7 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
 }');
 
 -- Unregistered draft change statement
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000005, 'D-T-CH01', 'PS12345', CURRENT_TIMESTAMP, 'CHANGE', 'DT', 'TEST0001', null,
 '{

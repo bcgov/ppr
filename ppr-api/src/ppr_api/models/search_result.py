@@ -32,7 +32,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
     __tablename__ = 'search_results'
 
-    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_clients.id'),
+    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_requests.id'),
                           primary_key=True, nullable=False)
     search_select = db.Column('api_result', db.JSON, nullable=True)
     search_response = db.Column('registrations', db.JSON, nullable=False)
@@ -43,7 +43,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     # parent keys
 
     # Relationships - Search
-    search = db.relationship('SearchClient', foreign_keys=[search_id],
+    search = db.relationship('SearchRequest', foreign_keys=[search_id],
                              back_populates='search_result', cascade='all, delete', uselist=False)
 
     @property

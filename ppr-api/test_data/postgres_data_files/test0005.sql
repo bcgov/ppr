@@ -1,12 +1,12 @@
 -- TEST0005 renewal statement base test: create financing statement, then renewal statement
 -- draft statement CLOB empty for testing.
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000008, 'D-T-0005', 'PS12345', CURRENT_TIMESTAMP, 'PPSALIEN', 'SA', 'TEST0005', null, '{}');
-INSERT INTO financing_statements(id, state_type_cd, expire_date, life, discharged, renewed)
+INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
   VALUES(200000004, 'ACT', CURRENT_TIMESTAMP + interval '365 days', 1, null , null)
 ;
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000005, 200000004, 'TEST0005', null, 'SA', 'PPSALIEN', CURRENT_TIMESTAMP, 200000008, 1,
@@ -33,16 +33,16 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
     VALUES(200000017, 'SP', 200000005, 200000004, null, null, null, null, null, 'TEST 5 SECURED PARTY',
            null, 200000007)
 ;
-INSERT INTO serial_collateral(id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000005, 'MV', 200000005, 200000004, null, 2018, 'TESLA', 'MODEL 3', 'YJ46JU622994', null,
          searchkey_vehicle('YJ46JU622994'))
 ;
 -- Create renewal
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000009, 'D-T-00R5', 'PS12345', CURRENT_TIMESTAMP, 'RENEWAL', 'RE', 'TEST0005', null, '{}');
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000006, 200000004, 'TEST00R5', 'TEST0005', 'RE', 'RENEWAL', CURRENT_TIMESTAMP + interval '5 minutes', 200000009, 2,

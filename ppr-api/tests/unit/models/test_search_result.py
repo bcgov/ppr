@@ -21,7 +21,7 @@ from http import HTTPStatus
 
 import pytest
 
-from ppr_api.models import SearchResult, SearchClient
+from ppr_api.models import SearchResult, SearchRequest
 from ppr_api.exceptions import BusinessException
 
 
@@ -133,7 +133,7 @@ def test_search_detail_full_create(session, client, jwt):
         },
         'clientReferenceId': 'T-SR-SS-1001'
     }
-    search_query = SearchClient.create_from_json(json_data, 'PS12345')
+    search_query = SearchRequest.create_from_json(json_data, 'PS12345')
 
     # test
     search_query.search()
@@ -184,7 +184,7 @@ def test_search_history_sort(session, client, jwt):
             'value': 'TEST0001'
         }
     }
-    search_query = SearchClient.create_from_json(json_data, 'PS12345')
+    search_query = SearchRequest.create_from_json(json_data, 'PS12345')
 
     # test
     search_query.search()

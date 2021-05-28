@@ -34,11 +34,11 @@ RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST ' + str(SEARCH_RESULTS_MAX_SIZE) + ' RO
 
 # Serial number search base where clause
 SERIAL_SEARCH_BASE = """
-SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
-        sc.serial_type_cd,sc.serial_number,sc.year,sc.make,sc.model,
+SELECT r.registration_type,r.registration_ts AS base_registration_ts,
+        sc.serial_type,sc.serial_number,sc.year,sc.make,sc.model,
         r.registration_number AS base_registration_num,
         CASE WHEN serial_number = '?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-        fs.expire_date,fs.state_type_cd,sc.id AS vehicle_id, sc.mhr_number
+        fs.expire_date,fs.state_type,sc.id AS vehicle_id, sc.mhr_number
   FROM registrations r, financing_statements fs, serial_collateral sc 
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
@@ -55,9 +55,9 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
 
 # Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
 REG_NUM_QUERY = """
-SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
+SELECT r.registration_type,r.registration_ts AS base_registration_ts,
         r.registration_number AS base_registration_num,
-        'EXACT' AS match_type,fs.state_type_cd, fs.expire_date
+        'EXACT' AS match_type,fs.state_type, fs.expire_date
   FROM registrations r, financing_statements fs, registrations r2
  WHERE r2.financing_id = r.financing_id
    AND r.financing_id = fs.id
@@ -74,28 +74,28 @@ SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
 
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
 MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
-    " AND sc.serial_type_cd = 'MH' " + \
+    " AND sc.serial_type = 'MH' " + \
      "AND sc.srch_vin = searchkey_mhr('?') " + \
 "ORDER BY match_type, r.registration_ts ASC " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
-    " AND sc.serial_type_cd NOT IN ('AC', 'AF', 'AP') " + \
+    " AND sc.serial_type NOT IN ('AC', 'AF', 'AP') " + \
      "AND sc.srch_vin = searchkey_vehicle('?') " + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
 AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
-    " AND sc.serial_type_cd IN ('AC', 'AF', 'AP') " + \
+    " AND sc.serial_type IN ('AC', 'AF', 'AP') " + \
      "AND sc.srch_vin = searchkey_aircraft('?') " + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 BUSINESS_NAME_QUERY = """
-SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
+SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
        CASE WHEN p.business_name = '?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type_cd,p.id
+       fs.expire_date,fs.state_type,p.id
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
@@ -121,11 +121,11 @@ ORDER BY match_type, p.business_name
 #               AND A.WORD_ID = B.WORD_ID), 85)
 
 INDIVIDUAL_NAME_QUERY = """
-SELECT r.registration_type_cd,r.registration_ts AS base_registration_ts,
+SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = 'LNAME?' AND p.first_name = 'FNAME?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type_cd
+       fs.expire_date,fs.state_type
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
@@ -204,15 +204,15 @@ SELECT COUNT(r.id)
 """
 
 MHR_NUM_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
-  " AND sc.serial_type_cd = 'MH' " + \
+  " AND sc.serial_type = 'MH' " + \
    "AND sc.srch_vin = searchkey_mhr('?')"
 
 SERIAL_NUM_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
-  " AND sc.serial_type_cd NOT IN ('AC', 'AF') " + \
+  " AND sc.serial_type NOT IN ('AC', 'AF') " + \
    "AND sc.srch_vin = searchkey_vehicle('?')"
 
 AIRCRAFT_DOT_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
-  " AND sc.serial_type_cd IN ('AC', 'AF') " + \
+  " AND sc.serial_type IN ('AC', 'AF') " + \
    "AND sc.srch_vin = searchkey_aircraft('?')"
 
 COUNT_QUERY_FROM_SEARCH_TYPE = {
@@ -226,7 +226,7 @@ COUNT_QUERY_FROM_SEARCH_TYPE = {
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
 'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
        'sr.exact_match_count, sr.similar_match_count ' + \
-  'FROM search_clients sc, search_results sr ' + \
+  'FROM search_requests sc, search_results sr ' + \
  'WHERE sc.id = sr.search_id ' + \
    "AND sc.account_id = '?' " + \
    "AND sc.search_ts > ((now() at time zone 'utc') - interval '" + str(GET_HISTORY_DAYS_LIMIT) + " days') " + \
@@ -236,7 +236,7 @@ ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
 ACCOUNT_SEARCH_HISTORY_QUERY = \
 'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
        'sr.exact_match_count, sr.similar_match_count ' + \
-  'FROM search_clients sc, search_results sr ' + \
+  'FROM search_requests sc, search_results sr ' + \
  'WHERE sc.id = sr.search_id ' + \
    "AND sc.account_id = '?' " + \
 'ORDER BY sc.search_ts DESC ' + \

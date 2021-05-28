@@ -24,7 +24,7 @@ from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import authorized
-from ppr_api.models import SearchClient
+from ppr_api.models import SearchRequest
 from ppr_api.resources import utils as resource_utils
 
 
@@ -55,7 +55,7 @@ class SearchHistoryResource(Resource):
             # Try to fetch search history by account id.
             # No results throws a not found business exception.
             current_app.logger.info(f'Fetching search history for {account_id}.')
-            history = SearchClient.find_all_by_account_id(account_id)
+            history = SearchRequest.find_all_by_account_id(account_id)
             return jsonify(history), HTTPStatus.OK
 
         except BusinessException as exception:

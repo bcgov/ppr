@@ -1,12 +1,12 @@
 -- TEST0001 financing statement security agreement base test
 -- draft statement CLOB empty for testing.
-INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type_cd,
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000000, 'D-T-0001', 'PS12345', current_timestamp, 'PPSALIEN', 'SA', 'TEST0001', null, '{}');
-INSERT INTO financing_statements(id, state_type_cd, expire_date, life, discharged, renewed)
+INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
   VALUES(200000000, 'ACT', current_timestamp + interval '730 days', 2, null , null)
 ;
-INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type_cd,
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000000, 200000000, 'TEST0001', null, 'SA', 'PPSALIEN', current_timestamp, 200000000, 2,
@@ -49,12 +49,12 @@ INSERT INTO general_collateral(id, registration_id, financing_id, registration_i
 INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description)
   VALUES(200000001, 200000000, 200000000, null, 'TEST0001 GC 2')
 ;
-INSERT INTO serial_collateral(id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000000, 'MV', 200000000, 200000000, null, 2018, 'HYUNDAI', 'TUSCON', 'KM8J3CA46JU622994', null,
          searchkey_vehicle('KM8J3CA46JU622994'))
 ;
-INSERT INTO serial_collateral(id, serial_type_cd, registration_id, financing_id, registration_id_end,
+INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
   VALUES(200000001, 'MH', 200000000, 200000000, null, 2001, 'HOMCO IND. LTD DIPLOMAT', null, '9407', '21324', 
          searchkey_mhr('9407'))

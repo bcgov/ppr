@@ -162,7 +162,7 @@ def test_draft_json(session):
         document_number='TEST1234',
         account_id='PS12345',
         create_ts=now_ts(),
-        registration_type_cd=json_data['changeStatement']['changeType'],
+        registration_type=json_data['changeStatement']['changeType'],
         registration_type_cl='CHANGE',
         draft=json_data,  # json.dumps(json_data),
         registration_number=json_data['changeStatement']['baseRegistrationNumber']
@@ -181,7 +181,7 @@ def test_draft_create_from_json(session):
     assert draft.draft
     assert draft.account_id == 'PS12345'
     assert draft.registration_type_cl == 'CHANGE'
-    assert draft.registration_type_cd == json_data['changeStatement']['changeType']
+    assert draft.registration_type == json_data['changeStatement']['changeType']
     assert draft.registration_number == json_data['changeStatement']['baseRegistrationNumber']
 
     json_data = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)
@@ -190,5 +190,5 @@ def test_draft_create_from_json(session):
     assert draft.draft
     assert draft.account_id == 'PS12345'
     assert draft.registration_type_cl == 'COURTORDER'
-    assert draft.registration_type_cd == 'CO'
+    assert draft.registration_type == 'CO'
     assert draft.registration_number == json_data['amendmentStatement']['baseRegistrationNumber']
