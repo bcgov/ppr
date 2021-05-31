@@ -200,8 +200,9 @@
                   counter="4000"
                   filled
                   label="Description of General Collateral"
-                  height="250"
                   class="white pt-2 text-input-field"
+                  @blur="validateGeneral()"
+                  :error-messages="generalCollateralError"
                 >
               </v-textarea>
             </v-col>
@@ -249,6 +250,7 @@ export default defineComponent({
       invalidSection: false,
       activeIndex: -1,
       showEditVehicle: [false],
+      generalCollateralError: '',
       vehicleCollateral: collateral.vehicleCollateral,
       generalCollateral: collateral.generalCollateral,
       showErrorSummary: computed((): boolean => {
@@ -307,8 +309,16 @@ export default defineComponent({
       localState.showEditVehicle = [false]
     }
 
+    const validateGeneral = () => {
+      if (collateral.generalCollateral.length > 4000) {
+        collateral.valid = false
+        localState.generalCollateralError = 'Maximum 4000 characters'
+      }
+    }
+
     const setValid = () => {
-      if ((collateral.generalCollateral) || (collateral.vehicleCollateral.length > 0)) {
+      if (((collateral.generalCollateral) || (collateral.vehicleCollateral.length > 0)) &&
+       (collateral.generalCollateral.length <= 4000)) {
         collateral.valid = true
       } else {
         collateral.valid = false
@@ -321,6 +331,7 @@ export default defineComponent({
       initEdit,
       resetData,
       getVehicleDescription,
+      validateGeneral,
       ...toRefs(localState)
     }
   }
