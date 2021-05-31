@@ -23,7 +23,7 @@
         <v-col cols="3" class="pt-4 generic-label">
           Vehicle Collateral
         </v-col>
-        <v-col class="pa-6">
+        <v-col class="pt-6 pb-0">
           <v-data-table
           class="collateral-table"
           :headers="headers"
@@ -31,11 +31,14 @@
           disable-pagination
           disable-sort
           hide-default-footer
+          calculate-widths
           no-data-text="No vehicle collateral"
         >
           <template v-slot:item="row" class="vehicle-data-table">
             <tr :key="row.item.id" class="vehicle-row">
-              <td>{{ getVehicleDescription(row.item.type) }} ({{ row.item.type }})</td>
+              <td :class="[$style['summary-cell']]">
+                {{ getVehicleDescription(row.item.type) }} ({{ row.item.type }})
+              </td>
               <td>{{ row.item.year }}</td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
@@ -126,7 +129,7 @@
               <td v-if="getMH">{{ row.item.manufacturedHomeRegistrationNumber }}</td>
 
               <!-- Action Btns -->
-              <td class="actions-cell pt-4">
+              <td class="actions-cell pa-0">
                 <div class="actions">
                   <span class="edit-action">
                     <v-btn text color="primary"
@@ -264,7 +267,7 @@ export default defineComponent({
         const editRow = headersToShow.pop()
         if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
           headersToShow.push({
-            class: 'column-md',
+            class: 'column-mds',
             sortable: false,
             text: 'MH Number',
             value: 'vehicle.manufacturedHomeRegistrationNumber'
@@ -346,5 +349,10 @@ export default defineComponent({
 .summary-text{
   font-size: 14px;
   color: $gray7;
+}
+.summary-cell {
+  overflow: visible;
+  text-overflow: inherit;
+  white-space: inherit;
 }
 </style>

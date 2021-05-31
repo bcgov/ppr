@@ -79,6 +79,7 @@ export const useVehicle = (props, context) => {
       newList.splice(props.activeIndex, 1, localState.currentVehicle)
     }
     collateral.vehicleCollateral = newList
+    collateral.valid = true
     setAddCollateral(collateral)
     context.emit('resetEvent')
   }

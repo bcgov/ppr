@@ -5,6 +5,11 @@ export const serialNumberValidator = ({ values }) => {
   let maxLen = 25
   let message = 'Maximum 25 letters'
   let emptyMessage = ''
+  let valueToValidate = values.serialNumber
+
+  if ((values.type === 'MH') && (values.manufacturedHomeRegistrationNumber.length > 0)) {
+    valueToValidate = values.manufacturedHomeRegistrationNumber
+  }
 
   switch (values.type) {
     case 'AC':
@@ -17,7 +22,7 @@ export const serialNumberValidator = ({ values }) => {
       emptyMessage = 'Enter the Boat Serial Number'
       break
     case 'MH':
-      if (!numbersOnly.test(values.serialNumber)) {
+      if (!numbersOnly.test(valueToValidate)) {
         succeeded = false
       }
       minLen = 6
@@ -36,14 +41,14 @@ export const serialNumberValidator = ({ values }) => {
       break
   }
 
-  if (values.serialNumber.length === 0) {
+  if (valueToValidate.length === 0) {
     message = emptyMessage
   }
 
-  if (values.serialNumber.length < minLen) {
+  if (valueToValidate.length < minLen) {
     succeeded = false
   }
-  if (values.serialNumber.length > maxLen) {
+  if (valueToValidate.length > maxLen) {
     succeeded = false
   }
   return {

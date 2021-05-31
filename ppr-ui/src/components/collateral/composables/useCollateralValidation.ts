@@ -14,7 +14,8 @@ const createEmptyErrors = () => ({
   year: createDefaultValidationResult(),
   make: createDefaultValidationResult(),
   model: createDefaultValidationResult(),
-  serialNumber: createDefaultValidationResult()
+  serialNumber: createDefaultValidationResult(),
+  manufacturedHomeRegistrationNumber: createDefaultValidationResult()
 })
 
 export const useCollateralValidation = () => {
@@ -29,8 +30,11 @@ export const useCollateralValidation = () => {
   const validateCollateralForm = async (currentVehicle) => {
     const validationResult = await formValidation.validateForm(currentVehicle)
     errors.value = { ...errors.value, ...validationResult.fieldErrors }
-    errors.value.serialNumber = validationResult.recordErrors.serialNumber
-
+    if (currentVehicle.type === 'MH') {
+      errors.value.manufacturedHomeRegistrationNumber = validationResult.recordErrors.serialNumber
+    } else {
+      errors.value.serialNumber = validationResult.recordErrors.serialNumber
+    }
     return validationResult.succeeded
   }
 

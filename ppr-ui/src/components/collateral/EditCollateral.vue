@@ -42,6 +42,8 @@
                       id="txt-man"
                       label="Manufactured Home Registration Number"
                       v-model="currentVehicle.manufacturedHomeRegistrationNumber"
+                      :error-messages="errors.manufacturedHomeRegistrationNumber.message ?
+                      errors.manufacturedHomeRegistrationNumber.message : ''"
                       persistent-hint
                     />
                   </v-col>
