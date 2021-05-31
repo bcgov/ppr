@@ -7,7 +7,8 @@ export const serialNumberValidator = ({ values }) => {
   let emptyMessage = ''
   let valueToValidate = values.serialNumber
 
-  if ((values.type === 'MH') && (values.manufacturedHomeRegistrationNumber.length > 0)) {
+  if ((values.type === 'MH') && (values.manufacturedHomeRegistrationNumber) &&
+    (values.manufacturedHomeRegistrationNumber.length > 0)) {
     valueToValidate = values.manufacturedHomeRegistrationNumber
   }
 

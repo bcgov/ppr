@@ -109,7 +109,7 @@ describe('Collateral validation tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
+    expect(messages.length).toBe(2)
     expect(messages.at(0).text()).toBe('Manufactured home registration number must contain 6 digits')
   })
 })
