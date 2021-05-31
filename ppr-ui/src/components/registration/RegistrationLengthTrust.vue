@@ -188,19 +188,14 @@ export default defineComponent({
         if (isNaN(life)) {
           localState.lifeYearsMessage = 'Registration length must be a number between 1 and ' +
                                         localState.maxYears + '.'
-          if (lengthTrust.valid) {
-            lengthTrust.valid = false
-            setLengthTrust(lengthTrust)
-          }
+          lengthTrust.valid = false
         } else if (life < 1 || life > feeInfoYears.quantityMax) {
           localState.lifeYearsMessage = 'Registration length must be between 1 and ' + localState.maxYears + '.'
-          if (lengthTrust.valid) {
-            lengthTrust.valid = false
-            setLengthTrust(lengthTrust)
-          }
+          lengthTrust.valid = false
         } else {
           lengthTrust.lifeYears = life
           lengthTrust.valid = true
+          localState.lifeInfinite = 'false'
           lengthTrust.showInvalid = false
           setLengthTrust(lengthTrust)
           feeSummary.quantity = life
@@ -210,7 +205,8 @@ export default defineComponent({
             context.emit('updated-fee-summary', feeSummary)
           }
         }
-      } else if (lengthTrust.valid && !lengthTrust.lifeInfinite) {
+      }
+      if (!lengthTrust.valid && !lengthTrust.lifeInfinite) {
         lengthTrust.valid = false
         setLengthTrust(lengthTrust)
         feeSummary.feeAmount = 0
