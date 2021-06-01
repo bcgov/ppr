@@ -107,18 +107,6 @@ import { getFinancingFee } from '@/utils'
 
 export default defineComponent({
   props: {
-    defaultTrustIndenture: {
-      type: Boolean,
-      default: false
-    },
-    defaultLifeInfinite: {
-      type: Boolean,
-      default: false
-    },
-    defaultLifeYears: {
-      type: String,
-      default: ''
-    },
     defaultRegistrationType: {
       type: String,
       default: ''
