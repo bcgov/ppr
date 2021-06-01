@@ -6,7 +6,6 @@ import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
-import { Tombstone } from '@/components/common'
 import { SearchedResult } from '@/components/tables'
 import { Search } from '@/views'
 import { SearchBar } from '@/components/search'
@@ -56,7 +55,6 @@ describe('Search component', () => {
 
   it('renders Search View with base components', () => {
     expect(wrapper.findComponent(Search).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     // doesn't render unless there are results
     expect(wrapper.vm.getSearchResults).toBeNull()

@@ -1,12 +1,14 @@
 <template>
-  <v-container fluid class="px-0 py-0 pb-7 white" style="max-width: none;">
-    <v-row no-gutters align="center" :class="[$style['breadcrumb-row'], 'px-15', 'py-2']">
-      <v-col cols="auto" class="pr-3" style="border-right: thin solid #ced4da">
+  <div id="tombstone">
+      <div :class="$style['breadcrumb-row']">
+      <v-container fluid class="pt-2 pb-2">
+        <v-row no-gutters>
+          <v-col cols="auto" class="pr-3" style="border-right: thin solid #ced4da">
         <v-btn id="tombstone-back-btn" :class="$style['back-btn']" exact :href="backURL" icon small>
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
-      </v-col>
-      <v-col cols="auto" class="pl-3">
+          </v-col>
+            <v-col cols="auto" class="pl-3">
         <v-breadcrumbs class="pa-0" :items="breadcrumbs">
           <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="item.href">
             <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
@@ -18,12 +20,16 @@
             <v-icon color="white">mdi-chevron-right</v-icon>
           </v-breadcrumbs-divider>
         </v-breadcrumbs>
-      </v-col>
-    </v-row>
-    <v-row no-gutters id="tombstone-header" class="px-15 pt-7">
+            </v-col>
+        </v-row>
+      </v-container>
+      </div>
+
+      <v-container id="tombstone-header" fluid class="pt-4">
       <span :class="$style['tombstone-header']"><b>{{ header }}</b></span>
-    </v-row>
-    <v-row no-gutters id="tombstone-user-info" :class="[$style['tombstone-sub-header'], 'px-15', 'pt-3']">
+      </v-container>
+      <v-container fluid id="tombstone-user-info" :class="[$style['tombstone-sub-header'], 'pt-4']">
+        <v-row no-gutters>
       <v-col cols="10">
         <v-row no-gutters>
           <v-col cols="auto" class="pr-3" style="border-right: thin solid #dee2e6">
@@ -39,8 +45,10 @@
           {{ date }}
         </v-row>
       </v-col>
-    </v-row>
-  </v-container>
+        </v-row>
+      </v-container>
+
+  </div>
 </template>
 <script lang="ts">
 // external
@@ -49,28 +57,43 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
 import { convertDate } from '@/utils'
+import { tombstoneBreadcrumbRegistration, tombstoneBreadcrumbDashboard } from '@/resources'
 
 export default defineComponent({
   props: {
     backURL: {
       type: String,
       default: ''
-    },
-    header: {
-      type: String,
-      default: ''
-    },
-    setItems: Array as () => Array<BreadcrumbIF>
+    }
   },
-  setup (props) {
-    const { getAccountLabel, getUserFirstName, getUserLastName } = useGetters<any>(
-      ['getAccountLabel', 'getUserFirstName', 'getUserLastName'])
+  setup (props, { root }) {
+    const { getAccountLabel, getUserFirstName, getUserLastName, getRegistrationType } =
+      useGetters<any>(['getAccountLabel', 'getUserFirstName', 'getUserLastName',
+        'getRegistrationType'])
     const localState = reactive({
       userName: computed((): string => {
         return `${getUserFirstName.value} ${getUserLastName.value}`
       }),
       date: '',
-      breadcrumbs: props.setItems,
+      breadcrumbs: computed((): Array<BreadcrumbIF> => {
+        console.log(root.$route.name)
+        if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
+        (root.$route.name === 'search')) {
+          return tombstoneBreadcrumbDashboard
+        } else {
+          const registrationBreadcrumb = tombstoneBreadcrumbRegistration
+          registrationBreadcrumb[2].text = getRegistrationType.value.registrationTypeUI || 'New Registration'
+          return registrationBreadcrumb
+        }
+      }),
+      header: computed((): string => {
+        if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
+        (root.$route.name === 'search')) {
+          return 'My PPR Dashboard'
+        } else {
+          return 'My Personal Property Registry'
+        }
+      }),
       accountName: computed((): string => {
         return getAccountLabel.value
       })

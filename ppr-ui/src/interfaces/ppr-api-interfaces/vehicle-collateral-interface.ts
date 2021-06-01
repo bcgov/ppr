@@ -1,11 +1,11 @@
-import { ActionTypes } from '@/enums'
+import { ActionTypes, APIVehicleTypes } from '@/enums'
 
 // Vehicle collateral interface.
 export interface VehicleCollateralIF {
   id: number,
   type: string, // One of VehicleTypes
   serialNumber: string,
-  year?: number, // Optional
+  year?: number | '', // Optional
   make?: string, // Optional
   model?: string, // Optional
   manufacturedHomeRegistrationNumber?: string, // Conditional: only returned on MHR number search.

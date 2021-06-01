@@ -164,7 +164,7 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
 
 export const vehicleTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: false,
     text: 'Vehicle Type',
     value: 'vehicle.type'
@@ -176,24 +176,24 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
     value: 'vehicle.year'
   },
   {
-    class: 'column-md',
+    class: 'column-mds',
     sortable: false,
     text: 'Make',
     value: 'vehicle.make'
   },
   {
-    class: 'column-md',
+    class: 'column-mds',
     sortable: false,
     text: 'Model',
     value: 'vehicle.model'
   },
   {
     class: 'column-lg',
-    text: 'Serial / VIN Number',
+    text: 'Serial/VIN/D.O.T. Number',
     value: 'vehicle.serial'
   },
   {
-    class: 'column-mds',
+    class: 'column-mds pa-0',
     sortable: false,
     text: '',
     value: 'edit'

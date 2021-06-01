@@ -1,12 +1,9 @@
 <template>
   <v-container fluid class="pa-0" style="max-width: none;">
     <v-row no-gutters>
-        <tombstone :backURL="dashboardURL" :header="'My Personal Property Registry'" :setItems="breadcrumbs"/>
-    </v-row>
-    <v-row no-gutters>
       <v-container fluid class="pt-4">
         <v-row>
-          <v-col cols="9" class="ps-8">
+          <v-col cols="9">
             <v-row no-gutters
                    id="registration-header"
                    class="length-trust-header pt-3 pb-3 soft-corners-top">
@@ -59,18 +56,16 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, StatementTypes } from '@/enums'
 import {
-  ActionBindingIF, BreadcrumbIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
-import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 
 @Component({
   components: {
     ButtonFooter,
     RegistrationFee,
-    Stepper,
-    Tombstone
+    Stepper
   }
 })
 export default class AddParties extends Vue {
@@ -87,16 +82,6 @@ export default class AddParties extends Vue {
 
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
-
-  private get breadcrumbs (): Array<BreadcrumbIF> {
-    const registrationBreadcrumb = tombstoneBreadcrumbRegistration
-    registrationBreadcrumb[2].text = this.getRegistrationType?.registrationTypeUI || 'New Registration'
-    return registrationBreadcrumb
-  }
-
-  private get dashboardURL (): string {
-    return window.location.origin + '/dashboard'
-  }
 
   private get feeSummary (): FeeSummaryIF {
     return this.getFeeSummary

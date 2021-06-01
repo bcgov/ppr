@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="registration-bar">
+  <v-container fluid no-gutters class="registration-bar px-0">
     <v-row no-gutters class="pt-1">
       <v-col cols="4">
         <div class="actions">
@@ -31,6 +31,15 @@
             </v-btn>
           </template>
           <v-list :class="[$style['actions__more-actions'], 'more-actions']">
+            <v-list-item
+              id="btn-reparers"
+              @click="newRegistration(registrationTypeValues.SECURITY_AGREEMENT)"
+            >
+              <v-list-item-title>{{
+                registrationTypes.SECURITY_AGREEMENT
+              }}</v-list-item-title>
+            </v-list-item>
+
             <v-list-item
               id="btn-reparers"
               @click="newRegistration(registrationTypeValues.REPAIRERS_LIEN)"
@@ -108,6 +117,9 @@
                 registrationTypes.FORESTRY_SUBCONTRACTOR_LIEN
               }}</v-list-item-title>
             </v-list-item>
+            <div>
+              <div :class="$style['line']"></div>
+            </div>
             <v-list-item
               id="btn-mr"
               @click="
@@ -182,7 +194,6 @@ export default defineComponent({
           }
         })
       setRegistrationType(reg)
-      console.log(reg)
       emit('selected-registration-type', reg)
     }
 
@@ -212,5 +223,10 @@ export default defineComponent({
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   box-shadow: none;
+  margin-left: 1px;
+}
+
+.line {
+  border-bottom: 1px solid $gray3;
 }
 </style>

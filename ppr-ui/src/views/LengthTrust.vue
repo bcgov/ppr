@@ -1,16 +1,9 @@
 <template>
   <v-container fluid class="pa-0" style="max-width: none">
     <v-row no-gutters>
-      <tombstone
-        :backURL="dashboardURL"
-        :header="'My Personal Property Registry'"
-        :setItems="breadcrumbs"
-      />
-    </v-row>
-    <v-row no-gutters>
       <v-container fluid class="pt-4">
         <v-row>
-          <v-col cols="9" class="ps-8">
+          <v-col cols="9">
             <v-row
               no-gutters
               id="registration-header"
@@ -46,7 +39,6 @@
             <registration-fee
               :registrationType="registrationTypeUI"
               :updatedFeeSummary="updatedFeeSummary"
-              :hint="feeHint"
             />
           </v-col>
         </v-row>
@@ -68,14 +60,12 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { getFinancingFee } from '@/utils'
 import {
-  ActionBindingIF, BreadcrumbIF, ErrorIF, FeeSummaryIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, ErrorIF, FeeSummaryIF, LengthTrustIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { tombstoneBreadcrumbRegistration } from '@/resources'
 // local components
-import { ButtonFooter, RegistrationFee, Stepper, Tombstone } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { RouteNames, StatementTypes } from '@/enums'
 
@@ -84,8 +74,7 @@ import { RouteNames, StatementTypes } from '@/enums'
     ButtonFooter,
     RegistrationFee,
     RegistrationLengthTrust,
-    Stepper,
-    Tombstone
+    Stepper
   }
 })
 export default class LengthTrust extends Vue {
@@ -106,23 +95,8 @@ export default class LengthTrust extends Vue {
 
   private updatedFeeSummary: FeeSummaryIF = null
 
-  private get breadcrumbs (): Array<BreadcrumbIF> {
-    const registrationBreadcrumb = tombstoneBreadcrumbRegistration
-    registrationBreadcrumb[2].text =
-      this.getRegistrationType?.registrationTypeUI || 'New Registration'
-    return registrationBreadcrumb
-  }
-
-  private get dashboardURL (): string {
-    return window.location.origin + '/dashboard'
-  }
-
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get feeHint (): string {
-    return getFinancingFee(false).hint
   }
 
   private get feeSummary (): FeeSummaryIF {

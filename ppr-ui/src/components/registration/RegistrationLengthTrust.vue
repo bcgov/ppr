@@ -7,12 +7,12 @@
           <label class="pl-3"><strong>Registration Length and Trust Indenture</strong></label>
         </v-col>
       </v-row>
-      <v-container :class="{'invalid-message': showErrorSummary}">
+      <v-container class="pt-4 px-4" :class="{'invalid-message': showErrorSummary}">
       <v-row no-gutters v-if="showErrorSummary" class="pa-6">
         <v-col cols="auto">
           <span :class="{'invalid-message': showErrorSummary}">
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
-          This step is unfinished
+          This step is unfinished.
           </span>
           <span id="router-link-length-trust" :class="$style['invalid-link']" @click="goToLengthTrust()">
             Return to this step to complete it.
@@ -20,15 +20,15 @@
         </v-col>
       </v-row>
       <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" :class="$style['length-trust-label']">
+        <v-col cols="3" class="generic-label">
           Registration Length
         </v-col>
         <v-col :class="$style['summary-text']">
           {{lengthSummary}}
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pb-3">
-        <v-col cols="3" :class="$style['length-trust-label']">
+      <v-row no-gutters class="ps-6 pb-6">
+        <v-col cols="3" class="generic-label">
           Trust Indenture
         </v-col>
         <v-col :class="$style['summary-text']">
@@ -40,10 +40,10 @@
   </v-container>
   <v-container fluid no-gutters class="white pa-6" :class="{'invalid-message': showErrorComponent}" v-else>
     <v-row no-gutters>
-      <v-col cols="3" :class="$style['length-trust-label']">
+      <v-col cols="3" class="generic-label">
         <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
       </v-col>
-      <v-col cols="1">
+      <v-col cols="auto">
         <v-radio-group v-model="lifeInfinite">
             <v-radio class="years-radio pa-0 ma-0"
                         :hide-details="false"
@@ -65,17 +65,17 @@
                         :readonly="lifeYearsDisabled"
                         :hint="lifeYearsHint"
                         persistent-hint
-                        placeholder="Length (years)"
+                        label="Length in years"
                         v-model="lifeYearsEdit"/>
         <div class="pt-5">Infinite ($500.00 non-refundable)</div>
       </v-col>
       <v-divider class="mx-4" />
     </v-row>
     <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
-      <v-col cols="3" :class="$style['length-trust-label']">
+      <v-col cols="3" class="generic-label">
         Trust Indenture
       </v-col>
-      <v-col cols="1">
+      <v-col cols="auto">
         <v-checkbox class="trust-checkbox pa-0 ma-0"
                     :hide-details="false"
                     :hint="trustIndentureHint"
@@ -84,11 +84,11 @@
         </v-checkbox>
       </v-col>
       <v-col cols="8">
-        <v-tooltip top>
+        <v-tooltip top content-class="top-tooltip" transition="fade-transition">
             <template v-slot:activator="{ on }">
               <span v-on="on" class="trust-indenture">Trust Indenture</span>
             </template>
-            <span class="trust-indenture">Helper top tip text will go here</span>
+            <p>Helper top tip text will go here</p>
           </v-tooltip>
       </v-col>
     </v-row>
@@ -253,18 +253,12 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  color: $gray9;
-  font-weight: bold;
-}
-
 .summary-text{
   font-size: 16px;
   color: $gray7;
 }
-
 .invalid-link {
-  padding: 1.25rem;
+  padding: 0.25rem;
   font-size: 16px;
   color: #1669BB;
   text-decoration: underline;

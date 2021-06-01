@@ -1,81 +1,104 @@
 <template>
   <div id="edit-vehicle" class="white pa-6">
     <v-expand-transition>
-      <ul class="list add-vehicle">
-        <li class="add-vehicle-container">
-          <div class="meta-container">
+      <v-row no-gutters>
+        <v-col cols="3">
             <label
-              class="add-vehicle-header"
+              class="add-vehicle-header general-label"
               :class="{ 'error-text': invalidSection }"
             >
               <span v-if="activeIndex === -1" class="pl-5"> Add Vehicle </span>
               <span v-else>Edit Vehicle</span>
             </label>
-
-            <div class="meta-container__inner">
+        </v-col>
+        <v-col cols="9">
               <v-form
                 ref="vehicleForm"
                 class="vehicle-form"
                 v-on:submit.prevent="addVehicle"
               >
-                <v-row>
+                <v-row no-gutters>
+                    <v-col>
+                      <v-select
+                        :items="vehicleTypes"
+                        filled
+                        label="Vehicle Type"
+                        v-model="currentVehicle.type"
+                        id="txt-type"
+                        :error-messages="errors.type.message ? errors.type.message : ''"
+                      >
+                        <template slot="item" slot-scope="data">
+                          <span class="list-item">
+                            {{ data.item.text }}
+                          </span>
+                        </template>
+                      </v-select>
+                    </v-col>
+                </v-row>
+                <v-row no-gutters v-if="currentVehicle.type === 'MH'">
                   <v-col>
                     <v-text-field
                       filled
-                      label="Serial / VIN / DOT/ MH Number"
-                      hint="17 characters; no letters O,Q or "
-                      id="txt-serial"
-                      v-model="vehicle.serialNumber"
+                      id="txt-man"
+                      label="Manufactured Home Registration Number"
+                      v-model="currentVehicle.manufacturedHomeRegistrationNumber"
+                      :error-messages="errors.manufacturedHomeRegistrationNumber.message ?
+                      errors.manufacturedHomeRegistrationNumber.message : ''"
                       persistent-hint
                     />
                   </v-col>
                 </v-row>
-                <v-row>
-                  <v-col cols="8">
-                    <v-select
-                      :items="vehicleTypes"
+                <v-row no-gutters>
+                  <v-col>
+                    <v-text-field
                       filled
-                      label="Vehicle Type"
-                      v-model="vehicle.type"
-                      id="txt-type"
-                    >
-                      <template slot="item" slot-scope="data">
-                        <span class="list-item">
-                          {{ data.item.text }}
-                        </span>
-                      </template>
-                    </v-select>
-                  </v-col>
-                  <v-col cols="4">
-                    <v-select
-                      :items="getYears"
-                      filled
-                      label="Year"
-                      v-model="vehicle.year"
-                      id="txt-years"
-                    >
-                    </v-select>
+                      :label="getSerialLabel"
+                      :disabled="getSerialDisabled"
+                      id="txt-serial"
+                      v-model="currentVehicle.serialNumber"
+                      :error-messages="errors.serialNumber.message ? errors.serialNumber.message : ''"
+                      :hint="getSerialHint"
+                      @blur="onBlur('serialNumber')"
+                      persistent-hint
+                    />
                   </v-col>
                 </v-row>
-                <v-row>
+                <v-row no-gutters>
+                  <v-col cols="4">
+                    <v-text-field
+                      filled
+                      label="Year"
+                      id="txt-years"
+                      v-model="currentVehicle.year"
+                      @blur="onBlur('year')"
+                      persistent-hint
+                      :error-messages="errors.year.message ? errors.year.message : ''"
+                    />
+                  </v-col>
+                </v-row>
+                <v-row no-gutters>
                   <v-col>
                     <v-text-field
                       filled
                       label="Make"
                       id="txt-make"
-                      v-model="vehicle.make"
+                      v-model="currentVehicle.make"
                       persistent-hint
+                      @blur="onBlur('make')"
+                      :error-messages="errors.make.message ? errors.make.message : ''"
                     />
                   </v-col>
                 </v-row>
-                <v-row>
+                <v-row no-gutters>
                   <v-col>
                     <v-text-field
                       filled
                       label="Model"
                       id="txt-model"
-                      v-model="vehicle.model"
+                      v-model="currentVehicle.model"
+                      @blur="onBlur('model')"
                       persistent-hint
+                      :error-messages="errors.model.message ? errors.model.message : ''"
                     />
                   </v-col>
                 </v-row>
@@ -97,7 +120,7 @@
                       id="done-btn"
                       class="m1-auto"
                       color="primary"
-                      @click="validateForm()"
+                      @click="onSubmitForm()"
                     >
                       Done
                     </v-btn>
@@ -115,24 +138,20 @@
                   </v-col>
                 </v-row>
               </v-form>
-            </div>
-          </div>
-        </li>
-      </ul>
+        </v-col>
+      </v-row>
     </v-expand-transition>
   </div>
 </template>
 
 <script lang="ts">
 import {
-  computed,
   defineComponent,
-  reactive,
-  toRefs
+  onMounted
 } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { VehicleTypes } from '@/resources'
+
+import { useCollateralValidation } from './composables/useCollateralValidation'
+import { useVehicle } from './composables/useVehicle'
 
 export default defineComponent({
   props: {
@@ -147,61 +166,49 @@ export default defineComponent({
   },
   emits: ['addEditVehicle', 'resetEvent'],
   setup (props, context) {
-    console.log(props.activeIndex)
-    const { setAddCollateral } = useActions<any>(['setAddCollateral'])
-    const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
+    const {
+      // @ts-ignore - returned by toRef
+      currentVehicle,
+      // @ts-ignore - returned by toRef
+      vehicleTypes,
+      // @ts-ignore - returned by toRef
+      getSerialLabel,
+      // @ts-ignore - returned by toRef
+      getSerialDisabled,
+      // @ts-ignore - returned by toRef
+      getSerialHint,
+      getVehicle,
+      resetFormAndData,
+      removeVehicle,
+      addVehicle
+    } = useVehicle(props, context)
+    const { errors, validateInput, validateCollateralForm } = useCollateralValidation()
+    onMounted(getVehicle)
 
-    const localState = reactive({
-      // eslint-disable-line
-      vehicleTypes: VehicleTypes,
-      vehicle: computed(() => {
-        const vehicles: VehicleCollateralIF[] = getAddCollateral.value.vehicleCollateral
-        if (props.activeIndex >= 0) {
-          return vehicles[props.activeIndex]
-        }
-        return { id: -1, type: '', year: 2021, make: '', model: '', serialNumber: '' }
-      })
-    })
-    const getYears = computed(function () {
-      const year = new Date().getFullYear()
-      return Array.from(
-        { length: year - 1900 },
-        (value, index) => 1901 + index
-      ).reverse()
-    })
-
-    const validateForm = () => {
-      let collateral = getAddCollateral.value // eslint-disable-line
-      let newList: VehicleCollateralIF[] = collateral.vehicleCollateral // eslint-disable-line
-      // New vehicle
-      if (props.activeIndex === -1) {
-        localState.vehicle.id = newList.length + 1
-        newList.push(localState.vehicle)
-      } else {
-        // Edit vehicle
-        newList.splice(props.activeIndex, 1, localState.vehicle)
+    const onSubmitForm = async () => {
+      const isValid = await validateCollateralForm(currentVehicle.value)
+      if (!isValid) {
+        return
       }
-      collateral.vehicleCollateral = newList
-      setAddCollateral(collateral)
-      context.emit('resetEvent')
+
+      addVehicle()
     }
 
-    const resetFormAndData = (emitEvent: boolean): void => {
-      if (emitEvent) {
-        context.emit('resetEvent')
-      }
-    }
-    const removeVehicle = (): void => {
-      context.emit('removeVehicle', props.activeIndex)
-      resetFormAndData(true)
+    const onBlur = (fieldname) => {
+      validateInput(fieldname, currentVehicle.value[fieldname])
     }
 
     return {
-      getYears,
-      validateForm,
+      onSubmitForm,
       resetFormAndData,
       removeVehicle,
-      ...toRefs(localState)
+      onBlur,
+      errors,
+      currentVehicle,
+      vehicleTypes,
+      getSerialLabel,
+      getSerialDisabled,
+      getSerialHint
     }
   }
 })

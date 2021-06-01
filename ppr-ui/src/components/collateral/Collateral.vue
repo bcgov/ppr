@@ -7,14 +7,54 @@
           <label class="pl-3"><strong>Collateral</strong></label>
         </v-col>
       </v-row>
-      <v-container :class="{'invalid-message': showErrorSummary}">
-      <v-row no-gutters v-if="showErrorSummary" class="pa-6">
+      <v-container v-if="showErrorSummary" :class="{'invalid-message': showErrorSummary}">
+      <v-row no-gutters class="pa-6">
         <v-col cols="auto">
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
-          This step is unfinished
+          <span class="invalid-message">This step is unfinished.</span>
           <router-link id="router-link-collateral" class="invalid-link" :to="{ path: '/add-collateral' }">
             Return to this step to complete it.
           </router-link>
+        </v-col>
+      </v-row>
+      </v-container>
+      <v-container v-else>
+      <v-row no-gutters class="ps-6 pb-3">
+        <v-col cols="3" class="pt-4 generic-label">
+          Vehicle Collateral
+        </v-col>
+        <v-col class="pt-6 pb-0">
+          <v-data-table
+          class="collateral-table"
+          :headers="headers"
+          :items="vehicleCollateral"
+          disable-pagination
+          disable-sort
+          hide-default-footer
+          calculate-widths
+          no-data-text="No vehicle collateral"
+        >
+          <template v-slot:item="row" class="vehicle-data-table">
+            <tr :key="row.item.id" class="vehicle-row">
+              <td :class="[$style['summary-cell']]">
+                {{ getVehicleDescription(row.item.type) }} ({{ row.item.type }})
+              </td>
+              <td>{{ row.item.year }}</td>
+              <td>{{ row.item.make }}</td>
+              <td>{{ row.item.model }}</td>
+              <td>{{ row.item.serialNumber }}</td>
+              <td v-if="getMH">{{ row.item.manufacturedHomeRegistrationNumber }}</td>
+            </tr>
+          </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="ps-6 pb-3">
+        <v-col cols="3" class="generic-label">
+          General Collateral
+        </v-col>
+        <v-col :class="[$style['summary-text'], 'pa-6']">
+          {{ generalCollateral }}
         </v-col>
       </v-row>
       </v-container>
@@ -22,31 +62,29 @@
   </v-container>
   <v-container fluid no-gutters v-else class="pa-0">
     <v-row no-gutters>
-      <v-container fluid>
-        <v-row no-gutters>
-          <v-col cols="auto">Your registration must include one of the following:</v-col>
+
+          <v-col cols="auto"><b>Your registration must include one of the following:</b></v-col>
         </v-row>
         <v-row no-gutters class='pt-6'>
           <v-col cols="auto">
-            <b>At least one form of collateral (vehicle or general)</b>
+            <ul><li>At least one form of collateral (vehicle or general)</li></ul>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row no-gutters class="pb-4 pt-10">
           <v-col>
             <v-btn
                 id="btn-add-collateral"
                 outlined
                 color="primary"
-                class="ml-2"
                 @click="showAddVehicle=true"
               >
-                <v-icon>mdi-domain-plus</v-icon>
+                <v-icon>mdi-plus</v-icon>
                 <span>Add Vehicle Collateral</span>
             </v-btn>
           </v-col>
         </v-row>
-      </v-container>
-    </v-row>
+     <v-row no-gutters>
+      <v-col>
     <div :class="{'invalid-section': invalidSection}">
       <v-expand-transition>
         <v-card flat class="add-collateral-container" v-if="showAddVehicle">
@@ -58,7 +96,9 @@
         </v-card>
       </v-expand-transition>
     </div>
-    <v-row no-gutters>
+      </v-col>
+     </v-row>
+    <v-row no-gutters class="pt-4">
       <v-col>
         <v-data-table
           class="collateral-table"
@@ -67,6 +107,7 @@
           disable-pagination
           disable-sort
           hide-default-footer
+          no-data-text="No vehicle collateral yet."
         >
           <template v-slot:item="row" class="vehicle-data-table">
             <tr
@@ -85,9 +126,10 @@
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
               <td>{{ row.item.serialNumber }}</td>
+              <td v-if="getMH">{{ row.item.manufacturedHomeRegistrationNumber }}</td>
 
               <!-- Action Btns -->
-              <td class="actions-cell pt-4">
+              <td class="actions-cell pa-0">
                 <div class="actions">
                   <span class="edit-action">
                     <v-btn text color="primary"
@@ -131,7 +173,7 @@
             <tr v-if="showEditVehicle[row.index]">
               <td colspan="6" :class="{'invalid-section': invalidSection}">
                 <v-expand-transition>
-                  <div class="edit-vehicle-container col-9">
+                  <div class="edit-vehicle-container col-12">
                     <edit-collateral
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
@@ -145,22 +187,32 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row no-gutters class='pt-6'>
-          <v-col cols="auto">
+    <v-row>
+      <v-col>
+    <v-card flat id="general-collateral">
+      <v-container fluid no-gutters class="pa-0">
+        <v-row no-gutters class='pt-6'>
+          <v-col cols="3" class="generic-label pa-4">
             General Collateral:
           </v-col>
+            <v-col cols="9" class="pr-4">
+                <v-textarea
+                  v-model="generalCollateral"
+                  id="generalCollateral"
+                  auto-grow
+                  counter="4000"
+                  filled
+                  label="Description of General Collateral"
+                  class="white pt-2 text-input-field"
+                  @blur="validateGeneral()"
+                  :error-messages="generalCollateralError"
+                >
+              </v-textarea>
+            </v-col>
         </v-row>
-    <v-row no-gutters>
-        <v-col cols="9">
-            <v-text-field
-              v-model="generalCollateral"
-              id="generalCollateral"
-              class="white pt-2 text-input-field"
-              hint="0 of xxxx characters"
-              persistent-hint
-            >
-          </v-text-field>
-        </v-col>
+      </v-container>
+    </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -176,12 +228,11 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddCollateralIF, VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditCollateral from './EditCollateral.vue'
-import { vehicleTableHeaders } from '@/resources'
+import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 
 export default defineComponent({
   components: {
-    EditCollateral //,
-    // ActionTypes
+    EditCollateral
   },
   props: {
     isSummary: {
@@ -197,16 +248,35 @@ export default defineComponent({
 
     const localState = reactive({
       summaryView: props.isSummary,
-      headers: vehicleTableHeaders,
       showAddVehicle: false,
       addEditInProgress: false,
       invalidSection: false,
       activeIndex: -1,
       showEditVehicle: [false],
+      generalCollateralError: '',
       vehicleCollateral: collateral.vehicleCollateral,
       generalCollateral: collateral.generalCollateral,
       showErrorSummary: computed((): boolean => {
         return (!collateral.valid)
+      }),
+      getMH: computed(function () {
+        return collateral.vehicleCollateral.find(obj => obj.type === 'MH')
+      }),
+      headers: computed(function () {
+        const headersToShow = [...vehicleTableHeaders]
+        const editRow = headersToShow.pop()
+        if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
+          headersToShow.push({
+            class: 'column-mds',
+            sortable: false,
+            text: 'MH Number',
+            value: 'vehicle.manufacturedHomeRegistrationNumber'
+          })
+        }
+        if (!props.isSummary) {
+          headersToShow.push(editRow)
+        }
+        return headersToShow
       })
     })
 
@@ -224,6 +294,11 @@ export default defineComponent({
       setValid()
     }
 
+    const getVehicleDescription = (code: string): string => {
+      const vehicle = VehicleTypes.find(obj => obj.value === code)
+      return vehicle.text
+    }
+
     const initEdit = (index: number) => {
       localState.activeIndex = index
       localState.addEditInProgress = true
@@ -237,8 +312,16 @@ export default defineComponent({
       localState.showEditVehicle = [false]
     }
 
+    const validateGeneral = () => {
+      if (collateral.generalCollateral.length > 4000) {
+        collateral.valid = false
+        localState.generalCollateralError = 'Maximum 4000 characters'
+      }
+    }
+
     const setValid = () => {
-      if ((collateral.generalCollateral) || (collateral.vehicleCollateral.length > 0)) {
+      if (((collateral.generalCollateral) || (collateral.vehicleCollateral.length > 0)) &&
+       (collateral.generalCollateral.length <= 4000)) {
         collateral.valid = true
       } else {
         collateral.valid = false
@@ -250,6 +333,8 @@ export default defineComponent({
       removeVehicle,
       initEdit,
       resetData,
+      getVehicleDescription,
+      validateGeneral,
       ...toRefs(localState)
     }
   }
@@ -260,5 +345,14 @@ export default defineComponent({
 @import "@/assets/styles/theme.scss";
 .length-trust-label {
   font-size: 0.875rem;
+}
+.summary-text{
+  font-size: 14px;
+  color: $gray7;
+}
+.summary-cell {
+  overflow: visible;
+  text-overflow: inherit;
+  white-space: inherit;
 }
 </style>

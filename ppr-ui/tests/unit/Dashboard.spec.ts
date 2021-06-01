@@ -7,7 +7,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { Dashboard } from '@/views'
-import { Tombstone } from '@/components/common'
 import { SearchBar } from '@/components/search'
 import { SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
@@ -53,7 +52,6 @@ describe('Dashboard component', () => {
 
   it('renders Dashboard View with child components', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)

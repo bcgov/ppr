@@ -29,6 +29,7 @@
 
     <div class="app-body">
       <main v-if="!isErrorDialog">
+        <tombstone :backURL="dashboardURL" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">
@@ -65,13 +66,20 @@ import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components
 
 // local Components
 import * as Dialogs from '@/components/dialogs'
+import { Tombstone } from '@/components/common'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
+import {
+  fetchError, loginError, paymentError, saveSearchError
+} from '@/resources'
+
 import { getKeycloakRoles, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
-import { ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
+import {
+  ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, // eslint-disable-line
+  UserSettingsIF, BreadcrumbIF, RegistrationTypeIF // eslint-disable-line
+  } from '@/interfaces' // eslint-disable-line
 import { RouteNames } from './enums'
 
 @Component({
@@ -79,6 +87,7 @@ import { RouteNames } from './enums'
     SbcHeader,
     SbcFooter,
     SbcAuthenticationOptionsDialog,
+    Tombstone,
     ...Dialogs,
     ...Views
   }
@@ -122,6 +131,10 @@ export default class App extends Mixins(AuthMixin) {
   /** The base URL that auth will redirect to. */
   private get baseUrl (): string {
     return sessionStorage.getItem('BASE_URL')
+  }
+
+  private get dashboardURL (): string {
+    return window.location.origin + '/dashboard'
   }
 
   /** The login URL. */
