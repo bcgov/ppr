@@ -134,7 +134,7 @@ export default class App extends Mixins(AuthMixin) {
   }
 
   private get dashboardURL (): string {
-    return window.location.origin + 'dashboard'
+    return window.location.origin + '/dashboard'
   }
 
   /** The login URL. */
