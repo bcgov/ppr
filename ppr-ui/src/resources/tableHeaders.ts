@@ -199,3 +199,31 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
     value: 'edit'
   }
 ]
+
+export const debtorTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Name',
+    value: 'party.name'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Address',
+    value: 'party.address'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Birthdate',
+    value: 'party.birthdate'
+  },
+
+  {
+    class: 'column-mds pa-0',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]

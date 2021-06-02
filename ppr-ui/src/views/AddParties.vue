@@ -12,23 +12,21 @@
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <v-row class='pt-6'>
-              <v-col cols="auto" class="sub-header ps-4">
+            <v-row no-gutters class='pt-6'>
+              <v-col cols="auto" class="sub-header">
                 Add Secured Parties and Debtors
               </v-col>
             </v-row>
-            <v-row class="pa-2">
-              <v-col cols="auto">
-                Add the people and businesses who have an interest in this registration.
+            <v-row no-gutters>
+              <v-col class="pt-2 pb-6">
+               Add the people and businesses who have an interest in this registration.
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-container fluid class="pa-10">
-                <v-row no-gutters class='pt-12'>
-                  <v-col cols="auto">Content</v-col>
-                </v-row>
-              </v-container>
-            </v-row>
+              <v-col cols="auto">
+                <parties />
+              </v-col>
+          </v-row>
         </v-col>
         <v-col cols="3">
             <registration-fee
@@ -60,12 +58,14 @@ import {
 } from '@/interfaces'
 // local components
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
+import { Parties } from '@/components/parties'
 
 @Component({
   components: {
     ButtonFooter,
     RegistrationFee,
-    Stepper
+    Stepper,
+    Parties
   }
 })
 export default class AddParties extends Vue {

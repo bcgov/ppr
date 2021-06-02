@@ -76,7 +76,6 @@ export default defineComponent({
       }),
       date: '',
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
-        console.log(root.$route.name)
         if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
         (root.$route.name === 'search')) {
           return tombstoneBreadcrumbDashboard
