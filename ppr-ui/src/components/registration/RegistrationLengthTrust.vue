@@ -48,12 +48,14 @@
             <v-radio class="years-radio pa-0 ma-0"
                         :hide-details="false"
                         label=""
-                        value="false">
+                        value="false"
+                        @click="setLifeInfinite('false')">
             </v-radio>
             <v-radio class="infinite-radio pt-15 ma-0"
                         :hide-details="false"
                         label=""
-                        value="true">
+                        value="true"
+                        @click="setLifeInfinite('true')">
             </v-radio>
         </v-radio-group>
       </v-col>
@@ -105,18 +107,6 @@ import { getFinancingFee } from '@/utils'
 
 export default defineComponent({
   props: {
-    defaultTrustIndenture: {
-      type: Boolean,
-      default: false
-    },
-    defaultLifeInfinite: {
-      type: Boolean,
-      default: false
-    },
-    defaultLifeYears: {
-      type: String,
-      default: ''
-    },
     defaultRegistrationType: {
       type: String,
       default: ''
@@ -181,6 +171,29 @@ export default defineComponent({
       router.push({ path: '/length-trust' })
     }
 
+    const setLifeInfinite = (val: string): void => {
+      lengthTrust.lifeInfinite = (String(val) === 'true')
+      localState.lifeYearsDisabled = lengthTrust.lifeInfinite
+      if (lengthTrust.lifeInfinite) {
+        localState.lifeYearsEdit = ''
+        lengthTrust.lifeYears = 0
+        lengthTrust.valid = true
+        feeSummary.quantity = feeInfoInfinite.quantityMin
+        feeSummary.feeAmount = feeInfoInfinite.feeAmount
+        setLengthTrust(lengthTrust)
+        setFeeSummary(feeSummary)
+        context.emit('updated-fee-summary', feeSummary)
+      } else {
+        lengthTrust.valid = false
+        lengthTrust.lifeYears = 0
+        feeSummary.feeAmount = 0
+        feeSummary.quantity = 0
+        setLengthTrust(lengthTrust)
+        setFeeSummary(feeSummary)
+        context.emit('updated-fee-summary', feeSummary)
+      }
+    }
+
     watch(() => localState.lifeYearsEdit, (val: string) => {
       localState.lifeYearsMessage = ''
       if (val.length > 0) {
@@ -188,19 +201,14 @@ export default defineComponent({
         if (isNaN(life)) {
           localState.lifeYearsMessage = 'Registration length must be a number between 1 and ' +
                                         localState.maxYears + '.'
-          if (lengthTrust.valid) {
-            lengthTrust.valid = false
-            setLengthTrust(lengthTrust)
-          }
+          lengthTrust.valid = false
         } else if (life < 1 || life > feeInfoYears.quantityMax) {
           localState.lifeYearsMessage = 'Registration length must be between 1 and ' + localState.maxYears + '.'
-          if (lengthTrust.valid) {
-            lengthTrust.valid = false
-            setLengthTrust(lengthTrust)
-          }
+          lengthTrust.valid = false
         } else {
           lengthTrust.lifeYears = life
           lengthTrust.valid = true
+          localState.lifeInfinite = 'false'
           lengthTrust.showInvalid = false
           setLengthTrust(lengthTrust)
           feeSummary.quantity = life
@@ -210,7 +218,10 @@ export default defineComponent({
             context.emit('updated-fee-summary', feeSummary)
           }
         }
-      } else if (lengthTrust.valid && !lengthTrust.lifeInfinite) {
+      } else {
+        lengthTrust.valid = false
+      }
+      if (!lengthTrust.valid && !lengthTrust.lifeInfinite) {
         lengthTrust.valid = false
         setLengthTrust(lengthTrust)
         feeSummary.feeAmount = 0
@@ -223,28 +234,10 @@ export default defineComponent({
       lengthTrust.trustIndenture = val
       setLengthTrust(lengthTrust)
     })
-    watch(() => localState.lifeInfinite, (val: string) => {
-      lengthTrust.lifeInfinite = (String(val) === 'true')
-      localState.lifeYearsDisabled = lengthTrust.lifeInfinite
-      if (lengthTrust.lifeInfinite) {
-        localState.lifeYearsEdit = ''
-        lengthTrust.lifeYears = 0
-        lengthTrust.valid = true
-        feeSummary.quantity = feeInfoInfinite.quantityMin
-        feeSummary.feeAmount = feeInfoInfinite.feeAmount
-      } else {
-        lengthTrust.valid = false
-        lengthTrust.lifeYears = 0
-        feeSummary.feeAmount = 0
-        feeSummary.quantity = 0
-      }
-      setLengthTrust(lengthTrust)
-      setFeeSummary(feeSummary)
-      context.emit('updated-fee-summary', feeSummary)
-    })
 
     return {
       goToLengthTrust,
+      setLifeInfinite,
       ...toRefs(localState)
     }
   }

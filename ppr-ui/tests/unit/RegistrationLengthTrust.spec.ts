@@ -40,10 +40,7 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent (
-  defaultTrustIndenture: Boolean,
-  defaultLifeInfinite: Boolean,
-  defaultLifeYears: String,
+function createComponent(
   defaultRegistrationType: String
 ): Wrapper<any> {
   const localVue = createLocalVue()
@@ -52,7 +49,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(RegistrationLengthTrust, {
     localVue,
-    propsData: { defaultTrustIndenture, defaultLifeInfinite, defaultLifeYears, defaultRegistrationType },
+    propsData: { defaultRegistrationType },
     store,
     vuetify
   })
@@ -60,13 +57,10 @@ function createComponent (
 
 describe('RegistrationLengthTrust SA tests', () => {
   let wrapper: Wrapper<any>
-  const defaultTrustIndenture: Boolean = Boolean(false)
-  const defaultLifeInfinite: Boolean = Boolean(false)
-  const defaultLifeYears: String = String('')
   const defaultRegistrationType: String = String('SA')
 
   beforeEach(async () => {
-    wrapper = createComponent(defaultTrustIndenture, defaultLifeInfinite, defaultLifeYears, defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -104,13 +98,10 @@ describe('RegistrationLengthTrust SA tests', () => {
 
 describe('RegistrationLengthTrust RL tests', () => {
   let wrapper: Wrapper<any>
-  const defaultTrustIndenture: Boolean = Boolean(false)
-  const defaultLifeInfinite: Boolean = Boolean(true)
-  const defaultLifeYears: String = String('')
   const defaultRegistrationType: String = String('RL')
 
   beforeEach(async () => {
-    wrapper = createComponent(defaultTrustIndenture, defaultLifeInfinite, defaultLifeYears, defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -119,19 +110,15 @@ describe('RegistrationLengthTrust RL tests', () => {
   it('renders with RL values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(false)
-    expect(wrapper.vm.lifeInfinite).toBe('true')
-    expect(wrapper.vm.lifeYearsEdit).toBe('')
-    expect(wrapper.vm.lifeYearsDisabled).toBe(true)
+    expect(wrapper.vm.lifeInfinite).toBe('')
+    expect(wrapper.vm.lifeYearsEdit).toBe('3')
+    expect(wrapper.vm.lifeYearsDisabled).toBe(false)
   })
 })
 
 describe('RegistrationLengthTrust SG tests', () => {
   let wrapper: Wrapper<any>
-  const defaultTrustIndenture: Boolean = Boolean(true)
-  const defaultLifeInfinite: Boolean = Boolean(false)
-  const defaultLifeYears: String = String('3')
   const defaultRegistrationType: String = String('SG')
-
   beforeEach(async () => {
     await store.dispatch('setLengthTrust', {
       valid: false,
@@ -139,7 +126,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       lifeInfinite: false,
       lifeYears: 3
     })
-    wrapper = createComponent(defaultTrustIndenture, defaultLifeInfinite, defaultLifeYears, defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -151,6 +138,32 @@ describe('RegistrationLengthTrust SG tests', () => {
     expect(wrapper.vm.lifeInfinite).toBe('')
     expect(wrapper.vm.lifeYearsEdit).toBe('3')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
+    expect(wrapper.vm.trustIndenture).toBe(true)
+  })
+})
+
+describe('RegistrationLengthTrust life infinite tests', () => {
+  let wrapper: Wrapper<any>
+  const defaultRegistrationType: String = String('SG')
+  beforeEach(async () => {
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: true,
+      lifeInfinite: true,
+      lifeYears: 0
+    })
+    wrapper = createComponent(defaultRegistrationType)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('life infinite renders with SG values', async () => {
+    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.vm.showTrustIndenture).toBe(true)
+    expect(wrapper.vm.lifeInfinite).toBe('true')
+    expect(wrapper.vm.lifeYearsEdit).toBe('')
+    expect(wrapper.vm.lifeYearsDisabled).toBe(true)
     expect(wrapper.vm.trustIndenture).toBe(true)
   })
 })
