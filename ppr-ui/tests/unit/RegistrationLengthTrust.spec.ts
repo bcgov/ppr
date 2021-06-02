@@ -86,7 +86,7 @@ describe('RegistrationLengthTrust SA tests', () => {
     await Vue.nextTick()
     wrapper.vm.$data.lifeYearsEdit = 'XX'
     await Vue.nextTick()
-    expect(wrapper.vm.lifeYearsMessage).toBe('Registration length must be a number between 1 and 25.')
+    expect(wrapper.vm.lifeYearsMessage).toBe('Registration length must be a number between 1 and 25')
   })
   it('renders lifeInfinite', async () => {
     wrapper.vm.$data.lifeInfinite = 'true'

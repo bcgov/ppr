@@ -38,7 +38,7 @@
       </v-container>
     </v-card>
   </v-container>
-  <v-container fluid no-gutters class="white pa-6" :class="{'invalid-message': showErrorComponent}" v-else>
+  <v-container fluid no-gutters class="white pa-6 rounded" :class="{'invalid-message': showErrorComponent}" v-else>
     <v-row no-gutters>
       <v-col cols="3" class="generic-label">
         <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
@@ -200,10 +200,10 @@ export default defineComponent({
         var life = parseInt(val)
         if (isNaN(life)) {
           localState.lifeYearsMessage = 'Registration length must be a number between 1 and ' +
-                                        localState.maxYears + '.'
+                                        localState.maxYears
           lengthTrust.valid = false
         } else if (life < 1 || life > feeInfoYears.quantityMax) {
-          localState.lifeYearsMessage = 'Registration length must be between 1 and ' + localState.maxYears + '.'
+          localState.lifeYearsMessage = 'Registration length must be between 1 and ' + localState.maxYears
           lengthTrust.valid = false
         } else {
           lengthTrust.lifeYears = life
