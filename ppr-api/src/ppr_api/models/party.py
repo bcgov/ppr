@@ -25,9 +25,9 @@ from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
-BUS_SEARCH_KEY_SP = "select search_key_pkg.businame('?') from dual"
-FIRST_NAME_KEY_SP = "select search_key_pkg.firstname('?') from dual"
-LAST_NAME_KEY_SP = "select search_key_pkg.lastname('?') from dual"
+BUS_SEARCH_KEY_SP = "select searchkey_business_name('?')"
+FIRST_NAME_KEY_SP = "select searchkey_first_name('?')"
+LAST_NAME_KEY_SP = "select searchkey_last_name('?')"
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -41,15 +41,13 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         REGISTERING_PARTY = 'RG'
         SECURED_PARTY = 'SP'
 
-    __tablename__ = 'party'
+    __tablename__ = 'parties'
 
-
-#    party_id = db.Column('party_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    party_id = db.Column('party_id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
-    party_type_cd = db.Column('party_type_cd', db.String(3), db.ForeignKey('party_type.party_type_cd'), nullable=False)
+    id = db.Column('id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
+    party_type = db.Column('party_type', db.String(30), db.ForeignKey('party_types.party_type'), nullable=False)
     # party person
     first_name = db.Column('first_name', db.String(50), nullable=True)
-    middle_name = db.Column('middle_name', db.String(50), nullable=True)
+    middle_initial = db.Column('middle_initial', db.String(50), nullable=True)
     last_name = db.Column('last_name', db.String(50), nullable=True)
     # or party business
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
@@ -58,16 +56,12 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
     last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
-    # Legacy only
-    block_number = db.Column('block_number', db.Integer, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=True)
-    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), nullable=True)
-    registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statement.financing_id'), nullable=False)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True)
+    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True)
+    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False)
+    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
@@ -87,16 +81,16 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                                           back_populates='parties', cascade='all, delete',
                                           uselist=False)
     # Relationships - PartyType
-    party_type = db.relationship('PartyType', foreign_keys=[party_type_cd],
-                                 back_populates='party', cascade='all, delete', uselist=False)
+    party_types = db.relationship('PartyType', foreign_keys=[party_type],
+                                  back_populates='party', cascade='all, delete', uselist=False)
 
     @property
     def json(self) -> dict:
         """Return the party as a json object."""
         party = {
         }
-        if self.party_type_cd != model_utils.PARTY_REGISTERING:
-            party['partyId'] = self.party_id
+        if self.party_type != model_utils.PARTY_REGISTERING:
+            party['partyId'] = self.id
 
         if self.client_code and self.branch_id:
             party['code'] = str(self.branch_id)
@@ -117,8 +111,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                     'first': self.first_name,
                     'last': self.last_name
                 }
-                if self.middle_name:
-                    person_name['middle'] = self.middle_name
+                if self.middle_initial:
+                    person_name['middle'] = self.middle_initial
                 party['personName'] = person_name
 
             if self.address:
@@ -137,8 +131,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     def name(self) -> str:
         """Return the full name of the party for comparison."""
         if self.last_name:
-            if self.middle_name:
-                return ' '.join((self.first_name, self.middle_name, self.last_name)).strip().upper()
+            if self.middle_initial:
+                return ' '.join((self.first_name, self.middle_initial, self.last_name)).strip().upper()
             return ' '.join((self.first_name, self.last_name)).strip().upper()
         return self.business_name.strip().upper()
 
@@ -157,7 +151,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         parties = None
         if registration_id:
             parties = cls.query.filter(Party.registration_id == registration_id) \
-                               .order_by(Party.party_id).all()
+                               .order_by(Party.id).all()
 
         return parties
 
@@ -167,7 +161,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         parties = None
         if financing_id:
             parties = cls.query.filter(Party.financing_id == financing_id) \
-                               .order_by(Party.party_id).all()
+                               .order_by(Party.id).all()
 
         return parties
 
@@ -176,11 +170,11 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create a party object from a json schema object: map json to db."""
         party = Party()
         if party_type != model_utils.PARTY_DEBTOR_BUS:
-            party.party_type_cd = party_type
+            party.party_type = party_type
         elif 'businessName' in json_data:
-            party.party_type_cd = party_type
+            party.party_type = party_type
         else:
-            party.party_type_cd = model_utils.PARTY_DEBTOR_IND
+            party.party_type = model_utils.PARTY_DEBTOR_IND
 
         if party_type != model_utils.PARTY_DEBTOR_BUS and 'code' in json_data:
             party.branch_id = int(json_data['code'])
@@ -193,7 +187,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 party.last_name = json_data['personName']['last'].strip().upper()
                 party.first_name = json_data['personName']['first'].strip().upper()
                 if 'middle' in json_data['personName']:
-                    party.middle_name = json_data['personName']['middle'].strip().upper()
+                    party.middle_initial = json_data['personName']['middle'].strip().upper()
 
             # if 'emailAddress' in json_data:
             #   party.email_id = json_data['emailAddress']
@@ -270,10 +264,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 @event.listens_for(Party, 'before_insert')
 def party_before_insert_listener(mapper, connection, target):   # pylint: disable=unused-argument; don't use mapper
     """Conditionally set debtor search key values."""
-    if target.party_type_cd == target.PartyTypes.DEBTOR_COMPANY.value:
+    if target.party_type == target.PartyTypes.DEBTOR_COMPANY.value:
         sp_call = BUS_SEARCH_KEY_SP.replace('?', target.business_name)
         target.business_search_key = connection.scalar(sp_call)
-    elif target.party_type_cd == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
+    elif target.party_type == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
         sp_call_firstname = FIRST_NAME_KEY_SP.replace('?', target.first_name)
         sp_call_lastname = LAST_NAME_KEY_SP.replace('?', target.last_name)
         target.first_name_key = connection.scalar(sp_call_firstname)

@@ -27,7 +27,7 @@ def test_find_by_id(session):
     """Assert that find trust indenture by trust indenture ID contains all expected elements."""
     trust_indenture = TrustIndenture.find_by_id(200000000)
     assert trust_indenture
-    assert trust_indenture.trust_id == 200000000
+    assert trust_indenture.id == 200000000
     assert trust_indenture.registration_id == 200000000
     assert trust_indenture.financing_id == 200000000
     assert trust_indenture.trust_indenture == 'Y'
@@ -38,7 +38,7 @@ def test_find_by_registration_num(session):
     trust_indenture = TrustIndenture.find_by_registration_number('TEST0001')
     assert trust_indenture
     assert len(trust_indenture) == 1
-    assert trust_indenture[0].trust_id == 200000000
+    assert trust_indenture[0].id == 200000000
     assert trust_indenture[0].registration_id == 200000000
     assert trust_indenture[0].financing_id == 200000000
     assert trust_indenture[0].trust_indenture == 'Y'
@@ -49,7 +49,7 @@ def test_find_by_financing_id(session):
     trust_indenture = TrustIndenture.find_by_financing_id(200000000)
     assert trust_indenture
     assert len(trust_indenture) == 1
-    assert trust_indenture[0].trust_id == 200000000
+    assert trust_indenture[0].id == 200000000
     assert trust_indenture[0].registration_id == 200000000
     assert trust_indenture[0].financing_id == 200000000
     assert trust_indenture[0].trust_indenture == 'Y'

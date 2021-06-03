@@ -25,9 +25,9 @@ from .db import db
 class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains client party information (registering and secured parties)."""
 
-    __tablename__ = 'client_code'
+    __tablename__ = 'client_codes'
     # key value is generated from a db function tbd. ,default=db.func.get_code_branch_id()
-    branch_id = db.Column('branch_id', db.Integer, primary_key=True, nullable=False)
+    id = db.Column('id', db.Integer, primary_key=True, nullable=False)
     head_id = db.Column('head_id', db.Integer, index=True, nullable=False)
     name = db.Column('name', db.String(150), index=True, nullable=False)
     bconline_account = db.Column('bconline_account', db.Integer, nullable=True)
@@ -40,8 +40,8 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     date_ts = db.Column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
-    id = db.Column('id', db.Integer, db.ForeignKey('users.id'), nullable=True)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=False)
+    users_id = db.Column('users_id', db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Relationships
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
@@ -53,7 +53,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the client party branch as a json object."""
         party = {
-            'code': str(self.branch_id),
+            'code': str(self.id),
             'businessName': self.name,
             'contact': {
                 'name': self.contact_name,
@@ -75,7 +75,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a client party branch json object by client code."""
         party = None
         if code:
-            party = db.session.query(ClientCode).filter(ClientCode.branch_id == int(code)).one_or_none()
+            party = db.session.query(ClientCode).filter(ClientCode.id == int(code)).one_or_none()
 
         if party:
             return party.json

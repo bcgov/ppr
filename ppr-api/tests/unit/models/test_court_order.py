@@ -28,10 +28,10 @@ def test_find_by_id(session):
     """Assert that find court order by court order ID contains all expected elements."""
     court_order = CourtOrder.find_by_id(200000000)
     assert court_order
-    assert court_order.court_order_id == 200000000
+    assert court_order.id == 200000000
     assert court_order.court_name
     assert court_order.court_registry
-    assert court_order.court_date
+    assert court_order.order_date
     assert court_order.file_number
     assert court_order.effect_of_order
 
@@ -40,10 +40,10 @@ def test_find_by_registration_id(session):
     """Assert that find court order by registration id contains all expected elements."""
     court_order = CourtOrder.find_by_registration_id(200000007)
     assert court_order
-    assert court_order.court_order_id == 200000000
+    assert court_order.id == 200000000
     assert court_order.court_name
     assert court_order.court_registry
-    assert court_order.court_date
+    assert court_order.order_date
     assert court_order.file_number
     assert court_order.effect_of_order
 
@@ -63,19 +63,19 @@ def test_find_by_reg_id_invalid(session):
 def test_court_order_json(session):
     """Assert that the court order model renders to a json format correctly."""
     court_order = CourtOrder(
-        court_order_id=1000,
+        id=1000,
         court_name='name',
         court_registry='registry',
         file_number='file',
         effect_of_order='effect',
-        court_date=now_ts()
+        order_date=now_ts()
     )
 
     court_json = {
         'courtName': court_order.court_name,
         'courtRegistry': court_order.court_registry,
         'fileNumber': court_order.file_number,
-        'orderDate': format_ts(court_order.court_date),
+        'orderDate': format_ts(court_order.order_date),
         'effectOfOrder': court_order.effect_of_order
     }
 
@@ -91,6 +91,6 @@ def test_create_from_renewal_json(session):
     assert court_order.registration_id == 12345
     assert court_order.court_name
     assert court_order.court_registry
-    assert court_order.court_date
+    assert court_order.order_date
     assert court_order.file_number
     assert court_order.effect_of_order

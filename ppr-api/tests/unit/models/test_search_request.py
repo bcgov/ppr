@@ -17,11 +17,11 @@
 Test-Suite to ensure that the Search Model is working as expected.
 """
 from http import HTTPStatus
-import json
+import copy
 
 import pytest
 
-from ppr_api.models import SearchClient
+from ppr_api.models import SearchRequest
 from ppr_api.models.utils import now_ts_offset, format_ts
 from ppr_api.exceptions import BusinessException
 
@@ -326,7 +326,7 @@ TEST_INVALID_DATA = [
 
 # testdata pattern is ({search type}, {JSON data}, {expected # of results})
 TEST_VALID_DATA_COUNT = [
-    ('SS', SERIAL_NUMBER_JSON, 7),
+    ('SS', SERIAL_NUMBER_JSON, 6),
     ('IS', INDIVIDUAL_DEBTOR_JSON, 4),
     ('BS', BUSINESS_DEBTOR_JSON, 2)
 ]
@@ -361,22 +361,22 @@ def test_search_no_account(session):
         },
         'clientReferenceId': 'T-SQ-RG-4'
     }
-    query = SearchClient.create_from_json(json_data, None)
+    query = SearchRequest.create_from_json(json_data, None)
     query.search()
 
-    assert query.search_id
+    assert query.id
     assert query.search_response
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
 def test_search_valid(session, search_type, json_data):
     """Assert that a valid search returns the expected search type result."""
-    query = SearchClient.create_from_json(json_data, None)
+    query = SearchRequest.create_from_json(json_data, None)
     query.search()
 
     result = query.json
 #    print(result)
-    assert query.search_id
+    assert query.id
     assert query.search_response
     assert result['searchId']
     assert result['searchQuery']
@@ -425,10 +425,10 @@ def test_search_valid(session, search_type, json_data):
 @pytest.mark.parametrize('search_type,json_data', TEST_NONE_DATA)
 def test_search_no_results(session, search_type, json_data):
     """Assert that a search query with no results returns the expected result."""
-    query = SearchClient.create_from_json(json_data, None)
+    query = SearchRequest.create_from_json(json_data, None)
     query.search()
 
-    assert query.search_id
+    assert query.id
     assert not query.search_response
     assert query.returned_results_size == 0
 
@@ -436,7 +436,7 @@ def test_search_no_results(session, search_type, json_data):
 @pytest.mark.parametrize('search_type,json_data,excluded_match', TEST_EXPIRED_DATA)
 def test_search_expired(session, search_type, json_data, excluded_match):
     """Assert that an expired financing statement is excluded from the search results."""
-    query = SearchClient.create_from_json(json_data, None)
+    query = SearchRequest.create_from_json(json_data, None)
     query.search()
     result = query.json
 
@@ -457,7 +457,7 @@ def test_search_expired(session, search_type, json_data, excluded_match):
 @pytest.mark.parametrize('search_type,json_data,excluded_match', TEST_DISCHARGED_DATA)
 def test_search_discharged(session, search_type, json_data, excluded_match):
     """Assert that a discharged financing statement is excluded from the search results."""
-    query = SearchClient.create_from_json(json_data, None)
+    query = SearchRequest.create_from_json(json_data, None)
     query.search()
     result = query.json
 
@@ -491,7 +491,7 @@ def test_search_startdatetime_invalid(session, client, jwt):
 
     # test
     with pytest.raises(BusinessException) as bad_request_err:
-        SearchClient.validate_query(json_data)
+        SearchRequest.validate_query(json_data)
 
     # check
     assert bad_request_err
@@ -515,7 +515,7 @@ def test_search_enddatatetime_invalid(session, client, jwt):
 
     # test
     with pytest.raises(BusinessException) as bad_request_err:
-        SearchClient.validate_query(json_data)
+        SearchRequest.validate_query(json_data)
 
     # check
     assert bad_request_err
@@ -525,7 +525,7 @@ def test_search_enddatatetime_invalid(session, client, jwt):
 
 def test_find_by_account_id(session):
     """Assert that the account search history list first item contains all expected elements."""
-    history = SearchClient.find_all_by_account_id('PS12345')
+    history = SearchRequest.find_all_by_account_id('PS12345')
     # print(history)
     assert history
     assert history[0]['searchId']
@@ -540,7 +540,7 @@ def test_find_by_account_id(session):
 
 def test_find_by_account_id_no_result(session):
     """Assert that the find search history by invalid account ID returns the expected result."""
-    history = SearchClient.find_all_by_account_id('XXXX345')
+    history = SearchRequest.find_all_by_account_id('XXXX345')
     # check
     assert len(history) == 0
 
@@ -554,10 +554,10 @@ def test_create_from_json(session):
         },
         'clientReferenceId': 'T-SQ-SS-1'
     }
-    search_client = SearchClient.create_from_json(json_data, 'PS12345')
+    search_client = SearchRequest.create_from_json(json_data, 'PS12345')
 
     assert search_client.account_id == 'PS12345'
-    assert search_client.search_type_cd == 'SS'
+    assert search_client.search_type == 'SS'
     assert search_client.client_reference_id == 'T-SQ-SS-1'
     assert search_client.search_ts
     assert search_client.search_criteria
@@ -565,9 +565,9 @@ def test_create_from_json(session):
 
 def test_search_autosave(session):
     """Assert that a valid search query selection update works as expected."""
-    query = SearchClient.find_by_id(200000000)
+    query = SearchRequest.find_by_id(200000000)
     assert query.search_response
-    update_data = json.loads(query.search_response)
+    update_data = copy.deepcopy(query.search_response)  # json.loads(query.search_response)
     if update_data[0]['matchType'] == 'EXACT':
         update_data[0]['matchType'] = 'SIMILAR'
     else:
@@ -583,7 +583,7 @@ def test_search_invalid_criteria_400(session, client, jwt, search_type, json_dat
     """Assert that validation of a search request with invalid criteria throws a BusinessException."""
     # test
     with pytest.raises(BusinessException) as bad_request_err:
-        SearchClient.validate_query(json_data)
+        SearchRequest.validate_query(json_data)
 
     # check
     assert bad_request_err
@@ -594,7 +594,7 @@ def test_search_invalid_criteria_400(session, client, jwt, search_type, json_dat
 @pytest.mark.parametrize('search_type,json_data,result_size', TEST_VALID_DATA_COUNT)
 def test_get_total_count(session, search_type, json_data, result_size):
     """Assert that the get total count function works as expected."""
-    search_client = SearchClient.create_from_json(json_data, 'PS12345')
+    search_client = SearchRequest.create_from_json(json_data, 'PS12345')
     search_client.get_total_count()
     # print('test_total_count ' + search_type + ' actual results size=' + str(search_client.total_results_size))
     assert search_client.total_results_size >= result_size

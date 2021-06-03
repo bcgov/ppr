@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from enum import Enum
 from http import HTTPStatus
-import json
 
 from flask import current_app
 
@@ -31,7 +30,7 @@ from ppr_api.models import search_utils
 from .db import db
 
 
-class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
+class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search query (search step 1) information."""
 
     class SearchTypes(Enum):
@@ -44,16 +43,15 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         SERIAL_NUM = 'SS'
         MANUFACTURED_HOME_NUM = 'MH'
 
-    __tablename__ = 'search_client'
+    __tablename__ = 'search_requests'
 
 
-#    search_id = db.Column('search_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    search_id = db.Column('search_id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('search_id_seq'), primary_key=True)
     search_ts = db.Column('search_ts', db.DateTime, nullable=False, index=True)
-    search_type_cd = db.Column('search_type_cd', db.String(2),
-                               db.ForeignKey('search_type.search_type_cd'), nullable=False)
-    search_criteria = db.Column('api_criteria', db.String(1000), nullable=False)
-    search_response = db.Column('search_response', db.Text, nullable=True)
+    search_type = db.Column('search_type', db.String(2),
+                            db.ForeignKey('search_types.search_type'), nullable=False)
+    search_criteria = db.Column('api_criteria', db.JSON, nullable=False)
+    search_response = db.Column('search_response', db.JSON, nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
     client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
     total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
@@ -67,8 +65,8 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     # Relationships - SearchResult
     search_result = db.relationship('SearchResult', back_populates='search', uselist=False)
     # Relationships - SearchType
-    search_type = db.relationship('SearchType', foreign_keys=[search_type_cd],
-                                  back_populates='search_client', cascade='all, delete', uselist=False)
+    search_request_type = db.relationship('SearchType', foreign_keys=[search_type],
+                                          back_populates='search_request', cascade='all, delete', uselist=False)
 
     request_json = {}
 
@@ -76,15 +74,15 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the search query results as a json object."""
         result = {
-            'searchId': str(self.search_id),
+            'searchId': str(self.id),
             'searchDateTime': model_utils.format_ts(self.search_ts),
             'totalResultsSize': self.total_results_size,
             'returnedResultsSize': self.returned_results_size,
             'maxResultsSize': search_utils.SEARCH_RESULTS_MAX_SIZE,
-            'searchQuery': json.loads(self.search_criteria)
+            'searchQuery': self.search_criteria
         }
         if self.search_response:
-            result['results'] = json.loads(self.search_response)
+            result['results'] = self.search_response
 
         if self.pay_invoice_id and self.pay_path:
             payment = {
@@ -109,7 +107,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def update_search_selection(self, search_json):
         """Support UI search selection autosave: replace search response."""
-        self.search_response = json.dumps(search_json)
+        self.search_response = search_json
         self.save()
 
     def search_by_registration_number(self):
@@ -134,7 +132,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
             self.returned_results_size = 1
             self.total_results_size = 1
-            self.search_response = json.dumps(result_json)
+            self.search_response = result_json
         else:
             self.returned_results_size = 0
             self.total_results_size = 0
@@ -143,10 +141,10 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Execute a search query for either an aircraft DOT, MHR number, or serial number search type."""
         search_value = self.request_json['criteria']['value']
         query = search_utils.SERIAL_NUM_QUERY
-        if self.search_type_cd == 'MH':
+        if self.search_type == 'MH':
             query = search_utils.MHR_NUM_QUERY
-            query = query.replace('DECODE(serial_number', 'DECODE(mhr_number')
-        elif self.search_type_cd == 'AC':
+            query = query.replace('CASE WHEN serial_number', 'CASE WHEN mhr_number')
+        elif self.search_type == 'AC':
             query = search_utils.AIRCRAFT_DOT_QUERY
 
         query = query.replace('?', search_value)
@@ -172,7 +170,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                 if value is not None:
                     collateral['model'] = str(value)
                 match_type = str(values[8])
-                if self.search_type_cd == 'MH':
+                if self.search_type == 'MH':
                     collateral['manufacturedHomeRegistrationNumber'] = str(values[12])
                 result_json = {
                     'baseRegistrationNumber': str(values[7]),
@@ -186,7 +184,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             if self.returned_results_size > 0:
-                self.search_response = json.dumps(results_json)
+                self.search_response = results_json
         else:
             self.returned_results_size = 0
             self.total_results_size = 0
@@ -219,7 +217,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             if self.returned_results_size > 0:
-                self.search_response = json.dumps(results_json)
+                self.search_response = results_json
         else:
             self.returned_results_size = 0
             self.total_results_size = 0
@@ -261,19 +259,19 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             if self.returned_results_size > 0:
-                self.search_response = json.dumps(results_json)
+                self.search_response = results_json
         else:
             self.returned_results_size = 0
             self.total_results_size = 0
 
     def get_total_count(self):
         """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
-        count_query = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type_cd]
+        count_query = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type]
         if count_query:
-            if self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
+            if self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json['criteria']['debtorName']['business']
                 count_query = count_query.replace('?', search_value.strip().upper())
-            elif self.search_type_cd == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
+            elif self.search_type == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
                 last_name = self.request_json['criteria']['debtorName']['last']
                 first_name = self.request_json['criteria']['debtorName']['first']
                 count_query = count_query.replace('LNAME?', last_name.strip().upper())
@@ -288,13 +286,13 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def search(self):
         """Execute a search with the previously set search type and criteria."""
-        if self.search_type_cd == self.SearchTypes.REGISTRATION_NUM.value:
+        if self.search_type == self.SearchTypes.REGISTRATION_NUM.value:
             self.search_by_registration_number()
-        elif self.search_type_cd in (self.SearchTypes.SERIAL_NUM.value,
-                                     self.SearchTypes.MANUFACTURED_HOME_NUM.value,
-                                     self.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value):
+        elif self.search_type in (self.SearchTypes.SERIAL_NUM.value,
+                                  self.SearchTypes.MANUFACTURED_HOME_NUM.value,
+                                  self.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value):
             self.search_by_serial_type()
-        elif self.search_type_cd == self.SearchTypes.BUSINESS_DEBTOR.value:
+        elif self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
             self.search_by_business_name()
         else:
             self.search_by_individual_name()
@@ -310,8 +308,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query matching the id."""
         search = None
         if search_id:
-            # search = cls.query.get(search_id)
-            search = db.session.query(SearchClient).filter(SearchClient.search_id == search_id).one_or_none()
+            search = db.session.query(SearchRequest).filter(SearchRequest.id == search_id).one_or_none()
         return search
 
     @classmethod
@@ -331,7 +328,7 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
                     search = {
                         'searchId': str(values[0]),
                         'searchDateTime': model_utils.format_ts(values[1]),
-                        'searchQuery': json.loads(values[2]),
+                        'searchQuery': values[2],
                         'totalResultsSize': int(values[3]),
                         'returnedResultsSize': int(values[4])
                     }
@@ -357,11 +354,11 @@ class SearchClient(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_from_json(search_json,
                          account_id: str = None):
         """Create a search object from dict/json."""
-        new_search = SearchClient()
+        new_search = SearchRequest()
         new_search.request_json = search_json
         search_type = search_json['type']
-        new_search.search_type_cd = model_utils.TO_DB_SEARCH_TYPE[search_type]
-        new_search.search_criteria = json.dumps(search_json)
+        new_search.search_type = model_utils.TO_DB_SEARCH_TYPE[search_type]
+        new_search.search_criteria = search_json
         new_search.search_ts = model_utils.now_ts()
         if account_id:
             new_search.account_id = account_id
