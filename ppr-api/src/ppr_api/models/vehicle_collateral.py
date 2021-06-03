@@ -192,5 +192,5 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
         result = db.session.execute(statement)
         row = result.first()
-        search_vin = str(row._mapping['search_key'])
+        search_vin = str(row._mapping['search_key'])  # pylint: disable=protected-access; follows documentation
         return search_vin

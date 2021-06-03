@@ -117,7 +117,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         result = db.session.execute(query)
         row = result.first()
         if row is not None:
-            mapping = row._mapping
+            mapping = row._mapping  # pylint: disable=protected-access; follows documentation
             registration_type = str(mapping['registration_type'])
             # Remove state check for now - let the DB view take care of it.
             timestamp = mapping['base_registration_ts']
@@ -153,7 +153,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                mapping = row._mapping
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                 registration_type = str(mapping['registration_type'])
                 timestamp = mapping['base_registration_ts']
                 collateral = {
@@ -198,7 +198,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                mapping = row._mapping
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                 registration_type = str(mapping['registration_type'])
                 timestamp = mapping['base_registration_ts']
                 debtor = {
@@ -233,7 +233,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                mapping = row._mapping
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                 registration_type = str(mapping['registration_type'])
                 timestamp = mapping['base_registration_ts']
                 person = {
@@ -281,7 +281,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
             result = db.session.execute(count_query)
             row = result.first()
-            self.total_results_size = int(row._mapping['query_count'])
+            self.total_results_size = int(row._mapping['query_count'])  # pylint: disable=protected-access
 
     def search(self):
         """Execute a search with the previously set search type and criteria."""
@@ -323,7 +323,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    mapping = row._mapping
+                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     search = {
                         'searchId': str(mapping['id']),
                         'searchDateTime': model_utils.format_ts(mapping['search_ts']),

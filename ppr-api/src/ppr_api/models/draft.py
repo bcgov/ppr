@@ -95,7 +95,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    mapping = row._mapping
+                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     draft_json = {
                         'createDateTime': model_utils.format_ts(mapping['create_ts']),
                         'documentId': str(mapping['document_number']),

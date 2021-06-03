@@ -590,9 +590,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         result = db.session.execute(query)
         row = result.first()
-        registration.id = int(row._mapping['reg_id'])
-        registration.registration_num = str(row._mapping['reg_num'])
+        registration.id = int(row._mapping['reg_id'])  # pylint: disable=protected-access; follows documentation
+        registration.registration_num = str(row._mapping['reg_num'])  # pylint: disable=protected-access
         if not draft:
-            registration.document_number = str(row._mapping['doc_num'])
+            registration.document_number = str(row._mapping['doc_num'])  # pylint: disable=protected-access
 
         return registration
