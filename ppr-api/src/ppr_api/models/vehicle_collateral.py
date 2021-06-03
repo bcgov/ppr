@@ -19,9 +19,9 @@ from enum import Enum
 from .db import db
 
 
-SEARCH_VIN_STATEMENT = "SELECT searchkey_vehicle('?')"  # noqa: Q000
-SEARCH_VIN_STATEMENT_AC = "SELECT searchkey_aircraft('?')"  # noqa: Q000
-SEARCH_VIN_STATEMENT_MH = "SELECT searchkey_mhr('?')"  # noqa: Q000
+SEARCH_VIN_STATEMENT = "SELECT searchkey_vehicle('?') AS search_key"  # noqa: Q000
+SEARCH_VIN_STATEMENT_AC = "SELECT searchkey_aircraft('?') AS search_key"  # noqa: Q000
+SEARCH_VIN_STATEMENT_MH = "SELECT searchkey_mhr('?') AS search_key"  # noqa: Q000
 
 
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -192,6 +192,5 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
         result = db.session.execute(statement)
         row = result.first()
-        values = row.values()
-        search_vin = str(values[0])
+        search_vin = str(row._mapping['search_key'])
         return search_vin

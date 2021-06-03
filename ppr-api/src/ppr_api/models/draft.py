@@ -95,19 +95,19 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    values = row.values()
+                    mapping = row._mapping
                     draft_json = {
-                        'createDateTime': model_utils.format_ts(values[0]),
-                        'documentId': str(values[3]),
-                        'registrationType': str(values[2]),
-                        'path': '/api/v1/drafts/' + str(values[3])
+                        'createDateTime': model_utils.format_ts(mapping['create_ts']),
+                        'documentId': str(mapping['document_number']),
+                        'registrationType': str(mapping['registration_type']),
+                        'path': '/api/v1/drafts/' + str(mapping['document_number'])
                     }
-                    reg_class = str(values[1])
+                    reg_class = str(mapping['registration_type_cl'])
                     draft_json['type'] = model_utils.REG_CLASS_TO_DRAFT_TYPE[reg_class]
                     if reg_class in (model_utils.REG_CLASS_AMEND,
                                      model_utils.REG_CLASS_AMEND_COURT,
                                      model_utils.REG_CLASS_CHANGE):
-                        draft_json['baseRegistrationNumber'] = str(values[4])
+                        draft_json['baseRegistrationNumber'] = str(mapping['registration_number'])
 
                     drafts_json.append(draft_json)
 
