@@ -1,11 +1,10 @@
-Flask
+Flask<2
 Flask-Babel
 Flask-Migrate
 Flask-Moment
 flask_restx
 Flask-Script
 Flask-SQLAlchemy
-SQLAlchemy-Continuum
 asyncio-nats-client
 asyncio-nats-streaming
 attrs<=19.1.0
@@ -21,5 +20,4 @@ pycountry
 requests
 sentry-sdk[flask]
 strict-rfc3339
-Werkzeug<1
-cx_Oracle
+Werkzeug
