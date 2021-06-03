@@ -16,7 +16,6 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-import json
 
 from flask import current_app
 
@@ -31,23 +30,20 @@ from .search_utils import GET_DETAIL_DAYS_LIMIT
 class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search results detail (search step 2) information."""
 
-    __tablename__ = 'search_result'
+    __tablename__ = 'search_results'
 
-    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_client.search_id'),
+    search_id = db.Column('search_id', db.Integer, db.ForeignKey('search_requests.id'),
                           primary_key=True, nullable=False)
-    search_select = db.Column('api_result', db.Text, nullable=False)
-    search_response = db.Column('registrations', db.Text, nullable=False)
-    jaro = db.Column('jaro', db.Integer, nullable=True)
-    match = db.Column('match', db.String(1), nullable=True)
-    result_id = db.Column('result_id', db.Integer, nullable=True)
-    result = db.Column('result', db.String(150), nullable=True)
+    search_select = db.Column('api_result', db.JSON, nullable=True)
+    search_response = db.Column('registrations', db.JSON, nullable=False)
+    score = db.Column('score', db.Integer, nullable=True)
     exact_match_count = db.Column('exact_match_count', db.Integer, nullable=True)
     similar_match_count = db.Column('similar_match_count', db.Integer, nullable=True)
 
     # parent keys
 
     # Relationships - Search
-    search = db.relationship('SearchClient', foreign_keys=[search_id],
+    search = db.relationship('SearchRequest', foreign_keys=[search_id],
                              back_populates='search_result', cascade='all, delete', uselist=False)
 
     @property
@@ -55,9 +51,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query results as a json object."""
         result = None
         if self.search_response:
-            result = json.loads(self.search_response)
+            result = self.search_response
             if self.search_select:
-                result['selected'] = json.loads(self.search_select)
+                result['selected'] = self.search_select
         return result
 
     def save(self):
@@ -86,7 +82,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             'searchDateTime': model_utils.format_ts(self.search.search_ts),
             'exactResultsSize': self.exact_match_count,
             'similarResultsSize': self.similar_match_count,
-            'searchQuery': json.loads(self.search.search_criteria),
+            'searchQuery': self.search.search_criteria,
             'details': []
         }
         if self.search.pay_invoice_id and self.search.pay_path:
@@ -96,7 +92,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             detail_response['payment'] = payment
 
-        results = json.loads(self.search_response)
+        results = self.search_response
         new_results = []
         exact_count = 0
         similar_count = 0
@@ -117,7 +113,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     new_results.append(result)
 
         # current_app.logger.debug('exact_count=' + str(exact_count) + ' similar_count=' + str(similar_count))
-        self.search_select = json.dumps(search_select)
+        self.search_select = search_select
         self.exact_match_count = exact_count
         self.similar_match_count = similar_count
         # current_app.logger.debug('saving updates')
@@ -126,7 +122,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         detail_response['similarResultsSize'] = self.similar_match_count
         detail_response['totalResultsSize'] = (self.exact_match_count + self.similar_match_count)
         detail_response['details'] = new_results
-        self.search_response = json.dumps(detail_response)
+        self.search_response = detail_response
         self.save()
 
     @classmethod
@@ -135,11 +131,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         search_detail = None
         error_msg = ''
         if search_id and not limit_by_date:
-            # search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
             search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
         elif search_id and limit_by_date:
             min_allowed_date = model_utils.today_ts_offset(GET_DETAIL_DAYS_LIMIT, False)
-            # search_detail = cls.query.filter(SearchResult.search_id == search_id).one_or_none()
             search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
             if search_detail and search_detail.search and \
                     search_detail.search.search_ts.timestamp() < min_allowed_date.timestamp():
@@ -157,13 +151,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def create_from_search_query_no_results(search_query):
         """Create a search detail object from the inital search query which retured no results."""
-        search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
+        search_result = SearchResult(search_id=search_query.id, exact_match_count=0, similar_match_count=0)
         detail_response = {
             'searchDateTime': model_utils.format_ts(search_query.search_ts),
             'exactResultsSize': search_result.exact_match_count,
             'similarResultsSize': search_result.similar_match_count,
             'totalResultsSize': 0,
-            'searchQuery': json.loads(search_query.search_criteria)
+            'searchQuery': search_query.search_criteria
         }
         if search_query.pay_invoice_id and search_query.pay_path:
             payment = {
@@ -171,7 +165,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 'receipt': search_query.pay_path
             }
             detail_response['payment'] = payment
-        search_result.search_response = json.dumps(detail_response)
+        search_result.search_response = detail_response
         return search_result
 
     @staticmethod
@@ -180,8 +174,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         if search_query.total_results_size == 0:  # A search query with no results: build minimal details.
             return SearchResult.create_from_search_query_no_results(search_query)
 
-        search_result = SearchResult(search_id=search_query.search_id, exact_match_count=0, similar_match_count=0)
-        query_results = json.loads(search_query.search_response)
+        search_result = SearchResult(search_id=search_query.id, exact_match_count=0, similar_match_count=0)
+        query_results = search_query.search_response
         detail_results = []
         for result in query_results:
             reg_num = result['baseRegistrationNumber']
@@ -205,7 +199,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 changes = []
                 if financing.registration:
                     for reg in reversed(financing.registration):
-                        if reg.registration_num != financing.registration_num:
+                        if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
                             statement_json = reg.json
                             statement_json['statementType'] = \
                                 model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
@@ -218,7 +212,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 else:
                     search_result.similar_match_count += 1
 
-        search_result.search_response = json.dumps(detail_results)
+        search_result.search_response = detail_results
         return search_result
 
     @staticmethod
@@ -226,7 +220,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         """Create a search detail object from dict/json specifying the search selection."""
         search = SearchResult()
         search.search_id = search_id
-        search.search_select = json.dumps(search_json)
+        search.search_select = search_json
         detail_results = []
         for result in search_json:
             reg_num = result['baseRegistrationNumber']
@@ -249,7 +243,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             if changes:
                 financing_json['financingStatement']['changes'] = changes
             detail_results.append(financing_json)
-        search.search_response = json.dumps(detail_results)
+        search.search_response = detail_results
 
         return search
 

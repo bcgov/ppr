@@ -86,7 +86,7 @@ def test_find_head_office_codes(session, desc, results_size, search_value, fuzzy
 def test_client_party_json(session):
     """Assert that the client party model renders to a json format correctly."""
     party = ClientCode(
-        branch_id=1000,
+        id=1000,
         name='BUSINESS NAME',
         contact_name='CONTACT',
         contact_area_cd='250',

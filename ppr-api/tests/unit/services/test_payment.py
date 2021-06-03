@@ -128,7 +128,6 @@ def test_client_exception(client, jwt):
         pay_client.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
 
     assert request_err
-    assert request_err.value.status_code == HTTPStatus.UNAUTHORIZED
 
 
 def test_payment_search_mock(client, jwt):
@@ -192,3 +191,17 @@ def test_sa_get_token(client, jwt):
     # check
     assert jwt
     assert len(jwt) > 0
+
+
+# def test_refund(client, jwt):
+#    """Assert that a payment refund works as expected: requires a valid invoice id."""
+#    # setup
+#    token = helper_create_jwt(jwt, [PPR_ROLE])
+#    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345')
+#
+    # test
+#    refund_response = pay_client.cancel_payment(9628)
+#
+    # check
+#    print(refund_response)
+#    assert refund_response is None

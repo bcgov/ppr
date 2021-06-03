@@ -22,17 +22,14 @@ from .registration import Registration  # noqa: F401 pylint: disable=unused-impo
 class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the financing statement trust indenture information."""
 
-    __tablename__ = 'trust_indenture'
+    __tablename__ = 'trust_indentures'
 
-#    trust_id = db.Column('trust_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    trust_id = db.Column('trust_id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
     trust_indenture = db.Column('trust_indenture', db.String(1), nullable=False)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registration.registration_id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statement.financing_id'), nullable=False)
+    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False)
+    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
@@ -59,9 +56,9 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of trust indenture objects by registration number."""
         trust_indenture = None
         if registration_num:
-            trust_indenture = cls.query.filter(TrustIndenture.registration_id == Registration.registration_id,
+            trust_indenture = cls.query.filter(TrustIndenture.registration_id == Registration.id,
                                                Registration.registration_num == registration_num) \
-                                        .order_by(TrustIndenture.trust_id).all()
+                                        .order_by(TrustIndenture.id).all()
 
         return trust_indenture
 
@@ -71,7 +68,7 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         trust_indenture = None
         if financing_id:
             trust_indenture = cls.query.filter(TrustIndenture.financing_id == financing_id) \
-                                        .order_by(TrustIndenture.trust_id).all()
+                                        .order_by(TrustIndenture.id).all()
 
         return trust_indenture
 

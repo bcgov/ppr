@@ -23,7 +23,7 @@ def test_find_by_id(session):
     """Assert that find address by id contains all expected elements."""
     address = Address.find_by_id(200000000)
     assert address
-    assert address.address_id
+    assert address.id
     if address:
         json_data = address.json
         assert json_data['street']
@@ -46,7 +46,7 @@ def test_save(session):
     }
     address = Address.create_from_json(address_json)
     address.save()
-    assert address.address_id
+    assert address.id
 
 
 def test_address_json(session):

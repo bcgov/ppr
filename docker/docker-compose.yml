@@ -1,0 +1,31 @@
+version: "3.1"
+
+services:
+  ####################### PPR Database Definition #######################
+  pprdb:
+    image: postgres:11
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "54360:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data0
+
+  ####################### PPR Unit Test Database Definition #######################
+  # pprdb-test:
+  #  image: postgres:11
+  #  restart: always
+  #  environment:
+  #    POSTGRES_DB: postgres
+  #    POSTGRES_PASSWORD: postgres
+  #  ports:
+  #    - "54361:5432"
+  #  volumes:
+  #    - db-data:/var/lib/postgresql/data1
+
+
+volumes:
+  db-data:
+    driver: local

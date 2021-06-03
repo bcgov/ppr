@@ -22,19 +22,16 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
     __tablename__ = 'general_collateral'
 
-#    collateral_id = db.Column('general_collateral_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    collateral_id = db.Column('general_collateral_id', db.Integer,
-                              db.Sequence('general_id_seq'),
-                              primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
     description = db.Column('description', db.String(4000), nullable=False)
     # Legacy only
     status = db.Column('status', db.String(1), nullable=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registration.registration_id'), nullable=False)
+                                db.ForeignKey('registrations.id'), nullable=False)
     financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statement.financing_id'), nullable=False)
+                             db.ForeignKey('financing_statements.id'), nullable=False)
     registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
@@ -50,7 +47,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     def json(self) -> dict:
         """Return the genreal collateral as a json object."""
         return {
-            'collateralId': self.collateral_id,
+            'collateralId': self.id,
             'description': self.description
         }
 
@@ -69,7 +66,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         collateral = None
         if registration_id:
             collateral = cls.query.filter(GeneralCollateral.registration_id == registration_id) \
-                               .order_by(GeneralCollateral.collateral_id).all()
+                               .order_by(GeneralCollateral.id).all()
 
         return collateral
 
@@ -79,7 +76,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         collateral = None
         if financing_id:
             collateral = cls.query.filter(GeneralCollateral.financing_id == financing_id) \
-                                  .order_by(GeneralCollateral.collateral_id).all()
+                                  .order_by(GeneralCollateral.id).all()
 
         return collateral
 

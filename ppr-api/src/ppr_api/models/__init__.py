@@ -23,7 +23,7 @@ from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
 from .party import Party
 from .registration import Registration
-from .search_client import SearchClient
+from .search_request import SearchRequest
 from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
 from .type_tables import (
@@ -44,5 +44,5 @@ from .vehicle_collateral import VehicleCollateral
 __all__ = ('db',
            'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft', 'FinancingStatement',
            'GeneralCollateral', 'Party', 'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
-           'RegistrationTypeClass', 'SearchClient', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
+           'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
            'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')

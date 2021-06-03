@@ -27,11 +27,11 @@ def test_find_by_id(session):
     """Assert that find party by party ID contains all expected elements."""
     party = Party.find_by_id(200000000)
     assert party
-    assert party.party_id == 200000000
+    assert party.id == 200000000
     assert party.address_id
-    assert party.party_type_cd == 'RG'
+    assert party.party_type == 'RG'
     assert party.first_name
-    assert party.middle_name
+    assert party.middle_initial
     assert party.last_name
     assert party.registration_id
     assert not party.branch_id
@@ -44,11 +44,11 @@ def test_find_by_id_client(session):
     """Assert that find party by party ID for a client party contains all expected elements."""
     party = Party.find_by_id(200000004)
     assert party
-    assert party.party_type_cd == 'SP'
-    assert party.party_id == 200000004
+    assert party.party_type == 'SP'
+    assert party.id == 200000004
     assert party.registration_id
     assert not party.first_name
-    assert not party.middle_name
+    assert not party.middle_initial
     assert not party.last_name
     assert not party.birth_date
     assert not party.registration_id_end
@@ -64,11 +64,11 @@ def test_find_by_financing_id(session):
     parties = Party.find_by_financing_id(200000000)
     assert parties
     assert len(parties) >= 5
-    assert parties[0].party_type_cd == 'RG'
-    assert parties[1].party_type_cd == 'DI'
-    assert parties[2].party_type_cd == 'DB'
-    assert parties[3].party_type_cd == 'SP'
-    assert parties[4].party_type_cd == 'SP'
+    assert parties[0].party_type == 'RG'
+    assert parties[1].party_type == 'DI'
+    assert parties[2].party_type == 'DB'
+    assert parties[3].party_type == 'SP'
+    assert parties[4].party_type == 'SP'
 
 
 def test_find_by_registration_id(session):
@@ -76,11 +76,11 @@ def test_find_by_registration_id(session):
     parties = Party.find_by_registration_id(200000000)
     assert parties
     assert len(parties) == 5
-    assert parties[0].party_type_cd == 'RG'
-    assert parties[1].party_type_cd == 'DI'
-    assert parties[2].party_type_cd == 'DB'
-    assert parties[3].party_type_cd == 'SP'
-    assert parties[4].party_type_cd == 'SP'
+    assert parties[0].party_type == 'RG'
+    assert parties[1].party_type == 'DI'
+    assert parties[2].party_type == 'DB'
+    assert parties[3].party_type == 'SP'
+    assert parties[4].party_type == 'SP'
 
 
 def test_find_by_id_invalid(session):
@@ -104,9 +104,9 @@ def test_find_by_reg_id_invalid(session):
 def test_party_json(session):
     """Assert that the party model renders to a json format correctly."""
     party = Party(
-        party_id=1000,
+        id=1000,
         first_name='FIRST',
-        middle_name='MIDDLE',
+        middle_initial='MIDDLE',
         last_name='LAST',
         business_name='BUSINESS',
         registration_id=1000,
@@ -114,12 +114,12 @@ def test_party_json(session):
     )
 
     party_json = {
-        'partyId': party.party_id,
+        'partyId': party.id,
         'businessName': party.business_name,
         'personName': {
             'first': party.first_name,
             'last': party.last_name,
-            'middle': party.middle_name
+            'middle': party.middle_initial
         }
     }
 
@@ -161,7 +161,7 @@ def test_create_from_json(session):
 
     party_bus = Party.create_from_json(party_bus_json, 'SP', 1234)
     assert party_bus.registration_id
-    assert party_bus.party_type_cd == 'SP'
+    assert party_bus.party_type == 'SP'
     assert party_bus.business_name
     assert party_bus.address
     assert party_bus.address.street
@@ -174,10 +174,10 @@ def test_create_from_json(session):
 
     party_ind = Party.create_from_json(party_ind_json, 'DB', 1234)
     assert party_ind.registration_id
-    assert party_ind.party_type_cd == 'DI'
+    assert party_ind.party_type == 'DI'
     assert party_ind.last_name
     assert party_ind.first_name
-    assert party_ind.middle_name
+    assert party_ind.middle_initial
     assert party_ind.address
     assert party_ind.address.street
     assert party_ind.address.street_additional
@@ -202,7 +202,7 @@ def test_create_from_financing_json(session):
     assert parties
     assert len(parties) == 3
     for party in parties:
-        assert party.party_type_cd
+        assert party.party_type
         if not party.branch_id:
             assert party.address
 

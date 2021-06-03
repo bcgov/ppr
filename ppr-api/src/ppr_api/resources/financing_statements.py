@@ -21,16 +21,17 @@ from flask import jsonify, request
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
+from ppr_api.exceptions import BusinessException
+from ppr_api.models import FinancingStatement, Registration
+from ppr_api.models import utils as model_utils
+from ppr_api.resources import utils as resource_utils
+from ppr_api.services.authz import authorized, is_staff
+from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.exceptions import BusinessException
-from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import Registration, FinancingStatement, utils as model_utils
 
-from .utils import get_account_id, account_required_response, validation_error_response, \
-                   business_exception_response, default_exception_response
-from .utils import unauthorized_error_response, path_param_error_response
-from .utils import path_data_mismatch_error_response, base_debtor_invalid_response
+
+# from ppr_api.services.payment.payment import Payment, TransactionTypes
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -55,13 +56,13 @@ class FinancingResource(Resource):
         try:
 
             # Quick check: must provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch financing statement list for account ID
             statement_list = FinancingStatement.find_all_by_account_id(account_id, is_staff(jwt))
@@ -69,9 +70,9 @@ class FinancingResource(Resource):
             return jsonify(statement_list), HTTPStatus.OK
 
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -81,32 +82,42 @@ class FinancingResource(Resource):
         try:
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'financingStatement', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR)
+                return resource_utils.validation_error_response(errors, VAL_ERROR)
 
-            # TODO: charge a fee.
+            # Charge a fee.
+            statement = FinancingStatement.create_from_json(request_json, account_id)
+            # if account_id:
+            #    fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value
+            #    fee_quantity = 1
+            #    payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+            #    pay_ref = payment.create_payment(fee_code, fee_quantity, None, statement.client_reference_id)
+            #    invoice_id = pay_ref['invoiceId']
+            #    statement.pay_invoice_id = int(invoice_id)
+            #    statement.pay_path = pay_ref['receipt']
 
             # Try to save the financing statement: failure throws a business exception.
-            statement = FinancingStatement.create_from_json(request_json, account_id)
             statement.save()
 
             return statement.json, HTTPStatus.CREATED
 
+        except SBCPaymentException as pay_exception:
+            return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('GET,OPTIONS')
@@ -121,16 +132,16 @@ class GetFinancingResource(Resource):
         """Get a financing statement by registration number."""
         try:
             if registration_num is None:
-                return path_param_error_response('registration number')
+                return resource_utils.path_param_error_response('registration number')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch financing statement by registration number
             # Not found or non-staff historical throws a business exception.
@@ -139,9 +150,9 @@ class GetFinancingResource(Resource):
             return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('POST,OPTIONS')
@@ -156,28 +167,28 @@ class AmendmentResource(Resource):
         """Amend a financing statement by registration number."""
         try:
             if registration_num is None:
-                return path_param_error_response('registration number')
+                return resource_utils.path_param_error_response('registration number')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR_AMEND)
+                return resource_utils.validation_error_response(errors, VAL_ERROR_AMEND)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registration_num,
-                                                         'base registration number',
-                                                         request_json['baseRegistrationNumber'])
+                return resource_utils.path_data_mismatch_error_response(registration_num,
+                                                                        'base registration number',
+                                                                        request_json['baseRegistrationNumber'])
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
@@ -185,7 +196,7 @@ class AmendmentResource(Resource):
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
-                return base_debtor_invalid_response()
+                return resource_utils.base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
@@ -197,12 +208,14 @@ class AmendmentResource(Resource):
                                                       account_id)
             statement.save()
 
-            return statement.json, HTTPStatus.OK
+            return statement.json, HTTPStatus.OK  # CREATED
 
+        except SBCPaymentException as pay_exception:
+            return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('POST,OPTIONS')
@@ -217,28 +230,28 @@ class ChangeResource(Resource):
         """Change a financing statement by registration number."""
         try:
             if registration_num is None:
-                return path_param_error_response('registration number')
+                return resource_utils.path_param_error_response('registration number')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'changeStatement', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR_CHANGE)
+                return resource_utils.validation_error_response(errors, VAL_ERROR_CHANGE)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registration_num,
-                                                         'base registration number',
-                                                         request_json['baseRegistrationNumber'])
+                return resource_utils.path_data_mismatch_error_response(registration_num,
+                                                                        'base registration number',
+                                                                        request_json['baseRegistrationNumber'])
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
@@ -246,7 +259,7 @@ class ChangeResource(Resource):
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
-                return base_debtor_invalid_response()
+                return resource_utils.base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
@@ -258,12 +271,14 @@ class ChangeResource(Resource):
                                                       account_id)
             statement.save()
 
-            return statement.json, HTTPStatus.OK
+            return statement.json, HTTPStatus.OK  # CREATED
 
+        except SBCPaymentException as pay_exception:
+            return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('POST,OPTIONS')
@@ -278,28 +293,28 @@ class RenewalResource(Resource):
         """Renew a financing statement by registration number."""
         try:
             if registration_num is None:
-                return path_param_error_response('registration number')
+                return resource_utils.path_param_error_response('registration number')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'renewalStatement', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR_RENEWAL)
+                return resource_utils.validation_error_response(errors, VAL_ERROR_RENEWAL)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registration_num,
-                                                         'base registration number',
-                                                         request_json['baseRegistrationNumber'])
+                return resource_utils.path_data_mismatch_error_response(registration_num,
+                                                                        'base registration number',
+                                                                        request_json['baseRegistrationNumber'])
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
@@ -307,7 +322,7 @@ class RenewalResource(Resource):
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
-                return base_debtor_invalid_response()
+                return resource_utils.base_debtor_invalid_response()
 
             # TODO: charge a fee.
 
@@ -319,12 +334,14 @@ class RenewalResource(Resource):
                                                       account_id)
             statement.save()
 
-            return statement.json, HTTPStatus.OK
+            return statement.json, HTTPStatus.OK  # CREATED
 
+        except SBCPaymentException as pay_exception:
+            return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('POST,OPTIONS')
@@ -339,28 +356,28 @@ class DischargeResource(Resource):
         """Discharge a financing statement by registration number."""
         try:
             if registration_num is None:
-                return path_param_error_response('registration number')
+                return resource_utils.path_param_error_response('registration number')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
             if not valid_format:
-                return validation_error_response(errors, VAL_ERROR_DISCHARGE)
+                return resource_utils.validation_error_response(errors, VAL_ERROR_DISCHARGE)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
-                return path_data_mismatch_error_response(registration_num,
-                                                         'base registration number',
-                                                         request_json['baseRegistrationNumber'])
+                return resource_utils.path_data_mismatch_error_response(registration_num,
+                                                                        'base registration number',
+                                                                        request_json['baseRegistrationNumber'])
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
@@ -368,9 +385,9 @@ class DischargeResource(Resource):
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
-                return base_debtor_invalid_response()
+                return resource_utils.base_debtor_invalid_response()
 
-            # TODO: charge a fee.
+            # No fee for a discharge.
 
             # Try to save the discharge statement: failure throws a business exception.
             statement = Registration.create_from_json(request_json,
@@ -379,9 +396,9 @@ class DischargeResource(Resource):
                                                       registration_num,
                                                       account_id)
             statement.save()
-            return statement.json, HTTPStatus.OK
+            return statement.json, HTTPStatus.OK  # CREATED
 
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)

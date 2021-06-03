@@ -34,12 +34,11 @@ class ClientCodeHistorical(db.Model):  # pylint: disable=too-many-instance-attri
         BOTH = 'B'
         NAME = 'N'
 
-    __tablename__ = 'client_code_historical'
-    historical_head_id = db.Column('historical_head_id', db.Integer,
-                                   db.Sequence('historical_head_id_seq'), primary_key=True)
+    __tablename__ = 'client_codes_historical'
+    id = db.Column('id', db.Integer, db.Sequence('historical_head_id_seq'), primary_key=True)
     head_id = db.Column('head_id', db.Integer, index=True, nullable=False)
     name = db.Column('name', db.String(150), index=True, nullable=False)
-    historical_type_cd = db.Column('historical_type_cd', db.String(1), nullable=False)
+    historical_type = db.Column('historical_type', db.String(1), nullable=False)
     bconline_account = db.Column('bconline_account', db.Integer, nullable=True)
     # contact info
     contact_name = db.Column('contact_name', db.String(100), nullable=False)
@@ -50,9 +49,9 @@ class ClientCodeHistorical(db.Model):  # pylint: disable=too-many-instance-attri
     date_ts = db.Column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_code.branch_id'), nullable=False)
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('address_ppr.address_id'), nullable=False)
-    id = db.Column('id', db.Integer, db.ForeignKey('users.id'), nullable=True)
+    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=False)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=False)
+    users_id = db.Column('users_id', db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Relationships
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
@@ -87,7 +86,7 @@ class ClientCodeHistorical(db.Model):  # pylint: disable=too-many-instance-attri
         party = None
         if historical_id:
             party = db.session.query(ClientCodeHistorical).\
-                                     filter(ClientCodeHistorical.historical_head_id == historical_id).\
+                                     filter(ClientCodeHistorical.id == historical_id).\
                                      one_or_none()
 
         if party:

@@ -27,10 +27,10 @@ def test_find_by_id(session):
     """Assert that find vehicle collateral by vehicle collateral ID contains all expected elements."""
     collateral = VehicleCollateral.find_by_id(200000000)
     assert collateral
-    assert collateral.vehicle_id == 200000000
+    assert collateral.id == 200000000
     assert collateral.registration_id == 200000000
     assert collateral.financing_id == 200000000
-    assert collateral.vehicle_type_cd == 'MV'
+    assert collateral.vehicle_type == 'MV'
     assert collateral.make
     assert collateral.model
     assert collateral.serial_number
@@ -43,15 +43,15 @@ def test_find_by_financing_id(session):
     collateral = VehicleCollateral.find_by_financing_id(200000000)
     assert collateral
     assert len(collateral) >= 2
-    assert collateral[0].vehicle_id == 200000000
+    assert collateral[0].id == 200000000
     assert collateral[0].registration_id == 200000000
     assert collateral[0].financing_id == 200000000
     assert not collateral[0].registration_id_end
     assert not collateral[0].mhr_number
-    assert collateral[0].vehicle_type_cd
-    assert collateral[1].vehicle_id
+    assert collateral[0].vehicle_type
+    assert collateral[1].id
     assert collateral[1].registration_id
-    assert collateral[1].vehicle_type_cd == 'MH'
+    assert collateral[1].vehicle_type == 'MH'
     assert collateral[1].mhr_number
 
 
@@ -60,12 +60,12 @@ def test_find_by_registration_id(session):
     collateral = VehicleCollateral.find_by_registration_id(200000000)
     assert collateral
     assert len(collateral) == 2
-    assert collateral[0].vehicle_id
+    assert collateral[0].id
     assert collateral[0].registration_id
-    assert collateral[0].vehicle_type_cd
-    assert collateral[1].vehicle_id
+    assert collateral[0].vehicle_type
+    assert collateral[1].id
     assert collateral[1].registration_id
-    assert collateral[1].vehicle_type_cd == 'MH'
+    assert collateral[1].vehicle_type == 'MH'
     assert collateral[1].mhr_number
 
 
@@ -90,8 +90,8 @@ def test_find_by_reg_id_invalid(session):
 def test_vehicle_collateral_json(session):
     """Assert that the general collateral model renders to a json format correctly."""
     collateral = VehicleCollateral(
-        vehicle_id=1000,
-        vehicle_type_cd='MV',
+        id=1000,
+        vehicle_type='MV',
         year=2004,
         make='MAKE',
         model='MODEL',
@@ -100,8 +100,8 @@ def test_vehicle_collateral_json(session):
     )
 
     collateral_json = {
-        'vehicleId': collateral.vehicle_id,
-        'type': collateral.vehicle_type_cd,
+        'vehicleId': collateral.id,
+        'type': collateral.vehicle_type,
         'year': collateral.year,
         'make': collateral.make,
         'model': collateral.model,
@@ -126,7 +126,7 @@ def test_create_from_json(session):
     collateral = VehicleCollateral.create_from_json(json_data, 12345)
     assert collateral
     assert collateral.registration_id == 12345
-    assert collateral.vehicle_type_cd == 'MH'
+    assert collateral.vehicle_type == 'MH'
     assert collateral.serial_number == 'SERIAL'
     assert collateral.year == 2004
     assert collateral.make == 'MAKE'
@@ -142,7 +142,7 @@ def test_create_from_financing_json(session):
     assert len(collateral) == 1
     for c in collateral:
         assert c.registration_id == 12345
-        assert c.vehicle_type_cd
+        assert c.vehicle_type
         assert c.serial_number
 
 
@@ -155,5 +155,5 @@ def test_create_from_statement_json(session):
     for c in collateral:
         assert c.registration_id == 11111
         assert c.financing_id == 22222
-        assert c.vehicle_type_cd
+        assert c.vehicle_type
         assert c.serial_number

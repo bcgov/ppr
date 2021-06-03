@@ -48,13 +48,10 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         FORESTRY_SUBCONTRACTOR_LIEN = 'FS'
         MISCELLANEOUS = 'MR'
 
-    __tablename__ = 'financing_statement'
+    __tablename__ = 'financing_statements'
 
-#    financing_id = db.Column('financing_id', db.Integer, primary_key=True, server_default=db.FetchedValue())
-    financing_id = db.Column('financing_id', db.Integer,
-                             db.Sequence('financing_id_seq'), primary_key=True)
-    state_type_cd = db.Column('state_type_cd', db.String(3), db.ForeignKey('state_type.state_type_cd'), nullable=False)
-    registration_num = db.Column('registration_number', db.String(10), nullable=False)
+    id = db.Column('id', db.Integer, db.Sequence('financing_id_seq'), primary_key=True)
+    state_type = db.Column('state_type', db.String(3), db.ForeignKey('state_types.state_type'), nullable=False)
     life = db.Column('life', db.Integer, nullable=True)
     expire_date = db.Column('expire_date', db.DateTime, nullable=True)
     discharged = db.Column('discharged', db.String(1), nullable=True)
@@ -63,30 +60,23 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     type_claim = db.Column('type_claim', db.String(2), nullable=True)
     crown_charge_type = db.Column('crown_charge_type', db.String(2), nullable=True)
     crown_charge_other = db.Column('crown_charge_other', db.String(70), nullable=True)
-    prev_reg_type = db.Column('prev_reg_type', db.String(30), nullable=True)
-    prev_reg_cr_nbr = db.Column('prev_reg_cr_nbr', db.String(7), nullable=True)
-    prev_reg_cr_date = db.Column('prev_reg_cr_date', db.String(7), nullable=True)
-    prev_reg_cb_nbr = db.Column('prev_reg_cb_nbr', db.String(10), nullable=True)
-    prev_reg_cb_date = db.Column('prev_reg_cb_date', db.String(7), nullable=True)
-    prev_reg_mh_nbr = db.Column('prev_reg_mh_nbr', db.String(7), nullable=True)
-    prev_reg_mh_date = db.Column('prev_reg_mh_date', db.String(7), nullable=True)
 
     # Parent keys
 
     # Relationships
     registration = db.relationship('Registration', order_by='asc(Registration.registration_ts)',
                                    back_populates='financing_statement')
-    parties = db.relationship('Party', order_by='asc(Party.party_id)', back_populates='financing_statement')
+    parties = db.relationship('Party', order_by='asc(Party.id)', back_populates='financing_statement')
     vehicle_collateral = db.relationship('VehicleCollateral',
-                                         order_by='asc(VehicleCollateral.vehicle_id)',
+                                         order_by='asc(VehicleCollateral.id)',
                                          back_populates='financing_statement')
     general_collateral = db.relationship('GeneralCollateral',
-                                         order_by='asc(GeneralCollateral.collateral_id)',
+                                         order_by='asc(GeneralCollateral.id)',
                                          back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
     # Relationships - StateType
-    state_type = db.relationship('StateType', foreign_keys=[state_type_cd],
-                                 back_populates='financing_statement', cascade='all, delete', uselist=False)
+    fin_state_type = db.relationship('StateType', foreign_keys=[state_type],
+                                     back_populates='financing_statement', cascade='all, delete', uselist=False)
 
     # Use to indicate if a party or collateral is not in the original financing statement.
     mark_update_json = False
@@ -97,20 +87,20 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     def json(self) -> dict:
         """Return the financing statement as a json object."""
         statement = {
-            'statusType': self.state_type_cd
+            'statusType': self.state_type
         }
-        if self.state_type_cd == 'HDC':
+        if self.state_type == 'HDC':
             index = len(self.registration) - 1
             statement['dischargedDateTime'] = model_utils.format_ts(self.registration[index].registration_ts)
 
         if self.registration and self.registration[0]:
             reg = self.registration[0]
-            registration_id = reg.registration_id
-            statement['type'] = reg.registration_type_cd
+            registration_id = reg.id
+            statement['type'] = reg.registration_type
             statement['baseRegistrationNumber'] = reg.registration_num
             if reg.registration_type:
-                statement['registrationDescription'] = reg.registration_type.registration_desc
-                statement['registrationAct'] = reg.registration_type.registration_act
+                statement['registrationDescription'] = reg.reg_type.registration_desc
+                statement['registrationAct'] = reg.reg_type.registration_act
 
             statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
 
@@ -132,7 +122,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if vehicle_collateral:
                 statement['vehicleCollateral'] = vehicle_collateral
 
-            if reg.registration_type_cd == model_utils.REG_TYPE_REPAIRER_LIEN:
+            if reg.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
                 if reg.lien_value:
                     statement['lienAmount'] = reg.lien_value
                 if reg.surrender_date:
@@ -157,7 +147,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             statement['expiryDate'] = model_utils.format_ts(self.expire_date)
 
         self.set_court_order_json(statement)
-        return statement
+        return self.set_changes_json(statement)
 
     def set_court_order_json(self, statement):
         """Add court order info to the statement json if generating the current view and court order info exists."""
@@ -166,11 +156,24 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 if registration.court_order:
                     statement['courtOrderInformation'] = registration.court_order.json
 
+    def set_changes_json(self, statement):
+        """Add history of changes in reverse chronological order to financing statement json."""
+        if self.registration and len(self.registration) > 1:
+            changes = []
+            for reg in reversed(self.registration):
+                if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
+                    statement_json = reg.json
+                    statement_json['statementType'] = \
+                        model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
+                    changes.append(statement_json)
+            statement['changes'] = changes
+        return statement
+
     def party_json(self, party_type, registration_id):
         """Build party JSON: current_view_json determines if current or original data is included."""
         if party_type == Party.PartyTypes.REGISTERING_PARTY.value:
             for party in self.parties:
-                if party.party_type_cd == party_type and registration_id == party.registration_id:
+                if party.party_type == party_type and registration_id == party.registration_id:
                     return party.json
             # No registering party record: legacy data.
             return {}
@@ -178,9 +181,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         parties = []
         for party in self.parties:
             party_json = None
-            if party.party_type_cd == party_type or \
+            if party.party_type == party_type or \
                (party_type == Party.PartyTypes.DEBTOR_COMPANY.value and
-                party.party_type_cd == Party.PartyTypes.DEBTOR_INDIVIDUAL.value):
+                party.party_type == Party.PartyTypes.DEBTOR_INDIVIDUAL.value):
                 if not self.current_view_json and party.registration_id == registration_id:
                     party_json = party.json
                 elif self.current_view_json and not party.registration_id_end:
@@ -257,7 +260,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         if self.parties:
             for party in self.parties:
-                if (party.party_type_cd == 'DB' or party.party_type_cd == 'DI') and \
+                if (party.party_type == 'DB' or party.party_type == 'DI') and \
                         not party.registration_id_end:
                     if bus_name and party.business_name and \
                             bus_name == party.business_name.upper():
@@ -265,8 +268,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     else:
                         last_match = (last and party.last_name and last == party.last_name.upper())
                         first_match = (first and party.first_name and first == party.first_name.upper())
-                        middle_match = (not middle and not party.middle_name) or \
-                                       (middle and party.middle_name and middle == party.middle_name.upper())
+                        middle_match = (not middle and not party.middle_initial) or \
+                                       (middle and party.middle_initial and middle == party.middle_initial.upper())
                         if last_match and first_match and middle_match:
                             valid = True
 
@@ -277,9 +280,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         db.session.add(self)
         db.session.commit()
 
-        # Now save draft.registration_id
+        # Now save draft
         draft = self.registration[0].draft
-        draft.registration_id = self.registration[0].registration_id
         db.session.add(draft)
         db.session.commit()
 
@@ -292,23 +294,23 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if staff:
                 statement_list = db.session.query(Registration.registration_ts,
                                                   Registration.registration_num,
-                                                  Registration.registration_type_cd,
-                                                  FinancingStatement.state_type_cd).\
-                                filter(FinancingStatement.financing_id == Registration.financing_id,
+                                                  Registration.registration_type,
+                                                  FinancingStatement.state_type).\
+                                filter(FinancingStatement.id == Registration.financing_id,
                                        Registration.account_id == account_id,
                                        Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
-                                order_by(FinancingStatement.financing_id).all()
+                                order_by(FinancingStatement.id).all()
             else:
                 days_ago = model_utils.now_ts_offset(10, False)
                 statement_list = db.session.query(Registration.registration_ts,
                                                   Registration.registration_num,
-                                                  Registration.registration_type_cd,
-                                                  FinancingStatement.state_type_cd).\
-                                filter(FinancingStatement.financing_id == Registration.financing_id,
+                                                  Registration.registration_type,
+                                                  FinancingStatement.state_type).\
+                                filter(FinancingStatement.id == Registration.financing_id,
                                        Registration.account_id == account_id,
                                        Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN']),
                                        Registration.registration_ts > days_ago).\
-                                order_by(FinancingStatement.financing_id).all()
+                                order_by(FinancingStatement.id).all()
 
         results_json = []
         if not statement_list:
@@ -319,12 +321,12 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         #    )
 
         for statement in statement_list:
-            if staff or statement.state_type_cd == model_utils.STATE_ACTIVE:
+            if staff or statement.state_type == model_utils.STATE_ACTIVE:
                 statement_json = {
                     'matchType': 'EXACT',
                     'createDateTime': model_utils.format_ts(statement.registration_ts),
                     'baseRegistrationNumber': statement.registration_num,
-                    'registrationType': statement.registration_type_cd
+                    'registrationType': statement.registration_type
                 }
                 results_json.append(statement_json)
 
@@ -341,9 +343,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement object by financing ID."""
         statement = None
         if financing_id:
-            # statement = cls.query.get(financing_id)
             statement = db.session.query(FinancingStatement).\
-                        filter(FinancingStatement.financing_id == financing_id).one_or_none()
+                        filter(FinancingStatement.id == financing_id).one_or_none()
 
         return statement
 
@@ -354,11 +355,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
-            # statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
-            #                            Registration.registration_num == registration_num,
-            #                            Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN'])).one_or_none()
             statement = db.session.query(FinancingStatement).\
-                        filter(FinancingStatement.financing_id == Registration.financing_id,
+                        filter(FinancingStatement.id == Registration.financing_id,
                                Registration.registration_num == registration_num,
                                Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
                                one_or_none()
@@ -369,7 +367,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        if not allow_historical and not staff and statement.state_type_cd != model_utils.STATE_ACTIVE:
+        if not allow_historical and not staff and statement.state_type != model_utils.STATE_ACTIVE:
             raise BusinessException(
                 error=f'The Financing Statement for registration number {registration_num} has been discharged.',
                 status_code=HTTPStatus.BAD_REQUEST
@@ -382,22 +380,20 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by financing statement ID."""
         statement = None
         if financing_id:
-            # statement = cls.query.filter(FinancingStatement.financing_id == Registration.financing_id,
-            #                            FinancingStatement.financing_id == financing_id).one_or_none()
             statement = db.session.query(FinancingStatement).\
-                        filter(FinancingStatement.financing_id == Registration.financing_id,
-                               FinancingStatement.financing_id == financing_id).one_or_none()
+                        filter(FinancingStatement.id == Registration.financing_id,
+                               FinancingStatement.id == financing_id).one_or_none()
 
         return statement
 
     @staticmethod
     def create_from_json(json_data, account_id: str):
-        """Create a draft object from a json Draft schema object: map json to db."""
+        """Create a financing statement object from a json Financing Statement schema object: map json to db."""
         # Perform all addtional data validation checks.
         FinancingStatement.validate(json_data)
 
         statement = FinancingStatement()
-        statement.state_type_cd = model_utils.STATE_ACTIVE
+        statement.state_type = model_utils.STATE_ACTIVE
 
         # Do this early as it also checks the party codes and may throw an exception
         statement.parties = Party.create_from_financing_json(json_data, None)
@@ -417,8 +413,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 statement.expire_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
 
         statement.registration = [Registration.create_financing_from_json(json_data, account_id)]
-        statement.registration_num = statement.registration[0].registration_num
-        registration_id = statement.registration[0].registration_id
+        # statement.registration_num = statement.registration[0].registration_num
+        registration_id = statement.registration[0].id
         statement.trust_indenture = TrustIndenture.create_from_json(json_data, registration_id)
         if 'vehicleCollateral' in json_data:
             statement.vehicle_collateral = VehicleCollateral.create_from_financing_json(json_data, registration_id)

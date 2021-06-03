@@ -21,7 +21,7 @@ from ppr_api.models import db
 
 API = Namespace('OPS', description='Service - OPS checks')
 
-SQL = text('select 1 from dual')
+SQL = text('select 1')
 
 
 @API.route('healthz')

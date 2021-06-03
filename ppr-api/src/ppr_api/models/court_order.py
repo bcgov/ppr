@@ -21,19 +21,17 @@ from .db import db
 class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the amendment, renewal statement court order information."""
 
-    __tablename__ = 'court_order'
+    __tablename__ = 'court_orders'
 
-    court_order_id = db.Column('court_order_id', db.Integer,
-                               db.Sequence('court_order_id_seq'), primary_key=True)
-    court_date = db.Column('court_date', db.DateTime, nullable=False)
+    id = db.Column('id', db.Integer, db.Sequence('court_order_id_seq'), primary_key=True)
+    order_date = db.Column('order_date', db.DateTime, nullable=False)
     court_name = db.Column('court_name', db.String(256), nullable=False)
     court_registry = db.Column('court_registry', db.String(64), nullable=False)
     file_number = db.Column('file_number', db.String(20), nullable=False)
     effect_of_order = db.Column('effect_of_order', db.String(512), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registration.registration_id'), nullable=False)
+    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
@@ -46,7 +44,7 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
             'courtName': self.court_name,
             'courtRegistry': self.court_registry,
             'fileNumber': self.file_number,
-            'orderDate': format_ts(self.court_date)
+            'orderDate': format_ts(self.order_date)
         }
         if self.effect_of_order:
             court_order['effectOfOrder'] = self.effect_of_order
@@ -81,7 +79,7 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
         court_order.court_name = json_data['courtName']
         court_order.court_registry = json_data['courtRegistry']
         court_order.file_number = json_data['fileNumber']
-        court_order.court_date = ts_from_date_iso_format(json_data['orderDate'])
+        court_order.order_date = ts_from_date_iso_format(json_data['orderDate'])
         if 'effectOfOrder' in json_data:
             court_order.effect_of_order = json_data['effectOfOrder']
 

@@ -32,9 +32,9 @@ def test_find_by_id(session):
     """Assert that find registration by ID contains all expected elements."""
     registration = Registration.find_by_id(200000000)
     assert registration
-    assert registration.registration_id == 200000000
+    assert registration.id == 200000000
     assert registration.registration_num == 'TEST0001'
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -44,9 +44,9 @@ def test_find_by_id_as(session):
     """Assert that find an amemdment registration by ID contains all expected elements."""
     registration = Registration.find_by_id(200000008)
     assert registration
-    assert registration.registration_id == 200000008
+    assert registration.id == 200000008
     assert registration.registration_num
-    assert registration.registration_type_cd == 'CO'
+    assert registration.registration_type == 'CO'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'CO'
@@ -74,9 +74,9 @@ def test_find_by_id_cs_dt(session):
     """Assert that find an change registration DT by ID contains all expected elements."""
     registration = Registration.find_by_id(200000009)
     assert registration
-    assert registration.registration_id == 200000009
+    assert registration.id == 200000009
     assert registration.registration_num
-    assert registration.registration_type_cd == 'DT'
+    assert registration.registration_type == 'DT'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'DT'
@@ -97,9 +97,9 @@ def test_find_by_id_cs_st(session):
     """Assert that find an change registration ST by ID contains all expected elements."""
     registration = Registration.find_by_id(200000010)
     assert registration
-    assert registration.registration_id == 200000010
+    assert registration.id == 200000010
     assert registration.registration_num
-    assert registration.registration_type_cd == 'ST'
+    assert registration.registration_type == 'ST'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'ST'
@@ -119,9 +119,9 @@ def test_find_by_id_cs_su(session):
     """Assert that find an change registration SU by ID contains all expected elements."""
     registration = Registration.find_by_id(200000011)
     assert registration
-    assert registration.registration_id == 200000011
+    assert registration.id == 200000011
     assert registration.registration_num
-    assert registration.registration_type_cd == 'SU'
+    assert registration.registration_type == 'SU'
     assert registration.financing_id
     json_data = registration.json
     assert json_data['changeType'] == 'SU'
@@ -143,9 +143,9 @@ def test_find_by_registration_num_fs(session):
     """Assert that find a financing statement by registration number contains all expected elements."""
     registration = Registration.find_by_registration_number('TEST0001')
     assert registration
-    assert registration.registration_id == 200000000
+    assert registration.id == 200000000
     assert registration.registration_num == 'TEST0001'
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -155,9 +155,9 @@ def test_find_by_registration_num_ds(session):
     """Assert that find a discharge statement by registration number contains all expected elements."""
     registration = Registration.find_by_registration_number('TEST00D4')
     assert registration
-    assert registration.registration_id == 200000004
+    assert registration.id == 200000004
     assert registration.registration_num == 'TEST00D4'
-    assert registration.registration_type_cd == 'DC'
+    assert registration.registration_type == 'DC'
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -198,15 +198,15 @@ def test_save_discharge(session):
                                                  financing_statement,
                                                  'TEST0003',
                                                  'PS12345')
-    print(str(registration.registration_id))
-    print(registration.document_number)
-    print(registration.registration_num)
-#    print(registration.json)
+    # print(str(registration.id))
+    # print(registration.document_number)
+    # print(registration.registration_num)
+    # print(registration.json)
     registration.save()
     assert registration.financing_id == 200000003
-    assert registration.registration_id
+    assert registration.id
     assert registration.registration_num
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -239,9 +239,9 @@ def test_save_renewal(session):
 #    print(registration.json)
     registration.save()
     assert registration.financing_id == 200000004
-    assert registration.registration_id
+    assert registration.id
     assert registration.registration_num
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -274,9 +274,9 @@ def test_save_renewal_rl(session):
 #    print(registration.json)
     registration.save()
     assert registration.financing_id == 200000001
-    assert registration.registration_id
+    assert registration.id
     assert registration.registration_num
-    assert registration.registration_type_cd
+    assert registration.registration_type
     assert registration.registration_ts
     assert registration.account_id
     assert registration.client_reference_id
@@ -303,18 +303,18 @@ def test_save_amendment(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
-                json_data['deleteDebtors'][0]['partyId'] = party.party_id
-            elif party.party_type_cd == 'SP':
-                json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
+            if party.party_type == 'DB' or party.party_type == 'DI':
+                json_data['deleteDebtors'][0]['partyId'] = party.id
+            elif party.party_type == 'SP':
+                json_data['deleteSecuredParties'][0]['partyId'] = party.id
 
     for gc in financing_statement.general_collateral:
         if gc.registration_id != 200000000 and not gc.registration_id_end:
-            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.collateral_id
+            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.id
 
     for vc in financing_statement.vehicle_collateral:
         if vc.registration_id != 200000000 and not vc.registration_id_end:
-            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
+            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.id
 
     registration = Registration.create_from_json(json_data,
                                                  'AMENDMENT',
@@ -356,18 +356,18 @@ def test_save_amendment_from_draft(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
-                json_data['deleteDebtors'][0]['partyId'] = party.party_id
-            elif party.party_type_cd == 'SP':
-                json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
+            if party.party_type == 'DB' or party.party_type == 'DI':
+                json_data['deleteDebtors'][0]['partyId'] = party.id
+            elif party.party_type == 'SP':
+                json_data['deleteSecuredParties'][0]['partyId'] = party.id
 
     for gc in financing_statement.general_collateral:
         if gc.registration_id != 200000000 and not gc.registration_id_end:
-            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.collateral_id
+            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.id
 
     for vc in financing_statement.vehicle_collateral:
         if vc.registration_id != 200000000 and not vc.registration_id_end:
-            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
+            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.id
 
     # Now create a draft amendment
     draft_json = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)
@@ -400,18 +400,18 @@ def test_save_change(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
-                json_data['deleteDebtors'][0]['partyId'] = party.party_id
-            elif party.party_type_cd == 'SP':
-                json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
+            if party.party_type == 'DB' or party.party_type == 'DI':
+                json_data['deleteDebtors'][0]['partyId'] = party.id
+            elif party.party_type == 'SP':
+                json_data['deleteSecuredParties'][0]['partyId'] = party.id
 
     for gc in financing_statement.general_collateral:
         if gc.registration_id != 200000000 and not gc.registration_id_end:
-            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.collateral_id
+            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.id
 
     for vc in financing_statement.vehicle_collateral:
         if vc.registration_id != 200000000 and not vc.registration_id_end:
-            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
+            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.id
 
     registration = Registration.create_from_json(json_data,
                                                  'CHANGE',
@@ -450,18 +450,18 @@ def test_save_change_from_draft(session):
     assert financing_statement
     for party in financing_statement.parties:
         if party.registration_id != 200000000 and not party.registration_id_end:
-            if party.party_type_cd == 'DB' or party.party_type_cd == 'DI':
-                json_data['deleteDebtors'][0]['partyId'] = party.party_id
-            elif party.party_type_cd == 'SP':
-                json_data['deleteSecuredParties'][0]['partyId'] = party.party_id
+            if party.party_type == 'DB' or party.party_type == 'DI':
+                json_data['deleteDebtors'][0]['partyId'] = party.id
+            elif party.party_type == 'SP':
+                json_data['deleteSecuredParties'][0]['partyId'] = party.id
 
     for gc in financing_statement.general_collateral:
         if gc.registration_id != 200000000 and not gc.registration_id_end:
-            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.collateral_id
+            json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.id
 
     for vc in financing_statement.vehicle_collateral:
         if vc.registration_id != 200000000 and not vc.registration_id_end:
-            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.vehicle_id
+            json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.id
 
     # Now create a draft change
     draft_json = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
