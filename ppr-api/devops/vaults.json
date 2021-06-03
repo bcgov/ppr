@@ -10,7 +10,7 @@
         "application": [
             "jwt",
             "ppr-api",
-            "ppr-oracle",
+            "ppr-postgres",
             "launchdarkly",
             "sentry"
         ]
