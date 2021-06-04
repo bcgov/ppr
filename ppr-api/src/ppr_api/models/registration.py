@@ -580,16 +580,19 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration = Registration()
 
         # generate reg id, reg number. If not existing draft also generate doc number
-        query = "select nextval('registration_id_seq'), get_registration_num(), get_draft_document_number()"
+        query = """
+        select nextval('registration_id_seq') AS reg_id,
+               get_registration_num() AS reg_num,
+               get_draft_document_number() AS doc_num
+        """
         if draft:
-            query = "select nextval('registration_id_seq'), get_registration_num()"
+            query = "select nextval('registration_id_seq') AS reg_id, get_registration_num() AS reg_num"
 
         result = db.session.execute(query)
         row = result.first()
-        values = row.values()
-        registration.id = int(values[0])
-        registration.registration_num = str(values[1])
+        registration.id = int(row._mapping['reg_id'])  # pylint: disable=protected-access; follows documentation
+        registration.registration_num = str(row._mapping['reg_num'])  # pylint: disable=protected-access
         if not draft:
-            registration.document_number = str(values[2])
+            registration.document_number = str(row._mapping['doc_num'])  # pylint: disable=protected-access
 
         return registration

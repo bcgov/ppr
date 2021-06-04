@@ -117,17 +117,17 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         result = db.session.execute(query)
         row = result.first()
         if row is not None:
-            values = row.values()
-            registration_type = str(values[0])
+            mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+            registration_type = str(mapping['registration_type'])
             # Remove state check for now - let the DB view take care of it.
-            timestamp = values[1]
+            timestamp = mapping['base_registration_ts']
             result_json = [{
-                'baseRegistrationNumber': str(values[2]),
-                'matchType': str(values[3]),
+                'baseRegistrationNumber': str(mapping['base_registration_num']),
+                'matchType': str(mapping['match_type']),
                 'createDateTime': model_utils.format_ts(timestamp),
                 'registrationType': registration_type
             }]
-            if reg_num != str(values[2]):
+            if reg_num != str(mapping['base_registration_num']):
                 result_json[0]['registrationNumber'] = reg_num
 
             self.returned_results_size = 1
@@ -153,27 +153,27 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                values = row.values()
-                registration_type = str(values[0])
-                timestamp = values[1]
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                registration_type = str(mapping['registration_type'])
+                timestamp = mapping['base_registration_ts']
                 collateral = {
-                    'type': str(values[2]),
-                    'serialNumber': str(values[3])
+                    'type': str(mapping['serial_type']),
+                    'serialNumber': str(mapping['serial_number'])
                 }
-                value = values[4]
+                value = mapping['year']
                 if value is not None:
                     collateral['year'] = int(value)
-                value = values[5]
+                value = mapping['make']
                 if value is not None:
                     collateral['make'] = str(value)
-                value = values[6]
+                value = mapping['model']
                 if value is not None:
                     collateral['model'] = str(value)
-                match_type = str(values[8])
+                match_type = str(mapping['match_type'])
                 if self.search_type == 'MH':
-                    collateral['manufacturedHomeRegistrationNumber'] = str(values[12])
+                    collateral['manufacturedHomeRegistrationNumber'] = str(mapping['mhr_number'])
                 result_json = {
-                    'baseRegistrationNumber': str(values[7]),
+                    'baseRegistrationNumber': str(mapping['base_registration_num']),
                     'matchType': match_type,
                     'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
@@ -198,16 +198,16 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                values = row.values()
-                registration_type = str(values[0])
-                timestamp = values[1]
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                registration_type = str(mapping['registration_type'])
+                timestamp = mapping['base_registration_ts']
                 debtor = {
-                    'businessName': str(values[2]),
-                    'partyId': int(values[7])
+                    'businessName': str(mapping['business_name']),
+                    'partyId': int(mapping['id'])
                 }
                 result_json = {
-                    'baseRegistrationNumber': str(values[3]),
-                    'matchType': str(values[4]),
+                    'baseRegistrationNumber': str(mapping['base_registration_num']),
+                    'matchType': str(mapping['match_type']),
                     'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
                     'debtor': debtor
@@ -233,23 +233,23 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                values = row.values()
-                registration_type = str(values[0])
-                timestamp = values[1]
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                registration_type = str(mapping['registration_type'])
+                timestamp = mapping['base_registration_ts']
                 person = {
-                    'last': str(values[2]),
-                    'first': str(values[3])
+                    'last': str(mapping['last_name']),
+                    'first': str(mapping['first_name'])
                 }
-                middle = str(values[4])
+                middle = str(mapping['middle_initial'])
                 if middle:
                     person['middle'] = middle
                 debtor = {
                     'personName': person,
-                    'partyId': int(values[5])
+                    'partyId': int(mapping['id'])
                 }
                 result_json = {
-                    'baseRegistrationNumber': str(values[6]),
-                    'matchType': str(values[7]),
+                    'baseRegistrationNumber': str(mapping['base_registration_num']),
+                    'matchType': str(mapping['match_type']),
                     'createDateTime': model_utils.format_ts(timestamp),
                     'registrationType': registration_type,
                     'debtor': debtor
@@ -281,8 +281,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
             result = db.session.execute(count_query)
             row = result.first()
-            values = row.values()
-            self.total_results_size = int(values[0])
+            self.total_results_size = int(row._mapping['query_count'])  # pylint: disable=protected-access
 
     def search(self):
         """Execute a search with the previously set search type and criteria."""
@@ -324,18 +323,18 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    values = row.values()
+                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     search = {
-                        'searchId': str(values[0]),
-                        'searchDateTime': model_utils.format_ts(values[1]),
-                        'searchQuery': values[2],
-                        'totalResultsSize': int(values[3]),
-                        'returnedResultsSize': int(values[4])
+                        'searchId': str(mapping['id']),
+                        'searchDateTime': model_utils.format_ts(mapping['search_ts']),
+                        'searchQuery': mapping['api_criteria'],
+                        'totalResultsSize': int(mapping['total_results_size']),
+                        'returnedResultsSize': int(mapping['returned_results_size'])
                     }
-                    exact_value = values[5]
+                    exact_value = mapping['exact_match_count']
                     if exact_value is not None:
                         search['exactResultsSize'] = int(exact_value)
-                    similar_value = values[6]
+                    similar_value = mapping['similar_match_count']
                     if similar_value is not None:
                         search['selectedResultsSize'] = (int(similar_value) + int(exact_value))
                     else:

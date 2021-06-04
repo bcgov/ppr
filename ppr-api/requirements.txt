@@ -1,6 +1,6 @@
 Babel==2.9.1
 Flask-Babel==2.0.0
-Flask-Migrate==3.0.1
+Flask-Migrate==2.5.3
 Flask-Moment==0.11.0
 Flask-SQLAlchemy==2.5.1
 Flask-Script==2.0.6

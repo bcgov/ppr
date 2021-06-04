@@ -145,7 +145,7 @@ ORDER BY match_type, p.last_name, p.first_name
 
 # Total result count queries for serial number, debtor name searches:
 BUSINESS_NAME_TOTAL_COUNT = """
-SELECT COUNT(r.id)
+SELECT COUNT(r.id) AS query_count
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
@@ -170,7 +170,7 @@ SELECT COUNT(r.id)
 #               AND A.WORD_ID = B.WORD_ID), 85)
 
 INDIVIDUAL_NAME_TOTAL_COUNT = """
-SELECT COUNT(r.id)
+SELECT COUNT(r.id) AS query_count
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
@@ -188,7 +188,7 @@ SELECT COUNT(r.id)
 """
 
 SERIAL_SEARCH_COUNT_BASE = """
-SELECT COUNT(r.id)
+SELECT COUNT(r.id) AS query_count
   FROM registrations r, financing_statements fs, serial_collateral sc
   WHERE r.financing_id = fs.id
     AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
