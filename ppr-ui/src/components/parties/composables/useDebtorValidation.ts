@@ -34,8 +34,18 @@ export const useDebtorValidation = () => {
     return validationResult.succeeded
   } */
 
+  /**
+   * Handles validity events from address sub-components.
+   * @param addressToValidate the address to set the validity of
+   * @param isValid whether the address is valid
+   */
+  const updateValidity = (isValid: boolean): void => {
+
+  }
+
   return {
-    errors
+    errors,
+    updateValidity
     // validateInput,
     // validateCollateralForm
   }

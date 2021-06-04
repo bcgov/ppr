@@ -72,7 +72,8 @@
                 {{ getName(row.item) }}
               </td>
               <td>
-                {{ getFormattedAddress(row.item) }}
+                <span v-html="getFormattedAddress(row.item)">
+                </span>
               </td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->

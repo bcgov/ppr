@@ -21,8 +21,11 @@ export const useParty = () => {
   }
 
   const getFormattedBirthdate = (party: PartyIF): string => {
-    const date = new Date(party.birthDate)
-    return date.toLocaleString('default', { month: 'long' }) + ' ' + date.getDate + ', ' + date.getFullYear
+    if (party.birthDate) {
+      console.log(party.birthDate)
+      const date = new Date(party.birthDate)
+      return date.toLocaleString('default', { month: 'long' }) + ' ' + date.getDate() + ', ' + date.getFullYear()
+    }
   }
 
   return {

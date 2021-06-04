@@ -1,32 +1,46 @@
-import { reactive, toRefs, computed } from '@vue/composition-api'
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { reactive, toRefs, ref } from '@vue/composition-api'
+import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import { Months } from '@/resources/months'
+import { Countries, getCountryRegions } from '@/resources/countriesProvinces'
+import { PartyAddressSchema } from '@/schemas'
+import { LinkedErrors } from '@sentry/browser/dist/integrations'
+
+const initPerson = { first: '', middle: '', last: '' }
+const initAddress = {
+  street: '',
+  streetAdditional: '',
+  city: '',
+  region: '',
+  country: '',
+  postalCode: ''
+}
 
 export const useDebtor = (props, context) => {
   const { setAddSecuredPartiesAndDebtors } = useActions<any>(['setAddSecuredPartiesAndDebtors'])
   const { getAddSecuredPartiesAndDebtors } = useGetters<any>(['getAddSecuredPartiesAndDebtors'])
   const localState = reactive({
-    currentDebtor: {} as PartyIF
+    currentDebtor: { businessName: '', personName: initPerson, birthDate: '', address: initAddress } as PartyIF,
+    year: '',
+    month: '',
+    day: '',
+    months: Months,
+    countries: Countries
   })
 
   const getDebtor = () => {
     const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.value.debtors
     if (props.activeIndex >= 0) {
       localState.currentDebtor = debtors[props.activeIndex]
-    } else {
-      const initPerson = { first: '', middle: '', last: '' }
-      const initAddress = {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: '',
-        country: '',
-        postalCode: ''
+      props.isBusiness = false
+      if (localState.currentDebtor.businessName) {
+        props.isBusiness = true
       }
-      localState.currentDebtor = { businessName: '', personName: initPerson, birthDate: '', address: initAddress }
     }
-    console.log(localState.currentDebtor)
   }
+
+  const provinces = ref(getCountryRegions(localState.currentDebtor.address.country))
+  const addressSchema = PartyAddressSchema
 
   const resetFormAndData = (emitEvent: boolean): void => {
     if (emitEvent) {
@@ -39,9 +53,14 @@ export const useDebtor = (props, context) => {
   }
 
   const addDebtor = () => {
+    if (!props.isBusiness) {
+      const dateOfBirth = new Date()
+      dateOfBirth.setFullYear(parseInt(localState.year), parseInt(localState.month) - 1, parseInt(localState.day))
+      localState.currentDebtor.birthDate = dateOfBirth.toUTCString()
+    }
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.debtors // eslint-disable-line
-    // New vehicle
+    // New debtor
     if (props.activeIndex === -1) {
       // localState.currentDebtor.id = newList.length + 1
       newList.push(localState.currentDebtor)
@@ -55,11 +74,21 @@ export const useDebtor = (props, context) => {
     context.emit('resetEvent')
   }
 
+  /**
+   * Handles update events from address sub-components.
+   */
+  const updateAddress = (newAddress: AddressIF): void => {
+    localState.currentDebtor.address = newAddress
+  }
+
   return {
     getDebtor,
     addDebtor,
     resetFormAndData,
     removeDebtor,
+    provinces,
+    addressSchema,
+    updateAddress,
     ...toRefs(localState)
   }
 }

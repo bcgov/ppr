@@ -33,7 +33,8 @@ export const mockedAddress1: AddressIF = {
   city: 'Victoria',
   region: 'BC',
   country: 'CA',
-  postalCode: 'V8R1L2'
+  postalCode: 'V8R1L2',
+  deliveryInstructions: ''
 }
 
 export const mockedGeneralCollateral1: string = 'TEST1 GENERAL COLLATERAL'

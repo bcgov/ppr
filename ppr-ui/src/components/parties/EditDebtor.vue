@@ -19,6 +19,16 @@
                 class="debtor-form"
                 v-on:submit.prevent="addDebtor"
               >
+              <v-row v-if="isBusiness" no-gutters>
+                    <v-col>
+                     <label class="general-label">Business Legal Name</label>
+                    </v-col>
+                </v-row>
+                <v-row v-else no-gutters>
+                    <v-col>
+                     <label class="general-label">Individual Name</label>
+                    </v-col>
+                </v-row>
                 <v-row v-if="isBusiness" no-gutters>
                     <v-col>
                      <v-text-field
@@ -33,7 +43,7 @@
                     </v-col>
                 </v-row>
                 <v-row v-else no-gutters>
-                    <v-col cols="4">
+                    <v-col cols="4" class="pr-4">
                     <v-text-field
                       filled
                       label="First Name"
@@ -44,7 +54,7 @@
                       :error-messages="errors.first.message ? errors.first.message : ''"
                     />
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="4" class="pr-4">
                     <v-text-field
                       filled
                       label="Middle Name (Optional)"
@@ -65,66 +75,59 @@
                     />
                   </v-col>
                 </v-row>
+                <v-row v-if="!isBusiness" no-gutters>
+                    <v-col>
+                     <label class="general-label">Birthdate</label>
+                    </v-col>
+                </v-row>
+                <v-row v-if="!isBusiness" no-gutters>
+                   <v-col cols="4" class="pr-4">
+                     <v-autocomplete
+                        auto-select-first
+                        :items="months"
+                        filled
+                      label="Month"
+                      item-text="name"
+                      item-value="id"
+                      id="txt-first"
+                      v-model="month"
+                      persistent-hint
+                      ></v-autocomplete>
 
-                <v-row no-gutters>
-                  <v-col>
+                  </v-col>
+                  <v-col cols="4" class="pr-4">
                     <v-text-field
                       filled
-                      id="txt-street"
-                      v-model="currentDebtor.address.street"
-                      :error-messages="errors.street.message ? errors.street.message : ''"
-                      @blur="onBlur('street')"
+                      label="Day"
+                      id="txt-middle"
+                      v-model="day"
                       persistent-hint
                     />
                   </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col>
+                  <v-col cols="4">
                     <v-text-field
                       filled
                       label="Year"
-                      id="txt-street-additional"
-                      v-model="currentDebtor.address.streetAdditional"
-                      @blur="onBlur('streetAdditional')"
+                      id="txt-last"
+                      v-model="year"
                       persistent-hint
-                    />
+                     />
                   </v-col>
                 </v-row>
                 <v-row no-gutters>
-                  <v-col cols="4">
-                    <v-text-field
-                      filled
-                      label="City"
-                      id="txt-city"
-                      v-model="currentDebtor.address.city"
-                      persistent-hint
-                      @blur="onBlur('city')"
-                      :error-messages="errors.city.message ? errors.city.message : ''"
-                    />
-                  </v-col>
-                  <v-col cols="4">
-                    <v-text-field
-                      filled
-                      label="Province"
-                      id="txt-province"
-                      v-model="currentDebtor.address.region"
-                      persistent-hint
-                      @blur="onBlur('region')"
-                      :error-messages="errors.region.message ? errors.region.message : ''"
-                    />
-                  </v-col>
-                  <v-col cols="4">
-                    <v-text-field
-                      filled
-                      label="Postal Code"
-                      id="txt-postal-code"
-                      v-model="currentDebtor.address.postalCode"
-                      persistent-hint
-                      @blur="onBlur('postalCode')"
-                      :error-messages="errors.postalCode.message ? errors.postalCode.message : ''"
-                    />
-                  </v-col>
+                    <v-col>
+                      <label class="general-label">Address</label>
+                    </v-col>
                 </v-row>
+                <base-address ref="regMailingAddress"
+                    id="address-debtor"
+                    :address="currentDebtor.address"
+                    :editing="true"
+                    :schema="addressSchema"
+                    @update:address="updateAddress($event)"
+                    @valid="updateValidity(AddressTypes.MAILING_ADDRESS, $event)"
+                  />
+
                 <v-row>
                   <v-col>
                   <div class="form__row form__btns">
@@ -172,11 +175,14 @@ import {
   defineComponent,
   onMounted
 } from '@vue/composition-api'
-
+import BaseAddress from 'sbc-common-components/src/components/BaseAddress.vue'
 import { useDebtorValidation } from './composables/useDebtorValidation'
 import { useDebtor } from './composables/useDebtor'
 
 export default defineComponent({
+  components: {
+    BaseAddress
+  },
   props: {
     activeIndex: {
       type: Number,
@@ -196,14 +202,24 @@ export default defineComponent({
     const {
       // @ts-ignore - returned by toRef
       currentDebtor,
+      year,
+      month,
+      day,
+      months,
+      countries,
+      provinces,
       getDebtor,
       resetFormAndData,
       removeDebtor,
-      addDebtor
+      addDebtor,
+      addressSchema
     } = useDebtor(props, context)
-    const { errors } = useDebtorValidation()
+    const { errors, updateValidity } = useDebtorValidation()
 
     onMounted(getDebtor)
+
+    const onBlur = (fieldname) => {
+    }
 
     const onSubmitForm = async () => {
       // const isValid = await validateCollateralForm(currentVehicle.value)
@@ -216,9 +232,18 @@ export default defineComponent({
 
     return {
       currentDebtor,
+      year,
+      month,
+      day,
+      months,
+      countries,
+      provinces,
       resetFormAndData,
       removeDebtor,
       onSubmitForm,
+      onBlur,
+      addressSchema,
+      updateValidity,
       errors
     }
   }
