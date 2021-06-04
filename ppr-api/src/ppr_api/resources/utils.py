@@ -63,9 +63,9 @@ def business_exception_response(exception):
 
 
 def pay_exception_response(exception):
-    """Build pay 500 exception error response."""
+    """Build pay 402 exception error response."""
     current_app.logger.error(repr(exception))
-    return jsonify({'message': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({'message': repr(exception)}), HTTPStatus.PAYMENT_REQUIRED
 
 
 def default_exception_response(exception):

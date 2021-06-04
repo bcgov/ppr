@@ -67,7 +67,7 @@ def test_financing_create_valid_sa_201(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
@@ -89,7 +89,7 @@ def test_financing_create_valid_rl_201(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED

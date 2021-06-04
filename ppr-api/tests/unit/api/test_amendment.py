@@ -52,7 +52,7 @@ def test_amendment_invalid_type_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_amendment_valid_co_200(session, client, jwt):
+def test_amendment_valid_co_201(session, client, jwt):
     """Assert that a valid CO type amendment statement returns a 200 status."""
     # setup
     statement = copy.deepcopy(FINANCING_STATEMENT)
@@ -68,7 +68,7 @@ def test_amendment_valid_co_200(session, client, jwt):
 
     rv1 = client.post('/api/v1/financing-statements',
                       json=statement,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                       content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -97,15 +97,15 @@ def test_amendment_valid_co_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/amendments',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
 
     # check
 #    print(rv.json)
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.CREATED
 
 
-def test_amendment_valid_am_200(session, client, jwt):
+def test_amendment_valid_am_201(session, client, jwt):
     """Assert that a valid AM type amendment statement returns a 200 status."""
     # setup
     statement = copy.deepcopy(FINANCING_STATEMENT)
@@ -121,7 +121,7 @@ def test_amendment_valid_am_200(session, client, jwt):
 
     rv1 = client.post('/api/v1/financing-statements',
                       json=statement,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                       content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -150,11 +150,11 @@ def test_amendment_valid_am_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/amendments',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.CREATED
 
 
 def test_amendment_create_invalid_regnum_404(session, client, jwt):
@@ -200,7 +200,7 @@ def test_amendment_nonstaff_missing_account_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_amendment_staff_missing_account_200(session, client, jwt):
+def test_amendment_staff_missing_account_201(session, client, jwt):
     """Assert that an amendment statement request with a staff jwt and no account ID returns a 200 status."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON)
@@ -229,7 +229,7 @@ def test_amendment_staff_missing_account_200(session, client, jwt):
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.CREATED
 
 
 def test_amendment_nonstaff_unauthorized_404(session, client, jwt):

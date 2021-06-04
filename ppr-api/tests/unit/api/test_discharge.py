@@ -29,7 +29,7 @@ from tests.unit.services.utils import create_header_account, create_header
 SAMPLE_JSON = copy.deepcopy(DISCHARGE_STATEMENT)
 
 
-def test_discharge_valid_200(session, client, jwt):
+def test_discharge_valid_201(session, client, jwt):
     """Assert that a valid create statement returns a 200 status."""
     # setup - create a financing statement as the base registration, then a discharge
     statement = copy.deepcopy(FINANCING_STATEMENT)
@@ -45,7 +45,7 @@ def test_discharge_valid_200(session, client, jwt):
 
     rv1 = client.post('/api/v1/financing-statements',
                       json=statement,
-                      headers=create_header_account(jwt, [PPR_ROLE]),
+                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                       content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -61,10 +61,10 @@ def test_discharge_valid_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/discharges',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.CREATED
 
 
 def test_discharge_invalid_missing_basedebtor_400(session, client, jwt):
@@ -163,7 +163,7 @@ def test_discharge_nonstaff_missing_account_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_discharge_staff_missing_account_200(session, client, jwt):
+def test_discharge_staff_missing_account_201(session, client, jwt):
     """Assert that a discharge statement request with a staff jwt and no account ID returns a 200 status."""
     # setup
     json_data = copy.deepcopy(SAMPLE_JSON)
@@ -180,7 +180,7 @@ def test_discharge_staff_missing_account_200(session, client, jwt):
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.CREATED
 
 
 def test_discharge_nonstaff_unauthorized_401(session, client, jwt):

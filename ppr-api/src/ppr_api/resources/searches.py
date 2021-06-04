@@ -33,6 +33,9 @@ from ppr_api.resources import utils as resource_utils
 
 API = Namespace('searches', description='Endpoints for PPR searches.')
 VAL_ERROR = 'Search request data validation errors.'  # Validation error prefix
+SAVE_ERROR_MESSAGE = 'Account {0} search db save failed: {1}'
+PAY_REFUND_MESSAGE = 'Account {0} search refunding payment for invoice {1}.'
+PAY_REFUND_ERROR = 'Account {0} search payment refund failed for invoice {1}: {2}.'
 
 
 @cors_preflight('POST,OPTIONS')
@@ -67,6 +70,7 @@ class SearchResource(Resource):
             query = SearchRequest.create_from_json(request_json, account_id)
 
             # Charge a search fee.
+            invoice_id = None
             if account_id:
                 payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
                 pay_ref = payment.create_payment(TransactionTypes.SEARCH.value, 1, None, query.client_reference_id)
@@ -86,13 +90,14 @@ class SearchResource(Resource):
                 search_result.save()
 
             except Exception as db_exception:   # noqa: B902; handle all db related errors.
-                current_app.logger.error(f'Search {account_id} db save failed: ' + repr(db_exception))
-                current_app.logger.error(f'Search {account_id} rolling back payment for invoice {invoice_id}.')
-                try:
-                    payment.cancel_payment(invoice_id)
-                except Exception as cancel_exception:   # noqa: B902; log exception
-                    current_app.logger.error(f'Search {account_id} payment refund failed for invoice {invoice_id}: ' +
-                                             repr(cancel_exception))
+                current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, repr(db_exception)))
+                if account_id and invoice_id is not None:
+                    current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, invoice_id))
+                    try:
+                        payment.cancel_payment(invoice_id)
+                    except Exception as cancel_exception:   # noqa: B902; log exception
+                        current_app.logger.error(PAY_REFUND_ERROR.format(account_id, invoice_id,
+                                                                         repr(cancel_exception)))
 
                 raise db_exception
 
