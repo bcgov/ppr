@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """This exports all of the models and schemas used by the application."""
+# flake8: noqa I001
 from .db import db
 from .address import Address
 from .client_code import ClientCode
