@@ -216,30 +216,12 @@ class AmendmentResource(Resource):
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # Set up registration and pay.
-            registration = setup_registration_pay(request_json,
-                                                  model_utils.REG_CLASS_AMEND,
-                                                  statement,
-                                                  registration_num,
-                                                  account_id)
-            invoice_id = str(registration.pay_invoice_id)
-
-            # Try to save the amendment statement: failure throws an exception.
-            try:
-                registration.save()
-            except Exception as db_exception:   # noqa: B902; handle all db related errors.
-                current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'amendment', repr(db_exception)))
-                if account_id and invoice_id is not None:
-                    current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'amendment', invoice_id))
-                    try:
-                        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-                        payment.cancel_payment(invoice_id)
-                    except SBCPaymentException as cancel_exception:
-                        current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'amendment', invoice_id,
-                                                                         repr(cancel_exception)))
-                raise db_exception
-
-            return registration.json, HTTPStatus.CREATED
+            # Set up the registration, pay, and save the data.
+            return pay_and_save(request_json,
+                                model_utils.REG_CLASS_AMEND,
+                                statement,
+                                registration_num,
+                                account_id)
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -292,30 +274,12 @@ class ChangeResource(Resource):
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # Set up registration and pay.
-            registration = setup_registration_pay(request_json,
-                                                  model_utils.REG_CLASS_CHANGE,
-                                                  statement,
-                                                  registration_num,
-                                                  account_id)
-            invoice_id = str(registration.pay_invoice_id)
-
-            # Try to save the change statement: failure throws an exception.
-            try:
-                registration.save()
-            except Exception as db_exception:   # noqa: B902; handle all db related errors.
-                current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'change', repr(db_exception)))
-                if account_id and invoice_id is not None:
-                    current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'change', invoice_id))
-                    try:
-                        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-                        payment.cancel_payment(invoice_id)
-                    except SBCPaymentException as cancel_exception:
-                        current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'change', invoice_id,
-                                                                         repr(cancel_exception)))
-                raise db_exception
-
-            return registration.json, HTTPStatus.CREATED
+            # Set up the registration, pay, and save the data.
+            return pay_and_save(request_json,
+                                model_utils.REG_CLASS_CHANGE,
+                                statement,
+                                registration_num,
+                                account_id)
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -368,30 +332,12 @@ class RenewalResource(Resource):
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # Set up registration and pay.
-            registration = setup_registration_pay(request_json,
-                                                  model_utils.REG_CLASS_RENEWAL,
-                                                  statement,
-                                                  registration_num,
-                                                  account_id)
-            invoice_id = str(registration.pay_invoice_id)
-
-            # Try to save the renewal statement: failure throws an exception.
-            try:
-                registration.save()
-            except Exception as db_exception:   # noqa: B902; handle all db related errors.
-                current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'renewal', repr(db_exception)))
-                if account_id and invoice_id is not None:
-                    current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'renewal', invoice_id))
-                    try:
-                        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-                        payment.cancel_payment(invoice_id)
-                    except SBCPaymentException as cancel_exception:
-                        current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'renewal', invoice_id,
-                                                                         repr(cancel_exception)))
-                raise db_exception
-
-            return registration.json, HTTPStatus.CREATED
+            # Set up the registration, pay, and save the data.
+            return pay_and_save(request_json,
+                                model_utils.REG_CLASS_RENEWAL,
+                                statement,
+                                registration_num,
+                                account_id)
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -460,13 +406,14 @@ class DischargeResource(Resource):
             return resource_utils.default_exception_response(default_exception)
 
 
-def setup_registration_pay(request_json, registration_class, financing_statement, registration_num, account_id):
-    """Set up the registration and optionally pay."""
+def pay_and_save(request_json, registration_class, financing_statement, registration_num, account_id):
+    """Set up the registration, pay if there is an account id, and save the data."""
     registration = Registration.create_from_json(request_json,
                                                  registration_class,
                                                  financing_statement,
                                                  registration_num,
                                                  account_id)
+    invoice_id = None
     if account_id:
         fee_code = TransactionTypes.CHANGE.value
         fee_quantity = registration.life
@@ -480,7 +427,23 @@ def setup_registration_pay(request_json, registration_class, financing_statement
 
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
         pay_ref = payment.create_payment(fee_code, fee_quantity, None, registration.client_reference_id)
-        registration.pay_invoice_id = int(pay_ref['invoiceId'])
+        invoice_id = pay_ref['invoiceId']
+        registration.pay_invoice_id = int(invoice_id)
         registration.pay_path = pay_ref['receipt']
 
-    return registration
+    # Try to save the registration: failure will rollback the payment if one was made.
+    try:
+        registration.save()
+    except Exception as db_exception:   # noqa: B902; handle all db related errors.
+        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, repr(db_exception)))
+        if account_id and invoice_id is not None:
+            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, registration_class, invoice_id))
+            try:
+                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+                payment.cancel_payment(invoice_id)
+            except SBCPaymentException as cancel_exception:
+                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id,
+                                                                 repr(cancel_exception)))
+        raise db_exception
+
+    return registration.json, HTTPStatus.CREATED

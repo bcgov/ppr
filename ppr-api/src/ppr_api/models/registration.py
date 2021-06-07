@@ -218,6 +218,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if collateral:
                 registration['deleteVehicleCollateral'] = collateral
 
+        return self.set_payment_json(registration)
+
+    def set_payment_json(self, registration):
+        """Add registration payment info json if payment exists."""
+        if self.pay_invoice_id and self.pay_path:
+            payment = {
+                'invoiceId': str(self.pay_invoice_id),
+                'receipt': self.pay_path
+            }
+            registration['payment'] = payment
         return registration
 
     def save(self):
