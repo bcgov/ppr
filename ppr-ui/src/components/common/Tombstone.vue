@@ -1,5 +1,5 @@
 <template>
-  <div id="tombstone">
+  <div id="tombstone" class="white">
       <div :class="$style['breadcrumb-row']">
       <v-container fluid class="pt-2 pb-2">
         <v-row no-gutters>
@@ -8,7 +8,7 @@
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
           </v-col>
-            <v-col cols="auto" class="pl-3">
+            <v-col cols="auto" class="pl-3 pt-1">
         <v-breadcrumbs class="pa-0" :items="breadcrumbs">
           <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="item.href">
             <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
@@ -25,10 +25,10 @@
       </v-container>
       </div>
 
-      <v-container id="tombstone-header" fluid class="pt-4">
+      <v-container id="tombstone-header" fluid class="pt-6 pb-0">
       <span :class="$style['tombstone-header']"><b>{{ header }}</b></span>
       </v-container>
-      <v-container fluid id="tombstone-user-info" :class="[$style['tombstone-sub-header'], 'pt-4']">
+      <v-container fluid id="tombstone-user-info" :class="[$style['tombstone-sub-header'], 'pt-4', 'pb-6']">
         <v-row no-gutters>
       <v-col cols="10">
         <v-row no-gutters>

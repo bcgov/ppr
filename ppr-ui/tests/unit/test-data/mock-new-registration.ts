@@ -93,6 +93,13 @@ export const mockedDebtors1: Array<PartyIF> = [
   }
 ]
 
+export const mockedDebtors2: Array<PartyIF> = [
+  {
+    businessName: 'SOMEBODYS BUSINESS',
+    address: mockedAddress1
+  }
+]
+
 export const mockedNewRegStep1: LengthTrustIF = {
   valid: false,
   lifeYears: 5,

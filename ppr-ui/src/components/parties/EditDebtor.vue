@@ -9,7 +9,7 @@
             >
               <span v-if="activeIndex === -1" class="pl-5">Add</span>
               <span v-else>Edit</span>
-              <span v-if="isBusiness"> Business</span>
+              <span v-if="currentIsBusiness"> Business</span>
               <span v-else> Individual Debtor</span>
             </label>
         </v-col>
@@ -19,7 +19,7 @@
                 class="debtor-form"
                 v-on:submit.prevent="addDebtor"
               >
-              <v-row v-if="isBusiness" no-gutters>
+              <v-row v-if="currentIsBusiness" no-gutters>
                     <v-col>
                      <label class="general-label">Business Legal Name</label>
                     </v-col>
@@ -29,17 +29,23 @@
                      <label class="general-label">Individual Name</label>
                     </v-col>
                 </v-row>
-                <v-row v-if="isBusiness" no-gutters>
+                <v-row v-if="currentIsBusiness" no-gutters>
                     <v-col>
                      <v-text-field
                       filled
-                      id="txt-nane"
+                      id="txt-name"
                       label="Business Legal Name"
-                      v-model="currentDebtor.businessName"
+                      v-model="searchValue"
                       :error-messages="errors.businessName.message ?
                       errors.businessName.message : ''"
                       persistent-hint
+                      :hide-details="hideDetails"
                     />
+                    <auto-complete :searchValue="autoCompleteSearchValue"
+                       :setAutoCompleteIsActive="autoCompleteIsActive"
+                       @search-value="setSearchValue"
+                       @hide-details="setHideDetails">
+                    </auto-complete>
                     </v-col>
                 </v-row>
                 <v-row v-else no-gutters>
@@ -75,23 +81,22 @@
                     />
                   </v-col>
                 </v-row>
-                <v-row v-if="!isBusiness" no-gutters>
+                <v-row v-if="!currentIsBusiness" no-gutters>
                     <v-col>
                      <label class="general-label">Birthdate</label>
                     </v-col>
                 </v-row>
-                <v-row v-if="!isBusiness" no-gutters>
+                <v-row v-if="!currentIsBusiness" no-gutters>
                    <v-col cols="4" class="pr-4">
                      <v-autocomplete
                         auto-select-first
                         :items="months"
                         filled
                       label="Month"
-                      item-text="name"
-                      item-value="id"
-                      id="txt-first"
+                      id="txt-month"
                       v-model="month"
                       persistent-hint
+                      return-object
                       ></v-autocomplete>
 
                   </v-col>
@@ -99,7 +104,7 @@
                     <v-text-field
                       filled
                       label="Day"
-                      id="txt-middle"
+                      id="txt-day"
                       v-model="day"
                       persistent-hint
                     />
@@ -108,7 +113,7 @@
                     <v-text-field
                       filled
                       label="Year"
-                      id="txt-last"
+                      id="txt-year"
                       v-model="year"
                       persistent-hint
                      />
@@ -119,14 +124,14 @@
                       <label class="general-label">Address</label>
                     </v-col>
                 </v-row>
-                <base-address ref="regMailingAddress"
+                <!-- <base-address ref="regMailingAddress"
                     id="address-debtor"
                     :address="currentDebtor.address"
                     :editing="true"
                     :schema="addressSchema"
                     @update:address="updateAddress($event)"
-                    @valid="updateValidity(AddressTypes.MAILING_ADDRESS, $event)"
-                  />
+                    @valid="updateValidity($event)"
+                  /> -->
 
                 <v-row>
                   <v-col>
@@ -173,15 +178,20 @@
 <script lang="ts">
 import {
   defineComponent,
-  onMounted
+  onMounted,
+  watch,
+  reactive,
+  toRefs
 } from '@vue/composition-api'
-import BaseAddress from 'sbc-common-components/src/components/BaseAddress.vue'
+// import BaseAddress from 'sbc-common-components/src/components/BaseAddress.vue'
 import { useDebtorValidation } from './composables/useDebtorValidation'
 import { useDebtor } from './composables/useDebtor'
+import AutoComplete from '@/components/search/AutoComplete.vue'
 
 export default defineComponent({
   components: {
-    BaseAddress
+    // BaseAddress,
+    AutoComplete
   },
   props: {
     activeIndex: {
@@ -200,51 +210,84 @@ export default defineComponent({
   emits: ['addEditDebtor', 'resetEvent'],
   setup (props, context) {
     const {
-      // @ts-ignore - returned by toRef
       currentDebtor,
       year,
-      month,
       day,
+      monthValue,
       months,
-      countries,
-      provinces,
+      currentIsBusiness,
       getDebtor,
+      getMonthObject,
       resetFormAndData,
       removeDebtor,
       addDebtor,
+      updateAddress,
       addressSchema
     } = useDebtor(props, context)
+
     const { errors, updateValidity } = useDebtorValidation()
 
-    onMounted(getDebtor)
+    const localState = reactive({
+      autoCompleteIsActive: true,
+      autoCompleteSearchValue: '',
+      searchValue: '',
+      hideDetails: false,
+      month: { value: 0, text: '' }
+    })
 
     const onBlur = (fieldname) => {
     }
 
     const onSubmitForm = async () => {
-      // const isValid = await validateCollateralForm(currentVehicle.value)
-      // if (!isValid) {
-      //  return
-      // }
-
       addDebtor()
     }
+
+    const setSearchValue = (searchValueTyped: string) => {
+      localState.autoCompleteIsActive = false
+      localState.searchValue = searchValueTyped
+      currentDebtor.value.businessName = searchValueTyped
+    }
+
+    const setHideDetails = (hideDetails: boolean) => {
+      localState.hideDetails = hideDetails
+    }
+
+    onMounted(() => {
+      getDebtor()
+      setSearchValue(currentDebtor.value.businessName)
+      localState.month = getMonthObject()
+    })
+
+    watch(() => localState.searchValue, (val: string) => {
+      localState.autoCompleteSearchValue = val
+      // show autocomplete results when there is a searchValue
+      localState.autoCompleteIsActive = val !== ''
+      currentDebtor.value.businessName = val
+    })
+
+    watch(() => localState.month, (currentValue) => {
+      if (currentValue) {
+        monthValue.value = currentValue.value
+      }
+    })
 
     return {
       currentDebtor,
       year,
-      month,
       day,
       months,
-      countries,
-      provinces,
+      currentIsBusiness,
       resetFormAndData,
       removeDebtor,
       onSubmitForm,
+      setSearchValue,
+      setHideDetails,
       onBlur,
       addressSchema,
+      updateAddress,
       updateValidity,
-      errors
+      errors,
+      ...toRefs(localState)
     }
   }
 })
