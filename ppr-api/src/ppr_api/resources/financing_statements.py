@@ -17,7 +17,7 @@
 
 from http import HTTPStatus
 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
@@ -27,11 +27,9 @@ from ppr_api.models import utils as model_utils
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_staff
 from ppr_api.services.payment.exceptions import SBCPaymentException
+from ppr_api.services.payment.payment import Payment, TransactionTypes
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-
-
-# from ppr_api.services.payment.payment import Payment, TransactionTypes
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -41,6 +39,9 @@ VAL_ERROR_AMEND = 'Amendment Statement request data validation errors.'  # Amend
 VAL_ERROR_CHANGE = 'Change Statement request data validation errors.'  # Change validation error prefix
 VAL_ERROR_RENEWAL = 'Renewal Statement request data validation errors.'  # Renewal validation error prefix
 VAL_ERROR_DISCHARGE = 'Discharge Statement request data validation errors.'  # Discharge validation error prefix
+SAVE_ERROR_MESSAGE = 'Account {0} create {1} statement db save failed: {2}'
+PAY_REFUND_MESSAGE = 'Account {0} create {1} statement refunding payment for invoice {2}.'
+PAY_REFUND_ERROR = 'Account {0} create {1} statement payment refund failed for invoice {2}: {3}.'
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -98,17 +99,33 @@ class FinancingResource(Resource):
 
             # Charge a fee.
             statement = FinancingStatement.create_from_json(request_json, account_id)
-            # if account_id:
-            #    fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value
-            #    fee_quantity = 1
-            #    payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-            #    pay_ref = payment.create_payment(fee_code, fee_quantity, None, statement.client_reference_id)
-            #    invoice_id = pay_ref['invoiceId']
-            #    statement.pay_invoice_id = int(invoice_id)
-            #    statement.pay_path = pay_ref['receipt']
+            invoice_id = None
+            if account_id:
+                fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value
+                fee_quantity = statement.life
+                if statement.life == model_utils.LIFE_INFINITE:
+                    fee_quantity = 1
+                    fee_code = TransactionTypes.FINANCING_INFINITE.value
+                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+                pay_ref = payment.create_payment(fee_code, fee_quantity, None,
+                                                 statement.registration[0].client_reference_id)
+                invoice_id = pay_ref['invoiceId']
+                statement.registration[0].pay_invoice_id = int(invoice_id)
+                statement.registration[0].pay_path = pay_ref['receipt']
 
-            # Try to save the financing statement: failure throws a business exception.
-            statement.save()
+            # Try to save the financing statement: failure throws an exception.
+            try:
+                statement.save()
+            except Exception as db_exception:   # noqa: B902; handle all db related errors.
+                current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'financing', repr(db_exception)))
+                if account_id and invoice_id is not None:
+                    current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'financing', invoice_id))
+                    try:
+                        payment.cancel_payment(invoice_id)
+                    except SBCPaymentException as cancel_exception:
+                        current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'financing', invoice_id,
+                                                                         repr(cancel_exception)))
+                raise db_exception
 
             return statement.json, HTTPStatus.CREATED
 
@@ -144,9 +161,10 @@ class GetFinancingResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch financing statement by registration number
-            # Not found or non-staff historical throws a business exception.
+            # Not found throws a business exception.
             statement = FinancingStatement.find_by_registration_number(registration_num,
-                                                                       is_staff(jwt))
+                                                                       is_staff(jwt),
+                                                                       True)
             return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:
@@ -198,17 +216,12 @@ class AmendmentResource(Resource):
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # TODO: charge a fee.
-
-            # Try to save the amendment statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json,
-                                                      model_utils.REG_CLASS_AMEND,
-                                                      statement,
-                                                      registration_num,
-                                                      account_id)
-            statement.save()
-
-            return statement.json, HTTPStatus.OK  # CREATED
+            # Set up the registration, pay, and save the data.
+            return pay_and_save(request_json,
+                                model_utils.REG_CLASS_AMEND,
+                                statement,
+                                registration_num,
+                                account_id)
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -261,17 +274,12 @@ class ChangeResource(Resource):
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # TODO: charge a fee.
-
-            # Try to save the change statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json,
-                                                      model_utils.REG_CLASS_CHANGE,
-                                                      statement,
-                                                      registration_num,
-                                                      account_id)
-            statement.save()
-
-            return statement.json, HTTPStatus.OK  # CREATED
+            # Set up the registration, pay, and save the data.
+            return pay_and_save(request_json,
+                                model_utils.REG_CLASS_CHANGE,
+                                statement,
+                                registration_num,
+                                account_id)
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -324,17 +332,12 @@ class RenewalResource(Resource):
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # TODO: charge a fee.
-
-            # Try to save the renewal statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json,
-                                                      model_utils.REG_CLASS_RENEWAL,
-                                                      statement,
-                                                      registration_num,
-                                                      account_id)
-            statement.save()
-
-            return statement.json, HTTPStatus.OK  # CREATED
+            # Set up the registration, pay, and save the data.
+            return pay_and_save(request_json,
+                                model_utils.REG_CLASS_RENEWAL,
+                                statement,
+                                registration_num,
+                                account_id)
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -388,7 +391,6 @@ class DischargeResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
 
             # No fee for a discharge.
-
             # Try to save the discharge statement: failure throws a business exception.
             statement = Registration.create_from_json(request_json,
                                                       model_utils.REG_CLASS_DISCHARGE,
@@ -396,9 +398,52 @@ class DischargeResource(Resource):
                                                       registration_num,
                                                       account_id)
             statement.save()
-            return statement.json, HTTPStatus.OK  # CREATED
+            return statement.json, HTTPStatus.CREATED
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
+
+
+def pay_and_save(request_json, registration_class, financing_statement, registration_num, account_id):
+    """Set up the registration, pay if there is an account id, and save the data."""
+    registration = Registration.create_from_json(request_json,
+                                                 registration_class,
+                                                 financing_statement,
+                                                 registration_num,
+                                                 account_id)
+    invoice_id = None
+    if account_id:
+        fee_code = TransactionTypes.CHANGE.value
+        fee_quantity = registration.life
+        if registration_class == model_utils.REG_CLASS_AMEND:
+            fee_code = TransactionTypes.AMENDMENT.value
+        elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
+            fee_quantity = 1
+            fee_code = TransactionTypes.RENEWAL_INFINITE.value
+        elif registration_class == model_utils.REG_CLASS_RENEWAL:
+            fee_code = TransactionTypes.RENEWAL_LIFE_YEAR.value
+
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+        pay_ref = payment.create_payment(fee_code, fee_quantity, None, registration.client_reference_id)
+        invoice_id = pay_ref['invoiceId']
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
+
+    # Try to save the registration: failure will rollback the payment if one was made.
+    try:
+        registration.save()
+    except Exception as db_exception:   # noqa: B902; handle all db related errors.
+        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, repr(db_exception)))
+        if account_id and invoice_id is not None:
+            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, registration_class, invoice_id))
+            try:
+                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+                payment.cancel_payment(invoice_id)
+            except SBCPaymentException as cancel_exception:
+                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id,
+                                                                 repr(cancel_exception)))
+        raise db_exception
+
+    return registration.json, HTTPStatus.CREATED

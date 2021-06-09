@@ -29,12 +29,13 @@ MSG_INVALID_HTTP_VERB = 'Invalid HTTP verb'
 
 # Mapping from PPR transaction to Pay API filing type
 TRANSACTION_TO_FILING_TYPE = {
-    'AMENDMENT': '',
-    'CHANGE': '',
+    'AMENDMENT': 'FSCHG',
+    'CHANGE': 'FSCHG',
     'DISCHARGE': '',
     'FINANCING_LIFE_YEAR': 'FSREG',
     'FINANCING_INFINITE': 'INFRG',
-    'RENEWAL_LIFE_YEAR': '',
+    'RENEWAL_LIFE_YEAR': 'FSREN',
+    'RENEWAL_INFINITE': 'INFRN',
     'SEARCH': 'SERCH'
 }
 
@@ -79,7 +80,7 @@ class ApiClientException(Exception):
         self.body = body
         self.err = wrapped_err
         if wrapped_err:
-            self.message = '{msg}\r\n\r\n{desc}'.format(msg=message, desc=str(wrapped_err))
+            self.message = '{msg}: {desc}'.format(msg=message, desc=str(wrapped_err))
         else:
             self.message = message
         # Map HTTP status if the wrapped error has an HTTP status code

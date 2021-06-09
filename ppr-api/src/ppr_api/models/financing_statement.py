@@ -147,6 +147,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             statement['expiryDate'] = model_utils.format_ts(self.expire_date)
 
         self.set_court_order_json(statement)
+        self.set_payment_json(statement)
         return self.set_changes_json(statement)
 
     def set_court_order_json(self, statement):
@@ -167,6 +168,16 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                         model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
                     changes.append(statement_json)
             statement['changes'] = changes
+        return statement
+
+    def set_payment_json(self, statement):
+        """Add financing statement payment info json if payment exists."""
+        if self.registration and self.registration[0].pay_invoice_id:
+            payment = {
+                'invoiceId': str(self.registration[0].pay_invoice_id),
+                'receipt': self.registration[0].pay_path
+            }
+            statement['payment'] = payment
         return statement
 
     def party_json(self, party_type, registration_id):
