@@ -98,7 +98,7 @@ describe('Collateral store tests', () => {
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    expect(item1.querySelectorAll('td')[2].textContent).toContain('June 15, 1990')
+    expect(item1.querySelectorAll('td')[2].textContent).toContain('June 16, 1990')
 
   })
 })
