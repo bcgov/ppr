@@ -8,7 +8,8 @@
                    id="registration-header"
                    class="length-trust-header pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
-                <b>{{ registrationTypeUI }}</b>
+<h1>{{ registrationTypeUI }}</h1>
+
               </v-col>
             </v-row>
             <stepper class="mt-4" />

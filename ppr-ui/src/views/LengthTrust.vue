@@ -10,11 +10,12 @@
               class="length-trust-header pt-3 pb-3 soft-corners-top"
             >
               <v-col cols="auto">
-                <b>{{ registrationTypeUI }}</b>
+<h1>{{ registrationTypeUI }}</h1>
+
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <v-row no-gutters class="pt-6">
+            <v-row no-gutters class="pt-10">
               <v-col cols="auto" class="sub-header">
                 Registration Length and Trust Indenture
               </v-col>

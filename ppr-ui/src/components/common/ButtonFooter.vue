@@ -20,11 +20,12 @@
       <v-col cols="3" justify="end">
         <span class="pr-3" v-if="buttonConfig.showBack">
           <v-btn id='reg-back-btn' outlined color="primary" @click="submitBack">
-            &lt; Back
+<v-icon color="white">mdi-chevron-left</v-icon> Back
+
           </v-btn>
         </span>
-        <v-btn id='reg-next-btn' color="primary" @click="submitNext">
-          {{buttonConfig.nextText}} >
+        <v-btn id='reg-next-btn' color="primary" class="float-right" @click="submitNext">
+          {{buttonConfig.nextText}} <v-icon color="white">mdi-chevron-right</v-icon>
         </v-btn>
       </v-col>
     </v-row>
@@ -185,4 +186,5 @@ export default defineComponent({
   color: white;
   font-size: 1.125rem;
 }
+
 </style>
