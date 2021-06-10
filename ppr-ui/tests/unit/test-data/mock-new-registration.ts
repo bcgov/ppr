@@ -33,7 +33,8 @@ export const mockedAddress1: AddressIF = {
   city: 'Victoria',
   region: 'BC',
   country: 'CA',
-  postalCode: 'V8R1L2'
+  postalCode: 'V8R1L2',
+  deliveryInstructions: ''
 }
 
 export const mockedGeneralCollateral1: string = 'TEST1 GENERAL COLLATERAL'
@@ -88,6 +89,13 @@ export const mockedDebtors1: Array<PartyIF> = [
       middle: '1'
     },
     birthDate: '1990-06-15T16:42:00-08:00',
+    address: mockedAddress1
+  }
+]
+
+export const mockedDebtors2: Array<PartyIF> = [
+  {
+    businessName: 'SOMEBODYS BUSINESS',
     address: mockedAddress1
   }
 ]

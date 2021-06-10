@@ -6,5 +6,6 @@ export interface AddressIF {
   city: string, // Max length 30
   region: string, // Length 2 province/state code.
   country: string, // Length 2 couuntry code.
-  postalCode: string // Max length 15
+  postalCode: string, // Max length 15
+  deliveryInstructions: string
 }

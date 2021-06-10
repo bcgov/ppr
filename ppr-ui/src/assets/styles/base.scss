@@ -69,7 +69,7 @@ h2 {
 }
 
 h3 {
-  font-size: 0.95rem;   
+  font-size: 16px;   
   font-weight: 700;
   line-height: 2.25rem;
 }
@@ -338,4 +338,8 @@ span.invalid-message {
 .generic-label {
   color: $gray9;
   font-weight: bold;
+}
+
+.remove.theme--light.v-btn.v-btn--disabled {
+  color: rgba(211, 39, 44, 0.4) !important;
 }

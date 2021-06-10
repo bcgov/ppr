@@ -26,6 +26,7 @@
     "sinon": "^9.2.4",
     "vue": "^2.6.12",
     "vue-affix": "^0.5.2",
+    "vue-plugin-helper-decorator": "^0.0.12",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.5.1",
     "vuetify": "2.3.10",

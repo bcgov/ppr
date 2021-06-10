@@ -1,10 +1,6 @@
 <template>
   <v-container fluid class="pa-0 ma-0" style="max-width: none;">
-    <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: #FCBA19;" align="center" justify="center">
-      <v-col :class="$style['env-info']">
-        This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
-      </v-col>
-    </v-row>
+
     <v-row no-gutters>
       <v-container fluid class="py-10">
         <v-row no-gutters>
@@ -123,14 +119,6 @@ export default class Dashboard extends Vue {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  private get isProd (): boolean {
-    var env = sessionStorage.getItem('POD_NAMESPACE')
-    if (env != null && env.trim().length > 0) {
-      return Boolean(env.toLowerCase().endsWith('prod'))
-    }
-    return Boolean(false)
-  }
-
   private get searchHistoryLength (): number {
     return this.getSearchHistory?.length || 0
   }
@@ -206,11 +194,5 @@ export default class Dashboard extends Vue {
   font-size: 1rem;
   color: $gray9;
   background-color: $BCgovBlue0;
-}
-.env-info {
-  font-size: 16px;
-  text-align: center;
-  color: #212529;
-  background-color: #FCBA19;
 }
 </style>

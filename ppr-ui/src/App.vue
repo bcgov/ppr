@@ -29,6 +29,11 @@
 
     <div class="app-body">
       <main v-if="!isErrorDialog">
+    <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: #FCBA19;" align="center" justify="center">
+      <v-col class="env-info">
+        This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
+      </v-col>
+    </v-row>
         <tombstone :backURL="dashboardURL" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
@@ -176,6 +181,14 @@ export default class App extends Mixins(AuthMixin) {
   /** The About text. */
   private get aboutText (): string {
     return process.env.ABOUT_TEXT
+  }
+
+  private get isProd (): boolean {
+    var env = sessionStorage.getItem('POD_NAMESPACE')
+    if (env != null && env.trim().length > 0) {
+      return Boolean(env.toLowerCase().endsWith('prod'))
+    }
+    return Boolean(false)
   }
 
   /**
@@ -400,4 +413,12 @@ export default class App extends Mixins(AuthMixin) {
 .app-header {
   z-index: 1000;
 }
+
+.env-info {
+  font-size: 16px;
+  text-align: center;
+  color: #212529;
+  background-color: #FCBA19;
+}
+
 </style>
