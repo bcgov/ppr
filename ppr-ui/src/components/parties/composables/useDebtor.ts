@@ -75,7 +75,9 @@ export const useDebtor = (props, context) => {
       const dateOfBirth = new Date()
       // @ts-ignore - returned by toRef
       dateOfBirth.setFullYear(parseInt(localState.year), parseInt(localState.monthValue) - 1, parseInt(localState.day))
-      localState.currentDebtor.birthDate = dateOfBirth.toUTCString()
+      if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
+        localState.currentDebtor.birthDate = dateOfBirth.toUTCString()
+      }
     }
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.debtors // eslint-disable-line

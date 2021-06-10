@@ -339,3 +339,7 @@ span.invalid-message {
   color: $gray9;
   font-weight: bold;
 }
+
+.remove.theme--light.v-btn.v-btn--disabled {
+  color: rgba(211, 39, 44, 0.4) !important;
+}

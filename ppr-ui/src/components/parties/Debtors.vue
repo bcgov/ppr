@@ -1,54 +1,55 @@
 <template>
-    <v-container fluid no-gutters class="pa-0">
+  <v-container fluid no-gutters class="pa-0">
     <v-row no-gutters>
-
-          <v-col cols="auto">Include Debtors as either an Individual or a Business.
-            If the debtor is operating a business and you want to register both the name
-            of the business and the individual associated with the business, enter them as
-            seperate debtors.<br>
-            Note: If a Debtor name is entered incorrectly, it could invalidate the entire registration.
-          </v-col>
-        </v-row>
-        <v-row no-gutters class="pb-4 pt-10">
-          <v-col>
-            <v-btn
-                id="btn-add-individual"
-                class="mr-4"
-                outlined
-                color="primary"
-                @click="initAdd(false)"
-              >
-                <v-icon>mdi-plus</v-icon>
-                <span>Add an Individual Debtor</span>
-            </v-btn>
-
-            <v-btn
-                id="btn-add-business"
-                outlined
-                color="primary"
-                @click="initAdd(true)"
-              >
-                <v-icon>mdi-plus</v-icon>
-                <span>Add a Business Debtor</span>
-            </v-btn>
-          </v-col>
-        </v-row>
-      <v-row no-gutters>
-      <v-col>
-    <div :class="{'invalid-section': invalidSection}">
-      <v-expand-transition>
-        <v-card flat class="add-debtor-container" v-if="showAddDebtor">
-          <edit-debtor
-            :activeIndex="activeIndex"
-            :isBusiness="isBusiness"
-            :invalidSection="invalidSection"
-            @resetEvent="resetData"
-            />
-        </v-card>
-      </v-expand-transition>
-    </div>
+      <v-col cols="auto"
+        >Include Debtors as either an Individual or a Business. If the debtor is
+        operating a business and you want to register both the name of the
+        business and the individual associated with the business, enter them as
+        seperate debtors.<br />
+        Note: If a Debtor name is entered incorrectly, it could invalidate the
+        entire registration.
       </v-col>
-     </v-row>
+    </v-row>
+    <v-row no-gutters class="pb-4 pt-10">
+      <v-col>
+        <v-btn
+          id="btn-add-individual"
+          class="mr-4"
+          outlined
+          color="primary"
+          @click="initAdd(false)"
+        >
+          <v-icon>mdi-plus</v-icon>
+          <span>Add an Individual Debtor</span>
+        </v-btn>
+
+        <v-btn
+          id="btn-add-business"
+          outlined
+          color="primary"
+          @click="initAdd(true)"
+        >
+          <v-icon>mdi-plus</v-icon>
+          <span>Add a Business Debtor</span>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <div :class="{ 'invalid-section': invalidSection }">
+          <v-expand-transition>
+            <v-card flat class="add-debtor-container" v-if="showAddDebtor">
+              <edit-debtor
+                :activeIndex="activeIndex"
+                :isBusiness="isBusiness"
+                :invalidSection="invalidSection"
+                @resetEvent="resetData"
+              />
+            </v-card>
+          </v-expand-transition>
+        </div>
+      </v-col>
+    </v-row>
     <v-row no-gutters class="pt-4">
       <v-col>
         <v-data-table
@@ -66,24 +67,23 @@
               :key="row.item.id"
               class="debtor-row"
             >
-              <td
-                class="list-item__title"
-              >
+              <td class="list-item__title">
                 {{ getName(row.item) }}
               </td>
               <td>
-                <span v-html="getFormattedAddress(row.item)">
-                </span>
+                <span v-html="getFormattedAddress(row.item)"> </span>
               </td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
               <td class="actions-cell pa-0">
                 <div class="actions">
                   <span class="edit-action">
-                    <v-btn text color="primary"
-                          :id="'class-' + row.index + '-change-added-btn'"
-                          @click="initEdit(row.index)"
-                          :disabled="addEditInProgress"
+                    <v-btn
+                      text
+                      color="primary"
+                      :id="'class-' + row.index + '-change-added-btn'"
+                      @click="initEdit(row.index)"
+                      :disabled="addEditInProgress"
                     >
                       <v-icon small>mdi-pencil</v-icon>
                       <span>Edit</span>
@@ -91,42 +91,44 @@
                   </span>
 
                   <span class="actions__more">
-                  <v-menu offset-y left nudge-bottom="4">
-                    <template v-slot:activator="{ on }">
-                      <v-btn
-                        text
-                        small
-                        v-on="on"
-                        color="primary"
-                        class="actions__more-actions__btn"
-                        :disabled="addEditInProgress">
-                        <v-icon>mdi-menu-down</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-list class="actions__more-actions">
-                      <v-list-item  @click="removeDebtor(row.index)">
-                        <v-list-item-subtitle>
-                          <v-icon small>mdi-delete</v-icon>
-                          <span class="ml-1">Remove</span>
-                        </v-list-item-subtitle>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </span>
+                    <v-menu offset-y left nudge-bottom="4">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          text
+                          small
+                          v-on="on"
+                          color="primary"
+                          class="actions__more-actions__btn"
+                          :disabled="addEditInProgress"
+                        >
+                          <v-icon>mdi-menu-down</v-icon>
+                        </v-btn>
+                      </template>
+                      <v-list class="actions__more-actions">
+                        <v-list-item @click="removeDebtor(row.index)">
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-delete</v-icon>
+                            <span class="ml-1">Remove</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </span>
                 </div>
               </td>
             </tr>
 
             <!-- Edit Form -->
             <tr v-if="showEditDebtor[row.index]">
-              <td colspan="6" :class="{'invalid-section': invalidSection}">
+              <td colspan="6" :class="{ 'invalid-section': invalidSection }">
                 <v-expand-transition>
                   <div class="edit-debtor-container col-12">
                     <edit-debtor
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
                       @removeDebtor="removeDebtor"
-                      @resetEvent="resetData"/>
+                      @resetEvent="resetData"
+                    />
                   </div>
                 </v-expand-transition>
               </td>
@@ -135,12 +137,7 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col>
-      </v-col>
-    </v-row>
   </v-container>
-
 </template>
 
 <script lang="ts">
@@ -168,15 +165,15 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>(['setAddSecuredPartiesAndDebtors'])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>(['getAddSecuredPartiesAndDebtors'])
+    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
+      'setAddSecuredPartiesAndDebtors'
+    ])
+    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors'
+    ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const {
-      getName,
-      getFormattedAddress,
-      getFormattedBirthdate
-    } = useParty()
+    const { getName, getFormattedAddress, getFormattedBirthdate } = useParty()
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -188,7 +185,7 @@ export default defineComponent({
       showEditDebtor: [false],
       debtors: parties.debtors,
       showErrorSummary: computed((): boolean => {
-        return (!parties.valid)
+        return !parties.valid
       }),
       headers: debtorTableHeaders
     })
@@ -234,11 +231,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import "@/assets/styles/theme.scss";
+@import '@/assets/styles/theme.scss';
 .length-trust-label {
   font-size: 0.875rem;
 }
-.summary-text{
+.summary-text {
   font-size: 14px;
   color: $gray7;
 }
