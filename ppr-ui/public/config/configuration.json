@@ -9,5 +9,6 @@
   "SENTRY_DSN": "",
   "KEYCLOAK_CONFIG_PATH": "/local-keycloak-config-url/keycloak.json",
   "VON_API_URL": "https://orgbook.gov.bc.ca/api/v3",
-  "POD_NAMESPACE": "dev"
+  "POD_NAMESPACE": "dev",
+  "ADDRESS_COMPLETE_KEY": ""
 }
