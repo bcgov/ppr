@@ -1,15 +1,9 @@
 /* eslint-disable */
-import { computed, ComputedRef, ref, Ref, toRefs, reactive } from '@vue/composition-api'
-import { maxLength, required } from 'vuelidate/lib/validators'
+import { computed, Ref, reactive } from '@vue/composition-api'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
 const useVuelidate = require("@vuelidate/core").default;
-
-// export const maxLength = (param: number) => helpers.withParams(
-//   { type: 'maxLength', value: param },
-//   (value: string) => value.length <= param
-// )
 
 export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) {
   const validations = reactive({ addressLocal: schema.value })
