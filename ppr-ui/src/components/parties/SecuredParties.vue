@@ -130,7 +130,7 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditParty from './EditParty.vue'
-import { useParty } from '@/composables/useSecuredParty'
+import { useParty } from '@/composables/useParty'
 
 import { partyTableHeaders } from '@/resources'
 
@@ -153,7 +153,7 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress, getFormattedBirthdate } = useParty()
+    const { getName, getFormattedAddress } = useParty()
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -200,7 +200,6 @@ export default defineComponent({
       removeParty,
       getName,
       getFormattedAddress,
-      getFormattedBirthdate,
       initEdit,
       initAdd,
       resetData,

@@ -34,6 +34,7 @@
                         label=""
                         value="true"
                         @click="setBusiness('true')">
+                      </v-radio>
                     Business
                     </v-col>
                 </v-row>
@@ -172,13 +173,12 @@
 import {
   defineComponent,
   onMounted,
-  watch,
   reactive,
   toRefs
 } from '@vue/composition-api'
 // import BaseAddress from 'sbc-common-components/src/components/BaseAddress.vue'
-import { usePartyValidation } from './composables/usePartyValidation'
-import { useParty } from './composables/useSecuredParty'
+import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
+import { useSecuredParty } from './composables/useSecuredParty'
 
 export default defineComponent({
   components: {
@@ -201,17 +201,17 @@ export default defineComponent({
   emits: ['addEditParty', 'resetEvent'],
   setup (props, context) {
     const {
-      currentParty,
+      currentSecuredParty,
       currentIsBusiness,
-      getParty,
+      getSecuredParty,
       resetFormAndData,
-      removeParty,
-      addParty,
+      removeSecuredParty,
+      addSecuredParty,
       updateAddress,
       addressSchema
-    } = useParty(props, context)
+    } = useSecuredParty(props, context)
 
-    const { errors, updateValidity } = usePartyValidation()
+    const { errors, updateValidity } = useSecuredPartyValidation()
 
     const localState = reactive({
     })
@@ -220,18 +220,18 @@ export default defineComponent({
     }
 
     const onSubmitForm = async () => {
-      addParty()
+      addSecuredParty()
     }
 
     onMounted(() => {
-      getParty()
+      getSecuredParty()
     })
 
     return {
-      currentParty,
+      currentSecuredParty,
       currentIsBusiness,
       resetFormAndData,
-      removeParty,
+      removeSecuredParty,
       onSubmitForm,
       onBlur,
       addressSchema,
@@ -246,7 +246,4 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import "@/assets/styles/theme.scss";
-::v-deep .theme--light.v-btn.v-btn--disabled {
-  color: rgba(211, 39, 44, .4) !important;
-}
 </style>

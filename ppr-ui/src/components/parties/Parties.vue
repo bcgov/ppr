@@ -56,9 +56,7 @@
     <v-row no-gutters class="pb-4 pt-10">
       <v-col>
         <h3>Secured Parties</h3>
-        <v-card flat>
-          <div></div>
-        </v-card>
+        <secured-parties />
       </v-col>
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
@@ -80,10 +78,12 @@ import {
 } from '@vue/composition-api'
 // import { useGetters, useActions } from 'vuex-composition-helpers'
 import Debtors from './Debtors.vue'
+import SecuredParties from './SecuredParties.vue'
 
 export default defineComponent({
   components: {
-    Debtors
+    Debtors,
+    SecuredParties
   },
   props: {
     isSummary: {
