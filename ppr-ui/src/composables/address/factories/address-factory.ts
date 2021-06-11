@@ -32,10 +32,10 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
       let required = isSchemaRequired('addressRegion')
 
       // NB: make region required for Canada and USA
-      if (addressLocal['addressCountry'] === 'CA') {
+      if (addressLocal.addressCountry === 'CA') {
         label = 'Province'
         required = true
-      } else if (addressLocal['addressCountry'] === 'US') {
+      } else if (addressLocal.addressCountry === 'US') {
         label = 'State'
         required = true
       } else {
@@ -46,7 +46,7 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
     /** The Postal Code label with 'optional' as needed. */
     postalCodeLabel: computed((): string => {
       let label: string
-      if (addressLocal['addressCountry'] === 'US') {
+      if (addressLocal.addressCountry === 'US') {
         label = 'Zip Code'
       } else {
         label = 'Postal Code'
@@ -82,29 +82,28 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
    * @param address the data object returned by the AddressComplete Retrieve API
    */
   const addressCompletePopulate = (addressComplete: object): void => {
-
-    addressLocal.value.streetAddress = addressComplete['Line1'] || 'N/A'
+    addressLocal.value.streetAddress = addressComplete.Line1 || 'N/A'
     // Combine extra address lines into Street Address Additional field.
     addressLocal.value.streetAddressAdditional = combineLines(
-      combineLines(addressComplete['Line2'], addressComplete['Line3']),
-      combineLines(addressComplete['Line4'], addressComplete['Line5'])
+      combineLines(addressComplete.Line2, addressComplete.Line3),
+      combineLines(addressComplete.Line4, addressComplete.Line5)
     )
-    addressLocal.value.addressCity = addressComplete['City']
-    if (useCountryRegions(addressComplete['CountryIso2'])) {
+    addressLocal.value.addressCity = addressComplete.City
+    if (useCountryRegions(addressComplete.CountryIso2)) {
       // In this case, v-select will map known province code to province name
       // or v-select will be blank and user will have to select a known item.
-      addressLocal.value.addressRegion = addressComplete['ProvinceCode']
+      addressLocal.value.addressRegion = addressComplete.ProvinceCode
     } else {
       // In this case, v-text-input will allow manual entry but province info is probably too long
       // so set region to null and add province name to the Street Address Additional field.
       // If length is excessive, user will have to fix it.
       addressLocal.value.addressRegion = null
       addressLocal.value.streetAddressAdditional = combineLines(
-        addressLocal.value.streetAddressAdditional, addressComplete['ProvinceName']
+        addressLocal.value.streetAddressAdditional, addressComplete.ProvinceName
       )
     }
-    addressLocal.value.postalCode = addressComplete['PostalCode']
-    addressLocal.value.addressCountry = addressComplete['CountryIso2']
+    addressLocal.value.postalCode = addressComplete.PostalCode
+    addressLocal.value.addressCountry = addressComplete.CountryIso2
   }
   const uniqueIds = reactive({
     /** A unique id for this instance of this component. */
@@ -149,19 +148,19 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
     // If you want to use this component with the Canada Post AddressComplete service:
     // 1. The AddressComplete JavaScript script (and stylesheet) must be loaded.
     // 2. Your AddressComplete account key must be defined.
-    const pca = window['pca']
-    const key = window['addressCompleteKey']
+    const pca = window.pca
+    const key = window.addressCompleteKey
     if (!pca || !key) {
       // eslint-disable-next-line no-console
       console.log('AddressComplete not initialized due to missing script and/or key')
       return
     }
-  
+
     // Destroy the old object if it exists, and create a new one.
-    if (window['currentAddressComplete']) {
-      window['currentAddressComplete'].destroy()
+    if (window.currentAddressComplete) {
+      window.currentAddressComplete.destroy()
     }
-    window['currentAddressComplete'] = createAddressComplete(pca, key)
+    window.currentAddressComplete = createAddressComplete(pca, key)
   }
   return {
     addressCompletePopulate,
@@ -176,6 +175,6 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
  * @param code the short code of the country
  * @returns whether to use v-select (true) or v-text-field (false) for input
  */
- export function useCountryRegions (code: string): boolean {
+export function useCountryRegions (code: string): boolean {
   return (code === 'CA' || code === 'US')
 }

@@ -36,6 +36,6 @@ export const DefaultSchema: SchemaIF = {
   },
   deliveryInstructions: {
     max: 80,
-    maxLength: maxLength(80),
+    maxLength: maxLength(80)
   }
 }

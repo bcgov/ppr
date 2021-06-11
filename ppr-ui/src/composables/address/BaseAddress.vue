@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, toRefs, watch } from '@vue/composition-api'
 import { required } from 'vuelidate/lib/validators'
 
 import {
@@ -116,8 +116,9 @@ import {
   useAddressComplete,
   useCountryRegions,
   useCountriesProvinces,
-  useValidations } from '@/composables/address/factories'
-import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
+  useValidations
+} from '@/composables/address/factories'
+import { AddressIF, SchemaIF } from '@/composables/address/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'base-address',
@@ -140,7 +141,7 @@ export default defineComponent({
     },
     schema: {
       type: Object as () => SchemaIF,
-      default: null,
+      default: null
     }
   },
   setup (props, { emit }) {
@@ -149,7 +150,13 @@ export default defineComponent({
      * both addressLocal / schemaLocal will update/be updated by the parent component even though
      * neither one has a watcher or an emit
      */
-    const { addressLocal, addressCountry, schemaLocal, isSchemaRequired, labels } = useAddress(toRefs(props).value, toRefs(props).schema)
+    const {
+      addressLocal,
+      addressCountry,
+      schemaLocal,
+      isSchemaRequired,
+      labels
+    } = useAddress(toRefs(props).value, toRefs(props).schema)
 
     const { $v, rules, spaceRules } = useValidations(schemaLocal, addressLocal)
 
