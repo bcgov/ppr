@@ -19,7 +19,7 @@
           </span>
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pb-3">
+      <v-row no-gutters class="ps-6 pt-6 pb-3">
         <v-col cols="3" class="generic-label">
           Registration Length
         </v-col>
@@ -38,7 +38,8 @@
       </v-container>
     </v-card>
   </v-container>
-  <v-container fluid no-gutters class="white pa-6 rounded" :class="{'invalid-message': showErrorComponent}" v-else>
+  <v-container fluid no-gutters class="white pt-10 pa-6 pr-10 rounded"
+  :class="{'invalid-message': showErrorComponent}" v-else>
     <v-row no-gutters>
       <v-col cols="3" class="generic-label">
         <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
@@ -59,7 +60,7 @@
             </v-radio>
         </v-radio-group>
       </v-col>
-      <v-col cols="8">
+      <v-col>
         <v-text-field id="life-years-field"
                         autocomplete="off"
                         :error-messages="lifeYearsMessage || ''"
@@ -67,11 +68,15 @@
                         :readonly="lifeYearsDisabled"
                         :hint="lifeYearsHint"
                         persistent-hint
-                        label="Length in years"
+label="Length in Years"
+
                         v-model="lifeYearsEdit"/>
         <div class="pt-5">Infinite ($500.00 non-refundable)</div>
       </v-col>
-      <v-divider class="mx-4" />
+    </v-row>
+    <v-row>
+      <v-col cols="3"></v-col>
+      <v-col cols="9"><v-divider /></v-col>
     </v-row>
     <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
       <v-col cols="3" class="generic-label">
@@ -86,11 +91,12 @@
         </v-checkbox>
       </v-col>
       <v-col cols="8">
-        <v-tooltip top content-class="top-tooltip" transition="fade-transition">
+        <v-tooltip top content-class="top-tooltip pa-5" transition="fade-transition">
             <template v-slot:activator="{ on }">
               <span v-on="on" class="trust-indenture">Trust Indenture</span>
             </template>
-            <p>Helper top tip text will go here</p>
+Select if the security interest is contained in a Trust Indenture.
+
           </v-tooltip>
       </v-col>
     </v-row>

@@ -1,6 +1,6 @@
 <template>
   <v-container fluid no-gutters class="registration-bar px-0">
-    <v-row no-gutters class="pt-1">
+    <v-row no-gutters class="pt-1 mt-10">
       <v-col cols="4">
         <div class="actions">
         <v-btn
