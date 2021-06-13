@@ -1,0 +1,16 @@
+{
+  "baseRegistrationNumber": "100032B", 
+  "clientReferenceId": "T-DS-0032-1", 
+  "createDateTime": "2021-06-03T16:31:01+00:00", 
+  "dischargeRegistrationNumber": "100036B", 
+  "registeringParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8V 4V6", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY"
+  }
+}

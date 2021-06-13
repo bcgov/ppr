@@ -1,0 +1,51 @@
+{
+  "addDebtors": [
+    {
+      "address": {
+        "city": "VICTORIA", 
+        "country": "CA", 
+        "postalCode": "V8S 3J5", 
+        "region": "BC", 
+        "street": "1234 BLANSHARD ST"
+      }, 
+      "businessName": "BROWNING WINDOW CLEANING INC.", 
+      "partyId": 78
+    }
+  ], 
+  "baseRegistrationNumber": "100032B", 
+  "changeRegistrationNumber": "100034B", 
+  "changeType": "DT", 
+  "clientReferenceId": "T-CS-DT-0032-1", 
+  "createDateTime": "2021-06-03T16:29:33+00:00", 
+  "deleteDebtors": [
+    {
+      "address": {
+        "city": "VICTORIA", 
+        "country": "CA", 
+        "postalCode": "V8S 2V4", 
+        "region": "BC", 
+        "street": "520 JOHNSON ST"
+      }, 
+      "birthDate": "1986-12-02T03:20:20+00:00", 
+      "partyId": 75, 
+      "personName": {
+        "first": "MICHAEL", 
+        "last": "SMITH", 
+        "middle": "J"
+      }
+    }
+  ], 
+  "registeringParty": {
+    "address": {
+      "city": "city", 
+      "country": "CA", 
+      "postalCode": "V8R3A5", 
+      "region": "BC", 
+      "street": "TEST 200000000", 
+      "streetAdditional": "line 2"
+    }, 
+    "businessName": "TEST PARTY CODE 1", 
+    "code": "200000000", 
+    "emailAddress": "test-sp-client@gmail.com"
+  }
+}

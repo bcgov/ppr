@@ -17,13 +17,14 @@
 
 from http import HTTPStatus
 
-from flask import jsonify, request, current_app
+from flask import jsonify, request, current_app, g
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import FinancingStatement, Registration
 from ppr_api.models import utils as model_utils
+from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_staff
 from ppr_api.services.payment.exceptions import SBCPaymentException
@@ -97,35 +98,13 @@ class FinancingResource(Resource):
             if not valid_format:
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
 
-            # Charge a fee.
-            statement = FinancingStatement.create_from_json(request_json, account_id)
-            invoice_id = None
-            if account_id:
-                fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value
-                fee_quantity = statement.life
-                if statement.life == model_utils.LIFE_INFINITE:
-                    fee_quantity = 1
-                    fee_code = TransactionTypes.FINANCING_INFINITE.value
-                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-                pay_ref = payment.create_payment(fee_code, fee_quantity, None,
-                                                 statement.registration[0].client_reference_id)
-                invoice_id = pay_ref['invoiceId']
-                statement.registration[0].pay_invoice_id = int(invoice_id)
-                statement.registration[0].pay_path = pay_ref['receipt']
+            # Set up the financing statement registration, pay, and save the data.
+            statement = pay_and_save_financing(request_json, account_id)
 
-            # Try to save the financing statement: failure throws an exception.
-            try:
-                statement.save()
-            except Exception as db_exception:   # noqa: B902; handle all db related errors.
-                current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'financing', repr(db_exception)))
-                if account_id and invoice_id is not None:
-                    current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'financing', invoice_id))
-                    try:
-                        payment.cancel_payment(invoice_id)
-                    except SBCPaymentException as cancel_exception:
-                        current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'financing', invoice_id,
-                                                                         repr(cancel_exception)))
-                raise db_exception
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
 
             return statement.json, HTTPStatus.CREATED
 
@@ -165,6 +144,12 @@ class GetFinancingResource(Resource):
             statement = FinancingStatement.find_by_registration_number(registration_num,
                                                                        is_staff(jwt),
                                                                        True)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+
             return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:
@@ -217,11 +202,21 @@ class AmendmentResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
 
             # Set up the registration, pay, and save the data.
-            return pay_and_save(request_json,
-                                model_utils.REG_CLASS_AMEND,
-                                statement,
-                                registration_num,
-                                account_id)
+            registration = pay_and_save(request_json,
+                                        model_utils.REG_CLASS_AMEND,
+                                        statement,
+                                        registration_num,
+                                        account_id)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(registration.json,
+                               account_id,
+                               ReportTypes.AMENDMENT_STATEMENT_REPORT.value,
+                               token['name'])
+
+            return registration.json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -275,11 +270,18 @@ class ChangeResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
 
             # Set up the registration, pay, and save the data.
-            return pay_and_save(request_json,
-                                model_utils.REG_CLASS_CHANGE,
-                                statement,
-                                registration_num,
-                                account_id)
+            registration = pay_and_save(request_json,
+                                        model_utils.REG_CLASS_CHANGE,
+                                        statement,
+                                        registration_num,
+                                        account_id)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(registration.json, account_id, ReportTypes.CHANGE_STATEMENT_REPORT.value, token['name'])
+
+            return registration.json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -333,11 +335,18 @@ class RenewalResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
 
             # Set up the registration, pay, and save the data.
-            return pay_and_save(request_json,
-                                model_utils.REG_CLASS_RENEWAL,
-                                statement,
-                                registration_num,
-                                account_id)
+            registration = pay_and_save(request_json,
+                                        model_utils.REG_CLASS_RENEWAL,
+                                        statement,
+                                        registration_num,
+                                        account_id)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(registration.json, account_id, ReportTypes.RENEWAL_STATEMENT_REPORT.value, token['name'])
+
+            return registration.json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -392,13 +401,22 @@ class DischargeResource(Resource):
 
             # No fee for a discharge.
             # Try to save the discharge statement: failure throws a business exception.
-            statement = Registration.create_from_json(request_json,
-                                                      model_utils.REG_CLASS_DISCHARGE,
-                                                      statement,
-                                                      registration_num,
-                                                      account_id)
-            statement.save()
-            return statement.json, HTTPStatus.CREATED
+            registration = Registration.create_from_json(request_json,
+                                                         model_utils.REG_CLASS_DISCHARGE,
+                                                         statement,
+                                                         registration_num,
+                                                         account_id)
+            registration.save()
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(registration.json,
+                               account_id,
+                               ReportTypes.DISCHARGE_STATEMENT_REPORT.value,
+                               token['name'])
+
+            return registration.json, HTTPStatus.CREATED
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -446,4 +464,39 @@ def pay_and_save(request_json, registration_class, financing_statement, registra
                                                                  repr(cancel_exception)))
         raise db_exception
 
-    return registration.json, HTTPStatus.CREATED
+    return registration
+
+
+def pay_and_save_financing(request_json, account_id):
+    """Set up the financing statement, pay if there is an account id, and save the data."""
+    # Charge a fee.
+    statement = FinancingStatement.create_from_json(request_json, account_id)
+    invoice_id = None
+    if account_id:
+        fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value
+        fee_quantity = statement.life
+        if statement.life == model_utils.LIFE_INFINITE:
+            fee_quantity = 1
+            fee_code = TransactionTypes.FINANCING_INFINITE.value
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+        pay_ref = payment.create_payment(fee_code, fee_quantity, None,
+                                         statement.registration[0].client_reference_id)
+        invoice_id = pay_ref['invoiceId']
+        statement.registration[0].pay_invoice_id = int(invoice_id)
+        statement.registration[0].pay_path = pay_ref['receipt']
+
+    # Try to save the financing statement: failure throws an exception.
+    try:
+        statement.save()
+    except Exception as db_exception:   # noqa: B902; handle all db related errors.
+        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'financing', repr(db_exception)))
+        if account_id and invoice_id is not None:
+            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'financing', invoice_id))
+            try:
+                payment.cancel_payment(invoice_id)
+            except SBCPaymentException as cancel_exception:
+                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'financing', invoice_id,
+                                                                 repr(cancel_exception)))
+        raise db_exception
+
+    return statement

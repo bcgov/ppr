@@ -1,0 +1,41 @@
+{
+  "addDebtors": [
+    {
+      "address": {
+        "city": "VICTORIA", 
+        "country": "CA", 
+        "postalCode": "V8S 2V4", 
+        "region": "BC", 
+        "street": "620 JOHNSON ST"
+      }, 
+      "partyId": 382, 
+      "personName": {
+        "first": "JAMES", 
+        "last": "FOX"
+      }
+    }
+  ], 
+  "amendmentRegistrationNumber": "100209B", 
+  "baseRegistrationNumber": "100208B", 
+  "changeType": "CO", 
+  "clientReferenceId": "T-AM-CO-0001", 
+  "courtOrderInformation": {
+    "courtName": "Supreme Court of British Columbia.", 
+    "courtRegistry": "KAMLOOPS", 
+    "effectOfOrder": "Court Order to add James Smith as a debtor.", 
+    "fileNumber": "BC123445", 
+    "orderDate": "2020-02-02T07:00:00+00:00"
+  }, 
+  "createDateTime": "2021-06-11T23:14:26+00:00", 
+  "description": "Court Order debtor addition.", 
+  "registeringParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY"
+  }
+}

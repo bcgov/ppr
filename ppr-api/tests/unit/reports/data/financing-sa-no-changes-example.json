@@ -1,0 +1,102 @@
+{
+  "baseRegistrationNumber": "100098B", 
+  "clientReferenceId": "T-API-DL-001", 
+  "createDateTime": "2021-06-01T19:12:50+00:00", 
+  "debtors": [
+    {
+      "address": {
+        "city": "VICTORIA", 
+        "country": "CA", 
+        "postalCode": "A1A 1A1", 
+        "region": "BC", 
+        "street": "721 DEBTOR AVE"
+      }, 
+      "businessName": "MY COMPANY INC", 
+      "partyId": 218
+    }, 
+    {
+      "address": {
+        "city": "VICTORIA", 
+        "country": "CA", 
+        "postalCode": "V8S 3J5", 
+        "region": "BC", 
+        "street": "1234 BLANSHARD ST"
+      }, 
+      "businessName": "BROWNING WINDOW CLEANING INC.", 
+      "partyId": 267
+    }
+  ], 
+  "expiryDate": "2026-06-02T23:59:59+00:00", 
+  "generalCollateral": [
+    {
+      "collateralId": 47, 
+      "description": "1972 White Fender Stratocaster Guitar serial number 1234."
+    }
+  ], 
+  "lifeYears": 5, 
+  "registeringParty": {
+    "address": {
+      "city": "city", 
+      "country": "CA", 
+      "postalCode": "V8R3A5", 
+      "region": "BC", 
+      "street": "TEST 200000001", 
+      "streetAdditional": "line 2"
+    }, 
+    "businessName": "TEST PARTY CODE 2", 
+    "code": "200000001", 
+    "emailAddress": "test-rp-client@gmail.com"
+  }, 
+  "registrationAct": "PPSA SECURITY ACT", 
+  "registrationDescription": "PPSA SECURITY AGREEMENT", 
+  "securedParties": [
+    {
+      "address": {
+        "city": "SIDNEY", 
+        "country": "CA", 
+        "postalCode": "V7R 1R7", 
+        "region": "BC", 
+        "street": "3721 BEACON AVENUE"
+      }, 
+      "businessName": "BANK OF BRITISH COLUMBIA", 
+      "partyId": 217
+    }
+  ], 
+  "statusType": "ACT", 
+  "trustIndenture": false, 
+  "type": "SA", 
+  "vehicleCollateral": [
+    {
+      "make": "JAGUAR", 
+      "model": "F-TYPE", 
+      "serialNumber": "XKFJ3CA46JU900994", 
+      "type": "MV", 
+      "vehicleId": 71, 
+      "year": 2017
+    }, 
+    {
+      "make": "JAGUAR", 
+      "model": "E-TYPE", 
+      "serialNumber": "XKEJ3CA46JU900994", 
+      "type": "MV", 
+      "vehicleId": 72, 
+      "year": 1966
+    }, 
+    {
+      "make": "Honda", 
+      "model": "Accord", 
+      "serialNumber": "RVBKK21F81F9300350", 
+      "type": "MV", 
+      "vehicleId": 88, 
+      "year": 2019
+    }, 
+    {
+      "make": "BMW", 
+      "model": "i3", 
+      "serialNumber": "BMWKK21F81F233350", 
+      "type": "MV", 
+      "vehicleId": 89, 
+      "year": 2019
+    }
+  ]
+}

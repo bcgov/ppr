@@ -1,0 +1,68 @@
+<div class="no-page-break">
+   <div class="section-title mt-4">General Collateral</div>
+
+{% if generalCollateral is defined and change is not defined %}
+   <table class="section-data section-data-table mt-4" role="presentation">
+      {% for collateral in generalCollateral %}
+         <tr class="no-page-break">
+            <td class="col-50">
+               <div class="section-data">{{ collateral.description }}</div>
+            </td>
+         </tr>
+      {% endfor %}
+   </table>
+{% elif change is not defined and (addGeneralCollateral is defined or deleteGeneralCollateral is defined) %}
+   {% if addGeneralCollateral is defined %}
+   <table class="section-data section-data-table mt-4" role="presentation">
+      {% for collateral in addGeneralCollateral %}
+      <tr class="no-page-break">
+            <td>
+               <div><span class="label">Added</span></div>
+               <div class="section-data">{{ collateral.description }}</div>
+            </td>
+         </tr>
+      {% endfor %}
+   </table>
+   {% endif %}
+   {% if deleteGeneralCollateral is defined %}
+   <table class="section-data section-data-table mt-4" role="presentation">
+      {% for collateral in deleteGeneralCollateral %}
+         <tr class="no-page-break">
+            <td>
+               <span class="label">Removed</span>
+               <div class="section-data">{{ collateral.description }}</div>
+            </td>
+         </tr>
+      {% endfor %}
+   </table>
+   {% endif %}
+{% elif change is defined and (change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined) %}
+   {% if change.addGeneralCollateral is defined %}
+   <table class="section-data section-data-table mt-4" role="presentation">
+      {% for collateral in change.addGeneralCollateral %}
+      <tr class="no-page-break">
+            <td>
+               <div><span class="label">Added</span></div>
+               <div class="section-data">{{ collateral.description }}</div>
+            </td>
+         </tr>
+      {% endfor %}
+   </table>
+   {% endif %}
+   {% if change.deleteGeneralCollateral is defined %}
+   <table class="section-data section-data-table mt-4" role="presentation">
+      {% for collateral in change.deleteGeneralCollateral %}
+         <tr class="no-page-break">
+            <td>
+               <span class="label">Removed</span>
+               <div class="section-data">{{ collateral.description }}</div>
+            </td>
+         </tr>
+      {% endfor %}
+   </table>
+   {% endif %}
+{% else %}
+   <div class="title">None.</div>
+{% endif %}
+
+</div>

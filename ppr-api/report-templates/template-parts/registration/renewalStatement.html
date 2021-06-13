@@ -27,7 +27,7 @@
                         {{change.expiryDate}}
                     {% endif %}
                 </div>
-           </td>
+            </td>
         </tr>
         <tr>
             <td colspan="2" style="height:5px"></td>
@@ -39,9 +39,9 @@
                 <div class="bold pt-2">Base Registration Date and Time:</div>
             </td>
             <td>
-                <div class="pt-2">{{detail.financingStatement.registrationDescription}}</div>
-                <div class="pt-2">{{ detail.financingStatement.baseRegistrationNumber }}</div>
-                <div class="pt-2">{{detail.financingStatement.createDateTime}}</div>
+                <div class="pt-2">{{registrationDescription}}</div>
+                <div class="pt-2">{{baseRegistrationNumber }}</div>
+                <div class="pt-2">{{createDateTime}}</div>
             </td>
         </tr>
     </table>
@@ -50,14 +50,14 @@
 {% if change.courtOrderInformation is defined %}
 <div class="container pt-4">
 
-    [[search-result/courtOrderInformation.html]]
+    [[registration/courtOrderInformation.html]]
 
 </div>
 {% endif %}
 
 <div class="container pt-4">
 
-  [[search-result/registeringParty.html]]
+  [[registration/registeringParty.html]]
 
 </div>
 

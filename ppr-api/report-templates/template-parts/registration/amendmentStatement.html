@@ -1,0 +1,82 @@
+<div class="container pt-4 no-page-break">
+
+    <div class="section-title mt-4">{{change.changeType}}</div>
+
+    <table class="business-details-table" role="presentation">
+        <tr>
+            <td>
+                <div class="bold pt-2">Registration Date and Time:</div>
+                <div class="bold pt-2">Registration Number:</div>
+                <div class="bold pt-2">Details Description:</div>
+            </td>
+            <td>
+                <div class="pt-2">{{change.createDateTime}}</div>
+                <div class="pt-2">{{change.amendmentRegistrationNumber}}</div>
+                <div class="pt-2">{{change.description}}</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="height:5px"></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="bold pt-2">Base Registration Type:</div>
+                <div class="bold pt-2">Base Registration Number:</div>
+                <div class="bold pt-2">Base Registration Date and Time:</div>
+            </td>
+            <td>
+                <div class="pt-2">{{registrationDescription}}</div>
+                <div class="pt-2">{{change.baseRegistrationNumber }}</div>
+                <div class="pt-2">{{createDateTime}}</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+{% if change.courtOrderInformation is defined %}
+<div class="container pt-4">
+
+    [[registration/courtOrderInformation.html]]
+
+</div>
+{% endif %}
+
+{% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined %}
+<div class="container pt-4">
+
+    [[registration/vehicleCollateral.html]]
+
+</div>
+{% endif %}
+
+{% if change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
+<div class="container pt-4">
+
+    [[registration/generalCollateral.html]]
+
+</div>
+{% endif %}
+
+{% if change.addDebtors is defined or change.deleteDebtors is defined %}
+<div class="container pt-4">
+
+    [[registration/debtors.html]]
+
+</div>
+{% endif %}
+
+{% if change.addSecuredParties is defined or change.deleteSecuredParties is defined %}
+<div class="container pt-4">
+
+    [[registration/securedParties.html]]
+
+</div>
+{% endif %}
+
+<div class="container pt-4">
+
+  [[registration/registeringParty.html]]
+
+</div>
+
+<div class="separator mt-4"></div> 

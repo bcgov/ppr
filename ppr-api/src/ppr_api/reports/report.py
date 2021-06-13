@@ -185,6 +185,16 @@ class Report:  # pylint: disable=too-few-public-methods
             'stylePageDraft',
             'logo',
             'macros',
+            'registration/securedParties',
+            'registration/courtOrderInformation',
+            'registration/debtors',
+            'registration/registeringParty',
+            'registration/vehicleCollateral',
+            'registration/generalCollateral',
+            'registration/amendmentStatement',
+            'registration/changeStatement',
+            'registration/dischargeStatement',
+            'registration/renewalStatement',
             'search-result/selected',
             'search-result/financingStatement',
             'search-result/amendmentStatement',
@@ -230,19 +240,18 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_addresses(self):
         """Replace address country code with description."""
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value and self._report_data['totalResultsSize'] > 0:
-            for detail in self._report_data['details']:
-                self._set_financing_addresses(detail['financingStatement'])
-                if 'changes' in detail['financingStatement']:
-                    for change in detail['financingStatement']['changes']:
-                        if change['statementType'] == 'CHANGE_STATEMENT':
-                            self._set_amend_change_addresses(change)
-                        elif change['statementType'] == 'AMENDMENT_STATEMENT':
-                            self._set_amend_party_addresses(change)
-                        else:
-                            self._format_address(change['registeringParty']['address'])
+            self._set_search_addresses()
 
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
             self._set_financing_addresses(self._report_data)
+            if 'changes' in self._report_data:
+                for change in self._report_data['changes']:
+                    if change['statementType'] == 'CHANGE_STATEMENT':
+                        self._set_amend_change_addresses(change)
+                    elif change['statementType'] == 'AMENDMENT_STATEMENT':
+                        self._set_amend_party_addresses(change)
+                    else:
+                        self._format_address(change['registeringParty']['address'])
         elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value:
             self._set_amend_party_addresses(self._report_data)
         elif self._report_key == ReportTypes.CHANGE_STATEMENT_REPORT.value:
@@ -250,8 +259,21 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key != ReportTypes.SEARCH_DETAIL_REPORT.value:
             self._format_address(self._report_data['registeringParty']['address'])
 
+    def _set_search_addresses(self):
+        """Replace search results addresses country code with description."""
+        for detail in self._report_data['details']:
+            self._set_financing_addresses(detail['financingStatement'])
+            if 'changes' in detail['financingStatement']:
+                for change in detail['financingStatement']['changes']:
+                    if change['statementType'] == 'CHANGE_STATEMENT':
+                        self._set_amend_change_addresses(change)
+                    elif change['statementType'] == 'AMENDMENT_STATEMENT':
+                        self._set_amend_party_addresses(change)
+                    else:
+                        self._format_address(change['registeringParty']['address'])
+
     def _set_financing_addresses(self, statement):
-        """Replace financing statement address country code with description."""
+        """Replace financing statement addresses country code with description."""
         self._format_address(statement['registeringParty']['address'])
         for secured_party in statement['securedParties']:
             self._format_address(secured_party['address'])
@@ -289,22 +311,32 @@ class Report:  # pylint: disable=too-few-public-methods
                         delete['edit'] = True
 
     def _set_vehicle_collateral(self):
-        """Replace vehicle collateral type code with description."""
+        """Replace vehicle collateral type codes with descriptions."""
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value and self._report_data['totalResultsSize'] > 0:
-            for detail in self._report_data['details']:
-                Report._set_financing_vehicle_collateral(detail['financingStatement'])
-                if 'changes' in detail['financingStatement']:
-                    for change in detail['financingStatement']['changes']:
-                        if change['statementType'] == 'CHANGE_STATEMENT':
-                            Report._set_amend_change_vehicle_collateral(change)
-                        elif change['statementType'] == 'AMENDMENT_STATEMENT':
-                            Report._set_amend_vehicle_collateral(change)
+            self._set_search_vehicle_collateral()
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
             Report._set_financing_vehicle_collateral(self._report_data)
+            if 'changes' in self._report_data:
+                for change in self._report_data['changes']:
+                    if change['statementType'] == 'CHANGE_STATEMENT':
+                        Report._set_amend_change_vehicle_collateral(change)
+                    elif change['statementType'] == 'AMENDMENT_STATEMENT':
+                        Report._set_amend_vehicle_collateral(change)
         elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value:
             Report._set_amend_vehicle_collateral(self._report_data)
         elif self._report_key == ReportTypes.CHANGE_STATEMENT_REPORT.value:
             Report._set_amend_change_vehicle_collateral(self._report_data)
+
+    def _set_search_vehicle_collateral(self):
+        """Replace search results vehicle collateral type codes with descriptions."""
+        for detail in self._report_data['details']:
+            Report._set_financing_vehicle_collateral(detail['financingStatement'])
+            if 'changes' in detail['financingStatement']:
+                for change in detail['financingStatement']['changes']:
+                    if change['statementType'] == 'CHANGE_STATEMENT':
+                        Report._set_amend_change_vehicle_collateral(change)
+                    elif change['statementType'] == 'AMENDMENT_STATEMENT':
+                        Report._set_amend_vehicle_collateral(change)
 
     def _set_amend_change_addresses(self, statement):
         """Replace amendment/change statement address country code with description."""
@@ -406,6 +438,9 @@ class Report:  # pylint: disable=too-few-public-methods
                             Report._set_change_date_time(change)
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
             Report._set_financing_date_time(self._report_data)
+            if 'changes' in self._report_data:
+                for change in self._report_data['changes']:
+                    Report._set_change_date_time(change)
         else:
             Report._set_change_date_time(self._report_data)
 
@@ -455,8 +490,6 @@ class Report:  # pylint: disable=too-few-public-methods
             else:
                 criteria = self._report_data['searchQuery']['criteria']['value']
             self._report_data['meta_subject'] = f'{search_desc} - {criteria}'
-        else:
-            self._report_data['meta_subject'] = ReportMeta.reports[self._report_key]['metaSubject'].format()
 
     @staticmethod
     def _get_environment():
