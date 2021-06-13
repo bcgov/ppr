@@ -66,7 +66,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APISearchTypes.REGISTRATION_NUMBER,
     textLabel: 'Enter a registration number',
     hints: {
-      searchValue: 'Registration numbers contain 6 digits followed by 1 letter, e.g., 123456A'
+      searchValue: 'Registration numbers contain 7 characters'
     }
   }
 ]
