@@ -815,6 +815,24 @@ def upgrade():
             'registration_desc': 'PPSA TRANSITION FINANCING STATEMENT'
         },
         {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type_cd': 'TA',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'SECURITY AGREEMENT TRANSITION FINANCING STATEMENT'
+        },
+        {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type_cd': 'TG',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'SALES OF GOODS TRANSITION FINANCING STATEMENT'
+        },
+        {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type_cd': 'TM',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'M.H. TRANSITION FINANCING STATEMENT'
+        },
+        {
             'registration_type_cl': 'RENEWAL',
             'registration_type': 'RE',
             'registration_act': 'PPSA SECURITY ACT',
