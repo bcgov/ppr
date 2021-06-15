@@ -1,0 +1,28 @@
+{
+  "addVehicleCollateral": [
+    {
+      "make": "BMW", 
+      "model": "i3", 
+      "serialNumber": "BMWKK21F81F233350", 
+      "type": "MV", 
+      "vehicleId": 26, 
+      "year": 2019
+    }
+  ], 
+  "amendmentRegistrationNumber": "100035B", 
+  "baseRegistrationNumber": "100032B", 
+  "changeType": "AM", 
+  "clientReferenceId": "T-AS-AM-0032-1", 
+  "createDateTime": "2021-06-03T16:30:07+00:00", 
+  "description": "Add vehicle collateral.", 
+  "registeringParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY"
+  }
+}

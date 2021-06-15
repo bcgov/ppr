@@ -1,0 +1,83 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if environment == '' %}
+      [[stylePage.html]]
+    {% else %}
+      [[stylePageDraft.html]]
+    {% endif %}
+    [[style.html]]
+  </head>
+  <body>
+    <div class="header">
+      <table class="header-table" role="presentation">
+        <tr class="no-page-break">
+          <td>
+            [[logo.html]]
+          </td>
+          <td>
+            <div class="report-type">{{ environment }} {{ meta_title }}</div>
+            <div class="report-type-desc">BC Registries and Online Services</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="business-details-container">
+        <div class="business-name-header">
+          <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
+            Base Registration Number: {{ baseRegistrationNumber }}
+          </h2>
+        </div>
+  
+        <table class="business-details-table" role="presentation">
+            <tr>
+                <td>
+                    <div class="bold pt-2">Registration Date and Time:</div>
+                    <div class="bold pt-2">Registration Number:</div>
+                    <div class="bold pt-2">Registration Life:</div>
+                    <div class="bold pt-2">New Expiration Date and Time:</div>
+                </td>
+                <td>
+                    <div class="pt-2">{{createDateTime}}</div>
+                    <div class="pt-2">{{renewalRegistrationNumber}}</div>
+                    <div class="pt-2">
+                        {% if lifeInfinite is defined and lifeInfinite %}
+                            Infinite
+                        {% elif lifeYears is defined %}
+                            {{lifeYears}} {% if lifeYears > 1 %} Years {% else %} Year {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="pt-2">
+                        {% if lifeInfinite is defined and lifeInfinite %}
+                            Never
+                        {% else %}
+                            {{expiryDate}}
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    {% if courtOrderInformation is defined %}
+    <div class="container pt-4">
+    
+        [[registration/courtOrderInformation.html]]
+    
+    </div>
+    {% endif %}
+    
+    <div class="container pt-4">
+    
+      [[registration/registeringParty.html]]
+    
+    </div>
+    
+  </body>
+</html>

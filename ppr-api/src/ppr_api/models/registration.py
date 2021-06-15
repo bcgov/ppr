@@ -61,7 +61,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
 
     user_id = db.Column('user_id', db.String(1000), nullable=True)
-    detail_description = db.Column('detail_description', db.String(180), nullable=True)
+    detail_description = db.Column('detail_description', db.String(4000), nullable=True)
 
     # parent keys
     financing_id = db.Column('financing_id', db.Integer,

@@ -110,7 +110,7 @@ def upgrade():
     sa.Column('street', sa.String(length=50), nullable=False),
     sa.Column('street_additional', sa.String(length=50), nullable=True),
     sa.Column('city', sa.String(length=40), nullable=False),
-    sa.Column('region', sa.String(length=2), nullable=False),
+    sa.Column('region', sa.String(length=2), nullable=True),
     sa.Column('postal_code', sa.String(length=15), nullable=False),
     sa.Column('country', sa.String(length=2), nullable=True),
     sa.ForeignKeyConstraint(['country'], ['country_types.country_type'], ),
@@ -204,7 +204,7 @@ def upgrade():
     sa.Column('pay_invoice_id', sa.Integer(), nullable=True),
     sa.Column('pay_path', sa.String(length=256), nullable=True),
     sa.Column('user_id', sa.String(length=1000), nullable=True),
-    sa.Column('detail_description', sa.String(length=180), nullable=True),
+    sa.Column('detail_description', sa.String(length=4000), nullable=True),
     sa.Column('financing_id', sa.Integer(), nullable=False),
     sa.Column('draft_id', sa.Integer(), nullable=False),
     sa.Column('registration_type', sa.String(length=2), nullable=False),
@@ -813,6 +813,24 @@ def upgrade():
             'registration_type': 'TF',
             'registration_act': 'PPSA SECURITY ACT',
             'registration_desc': 'PPSA TRANSITION FINANCING STATEMENT'
+        },
+        {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type_cd': 'TA',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'SECURITY AGREEMENT TRANSITION FINANCING STATEMENT'
+        },
+        {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type_cd': 'TG',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'SALES OF GOODS TRANSITION FINANCING STATEMENT'
+        },
+        {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type_cd': 'TM',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'M.H. TRANSITION FINANCING STATEMENT'
         },
         {
             'registration_type_cl': 'RENEWAL',

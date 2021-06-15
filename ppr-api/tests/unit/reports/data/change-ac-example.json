@@ -1,0 +1,27 @@
+{
+  "addVehicleCollateral": [
+    {
+      "make": "Honda", 
+      "model": "Accord EX", 
+      "serialNumber": "RVBKK21F81F9301351", 
+      "type": "MV", 
+      "vehicleId": 120, 
+      "year": 2019
+    }
+  ], 
+  "baseRegistrationNumber": "100208B", 
+  "changeRegistrationNumber": "100210B", 
+  "changeType": "AC", 
+  "clientReferenceId": "T-CS-AC-0208-1", 
+  "createDateTime": "2021-06-11T23:18:48+00:00", 
+  "registeringParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY"
+  }
+}

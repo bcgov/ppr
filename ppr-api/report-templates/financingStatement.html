@@ -1,0 +1,118 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if environment == '' %}
+      [[stylePage.html]]
+    {% else %}
+      [[stylePageDraft.html]]
+    {% endif %}
+    [[style.html]]
+  </head>
+  <body>
+    <div class="header">
+      <table class="header-table" role="presentation">
+        <tr class="no-page-break">
+          <td>
+            [[logo.html]]
+          </td>
+          <td>
+            <div class="report-type">{{ environment }} {{ meta_title }}</div>
+            <div class="report-type-desc">BC Registries and Online Services</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="business-details-container">
+      <div class="financing-type">{{ registrationDescription }}</div>
+      <div class="financing-act">{{ registrationAct }}</div>
+      <div class="business-name-header">
+        <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
+          Base Registration Number: {{ baseRegistrationNumber }}
+          {% if statusType == 'HDC' %} 
+            <span class="lbl-business-name-gold">DISCHARGED</span>
+          {% elif statusType == 'HEX' %} 
+              <span class="lbl-business-name-gold">EXPIRED</span>
+          {% endif %}
+          </h2>
+      </div>
+ 
+      <table class="business-details-table" role="presentation">
+        <tr>
+          <td>
+            <div class="bold pt-2">Registration Date and Time:</div>
+            {% if meta_account_name is defined %}
+              <div class="bold pt-2">Account Name:</div>
+            {% endif %}
+            {% if clientReferenceId is defined and clientReferenceId != "" %}
+              <div class="bold pt-2">Folio Number:</div>
+            {% endif %}
+            <div class="bold pt-2">Current Expiry Date and Time:</div>
+            {% if trustIndenture is defined %}
+              <div class="bold pt-2">Trust Indenture:</div>
+            {% endif %}
+            </td>
+          <td>
+            <div class="pt-2">{{createDateTime}}</div>
+            {% if meta_account_name is defined %}
+              <div class="pt-2">{{meta_account_name}}</div>
+            {% endif %}
+            {% if clientReferenceId is defined and clientReferenceId != "" %}
+              <div class="pt-2">{{clientReferenceId}}</div>
+            {% endif %}
+            <div class="pt-2">{% if lifeInfinite is defined and lifeInfinite %} 
+              Never
+            {% else %}
+              {{expiryDate}}
+            {% endif %}</div>
+            {% if trustIndenture is defined %}
+              <div class="pt-2">{% if lifeInfinite %} Yes {% else %} No {% endif %}</div>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div>      
+
+    {#
+      Order will need to change.
+    #}
+    <div class="container pt-4">          
+      [[registration/registeringParty.html]]
+      [[registration/securedParties.html]]
+      [[registration/debtors.html]]
+      [[registration/vehicleCollateral.html]]
+      [[registration/generalCollateral.html]]
+      {% if courtOrderInformation is defined %}
+        [[registration/courtOrderInformation.html]]
+      {% endif %}
+    </div>
+
+    {% if changes is defined %}
+      <p style="page-break-before: always" ></p>
+
+      <div class="separator-strong mt-4"></div>
+      <div class="section-statement mt-4">History</div>
+      <div class="separator-strong mt-4"></div>
+
+      <div class="container pt-4">
+        {% for change in changes %}
+          {% if change.statementType == 'RENEWAL_STATEMENT' %}
+            [[registration/renewalStatement.html]]
+          {% elif change.statementType == 'CHANGE_STATEMENT' %}
+            [[registration/changeStatement.html]]
+          {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+            [[registration/amendmentStatement.html]]
+          {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+            [[registration/dischargeStatement.html]]
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %} 
+
+  </body>
+</html>
