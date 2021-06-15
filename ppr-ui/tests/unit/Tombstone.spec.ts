@@ -30,7 +30,7 @@ const tombstoneUserInfo: string = '#tombstone-user-info'
  *
  * @returns a Wrapper<SearchedResult> object with the given parameters.
  */
-function createComponent(backURL: string, mockRoute: string): Wrapper<any> {
+function createComponent (backURL: string, mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)

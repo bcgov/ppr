@@ -28,7 +28,7 @@ const addBusinessSelector: string = '#btn-add-business'
  *
  * @returns a Wrapper<Debtors> object with the given parameters.
  */
-function createComponent(
+function createComponent (
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -99,6 +99,5 @@ describe('Collateral store tests', () => {
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
     expect(item1.querySelectorAll('td')[2].textContent).toContain('June 16, 1990')
-
   })
 })

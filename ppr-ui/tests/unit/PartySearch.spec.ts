@@ -58,18 +58,14 @@ describe('Secured Party search event tests', () => {
   })
 
   it('emits the add secured party event', async () => {
-    
     await wrapper.find(addPartyLink).trigger('click')
-    
+
     expect(wrapper.emitted().showSecuredPartyAdd).toBeTruthy()
-    
   })
 
   it('emits the add registering party event', async () => {
-    
     await wrapper.find(addRegisteringPartyLink).trigger('click')
-    
+
     expect(wrapper.emitted().addRegisteringParty).toBeTruthy()
-    
   })
 })

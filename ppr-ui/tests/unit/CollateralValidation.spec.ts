@@ -26,7 +26,7 @@ const removeButtonSelector: string = '#remove-btn'
  *
  * @returns a Wrapper<EditCollateral> object with the given parameters.
  */
-function createComponent(
+function createComponent (
   activeIndex: Number,
   invalidSection: boolean
 ): Wrapper<any> {

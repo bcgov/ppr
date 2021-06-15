@@ -30,7 +30,7 @@ const removeButtonSelector: string = '#remove-btn'
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent(
+function createComponent (
   activeIndex: Number,
   isBusiness: boolean,
   invalidSection: boolean

@@ -17,14 +17,12 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-
-
 /**
  * Creates and mounts a component, so that it can be tested.
  *
  * @returns a Wrapper<Debtors> object with the given parameters.
  */
-function createComponent(
+function createComponent (
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -53,7 +51,6 @@ describe('Secured Party SA tests', () => {
     // won't show edit collateral component until click
     expect(wrapper.findComponent(EditParty).exists()).toBeFalsy()
   })
-
 })
 
 describe('Secured Party store tests', () => {

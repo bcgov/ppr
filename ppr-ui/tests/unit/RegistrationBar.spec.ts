@@ -77,7 +77,6 @@ describe('RegistrationBar select tests', () => {
     expect(wrapper.vm.selectedRegistrationType).toBe(selectedRegistrationType)
   })
   it('renders all selected registration types and allows you to click on one', async () => {
-
     wrapper.find('.more-actions-btn').trigger('click')
 
     await Vue.nextTick()
@@ -92,6 +91,5 @@ describe('RegistrationBar select tests', () => {
 
     const events = wrapper.emitted('selected-registration-type')
     expect(events.length).toBe(1)
-
   })
 })
