@@ -77,6 +77,18 @@ export const mockedRegisteringParty1: PartyIF = {
 export const mockedSecuredParties1: Array<PartyIF> = [
   {
     businessName: 'SECURED PARTY COMPANY LTD.',
+    emailAddress: 'test@company.com',
+    address: mockedAddress1
+  }
+]
+
+export const mockedSecuredParties2: Array<PartyIF> = [
+  {
+    personName: {
+      last: 'INDIVIDUAL PARTY',
+      first: 'TEST'
+    },
+    emailAddress: 'test@person.com',
     address: mockedAddress1
   }
 ]

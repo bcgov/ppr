@@ -12,14 +12,19 @@
       </v-col>
       <v-col cols="6">
         or
-        <a @click="goToAddSecuredParty"
+        <a id="add-party" @click="goToAddSecuredParty"
           >Add a Secured Party that doesn't have a code</a
         >
       </v-col>
     </v-row>
     <v-row class="px-6" align="center">
       <v-col cols="auto">
-        <v-checkbox class="reg-checkbox pa-0 ma-0" @click="addRegisteringParty" :hide-details="true">
+        <v-checkbox 
+          id="add-registering-party"
+          class="reg-checkbox pa-0 ma-0"
+          @click="addRegisteringParty"
+          :hide-details="true"
+          >
         </v-checkbox>
       </v-col>
       <v-col>

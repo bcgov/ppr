@@ -245,13 +245,13 @@ export const partyTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: false,
     text: 'Email Address',
-    value: 'email'
+    value: 'emailAddress'
   },
   {
     class: 'column-mds',
     sortable: false,
     text: 'Secured Party Code',
-    value: 'partyCode'
+    value: 'code'
   },
   {
     class: 'column-mds pa-0',

@@ -52,7 +52,7 @@
               <td>
                 <span v-html="getFormattedAddress(row.item)"> </span>
               </td>
-              <td>{{ row.item.email }}</td>
+              <td>{{ row.item.emailAddress }}</td>
               <td>{{ row.item.code }}</td>
               <!-- Action Btns -->
               <td class="actions-cell pa-0">

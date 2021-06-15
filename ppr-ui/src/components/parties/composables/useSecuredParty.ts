@@ -45,7 +45,7 @@ export const useSecuredParty = (props, context) => {
         businessName: '',
         personName: Object.assign({}, initPerson),
         birthDate: '',
-        email: '',
+        emailAddress: '',
         address: Object.assign({}, initAddress)
       }
       localState.currentSecuredParty = blankSecuredParty
@@ -87,7 +87,7 @@ export const useSecuredParty = (props, context) => {
     // New debtor
     const tempSecuredParty = {
       businessName: 'Temp Registering Party',
-      email: 'temp@email.com',
+      emailAddress: 'temp@email.com',
       address: {
         streetAddress: '123 Any St',
         streetAddressAdditional: '',

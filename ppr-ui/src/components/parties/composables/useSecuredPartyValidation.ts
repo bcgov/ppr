@@ -8,7 +8,7 @@ const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
   first: createDefaultValidationResult(),
   last: createDefaultValidationResult(),
-  email: createDefaultValidationResult(),
+  emailAddress: createDefaultValidationResult(),
   street: createDefaultValidationResult(),
   city: createDefaultValidationResult(),
   region: createDefaultValidationResult(),

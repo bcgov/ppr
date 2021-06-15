@@ -113,9 +113,9 @@
                       filled
                       id="txt-email"
                       label="Email Address"
-                      v-model="currentSecuredParty.email"
+                      v-model="currentSecuredParty.emailAddress"
                       :error-messages="
-                        errors.email.message ? errors.email.message : ''
+                        errors.emailAddress.message ? errors.emailAddress.message : ''
                       "
                       persistent-hint
                     />
