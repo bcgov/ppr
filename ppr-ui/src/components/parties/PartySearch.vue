@@ -19,7 +19,7 @@
     </v-row>
     <v-row class="px-6" align="center">
       <v-col cols="auto">
-        <v-checkbox 
+        <v-checkbox
           id="add-registering-party"
           class="reg-checkbox pa-0 ma-0"
           @click="addRegisteringParty"
