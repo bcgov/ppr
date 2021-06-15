@@ -3,21 +3,21 @@ import { required, maxLength } from 'vuelidate/lib/validators'
 // The Party Address schema containing Vuelidate rules.
 // NB: This should match the subject JSON schema.
 export const PartyAddressSchema = {
-  street: {
+  streetAddress: {
     required,
     maxLength: maxLength(50)
   },
-  streetAdditional: {
+  streetAddressAdditional: {
     maxLength: maxLength(30)
   },
-  city: {
+  addressCity: {
     required,
     maxLength: maxLength(40)
   },
-  country: {
+  addressCountry: {
     required
   },
-  region: {
+  addressRegion: {
     maxLength: maxLength(2)
   },
   postalCode: {

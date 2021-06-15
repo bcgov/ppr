@@ -1,6 +1,4 @@
-import { reactive, toRefs, computed } from '@vue/composition-api' // eslint-disable-line no-unused-vars
-import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useGetters, useActions } from 'vuex-composition-helpers' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
@@ -12,18 +10,31 @@ export const useParty = () => {
   }
 
   const getFormattedAddress = (party: PartyIF): string => {
-    let address = party.address.street
-    if (party.address.streetAdditional) {
-      address = address + '<br>' + party.address.streetAdditional
+    let address = party.address.streetAddress
+    if (party.address.streetAddressAdditional) {
+      address = address + '<br>' + party.address.streetAddressAdditional
     }
-    address = address + '<br>' + party.address.city + ' ' + party.address.region + ' ' + party.address.postalCode
+    address =
+      address +
+      '<br>' +
+      party.address.addressCity +
+      ' ' +
+      party.address.addressRegion +
+      ' ' +
+      party.address.postalCode
     return address
   }
 
   const getFormattedBirthdate = (party: PartyIF): string => {
     if (party.birthDate) {
       const date = new Date(party.birthDate)
-      return date.toLocaleString('default', { month: 'long' }) + ' ' + date.getDate() + ', ' + date.getFullYear()
+      return (
+        date.toLocaleString('default', { month: 'long' }) +
+        ' ' +
+        date.getDate() +
+        ', ' +
+        date.getFullYear()
+      )
     }
   }
 

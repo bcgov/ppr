@@ -132,14 +132,13 @@
                 <label class="general-label">Address</label>
               </v-col>
             </v-row>
-            <!-- <base-address ref="regMailingAddress"
+            <base-address ref="regMailingAddress"
                     id="address-debtor"
-                    :address="currentDebtor.address"
+                    v-model="currentDebtor.address"
                     :editing="true"
                     :schema="addressSchema"
-                    @update:address="updateAddress($event)"
                     @valid="updateValidity($event)"
-                  /> -->
+                  />
 
             <v-row>
               <v-col>
@@ -191,14 +190,14 @@ import {
   reactive,
   toRefs
 } from '@vue/composition-api'
-// import BaseAddress from 'sbc-common-components/src/components/BaseAddress.vue'
+import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useDebtorValidation } from './composables/useDebtorValidation'
 import { useDebtor } from './composables/useDebtor'
 import AutoComplete from '@/components/search/AutoComplete.vue'
 
 export default defineComponent({
   components: {
-    // BaseAddress,
+    BaseAddress,
     AutoComplete
   },
   props: {
@@ -229,7 +228,6 @@ export default defineComponent({
       resetFormAndData,
       removeDebtor,
       addDebtor,
-      updateAddress,
       addressSchema
     } = useDebtor(props, context)
 
@@ -297,7 +295,6 @@ export default defineComponent({
       setHideDetails,
       onBlur,
       addressSchema,
-      updateAddress,
       updateValidity,
       errors,
       ...toRefs(localState)

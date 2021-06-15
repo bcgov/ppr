@@ -28,11 +28,11 @@ export const mockedError: ErrorIF = {
 }
 
 export const mockedAddress1: AddressIF = {
-  street: '1234 Fort St.',
-  streetAdditional: '2nd floor',
-  city: 'Victoria',
-  region: 'BC',
-  country: 'CA',
+  streetAddress: '1234 Fort St.',
+  streetAddressAdditional: '2nd floor',
+  addressCity: 'Victoria',
+  addressRegion: 'BC',
+  addressCountry: 'CA',
   postalCode: 'V8R1L2',
   deliveryInstructions: ''
 }

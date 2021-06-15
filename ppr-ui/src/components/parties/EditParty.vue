@@ -3,75 +3,80 @@
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
-            <label
-              class="add-party-header general-label"
-              :class="{ 'error-text': invalidSection }"
-            >
-              <span v-if="activeIndex === -1" class="pl-5">Add</span>
-              <span v-else>Edit</span>
-              Secured Party
-            </label>
+          <label
+            class="add-party-header general-label"
+            :class="{ 'error-text': invalidSection }"
+          >
+            <span v-if="activeIndex === -1" class="pl-5">Add</span>
+            <span v-else>Edit</span>
+            Secured Party
+          </label>
         </v-col>
         <v-col cols="9">
-              <v-form
-                ref="partyForm"
-                class="party-form"
-                v-on:submit.prevent="addParty"
-              >
-              <v-row no-gutters>
-                    <v-col cols="4">
-                    <v-radio class="years-radio pa-0 ma-0"
-                        :hide-details="false"
-                        label=""
-                        value="false"
-                        @click="setBusiness('false')">
-                    </v-radio>
-                    Individual Person
-                    </v-col>
-                    <v-col cols="4">
-                      <v-radio class="infinite-radio pt-15 ma-0"
-                        :hide-details="false"
-                        label=""
-                        value="true"
-                        @click="setBusiness('true')">
-                      </v-radio>
-                    Business
-                    </v-col>
+          <v-form
+            ref="partyForm"
+            class="party-form"
+            v-on:submit.prevent="addParty"
+          >
+            <v-row class="pb-6" no-gutters>
+              <v-col cols="auto">
+                <v-radio-group v-model="partyBusiness" row hide-details="true">
+                  <v-radio
+                    class="business-radio"
+                    label="Individual Person"
+                    value="I"
+                  >
+                  </v-radio>
+
+                  <v-radio
+                    class="individual-radio ml-8"
+                    label="Business"
+                    value="B"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+            <v-row no-gutters v-if="isPartyType">
+              <v-col cols="12">
+                <v-row v-if="partyBusiness === 'B'" no-gutters>
+                  <v-col>
+                    <label class="general-label">Business Name</label>
+                  </v-col>
                 </v-row>
-                <v-row v-if="currentIsBusiness" no-gutters>
-                    <v-col>
-                     <label class="general-label">Business Name</label>
-                    </v-col>
+                <v-row v-else no-gutters>
+                  <v-col>
+                    <label class="general-label">Person's Name</label>
+                  </v-col>
                 </v-row>
-                <v-row v-if="currentIsBusiness" no-gutters>
-                    <v-col>
-                     <label class="general-label">Person's Name</label>
-                    </v-col>
-                </v-row>
-                <v-row v-if="currentIsBusiness" no-gutters>
-                    <v-col>
-                     <v-text-field
+                <v-row v-if="partyBusiness === 'B'" no-gutters>
+                  <v-col>
+                    <v-text-field
                       filled
                       id="txt-name"
                       label="Business Legal Name"
-                      v-model="businessName"
-                      :error-messages="errors.businessName.message ?
-                      errors.businessName.message : ''"
+                      v-model="currentSecuredParty.businessName"
+                      :error-messages="
+                        errors.businessName.message
+                          ? errors.businessName.message
+                          : ''
+                      "
                       persistent-hint
-                      :hide-details="hideDetails"
                     />
-                    </v-col>
+                  </v-col>
                 </v-row>
                 <v-row v-else no-gutters>
-                    <v-col cols="4" class="pr-4">
+                  <v-col cols="4" class="pr-4">
                     <v-text-field
                       filled
                       label="First Name"
                       id="txt-first"
-                      v-model="currentParty.personName.first"
+                      v-model="currentSecuredParty.personName.first"
                       persistent-hint
                       @blur="onBlur('first')"
-                      :error-messages="errors.first.message ? errors.first.message : ''"
+                      :error-messages="
+                        errors.first.message ? errors.first.message : ''
+                      "
                     />
                   </v-col>
                   <v-col cols="4" class="pr-4">
@@ -79,7 +84,7 @@
                       filled
                       label="Middle Name (Optional)"
                       id="txt-middle"
-                      v-model="currentParty.personName.middle"
+                      v-model="currentSecuredParty.personName.middle"
                       persistent-hint
                     />
                   </v-col>
@@ -88,81 +93,85 @@
                       filled
                       label="Last Name"
                       id="txt-last"
-                      v-model="currentParty.personName.last"
+                      v-model="currentSecuredParty.personName.last"
                       persistent-hint
                       @blur="onBlur('last')"
-                      :error-messages="errors.last.message ? errors.last.message : ''"
+                      :error-messages="
+                        errors.last.message ? errors.last.message : ''
+                      "
                     />
                   </v-col>
                 </v-row>
                 <v-row no-gutters>
-                    <v-col>
-                      <label class="general-label">Email Address</label>
-                    </v-col>
+                  <v-col>
+                    <label class="general-label">Email Address</label>
+                  </v-col>
                 </v-row>
                 <v-row no-gutters>
-                    <v-col>
-                     <v-text-field
+                  <v-col>
+                    <v-text-field
                       filled
                       id="txt-email"
                       label="Email Address"
-                      v-model="email"
-                      :error-messages="errors.email.message ?
-                      errors.email.message : ''"
+                      v-model="currentSecuredParty.email"
+                      :error-messages="
+                        errors.email.message ? errors.email.message : ''
+                      "
                       persistent-hint
                     />
-                    </v-col>
-                </v-row>
-                <v-row no-gutters>
-                    <v-col>
-                      <label class="general-label">Address</label>
-                    </v-col>
-                </v-row>
-                <!-- <base-address ref="regMailingAddress"
-                    id="address-Party"
-                    :address="currentParty.address"
-                    :editing="true"
-                    :schema="addressSchema"
-                    @update:address="updateAddress($event)"
-                    @valid="updateValidity($event)"
-                  /> -->
-
-                <v-row>
-                  <v-col>
-                  <div class="form__row form__btns">
-                    <v-btn
-                      large
-                      outlined
-                      color="error"
-                      :disabled="activeIndex === -1"
-                      @click="removeParty()"
-                      id="remove-btn"
-                      >Remove
-                    </v-btn>
-
-                    <v-btn
-                      large
-                      id="done-btn"
-                      class="m1-auto"
-                      color="primary"
-                      @click="onSubmitForm()"
-                    >
-                      Done
-                    </v-btn>
-
-                    <v-btn
-                      id="cancel-btn"
-                      large
-                      outlined
-                      color="primary"
-                      @click="resetFormAndData(true)"
-                    >
-                      Cancel
-                    </v-btn>
-                  </div>
                   </v-col>
                 </v-row>
-              </v-form>
+                <v-row no-gutters>
+                  <v-col>
+                    <label class="general-label">Address</label>
+                  </v-col>
+                </v-row>
+                <base-address
+                  ref="regMailingAddress"
+                  id="address-secured-party"
+                  v-model="currentSecuredParty.address"
+                  :editing="true"
+                  :schema="addressSchema"
+                  @valid="updateValidity($event)"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <div class="form__row form__btns">
+                  <v-btn
+                    large
+                    outlined
+                    color="error"
+                    :disabled="activeIndex === -1"
+                    @click="removeParty()"
+                    id="remove-btn"
+                    >Remove
+                  </v-btn>
+
+                  <v-btn
+                    large
+                    id="done-btn"
+                    class="m1-auto"
+                    color="primary"
+                    @click="onSubmitForm()"
+                  >
+                    Done
+                  </v-btn>
+
+                  <v-btn
+                    id="cancel-btn"
+                    large
+                    outlined
+                    color="primary"
+                    @click="resetFormAndData(true)"
+                  >
+                    Cancel
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-form>
         </v-col>
       </v-row>
     </v-expand-transition>
@@ -174,24 +183,21 @@ import {
   defineComponent,
   onMounted,
   reactive,
-  toRefs
+  toRefs,
+  computed
 } from '@vue/composition-api'
-// import BaseAddress from 'sbc-common-components/src/components/BaseAddress.vue'
+import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
 import { useSecuredParty } from './composables/useSecuredParty'
 
 export default defineComponent({
   components: {
-    // BaseAddress,
+    BaseAddress
   },
   props: {
     activeIndex: {
       type: Number,
       default: -1
-    },
-    isBusiness: {
-      type: Boolean,
-      default: true
     },
     invalidSection: {
       type: Boolean,
@@ -214,17 +220,34 @@ export default defineComponent({
     const { errors, updateValidity } = useSecuredPartyValidation()
 
     const localState = reactive({
+      partyBusiness: '',
+      isPartyType: computed((): boolean => {
+        if (localState.partyBusiness === '') {
+          return false
+        }
+        return true
+      })
     })
 
-    const onBlur = (fieldname) => {
-    }
+    const onBlur = fieldname => {}
 
     const onSubmitForm = async () => {
       addSecuredParty()
     }
 
+    const getPartyBusiness = () => {
+      const businessValue = currentIsBusiness.value
+      if (businessValue !== null) {
+        if (businessValue) {
+          localState.partyBusiness = 'B'
+        }
+        localState.partyBusiness = 'I'
+      }
+    }
+
     onMounted(() => {
       getSecuredParty()
+      getPartyBusiness()
     })
 
     return {
@@ -245,5 +268,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import "@/assets/styles/theme.scss";
+@import '@/assets/styles/theme.scss';
 </style>

@@ -10,5 +10,5 @@
   "KEYCLOAK_CONFIG_PATH": "/local-keycloak-config-url/keycloak.json",
   "VON_API_URL": "https://orgbook.gov.bc.ca/api/v3",
   "POD_NAMESPACE": "dev",
-  "ADDRESS_COMPLETE_KEY": ""
+  "ADDRESS_COMPLETE_KEY": "RH99-RN99-GB72-FW86"
 }

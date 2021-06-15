@@ -5,25 +5,35 @@ import { PartyAddressSchema } from '@/schemas'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
-  street: '',
-  streetAdditional: '',
-  city: '',
-  region: '',
-  country: '',
+  streetAddress: '',
+  streetAddressAdditional: '',
+  addressCity: '',
+  addressRegion: '',
+  addressCountry: '',
   postalCode: '',
   deliveryInstructions: ''
 }
 
 export const useSecuredParty = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>(['setAddSecuredPartiesAndDebtors'])
-  const { getAddSecuredPartiesAndDebtors } = useGetters<any>(['getAddSecuredPartiesAndDebtors'])
+  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
+    'setAddSecuredPartiesAndDebtors'
+  ])
+  const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
+    'getAddSecuredPartiesAndDebtors'
+  ])
   const localState = reactive({
-    currentSecuredParty: { businessName: '', personName: initPerson, emailAddress: '', address: initAddress } as PartyIF,
-    currentIsBusiness: props.isBusiness
+    currentSecuredParty: {
+      businessName: '',
+      personName: initPerson,
+      emailAddress: '',
+      address: initAddress
+    } as PartyIF,
+    currentIsBusiness: null
   })
 
   const getSecuredParty = () => {
-    const securedParties: PartyIF[] = getAddSecuredPartiesAndDebtors.value.securedParties
+    const securedParties: PartyIF[] =
+      getAddSecuredPartiesAndDebtors.value.securedParties
     if (props.activeIndex >= 0) {
       localState.currentSecuredParty = securedParties[props.activeIndex]
       localState.currentIsBusiness = false
@@ -31,7 +41,14 @@ export const useSecuredParty = (props, context) => {
         localState.currentIsBusiness = true
       }
     } else {
-      localState.currentSecuredParty = { businessName: '', personName: initPerson, emailAddress: '', address: initAddress }
+      const blankSecuredParty = {
+        businessName: '',
+        personName: Object.assign({}, initPerson),
+        birthDate: '',
+        email: '',
+        address: Object.assign({}, initAddress)
+      }
+      localState.currentSecuredParty = blankSecuredParty
     }
   }
 
@@ -46,7 +63,6 @@ export const useSecuredParty = (props, context) => {
     context.emit('removeSecuredParty', props.activeIndex)
     resetFormAndData(true)
   }
-
 
   const addSecuredParty = () => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
@@ -65,6 +81,29 @@ export const useSecuredParty = (props, context) => {
     context.emit('resetEvent')
   }
 
+  const addRegisteringParty = () => {
+    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+    // New debtor
+    const tempSecuredParty = {
+      businessName: 'Temp Registering Party',
+      email: 'temp@email.com',
+      address: {
+        streetAddress: '123 Any St',
+        streetAddressAdditional: '',
+        addressCity: 'Victoria',
+        addressRegion: 'BC',
+        addressCountry: 'Canada',
+        postalCode: 'V8T2T1',
+        deliveryInstructions: ''
+      }
+    }
+    newList.push(tempSecuredParty)
+
+    parties.securedParties = newList
+    setAddSecuredPartiesAndDebtors(parties)
+  }
+
   /**
    * Handles update events from address sub-components.
    */
@@ -75,6 +114,7 @@ export const useSecuredParty = (props, context) => {
   return {
     getSecuredParty,
     addSecuredParty,
+    addRegisteringParty,
     resetFormAndData,
     removeSecuredParty,
     addressSchema,

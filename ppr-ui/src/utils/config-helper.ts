@@ -96,4 +96,10 @@ export async function fetchConfig (): Promise<any> {
   const podNamespace = response.data.POD_NAMESPACE
   sessionStorage.setItem('POD_NAMESPACE', podNamespace)
   console.log('POD_NAMESPACE: ' + podNamespace)
+
+  const addressCompleteKey: string = response.data.ADDRESS_COMPLETE_KEY
+  if (addressCompleteKey) {
+    (<any>window).addressCompleteKey = addressCompleteKey
+    console.info('Set Address Complete Key.')
+  }
 }

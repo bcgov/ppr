@@ -60,9 +60,9 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, StatementTypes } from '@/enums'
 import {
-  ActionBindingIF,
-  FeeSummaryIF,
-  ErrorIF,
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  FeeSummaryIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 // local components

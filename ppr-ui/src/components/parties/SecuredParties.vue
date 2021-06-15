@@ -9,16 +9,18 @@
       </v-col>
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
-      <!-- Party Search here -->
+      <party-search
+      @showSecuredPartyAdd="initAdd"
+      @addRegisteringParty="addRegisteringParty"
+      />
     </v-row>
     <v-row no-gutters>
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
-            <v-card flat class="add-party-container" v-if="showAddParty">
+            <v-card flat class="add-party-container" v-if="showAddSecuredParty">
               <edit-party
                 :activeIndex="activeIndex"
-                :isBusiness="isBusiness"
                 :invalidSection="invalidSection"
                 @resetEvent="resetData"
               />
@@ -32,7 +34,7 @@
         <v-data-table
           class="party-table"
           :headers="headers"
-          :items="parties"
+          :items="securedParties"
           disable-pagination
           disable-sort
           hide-default-footer
@@ -50,7 +52,8 @@
               <td>
                 <span v-html="getFormattedAddress(row.item)"> </span>
               </td>
-              <td>{{ getFormattedBirthdate(row.item) }}</td>
+              <td>{{ row.item.email }}</td>
+              <td>{{ row.item.code }}</td>
               <!-- Action Btns -->
               <td class="actions-cell pa-0">
                 <div class="actions">
@@ -130,13 +133,16 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditParty from './EditParty.vue'
+import PartySearch from './PartySearch.vue'
 import { useParty } from '@/composables/useParty'
+import { useSecuredParty } from './composables/useSecuredParty'
 
 import { partyTableHeaders } from '@/resources'
 
 export default defineComponent({
   components: {
-    EditParty
+    EditParty,
+    PartySearch
   },
   props: {
     isSummary: {
@@ -144,7 +150,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
@@ -154,10 +160,11 @@ export default defineComponent({
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const { getName, getFormattedAddress } = useParty()
+    const { addRegisteringParty } = useSecuredParty(props, context)
 
     const localState = reactive({
       summaryView: props.isSummary,
-      showAddParty: false,
+      showAddSecuredParty: false,
       isBusiness: true,
       addEditInProgress: false,
       invalidSection: false,
@@ -184,15 +191,14 @@ export default defineComponent({
       localState.showEditParty[index] = true
     }
 
-    const initAdd = (isBusiness: boolean) => {
-      localState.isBusiness = isBusiness
-      localState.showAddParty = true
+    const initAdd = () => {
+      localState.showAddSecuredParty = true
     }
 
     const resetData = () => {
       localState.activeIndex = -1
       localState.addEditInProgress = false
-      localState.showAddParty = false
+      localState.showAddSecuredParty = false
       localState.showEditParty = [false]
     }
 
@@ -203,6 +209,8 @@ export default defineComponent({
       initEdit,
       initAdd,
       resetData,
+      parties,
+      addRegisteringParty,
       ...toRefs(localState)
     }
   }
