@@ -39,7 +39,6 @@ export const useDebtor = (props, context) => {
   })
 
   const getDebtor = () => {
-    console.log(props.activeIndex)
     const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.value.debtors
     if (props.activeIndex >= 0) {
       localState.currentDebtor = debtors[props.activeIndex]
@@ -58,7 +57,6 @@ export const useDebtor = (props, context) => {
         address: Object.assign({}, initAddress)
       }
       localState.currentDebtor = blankDebtor
-      console.log(localState.currentDebtor)
     }
   }
 
@@ -106,7 +104,6 @@ export const useDebtor = (props, context) => {
       newList.splice(props.activeIndex, 1, localState.currentDebtor)
     }
     parties.debtors = newList
-    console.log(newList)
     // collateral.valid = true
     setAddSecuredPartiesAndDebtors(parties)
     context.emit('resetEvent')
