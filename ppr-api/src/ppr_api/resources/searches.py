@@ -36,6 +36,15 @@ VAL_ERROR = 'Search request data validation errors.'  # Validation error prefix
 SAVE_ERROR_MESSAGE = 'Account {0} search db save failed: {1}'
 PAY_REFUND_MESSAGE = 'Account {0} search refunding payment for invoice {1}.'
 PAY_REFUND_ERROR = 'Account {0} search payment refund failed for invoice {1}: {2}.'
+# Map api spec search type to payment transaction details description
+TO_DB_SEARCH_TYPE = {
+    'AIRCRAFT_DOT': 'Search by Aircraft DOT:',
+    'BUSINESS_DEBTOR': 'Search by Business Debtor:',
+    'INDIVIDUAL_DEBTOR': 'Search by Individual Debtor:',
+    'MHR_NUMBER': 'Search by MHR Number:',
+    'REGISTRATION_NUMBER': 'Search by Registration Number:',
+    'SERIAL_NUMBER': 'Search by Serial Number:'
+}
 
 
 @cors_preflight('POST,OPTIONS')
@@ -72,7 +81,9 @@ class SearchResource(Resource):
             # Charge a search fee.
             invoice_id = None
             if account_id:
-                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+                payment = Payment(jwt=jwt.get_token_auth_header(),
+                                  account_id=account_id,
+                                  details=get_payment_details(query, request_json['type']))
                 pay_ref = payment.create_payment(TransactionTypes.SEARCH.value, 1, None, query.client_reference_id)
                 invoice_id = pay_ref['invoiceId']
                 query.pay_invoice_id = int(invoice_id)
@@ -153,3 +164,19 @@ class SearchDetailResource(Resource):
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
+
+
+def get_payment_details(search_request, search_type):
+    """Extract the payment details value from the search request criteria."""
+    details = {
+        'label': TO_DB_SEARCH_TYPE[search_type]
+    }
+    if search_request.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
+        details['value'] = search_request.search_criteria['criteria']['debtorName']['business']
+    elif search_request.search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
+        details['value'] = search_request.search_criteria['criteria']['debtorName']['last'] + ', ' +\
+                           search_request.search_criteria['criteria']['debtorName']['first']
+    else:
+        details['value'] = search_request.search_criteria['criteria']['value']
+
+    return details

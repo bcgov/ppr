@@ -37,12 +37,13 @@ class TransactionTypes(Enum):
 class Payment:
     """Interface for the pay-api service."""
 
-    def __init__(self, jwt=None, account_id=None, api_key=None):
+    def __init__(self, jwt=None, account_id=None, api_key=None, details=None):
         """Initialize, set api url from env variable."""
         self.api_url = None
         self.jwt = jwt
         self.account_id = account_id
         self.api_key = api_key
+        self.details = details
 
     def create_payment(self, transaction_type, quantity, transaction_id=None, client_reference_id=None):
         """Submit a payment request for the account_id-jwt pair.
@@ -53,9 +54,13 @@ class Payment:
         Transaction ID is the ppr GUID reference for the payment transaction: either the
         registration_id or the search_id if available.
         Client reference ID if present maps to the pay api folio number.
+        Detail_label and detail_value if they exist will show up on the account transaction report.
         """
         try:
-            api_instance = SBCPaymentClient(self.jwt, self.account_id, self.api_key)
+            api_instance = SBCPaymentClient(self.jwt,
+                                            self.account_id,
+                                            self.api_key,
+                                            self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
             api_response = api_instance.create_payment(transaction_type,

@@ -24,9 +24,11 @@ import pytest
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_QUERY
 
-from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
-from tests.unit.services.utils import create_header_account, create_header
-from ppr_api.models.utils import now_ts_offset, format_ts
+from ppr_api.models import SearchRequest
+from ppr_api.models.utils import format_ts, now_ts_offset
+from ppr_api.resources.searches import get_payment_details
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from tests.unit.services.utils import create_header, create_header_account
 
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
@@ -342,3 +344,17 @@ def test_search_selection_update_nonstaff_no_account_400(session, client, jwt):
                     content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
+
+
+def test_get_payment_details(session, client, jwt):
+    """Assert that a valid search request payment details setup works as expected."""
+    # setup
+    json_data = copy.deepcopy(SERIAL_NUMBER_JSON)
+    query = SearchRequest.create_from_json(json_data)
+    # test
+    details = get_payment_details(query, json_data['type'])
+
+    # check
+    assert details
+    assert details['label'] == 'Search by Serial Number:'
+    assert details['value'] == 'JU622994'

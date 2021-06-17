@@ -31,6 +31,10 @@ from tests.unit.services.utils import helper_create_jwt
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 MOCK_URL = 'https://bcregistry-bcregistry-mock.apigee.net/pay/api/v1/'
+PAY_DETAILS_SEARCH = {
+    'label': 'Search by SERIAL_NUMBER',
+    'value': '123456789'
+}
 
 
 def test_payment_data_all(client, jwt):
@@ -116,6 +120,23 @@ def test_client_search_mock(client, jwt):
     assert pay_data['receipt']
 
 
+def test_client_search_pay_details_mock(client, jwt):
+    """Assert that a pay-api client with payment details works as expected with the mock service endpoint."""
+    # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=PAY_DETAILS_SEARCH)
+    pay_client.api_url = MOCK_URL_NO_KEY
+
+    # test
+    pay_data = pay_client.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
+
+    print(pay_data)
+    # check
+    assert pay_data
+    assert pay_data['invoiceId']
+    assert pay_data['receipt']
+
+
 def test_client_exception(client, jwt):
     """Assert that the pay-api client works as expected with an unuathorized exception."""
     # setup
@@ -135,6 +156,22 @@ def test_payment_search_mock(client, jwt):
     # setup
     token = helper_create_jwt(jwt, [PPR_ROLE])
     payment = Payment(jwt=token, account_id='PS12345')
+    payment.api_url = MOCK_URL_NO_KEY
+
+    # test
+    pay_data = payment.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
+    print(pay_data)
+    # check
+    assert pay_data
+    assert pay_data['invoiceId']
+    assert pay_data['receipt']
+
+
+def test_payment_with_details_search_mock(client, jwt):
+    """Assert that a pay-api search payment request with details works as expected with the mock service endpoint."""
+    # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_SEARCH)
     payment.api_url = MOCK_URL_NO_KEY
 
     # test
