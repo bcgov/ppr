@@ -37,13 +37,13 @@ SAVE_ERROR_MESSAGE = 'Account {0} search db save failed: {1}'
 PAY_REFUND_MESSAGE = 'Account {0} search refunding payment for invoice {1}.'
 PAY_REFUND_ERROR = 'Account {0} search payment refund failed for invoice {1}: {2}.'
 # Map api spec search type to payment transaction details description
-TO_DB_SEARCH_TYPE = {
-    'AIRCRAFT_DOT': 'Search by Aircraft DOT:',
-    'BUSINESS_DEBTOR': 'Search by Business Debtor:',
-    'INDIVIDUAL_DEBTOR': 'Search by Individual Debtor:',
-    'MHR_NUMBER': 'Search by MHR Number:',
+TO_SEARCH_TYPE_DESCRIPTION = {
+    'AIRCRAFT_DOT': 'Aircraft Airframe DOT Number:',
+    'BUSINESS_DEBTOR': 'Debtor Business Name:',
+    'INDIVIDUAL_DEBTOR': 'Debtor Individual Name:',
+    'MHR_NUMBER': 'Manufactured Home Registration Number:',
     'REGISTRATION_NUMBER': 'Search by Registration Number:',
-    'SERIAL_NUMBER': 'Search by Serial Number:'
+    'SERIAL_NUMBER': 'Serial/VIN Number:'
 }
 
 
@@ -169,7 +169,7 @@ class SearchDetailResource(Resource):
 def get_payment_details(search_request, search_type):
     """Extract the payment details value from the search request criteria."""
     details = {
-        'label': TO_DB_SEARCH_TYPE[search_type]
+        'label': TO_SEARCH_TYPE_DESCRIPTION[search_type]
     }
     if search_request.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
         details['value'] = search_request.search_criteria['criteria']['debtorName']['business']

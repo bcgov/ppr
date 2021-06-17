@@ -356,5 +356,5 @@ def test_get_payment_details(session, client, jwt):
 
     # check
     assert details
-    assert details['label'] == 'Search by Serial Number:'
+    assert details['label'] == 'Serial/VIN Number:'
     assert details['value'] == 'JU622994'
