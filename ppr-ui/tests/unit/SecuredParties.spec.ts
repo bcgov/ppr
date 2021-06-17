@@ -5,23 +5,17 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
-  mockedDebtors1,
-  mockedDebtors2
+  mockedSecuredParties1,
+  mockedSecuredParties2
 } from './test-data'
 
 // Components
-import { Debtors, EditDebtor } from '@/components/parties'
+import { SecuredParties, EditParty } from '@/components/parties'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
-// Events
-
-// Input field selectors / buttons
-const addIndividualSelector: string = '#btn-add-individual'
-const addBusinessSelector: string = '#btn-add-business'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -34,7 +28,7 @@ function createComponent (
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Debtors, {
+  return mount(SecuredParties, {
     localVue,
     propsData: {},
     store,
@@ -42,7 +36,7 @@ function createComponent (
   })
 }
 
-describe('Debtor SA tests', () => {
+describe('Secured Party SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -53,27 +47,18 @@ describe('Debtor SA tests', () => {
   })
 
   it('renders with default values', async () => {
-    expect(wrapper.findComponent(Debtors).exists()).toBe(true)
+    expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
     // won't show edit collateral component until click
-    expect(wrapper.findComponent(EditDebtor).exists()).toBeFalsy()
-  })
-
-  it('add debtor button shows the add form', async () => {
-    expect(wrapper.find(addIndividualSelector).exists()).toBe(true)
-    expect(wrapper.find(addBusinessSelector).exists()).toBe(true)
-    wrapper.find(addIndividualSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.findComponent(EditDebtor).exists()).toBeTruthy()
-    expect(wrapper.findComponent(EditDebtor).isVisible()).toBe(true)
+    expect(wrapper.findComponent(EditParty).exists()).toBeFalsy()
   })
 })
 
-describe('Collateral store tests', () => {
+describe('Secured Party store tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      debtors: mockedDebtors1
+      securedParties: mockedSecuredParties1
     })
     wrapper = createComponent()
   })
@@ -81,23 +66,23 @@ describe('Collateral store tests', () => {
     wrapper.destroy()
   })
 
-  it('renders debtor table and headers', async () => {
-    expect(wrapper.find('.debtor-table').exists()).toBeTruthy()
+  it('renders secured party table and headers', async () => {
+    expect(wrapper.find('.party-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.text-start').length).toBe(4)
+    expect(wrapper.findAll('.text-start').length).toBe(5)
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
 
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
 
-    expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('SECURED PARTY COMPANY LTD.')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    expect(item1.querySelectorAll('td')[2].textContent).toContain('June 16, 1990')
+    expect(item1.querySelectorAll('td')[2].textContent).toContain('test@company.com')
   })
 })

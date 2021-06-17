@@ -40,7 +40,7 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent(
+function createComponent (
   defaultRegistrationType: String
 ): Wrapper<any> {
   const localVue = createLocalVue()

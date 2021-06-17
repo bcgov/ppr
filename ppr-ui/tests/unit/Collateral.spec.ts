@@ -27,7 +27,7 @@ const addButtonSelector: string = '#btn-add-collateral'
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent(
+function createComponent (
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -65,10 +65,7 @@ describe('Collateral SA tests', () => {
     expect(wrapper.findComponent(EditCollateral).exists()).toBeTruthy()
     expect(wrapper.findComponent(EditCollateral).isVisible()).toBe(true)
   })
-
 })
-
-
 
 describe('Collateral store tests', () => {
   let wrapper: Wrapper<any>
@@ -87,7 +84,6 @@ describe('Collateral store tests', () => {
   it('renders general collateral when set', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.vm.generalCollateral).toEqual('TEST1 GENERAL COLLATERAL')
-
   })
   it('renders vehicle collateral table and headers', async () => {
     expect(wrapper.find('.collateral-table').exists()).toBeTruthy()
@@ -109,6 +105,5 @@ describe('Collateral store tests', () => {
     expect(vehicleItem1.querySelectorAll('td')[2].textContent).toContain('HYUNDAI')
     expect(vehicleItem1.querySelectorAll('td')[3].textContent).toContain('TUSCON')
     expect(vehicleItem1.querySelectorAll('td')[4].textContent).toContain('KM8J3CA46JU622994')
-
   })
 })

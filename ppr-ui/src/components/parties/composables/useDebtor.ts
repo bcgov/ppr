@@ -7,26 +7,30 @@ import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
-  street: '',
-  streetAdditional: '',
-  city: '',
-  region: '',
-  country: '',
+  streetAddress: '',
+  streetAddressAdditional: '',
+  addressCity: '',
+  addressRegion: '',
+  addressCountry: '',
   postalCode: '',
   deliveryInstructions: ''
 }
-const {
-  getDay,
-  getMonth,
-  getMonthFull,
-  getYear
-} = useParty()
+const { getDay, getMonth, getMonthFull, getYear } = useParty()
 
 export const useDebtor = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>(['setAddSecuredPartiesAndDebtors'])
-  const { getAddSecuredPartiesAndDebtors } = useGetters<any>(['getAddSecuredPartiesAndDebtors'])
+  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
+    'setAddSecuredPartiesAndDebtors'
+  ])
+  const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
+    'getAddSecuredPartiesAndDebtors'
+  ])
   const localState = reactive({
-    currentDebtor: { businessName: '', personName: initPerson, birthDate: '', address: initAddress } as PartyIF,
+    currentDebtor: {
+      businessName: '',
+      personName: initPerson,
+      birthDate: '',
+      address: initAddress
+    } as PartyIF,
     year: '',
     day: '',
     monthValue: 0,
@@ -46,7 +50,13 @@ export const useDebtor = (props, context) => {
         localState.day = getDay(localState.currentDebtor)
       }
     } else {
-      localState.currentDebtor = { businessName: '', personName: initPerson, birthDate: '', address: initAddress }
+      const blankDebtor = {
+        businessName: '',
+        personName: Object.assign({}, initPerson),
+        birthDate: '',
+        address: Object.assign({}, initAddress)
+      }
+      localState.currentDebtor = blankDebtor
     }
   }
 
@@ -74,7 +84,11 @@ export const useDebtor = (props, context) => {
     if (!localState.currentIsBusiness) {
       const dateOfBirth = new Date()
       // @ts-ignore - returned by toRef
-      dateOfBirth.setFullYear(parseInt(localState.year), parseInt(localState.monthValue) - 1, parseInt(localState.day))
+      dateOfBirth.setFullYear(
+        parseInt(localState.year),
+        localState.monthValue - 1,
+        parseInt(localState.day)
+      )
       if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
         localState.currentDebtor.birthDate = dateOfBirth.toUTCString()
       }
@@ -95,20 +109,12 @@ export const useDebtor = (props, context) => {
     context.emit('resetEvent')
   }
 
-  /**
-   * Handles update events from address sub-components.
-   */
-  const updateAddress = (newAddress: AddressIF): void => {
-    localState.currentDebtor.address = newAddress
-  }
-
   return {
     getDebtor,
     addDebtor,
     resetFormAndData,
     removeDebtor,
     addressSchema,
-    updateAddress,
     getMonthObject,
     ...toRefs(localState)
   }

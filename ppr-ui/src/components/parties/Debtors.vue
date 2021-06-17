@@ -59,7 +59,7 @@
           disable-pagination
           disable-sort
           hide-default-footer
-          no-data-text="No debtors addeed yet."
+          no-data-text="No debtors added yet."
         >
           <template v-slot:item="row" class="debtor-data-table">
             <tr

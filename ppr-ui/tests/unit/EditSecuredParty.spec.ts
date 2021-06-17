@@ -5,18 +5,17 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  mockedDebtors1,
-  mockedDebtors2
-} from './test-data'
+import { mockedSecuredParties1, mockedSecuredParties2 } from './test-data'
 
 // Components
-import { EditDebtor } from '@/components/parties'
+import { EditParty } from '@/components/parties'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
+
+// Events
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn'
@@ -30,126 +29,124 @@ const removeButtonSelector: string = '#remove-btn'
  */
 function createComponent (
   activeIndex: Number,
-  isBusiness: boolean,
   invalidSection: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(EditDebtor, {
+  return mount(EditParty, {
     localVue,
-    propsData: { activeIndex, isBusiness, invalidSection },
+    propsData: { activeIndex, invalidSection },
     store,
     vuetify
   })
 }
 
-describe('Debtor add individual tests', () => {
+describe('Secured Party add individual tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = createComponent(-1, false, false)
+    wrapper = createComponent(-1, false)
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders with default values', async () => {
-    expect(wrapper.findComponent(EditDebtor).exists()).toBe(true)
-    expect(wrapper.vm.currentDebtor.personName.first).toBe('')
+    expect(wrapper.findComponent(EditParty).exists()).toBe(true)
+    // radio button value is blank
+    expect(wrapper.vm.partyBusiness).toBe('')
   })
 
   it('shows buttons on the form and remove button is disabled', async () => {
     expect(wrapper.find(doneButtonSelector).exists()).toBe(true)
     expect(wrapper.find(cancelButtonSelector).exists()).toBe(true)
     expect(wrapper.find(removeButtonSelector).exists()).toBe(true)
-    expect(wrapper.find(removeButtonSelector).attributes('disabled')).toBe('disabled')
+    expect(wrapper.find(removeButtonSelector).attributes('disabled')).toBe(
+      'disabled'
+    )
   })
 
-  it('adds a debtor to the store', async () => {
+  it('adds a secured party to the store', async () => {
+    const radioInput = wrapper.findAll('input[type="radio"]')
+    const radioIsIndividual = radioInput.at(0)
+
+    await radioIsIndividual.trigger('click')
     wrapper.find('#txt-first').setValue('JOE')
     wrapper.find('#txt-last').setValue('SCHMOE')
-    wrapper.find('#txt-month').setValue(6)
-    wrapper.find('#txt-day').setValue('25')
-    wrapper.find('#txt-year').setValue(1980)
+    wrapper.find('#txt-email').setValue('joe@apples.com')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddSecuredPartiesAndDebtors.debtors.length).toBe(1)
+    expect(
+      store.getters.getAddSecuredPartiesAndDebtors.securedParties.length
+    ).toBe(1)
   })
 })
 
-describe('Debtor add business tests', () => {
+describe('Secured Party add business tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = createComponent(-1, true, false)
+    wrapper = createComponent(-1, false)
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders with default values', async () => {
-    expect(wrapper.findComponent(EditDebtor).exists()).toBe(true)
-    expect(wrapper.vm.currentDebtor.businessName).toBe('')
+    expect(wrapper.findComponent(EditParty).exists()).toBe(true)
+    expect(wrapper.vm.currentSecuredParty.businessName).toBe('')
   })
 
-  it('adds a debtor to the store', async () => {
+  it('adds a secured party business to the store', async () => {
+    const radioInput = wrapper.findAll('input[type="radio"]')
+    const radioIsBusiness = radioInput.at(1)
+
+    await radioIsBusiness.trigger('click')
     wrapper.find('#txt-name').setValue('TONYS TOOLS')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddSecuredPartiesAndDebtors.debtors[1].businessName).toBe('TONYS TOOLS')
+    expect(
+      store.getters.getAddSecuredPartiesAndDebtors.securedParties[1]
+        .businessName
+    ).toBe('TONYS TOOLS')
   })
 })
 
-describe('Debtor edit individual tests', () => {
+describe('Secured Party edit individual tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      debtors: mockedDebtors1
+      securedParties: mockedSecuredParties2
     })
-    wrapper = createComponent(0, false, false)
+    wrapper = createComponent(0, false)
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
-  it('renders debtor when editing', async () => {
-    expect(wrapper.findComponent(EditDebtor).exists()).toBe(true)
-    expect(wrapper.vm.currentDebtor.personName.first).toEqual('TEST')
-    expect(wrapper.vm.currentDebtor.personName.last).toEqual('INDIVIDUAL DEBTOR')
-    expect(wrapper.vm.currentDebtor.birthDate).toEqual('1990-06-15T16:42:00-08:00')
+  it('renders secured party when editing', async () => {
+    expect(wrapper.findComponent(EditParty).exists()).toBe(true)
+    expect(wrapper.vm.currentSecuredParty.personName.first).toEqual('TEST')
+    expect(wrapper.vm.currentSecuredParty.personName.last).toEqual(
+      'INDIVIDUAL PARTY'
+    )
+    expect(wrapper.vm.currentSecuredParty.emailAddress).toEqual(
+      'test@person.com'
+    )
   })
 
   it('Emits reset event', async () => {
     wrapper.find(cancelButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
-  })
-})
-
-describe('Debtor edit business tests', () => {
-  let wrapper: Wrapper<any>
-
-  beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      debtors: mockedDebtors2
-    })
-    wrapper = createComponent(0, true, false)
-  })
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
-  it('renders debtor when editing', async () => {
-    expect(wrapper.findComponent(EditDebtor).exists()).toBe(true)
-    expect(wrapper.vm.currentDebtor.businessName).toEqual('SOMEBODYS BUSINESS')
   })
 })

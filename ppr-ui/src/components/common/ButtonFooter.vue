@@ -2,33 +2,59 @@
   <v-footer class="white pa-0">
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
-      <v-col cols="9">
-        <span class="pr-3" v-if="buttonConfig.showCancel">
-          <v-btn id='reg-cancel-btn' outlined color="primary" @click="submitCancel">
-            Cancel
+        <v-col cols="9">
+          <span class="pr-3" v-if="buttonConfig.showCancel">
+            <v-btn
+              id="reg-cancel-btn"
+              outlined
+              color="primary"
+              @click="submitCancel"
+            >
+              Cancel
+            </v-btn>
+          </span>
+          <span class="pr-3" v-if="buttonConfig.showSaveResume">
+            <v-btn
+              id="reg-save-resume-btn"
+              outlined
+              color="primary"
+              @click="submitSaveResume"
+            >
+              Save and Resume Later
+            </v-btn>
+          </span>
+          <v-btn
+            id="reg-save-btn"
+            outlined
+            color="primary"
+            @click="submitSave"
+            v-if="buttonConfig.showSave"
+          >
+            Save
           </v-btn>
-        </span>
-        <span class="pr-3" v-if="buttonConfig.showSaveResume">
-          <v-btn id='reg-save-resume-btn' outlined color="primary" @click="submitSaveResume">
-            Save and Resume Later
+        </v-col>
+        <v-col cols="3" justify="end">
+          <span class="pr-3" v-if="buttonConfig.showBack">
+            <v-btn
+              id="reg-back-btn"
+              outlined
+              color="primary"
+              @click="submitBack"
+            >
+              <v-icon color="primary">mdi-chevron-left</v-icon> Back
+            </v-btn>
+          </span>
+          <v-btn
+            id="reg-next-btn"
+            color="primary"
+            class="float-right"
+            @click="submitNext"
+          >
+            {{ buttonConfig.nextText }}
+            <v-icon color="white">mdi-chevron-right</v-icon>
           </v-btn>
-        </span>
-        <v-btn id='reg-save-btn' outlined color="primary" @click="submitSave" v-if="buttonConfig.showSave">
-          Save
-        </v-btn>
-      </v-col>
-      <v-col cols="3" justify="end">
-        <span class="pr-3" v-if="buttonConfig.showBack">
-          <v-btn id='reg-back-btn' outlined color="primary" @click="submitBack">
-<v-icon color="white">mdi-chevron-left</v-icon> Back
-
-          </v-btn>
-        </span>
-        <v-btn id='reg-next-btn' color="primary" class="float-right" @click="submitNext">
-          {{buttonConfig.nextText}} <v-icon color="white">mdi-chevron-right</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
+        </v-col>
+      </v-row>
     </v-container>
   </v-footer>
 </template>
@@ -36,13 +62,20 @@
 <script lang="ts">
 // external
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs
+} from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
 import {
-  ActionBindingIF, ButtonConfigIF, DraftIF, ErrorIF, // eslint-disable-line no-unused-vars
+  ButtonConfigIF, // eslint-disable-line no-unused-vars
+  DraftIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
   StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
@@ -68,19 +101,24 @@ export default defineComponent({
     const localState = reactive({
       statementType: props.currentStatementType,
       stepName: props.currentStepName,
-      buttonConfig: computed((): ButtonConfigIF => {
-        if (localState.statementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT) {
-          const stepConfig: Array<ButtonConfigIF> = getFinancingButtons.value
-          var config:ButtonConfigIF
-          for (var i in stepConfig) {
-            config = stepConfig[i]
-            if (config.stepName === localState.stepName) {
-              return config
+      buttonConfig: computed(
+        (): ButtonConfigIF => {
+          if (
+            localState.statementType.toUpperCase() ===
+            StatementTypes.FINANCING_STATEMENT
+          ) {
+            const stepConfig: Array<ButtonConfigIF> = getFinancingButtons.value
+            var config: ButtonConfigIF
+            for (var i in stepConfig) {
+              config = stepConfig[i]
+              if (config.stepName === localState.stepName) {
+                return config
+              }
             }
           }
+          return null
         }
-        return null
-      })
+      )
     })
     const submitCancel = () => {
       // clear all state set data
@@ -92,11 +130,16 @@ export default defineComponent({
     }
     /** Save the draft version from data stored in the state model. */
     const saveDraft = async () => {
-      const stateModel:StateModelIF = getStateModel.value
-      const draft:DraftIF = await saveFinancingStatementDraft(stateModel)
+      const stateModel: StateModelIF = getStateModel.value
+      const draft: DraftIF = await saveFinancingStatementDraft(stateModel)
       setDraft(draft)
       if (draft.error !== undefined) {
-        console.log('saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message)
+        console.log(
+          'saveDraft error status: ' +
+            draft.error.statusCode +
+            ' message: ' +
+            draft.error.message
+        )
         // Emit error message.
         emit('draft-save-error', draft.error)
         return false
@@ -120,8 +163,11 @@ export default defineComponent({
       })
     }
     const submitNext = () => {
-      if (localState.statementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT &&
-          localState.stepName === RouteNames.REVIEW_CONFIRM) {
+      if (
+        localState.statementType.toUpperCase() ===
+          StatementTypes.FINANCING_STATEMENT &&
+        localState.stepName === RouteNames.REVIEW_CONFIRM
+      ) {
         submitFinancingStatement()
       } else {
         props.router.push({
@@ -132,10 +178,12 @@ export default defineComponent({
 
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
     const submitFinancingStatement = () => {
-      const stateModel:StateModelIF = getStateModel.value
-      if (stateModel.lengthTrustStep.valid &&
-          stateModel.addSecuredPartiesAndDebtorsStep.valid &&
-          stateModel.addCollateralStep.valid) {
+      const stateModel: StateModelIF = getStateModel.value
+      if (
+        stateModel.lengthTrustStep.valid &&
+        stateModel.addSecuredPartiesAndDebtorsStep.valid &&
+        stateModel.addCollateralStep.valid
+      ) {
         // API call here
         // Handle API call error here
         props.router.push({
@@ -143,7 +191,7 @@ export default defineComponent({
         })
       } else {
         // emit registation incomplete error
-        const error:ErrorIF = {
+        const error: ErrorIF = {
           statusCode: 400,
           message: 'Registration incomplete: one or more steps is invalid.'
         }
@@ -186,5 +234,4 @@ export default defineComponent({
   color: white;
   font-size: 1.125rem;
 }
-
 </style>

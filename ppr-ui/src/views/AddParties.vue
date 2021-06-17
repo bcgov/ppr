@@ -4,43 +4,48 @@
       <v-container fluid class="pt-4">
         <v-row>
           <v-col cols="9">
-            <v-row no-gutters
-                   id="registration-header"
-                   class="length-trust-header pt-3 pb-3 soft-corners-top">
+            <v-row
+              no-gutters
+              id="registration-header"
+              class="length-trust-header pt-3 pb-3 soft-corners-top"
+            >
               <v-col cols="auto">
 <h1>{{ registrationTypeUI }}</h1>
 
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <v-row no-gutters class='pt-6'>
+            <v-row no-gutters class="pt-6">
               <v-col cols="auto" class="sub-header">
                 Add Secured Parties and Debtors
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col class="pt-2 pb-6">
-               Add the people and businesses who have an interest in this registration.
+                Add the people and businesses who have an interest in this
+                registration.
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col cols="auto">
                 <parties />
               </v-col>
-          </v-row>
-        </v-col>
-        <v-col cols="3">
-            <registration-fee
-              :registrationType="registrationTypeUI"
-            />
+            </v-row>
           </v-col>
+          <v-col cols="3">
+            <registration-fee :registrationType="registrationTypeUI" />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-row>
-    </v-container>
-    </v-row>
-    <v-row no-gutters class='pt-10'>
+    <v-row no-gutters class="pt-10">
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                       :router="this.$router" @draft-save-error="saveDraftError"/>
+        <button-footer
+          :currentStatementType="statementType"
+          :currentStepName="stepName"
+          :router="this.$router"
+          @draft-save-error="saveDraftError"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -55,7 +60,10 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, StatementTypes } from '@/enums'
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  FeeSummaryIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 // local components
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
