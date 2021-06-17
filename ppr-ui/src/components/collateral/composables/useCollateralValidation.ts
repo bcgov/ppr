@@ -22,15 +22,26 @@ export const useCollateralValidation = () => {
   const errors = ref(createEmptyErrors())
 
   const validateInput = (fieldName, value) => {
-    formValidation.validateField(fieldName, value)
+    formValidation
+      .validateField(fieldName, value)
       .then(validationResult => (errors.value[fieldName] = validationResult))
   }
 
-  const validateCollateralForm = async (currentVehicle) => {
+  // special case, need to pass in entire record
+  const validateSerial = currentVehicle => {
+    formValidation
+      .validateRecord(currentVehicle)
+      .then(function (validationResult) {
+        errors.value.serialNumber = validationResult.recordErrors.serialNumber
+      })
+  }
+
+  const validateCollateralForm = async currentVehicle => {
     const validationResult = await formValidation.validateForm(currentVehicle)
     errors.value = { ...errors.value, ...validationResult.fieldErrors }
     if (currentVehicle.type === 'MH') {
-      errors.value.manufacturedHomeRegistrationNumber = validationResult.recordErrors.serialNumber
+      errors.value.manufacturedHomeRegistrationNumber =
+        validationResult.recordErrors.serialNumber
     } else {
       errors.value.serialNumber = validationResult.recordErrors.serialNumber
     }
@@ -40,6 +51,7 @@ export const useCollateralValidation = () => {
   return {
     errors,
     validateInput,
+    validateSerial,
     validateCollateralForm
   }
 }

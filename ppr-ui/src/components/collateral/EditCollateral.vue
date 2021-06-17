@@ -57,8 +57,7 @@
                       id="txt-serial"
                       v-model="currentVehicle.serialNumber"
                       :error-messages="errors.serialNumber.message ? errors.serialNumber.message : ''"
-                      :hint="getSerialHint"
-                      @blur="onBlur('serialNumber')"
+                      @keyup="onBlur('serialNumber')"
                       persistent-hint
                     />
                   </v-col>
@@ -176,14 +175,12 @@ export default defineComponent({
       getSerialLabel,
       // @ts-ignore - returned by toRef
       getSerialDisabled,
-      // @ts-ignore - returned by toRef
-      getSerialHint,
       getVehicle,
       resetFormAndData,
       removeVehicle,
       addVehicle
     } = useVehicle(props, context)
-    const { errors, validateInput, validateCollateralForm } = useCollateralValidation()
+    const { errors, validateInput, validateSerial, validateCollateralForm } = useCollateralValidation()
     onMounted(getVehicle)
 
     const onSubmitForm = async () => {
@@ -196,7 +193,11 @@ export default defineComponent({
     }
 
     const onBlur = (fieldname) => {
-      validateInput(fieldname, currentVehicle.value[fieldname])
+      if (fieldname === 'serialNumber') {
+        validateSerial(currentVehicle.value)
+      } else {
+        validateInput(fieldname, currentVehicle.value[fieldname])
+      }
     }
 
     return {
@@ -208,8 +209,7 @@ export default defineComponent({
       currentVehicle,
       vehicleTypes,
       getSerialLabel,
-      getSerialDisabled,
-      getSerialHint
+      getSerialDisabled
     }
   }
 })

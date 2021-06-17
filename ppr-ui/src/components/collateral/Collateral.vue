@@ -13,15 +13,13 @@
       >
         <v-row no-gutters class="pa-6">
           <v-col cols="auto">
-            <v-icon color="#D3272C">mdi-information-outline</v-icon>
+            <v-icon color="#D3272C">mdi-information-outline</v-icon>&nbsp;
             <span class="invalid-message">This step is unfinished.</span>
             <router-link
               id="router-link-collateral"
               class="invalid-link"
               :to="{ path: '/add-collateral' }"
-            >
-              Return to this step to complete it.
-            </router-link>
+            >Return to this step to complete it.</router-link>
           </v-col>
         </v-row>
       </v-container>
@@ -42,8 +40,8 @@
               no-data-text="No vehicle collateral"
             >
               <template v-slot:item="row" class="vehicle-data-table">
-                <tr :key="row.item.id" class="vehicle-row">
-                  <td :class="[$style['summary-cell']]">
+                <tr :key="row.item.id" :class="[$style['vehicle-row']]">
+                  <td :class="[$style['summary-cell'], 'pl-0']">
                     {{ getVehicleDescription(row.item.type) }}
                   </td>
                   <td>{{ row.item.year }}</td>
@@ -62,7 +60,9 @@
           <v-col cols="3" class="generic-label">
             General Collateral
           </v-col>
-          <v-col :class="[$style['summary-text'], 'pa-6']">
+        </v-row>
+        <v-row class="px-6" no-gutters>
+          <v-col :class="[$style['summary-text'], 'py-6']">
             {{ generalCollateral }}
           </v-col>
         </v-row>
@@ -126,9 +126,9 @@
             <tr
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
-              class="vehicle-row"
+              :class="[$style['vehicle-row']]"
             >
-              <td class="list-item__title">
+              <td>
                 {{ getVehicleDescription(row.item.type) }}
               </td>
               <td>
@@ -188,7 +188,7 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditVehicle[row.index]">
-              <td colspan="6" :class="{ 'invalid-section': invalidSection }">
+              <td :colspan="getNumCols" :class="{ 'invalid-section': invalidSection }">
                 <v-expand-transition>
                   <div class="edit-vehicle-container col-12">
                     <edit-collateral
@@ -274,6 +274,13 @@ export default defineComponent({
       generalCollateralError: '',
       vehicleCollateral: collateral.vehicleCollateral,
       generalCollateral: collateral.generalCollateral,
+      getNumCols: computed((): number => {
+        if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
+          return 7
+        } else {
+          return 6
+        }
+      }),
       showErrorSummary: computed((): boolean => {
         return !collateral.valid
       }),
@@ -293,6 +300,9 @@ export default defineComponent({
         }
         if (!props.isSummary) {
           headersToShow.push(editRow)
+        } else {
+          // remove left padding for summary table
+          headersToShow[0].class = 'column-md pl-0'
         }
         return headersToShow
       })
@@ -384,5 +394,9 @@ export default defineComponent({
   overflow: visible;
   text-overflow: inherit;
   white-space: inherit;
+}
+
+.vehicle-row {
+  text-transform: uppercase;
 }
 </style>
