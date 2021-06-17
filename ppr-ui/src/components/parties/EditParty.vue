@@ -131,7 +131,6 @@
                   id="address-secured-party"
                   v-model="currentSecuredParty.address"
                   :editing="true"
-                  :schema="addressSchema"
                   @valid="updateValidity($event)"
                 />
               </v-col>
