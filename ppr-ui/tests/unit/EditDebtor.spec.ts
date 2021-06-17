@@ -18,8 +18,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
-
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn'
 const cancelButtonSelector: string = '#cancel-btn'

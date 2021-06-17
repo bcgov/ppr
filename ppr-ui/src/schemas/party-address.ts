@@ -4,27 +4,27 @@ import { required, maxLength } from 'vuelidate/lib/validators'
 // NB: This should match the subject JSON schema.
 export const PartyAddressSchema = {
   streetAddress: {
-    required,
-    maxLength: maxLength(50)
+    // required,
+    // maxLength: maxLength(50)
   },
   streetAddressAdditional: {
-    maxLength: maxLength(30)
+    // maxLength: maxLength(30)
   },
   addressCity: {
-    required,
-    maxLength: maxLength(40)
+    // required,
+    // maxLength: maxLength(40)
   },
   addressCountry: {
-    required
+    // required
   },
   addressRegion: {
-    maxLength: maxLength(2)
+    // maxLength: maxLength(2)
   },
   postalCode: {
-    required,
-    maxLength: maxLength(15)
+    // required,
+    // maxLength: maxLength(15)
   },
   deliveryInstructions: {
-    maxLength: maxLength(80)
+    // maxLength: maxLength(80)
   }
 }
