@@ -136,6 +136,7 @@
                     id="address-debtor"
                     v-model="currentDebtor.address"
                     :editing="true"
+                    :schema="addressSchema"
                     @valid="updateValidity($event)"
                   />
 
