@@ -37,7 +37,8 @@ export async function fetchConfig (): Promise<any> {
    * This will be removed when a fix is made to sbc-common-components to handle this
    */
   const authConfig = {
-    VUE_APP_AUTH_ROOT_API: response.data.SBC_CONFIG_AUTH_API_URL
+    VUE_APP_AUTH_ROOT_API: response.data.SBC_CONFIG_AUTH_API_URL,
+    AUTH_URL: response.data.AUTH_URL
   }
   const authConfigString = JSON.stringify(authConfig)
   sessionStorage.setItem('AUTH_API_CONFIG', authConfigString)
