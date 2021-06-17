@@ -35,7 +35,7 @@ export const useVehicle = (props, context) => {
       let hint = 'Up to 25 characters'
       switch (localState.currentVehicle.type) {
         case '':
-          hint = 'Select a vehicle type first'
+          hint = ''
           break
         case 'AC':
           hint = 'Up to 25 letters'

@@ -3,7 +3,7 @@ export const serialNumberValidator = ({ values }) => {
   let succeeded = true
   let minLen = 1
   let maxLen = 25
-  let message = 'Maximum 25 letters'
+  let message = 'Maximum 25 characters'
   let emptyMessage = ''
   let valueToValidate = values.serialNumber
 
@@ -32,7 +32,7 @@ export const serialNumberValidator = ({ values }) => {
       message = 'Manufactured home registration number must contain 6 digits'
       break
     case 'MV':
-      emptyMessage = 'Enter the Serial / VIN Number'
+      emptyMessage = 'Enter the Serial or VIN Number'
       break
     case 'OM':
       emptyMessage = 'Enter the Outboard Motor Serial Number'

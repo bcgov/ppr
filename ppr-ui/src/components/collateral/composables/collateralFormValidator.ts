@@ -31,10 +31,6 @@ const validationSchema = {
           }
         },
         message: 'Enter a valid year'
-      },
-      {
-        validator: Validators.required.validator,
-        message: 'Enter a valid year'
       }
     ],
     make: [
