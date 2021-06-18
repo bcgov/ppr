@@ -145,7 +145,7 @@ export default class App extends Mixins(AuthMixin) {
   /** The login URL. */
   private get loginURL (): string {
     // if AUTH_URL does not exist this will return 'undefined'. Needs to be null or str
-    const url = sessionStorage.getItem('AUTH_URL')
+    const url = sessionStorage.getItem('AUTH_WEB_URL')
     if (url) return url
     return null
   }

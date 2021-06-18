@@ -32,26 +32,15 @@ export async function fetchConfig (): Promise<any> {
     return Promise.reject(new Error('Could not fetch configuration.json'))
   })
 
-  /**
-   * authConfig is a workaround to fix the user settings call as it expects a URL with no trailing slash.
-   * This will be removed when a fix is made to sbc-common-components to handle this
-   */
-  const authConfig = {
-    VUE_APP_AUTH_ROOT_API: response.data.SBC_CONFIG_AUTH_API_URL
-  }
-  const authConfigString = JSON.stringify(authConfig)
-  sessionStorage.setItem('AUTH_API_CONFIG', authConfigString)
-  console.log('AUTH_API_CONFIG: ' + authConfigString)
-
-  const authApiUrl: string = response.data.AUTH_API_URL
+  const authApiUrl: string = response.data.AUTH_API_URL + response.data.AUTH_API_VERSION + '/'
   sessionStorage.setItem('AUTH_API_URL', authApiUrl)
   console.log('Set Auth API URL to: ' + authApiUrl)
 
-  const payApiUrl: string = response.data.PAY_API_URL
+  const payApiUrl: string = response.data.PAY_API_URL + response.data.PAY_API_VERSION + '/'
   sessionStorage.setItem('PAY_API_URL', payApiUrl)
   console.log('Set Pay API URL to: ' + payApiUrl)
 
-  const pprApiUrl: string = response.data.PPR_API_URL
+  const pprApiUrl: string = response.data.PPR_API_URL + response.data.PPR_API_VERSION + '/'
   const pprApiKey: string = response.data.PPR_API_KEY
   sessionStorage.setItem('PPR_API_URL', pprApiUrl)
   sessionStorage.setItem('PPR_API_KEY', pprApiKey)
@@ -65,15 +54,28 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('KEYCLOAK_CONFIG_PATH', keycloakConfigPath)
   console.info('Set Keycloak Config Path to: ' + keycloakConfigPath)
 
-  const vonApiUrl: string = response.data.VON_API_URL
+  const vonApiUrl: string = response.data.VON_API_URL + response.data.VON_API_VERSION
   sessionStorage.setItem('VON_API_URL', vonApiUrl)
   console.log('Set VON API URL to: ' + vonApiUrl)
 
-  const ldClientId: string = response.data.LD_CLIENT_ID
+  // for system alert banner (sbc-common-components)
+  const statusApiUrl: string = response.data.STATUS_API_URL + response.data.STATUS_API_VERSION
+  sessionStorage.setItem('STATUS_API_URL', statusApiUrl)
+  console.log('Set Status API URL to: ' + statusApiUrl)
+
+  // for sbc header (sbc-common-components)
+  const authWebUrl: string = response.data.AUTH_WEB_URL
+  sessionStorage.setItem('AUTH_WEB_URL', authWebUrl)
+  console.log('Set Auth Web URL to: ' + authWebUrl)
+
+  const ldClientId: string = response.data.PPR_LD_CLIENT_ID
   if (ldClientId) {
     (<any>window).ldClientId = ldClientId
     console.info('Set Launch Darkly Client ID.')
   }
+
+  const sentryEnable = response.data.SENTRY_ENABLE;
+  (<any>window).sentryEnable = sentryEnable
 
   const sentryDsn = response.data.SENTRY_DSN
   if (sentryDsn) {
