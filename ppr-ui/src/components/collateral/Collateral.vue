@@ -14,12 +14,10 @@
         <v-row no-gutters class="pa-6">
           <v-col cols="auto">
             <v-icon color="#D3272C">mdi-information-outline</v-icon>&nbsp;
-            <span class="invalid-message">This step is unfinished.</span>
-            <router-link
-              id="router-link-collateral"
-              class="invalid-link"
-              :to="{ path: '/add-collateral' }"
-            >Return to this step to complete it.</router-link>
+            <span class="invalid-message">This step is unfinished. </span>
+            <span id="router-link-collateral"
+            class="invalid-link"
+            @click="goToCollateral()">Return to this step to complete it.</span>
           </v-col>
         </v-row>
       </v-container>
@@ -98,7 +96,7 @@
     </v-row>
     <v-row no-gutters>
       <v-col>
-        <div :class="{ 'invalid-section': invalidSection }">
+        <div>
           <v-expand-transition>
             <v-card flat class="add-collateral-container" v-if="showAddVehicle">
               <edit-collateral
@@ -115,6 +113,7 @@
       <v-col>
         <v-data-table
           class="collateral-table"
+          :class="{'invalid-message': showErrorComponent}"
           :headers="headers"
           :items="vehicleCollateral"
           disable-pagination
@@ -188,7 +187,7 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditVehicle[row.index]">
-              <td :colspan="getNumCols" :class="{ 'invalid-section': invalidSection }">
+              <td :colspan="getNumCols">
                 <v-expand-transition>
                   <div class="edit-vehicle-container col-12">
                     <edit-collateral
@@ -207,7 +206,7 @@
     </v-row>
     <v-row class="pt-8">
       <v-col>
-        <v-card flat id="general-collateral">
+        <v-card flat id="general-collateral" :class="{'invalid-message': showErrorComponent}" >
           <v-container fluid no-gutters class="pa-0">
             <v-row no-gutters class="py-6">
               <v-col cols="3" class="generic-label pa-4">
@@ -258,11 +257,13 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup (props, context) {
     const { setAddCollateral } = useActions<any>(['setAddCollateral'])
     const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
 
     const collateral: AddCollateralIF = getAddCollateral.value
+
+    const router = context.root.$router
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -274,6 +275,7 @@ export default defineComponent({
       generalCollateralError: '',
       vehicleCollateral: collateral.vehicleCollateral,
       generalCollateral: collateral.generalCollateral,
+      showErrorComponent: collateral.showInvalid,
       getNumCols: computed((): number => {
         if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
           return 7
@@ -299,6 +301,7 @@ export default defineComponent({
           })
         }
         if (!props.isSummary) {
+          headersToShow[0].class = 'column-md'
           headersToShow.push(editRow)
         } else {
           // remove left padding for summary table
@@ -346,6 +349,7 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddVehicle = false
       localState.showEditVehicle = [false]
+      setValid()
     }
 
     const validateGeneral = () => {
@@ -356,16 +360,22 @@ export default defineComponent({
     }
 
     const setValid = () => {
-      if (
-        (collateral.generalCollateral ||
-          collateral.vehicleCollateral.length > 0) &&
-        collateral.generalCollateral.length <= 4000
+      if ((collateral.vehicleCollateral.length > 0) ||
+        ((collateral.generalCollateral.length <= 4000) &&
+        (collateral.generalCollateral.length > 0))
       ) {
         collateral.valid = true
+        collateral.showInvalid = false
       } else {
         collateral.valid = false
       }
       setAddCollateral(collateral)
+    }
+
+    const goToCollateral = (): void => {
+      collateral.showInvalid = true
+      setAddCollateral(collateral)
+      router.push({ path: '/add-collateral' })
     }
 
     return {
@@ -375,6 +385,7 @@ export default defineComponent({
       resetData,
       getVehicleDescription,
       validateGeneral,
+      goToCollateral,
       ...toRefs(localState)
     }
   }

@@ -343,3 +343,23 @@ span.invalid-message {
 .remove.theme--light.v-btn.v-btn--disabled {
   color: rgba(211, 39, 44, 0.4) !important;
 }
+
+.actions .edit-action {
+  border-right: 1px solid #f1f3f5;
+}
+
+.actions .v-list-item__subtitle, .actions .v-list-item__subtitle .v-icon {
+  color: $primary-blue;
+}
+
+.actions .v-list-item {
+  min-height: 28px;
+}
+
+.invalid-link {
+  padding: 0.25rem;
+  font-size: 16px;
+  color: #1669BB;
+  text-decoration: underline;
+  cursor: pointer;
+}

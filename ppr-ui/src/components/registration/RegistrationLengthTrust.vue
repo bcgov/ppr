@@ -14,7 +14,7 @@
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
           This step is unfinished.
           </span>
-          <span id="router-link-length-trust" :class="$style['invalid-link']" @click="goToLengthTrust()">
+          <span id="router-link-length-trust" class="invalid-link" @click="goToLengthTrust()">
             Return to this step to complete it.
           </span>
         </v-col>
@@ -256,13 +256,6 @@ export default defineComponent({
   font-size: 16px;
   color: $gray7;
 }
-.invalid-link {
-  padding: 0.25rem;
-  font-size: 16px;
-  color: #1669BB;
-  text-decoration: underline;
-  cursor: pointer;
-}
 
 .v-list-item {
   min-height: 0;
@@ -279,10 +272,6 @@ export default defineComponent({
   top: 2px;
   left: 2px;
   color: $BCgovGold9;
-}
-
-::v-deep .theme--light.v-input.error--text input {
-  color: #d3272c
 }
 
 </style>
