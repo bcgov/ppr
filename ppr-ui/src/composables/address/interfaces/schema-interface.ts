@@ -9,11 +9,11 @@ interface SchemaOptionsIF {
 }
 
 export interface SchemaIF {
-  streetAddress: SchemaOptionsIF,
-  streetAddressAdditional: SchemaOptionsIF,
-  addressCity: SchemaOptionsIF,
-  addressRegion: SchemaOptionsIF,
+  street: SchemaOptionsIF,
+  streetAdditional: SchemaOptionsIF,
+  city: SchemaOptionsIF,
+  region: SchemaOptionsIF,
   postalCode: SchemaOptionsIF,
-  addressCountry: SchemaOptionsIF,
+  country: SchemaOptionsIF,
   deliveryInstructions: SchemaOptionsIF
 }

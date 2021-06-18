@@ -46,12 +46,12 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
    */
   const createVuetifyRulesObject = (model: string): { [attr: string]: Array<Function> } =>  {
     let obj = {
-      streetAddress: [],
-      streetAddressAdditional: [],
-      addressCity: [],
-      addressRegion: [],
+      street: [],
+      streetAdditional: [],
+      city: [],
+      region: [],
       postalCode: [],
-      addressCountry: [],
+      country: [],
       deliveryInstructions: []
     }
   
@@ -82,10 +82,10 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
     }
   
     // sample return object
-    // streetAddress: [
-    //   () => this.requiredRule('addressLocal', 'streetAddress'),
-    //   () => this.minLengthRule('addressLocal', 'streetAddress'),
-    //   () => this.maxLengthRule('addressLocal', 'streetAddress')
+    // street: [
+    //   () => this.requiredRule('addressLocal', 'street'),
+    //   () => this.minLengthRule('addressLocal', 'street'),
+    //   () => this.maxLengthRule('addressLocal', 'street')
     // ],
     // ...
   

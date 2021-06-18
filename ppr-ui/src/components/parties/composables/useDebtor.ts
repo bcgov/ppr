@@ -7,11 +7,11 @@ import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
-  streetAddress: '',
-  streetAddressAdditional: '',
-  addressCity: '',
-  addressRegion: '',
-  addressCountry: '',
+  street: '',
+  streetAdditional: '',
+  city: '',
+  region: '',
+  country: '',
   postalCode: '',
   deliveryInstructions: ''
 }
