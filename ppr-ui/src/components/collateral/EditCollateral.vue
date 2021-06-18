@@ -44,6 +44,7 @@
                       v-model="currentVehicle.manufacturedHomeRegistrationNumber"
                       :error-messages="errors.manufacturedHomeRegistrationNumber.message ?
                       errors.manufacturedHomeRegistrationNumber.message : ''"
+                      @keyup="onBlur('manufacturedHomeRegistrationNumber')"
                       persistent-hint
                     />
                   </v-col>
