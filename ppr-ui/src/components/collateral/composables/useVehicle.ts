@@ -16,10 +16,11 @@ export const useVehicle = (props, context) => {
         case 'MH':
           return 'Serial Number (if MHR number is not available)'
         case 'BO':
-          return 'Boat Serial Number'
+          return 'Serial Number'
         case 'AF':
+          return 'D.O.T or Serial Number'
         case 'AC':
-          return 'Aircraft Airframe D.O.T number'
+          return 'D.O.T number'
         case 'OM':
           return 'Outboard Motor Serial Number'
         case 'TR':
@@ -30,21 +31,6 @@ export const useVehicle = (props, context) => {
     }),
     getSerialDisabled: computed(function () {
       return localState.currentVehicle.type === ''
-    }),
-    getSerialHint: computed(function () {
-      let hint = 'Up to 25 characters'
-      switch (localState.currentVehicle.type) {
-        case '':
-          hint = 'Select a vehicle type first'
-          break
-        case 'AC':
-          hint = 'Up to 25 letters'
-          break
-        case 'MH':
-          hint = 'Must contain 6 digits'
-          break
-      }
-      return hint
     })
   })
 

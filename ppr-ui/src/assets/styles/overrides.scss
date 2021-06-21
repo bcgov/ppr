@@ -21,7 +21,7 @@ td {
 // Buttons
 .v-btn {
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: normal;
   letter-spacing: normal;
   padding: inherit 28px !important;
   text-transform: none;
@@ -34,6 +34,17 @@ td {
   background-color: $primary-blue !important;
   color: white !important;
 }
+
+.v-btn:not(.v-btn--round).v-size--large {
+  min-width: 88px;
+}
+
+tbody {
+  tr:hover {
+     background-color: transparent !important;
+  }
+}
+
 .sbc-header {
   .v-btn {
     background-color: rgba(0, 0, 0, 0)!important;
@@ -209,4 +220,20 @@ td {
 
 .theme--light.v-application .v-input--selection-controls__ripple {
   color: $gray7;
+}
+
+.v-application #remove-btn:disabled {
+  color: #d3272c !important;
+    caret-color: #d3272c !important;
+    opacity: 0.4 !important;
+}
+
+.v-btn.edit-btn:disabled {
+  color: $primary-blue !important;
+  opacity: 0.4 !important;
+}
+
+.theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
+  border-color: rgba(0, 0, 0, 0.42);
+  border-image: none;
 }

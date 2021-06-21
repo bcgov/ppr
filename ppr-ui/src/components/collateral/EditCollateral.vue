@@ -1,13 +1,13 @@
 <template>
-  <div id="edit-vehicle" class="white pa-6">
+  <div id="edit-vehicle" class="white py-8 pr-6">
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
             <label
-              class="add-vehicle-header general-label"
+              class="add-vehicle-header generic-label"
               :class="{ 'error-text': invalidSection }"
             >
-              <span v-if="activeIndex === -1" class="pl-5"> Add Vehicle </span>
+              <span v-if="activeIndex === -1" class="pl-4"> Add Vehicle </span>
               <span v-else>Edit Vehicle</span>
             </label>
         </v-col>
@@ -44,6 +44,7 @@
                       v-model="currentVehicle.manufacturedHomeRegistrationNumber"
                       :error-messages="errors.manufacturedHomeRegistrationNumber.message ?
                       errors.manufacturedHomeRegistrationNumber.message : ''"
+                      @keyup="onBlur('manufacturedHomeRegistrationNumber')"
                       persistent-hint
                     />
                   </v-col>
@@ -57,8 +58,7 @@
                       id="txt-serial"
                       v-model="currentVehicle.serialNumber"
                       :error-messages="errors.serialNumber.message ? errors.serialNumber.message : ''"
-                      :hint="getSerialHint"
-                      @blur="onBlur('serialNumber')"
+                      @keyup="onBlur('serialNumber')"
                       persistent-hint
                     />
                   </v-col>
@@ -67,10 +67,11 @@
                   <v-col cols="4">
                     <v-text-field
                       filled
-                      label="Year"
+                      label="Year (Optional)"
                       id="txt-years"
                       v-model="currentVehicle.year"
                       @blur="onBlur('year')"
+                      hint="YYYY"
                       persistent-hint
                       :error-messages="errors.year.message ? errors.year.message : ''"
                     />
@@ -118,7 +119,7 @@
                     <v-btn
                       large
                       id="done-btn"
-                      class="m1-auto"
+                      class="ml-auto"
                       color="primary"
                       @click="onSubmitForm()"
                     >
@@ -175,14 +176,12 @@ export default defineComponent({
       getSerialLabel,
       // @ts-ignore - returned by toRef
       getSerialDisabled,
-      // @ts-ignore - returned by toRef
-      getSerialHint,
       getVehicle,
       resetFormAndData,
       removeVehicle,
       addVehicle
     } = useVehicle(props, context)
-    const { errors, validateInput, validateCollateralForm } = useCollateralValidation()
+    const { errors, validateInput, validateSerial, validateCollateralForm } = useCollateralValidation()
     onMounted(getVehicle)
 
     const onSubmitForm = async () => {
@@ -195,7 +194,11 @@ export default defineComponent({
     }
 
     const onBlur = (fieldname) => {
-      validateInput(fieldname, currentVehicle.value[fieldname])
+      if (fieldname === 'serialNumber') {
+        validateSerial(currentVehicle.value)
+      } else {
+        validateInput(fieldname, currentVehicle.value[fieldname])
+      }
     }
 
     return {
@@ -207,8 +210,7 @@ export default defineComponent({
       currentVehicle,
       vehicleTypes,
       getSerialLabel,
-      getSerialDisabled,
-      getSerialHint
+      getSerialDisabled
     }
   }
 })

@@ -1,21 +1,21 @@
 export enum APIVehicleTypes {
-  AIRCRAFT = 'AC',
-  AIRCRAFT_AIRFRAME = 'AF',
-  BOAT = 'BO',
-  ELECTRIC_VEHICLE = 'EV',
-  MANUFACTURED_HOME = 'MH',
   MOTOR_VEHICLE = 'MV',
+  BOAT = 'BO',
+  TRAILER = 'TR',
   OUTBOARD_MOTOR = 'OB',
-  TRAILER = 'TR'
+  MANUFACTURED_HOME = 'MH',
+  AIRCRAFT = 'AC',
+  AIRCRAFT_AIRFRAME = 'AF'
+  // ELECTRIC_VEHICLE = 'EV',
 }
 
 export enum UIVehicleTypes {
-  AIRCRAFT = 'Aircraft',
-  AIRCRAFT_AIRFRAME = 'Aircraft Airframe',
-  BOAT = 'Boat',
-  ELECTRIC_VEHICLE = 'Electric Vehicle',
-  MANUFACTURED_HOME = 'Manufactured Home',
-  MOTOR_VEHICLE = 'Motor Vehicle',
-  OUTBOARD_MOTOR = 'Outboard Motor',
-  TRAILER = 'Trailer'
+  MOTOR_VEHICLE = 'Motor Vehicle (MV)',
+  BOAT = 'Boat (BO)',
+  TRAILER = 'Trailer (TR)',
+  OUTBOARD_MOTOR = 'Outboard Motor (OM)',
+  MANUFACTURED_HOME = 'Manufactured Home (MH)',
+  AIRCRAFT = 'Aircraft/Airframe Registered in Canada (AC)',
+  AIRCRAFT_AIRFRAME = 'Aircraft/Airframe Not Registered in Canada (AF)'
+  // ELECTRIC_VEHICLE = 'Electric Vehicle',
 }
