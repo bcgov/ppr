@@ -54,7 +54,13 @@ PAYMENT_REQUEST_TEMPLATE = {
     },
     'businessInfo': {
         'corpType': 'PPR'
-    }
+    },
+    'details': [
+        {
+            'label': '',
+            'value': ''
+        }
+    ]
 }
 
 PAYMENT_REFUND_TEMPLATE = {
@@ -121,13 +127,19 @@ class HttpVerbs(Enum):
 class BaseClient:
     """Base class for common api call properties and functions."""
 
-    def __init__(self, jwt=None, account_id=None, api_key=None):
+    def __init__(self, jwt=None, account_id=None, api_key=None, details=None):
         """Set the API URL from the env variables PAYMENT_SVC_PREFIX and PAYMENT_SVC_URL."""
         service_url = current_app.config.get('PAYMENT_SVC_URL')
         self.api_url = service_url + '/' if service_url[-1] != '/' else service_url
         self.jwt = jwt
         self.account_id = account_id
         self.api_key = api_key
+        if details and 'label' in details and 'value' in details:
+            self.detail_label = details['label']
+            self.detail_value = details['value']
+        else:
+            self.detail_label = None
+            self.detail_value = None
 
     def call_api(self, method, relative_path, data=None, token=None):
         """Call the Pay API."""
@@ -199,6 +211,11 @@ class SBCPaymentClient(BaseClient):
     def create_payment(self, transaction_type, quantity=1, ppr_id=None, client_reference_id=None):
         """Submit a payment request for the PPR API transaction."""
         data = SBCPaymentClient.create_payment_data(transaction_type, quantity, ppr_id, client_reference_id)
+        if self.detail_label and self.detail_value:
+            data['details'][0]['label'] = self.detail_label
+            data['details'][0]['value'] = self.detail_value
+        else:
+            del data['details']
         # current_app.logger.debug('create paymnent payload:')
         # current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)

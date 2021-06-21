@@ -43,6 +43,14 @@ VAL_ERROR_DISCHARGE = 'Discharge Statement request data validation errors.'  # D
 SAVE_ERROR_MESSAGE = 'Account {0} create {1} statement db save failed: {2}'
 PAY_REFUND_MESSAGE = 'Account {0} create {1} statement refunding payment for invoice {2}.'
 PAY_REFUND_ERROR = 'Account {0} create {1} statement payment refund failed for invoice {2}: {3}.'
+# Payment detail/transaction description by registration.
+REG_CLASS_TO_STATEMENT_TYPE = {
+    'AMENDMENT': 'Register an Amendment Statement',
+    'COURTORDER': 'Register an Amendment Statement',
+    'CHANGE': 'Register a Change Statement',
+    'RENEWAL': 'Register a Renewal Statement',
+    'DISCHARGE': 'Register a Discharge Statement'
+}
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -443,7 +451,9 @@ def pay_and_save(request_json, registration_class, financing_statement, registra
         elif registration_class == model_utils.REG_CLASS_RENEWAL:
             fee_code = TransactionTypes.RENEWAL_LIFE_YEAR.value
 
-        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+        payment = Payment(jwt=jwt.get_token_auth_header(),
+                          account_id=account_id,
+                          details=get_payment_details(registration))
         pay_ref = payment.create_payment(fee_code, fee_quantity, None, registration.client_reference_id)
         invoice_id = pay_ref['invoiceId']
         registration.pay_invoice_id = int(invoice_id)
@@ -478,7 +488,9 @@ def pay_and_save_financing(request_json, account_id):
         if statement.life == model_utils.LIFE_INFINITE:
             fee_quantity = 1
             fee_code = TransactionTypes.FINANCING_INFINITE.value
-        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+        payment = Payment(jwt=jwt.get_token_auth_header(),
+                          account_id=account_id,
+                          details=get_payment_details_financing(statement))
         pay_ref = payment.create_payment(fee_code, fee_quantity, None,
                                          statement.registration[0].client_reference_id)
         invoice_id = pay_ref['invoiceId']
@@ -500,3 +512,21 @@ def pay_and_save_financing(request_json, account_id):
         raise db_exception
 
     return statement
+
+
+def get_payment_details_financing(statement):
+    """Extract the payment details value from the request financing statement."""
+    details = {
+        'label': 'Create Financing Statement Type:',
+        'value': statement.registration[0].registration_type
+    }
+    return details
+
+
+def get_payment_details(registration):
+    """Extract the payment details value from the registration request."""
+    details = {
+        'label': REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl] + ' for Base Registration:',
+        'value': registration.base_registration_num
+    }
+    return details

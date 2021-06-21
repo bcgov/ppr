@@ -19,10 +19,12 @@ Test-Suite to ensure that the /financing-statement/registrationNum/renewals endp
 import copy
 from http import HTTPStatus
 
-from registry_schemas.example_data.ppr import RENEWAL_STATEMENT, FINANCING_STATEMENT
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT, RENEWAL_STATEMENT
 
-from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
-from tests.unit.services.utils import create_header_account, create_header
+from ppr_api.models import FinancingStatement, Registration
+from ppr_api.resources.financing_statements import get_payment_details
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from tests.unit.services.utils import create_header, create_header_account
 
 
 # prep sample post renewal statement data
@@ -248,3 +250,23 @@ def test_renewal_invalid_debtor_400(session, client, jwt):
 
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
+
+
+def test_get_payment_details_registration(session, client, jwt):
+    """Assert that a valid renewal request payment details setup works as expected."""
+    # setup
+    json_data = copy.deepcopy(RENEWAL_STATEMENT)
+    registration_num = 'TEST0001'
+    statement = FinancingStatement.find_by_registration_number(registration_num, False)
+    registration = Registration.create_from_json(json_data,
+                                                 'RENEWAL',
+                                                 statement,
+                                                 registration_num,
+                                                 'PS12345')
+    # test
+    details = get_payment_details(registration)
+
+    # check
+    assert details
+    assert details['label'] == 'Register a Renewal Statement for Base Registration:'
+    assert details['value'] == 'TEST0001'
