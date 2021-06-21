@@ -1,6 +1,6 @@
 <template>
   <v-container flat class="pa-0" id="party-summary">
-    <v-row no-gutters class="summary-header pa-2">
+    <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="#38598A">mdi-account-multiple-plus</v-icon>
         <label class="pl-3"
@@ -26,7 +26,7 @@
       </v-row>
     </v-container>
     <v-container class="pa-0">
-      <v-row class="pt-6">
+      <v-row class="pt-6 px-1">
         <v-col class="generic-label">Registering Party</v-col>
       </v-row>
       <v-row no-gutters class="pb-6 pt-4">
@@ -55,7 +55,7 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="securedParties && securedParties.length && securedParties.length > 0">
+      <v-row class="px-1" v-if="securedParties && securedParties.length && securedParties.length > 0">
         <v-col class="generic-label">Secured Parties</v-col>
       </v-row>
       <v-row  v-if="securedParties && securedParties.length > 0" no-gutters class="pb-6 pt-4">
@@ -84,7 +84,7 @@
           </v-data-table>
         </v-col>
       </v-row>
-      <v-row v-if="debtors && debtors.length > 0">
+      <v-row class="px-1" v-if="debtors && debtors.length > 0">
         <v-col class="generic-label">Debtors</v-col>
       </v-row>
       <v-row  v-if="debtors && debtors.length > 0" no-gutters class="pb-6 pt-4">

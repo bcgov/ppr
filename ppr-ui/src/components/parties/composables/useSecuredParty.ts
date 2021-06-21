@@ -101,6 +101,7 @@ export const useSecuredParty = (props, context) => {
     newList.push(tempSecuredParty)
 
     parties.securedParties = newList
+
     setAddSecuredPartiesAndDebtors(parties)
   }
 

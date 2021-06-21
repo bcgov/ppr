@@ -1,4 +1,4 @@
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
@@ -67,6 +67,16 @@ export const useParty = () => {
     }
   }
 
+  const isPartiesValid = (parties: AddPartiesIF): boolean => {
+    if (parties.debtors.length === 0) {
+      return false
+    }
+    if (parties.securedParties.length === 0) {
+      return false
+    }
+    return true
+  }
+
   return {
     getName,
     getFormattedAddress,
@@ -74,6 +84,7 @@ export const useParty = () => {
     getMonth,
     getMonthFull,
     getDay,
-    getYear
+    getYear,
+    isPartiesValid
   }
 }

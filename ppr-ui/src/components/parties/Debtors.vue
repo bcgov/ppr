@@ -174,7 +174,7 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress, getFormattedBirthdate } = useParty()
+    const { getName, getFormattedAddress, getFormattedBirthdate, isPartiesValid } = useParty()
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -198,6 +198,7 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       localState.debtors.splice(index, 1)
       currentParties.debtors = localState.debtors
+      currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
       // setValid()
     }
@@ -218,6 +219,9 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      currentParties.valid = isPartiesValid(currentParties)
+      setAddSecuredPartiesAndDebtors(currentParties)
     }
 
     return {

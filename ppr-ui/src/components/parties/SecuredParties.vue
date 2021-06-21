@@ -160,7 +160,7 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress } = useParty()
+    const { getName, getFormattedAddress, isPartiesValid } = useParty()
     const { addRegisteringParty } = useSecuredParty(props, context)
 
     const localState = reactive({
@@ -185,8 +185,8 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       localState.securedParties.splice(index, 1)
       currentParties.securedParties = localState.securedParties
+      currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
-      // setValid()
     }
 
     const initEdit = (index: number) => {
@@ -204,6 +204,9 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddSecuredParty = false
       localState.showEditParty = [false]
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      currentParties.valid = isPartiesValid(currentParties)
+      setAddSecuredPartiesAndDebtors(currentParties)
     }
 
     return {
