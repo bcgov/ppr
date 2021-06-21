@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0" id="collateral-summary">
+  <v-container flat class="pa-0" id="party-summary">
     <v-row no-gutters class="summary-header pa-2">
       <v-col cols="auto" class="pa-2">
         <v-icon color="#38598A">mdi-account-multiple-plus</v-icon>
@@ -32,7 +32,7 @@
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
-            class="party-table"
+            class="registering-table"
             :headers="partyHeaders"
             :items="registeringParty"
             disable-pagination
@@ -40,7 +40,7 @@
             hide-default-footer
           >
             <template v-slot:item="row" class="party-data-table">
-              <tr :key="row.item.id" class="party-row">
+              <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title">
                   {{ getName(row.item) }}
                 </td>
@@ -55,10 +55,10 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="securedParties.length > 0">
+      <v-row v-if="securedParties && securedParties.length && securedParties.length > 0">
         <v-col class="generic-label">Secured Parties</v-col>
       </v-row>
-      <v-row  v-if="securedParties.length > 0" no-gutters class="pb-6 pt-4">
+      <v-row  v-if="securedParties && securedParties.length > 0" no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
             class="party-table"
@@ -84,10 +84,10 @@
           </v-data-table>
         </v-col>
       </v-row>
-      <v-row v-if="debtors.length > 0">
+      <v-row v-if="debtors && debtors.length > 0">
         <v-col class="generic-label">Debtors</v-col>
       </v-row>
-      <v-row  v-if="debtors.length > 0" no-gutters class="pb-6 pt-4">
+      <v-row  v-if="debtors && debtors.length > 0" no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
             class="debtor-table"

@@ -10,6 +10,8 @@ import { ReviewConfirm } from '@/views'
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
+import { Parties } from '@/components/parties'
+
 
 // Other
 import mockRouter from './MockRouter'
@@ -106,6 +108,7 @@ describe('ReviewConfirm step 1 tests', () => {
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(Parties).exists()).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('Not entered')
@@ -124,6 +127,7 @@ describe('ReviewConfirm step 1 tests', () => {
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(Parties).exists()).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(false)
     // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('3')
