@@ -4,14 +4,14 @@
     <v-expand-transition>
       <div v-if="!editing" class="address-block">
         <div class="address-block__info pre-wrap">
-          <div class="address-block__info-row">{{ addressLocal.streetAddress }}</div>
-          <div class="address-block__info-row">{{ addressLocal.streetAddressAdditional }}</div>
+          <div class="address-block__info-row">{{ addressLocal.street }}</div>
+          <div class="address-block__info-row">{{ addressLocal.streetAdditional }}</div>
           <div class="address-block__info-row">
-            <span>{{ addressLocal.addressCity }}</span>
-            <span v-if="addressLocal.addressRegion">&nbsp;{{ addressLocal.addressRegion }}</span>
+            <span>{{ addressLocal.city }}</span>
+            <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}</span>
             <span v-if="addressLocal.postalCode">&nbsp;{{ addressLocal.postalCode }}</span>
           </div>
-          <div class="address-block__info-row">{{ getCountryName(addressCountry) }}</div>
+          <div class="address-block__info-row">{{ getCountryName(country) }}</div>
           <div class="address-block__info-row">{{ addressLocal.deliveryInstructions }}</div>
         </div>
       </div>
@@ -28,10 +28,10 @@
                         :name="Math.random()"
                         filled
                         class="street-address"
-                        :id="streetAddressId"
-                        :label="streetAddressLabel"
-                        v-model="addressLocal.streetAddress"
-                        :rules="[...rules.streetAddress, ...spaceRules]"
+                        :id="streetId"
+                        :label="streetLabel"
+                        v-model="addressLocal.street"
+                        :rules="[...rules.street, ...spaceRules]"
                         @keypress.once="enableAddressComplete()"
                         @click="enableAddressComplete()"
           />
@@ -40,36 +40,36 @@
           <v-textarea auto-grow
                       filled
                       class="street-address-additional"
-                      :label="streetAddressAdditionalLabel"
+                      :label="streetAdditionalLabel"
                       rows="1"
-                      v-model="addressLocal.streetAddressAdditional"
-                      :rules="[...rules.streetAddressAdditional, ...spaceRules]"
+                      v-model="addressLocal.streetAdditional"
+                      :rules="[...rules.streetAdditional, ...spaceRules]"
           />
         </div>
         <div class="form__row three-column">
           <v-text-field filled
                         class="item address-city"
-                        :label="addressCityLabel"
-                        v-model="addressLocal.addressCity"
-                        :rules="[...rules.addressCity, ...spaceRules]"
+                        :label="cityLabel"
+                        v-model="addressLocal.city"
+                        :rules="[...rules.city, ...spaceRules]"
           />
-          <v-select v-if="useCountryRegions(addressCountry)"
+          <v-select v-if="useCountryRegions(country)"
                     filled
                     class="item address-region"
                     :menu-props="{maxHeight:'40rem'}"
-                    :label="addressRegionLabel"
+                    :label="regionLabel"
                     item-text="name"
                     item-value="short"
-                    v-model="addressLocal.addressRegion"
-                    :items="getCountryRegions(addressCountry)"
-                    :rules="[...rules.addressRegion, ...spaceRules]"
+                    v-model="addressLocal.region"
+                    :items="getCountryRegions(country)"
+                    :rules="[...rules.region, ...spaceRules]"
           />
           <v-text-field v-else
                         filled
                         class="item address-region"
-                        :label="addressRegionLabel"
-                        v-model="addressLocal.addressRegion"
-                        :rules="[...rules.addressRegion, ...spaceRules]"
+                        :label="regionLabel"
+                        v-model="addressLocal.region"
+                        :rules="[...rules.region, ...spaceRules]"
           />
           <v-text-field filled
                         class="item postal-code"
@@ -81,16 +81,16 @@
         <div class="form__row">
           <v-select filled
                     class="address-country"
-                    :label="addressCountryLabel"
+                    :label="countryLabel"
                     menu-props="auto"
                     item-text="name"
                     item-value="code"
-                    v-model="addressLocal.addressCountry"
+                    v-model="addressLocal.country"
                     :items="getCountries()"
-                    :rules="[...rules.addressCountry, ...spaceRules]"
+                    :rules="[...rules.country, ...spaceRules]"
           />
           <!-- special field to select AddressComplete country, separate from our model field -->
-          <input type="hidden" :id="addressCountryId" :value="addressCountry" />
+          <input type="hidden" :id="countryId" :value="country" />
         </div>
         <div class="form__row">
           <v-textarea auto-grow
@@ -126,12 +126,12 @@ export default defineComponent({
     value: {
       type: Object as () => AddressIF,
       default: () => ({
-        streetAddress: '',
-        streetAddressAdditional: '',
-        addressCity: '',
-        addressRegion: '',
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
         postalCode: '',
-        addressCountry: '',
+        country: '',
         deliveryInstructions: ''
       })
     },
@@ -152,7 +152,7 @@ export default defineComponent({
      */
     const {
       addressLocal,
-      addressCountry,
+      country,
       schemaLocal,
       isSchemaRequired,
       labels
@@ -167,19 +167,19 @@ export default defineComponent({
     /**
      * Watches changes to the Address Country and updates the schema accordingly.
      */
-    watch(() => addressCountry, () => {
+    watch(() => country, () => {
       // skip this if component is called without a schema (eg, display mode)
       if (schemaLocal) {
-        if (useCountryRegions(addressLocal.value.addressCountry)) {
+        if (useCountryRegions(addressLocal.value.country)) {
           // we are using a region list for the current country so make region a required field
-          const addressRegion = { ...schemaLocal.value.addressRegion, required }
+          const region = { ...schemaLocal.value.region, required }
           // re-assign the local schema because Vue does not detect property addition
-          schemaLocal.value = { ...schemaLocal.value, addressRegion }
+          schemaLocal.value = { ...schemaLocal.value, region }
         } else {
           // we are not using a region list for the current country so remove required property
-          const { required, ...addressRegion } = schemaLocal.value.addressRegion
+          const { required, ...region } = schemaLocal.value.region
           // re-assign the local schema because Vue does not detect property deletion
-          schemaLocal.value = { ...schemaLocal.value, addressRegion }
+          schemaLocal.value = { ...schemaLocal.value, region }
         }
       }
     })
@@ -189,7 +189,7 @@ export default defineComponent({
 
     return {
       addressLocal,
-      addressCountry,
+      country,
       ...countryProvincesHelpers,
       enableAddressComplete,
       isSchemaRequired,
