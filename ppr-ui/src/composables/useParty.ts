@@ -10,16 +10,16 @@ export const useParty = () => {
   }
 
   const getFormattedAddress = (party: PartyIF): string => {
-    let address = party.address.streetAddress
-    if (party.address.streetAddressAdditional) {
-      address = address + '<br>' + party.address.streetAddressAdditional
+    let address = party.address.street
+    if (party.address.streetAdditional) {
+      address = address + '<br>' + party.address.streetAdditional
     }
     address =
       address +
       '<br>' +
-      party.address.addressCity +
+      party.address.city +
       ' ' +
-      party.address.addressRegion +
+      party.address.region +
       ' ' +
       party.address.postalCode
     return address

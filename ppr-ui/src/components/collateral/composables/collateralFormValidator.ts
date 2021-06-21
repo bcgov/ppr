@@ -16,6 +16,13 @@ const validationSchema = {
         message: 'Enter the vehicle model'
       }
     ],
+    manufacturedHomeRegistrationNumber: [
+      {
+        validator: Validators.maxLength.validator,
+        customArgs: { length: 6 },
+        message: 'Manufactured Home Registration Number must contain 6 digits'
+      }
+    ],
     year: [
       {
         validator: rangeNumber.validator,
@@ -30,10 +37,6 @@ const validationSchema = {
             inclusive: true
           }
         },
-        message: 'Enter a valid year'
-      },
-      {
-        validator: Validators.required.validator,
         message: 'Enter a valid year'
       }
     ],

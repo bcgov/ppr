@@ -21,8 +21,10 @@ from http import HTTPStatus
 
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
-from ppr_api.services.authz import STAFF_ROLE, PPR_ROLE, COLIN_ROLE
-from tests.unit.services.utils import create_header_account, create_header
+from ppr_api.models import FinancingStatement
+from ppr_api.resources.financing_statements import get_payment_details_financing
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from tests.unit.services.utils import create_header, create_header_account
 
 
 # prep sample post financing statement data
@@ -267,3 +269,17 @@ def test_financing_get_nonstaff_unauthorized_401(session, client, jwt):
 
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
+
+
+def test_get_payment_details_financing(session, client, jwt):
+    """Assert that a valid financing statement request payment details setup works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING_STATEMENT)
+    statement = FinancingStatement.create_from_json(json_data, 'PS12345')
+    # test
+    details = get_payment_details_financing(statement)
+
+    # check
+    assert details
+    assert details['label'] == 'Create Financing Statement Type:'
+    assert details['value'] == 'SA'

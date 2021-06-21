@@ -1,9 +1,9 @@
 export interface AddressIF {
-  streetAddress: string
-  streetAddressAdditional: string
-  addressCity: string
-  addressRegion: string
+  street: string
+  streetAdditional: string
+  city: string
+  region: string
   postalCode: string
-  addressCountry: string
+  country: string
   deliveryInstructions: string
 }

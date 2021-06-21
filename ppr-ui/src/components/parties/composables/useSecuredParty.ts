@@ -5,11 +5,11 @@ import { PartyAddressSchema } from '@/schemas'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
-  streetAddress: '',
-  streetAddressAdditional: '',
-  addressCity: '',
-  addressRegion: '',
-  addressCountry: '',
+  street: '',
+  streetAdditional: '',
+  city: '',
+  region: '',
+  country: '',
   postalCode: '',
   deliveryInstructions: ''
 }
@@ -89,11 +89,11 @@ export const useSecuredParty = (props, context) => {
       businessName: 'Temp Registering Party',
       emailAddress: 'temp@email.com',
       address: {
-        streetAddress: '123 Any St',
-        streetAddressAdditional: '',
-        addressCity: 'Victoria',
-        addressRegion: 'BC',
-        addressCountry: 'Canada',
+        street: '123 Any St',
+        streetAdditional: '',
+        city: 'Victoria',
+        region: 'BC',
+        country: 'Canada',
         postalCode: 'V8T2T1',
         deliveryInstructions: ''
       }

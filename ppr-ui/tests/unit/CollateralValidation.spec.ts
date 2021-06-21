@@ -61,12 +61,10 @@ describe('Collateral validation tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(5)
+    expect(messages.length).toBe(4)
     expect(messages.at(0).text()).toBe('Type is required')
-    expect(messages.at(1).text()).toBe('Select a vehicle type first')
-    expect(messages.at(2).text()).toBe('Enter a valid year')
-    expect(messages.at(3).text()).toBe('Enter the vehicle make')
-    expect(messages.at(4).text()).toBe('Enter the vehicle model')
+    expect(messages.at(2).text()).toBe('Enter the vehicle make')
+    expect(messages.at(3).text()).toBe('Enter the vehicle model')
   })
 
   it('validates invalid year', async () => {
@@ -79,8 +77,8 @@ describe('Collateral validation tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(2)
-    expect(messages.at(1).text()).toBe('Enter a valid year')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Enter a valid year')
   })
 
   it('validates serial number for vehicle', async () => {
@@ -94,22 +92,22 @@ describe('Collateral validation tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 25 letters')
+    expect(messages.length).toBe(2)
+    expect(messages.at(0).text()).toBe('Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)')
   })
 
   it('validates number for manufactured home', async () => {
     wrapper.find('#txt-type').setValue('MH')
     await Vue.nextTick()
-    wrapper.find('#txt-serial').setValue('ABCDEF')
+    wrapper.find('#txt-man').setValue('ABCDEF123')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
     wrapper.find('#txt-years').setValue(2012)
-    // no input added
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
-    expect(messages.at(0).text()).toBe('Manufactured home registration number must contain 6 digits')
+    expect(messages.at(0).text()).toBe('Manufactured Home Registration Number must contain 6 digits')
+
   })
 })
