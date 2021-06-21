@@ -42,6 +42,15 @@
                 </v-row>
               </v-container>
             </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="ps-1 pt-8">
+                <v-row no-gutters class='pt-1'>
+                  <v-col>
+                    <parties :isSummary="true"/>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-row>
           </v-col>
           <v-col cols="3">
             <registration-fee :registrationType="registrationTypeUI"/>
