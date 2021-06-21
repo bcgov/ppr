@@ -1,32 +1,35 @@
 <template>
-  <v-card flat id="collateral-summary">
+  <v-container flat class="pa-0" id="collateral-summary">
     <v-row no-gutters class="summary-header pa-2">
       <v-col cols="auto" class="pa-2">
-        <v-icon color="#38598A">mdi-car</v-icon>
-        <label class="pl-3"><strong>Registering Party, Secured Parties, and Debtors</strong></label>
+        <v-icon color="#38598A">mdi-account-multiple-plus</v-icon>
+        <label class="pl-3"
+          ><strong
+            >Registering Party, Secured Parties, and Debtors</strong
+          ></label
+        >
       </v-col>
     </v-row>
     <v-container
       v-if="showErrorSummary"
+      class="white"
       :class="{ 'invalid-message': showErrorSummary }"
     >
       <v-row no-gutters class="pa-6">
         <v-col cols="auto">
           <v-icon color="#D3272C">mdi-information-outline</v-icon>
-          <span class="invalid-message">This step is unfinished.</span>
-          <router-link
-            id="router-link-parties"
+          <span class="invalid-message"> This step is unfinished. </span>
+          <span id="router-link-parties"
             class="invalid-link"
-            :to="{ path: '/add-securedparties-debtors' }"
-          >
-            Return to this step to complete it.
-          </router-link>
+            @click="goToParties()">Return to this step to complete it.</span>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col class="generic-label">Regsitering Party</v-col>
+    </v-container>
+    <v-container class="pa-0">
+      <v-row class="pt-6">
+        <v-col class="generic-label">Registering Party</v-col>
       </v-row>
-      <v-row no-gutters class="pt-4">
+      <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
             class="party-table"
@@ -51,11 +54,11 @@
           </v-data-table>
         </v-col>
       </v-row>
-      
-      <v-row>
+
+      <v-row v-if="securedParties.length > 0">
         <v-col class="generic-label">Secured Parties</v-col>
       </v-row>
-      <v-row no-gutters class="pt-4">
+      <v-row  v-if="securedParties.length > 0" no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
             class="party-table"
@@ -81,13 +84,14 @@
           </v-data-table>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row v-if="debtors.length > 0">
         <v-col class="generic-label">Debtors</v-col>
       </v-row>
-      <v-row no-gutters class="pt-4">
+      <v-row  v-if="debtors.length > 0" no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
             class="debtor-table"
+            :class="{'invalid-message': showErrorDebtors}"
             :headers="debtorHeaders"
             :items="debtors"
             disable-pagination
@@ -109,52 +113,76 @@
           </v-data-table>
         </v-col>
       </v-row>
-
-
     </v-container>
-  </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
 import {
   defineComponent,
   reactive,
+  computed,
   toRefs
-  // watch,
-  // computed
 } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
 
-import { partyTableHeaders } from '@/resources'
-import { debtorTableHeaders } from '@/resources'
-
+import { partyTableHeaders, debtorTableHeaders } from '@/resources'
 
 export default defineComponent({
-  setup (props, { emit }) {
+  setup (props, context) {
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
     ])
+    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
+      'setAddSecuredPartiesAndDebtors'
+    ])
+    const router = context.root.$router
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const { getName, getFormattedAddress, getFormattedBirthdate } = useParty()
     const localState = reactive({
       debtors: parties.debtors,
       securedParties: parties.securedParties,
-      registeringParty: [parties.registeringParty],
+      registeringParty: [
+        {
+          businessName: '',
+          personName: { first: 'Test', last: 'Person' },
+          emailAddress: 'test@test.com',
+          code: '12345',
+          address: {
+            streetAddress: '123 Any St.',
+            addressCity: 'Victoria',
+            addressRegion: 'BC',
+            addressCountry: 'Canada'
+          }
+        } as PartyIF
+      ], // [parties.registeringParty],
       debtorHeaders: debtorTableHeaders,
-      partyHeaders: partyTableHeaders
+      partyHeaders: partyTableHeaders,
+      showErrorSummary: computed((): boolean => {
+        return !parties.valid
+      })
     })
+
+    const goToParties = (): void => {
+      parties.showInvalid = true
+      setAddSecuredPartiesAndDebtors(parties)
+      router.push({ path: '/add-securedparties-debtors' })
+    }
 
     return {
       getName,
       getFormattedAddress,
       getFormattedBirthdate,
+      goToParties,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module></style>
+<style lang="scss" module>
+
+</style>

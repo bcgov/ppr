@@ -33,12 +33,13 @@
       <v-col>
         <v-data-table
           class="party-table"
+          :class="{'invalid-message': showErrorSecuredParties}"
           :headers="headers"
           :items="securedParties"
           disable-pagination
           disable-sort
           hide-default-footer
-          no-data-text="No Parties addeed yet."
+          no-data-text="No Parties added yet."
         >
           <template v-slot:item="row" class="party-data-table">
             <tr
@@ -173,6 +174,9 @@ export default defineComponent({
       securedParties: parties.securedParties,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
+      }),
+      showErrorSecuredParties: computed((): boolean => {
+        return parties.showInvalid && parties.securedParties.length === 0
       }),
       headers: partyTableHeaders
     })

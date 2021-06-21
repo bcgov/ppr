@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0" v-if="summaryView">
+  <v-container fluid no-gutters class="pa-0" v-if="summaryView">
     <party-summary />
   </v-container>
   <v-container fluid no-gutters v-else class="pa-0">
@@ -52,7 +52,6 @@ import {
 import Debtors from './Debtors.vue'
 import SecuredParties from './SecuredParties.vue'
 import PartySummary from './PartySummary.vue'
-
 
 export default defineComponent({
   components: {
