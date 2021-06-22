@@ -61,7 +61,6 @@
                   id="txt-first"
                   v-model="currentDebtor.personName.first"
                   persistent-hint
-                  @blur="onBlur('first')"
                   :error-messages="
                     errors.first.message ? errors.first.message : ''
                   "
@@ -83,7 +82,6 @@
                   id="txt-last"
                   v-model="currentDebtor.personName.last"
                   persistent-hint
-                  @blur="onBlur('last')"
                   :error-messages="
                     errors.last.message ? errors.last.message : ''
                   "
@@ -104,6 +102,9 @@
                   label="Month"
                   id="txt-month"
                   v-model="month"
+                  :error-messages="
+                    errors.month.message ? errors.month.message : ''
+                  "
                   persistent-hint
                   return-object
                 ></v-autocomplete>
@@ -114,6 +115,7 @@
                   label="Day"
                   id="txt-day"
                   v-model="day"
+                  :error-messages="errors.day.message ? errors.day.message : ''"
                   persistent-hint
                 />
               </v-col>
@@ -123,6 +125,9 @@
                   label="Year"
                   id="txt-year"
                   v-model="year"
+                  :error-messages="
+                    errors.year.message ? errors.year.message : ''
+                  "
                   persistent-hint
                 />
               </v-col>
@@ -132,13 +137,14 @@
                 <label class="general-label">Address</label>
               </v-col>
             </v-row>
-            <base-address ref="regMailingAddress"
-                    id="address-debtor"
-                    v-model="currentDebtor.address"
-                    :editing="true"
-                    :schema="addressSchema"
-                    @valid="updateValidity($event)"
-                  />
+            <base-address
+              ref="regMailingAddress"
+              id="address-debtor"
+              v-model="currentDebtor.address"
+              :editing="true"
+              :schema="addressSchema"
+              @valid="updateValidity($event)"
+            />
 
             <v-row>
               <v-col>
@@ -231,7 +237,7 @@ export default defineComponent({
       addressSchema
     } = useDebtor(props, context)
 
-    const { errors, updateValidity } = useDebtorValidation()
+    const { errors, updateValidity, validateDebtorForm } = useDebtorValidation()
 
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -241,10 +247,10 @@ export default defineComponent({
       month: { value: 0, text: '' }
     })
 
-    const onBlur = fieldname => {}
-
     const onSubmitForm = async () => {
-      addDebtor()
+      if (validateDebtorForm(currentIsBusiness, currentDebtor, year, monthValue, day) === true) {
+        addDebtor()
+      }
     }
 
     const setSearchValue = (searchValueTyped: string) => {
@@ -293,7 +299,6 @@ export default defineComponent({
       onSubmitForm,
       setSearchValue,
       setHideDetails,
-      onBlur,
       addressSchema,
       updateValidity,
       errors,
