@@ -152,10 +152,10 @@ export default defineComponent({
           emailAddress: 'test@test.com',
           code: '12345',
           address: {
-            streetAddress: '123 Any St.',
-            addressCity: 'Victoria',
-            addressRegion: 'BC',
-            addressCountry: 'Canada'
+            street: '123 Any St.',
+            city: 'Victoria',
+            region: 'BC',
+            country: 'Canada'
           }
         } as PartyIF
       ], // [parties.registeringParty],
