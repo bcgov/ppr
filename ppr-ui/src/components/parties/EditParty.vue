@@ -117,6 +117,7 @@
                       :error-messages="
                         errors.emailAddress.message ? errors.emailAddress.message : ''
                       "
+                      @blur="onBlur('emailAddress')"
                       persistent-hint
                     />
                   </v-col>
@@ -217,7 +218,7 @@ export default defineComponent({
       addressSchema
     } = useSecuredParty(props, context)
 
-    const { errors, updateValidity } = useSecuredPartyValidation()
+    const { errors, updateValidity, validateSecuredPartyForm, validateInput } = useSecuredPartyValidation()
 
     const localState = reactive({
       partyBusiness: '',
@@ -229,11 +230,13 @@ export default defineComponent({
       })
     })
 
-    const onBlur = fieldname => {}
+    const onBlur = (fieldname) => {
+      validateInput(fieldname, currentSecuredParty.value[fieldname])
+    }
 
 
     const onSubmitForm = async () => {
-      if (validateDebtorForm(currentIsBusiness, currentDebtor, year, monthValue, day) === true) {
+      if (validateSecuredPartyForm(currentIsBusiness, currentSecuredParty) === true) {
         addSecuredParty()
       }
     }

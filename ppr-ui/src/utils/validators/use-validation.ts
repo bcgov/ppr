@@ -7,4 +7,7 @@ export const useValidation = () => {
     }
     return errors
   }
+  return {
+    resetError
+  }
 }
