@@ -31,7 +31,8 @@
             "auth-api",
             "pay-api",
             "ppr-api",
-            "status-api"
+            "status-api",
+            "von-api"
         ]
     },
     {
