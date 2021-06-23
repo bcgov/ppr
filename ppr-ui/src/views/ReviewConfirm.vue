@@ -37,6 +37,15 @@
               <v-container fluid class="ps-1 pt-8">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
+                    <parties :isSummary="true"/>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="ps-1 pt-8">
+                <v-row no-gutters class='pt-1'>
+                  <v-col>
                     <collateral :isSummary="true"/>
                   </v-col>
                 </v-row>
@@ -74,6 +83,7 @@ import {
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
+import { Parties } from '@/components/parties'
 
 @Component({
   components: {
@@ -81,7 +91,8 @@ import { Collateral } from '@/components/collateral'
     RegistrationFee,
     RegistrationLengthTrust,
     Stepper,
-    Collateral
+    Collateral,
+    Parties
   }
 })
 export default class ReviewConfirm extends Vue {

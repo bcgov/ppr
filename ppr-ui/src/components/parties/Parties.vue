@@ -1,34 +1,6 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0" v-if="summaryView">
-    <v-card flat id="collateral-summary">
-      <v-row no-gutters class="summary-header pa-2">
-        <v-col cols="auto" class="pa-2">
-          <v-icon color="#38598A">mdi-car</v-icon>
-          <label class="pl-3"><strong>Secured Parties</strong></label>
-        </v-col>
-      </v-row>
-      <v-container
-        v-if="showErrorSummary"
-        :class="{ 'invalid-message': showErrorSummary }"
-      >
-        <v-row no-gutters class="pa-6">
-          <v-col cols="auto">
-            <v-icon color="#D3272C">mdi-information-outline</v-icon>
-            <span class="invalid-message">This step is unfinished.</span>
-            <router-link
-              id="router-link-collateral"
-              class="invalid-link"
-              :to="{ path: '/add-collateral' }"
-            >
-              Return to this step to complete it.
-            </router-link>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-container v-else>
-        <v-row no-gutters class="ps-6 pb-3"> </v-row>
-      </v-container>
-    </v-card>
+  <v-container fluid no-gutters class="pa-0" v-if="summaryView">
+    <party-summary />
   </v-container>
   <v-container fluid no-gutters v-else class="pa-0">
     <v-row no-gutters>
@@ -79,11 +51,13 @@ import {
 // import { useGetters, useActions } from 'vuex-composition-helpers'
 import Debtors from './Debtors.vue'
 import SecuredParties from './SecuredParties.vue'
+import PartySummary from './PartySummary.vue'
 
 export default defineComponent({
   components: {
     Debtors,
-    SecuredParties
+    SecuredParties,
+    PartySummary
   },
   props: {
     isSummary: {

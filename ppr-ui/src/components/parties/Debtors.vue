@@ -54,6 +54,7 @@
       <v-col>
         <v-data-table
           class="debtor-table"
+          :class="{'invalid-message': showErrorDebtors}"
           :headers="headers"
           :items="debtors"
           disable-pagination
@@ -173,7 +174,7 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress, getFormattedBirthdate } = useParty()
+    const { getName, getFormattedAddress, getFormattedBirthdate, isPartiesValid } = useParty()
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -187,6 +188,9 @@ export default defineComponent({
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       }),
+      showErrorDebtors: computed((): boolean => {
+        return parties.showInvalid && parties.debtors.length === 0
+      }),
       headers: debtorTableHeaders
     })
 
@@ -194,6 +198,7 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       localState.debtors.splice(index, 1)
       currentParties.debtors = localState.debtors
+      currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
       // setValid()
     }
@@ -214,6 +219,9 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      currentParties.valid = isPartiesValid(currentParties)
+      setAddSecuredPartiesAndDebtors(currentParties)
     }
 
     return {

@@ -33,12 +33,13 @@
       <v-col>
         <v-data-table
           class="party-table"
+          :class="{'invalid-message': showErrorSecuredParties}"
           :headers="headers"
           :items="securedParties"
           disable-pagination
           disable-sort
           hide-default-footer
-          no-data-text="No Parties addeed yet."
+          no-data-text="No Parties added yet."
         >
           <template v-slot:item="row" class="party-data-table">
             <tr
@@ -159,7 +160,7 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress } = useParty()
+    const { getName, getFormattedAddress, isPartiesValid } = useParty()
     const { addRegisteringParty } = useSecuredParty(props, context)
 
     const localState = reactive({
@@ -174,6 +175,9 @@ export default defineComponent({
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       }),
+      showErrorSecuredParties: computed((): boolean => {
+        return parties.showInvalid && parties.securedParties.length === 0
+      }),
       headers: partyTableHeaders
     })
 
@@ -181,8 +185,8 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       localState.securedParties.splice(index, 1)
       currentParties.securedParties = localState.securedParties
+      currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
-      // setValid()
     }
 
     const initEdit = (index: number) => {
@@ -200,6 +204,9 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddSecuredParty = false
       localState.showEditParty = [false]
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      currentParties.valid = isPartiesValid(currentParties)
+      setAddSecuredPartiesAndDebtors(currentParties)
     }
 
     return {
