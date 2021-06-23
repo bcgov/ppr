@@ -22,10 +22,10 @@ Search constants and helper functions.
 
 GET_DETAIL_DAYS_LIMIT = 7 # Number of days in the past a get details request is allowed.
 # Maximum number of days in the past to filter when fetching account search history: set to <= 0 to disable.
-GET_HISTORY_DAYS_LIMIT = 7
+GET_HISTORY_DAYS_LIMIT = -1
 
 # Account search history max result set size.
-ACCOUNT_SEARCH_HISTORY_MAX_SIZE = 500
+ACCOUNT_SEARCH_HISTORY_MAX_SIZE = 1000
 # Maximum number or results returned by search.
 SEARCH_RESULTS_MAX_SIZE = 1000
 
@@ -75,19 +75,19 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
 MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type = 'MH' " + \
-     "AND sc.srch_vin = searchkey_mhr('?') " + \
+     "AND sc.srch_vin = (SELECT searchkey_mhr('?')) " + \
 "ORDER BY match_type, r.registration_ts ASC " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type NOT IN ('AC', 'AF', 'AP') " + \
-     "AND sc.srch_vin = searchkey_vehicle('?') " + \
+     "AND sc.srch_vin = (SELECT searchkey_vehicle('?')) " + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
 AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type IN ('AC', 'AF', 'AP') " + \
-     "AND sc.srch_vin = searchkey_aircraft('?') " + \
+     "AND sc.srch_vin = (SELECT searchkey_aircraft('?')) " + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 BUSINESS_NAME_QUERY = """
@@ -109,7 +109,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND p.business_srch_key = searchkey_business_name('?')
+   AND p.business_srch_key = (SELECT searchkey_business_name('?'))
 ORDER BY match_type, p.business_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
