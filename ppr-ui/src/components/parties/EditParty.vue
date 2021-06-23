@@ -231,8 +231,11 @@ export default defineComponent({
 
     const onBlur = fieldname => {}
 
+
     const onSubmitForm = async () => {
-      addSecuredParty()
+      if (validateDebtorForm(currentIsBusiness, currentDebtor, year, monthValue, day) === true) {
+        addSecuredParty()
+      }
     }
 
     const getPartyBusiness = () => {

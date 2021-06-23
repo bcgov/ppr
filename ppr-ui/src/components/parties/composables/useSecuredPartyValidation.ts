@@ -2,7 +2,7 @@ import {
   ref
 } from '@vue/composition-api'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
-// import { formValidation } from './collateralFormValidator'
+import { formValidation } from './securedPartyFormValidator'
 
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
@@ -18,22 +18,55 @@ const createEmptyErrors = () => ({
 export const useSecuredPartyValidation = () => {
   const errors = ref(createEmptyErrors())
 
-  /* const validateInput = (fieldName, value) => {
-    console.log(value)
-    formValidation.validateField(fieldName, value)
-      .then(validationResult => (errors.value[fieldName] = validationResult))
+  const validateName = (isBusiness, form) => {
+    if (isBusiness === true) {
+      if (form.businessName.length === 0) {
+        errors.value.businessName = {
+          type: 'NAME',
+          succeeded: false,
+          message: 'Please enter a business name'
+        }
+      } else {
+        resetError('businessName')
+      }
+    } else {
+      if (form.personName.first.length === 0) {
+        errors.value.first = {
+          type: 'NAME',
+          succeeded: false,
+          message: 'Please enter a first name'
+        }
+      } else {
+        resetError('first')
+      }
+      if (form.personName.last.length === 0) {
+        errors.value.last = {
+          type: 'NAME',
+          succeeded: false,
+          message: 'Please enter a last name'
+        }
+      } else {
+        resetError('last')
+      }
+    }
   }
 
-  const validateCollateralForm = async (currentVehicle) => {
-    const validationResult = await formValidation.validateForm(currentVehicle)
-    errors.value = { ...errors.value, ...validationResult.fieldErrors }
-    if (currentVehicle.type === 'MH') {
-      errors.value.manufacturedHomeRegistrationNumber = validationResult.recordErrors.serialNumber
+  const validateSecuredPartyForm = (
+    currentIsBusiness,
+    currentDebtor
+  ): boolean => {
+   
+    validateName(currentIsBusiness.value, currentDebtor.value)
+    if (currentIsBusiness.value === true) {
+      return errors.value.businessName.succeeded
     } else {
-      errors.value.serialNumber = validationResult.recordErrors.serialNumber
+      return (
+        errors.value.first.succeeded &&
+        errors.value.last.succeeded &&
+        errors.value.emailAddress.succeeded
+      )
     }
-    return validationResult.succeeded
-  } */
+  }
 
   /**
    * Handles validity events from address sub-components.
