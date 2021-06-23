@@ -70,12 +70,18 @@ describe('Debtor add individual tests', () => {
   it('adds a debtor to the store', async () => {
     wrapper.find('#txt-first').setValue('JOE')
     wrapper.find('#txt-last').setValue('SCHMOE')
-    wrapper.find('#txt-month').setValue(6)
+    await wrapper.find('#txt-month').setValue(6)
+    wrapper.vm.$data.month = { value: 6, text: 'June' }
+    await Vue.nextTick()
     wrapper.find('#txt-day').setValue('25')
     wrapper.find('#txt-year').setValue(1980)
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
+    //no validation messages
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(0)
+  
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
     expect(store.getters.getAddSecuredPartiesAndDebtors.debtors.length).toBe(1)
@@ -99,8 +105,15 @@ describe('Debtor add business tests', () => {
 
   it('adds a debtor to the store', async () => {
     wrapper.find('#txt-name').setValue('TONYS TOOLS')
+    // for the autocomplete
+    wrapper.vm.$data.searchValue = 'TONYS TOOLS'
+    await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
+
+    //no validation messages
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(0)
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
