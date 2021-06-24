@@ -6,8 +6,8 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
-  mockedSecuredParties2,
-  mockedDebtors1
+  mockedDebtors1,
+  mockedRegisteringParty1
 } from './test-data'
 
 // Components
@@ -58,7 +58,8 @@ describe('Secured Party list tests', () => {
 
   beforeEach(async () => {
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      securedParties: mockedSecuredParties1
+      securedParties: mockedSecuredParties1,
+      registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent()
   })
@@ -91,7 +92,8 @@ describe('Debtor list tests', () => {
 
   beforeEach(async () => {
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      debtors: mockedDebtors1
+      debtors: mockedDebtors1,
+      registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent()
   })
@@ -117,5 +119,37 @@ describe('Debtor list tests', () => {
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
     expect(item1.querySelectorAll('td')[2].textContent).toContain('June 16, 1990')
+  })
+})
+
+describe('Registering Party tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: mockedRegisteringParty1
+    })
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders registering party table and headers', async () => {
+    expect(wrapper.find('.registering-table').exists()).toBeTruthy()
+    // column header class is text-start
+    expect(wrapper.findAll('.registering-table .text-start').length).toBe(5)
+  })
+
+  it('displays the correct rows when data is present', () => {
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row').length
+    expect(rowCount).toEqual(1)
+  })
+
+  it('displays the correct data in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row')[0]
+
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
+    expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
   })
 })

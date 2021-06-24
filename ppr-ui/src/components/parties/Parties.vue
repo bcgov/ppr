@@ -20,10 +20,8 @@
     <v-row no-gutters class="pb-4 pt-10">
       <v-col>
         <h3>Registering Party</h3>
-        <v-card flat>
-          <div></div>
-        </v-card>
-      </v-col>
+        <registering-party />
+       </v-col>
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
       <v-col>
@@ -52,12 +50,14 @@ import {
 import Debtors from './Debtors.vue'
 import SecuredParties from './SecuredParties.vue'
 import PartySummary from './PartySummary.vue'
+import RegisteringParty from './RegisteringParty.vue'
 
 export default defineComponent({
   components: {
     Debtors,
     SecuredParties,
-    PartySummary
+    PartySummary,
+    RegisteringParty
   },
   props: {
     isSummary: {
