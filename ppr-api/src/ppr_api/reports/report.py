@@ -283,9 +283,10 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _set_financing_vehicle_collateral(statement):
         """Replace financing statement vehicle collateral type code with description."""
-        for collateral in statement['vehicleCollateral']:
-            desc = TO_VEHICLE_TYPE_DESCRIPTION[collateral['type']]
-            collateral['type'] = desc
+        if 'vehicleCollateral' in statement:
+            for collateral in statement['vehicleCollateral']:
+                desc = TO_VEHICLE_TYPE_DESCRIPTION[collateral['type']]
+                collateral['type'] = desc
 
     @staticmethod
     def _set_amend_change_vehicle_collateral(statement):

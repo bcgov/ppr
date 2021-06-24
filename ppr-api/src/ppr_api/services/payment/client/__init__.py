@@ -175,8 +175,8 @@ class BaseClient:
 
             if response:
                 current_app.logger.info('Account ' + self.account_id + ' pay api response=' + response.text)
-            if not response or not response.ok:
-                raise ApiRequestError(response)
+            if not response.ok:
+                raise ApiRequestError(response, str(response.status_code) + ': ' + response.text)
 
             return json.loads(response.text)
 
