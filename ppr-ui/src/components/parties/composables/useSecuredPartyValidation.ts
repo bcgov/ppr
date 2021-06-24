@@ -1,6 +1,4 @@
-import {
-  ref
-} from '@vue/composition-api'
+import { ref } from '@vue/composition-api'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'
@@ -21,8 +19,9 @@ export const useSecuredPartyValidation = () => {
   const { resetError } = useValidation()
 
   const validateInput = (fieldName, value) => {
-    formValidation.validateField(fieldName, value)
-      .then(validationResult => (errors.value[fieldName] = validationResult))
+    formValidation.validateField(fieldName, value).then(validationResult => {
+      errors.value[fieldName] = validationResult
+    })
   }
 
   const validateName = (isBusiness, form) => {
@@ -58,14 +57,11 @@ export const useSecuredPartyValidation = () => {
     }
   }
 
-  const validateSecuredPartyForm = (
-    currentIsBusiness,
-    currentParty
-  ): boolean => {
-   
-    validateName(currentIsBusiness.value, currentParty.value)
-    if (currentIsBusiness.value === true) {
-      return errors.value.businessName.succeeded
+  const validateSecuredPartyForm = (partyBusiness, currentParty): boolean => {
+    const currentIsBusiness = partyBusiness === 'B'
+    validateName(currentIsBusiness, currentParty.value)
+    if (currentIsBusiness === true) {
+      return errors.value.businessName.succeeded && errors.value.emailAddress.succeeded
     } else {
       return (
         errors.value.first.succeeded &&
@@ -80,9 +76,7 @@ export const useSecuredPartyValidation = () => {
    * @param addressToValidate the address to set the validity of
    * @param isValid whether the address is valid
    */
-  const updateValidity = (isValid: boolean): void => {
-
-  }
+  const updateValidity = (isValid: boolean): void => {}
 
   return {
     errors,

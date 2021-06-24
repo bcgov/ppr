@@ -185,7 +185,8 @@ import {
   onMounted,
   reactive,
   toRefs,
-  computed
+  computed,
+  watch
 } from '@vue/composition-api'
 import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
@@ -234,9 +235,8 @@ export default defineComponent({
       validateInput(fieldname, currentSecuredParty.value[fieldname])
     }
 
-
     const onSubmitForm = async () => {
-      if (validateSecuredPartyForm(currentIsBusiness, currentSecuredParty) === true) {
+      if (validateSecuredPartyForm(localState.partyBusiness, currentSecuredParty) === true) {
         addSecuredParty()
       }
     }
@@ -244,12 +244,25 @@ export default defineComponent({
     const getPartyBusiness = () => {
       const businessValue = currentIsBusiness.value
       if (businessValue !== null) {
+        localState.partyBusiness = 'I'
         if (businessValue) {
           localState.partyBusiness = 'B'
         }
-        localState.partyBusiness = 'I'
       }
     }
+
+    watch(
+      () => localState.partyBusiness,
+      currentValue => {
+        if (currentValue === 'I') {
+          currentSecuredParty.value.businessName = ''
+        } else {
+          currentSecuredParty.value.personName.first = ''
+          currentSecuredParty.value.personName.middle = ''
+          currentSecuredParty.value.personName.last = ''
+        }
+      }
+    )
 
     onMounted(() => {
       getSecuredParty()

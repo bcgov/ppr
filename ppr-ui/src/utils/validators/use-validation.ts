@@ -1,6 +1,7 @@
 export const useValidation = () => {
   const resetError = (fieldName, errors) => {
-    errors.value[fieldName] = {
+    console.log(errors)
+    errors[fieldName] = {
       type: '',
       succeeded: true,
       message: ''

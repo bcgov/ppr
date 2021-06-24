@@ -2,12 +2,7 @@ import { Validators, createFormValidation } from '@lemoncode/fonk'
 
 const validationSchema = {
   field: {
-    email: [
-      {
-        validator: Validators.email.validator,
-        message: 'Please enter a valid email address'
-      }
-    ]
+    emailAddress: [Validators.email]
   }
 }
 // @ts-ignore - there is a type mismatch in the structure above, but it still works
