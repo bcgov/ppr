@@ -65,7 +65,6 @@ export default defineComponent({
           const regParty = await getRegisteringPartyFromAuth()
           parties.registeringParty = regParty
           setAddSecuredPartiesAndDebtors(parties)
-          console.log('RegisteringParty.vue onMounted regParty=' + JSON.stringify(regParty))
           localState.registeringParty = [regParty]
         } catch (e) {
           localState.registeringParty = null
