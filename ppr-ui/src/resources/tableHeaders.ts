@@ -285,11 +285,5 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'
-  },
-  {
-    class: 'column-mds pa-0',
-    sortable: false,
-    text: '',
-    value: 'edit'
   }
 ]

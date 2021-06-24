@@ -138,7 +138,7 @@ describe('Registering Party tests', () => {
   it('renders registering party table and headers', async () => {
     expect(wrapper.find('.registering-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.registering-table .text-start').length).toBe(5)
+    expect(wrapper.findAll('.registering-table .text-start').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
