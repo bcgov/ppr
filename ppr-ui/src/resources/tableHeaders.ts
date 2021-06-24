@@ -260,3 +260,36 @@ export const partyTableHeaders: Array<BaseHeaderIF> = [
     value: 'edit'
   }
 ]
+
+export const registeringTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Name',
+    value: 'name'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Address',
+    value: 'address'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Email Address',
+    value: 'emailAddress'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Registering Party Code',
+    value: 'code'
+  },
+  {
+    class: 'column-mds pa-0',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]

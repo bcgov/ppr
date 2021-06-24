@@ -26,18 +26,20 @@
       </v-row>
     </v-container>
     <v-container class="pa-0">
-      <v-row class="pt-6 px-1">
+      <v-row class="pt-6 px-1" v-if="registeringParty && registeringParty.length && registeringParty.length > 0">
         <v-col class="generic-label">Registering Party</v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
+      <v-row no-gutters class="pb-6 pt-4"
+             v-if="registeringParty && registeringParty.length && registeringParty.length > 0">
         <v-col>
           <v-data-table
             class="registering-table"
-            :headers="partyHeaders"
+            :headers="registeringHeaders"
             :items="registeringParty"
             disable-pagination
             disable-sort
             hide-default-footer
+            no-data-text="No Registering Party obtained yet from user Account Information."
           >
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
@@ -128,7 +130,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
 
-import { partyTableHeaders, debtorTableHeaders } from '@/resources'
+import { partyTableHeaders, debtorTableHeaders, registeringTableHeaders } from '@/resources'
 
 export default defineComponent({
   setup (props, context) {
@@ -145,22 +147,10 @@ export default defineComponent({
     const localState = reactive({
       debtors: parties.debtors,
       securedParties: parties.securedParties,
-      registeringParty: [
-        {
-          businessName: '',
-          personName: { first: 'Test', last: 'Person' },
-          emailAddress: 'test@test.com',
-          code: '12345',
-          address: {
-            street: '123 Any St.',
-            city: 'Victoria',
-            region: 'BC',
-            country: 'Canada'
-          }
-        } as PartyIF
-      ], // [parties.registeringParty],
+      registeringParty: (parties.registeringParty !== null ? [parties.registeringParty] : null),
       debtorHeaders: debtorTableHeaders,
       partyHeaders: partyTableHeaders,
+      registeringHeaders: registeringTableHeaders,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       })

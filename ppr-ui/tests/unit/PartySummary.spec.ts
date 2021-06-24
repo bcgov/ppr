@@ -6,8 +6,8 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
-  mockedSecuredParties2,
-  mockedDebtors1
+  mockedDebtors1,
+  mockedRegisteringParty1
 } from './test-data'
 
 // Components
@@ -58,7 +58,8 @@ describe('Secured Party list tests', () => {
 
   beforeEach(async () => {
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      securedParties: mockedSecuredParties1
+      securedParties: mockedSecuredParties1,
+      registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent()
   })
@@ -91,7 +92,8 @@ describe('Debtor list tests', () => {
 
   beforeEach(async () => {
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      debtors: mockedDebtors1
+      debtors: mockedDebtors1,
+      registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent()
   })
