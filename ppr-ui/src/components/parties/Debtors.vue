@@ -121,7 +121,7 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditDebtor[row.index]">
-              <td colspan="6" :class="{ 'invalid-section': invalidSection }">
+              <td colspan="4" :class="{ 'invalid-section': invalidSection }">
                 <v-expand-transition>
                   <div class="edit-debtor-container col-12">
                     <edit-debtor

@@ -101,7 +101,7 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditParty[row.index]">
-              <td colspan="6" :class="{ 'invalid-section': invalidSection }">
+              <td colspan="5" :class="{ 'invalid-section': invalidSection }">
                 <v-expand-transition>
                   <div class="edit-Party-container col-12">
                     <edit-party

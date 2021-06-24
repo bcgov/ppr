@@ -117,6 +117,7 @@
                       :error-messages="
                         errors.emailAddress.message ? errors.emailAddress.message : ''
                       "
+                      @blur="onBlur('emailAddress')"
                       persistent-hint
                     />
                   </v-col>
@@ -184,7 +185,8 @@ import {
   onMounted,
   reactive,
   toRefs,
-  computed
+  computed,
+  watch
 } from '@vue/composition-api'
 import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
@@ -217,7 +219,7 @@ export default defineComponent({
       addressSchema
     } = useSecuredParty(props, context)
 
-    const { errors, updateValidity } = useSecuredPartyValidation()
+    const { errors, updateValidity, validateSecuredPartyForm, validateInput } = useSecuredPartyValidation()
 
     const localState = reactive({
       partyBusiness: '',
@@ -229,21 +231,38 @@ export default defineComponent({
       })
     })
 
-    const onBlur = fieldname => {}
+    const onBlur = (fieldname) => {
+      validateInput(fieldname, currentSecuredParty.value[fieldname])
+    }
 
     const onSubmitForm = async () => {
-      addSecuredParty()
+      if (validateSecuredPartyForm(localState.partyBusiness, currentSecuredParty) === true) {
+        addSecuredParty()
+      }
     }
 
     const getPartyBusiness = () => {
       const businessValue = currentIsBusiness.value
       if (businessValue !== null) {
+        localState.partyBusiness = 'I'
         if (businessValue) {
           localState.partyBusiness = 'B'
         }
-        localState.partyBusiness = 'I'
       }
     }
+
+    watch(
+      () => localState.partyBusiness,
+      currentValue => {
+        if (currentValue === 'I') {
+          currentSecuredParty.value.businessName = ''
+        } else {
+          currentSecuredParty.value.personName.first = ''
+          currentSecuredParty.value.personName.middle = ''
+          currentSecuredParty.value.personName.last = ''
+        }
+      }
+    )
 
     onMounted(() => {
       getSecuredParty()
