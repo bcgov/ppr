@@ -54,19 +54,20 @@ export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
         if (!data) {
           throw new Error('Unable to obtain Registering Party from Account Information.')
         }
-        // Remove null defaults when api address available.
+        // If no api address registering party validation should fail.
         const address: AddressIF = {
-          street: data?.contact?.street || 'NA',
-          streetAdditional: data?.contact?.streetAdditional,
-          city: data?.contact?.city || 'NA',
-          region: data?.contact?.region || 'BC',
-          postalCode: data?.contact?.postalCode || 'V8R1V1',
-          country: data?.contact?.country || 'CA',
-          deliveryInstructions: ''
+          street: data?.mailingAddress?.street || '',
+          streetAdditional: data?.mailingAddress?.streetAdditional,
+          city: data?.mailingAddress?.city || '',
+          region: data?.mailingAddress?.region || '',
+          postalCode: data?.mailingAddress?.postalCode || '',
+          country: data?.mailingAddress?.country || '',
+          deliveryInstructions: '' // Not used by PPR or returned by the api.
         }
+        // Auth API account name is always business name.
+        // No client party code or email is available via the auth api.
         const party: PartyIF = {
-          businessName: data.name,
-          personName: { first: 'Test', last: 'Person' },
+          businessName: data.businessName || data.name,
           emailAddress: '',
           code: '',
           address: address
