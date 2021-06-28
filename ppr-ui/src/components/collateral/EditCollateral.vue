@@ -8,7 +8,7 @@
               :class="{ 'error-text': invalidSection }"
             >
               <span v-if="activeIndex === -1" class="pl-4"> Add Vehicle </span>
-              <span v-else>Edit Vehicle</span>
+              <span v-else class="ml-n3">Edit Vehicle</span>
             </label>
         </v-col>
         <v-col cols="9">
@@ -218,7 +218,5 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import "@/assets/styles/theme.scss";
-::v-deep .theme--light.v-btn.v-btn--disabled {
-  color: rgba(211, 39, 44, .4) !important;
-}
+
 </style>

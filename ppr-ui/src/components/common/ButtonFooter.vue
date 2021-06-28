@@ -34,16 +34,6 @@
           </v-btn>
         </v-col>
         <v-col cols="3" justify="end">
-          <span class="pr-3" v-if="buttonConfig.showBack">
-            <v-btn
-              id="reg-back-btn"
-              outlined
-              color="primary"
-              @click="submitBack"
-            >
-              <v-icon color="primary">mdi-chevron-left</v-icon> Back
-            </v-btn>
-          </span>
           <v-btn
             id="reg-next-btn"
             color="primary"
@@ -53,6 +43,17 @@
             {{ buttonConfig.nextText }}
             <v-icon color="white">mdi-chevron-right</v-icon>
           </v-btn>
+          <span class="pr-3" v-if="buttonConfig.showBack">
+            <v-btn
+              id="reg-back-btn"
+              outlined
+              color="primary"
+              class="float-right mr-4"
+              @click="submitBack"
+            >
+              <v-icon color="primary">mdi-chevron-left</v-icon> Back
+            </v-btn>
+          </span>
         </v-col>
       </v-row>
     </v-container>

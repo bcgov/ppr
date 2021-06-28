@@ -22,11 +22,11 @@ export const VehicleTypes: Array<any> = [
     text: UIVehicleTypes.MANUFACTURED_HOME
   },
   {
-    value: APIVehicleTypes.AIRCRAFT_AIRFRAME,
-    text: UIVehicleTypes.AIRCRAFT_AIRFRAME
-  },
-  {
     value: APIVehicleTypes.AIRCRAFT,
     text: UIVehicleTypes.AIRCRAFT
+  },
+  {
+    value: APIVehicleTypes.AIRCRAFT_AIRFRAME,
+    text: UIVehicleTypes.AIRCRAFT_AIRFRAME
   }
 ]

@@ -17,6 +17,7 @@ export const serialNumberValidator = ({ values }) => {
 
   switch (values.type) {
     case 'AC':
+      message = 'Maximum 25 letters'
       emptyMessage = 'Enter the D.O.T Number'
       break
     case 'AF':
@@ -37,6 +38,8 @@ export const serialNumberValidator = ({ values }) => {
     case 'TR':
     case 'BO':
       emptyMessage = 'Enter the Serial Number'
+      message =
+        'Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)'
       break
   }
 
