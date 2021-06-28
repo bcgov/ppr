@@ -134,7 +134,9 @@
               </td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
-              <td :class="[$style['vehicle-row']]">{{ row.item.serialNumber }}</td>
+              <td :class="[$style['vehicle-row']]">
+                {{ row.item.serialNumber }}
+              </td>
               <td v-if="getMH">
                 {{ row.item.manufacturedHomeRegistrationNumber }}
               </td>
