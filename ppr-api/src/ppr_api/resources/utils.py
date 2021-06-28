@@ -24,8 +24,9 @@ ACCOUNT_REQUIRED = 'Account-Id header required.'
 def serialize(errors):
     """Serialize errors."""
     error_message = []
-    for error in errors:
-        error_message.append('Schema validation: ' + error.message + '.')
+    if errors:
+        for error in errors:
+            error_message.append('Schema validation: ' + error.message + '.')
     return error_message
 
 
@@ -50,10 +51,12 @@ def account_required_response():
     return jsonify({'message': ACCOUNT_REQUIRED}), HTTPStatus.BAD_REQUEST
 
 
-def validation_error_response(errors, cause):
+def validation_error_response(errors, cause, additional_msg: str = None):
     """Build a schema validation error response."""
-    return jsonify({'message': cause, 'detail': serialize(errors)}), HTTPStatus.BAD_REQUEST
-#    return {'cause': cause, 'message': schema_utils.serialize(errors)}, HTTPStatus.BAD_REQUEST
+    details = serialize(errors)
+    if additional_msg:
+        details.append('Additional validation: ' + additional_msg)
+    return jsonify({'message': cause, 'detail': details}), HTTPStatus.BAD_REQUEST
 
 
 def business_exception_response(exception):

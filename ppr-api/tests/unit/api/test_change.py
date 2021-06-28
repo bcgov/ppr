@@ -19,62 +19,237 @@ Test-Suite to ensure that the /financing-statement/registrationNum/changes endpo
 import copy
 from http import HTTPStatus
 
+import pytest
 from registry_schemas.example_data.ppr import CHANGE_STATEMENT, FINANCING_STATEMENT
 
-from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
-from tests.unit.services.utils import create_header_account, create_header
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from tests.unit.services.utils import create_header, create_header_account
 
 
 # prep sample post change statement data
 SAMPLE_JSON = copy.deepcopy(CHANGE_STATEMENT)
+STATEMENT_VALID = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ],
+  'payment': {
+      'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
+      'invoiceId': '2199700'
+  }
+}
+INVALID_REG_NUM = {
+  'baseRegistrationNumber': 'TESTXXX1',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ]
+}
+MISSING_BASE_DEBTOR = {
+  'baseRegistrationNumber': 'TEST0001',
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ]
+}
+INVALID_BASE_DEBTOR = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 3 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ]
+}
+INVALID_HISTORICAL = {
+  'baseRegistrationNumber': 'TEST0003',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ]
+}
+INVALID_CODE = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'code': '300000000'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ]
+}
+INVALID_ADDRESS = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'XX',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AC',
+  'addVehicleCollateral': [
+      {
+          'type': 'MV',
+          'serialNumber': 'KM8J3CA46JU724994',
+          'year': 2018,
+          'make': 'HYUNDAI',
+          'model': 'TUCSON'
+      }
+  ]
+}
+
+# testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account}, {reg_num})
+TEST_CREATE_DATA = [
+    ('Invalid registration number', INVALID_REG_NUM, [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXX1'),
+    ('Invalid missing base debtor', MISSING_BASE_DEBTOR, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid base debtor', INVALID_BASE_DEBTOR, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid historical', INVALID_HISTORICAL, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0003'),
+    ('Invalid party code extra validation', INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
+    ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
+]
 
 
-def test_change_create_invalid_type_400(session, client, jwt):
-    """Assert that create statement with an invalid type returns a 400 error."""
+@pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
+def test_create_change(session, client, jwt, desc, json_data, roles, status, has_account, reg_num):
+    """Assert that a post change registration statement works as expected."""
+    headers = None
     # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    json_data['changeType'] = 'XX'
-    del json_data['documentId']
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['addDebtors']
-    del json_data['deleteVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['addGeneralCollateral']
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
 
     # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    response = client.post('/api/v1/financing-statements/' + reg_num + '/changes',
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
     # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
+    # print('Response data:')
+    # print(response.json)
+    assert response.status_code == status
 
 
-def test_change_create_valid_su_201(session, client, jwt):
+def test_change_substitute_collateral_success(session, client, jwt):
     """Assert that a valid SU type change statement returns a 200 status."""
     # setup
-    statement = copy.deepcopy(FINANCING_STATEMENT)
-    statement['debtors'][0]['businessName'] = 'TEST BUS 2 DEBTOR'
-    statement['type'] = 'SA'
-    del statement['createDateTime']
-    del statement['baseRegistrationNumber']
-    del statement['payment']
-    del statement['documentId']
-    del statement['lifeInfinite']
-    del statement['lienAmount']
-    del statement['surrenderDate']
-
-    rv1 = client.post('/api/v1/financing-statements',
-                      json=statement,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                      content_type='application/json')
+    rv1 = create_financing_test(session, client, jwt)
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
     base_reg_num = rv1.json['baseRegistrationNumber']
@@ -106,24 +281,10 @@ def test_change_create_valid_su_201(session, client, jwt):
     assert rv.status_code == HTTPStatus.CREATED
 
 
-def test_change_create_valid_dt_201(session, client, jwt):
+def test_change_debtor_transfer_success(session, client, jwt):
     """Assert that a valid DT type change statement returns a 200 status."""
     # setup
-    statement = copy.deepcopy(FINANCING_STATEMENT)
-    statement['debtors'][0]['businessName'] = 'TEST BUS 2 DEBTOR'
-    statement['type'] = 'SA'
-    del statement['createDateTime']
-    del statement['baseRegistrationNumber']
-    del statement['payment']
-    del statement['documentId']
-    del statement['lifeInfinite']
-    del statement['lienAmount']
-    del statement['surrenderDate']
-
-    rv1 = client.post('/api/v1/financing-statements',
-                      json=statement,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                      content_type='application/json')
+    rv1 = create_financing_test(session, client, jwt)
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
     base_reg_num = rv1.json['baseRegistrationNumber']
@@ -155,179 +316,20 @@ def test_change_create_valid_dt_201(session, client, jwt):
     assert rv.status_code == HTTPStatus.CREATED
 
 
-def test_change_create_invalid_regnum_404(session, client, jwt):
-    """Assert that an change statement on an invalid registration number returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'X12345X'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    json_data['changeType'] = 'AC'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['addDebtors']
-    del json_data['deleteVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['addGeneralCollateral']
+def create_financing_test(session, client, jwt):
+    """Create a financing statement for testing."""
+    statement = copy.deepcopy(FINANCING_STATEMENT)
+    statement['debtors'][0]['businessName'] = 'TEST BUS 2 DEBTOR'
+    statement['type'] = 'SA'
+    del statement['createDateTime']
+    del statement['baseRegistrationNumber']
+    del statement['payment']
+    del statement['documentId']
+    del statement['lifeInfinite']
+    del statement['lienAmount']
+    del statement['surrenderDate']
 
-    # test
-    rv = client.post('/api/v1/financing-statements/X12345X/changes',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_change_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a change statement request with a non-staff jwt and no account ID returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    json_data['changeType'] = 'AC'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['addDebtors']
-    del json_data['deleteVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['addGeneralCollateral']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
-                     json=json_data,
-                     headers=create_header(jwt, [COLIN_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_change_staff_missing_account_201(session, client, jwt):
-    """Assert that a change statement request with a staff jwt and no account ID returns a 200 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['changeType'] = 'AC'
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['addDebtors']
-    del json_data['deleteVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['addGeneralCollateral']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_change_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a change statement request with a non-ppr role and account ID returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    json_data['changeType'] = 'AC'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['addDebtors']
-    del json_data['deleteVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['addGeneralCollateral']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
-                     json=json_data,
-                     headers=create_header_account(jwt, [COLIN_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
-
-
-def test_change_invalid_missing_basedebtor_400(session, client, jwt):
-    """Assert that create statement with a missing base debtor returns a 400 error."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['baseDebtor']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_change_invalid_historical_400(session, client, jwt):
-    """Assert that a change statement on an already discharged registration returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0003'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0003/changes',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_change_invalid_debtor_400(session, client, jwt):
-    """Assert that a change statement with an invalid base debtor name returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 3 DEBTOR'
-    del json_data['createDateTime']
-    del json_data['changeRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/changes',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
+    return client.post('/api/v1/financing-statements',
+                       json=statement,
+                       headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                       content_type='application/json')

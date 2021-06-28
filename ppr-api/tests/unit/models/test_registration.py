@@ -16,16 +16,18 @@
 
 Test-Suite to ensure that the Registration Model is working as expected.
 """
-from http import HTTPStatus
 import copy
 
-import pytest
-from registry_schemas.example_data.ppr import DISCHARGE_STATEMENT
-from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, RENEWAL_STATEMENT, CHANGE_STATEMENT
-from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT, DRAFT_CHANGE_STATEMENT
-from ppr_api.models import Registration, FinancingStatement, Draft
+from registry_schemas.example_data.ppr import (
+    AMENDMENT_STATEMENT,
+    CHANGE_STATEMENT,
+    DISCHARGE_STATEMENT,
+    DRAFT_AMENDMENT_STATEMENT,
+    DRAFT_CHANGE_STATEMENT,
+    RENEWAL_STATEMENT,
+)
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.models import Draft, FinancingStatement, Registration
 
 
 def test_find_by_id(session):
@@ -480,125 +482,3 @@ def test_save_change_from_draft(session):
     result = registration.json
     assert result
 #    assert 'documentId' in result
-
-
-def test_renewal_client_code_invalid(session):
-    """Assert that the renewal statement json with an invalid RP client code validates correctly."""
-    json_data = copy.deepcopy(RENEWAL_STATEMENT)
-    del json_data['createDateTime']
-    del json_data['renewalRegistrationNumber']
-    del json_data['payment']
-    del json_data['courtOrderInformation']
-    del json_data['registeringParty']
-    party = {
-        'code': '900000000'
-    }
-    json_data['registeringParty'] = party
-
-    financing_statement = FinancingStatement.find_by_financing_id(200000004)
-    assert financing_statement
-
-    with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data,
-                                      'RS',
-                                      financing_statement,
-                                      'TEST0001',
-                                      'PS12345')
-
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)
-
-
-def test_amendment_party_id_invalid(session):
-    """Assert that the amendment statement json with an invalid SP delete party ID validates correctly."""
-    registration = Registration.find_by_id(200000008)
-    assert registration
-
-    json_data = registration.json
-    del json_data['createDateTime']
-    del json_data['amendmentRegistrationNumber']
-    del json_data['addGeneralCollateral']
-    del json_data['addVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['deleteVehicleCollateral']
-    del json_data['addDebtors']
-    del json_data['addSecuredParties']
-    json_data['deleteSecuredParties'][0]['partyId'] = 300000000
-    json_data['deleteDebtors'][0]['partyId'] = 300000001
-
-    financing_statement = FinancingStatement.find_by_financing_id(200000000)
-    with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data,
-                                      'AMENDMENT',
-                                      financing_statement,
-                                      'TEST0005',
-                                      'PS12345')
-
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)
-
-
-def test_amendment_vehicle_id_invalid(session):
-    """Assert that the amendment statement json with an invalid delete vehicle collateral ID validates correctly."""
-    registration = Registration.find_by_id(200000008)
-    assert registration
-
-    json_data = registration.json
-    del json_data['createDateTime']
-    del json_data['amendmentRegistrationNumber']
-    del json_data['addGeneralCollateral']
-    del json_data['addVehicleCollateral']
-    del json_data['deleteGeneralCollateral']
-    del json_data['addDebtors']
-    del json_data['addSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['deleteSecuredParties']
-    json_data['deleteVehicleCollateral'][0]['vehicleId'] = 300000000
-
-    financing_statement = FinancingStatement.find_by_financing_id(200000000)
-    with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data,
-                                      'AMENDMENT',
-                                      financing_statement,
-                                      'TEST0001',
-                                      'PS12345')
-
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)
-
-
-def test_amendment_collateral_id_invalid(session):
-    """Assert that the amendment statement json with an invalid delete general collateral ID validates correctly."""
-    registration = Registration.find_by_id(200000008)
-    assert registration
-
-    json_data = registration.json
-    del json_data['createDateTime']
-    del json_data['amendmentRegistrationNumber']
-    del json_data['addGeneralCollateral']
-    del json_data['addVehicleCollateral']
-    del json_data['deleteVehicleCollateral']
-    del json_data['addDebtors']
-    del json_data['addSecuredParties']
-    del json_data['deleteDebtors']
-    del json_data['deleteSecuredParties']
-    json_data['deleteGeneralCollateral'][0]['collateralId'] = 300000000
-
-    financing_statement = FinancingStatement.find_by_financing_id(200000000)
-    with pytest.raises(BusinessException) as bad_request_err:
-        Registration.create_from_json(json_data,
-                                      'AMENDMENT',
-                                      financing_statement,
-                                      'TEST0001',
-                                      'PS12345')
-
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)

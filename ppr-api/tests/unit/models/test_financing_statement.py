@@ -217,35 +217,6 @@ def test_validate_base_debtor(session):
     assert not valid
 
 
-def test_financing_client_code_invalid(session):
-    """Assert that the financing statement json with an invalid RP client code validates correctly."""
-    json_data = copy.deepcopy(FINANCING_STATEMENT)
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['trustIndenture']
-    del json_data['generalCollateral']
-    del json_data['expiryDate']
-    del json_data['registeringParty']
-    del json_data['documentId']
-    party = {
-        'code': '900000000'
-    }
-    sp = {
-        'code': '900000001'
-    }
-    json_data['registeringParty'] = party
-    json_data['securedParties'].append(sp)
-    with pytest.raises(BusinessException) as bad_request_err:
-        FinancingStatement.create_from_json(json_data, 'PS12345')
-
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)
-
-
 def test_current_json(session):
     """Assert that financing statement JSON contains expected current view elements."""
     result = FinancingStatement.find_by_id(200000000)

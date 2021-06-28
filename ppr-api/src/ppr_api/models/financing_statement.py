@@ -400,9 +400,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     @staticmethod
     def create_from_json(json_data, account_id: str):
         """Create a financing statement object from a json Financing Statement schema object: map json to db."""
-        # Perform all addtional data validation checks.
-        FinancingStatement.validate(json_data)
-
         statement = FinancingStatement()
         statement.state_type = model_utils.STATE_ACTIVE
 
@@ -436,40 +433,3 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             party.registration_id = registration_id
 
         return statement
-
-    @staticmethod
-    def validate(json_data):
-        """Perform any extra data validation here, either because it is too complicated for the schema.
-
-        Or because it requires existing data (client party codes).
-        """
-        error_msg = ''
-
-        # Verify the party codes.
-        error_msg = error_msg + FinancingStatement.validate_parties(json_data)
-
-        if error_msg != '':
-            raise BusinessException(
-                error=error_msg,
-                status_code=HTTPStatus.BAD_REQUEST
-            )
-
-    @staticmethod
-    def validate_parties(json_data):
-        """Verify party codes."""
-        error_msg = ''
-        code = None
-
-        if 'registeringParty' in json_data and 'code' in json_data['registeringParty']:
-            code = json_data['registeringParty']['code']
-            if not Party.verify_party_code(code):
-                error_msg = error_msg + 'No registering party client party found for code ' + code + '. '
-
-        if 'securedParties' in json_data:
-            for party in json_data['securedParties']:
-                if 'code' in party:
-                    code = party['code']
-                    if not Party.verify_party_code(code):
-                        error_msg = error_msg + 'No secured party client party found for code ' + code + '. '
-
-        return error_msg

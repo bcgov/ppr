@@ -19,17 +19,165 @@ Test-Suite to ensure that the /financing-statement/registrationNum/discharges en
 import copy
 from http import HTTPStatus
 
-from registry_schemas.example_data.ppr import DISCHARGE_STATEMENT, FINANCING_STATEMENT
+import pytest
+from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
-from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
-from tests.unit.services.utils import create_header_account, create_header
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from tests.unit.services.utils import create_header, create_header_account
 
 
 # prep sample post discharge statement data
-SAMPLE_JSON = copy.deepcopy(DISCHARGE_STATEMENT)
+STATEMENT_VALID = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'payment': {
+      'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
+      'invoiceId': '2199700'
+  }
+}
+INVALID_REG_NUM = {
+  'baseRegistrationNumber': 'TESTXXX1',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'payment': {
+      'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
+      'invoiceId': '2199700'
+  }
+}
+MISSING_BASE_DEBTOR = {
+  'baseRegistrationNumber': 'TEST0001',
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  }
+}
+INVALID_BASE_DEBTOR = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 3 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  }
+}
+INVALID_HISTORICAL = {
+  'baseRegistrationNumber': 'TEST0003',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  }
+}
+INVALID_CODE = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'code': '300000000'
+  }
+}
+INVALID_ADDRESS = {
+  'baseRegistrationNumber': 'TEST0001',
+  'baseDebtor': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'XX',
+          'postalCode': 'V8W 2V8'
+      }
+  }
+}
 
 
-def test_discharge_valid_201(session, client, jwt):
+# testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account}, {reg_num})
+TEST_CREATE_DATA = [
+    ('Invalid registration number', INVALID_REG_NUM, [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXX1'),
+    ('Invalid missing base debtor', MISSING_BASE_DEBTOR, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid base debtor', INVALID_BASE_DEBTOR, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid historical', INVALID_HISTORICAL, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0003'),
+    ('Invalid party code extra validation', INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
+    ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
+]
+
+
+@pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
+def test_create_discharge(session, client, jwt, desc, json_data, roles, status, has_account, reg_num):
+    """Assert that a post discharge registration statement works as expected."""
+    headers = None
+    # setup
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.post('/api/v1/financing-statements/' + reg_num + '/discharges',
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == status
+
+
+def test_discharge_success(session, client, jwt):
     """Assert that a valid create statement returns a 200 status."""
     # setup - create a financing statement as the base registration, then a discharge
     statement = copy.deepcopy(FINANCING_STATEMENT)
@@ -51,11 +199,9 @@ def test_discharge_valid_201(session, client, jwt):
     assert rv1.json['baseRegistrationNumber']
     base_reg_num = rv1.json['baseRegistrationNumber']
 
-    json_data = copy.deepcopy(SAMPLE_JSON)
+    json_data = copy.deepcopy(STATEMENT_VALID)
     json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
     json_data['baseRegistrationNumber'] = base_reg_num
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
     del json_data['payment']
 
     # test
@@ -65,137 +211,3 @@ def test_discharge_valid_201(session, client, jwt):
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_discharge_invalid_missing_basedebtor_400(session, client, jwt):
-    """Assert that create statement with a missing base debtor returns a 400 error."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-    del json_data['baseDebtor']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/023001B/discharges',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_discharge_invalid_regnum_404(session, client, jwt):
-    """Assert that a discharge statement on an invalid registration number returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'X12345X'
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/X12345X/discharges',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_discharge_invalid_historical_400(session, client, jwt):
-    """Assert that a discharge statement on an already discharged registration returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0003'
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0003/discharges',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_discharge_invalid_debtor_400(session, client, jwt):
-    """Assert that a discharge statement with an invalid base debtor name returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 3 DEBTOR'
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/discharges',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_discharge_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a discharge statement request with a non-staff jwt and no account ID returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/discharges',
-                     json=json_data,
-                     headers=create_header(jwt, [COLIN_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_discharge_staff_missing_account_201(session, client, jwt):
-    """Assert that a discharge statement request with a staff jwt and no account ID returns a 200 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
-    json_data['baseRegistrationNumber'] = 'TEST0001'
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/TEST0001/discharges',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_discharge_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a discharge statement request with a non-ppr role and account ID returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    del json_data['createDateTime']
-    del json_data['dischargeRegistrationNumber']
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/023001B/discharges',
-                     json=json_data,
-                     headers=create_header_account(jwt, [COLIN_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
