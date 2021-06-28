@@ -5,6 +5,7 @@ export * from './individual-name-interface'
 export * from './party-interface'
 export * from './registration-interfaces' // Includes payment and draft
 export * from './search-history-response-interface'
+export * from './search-party-interface'
 export * from './search-criteria-interface'
 export * from './search-result-interface'
 export * from './search-response-interface'
