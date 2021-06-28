@@ -17,6 +17,7 @@
           class="mr-4"
           outlined
           color="primary"
+          :disabled="addEditInProgress"
           @click="initAdd(false)"
         >
           <v-icon>mdi-plus</v-icon>
@@ -27,6 +28,7 @@
           id="btn-add-business"
           outlined
           color="primary"
+          :disabled="addEditInProgress"
           @click="initAdd(true)"
         >
           <v-icon>mdi-plus</v-icon>
@@ -82,6 +84,7 @@
                     <v-btn
                       text
                       color="primary"
+                      class="edit-btn"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
@@ -211,6 +214,7 @@ export default defineComponent({
 
     const initAdd = (isBusiness: boolean) => {
       localState.isBusiness = isBusiness
+      localState.addEditInProgress = true
       localState.showAddDebtor = true
     }
 

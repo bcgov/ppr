@@ -62,6 +62,7 @@
                     <v-btn
                       text
                       color="primary"
+                      class="edit-btn"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"

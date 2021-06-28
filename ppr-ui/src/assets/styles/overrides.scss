@@ -233,6 +233,12 @@ tbody {
   opacity: 0.4 !important;
 }
 
+.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: $primary-blue !important;
+  opacity: 0.4 !important;
+  color: white !important;
+}
+
 .v-btn.v-btn--outlined:disabled {
   color: #1669bb !important;
   caret-color: #1669bb !important;
