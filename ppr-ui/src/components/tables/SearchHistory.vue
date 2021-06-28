@@ -26,7 +26,7 @@
           </template>
           <template v-slot:[`item.pdf`]="{ item }">
             <v-btn :id="`pdf-btn-${item.searchId}`"
-                   :class="[$style['pdf-btn'], 'pa-0']"
+                   :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
                    depressed
                    :loading="item.searchId === loadingPDF"
                    @click="downloadPDF(item.searchId)">
