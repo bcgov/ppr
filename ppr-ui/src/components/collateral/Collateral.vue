@@ -22,7 +22,7 @@
         </v-row>
       </v-container>
       <v-container v-else>
-        <v-row no-gutters class="ps-6 pb-3">
+        <v-row no-gutters class="ps-6 pb-3" v-if="vehicleCollateral.length > 0">
           <v-col cols="3" class="pt-4 generic-label">
             Vehicle Collateral
           </v-col>
@@ -54,12 +54,12 @@
             </v-data-table>
           </v-col>
         </v-row>
-        <v-row no-gutters class="ps-6 pb-3">
+        <v-row no-gutters class="ps-6 pt-4 pb-3" v-if="generalCollateral.length > 0">
           <v-col cols="3" class="generic-label">
             General Collateral
           </v-col>
         </v-row>
-        <v-row class="px-6" no-gutters>
+        <v-row class="px-6" no-gutters v-if="generalCollateral.length > 0">
           <v-col :class="[$style['summary-text'], 'py-6']">
             {{ generalCollateral }}
           </v-col>
@@ -141,7 +141,7 @@
               </td>
 
               <!-- Action Btns -->
-              <td class="actions-cell pa-0">
+              <td class="actions-cell px-0 py-2">
                 <div class="actions">
                   <span class="edit-action">
                     <v-btn
@@ -294,7 +294,7 @@ export default defineComponent({
         const editRow = headersToShow.pop()
         if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
           headersToShow.push({
-            class: 'column-mds',
+            class: 'column-sm',
             sortable: false,
             text: 'MH Number',
             value: 'vehicle.manufacturedHomeRegistrationNumber'

@@ -77,13 +77,24 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, StatementTypes } from '@/enums'
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 // local components
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
+import {
+  getAddCollateral, // eslint-disable-line no-unused-vars
+  getLengthTrust, // eslint-disable-line no-unused-vars
+  getAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
+} from '@/store/getters'
+import {
+  setAddCollateral, // eslint-disable-line no-unused-vars
+  setLengthTrust, // eslint-disable-line no-unused-vars
+  setAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
+} from '@/store/actions'
 
 @Component({
   components: {
@@ -98,8 +109,14 @@ import { Parties } from '@/components/parties'
 export default class ReviewConfirm extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getFeeSummary: FeeSummaryIF
+  @Getter getAddCollateral: AddCollateralIF
+  @Getter getLengthTrust: LengthTrustIF
+  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
 
   @Action resetNewRegistration: ActionBindingIF
+  @Action setAddCollateral: ActionBindingIF
+  @Action setLengthTrust: ActionBindingIF
+  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
 
   @Prop({ default: '#app' })
   private attachDialog: string
@@ -139,6 +156,24 @@ export default class ReviewConfirm extends Vue {
 
   private get stepName (): string {
     return RouteNames.REVIEW_CONFIRM
+  }
+
+  mounted () {
+    const collateral = this.getAddCollateral
+    if (!collateral.valid) {
+      collateral.showInvalid = true
+      this.setAddCollateral(collateral)
+    }
+    const lengthTrust = this.getLengthTrust
+    if (!lengthTrust.valid) {
+      lengthTrust.showInvalid = true
+      this.setLengthTrust(lengthTrust)
+    }
+    const parties = this.getAddSecuredPartiesAndDebtors
+    if (!parties.valid) {
+      parties.showInvalid = true
+      this.setAddSecuredPartiesAndDebtors(parties)
+    }
   }
 
   @Emit('error')

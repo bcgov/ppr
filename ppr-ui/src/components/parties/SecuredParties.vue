@@ -56,12 +56,13 @@
               <td>{{ row.item.emailAddress }}</td>
               <td>{{ row.item.code }}</td>
               <!-- Action Btns -->
-              <td class="actions-cell pa-0">
+              <td class="actions-cell  px-0 py-2">
                 <div class="actions">
                   <span class="edit-action">
                     <v-btn
                       text
                       color="primary"
+                      class="edit-btn"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"

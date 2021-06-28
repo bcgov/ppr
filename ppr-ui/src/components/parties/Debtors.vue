@@ -17,6 +17,7 @@
           class="mr-4"
           outlined
           color="primary"
+          :disabled="addEditInProgress"
           @click="initAdd(false)"
         >
           <v-icon>mdi-plus</v-icon>
@@ -27,6 +28,7 @@
           id="btn-add-business"
           outlined
           color="primary"
+          :disabled="addEditInProgress"
           @click="initAdd(true)"
         >
           <v-icon>mdi-plus</v-icon>
@@ -76,12 +78,13 @@
               </td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
-              <td class="actions-cell pa-0">
+              <td class="actions-cell px-0 py-2">
                 <div class="actions">
                   <span class="edit-action">
                     <v-btn
                       text
                       color="primary"
+                      class="edit-btn"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
@@ -211,6 +214,7 @@ export default defineComponent({
 
     const initAdd = (isBusiness: boolean) => {
       localState.isBusiness = isBusiness
+      localState.addEditInProgress = true
       localState.showAddDebtor = true
     }
 

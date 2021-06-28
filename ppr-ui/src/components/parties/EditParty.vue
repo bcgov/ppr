@@ -4,7 +4,7 @@
       <v-row no-gutters>
         <v-col cols="3">
           <label
-            class="add-party-header general-label"
+            class="add-party-header generic-label ml-n8"
             :class="{ 'error-text': invalidSection }"
           >
             <span v-if="activeIndex === -1" class="pl-5">Add</span>
@@ -153,8 +153,9 @@
                   <v-btn
                     large
                     id="done-btn"
-                    class="m1-auto"
+                    class="ml-auto"
                     color="primary"
+                    :disabled="!isPartyType"
                     @click="onSubmitForm()"
                   >
                     Done

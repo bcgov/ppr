@@ -148,8 +148,16 @@ export default defineComponent({
       debtors: parties.debtors,
       securedParties: parties.securedParties,
       registeringParty: (parties.registeringParty !== null ? [parties.registeringParty] : null),
-      debtorHeaders: debtorTableHeaders,
-      partyHeaders: partyTableHeaders,
+      debtorHeaders: computed(function () {
+        const headersToShow = [...debtorTableHeaders]
+        headersToShow.pop()
+        return headersToShow
+      }),
+      partyHeaders: computed(function () {
+        const headersToShow = [...partyTableHeaders]
+        headersToShow.pop()
+        return headersToShow
+      }),
       registeringHeaders: registeringTableHeaders,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
