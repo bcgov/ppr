@@ -45,7 +45,7 @@
                   <td>{{ row.item.year }}</td>
                   <td>{{ row.item.make }}</td>
                   <td>{{ row.item.model }}</td>
-                  <td :class="[$style['vehicle-row']]">{{ row.item.serialNumber }}</td>
+                  <td :class="[$style['vehicle-cell']]">{{ row.item.serialNumber }}</td>
                   <td v-if="getMH">
                     {{ row.item.manufacturedHomeRegistrationNumber }}
                   </td>
@@ -125,6 +125,7 @@
             <tr
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
+              class="vehicle-row"
             >
               <td>
                 {{ getVehicleDescription(row.item.type) }}
@@ -134,7 +135,7 @@
               </td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
-              <td :class="[$style['vehicle-row']]">
+              <td :class="[$style['vehicle-cell']]">
                 {{ row.item.serialNumber }}
               </td>
               <td v-if="getMH">
@@ -408,7 +409,7 @@ export default defineComponent({
   white-space: inherit;
 }
 
-.vehicle-row {
+.vehicle-cell {
   text-transform: uppercase;
 }
 </style>
