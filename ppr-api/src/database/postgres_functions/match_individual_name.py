@@ -40,6 +40,16 @@ match_individual_name = PGFunction(
         v_first1 = split_part(v_firstname_key, ' ', 1);
         v_first2 = split_part(v_firstname_key, ' ', 2);  -- May be null
         v_first3 = split_part(v_firstname_key, ' ', 3);  -- May be null
+
+        IF (LENGTH(v_last2) < 1) THEN
+            v_last2 := null;
+        END IF;
+        IF (LENGTH(v_first2) < 1) THEN
+            v_first2 := null;
+        END IF;
+        IF (LENGTH(v_first3) < 1) THEN
+            v_first3 := null;
+        END IF;
         
         -- Replace where clause: Oracle uses UTL_MATCH.JARO_WINKLER_SIMILARITY
         SELECT array_agg(id)
@@ -47,15 +57,18 @@ match_individual_name = PGFunction(
         FROM parties p
         WHERE registration_id_end IS NULL AND
             party_type = 'DI' AND
-            ((levenshtein(p.last_name_key, v_lastname_key) <= 2 AND 
+            (
+                (levenshtein(p.last_name_key, v_lastname_key) <= 2 AND 
                 (levenshtein(p.first_name_key, v_firstname_key) <= 2 OR
                 searchkey_name_match(p.first_name_key, v_first1, v_first2, v_first3) > 0 OR
-                searchkey_nickname_match(p.first_name_key, v_first1, v_first2, v_first3) > 0)) OR
-            -- This looks like a full party table scan
-            (searchkey_name_match(p.last_name_key, v_last1, v_last2, null) > 0 AND 
+                searchkey_nickname_match(p.first_name_key, v_first1, v_first2, v_first3) > 0)
+                ) OR
+                -- This looks like a full parties table scan: commenting out reduces the query by about 3 seconds.
+                (searchkey_name_match(p.last_name_key, v_last1, v_last2, null) > 0 AND 
                 (searchkey_name_match(p.first_name_key, v_first1, v_first2, v_first3) > 0 OR
-                searchkey_nickname_match(p.first_name_key, v_first1, v_first2, v_first3) > 0)));
-
+                searchkey_nickname_match(p.first_name_key, v_first1, v_first2, v_first3) > 0)
+                )
+            );
         RETURN v_ids;
     END
     ; 
