@@ -38,14 +38,14 @@
               no-data-text="No vehicle collateral"
             >
               <template v-slot:item="row" class="vehicle-data-table">
-                <tr :key="row.item.id" :class="[$style['vehicle-row']]">
+                <tr :key="row.item.id">
                   <td :class="[$style['summary-cell'], 'pl-0']">
                     {{ getVehicleDescription(row.item.type) }}
                   </td>
                   <td>{{ row.item.year }}</td>
                   <td>{{ row.item.make }}</td>
                   <td>{{ row.item.model }}</td>
-                  <td>{{ row.item.serialNumber }}</td>
+                  <td :class="[$style['vehicle-cell']]">{{ row.item.serialNumber }}</td>
                   <td v-if="getMH">
                     {{ row.item.manufacturedHomeRegistrationNumber }}
                   </td>
@@ -125,7 +125,7 @@
             <tr
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
-              :class="[$style['vehicle-row']]"
+              class="vehicle-row"
             >
               <td>
                 {{ getVehicleDescription(row.item.type) }}
@@ -135,7 +135,9 @@
               </td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
-              <td>{{ row.item.serialNumber }}</td>
+              <td :class="[$style['vehicle-cell']]">
+                {{ row.item.serialNumber }}
+              </td>
               <td v-if="getMH">
                 {{ row.item.manufacturedHomeRegistrationNumber }}
               </td>
@@ -407,7 +409,7 @@ export default defineComponent({
   white-space: inherit;
 }
 
-.vehicle-row {
+.vehicle-cell {
   text-transform: uppercase;
 }
 </style>

@@ -17,7 +17,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
 
 // Input field selectors / buttons
 const addButtonSelector: string = '#btn-add-collateral'
@@ -40,6 +39,7 @@ function createComponent (
     vuetify
   })
 }
+
 
 describe('Collateral SA tests', () => {
   let wrapper: Wrapper<any>
