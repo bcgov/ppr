@@ -57,9 +57,9 @@ STATE_ACTIVE = 'ACT'
 STATE_EXPIRED = 'HEX'
 
 # Financing statement, registraiton constants
-LIFE_INFINITE = -99
+LIFE_INFINITE = 99
 REPAIRER_LIEN_DAYS = 180
-REPAIRER_LIEN_YEARS = 1
+REPAIRER_LIEN_YEARS = 0
 
 # Mapping from API draft type to DB registration class
 DRAFT_TYPE_TO_REG_CLASS = {
