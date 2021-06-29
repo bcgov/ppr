@@ -9,7 +9,7 @@ import {
   SearchResponseIF,
   SearchResultIF,
   UserSettingsIF,
-  SearchPartyIF 
+  SearchPartyIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
@@ -257,7 +257,13 @@ export async function partyCodeSearch (nameOrCode: string): Promise<SearchPartyI
         throw new Error('Invalid API response')
       }
       return data
-    }).catch(error => {
-      return []
-    })
+    }).catch(
+      error => {
+        return {
+          error: {
+            statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+          }
+        }
+      }
+    )
 }
