@@ -247,10 +247,14 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
 }
 
 // Submit a search query (search step 1) request.
-export async function partyCodeSearch (nameOrCode: string): Promise<SearchPartyIF> {
+export async function partyCodeSearch (nameOrCode: string): Promise<[SearchPartyIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`party-codes/head-offices/${nameOrCode}`, config)
+  let fuzzyName = ''
+  if (!/^\d+$/.test(nameOrCode)) {
+    fuzzyName = '?fuzzyNameSearch=true'
+  }
+  return axios.get(`party-codes/head-offices/${nameOrCode}${fuzzyName}`, config)
     .then(response => {
       const data = response?.data
       if (!data) {

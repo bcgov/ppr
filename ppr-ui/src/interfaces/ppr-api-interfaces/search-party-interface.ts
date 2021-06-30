@@ -4,11 +4,11 @@ import { AddressIF } from '@/interfaces'
 export interface SearchPartyIF {
   code: string, // party code.
   businessName?: string, 
-  contact?: [
+  contact?: {
     name?: string,
     areaCode?: string,
     phoneNumber?: string
-  ], 
+  }, 
   emailAddress?: string, 
   address?: AddressIF
 }
