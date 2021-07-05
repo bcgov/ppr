@@ -13,6 +13,7 @@
         />
         <v-card
           v-if="showAutoComplete"
+          id="party-search-auto-complete"
           :class="['mt-1', $style['auto-complete-card']]"
           elevation="5"
         >
@@ -197,7 +198,6 @@ export default defineComponent({
 
     const updateAutoCompleteResults = async (searchValue: string) => {
       const response: [SearchPartyIF] = await partyCodeSearch(searchValue)
-      console.log(response)
       // check if results are still relevant before updating list
       if (response?.length > 0) {
         // will take up to 25 results
