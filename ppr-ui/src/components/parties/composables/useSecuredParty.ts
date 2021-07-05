@@ -81,29 +81,7 @@ export const useSecuredParty = (props, context) => {
     context.emit('resetEvent')
   }
 
-  const addRegisteringParty = () => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-    let newList: PartyIF[] = parties.securedParties // eslint-disable-line
-    // New debtor
-    const tempSecuredParty = {
-      businessName: 'Temp Registering Party',
-      emailAddress: 'temp@email.com',
-      address: {
-        street: '123 Any St',
-        streetAdditional: '',
-        city: 'Victoria',
-        region: 'BC',
-        country: 'Canada',
-        postalCode: 'V8T2T1',
-        deliveryInstructions: ''
-      }
-    }
-    newList.push(tempSecuredParty)
-
-    parties.securedParties = newList
-
-    setAddSecuredPartiesAndDebtors(parties)
-  }
+  
 
   /**
    * Handles update events from address sub-components.
@@ -115,7 +93,6 @@ export const useSecuredParty = (props, context) => {
   return {
     getSecuredParty,
     addSecuredParty,
-    addRegisteringParty,
     resetFormAndData,
     removeSecuredParty,
     addressSchema,

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0">
+  <v-container fluid no-gutters class="white px-0 py-6">
     <v-row class="px-6" align="center">
       <v-col cols="6">
         <v-text-field
@@ -9,6 +9,7 @@
           :hide-details="true"
           v-model="searchValue"
           persistent-hint
+          :disabled="autoCompleteDisabled"
         />
         <v-card
           v-if="showAutoComplete"
@@ -24,7 +25,7 @@
                 right
                 :id="$style['auto-complete-close-btn']"
                 class="auto-complete-close-btn"
-                @click="autoCompleteIsActive = false"
+                @click="closeAutoComplete()"
               >
                 <v-icon>mdi-close</v-icon>
               </v-btn>
@@ -48,17 +49,32 @@
                       <v-list-item-subtitle>
                         <v-row :class="$style['auto-complete-row']">
                           <v-col cols="2">{{ result.code }}</v-col>
-                          <v-col cols="9">{{ result.businessName }}<br>
-                            {{ result.address.street }}, {{ result.address.city }} {{ result.address.region }}
-                            {{ result.address.country }}, {{ result.address.postalCode }}
+                          <v-col cols="9"
+                            >{{ result.businessName }}<br />
+                            {{ result.address.street }},
+                            {{ result.address.city }}
+                            {{ result.address.region }}
+                            {{ result.address.country }},
+                            {{ result.address.postalCode }}
                           </v-col>
                         </v-row>
                       </v-list-item-subtitle>
                     </v-list-item-content>
-                    <v-list-item-action class="mt-n1">
-                      <v-btn @click="addResult(result)">
-                        <v-icon>mdi-plus</v-icon> Add
-                      </v-btn>
+                    <v-list-item-action
+                      :class="$style['auto-complete-action']"
+                      class="mt-n1"
+                    >
+                      <span
+                        v-if="!resultAdded[i]"
+                        @click="addResult(result, i)"
+                      >
+                        <v-icon>mdi-plus</v-icon>Add
+                      </span>
+                      <span class="auto-complete-added" v-else>
+                        <v-icon class="auto-complete-added"
+                          >mdi-check</v-icon
+                        >Added
+                      </span>
                     </v-list-item-action>
                   </v-list-item>
                 </v-list-item-group>
@@ -67,9 +83,14 @@
           </v-row>
         </v-card>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="6" :class="{ 'disabled-text': autoCompleteDisabled }">
         or
-        <a id="add-party" @click="goToAddSecuredParty"
+        <a
+          id="add-party"
+          class="generic-link"
+          :class="{ 'disabled-text': autoCompleteDisabled }"
+          @click="goToAddSecuredParty"
+          :disabled="autoCompleteDisabled"
           >Add a Secured Party that doesn't have a code</a
         >
       </v-col>
@@ -80,11 +101,13 @@
           id="add-registering-party"
           class="reg-checkbox pa-0 ma-0"
           @click="addRegisteringParty"
+          v-model="registeringPartySelected"
           :hide-details="true"
+          :disabled="autoCompleteDisabled"
         >
         </v-checkbox>
       </v-col>
-      <v-col>
+      <v-col :class="{ 'disabled-text': autoCompleteDisabled }">
         Include the registering party as a secured party
       </v-col>
     </v-row>
@@ -104,7 +127,17 @@ import { partyCodeSearch } from '@/utils'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
-  emits: ['showSecuredPartyAdd'],
+  props: {
+    isAutoCompleteDisabled: {
+      type: Boolean,
+      default: false
+    },
+    registeringPartyAdded: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['showSecuredPartyAdd', 'addRegisteringParty', 'removeRegisteringParty'],
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
@@ -117,9 +150,17 @@ export default defineComponent({
       autoCompleteIsActive: false,
       autoCompleteSelected: -1,
       autoCompleteResults: [],
+      autoCompleteDisabled: computed((): boolean => {
+        return props.isAutoCompleteDisabled
+      }),
+      registeringPartySelected: false,
+      resultAdded: [],
       partyCode: 0,
       showAutoComplete: computed((): boolean => {
-        return localState.autoCompleteResults?.length > 0
+        return (
+          localState.autoCompleteResults?.length > 0 &&
+          localState.autoCompleteIsActive
+        )
       })
     })
 
@@ -128,10 +169,16 @@ export default defineComponent({
     }
 
     const addRegisteringParty = () => {
-      context.emit('addRegisteringParty')
+      console.log(localState.registeringPartySelected)
+      if (localState.registeringPartySelected) {
+        context.emit('addRegisteringParty')
+      } else {
+        context.emit('removeRegisteringParty')
+      }
     }
 
-    const addResult = (party: SearchPartyIF) => {
+    const addResult = (party: SearchPartyIF, resultIndex) => {
+      localState.resultAdded[resultIndex] = true
       const currentParties = getAddSecuredPartiesAndDebtors.value
       const newParty: PartyIF = {
         code: party.code,
@@ -143,13 +190,18 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors(currentParties)
     }
 
+    const closeAutoComplete = () => {
+      localState.autoCompleteIsActive = false
+      localState.resultAdded = []
+    }
+
     const updateAutoCompleteResults = async (searchValue: string) => {
       const response: [SearchPartyIF] = await partyCodeSearch(searchValue)
       console.log(response)
       // check if results are still relevant before updating list
       if (response?.length > 0) {
-        // will take up to 5 results
-        localState.autoCompleteResults = response?.slice(0, 5)
+        // will take up to 25 results
+        localState.autoCompleteResults = response?.slice(0, 25)
       }
     }
     watch(
@@ -157,7 +209,7 @@ export default defineComponent({
       (val: number) => {
         if (val >= 0) {
           localState.partyCode = localState.autoCompleteResults[val]?.value
-          localState.autoCompleteIsActive = false
+          // localState.autoCompleteIsActive = false
         }
       }
     )
@@ -173,14 +225,19 @@ export default defineComponent({
       (val: string) => {
         if (localState.searchValue.length >= 4) {
           updateAutoCompleteResults(val)
+          localState.autoCompleteIsActive = true
         }
       }
     )
+    watch(() => props.registeringPartyAdded, (sel: boolean) => {
+      localState.registeringPartySelected = sel    
+    })
 
     return {
       goToAddSecuredParty,
       addRegisteringParty,
       addResult,
+      closeAutoComplete,
       ...toRefs(localState)
     }
   }
@@ -202,7 +259,12 @@ export default defineComponent({
   z-index: 3;
 }
 .auto-complete-row {
-  min-width: 35rem;
+  width: 35rem;
+}
+.auto-complete-action {
+  width: 150px;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 .close-btn-row {
   height: 1rem;
