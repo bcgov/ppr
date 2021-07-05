@@ -151,7 +151,6 @@ import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-u
 import EditParty from './EditParty.vue'
 import PartySearch from './PartySearch.vue'
 import { useParty } from '@/composables/useParty'
-import { useSecuredParty } from './composables/useSecuredParty'
 
 import { partyTableHeaders } from '@/resources'
 

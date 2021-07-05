@@ -93,7 +93,9 @@ describe('Collateral validation tests', () => {
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
-    expect(messages.at(0).text()).toBe('Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)')
+    expect(messages.at(0).text()).toBe(
+      'Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)'
+    )
   })
 
   it('validates number for manufactured home', async () => {
@@ -107,7 +109,8 @@ describe('Collateral validation tests', () => {
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
-    expect(messages.at(0).text()).toBe('Manufactured Home Registration Number must contain 6 digits')
-
+    expect(messages.at(0).text()).toBe(
+      'Manufactured Home Registration Number must contain 6 digits'
+    )
   })
 })
