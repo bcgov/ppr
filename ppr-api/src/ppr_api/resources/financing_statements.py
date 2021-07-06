@@ -31,6 +31,7 @@ from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
+from ppr_api.utils.validators import party_validator, registration_validator
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -103,8 +104,9 @@ class FinancingResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'financingStatement', 'ppr')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR)
+            extra_validation_msg = validate_financing(request_json)
+            if not valid_format or extra_validation_msg != '':
+                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
             # Set up the financing statement registration, pay, and save the data.
             statement = pay_and_save_financing(request_json, account_id)
@@ -192,8 +194,9 @@ class AmendmentResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR_AMEND)
+            extra_validation_msg = validate_registration(request_json)
+            if not valid_format or extra_validation_msg != '':
+                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
@@ -208,6 +211,9 @@ class AmendmentResource(Resource):
             # Verify base debtor (bypassed for staff)
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
+
+            # Verify delete party and collateral ID's
+            validate_delete_ids(request_json, statement)
 
             # Set up the registration, pay, and save the data.
             registration = pay_and_save(request_json,
@@ -260,8 +266,9 @@ class ChangeResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'changeStatement', 'ppr')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR_CHANGE)
+            extra_validation_msg = validate_registration(request_json)
+            if not valid_format or extra_validation_msg != '':
+                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
@@ -276,6 +283,9 @@ class ChangeResource(Resource):
             # Verify base debtor (bypassed for staff)
             if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
+
+            # Verify delete party and collateral ID's
+            validate_delete_ids(request_json, statement)
 
             # Set up the registration, pay, and save the data.
             registration = pay_and_save(request_json,
@@ -325,8 +335,9 @@ class RenewalResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'renewalStatement', 'ppr')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR_RENEWAL)
+            extra_validation_msg = validate_financing(request_json)
+            if not valid_format or extra_validation_msg != '':
+                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
@@ -390,8 +401,9 @@ class DischargeResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR_DISCHARGE)
+            extra_validation_msg = validate_financing(request_json)
+            if not valid_format or extra_validation_msg != '':
+                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
@@ -530,3 +542,29 @@ def get_payment_details(registration):
         'value': registration.base_registration_num
     }
     return details
+
+
+def validate_financing(json_data):
+    """Perform non-schema extra validation on a financing statement."""
+    error_msg = party_validator.validate_financing_parties(json_data)
+
+    return error_msg
+
+
+def validate_registration(json_data):
+    """Perform non-schema extra validation on a non-financing registrations."""
+    error_msg = party_validator.validate_registration_parties(json_data)
+    error_msg += registration_validator.validate_collateral_ids(json_data)
+
+    return error_msg
+
+
+def validate_delete_ids(json_data, financing_statement):
+    """Perform non-schema extra validation on a change amendment delete party, collateral ID's."""
+    error_msg = party_validator.validate_party_ids(json_data, financing_statement)
+    error_msg += registration_validator.validate_collateral_ids(json_data, financing_statement)
+    if error_msg != '':
+        raise BusinessException(
+            error=error_msg,
+            status_code=HTTPStatus.BAD_REQUEST
+        )

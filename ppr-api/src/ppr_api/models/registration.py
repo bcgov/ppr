@@ -15,7 +15,6 @@
 # pylint: disable=too-many-statements, too-many-branches
 
 from enum import Enum
-from http import HTTPStatus
 import json
 
 from ppr_api.exceptions import BusinessException
@@ -264,9 +263,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                          base_registration_num: str,
                          account_id: str = None):
         """Create a registration object for an existing financing statement from dict/json."""
-        # Perform all addtional data validation checks.
-        Registration.validate(json_data, financing_statement, registration_type_cl)
-
         # Create or update draft.
         draft = Registration.find_draft(json_data, None, None)
         reg_vals = Registration.get_generated_values(draft)
@@ -331,7 +327,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
                     registration.financing_statement.expire_date = new_expiry_date
 
-            # TODO: verify this is updated.
+            # Verify this is updated.
             registration.financing_statement.life = registration.life
 
         # Repairer's lien renewal or amendment can have court order information.
@@ -428,137 +424,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     collateral.registration_id_end = registration.id
 
     @staticmethod
-    def validate(json_data, financing_statement, registration_type_cl: str):
-        """Perform any extra data validation here, either because it is too complicated for the schema.
-
-        Or because it requires existing data.
-        """
-        error_msg = ''
-
-        # Verify the party codes and delete party ID's.
-        error_msg = error_msg + Registration.validate_parties(json_data, financing_statement)
-
-        if registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                    model_utils.REG_CLASS_AMEND_COURT,
-                                    model_utils.REG_CLASS_CHANGE):
-            # Check delete vehicle ID's
-            if 'deleteVehicleCollateral' in json_data:
-                for collateral in json_data['deleteVehicleCollateral']:
-                    if 'vehicleId' not in collateral:
-                        error_msg = error_msg + 'Required vehicleId missing in deleteVehicleCollateral. '
-                    else:
-                        collateral_id = collateral['vehicleId']
-                        existing = Registration.find_vehicle_collateral_by_id(collateral_id,
-                                                                              financing_statement.vehicle_collateral)
-                        if not existing:
-                            error_msg = error_msg + 'Invalid vehicleId ' + str(collateral_id) + \
-                                                    ' in deleteVehicleCollateral. '
-
-            # Check delete general collateral ID's
-            if 'deleteGeneralCollateral' in json_data:
-                for collateral in json_data['deleteGeneralCollateral']:
-                    if 'collateralId' not in collateral:
-                        error_msg = error_msg + 'Required collateralId missing in deleteGeneralCollateral. '
-                    else:
-                        collateral_id = collateral['collateralId']
-                        existing = Registration.find_general_collateral_by_id(collateral_id,
-                                                                              financing_statement.general_collateral)
-                        if not existing:
-                            error_msg = error_msg + 'Invalid collateralId ' + str(collateral_id) + \
-                                                    ' in deleteGeneralCollateral. '
-
-        if error_msg != '':
-            raise BusinessException(
-                error=error_msg,
-                status_code=HTTPStatus.BAD_REQUEST
-            )
-
-    @staticmethod
-    def validate_parties(json_data, financing_statement):
-        """Verify party codes and delete party ID's."""
-        error_msg = ''
-        code = None
-
-        if 'registeringParty' in json_data and 'code' in json_data['registeringParty']:
-            code = json_data['registeringParty']['code']
-            if not Party.verify_party_code(code):
-                error_msg = error_msg + 'No registering party client party found for code ' + code + '. '
-
-        if 'addSecuredParties' in json_data:
-            for party in json_data['addSecuredParties']:
-                if 'code' in party:
-                    code = party['code']
-                    if not Party.verify_party_code(code):
-                        error_msg = error_msg + 'No secured party client party found for code ' + code + '. '
-
-        if 'deleteSecuredParties' in json_data:
-            for party in json_data['deleteSecuredParties']:
-                if 'partyId' not in party:
-                    error_msg = error_msg + 'Required partyId missing in deleteSecuredParties.'
-                else:
-                    existing = Registration.find_party_by_id(party['partyId'],
-                                                             model_utils.PARTY_SECURED,
-                                                             financing_statement.parties)
-                    if not existing:
-                        error_msg = error_msg + 'Invalid partyId ' + str(party['partyId']) + \
-                                                ' in deleteSecuredParties. '
-
-        if 'deleteDebtors' in json_data:
-            for party in json_data['deleteDebtors']:
-                if 'partyId' not in party:
-                    error_msg = error_msg + 'Required partyId missing in deleteDebtors.'
-                else:
-                    existing = Registration.find_party_by_id(party['partyId'],
-                                                             model_utils.PARTY_DEBTOR_BUS,
-                                                             financing_statement.parties)
-                    if not existing:
-                        error_msg = error_msg + 'Invalid partyId ' + str(party['partyId']) + \
-                                                ' in deleteDebtors. '
-
-        return error_msg
-
-    @staticmethod
-    def find_party_by_id(party_id: int, party_type: str, parties):
-        """Search existing list of party objects for a matching party id and type."""
-        party = None
-
-        if party_id and party_type and parties:
-            for eval_party in parties:
-                if eval_party.id == party_id and party_type == eval_party.party_type and \
-                        not eval_party.registration_id_end:
-                    party = eval_party
-                elif eval_party.id == party_id and party_type == model_utils.PARTY_DEBTOR_BUS and \
-                        eval_party.party_type == model_utils.PARTY_DEBTOR_IND and \
-                        not eval_party.registration_id_end:
-                    party = eval_party
-
-        return party
-
-    @staticmethod
-    def find_vehicle_collateral_by_id(vehicle_id: int, vehicle_collateral):
-        """Search existing list of vehicle_collateral objects for a matching vehicle id."""
-        collateral = None
-
-        if vehicle_id and vehicle_collateral:
-            for v_collateral in vehicle_collateral:
-                if v_collateral.id == vehicle_id and not v_collateral.registration_id_end:
-                    collateral = v_collateral
-
-        return collateral
-
-    @staticmethod
-    def find_general_collateral_by_id(collateral_id: int, general_collateral):
-        """Search existing list of general_collateral objects for a matching collateral id."""
-        collateral = None
-
-        if collateral_id and general_collateral:
-            for g_collateral in general_collateral:
-                if g_collateral.id == collateral_id and not g_collateral.registration_id_end:
-                    collateral = g_collateral
-
-        return collateral
-
-    @staticmethod
     def find_draft(json_data, registration_class: str, registration_type: str):
         """Try to find an existing draft if a documentId is in json_data.).
 
@@ -574,8 +439,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     if draft:
                         draft.document_number = doc_id
                         draft.draft = json.dumps(json_data)
-                        draft.registration_type_cl = registration_class
-                        draft.registration_type = registration_type
+                        if registration_class and registration_type:
+                            draft.registration_type_cl = registration_class
+                            draft.registration_type = registration_type
             except BusinessException:
                 draft = None
 
@@ -606,3 +472,42 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.document_number = str(row._mapping['doc_num'])  # pylint: disable=protected-access
 
         return registration
+
+    @staticmethod
+    def find_party_by_id(party_id: int, party_type: str, parties):
+        """Search existing list of party objects for a matching party id and type."""
+        party = None
+
+        if party_id and party_type and parties:
+            for eval_party in parties:
+                if eval_party.id == party_id and party_type == eval_party.party_type and \
+                        not eval_party.registration_id_end:
+                    party = eval_party
+                elif eval_party.id == party_id and party_type == model_utils.PARTY_DEBTOR_BUS and \
+                        eval_party.party_type == model_utils.PARTY_DEBTOR_IND and \
+                        not eval_party.registration_id_end:
+                    party = eval_party
+
+        return party
+
+    @staticmethod
+    def find_vehicle_collateral_by_id(vehicle_id: int, vehicle_collateral):
+        """Search existing list of vehicle_collateral objects for a matching vehicle id."""
+        collateral = None
+
+        if vehicle_id and vehicle_collateral:
+            for v_collateral in vehicle_collateral:
+                if v_collateral.id == vehicle_id and not v_collateral.registration_id_end:
+                    collateral = v_collateral
+        return collateral
+
+    @staticmethod
+    def find_general_collateral_by_id(collateral_id: int, general_collateral):
+        """Search existing list of general_collateral objects for a matching collateral id."""
+        collateral = None
+
+        if collateral_id and general_collateral:
+            for g_collateral in general_collateral:
+                if g_collateral.id == collateral_id and not g_collateral.registration_id_end:
+                    collateral = g_collateral
+        return collateral

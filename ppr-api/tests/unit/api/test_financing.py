@@ -16,10 +16,9 @@
 
 Test-Suite to ensure that the /financing-statement endpoint is working as expected.
 """
-import copy
 from http import HTTPStatus
 
-from registry_schemas.example_data.ppr import FINANCING_STATEMENT
+import pytest
 
 from ppr_api.models import FinancingStatement
 from ppr_api.resources.financing_statements import get_payment_details_financing
@@ -28,254 +27,335 @@ from tests.unit.services.utils import create_header, create_header_account
 
 
 # prep sample post financing statement data
-SAMPLE_JSON = copy.deepcopy(FINANCING_STATEMENT)
+FINANCING_VALID = {
+    'type': 'SA',
+    'clientReferenceId': 'A-00000402',
+    'documentId': '1234567',
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'securedParties': [
+        {
+            'businessName': 'BANK OF BRITISH COLUMBIA',
+            'address': {
+                'street': '3720 BEACON AVENUE',
+                'city': 'SIDNEY',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V7R 1R7'
+            },
+            'partyId': 1321095
+        }
+    ],
+    'debtors': [
+        {
+            'businessName': 'Brown Window Cleaning Inc.',
+            'address': {
+                'street': '1234 Blanshard St',
+                'city': 'Victoria',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V8S 3J5'
+             },
+            'emailAddress': 'csmith@bwc.com',
+            'partyId': 1400094
+        }
+    ],
+    'vehicleCollateral': [
+        {
+            'type': 'MV',
+            'serialNumber': 'KNADM5A39E6904135',
+            'year': 2014,
+            'make': 'KIA',
+            'model': 'RIO',
+            'vehicleId': 974124
+        }
+    ],
+    'generalCollateral': [
+        {
+            'description': 'Fridges and stoves. Proceeds: Accts Receivable.',
+            'addedDateTime': '2019-02-02T21:08:32+00:00',
+            'collateralId': 123435
+        }
+    ],
+    'lifeYears': 5,
+    'trustIndenture': False,
+    'lifeInfinite': False
+}
+FINANCING_INVALID_TYPE = {
+    'type': 'XX',
+    'clientReferenceId': 'A-00000402',
+    'documentId': '1234567',
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'securedParties': [
+        {
+            'businessName': 'BANK OF BRITISH COLUMBIA',
+            'address': {
+                'street': '3720 BEACON AVENUE',
+                'city': 'SIDNEY',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V7R 1R7'
+            },
+            'partyId': 1321095
+        }
+    ],
+    'debtors': [
+        {
+            'businessName': 'Brown Window Cleaning Inc.',
+            'address': {
+                'street': '1234 Blanshard St',
+                'city': 'Victoria',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V8S 3J5'
+             },
+            'emailAddress': 'csmith@bwc.com',
+            'partyId': 1400094
+        }
+    ],
+    'vehicleCollateral': [
+        {
+            'type': 'MV',
+            'serialNumber': 'KNADM5A39E6904135',
+            'year': 2014,
+            'make': 'KIA',
+            'model': 'RIO',
+            'vehicleId': 974124
+        }
+    ],
+    'generalCollateral': [
+        {
+            'description': 'Fridges and stoves. Proceeds: Accts Receivable.',
+            'addedDateTime': '2019-02-02T21:08:32+00:00',
+            'collateralId': 123435
+        }
+    ],
+    'lifeYears': 5,
+    'trustIndenture': False,
+    'lifeInfinite': False
+}
+FINANCING_INVALID_CODE = {
+    'type': 'SA',
+    'clientReferenceId': 'A-00000402',
+    'registeringParty': {
+        'code': '300000000'
+    },
+    'securedParties': [
+        {
+            'businessName': 'BANK OF BRITISH COLUMBIA',
+            'address': {
+                'street': '3720 BEACON AVENUE',
+                'city': 'SIDNEY',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V7R 1R7'
+            },
+            'partyId': 1321095
+        }
+    ],
+    'debtors': [
+        {
+            'businessName': 'Brown Window Cleaning Inc.',
+            'address': {
+                'street': '1234 Blanshard St',
+                'city': 'Victoria',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V8S 3J5'
+             },
+            'emailAddress': 'csmith@bwc.com',
+            'partyId': 1400094
+        }
+    ],
+    'vehicleCollateral': [
+        {
+            'type': 'MV',
+            'serialNumber': 'KNADM5A39E6904135',
+            'year': 2014,
+            'make': 'KIA',
+            'model': 'RIO',
+            'vehicleId': 974124
+        }
+    ],
+    'generalCollateral': [
+        {
+            'description': 'Fridges and stoves. Proceeds: Accts Receivable.',
+            'addedDateTime': '2019-02-02T21:08:32+00:00',
+            'collateralId': 123435
+        }
+    ],
+    'lifeYears': 5,
+    'trustIndenture': False,
+    'lifeInfinite': False
+}
+FINANCING_INVALID_ADDRESS = {
+    'type': 'SA',
+    'clientReferenceId': 'A-00000402',
+    'documentId': '1234567',
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'XX',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        }
+    },
+    'securedParties': [
+        {
+            'businessName': 'BANK OF BRITISH COLUMBIA',
+            'address': {
+                'street': '3720 BEACON AVENUE',
+                'city': 'SIDNEY',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V7R 1R7'
+            },
+            'partyId': 1321095
+        }
+    ],
+    'debtors': [
+        {
+            'businessName': 'Brown Window Cleaning Inc.',
+            'address': {
+                'street': '1234 Blanshard St',
+                'city': 'Victoria',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V8S 3J5'
+             },
+            'emailAddress': 'csmith@bwc.com',
+            'partyId': 1400094
+        }
+    ],
+    'vehicleCollateral': [
+        {
+            'type': 'MV',
+            'serialNumber': 'KNADM5A39E6904135',
+            'year': 2014,
+            'make': 'KIA',
+            'model': 'RIO',
+            'vehicleId': 974124
+        }
+    ],
+    'generalCollateral': [
+        {
+            'description': 'Fridges and stoves. Proceeds: Accts Receivable.',
+            'addedDateTime': '2019-02-02T21:08:32+00:00',
+            'collateralId': 123435
+        }
+    ],
+    'lifeYears': 5,
+    'trustIndenture': False,
+    'lifeInfinite': False
+}
+
+# testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account})
+TEST_CREATE_DATA = [
+    ('Invalid type schema validation', FINANCING_INVALID_TYPE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
+    ('Invalid party code extra validation', FINANCING_INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
+    ('Invalid party address extra validation', FINANCING_INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
+    ('Missing account', FINANCING_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False),
+    ('Invalid role', FINANCING_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
+    ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False)
+]
+# testdata pattern is ({description}, {roles}, {status}, {has_account})
+TEST_GET_LIST = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True),
+    ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False)
+]
+# testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num})
+TEST_GET_STATEMENT = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
+    ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX'),
+    ('Valid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0001')
+]
 
 
-def test_financing_create_invalid_type_400(session, client, jwt):
-    """Assert that create statement with an invalid type returns a 400 error."""
+@pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
+def test_create(session, client, jwt, desc, json_data, roles, status, has_account):
+    """Assert that a post financing statement works as expected."""
+    headers = None
     # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['type'] = 'XX'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['documentId']
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
 
     # test
-    rv = client.post('/api/v1/financing-statements',
-                     json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
-                     content_type='application/json')
+    response = client.post('/api/v1/financing-statements',
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
     # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
+    assert response.status_code == status
 
 
-def test_financing_create_valid_sa_201(session, client, jwt):
-    """Assert that a valid SA type financing statement returns a 201 status."""
+@pytest.mark.parametrize('desc,roles,status,has_account', TEST_GET_LIST)
+def test_get_account_list(session, client, jwt, desc, roles, status, has_account):
+    """Assert that a get account financing statement list works as expected."""
+    headers = None
     # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['type'] = 'SA'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['documentId']
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
 
     # test
-    rv = client.post('/api/v1/financing-statements',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
+    response = client.get('/api/v1/financing-statements',
+                          headers=headers)
+
     # check
-    assert rv.status_code == HTTPStatus.CREATED
+    assert response.status_code == status
 
 
-def test_financing_create_valid_rl_201(session, client, jwt):
-    """Assert that a valid RL type financing statement returns a 201 status."""
+@pytest.mark.parametrize('desc,roles,status,has_account, reg_num', TEST_GET_STATEMENT)
+def test_get_statement(session, client, jwt, desc, roles, status, has_account, reg_num):
+    """Assert that a get financing statement by registration number works as expected."""
+    headers = None
     # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['type'] = 'RL'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['trustIndenture']
-    del json_data['generalCollateral']
-    del json_data['documentId']
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
 
     # test
-    rv = client.post('/api/v1/financing-statements',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_financing_get_list_200(session, client, jwt):
-    """Assert that a get financing statement summary list for an account returns a 200 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_financing_valid_get_statement_200(session, client, jwt):
-    """Assert that a valid get financing statement by registration number returns a 200 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements/TEST0001',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_financing_invalid_get_statement_404(session, client, jwt):
-    """Assert that a get statement by invalid registration number returns a 404 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements/X12345X',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_financing_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a create financing statement request with a non-staff jwt and no account ID returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['type'] = 'SA'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['documentId']
-
-    # test
-    rv = client.post('/api/v1/financing-statements',
-                     json=json_data,
-                     headers=create_header(jwt, [COLIN_ROLE]),
-                     content_type='application/json')
+    response = client.get('/api/v1/financing-statements/' + reg_num,
+                          headers=headers)
 
     # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_financing_staff_missing_account_201(session, client, jwt):
-    """Assert that a create financing statement request with a staff jwt and no account ID returns a 201 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['type'] = 'SA'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['documentId']
-
-    # test
-    rv = client.post('/api/v1/financing-statements',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
-
-
-def test_financing_list_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a list financing statements request with a non-staff jwt and no account ID returns a 400 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements',
-                    headers=create_header(jwt, [COLIN_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_financing_list_staff_missing_account_400(session, client, jwt):
-    """Assert that a list financing statements request with a staff jwt and no account ID returns a 400 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements',
-                    headers=create_header(jwt, [PPR_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_financing_get_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a get financing statement request with a non-staff jwt and no account ID returns a 400 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements/TEST0001',
-                    headers=create_header(jwt, [COLIN_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_financing_get_staff_missing_account_200(session, client, jwt):
-    """Assert that a get financing statement request with a staff jwt and no account ID returns a 200 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements/TEST0001',
-                    headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_financing_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a create financing statement request with a non-ppr role and account ID returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON)
-    json_data['type'] = 'SA'
-    del json_data['createDateTime']
-    del json_data['baseRegistrationNumber']
-    del json_data['payment']
-    del json_data['lifeInfinite']
-    del json_data['lienAmount']
-    del json_data['surrenderDate']
-    del json_data['documentId']
-
-    # test
-    rv = client.post('/api/v1/financing-statements',
-                     json=json_data,
-                     headers=create_header_account(jwt, [COLIN_ROLE]),
-                     content_type='application/json')
-
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
-
-
-def test_financing_list_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a list financing statements request with a non-ppr role and account ID returns a 404 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements',
-                    headers=create_header_account(jwt, [COLIN_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
-
-
-def test_financing_get_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a get financing statement request with a non-ppr role and account ID returns a 404 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/financing-statements/TEST0001',
-                    headers=create_header_account(jwt, [COLIN_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.status_code == status
 
 
 def test_get_payment_details_financing(session, client, jwt):
     """Assert that a valid financing statement request payment details setup works as expected."""
     # setup
-    json_data = copy.deepcopy(FINANCING_STATEMENT)
-    statement = FinancingStatement.create_from_json(json_data, 'PS12345')
+    statement = FinancingStatement.create_from_json(FINANCING_VALID, 'PS12345')
     # test
     details = get_payment_details_financing(statement)
 
