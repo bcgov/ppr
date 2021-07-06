@@ -15,8 +15,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
-
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn'
 const cancelButtonSelector: string = '#cancel-btn'
@@ -107,10 +105,12 @@ describe('Secured Party add business tests', () => {
     const radioIsBusiness = radioInput.at(1)
 
     await radioIsBusiness.trigger('click')
+    await Vue.nextTick()
     wrapper.find('#txt-name').setValue('TONYS TOOLS')
+    await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
-
+    
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
     expect(
