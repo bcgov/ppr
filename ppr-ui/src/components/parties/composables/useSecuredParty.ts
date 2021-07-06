@@ -81,8 +81,6 @@ export const useSecuredParty = (props, context) => {
     context.emit('resetEvent')
   }
 
-  
-
   /**
    * Handles update events from address sub-components.
    */
