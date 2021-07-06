@@ -10,27 +10,16 @@
         >
       </v-col>
     </v-row>
-    <v-container
-      v-if="showErrorSummary"
-      class="white"
-      :class="{ 'invalid-message': showErrorSummary }"
-    >
-      <v-row no-gutters class="pa-6">
-        <v-col cols="auto">
-          <v-icon color="#D3272C">mdi-information-outline</v-icon>
-          <span class="invalid-message"> This step is unfinished. </span>
-          <span id="router-link-parties"
-            class="invalid-link"
-            @click="goToParties()">Return to this step to complete it.</span>
-        </v-col>
-      </v-row>
-    </v-container>
     <v-container class="pa-0">
-      <v-row class="pt-6 px-1" v-if="registeringParty && registeringParty.length && registeringParty.length > 0">
+      <v-row
+        class="pt-6 px-1"
+      >
         <v-col class="generic-label">Registering Party</v-col>
       </v-row>
-      <v-row no-gutters class="pb-6 pt-4"
-             v-if="registeringParty && registeringParty.length && registeringParty.length > 0">
+      <v-row
+        no-gutters
+        class="pb-6 pt-4"
+       >
         <v-col>
           <v-data-table
             class="registering-table"
@@ -44,6 +33,12 @@
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title">
+                  <span v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></span
+                  >
+                  <span v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></span
+                  >
                   {{ getName(row.item) }}
                 </td>
                 <td>
@@ -57,23 +52,29 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-1" v-if="securedParties && securedParties.length && securedParties.length > 0">
+      <v-row class="px-1">
         <v-col class="generic-label">Secured Parties</v-col>
       </v-row>
-      <v-row  v-if="securedParties && securedParties.length > 0" no-gutters class="pb-6 pt-4">
+      <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
-            class="party-table"
+            class="party-summary-table"
             :headers="partyHeaders"
             :items="securedParties"
             disable-pagination
             disable-sort
             hide-default-footer
-            no-data-text="No Parties addeed yet."
+            no-data-text=""
           >
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="party-row">
                 <td class="list-item__title">
+                  <span v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></span
+                  >
+                  <span v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></span
+                  >
                   {{ getName(row.item) }}
                 </td>
                 <td>
@@ -83,27 +84,44 @@
                 <td>{{ row.item.code }}</td>
               </tr>
             </template>
+            <template slot="no-data">
+                  <v-icon color="#D3272C">mdi-information-outline</v-icon>
+                  <span class="invalid-message">
+                    This step is unfinished.
+                  </span>
+                  <span
+                    id="router-link-parties"
+                    class="invalid-link"
+                    @click="goToParties()"
+                    >Return to this step to complete it.</span
+                  >
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
-      <v-row class="px-1" v-if="debtors && debtors.length > 0">
+      <v-row class="px-1">
         <v-col class="generic-label">Debtors</v-col>
       </v-row>
-      <v-row  v-if="debtors && debtors.length > 0" no-gutters class="pb-6 pt-4">
+      <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
-            class="debtor-table"
-            :class="{'invalid-message': showErrorDebtors}"
+            class="debtor-summary-table"
             :headers="debtorHeaders"
             :items="debtors"
             disable-pagination
             disable-sort
             hide-default-footer
-            no-data-text="No debtors added yet."
+            no-data-text=""
           >
             <template v-slot:item="row" class="debtor-data-table">
               <tr :key="row.item.id" class="debtor-row">
                 <td class="list-item__title">
+                  <span v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></span
+                  >
+                  <span v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></span
+                  >
                   {{ getName(row.item) }}
                 </td>
                 <td>
@@ -111,6 +129,18 @@
                 </td>
                 <td>{{ getFormattedBirthdate(row.item) }}</td>
               </tr>
+            </template>
+            <template slot="no-data">
+                  <v-icon color="#D3272C">mdi-information-outline</v-icon>
+                  <span class="invalid-message">
+                    This step is unfinished.
+                  </span>
+                  <span
+                    id="router-link-parties"
+                    class="invalid-link"
+                    @click="goToParties()"
+                    >Return to this step to complete it.</span
+                  >
             </template>
           </v-data-table>
         </v-col>
@@ -130,7 +160,11 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
 
-import { partyTableHeaders, debtorTableHeaders, registeringTableHeaders } from '@/resources'
+import {
+  partyTableHeaders,
+  debtorTableHeaders,
+  registeringTableHeaders
+} from '@/resources'
 
 export default defineComponent({
   setup (props, context) {
@@ -143,11 +177,17 @@ export default defineComponent({
     const router = context.root.$router
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress, getFormattedBirthdate } = useParty()
+    const {
+      getName,
+      getFormattedAddress,
+      getFormattedBirthdate,
+      isBusiness
+    } = useParty()
     const localState = reactive({
       debtors: parties.debtors,
       securedParties: parties.securedParties,
-      registeringParty: (parties.registeringParty !== null ? [parties.registeringParty] : null),
+      registeringParty:
+        parties.registeringParty !== null ? [parties.registeringParty] : [],
       debtorHeaders: computed(function () {
         const headersToShow = [...debtorTableHeaders]
         headersToShow.pop()
@@ -172,6 +212,7 @@ export default defineComponent({
 
     return {
       getName,
+      isBusiness,
       getFormattedAddress,
       getFormattedBirthdate,
       goToParties,
@@ -181,6 +222,4 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
-
-</style>
+<style lang="scss" module></style>
