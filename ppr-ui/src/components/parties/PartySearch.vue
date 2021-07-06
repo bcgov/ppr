@@ -170,7 +170,6 @@ export default defineComponent({
     }
 
     const addRegisteringParty = () => {
-      console.log(localState.registeringPartySelected)
       if (localState.registeringPartySelected) {
         context.emit('addRegisteringParty')
       } else {
@@ -230,7 +229,7 @@ export default defineComponent({
       }
     )
     watch(() => props.registeringPartyAdded, (sel: boolean) => {
-      localState.registeringPartySelected = sel    
+      localState.registeringPartySelected = sel
     })
 
     return {
