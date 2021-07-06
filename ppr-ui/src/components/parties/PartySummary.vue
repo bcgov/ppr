@@ -106,7 +106,6 @@
         <v-col>
           <v-data-table
             class="debtor-summary-table"
-            :class="{ 'invalid-message': showErrorDebtors }"
             :headers="debtorHeaders"
             :items="debtors"
             disable-pagination
@@ -188,7 +187,7 @@ export default defineComponent({
       debtors: parties.debtors,
       securedParties: parties.securedParties,
       registeringParty:
-        parties.registeringParty !== null ? [parties.registeringParty] : null,
+        parties.registeringParty !== null ? [parties.registeringParty] : [],
       debtorHeaders: computed(function () {
         const headersToShow = [...debtorTableHeaders]
         headersToShow.pop()

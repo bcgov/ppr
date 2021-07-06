@@ -11,7 +11,7 @@ import {
 } from './test-data'
 
 // Components
-import { PartySearch, PartySummary } from '@/components/parties'
+import { PartySummary } from '@/components/parties'
 
 Vue.use(Vuetify)
 
