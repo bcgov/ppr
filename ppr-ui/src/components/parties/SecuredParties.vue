@@ -10,8 +10,11 @@
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
       <party-search
-      @showSecuredPartyAdd="initAdd"
-      @addRegisteringParty="addRegisteringParty"
+        :isAutoCompleteDisabled="addEditInProgress"
+        :registeringPartyAdded="registeringPartyAdded"
+        @showSecuredPartyAdd="initAdd"
+        @addRegisteringParty="addRegisteringParty"
+        @removeRegisteringParty="removeRegisteringParty"
       />
     </v-row>
     <v-row no-gutters>
@@ -33,7 +36,7 @@
       <v-col>
         <v-data-table
           class="party-table"
-          :class="{'invalid-message': showErrorSecuredParties}"
+          :class="{ 'invalid-message': showErrorSecuredParties }"
           :headers="headers"
           :items="securedParties"
           disable-pagination
@@ -57,7 +60,17 @@
               <td>{{ row.item.code }}</td>
               <!-- Action Btns -->
               <td class="actions-cell  px-0 py-2">
-                <div class="actions">
+                <div class="actions" v-if="isRegisteringParty(row.item)">
+                  <v-list class="actions__more-actions">
+                    <v-list-item @click="removeRegisteringParty()">
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-delete</v-icon>
+                        <span class="ml-1">Remove</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
+                </div>
+                <div class="actions" v-else>
                   <span class="edit-action">
                     <v-btn
                       text
@@ -133,11 +146,11 @@ import {
   computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import { isEqual } from 'lodash'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditParty from './EditParty.vue'
 import PartySearch from './PartySearch.vue'
 import { useParty } from '@/composables/useParty'
-import { useSecuredParty } from './composables/useSecuredParty'
 
 import { partyTableHeaders } from '@/resources'
 
@@ -162,7 +175,6 @@ export default defineComponent({
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const { getName, getFormattedAddress, isPartiesValid } = useParty()
-    const { addRegisteringParty } = useSecuredParty(props, context)
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -173,6 +185,7 @@ export default defineComponent({
       activeIndex: -1,
       showEditParty: [false],
       securedParties: parties.securedParties,
+      registeringPartyAdded: false,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       }),
@@ -190,6 +203,35 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors(currentParties)
     }
 
+    const removeRegisteringParty = (): void => {
+      for (let i = 0; i < localState.securedParties.length; i++) {
+        if (isEqual(localState.securedParties[i], parties.registeringParty)) {
+          removeParty(i)
+          localState.registeringPartyAdded = false
+        }
+      }
+    }
+
+    const addRegisteringParty = () => {
+      let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+      const registeringParty: PartyIF =
+        parties.registeringParty !== null ? parties.registeringParty : null
+      newList.push(registeringParty)
+
+      parties.securedParties = newList
+
+      setAddSecuredPartiesAndDebtors(parties)
+      localState.registeringPartyAdded = true
+    }
+
+    const isRegisteringParty = (partyRow: PartyIF): boolean => {
+      if (isEqual(partyRow, parties.registeringParty)) {
+        return true
+      }
+      return false
+    }
+
     const initEdit = (index: number) => {
       localState.activeIndex = index
       localState.addEditInProgress = true
@@ -197,6 +239,7 @@ export default defineComponent({
     }
 
     const initAdd = () => {
+      localState.addEditInProgress = true
       localState.showAddSecuredParty = true
     }
 
@@ -218,7 +261,9 @@ export default defineComponent({
       initAdd,
       resetData,
       parties,
+      isRegisteringParty,
       addRegisteringParty,
+      removeRegisteringParty,
       ...toRefs(localState)
     }
   }

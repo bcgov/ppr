@@ -230,31 +230,31 @@ export const debtorTableHeaders: Array<BaseHeaderIF> = [
 
 export const partyTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Name',
     value: 'name'
   },
   {
-    class: 'column-md',
+    class: 'column-md py-4',
     sortable: false,
     text: 'Address',
     value: 'address'
   },
   {
-    class: 'column-md',
+    class: 'column-md py-4',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-mds',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Secured Party Code',
     value: 'code'
   },
   {
-    class: 'column-mds pa-0',
+    class: 'column-sm pa-0',
     sortable: false,
     text: '',
     value: 'edit'

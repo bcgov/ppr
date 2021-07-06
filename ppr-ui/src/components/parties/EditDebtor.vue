@@ -4,13 +4,13 @@
       <v-row no-gutters>
         <v-col cols="3">
           <label
-            class="add-debtor-header generic-label ml-n8"
+            class="add-debtor-header generic-label ml"
             :class="{ 'error-text': invalidSection }"
           >
-            <span v-if="activeIndex === -1" class="pl-5">Add</span>
+            <span v-if="activeIndex === -1">Add</span>
             <span v-else>Edit</span>
-            <span v-if="currentIsBusiness"> Business</span>
-            <span v-else> Individual Debtor</span>
+            <span v-if="currentIsBusiness"> a Business<br>Debtor</span>
+            <span v-else> an Individual<br>Debtor</span>
           </label>
         </v-col>
         <v-col cols="9">
@@ -19,14 +19,14 @@
             class="debtor-form"
             v-on:submit.prevent="addDebtor"
           >
-            <v-row v-if="currentIsBusiness" no-gutters>
+            <v-row v-if="currentIsBusiness" no-gutters class="pb-4">
               <v-col>
-                <label class="general-label">Business Legal Name</label>
+                <label class="generic-label">Business Legal Name</label>
               </v-col>
             </v-row>
-            <v-row v-else no-gutters>
+            <v-row v-else no-gutters class="pb-4">
               <v-col>
-                <label class="general-label">Individual Name</label>
+                <label class="generic-label">Person's Legal Name</label>
               </v-col>
             </v-row>
             <v-row v-if="currentIsBusiness" no-gutters>
@@ -88,9 +88,9 @@
                 />
               </v-col>
             </v-row>
-            <v-row v-if="!currentIsBusiness" no-gutters>
+            <v-row v-if="!currentIsBusiness" class="pb-4" no-gutters>
               <v-col>
-                <label class="general-label">Birthdate</label>
+                <label class="generic-label">Birthdate</label>
               </v-col>
             </v-row>
             <v-row v-if="!currentIsBusiness" no-gutters>
@@ -132,9 +132,9 @@
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row no-gutters class="pb-4">
               <v-col>
-                <label class="general-label">Address</label>
+                <label class="generic-label">Address</label>
               </v-col>
             </v-row>
             <base-address

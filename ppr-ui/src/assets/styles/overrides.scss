@@ -210,7 +210,7 @@ tbody {
   color: $primary-blue !important;
 }
 
-.more-actions .v-list-item__title {
+.more-actions .v-list-item__title, .v-list-item__action {
   font-size: 14px;
 }
 
@@ -257,7 +257,7 @@ tbody {
 }
 
 .theme--light.v-list-item .v-list-item__subtitle, .theme--light.v-list-item .v-list-item__action-text,
-.theme--light.v-list-item .v-list-item__subtitle .v-icon
+.theme--light.v-list-item .v-list-item__subtitle .v-icon, .v-list-item__action, .v-list-item__action .v-icon
  {
   color: #1669bb !important;
 }

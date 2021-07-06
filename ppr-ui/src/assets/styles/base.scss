@@ -365,6 +365,19 @@ span.invalid-message {
   cursor: pointer;
 }
 
+.generic-link {
+  color: #1669BB;
+  text-decoration: underline;
+}
+
+.disabled-text {
+  opacity: 0.4;
+}
+
+.auto-complete-added, .v-list .v-list-item--active .v-icon.auto-complete-added {
+  color: #2e8540 !important;
+}
+
 .rounded-top {
   border-radius: 4px 4px 0px 0px; 
 }

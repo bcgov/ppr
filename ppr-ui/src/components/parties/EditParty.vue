@@ -19,17 +19,20 @@
             v-on:submit.prevent="addParty"
           >
             <v-row class="pb-6" no-gutters>
-              <v-col cols="auto">
+              <v-col cols="12">
                 <v-radio-group v-model="partyBusiness" row hide-details="true">
                   <v-radio
-                    class="business-radio"
+                    :class="[
+                      'individual-radio',
+                      $style['party-radio-individual'],
+                    ]"
                     label="Individual Person"
                     value="I"
                   >
                   </v-radio>
 
                   <v-radio
-                    class="individual-radio ml-8"
+                    :class="['business-radio', $style['party-radio-business']]"
                     label="Business"
                     value="B"
                   >
@@ -39,14 +42,14 @@
             </v-row>
             <v-row no-gutters v-if="isPartyType">
               <v-col cols="12">
-                <v-row v-if="partyBusiness === 'B'" no-gutters>
+                <v-row v-if="partyBusiness === 'B'" no-gutters class="pb-4">
                   <v-col>
-                    <label class="general-label">Business Name</label>
+                    <label class="generic-label">Business Name</label>
                   </v-col>
                 </v-row>
-                <v-row v-else no-gutters>
+                <v-row v-else no-gutters class="pb-4">
                   <v-col>
-                    <label class="general-label">Person's Name</label>
+                    <label class="generic-label">Person's Name</label>
                   </v-col>
                 </v-row>
                 <v-row v-if="partyBusiness === 'B'" no-gutters>
@@ -55,7 +58,7 @@
                       filled
                       id="txt-name"
                       label="Business Legal Name"
-                      v-model="currentSecuredParty.businessName"
+                      v-model="searchValue"
                       :error-messages="
                         errors.businessName.message
                           ? errors.businessName.message
@@ -63,6 +66,13 @@
                       "
                       persistent-hint
                     />
+                    <auto-complete
+                      :searchValue="autoCompleteSearchValue"
+                      :setAutoCompleteIsActive="autoCompleteIsActive"
+                      @search-value="setSearchValue"
+                      @hide-details="setHideDetails"
+                    >
+                    </auto-complete>
                   </v-col>
                 </v-row>
                 <v-row v-else no-gutters>
@@ -102,9 +112,9 @@
                     />
                   </v-col>
                 </v-row>
-                <v-row no-gutters>
+                <v-row no-gutters class="pb-4">
                   <v-col>
-                    <label class="general-label">Email Address</label>
+                    <label class="generic-label">Email Address</label>
                   </v-col>
                 </v-row>
                 <v-row no-gutters>
@@ -115,16 +125,18 @@
                       label="Email Address"
                       v-model="currentSecuredParty.emailAddress"
                       :error-messages="
-                        errors.emailAddress.message ? errors.emailAddress.message : ''
+                        errors.emailAddress.message
+                          ? errors.emailAddress.message
+                          : ''
                       "
                       @blur="onBlur('emailAddress')"
                       persistent-hint
                     />
                   </v-col>
                 </v-row>
-                <v-row no-gutters>
+                <v-row no-gutters class="pb-4">
                   <v-col>
-                    <label class="general-label">Address</label>
+                    <label class="generic-label">Address</label>
                   </v-col>
                 </v-row>
                 <base-address
@@ -192,10 +204,12 @@ import {
 import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
 import { useSecuredParty } from './composables/useSecuredParty'
+import AutoComplete from '@/components/search/AutoComplete.vue'
 
 export default defineComponent({
   components: {
-    BaseAddress
+    BaseAddress,
+    AutoComplete
   },
   props: {
     activeIndex: {
@@ -220,10 +234,19 @@ export default defineComponent({
       addressSchema
     } = useSecuredParty(props, context)
 
-    const { errors, updateValidity, validateSecuredPartyForm, validateInput } = useSecuredPartyValidation()
+    const {
+      errors,
+      updateValidity,
+      validateSecuredPartyForm,
+      validateInput
+    } = useSecuredPartyValidation()
 
     const localState = reactive({
+      autoCompleteIsActive: true,
+      autoCompleteSearchValue: '',
       partyBusiness: '',
+      searchValue: '',
+      hideDetails: false,
       isPartyType: computed((): boolean => {
         if (localState.partyBusiness === '') {
           return false
@@ -232,12 +255,17 @@ export default defineComponent({
       })
     })
 
-    const onBlur = (fieldname) => {
+    const onBlur = fieldname => {
       validateInput(fieldname, currentSecuredParty.value[fieldname])
     }
 
     const onSubmitForm = async () => {
-      if (validateSecuredPartyForm(localState.partyBusiness, currentSecuredParty) === true) {
+      if (
+        validateSecuredPartyForm(
+          localState.partyBusiness,
+          currentSecuredParty
+        ) === true
+      ) {
         addSecuredParty()
       }
     }
@@ -252,6 +280,16 @@ export default defineComponent({
       }
     }
 
+    const setSearchValue = (searchValueTyped: string) => {
+      localState.autoCompleteIsActive = false
+      localState.searchValue = searchValueTyped
+      currentSecuredParty.value.businessName = searchValueTyped
+    }
+
+    const setHideDetails = (hideDetails: boolean) => {
+      localState.hideDetails = hideDetails
+    }
+
     watch(
       () => localState.partyBusiness,
       currentValue => {
@@ -262,6 +300,16 @@ export default defineComponent({
           currentSecuredParty.value.personName.middle = ''
           currentSecuredParty.value.personName.last = ''
         }
+      }
+    )
+
+    watch(
+      () => localState.searchValue,
+      (val: string) => {
+        localState.autoCompleteSearchValue = val
+        // show autocomplete results when there is a searchValue
+        localState.autoCompleteIsActive = val !== ''
+        currentSecuredParty.value.businessName = val
       }
     )
 
@@ -280,6 +328,8 @@ export default defineComponent({
       addressSchema,
       updateAddress,
       updateValidity,
+      setSearchValue,
+      setHideDetails,
       errors,
       ...toRefs(localState)
     }
@@ -289,4 +339,18 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+.party-radio-business {
+  width: 50%;
+  background-color: rgba(0, 0, 0, 0.06);
+  height: 60px;
+  padding: 10px;
+  margin-right: 0px !important;
+}
+.party-radio-individual {
+  width: 47%;
+  margin-right: 20px !important;
+  background-color: rgba(0, 0, 0, 0.06);
+  height: 60px;
+  padding: 10px;
+}
 </style>

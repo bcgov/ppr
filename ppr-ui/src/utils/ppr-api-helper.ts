@@ -3,7 +3,14 @@ import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
-import { DraftIF, SearchCriteriaIF, SearchResponseIF, SearchResultIF, UserSettingsIF } from '@/interfaces'
+import {
+  DraftIF,
+  SearchCriteriaIF,
+  SearchResponseIF,
+  SearchResultIF,
+  UserSettingsIF,
+  SearchPartyIF
+} from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
 /**
@@ -237,4 +244,30 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
       }
       return draft
     })
+}
+
+// Submit a search query (search step 1) request.
+export async function partyCodeSearch (nameOrCode: string): Promise<[SearchPartyIF]> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  let fuzzyName = ''
+  if (!/^\d+$/.test(nameOrCode)) {
+    fuzzyName = '?fuzzyNameSearch=true'
+  }
+  return axios.get(`party-codes/head-offices/${nameOrCode}${fuzzyName}`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    }).catch(
+      error => {
+        return {
+          error: {
+            statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+          }
+        }
+      }
+    )
 }
