@@ -72,8 +72,7 @@
                         <v-icon>mdi-plus</v-icon>Add
                       </span>
                       <span class="auto-complete-added" v-else>
-                        <v-icon class="auto-complete-added"
-                          >mdi-check</v-icon
+                        <v-icon class="auto-complete-added">mdi-check</v-icon
                         >Added
                       </span>
                     </v-list-item-action>
@@ -138,7 +137,11 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['showSecuredPartyAdd', 'addRegisteringParty', 'removeRegisteringParty'],
+  emits: [
+    'showSecuredPartyAdd',
+    'addRegisteringParty',
+    'removeRegisteringParty'
+  ],
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
@@ -228,9 +231,12 @@ export default defineComponent({
         }
       }
     )
-    watch(() => props.registeringPartyAdded, (sel: boolean) => {
-      localState.registeringPartySelected = sel
-    })
+    watch(
+      () => props.registeringPartyAdded,
+      (sel: boolean) => {
+        localState.registeringPartySelected = sel
+      }
+    )
 
     return {
       goToAddSecuredParty,
