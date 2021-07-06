@@ -202,26 +202,26 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
 
 export const debtorTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-md',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Name',
     value: 'party.name'
   },
   {
-    class: 'column-md',
+    class: 'column-mdl py-4',
     sortable: false,
     text: 'Address',
     value: 'party.address'
   },
   {
-    class: 'column-mds',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Birthdate',
     value: 'party.birthdate'
   },
 
   {
-    class: 'column-mds pa-0',
+    class: 'column-sm pa-0',
     sortable: false,
     text: '',
     value: 'edit'
@@ -263,25 +263,25 @@ export const partyTableHeaders: Array<BaseHeaderIF> = [
 
 export const registeringTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Name',
     value: 'name'
   },
   {
-    class: 'column-md',
+    class: 'column-md py-4',
     sortable: false,
     text: 'Address',
     value: 'address'
   },
   {
-    class: 'column-md',
+    class: 'column-md py-4',
     sortable: false,
     text: 'Email Address',
     value: 'emailAddress'
   },
   {
-    class: 'column-mds',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'

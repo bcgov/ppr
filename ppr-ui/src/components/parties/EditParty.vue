@@ -4,10 +4,10 @@
       <v-row no-gutters>
         <v-col cols="3">
           <label
-            class="add-party-header generic-label ml-n8"
+            class="add-party-header generic-label ml"
             :class="{ 'error-text': invalidSection }"
           >
-            <span v-if="activeIndex === -1" class="pl-5">Add</span>
+            <span v-if="activeIndex === -1" class="">Add</span>
             <span v-else>Edit</span>
             Secured Party
           </label>
@@ -20,7 +20,7 @@
           >
             <v-row class="pb-6" no-gutters>
               <v-col cols="12">
-                <v-radio-group v-model="partyBusiness" row hide-details="true">
+                <v-radio-group v-model="partyBusiness" class="mt-0" row hide-details="true">
                   <v-radio
                     :class="[
                       'individual-radio',

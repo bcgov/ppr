@@ -273,3 +273,12 @@ tbody {
   padding-bottom: 20px !important;
   vertical-align: bottom;
 }
+
+.v-data-table.party-summary-table tr.v-data-table__empty-wrapper td,
+.v-data-table.debtor-summary-table tr.v-data-table__empty-wrapper td {
+  text-align: left;
+  border-left: 3px solid #D3272C !important;
+  padding-left: 35px;
+  padding-top: 30px !important;
+  height: 90px;
+}

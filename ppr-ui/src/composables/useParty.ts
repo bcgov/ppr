@@ -9,6 +9,14 @@ export const useParty = () => {
     }
   }
 
+  const isBusiness = (party: PartyIF): boolean => {
+    if (party.businessName) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   const getFormattedAddress = (party: PartyIF): string => {
     let address = party.address.street
     if (party.address.streetAdditional) {
@@ -79,6 +87,7 @@ export const useParty = () => {
 
   return {
     getName,
+    isBusiness,
     getFormattedAddress,
     getFormattedBirthdate,
     getMonth,
