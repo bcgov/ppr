@@ -67,7 +67,6 @@ export default class Stepper extends Vue {
   }
 
   private showInvalid (step): boolean {
-    console.log(this.showStepErrors)
     return ((this.showStepErrors || this.showStepErrorsFlag) &&
       (!step.valid))
   }
