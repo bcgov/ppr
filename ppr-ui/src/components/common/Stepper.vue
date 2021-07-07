@@ -53,9 +53,10 @@ import { GetterIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 @Component({})
 export default class Stepper extends Vue {
   @Getter getSteps!: GetterIF
+  @Getter showStepErrors: boolean
 
   @Prop({ default: false })
-  private showStepErrors: boolean
+  showStepErrorsFlag: boolean
 
   private goTo (step) {
     this.$router.push(step.to).catch(error => error)
@@ -66,8 +67,9 @@ export default class Stepper extends Vue {
   }
 
   private showInvalid (step): boolean {
-    return (this.$route.name === 'review-confirm' && this.showStepErrors &&
-      this.$route.name !== step.to && !step.valid)
+    console.log(this.showStepErrors)
+    return ((this.showStepErrors || this.showStepErrorsFlag) &&
+      (!step.valid))
   }
 }
 </script>

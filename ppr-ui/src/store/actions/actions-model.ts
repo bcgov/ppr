@@ -109,3 +109,7 @@ export const setAddCollateralStepValidity = ({ commit }, validity) => {
 export const setLengthTrustStepValidity = ({ commit }, validity) => {
   commit('mutateLengthTrustStepValidity', validity)
 }
+
+export const setShowStepErrors: ActionIF = ({ commit }, show: boolean): void => {
+  commit('mutateShowStepErrors', show)
+}

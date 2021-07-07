@@ -21,8 +21,8 @@ export const useVehicle = (props, context) => {
           return 'D.O.T or Serial Number'
         case 'AC':
           return 'D.O.T Number'
-        case 'OM':
-          return 'Outboard Motor Serial Number'
+        case 'OB':
+          return 'Serial Number'
         case 'TR':
           return 'Trailer Serial Number'
         default:

@@ -26,6 +26,7 @@
                         v-model="currentVehicle.type"
                         id="txt-type"
                         :error-messages="errors.type.message ? errors.type.message : ''"
+                        @change="changeVehicleType"
                       >
                         <template slot="item" slot-scope="data">
                           <span class="list-item">
@@ -181,7 +182,7 @@ export default defineComponent({
       removeVehicle,
       addVehicle
     } = useVehicle(props, context)
-    const { errors, validateInput, validateSerial, validateCollateralForm } = useCollateralValidation()
+    const { errors, validateInput, validateSerial, validateCollateralForm, resetError } = useCollateralValidation()
     onMounted(getVehicle)
 
     const onSubmitForm = async () => {
@@ -201,6 +202,10 @@ export default defineComponent({
       }
     }
 
+    const changeVehicleType = () => {
+      resetError('type')
+    }
+
     return {
       onSubmitForm,
       resetFormAndData,
@@ -210,7 +215,8 @@ export default defineComponent({
       currentVehicle,
       vehicleTypes,
       getSerialLabel,
-      getSerialDisabled
+      getSerialDisabled,
+      changeVehicleType
     }
   }
 })

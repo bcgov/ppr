@@ -48,10 +48,15 @@ export const useCollateralValidation = () => {
     return validationResult.succeeded
   }
 
+  const resetError = (fieldName) => {
+    errors.value[fieldName] = createDefaultValidationResult()
+  }
+
   return {
     errors,
     validateInput,
     validateSerial,
-    validateCollateralForm
+    validateCollateralForm,
+    resetError
   }
 }

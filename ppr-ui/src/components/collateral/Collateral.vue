@@ -296,9 +296,9 @@ export default defineComponent({
         const editRow = headersToShow.pop()
         if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
           headersToShow.push({
-            class: 'column-sm',
+            class: 'column-mds',
             sortable: false,
-            text: 'MH Number',
+            text: 'MHR Number',
             value: 'vehicle.manufacturedHomeRegistrationNumber'
           })
         }
@@ -368,6 +368,7 @@ export default defineComponent({
       ) {
         collateral.valid = true
         collateral.showInvalid = false
+        localState.showErrorComponent = false
       } else {
         collateral.valid = false
       }

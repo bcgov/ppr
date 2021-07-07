@@ -34,7 +34,7 @@ export const serialNumberValidator = ({ values }) => {
       message =
         'Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)'
       break
-    case 'OM':
+    case 'OB':
     case 'TR':
     case 'BO':
       emptyMessage = 'Enter the Serial Number'

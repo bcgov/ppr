@@ -12,7 +12,7 @@
 
               </v-col>
             </v-row>
-            <stepper class="mt-4" :showStepErrors="showStepErrors"/>
+            <stepper class="mt-4" :showStepErrorsFlag="showStepErrors"/>
             <v-row class='pt-6'>
               <v-col cols="auto" class="sub-header ps-4">
                 Review and Confirm
@@ -116,6 +116,7 @@ export default class ReviewConfirm extends Vue {
   @Action resetNewRegistration: ActionBindingIF
   @Action setAddCollateral: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
+  @Action setShowStepErrors: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
 
   @Prop({ default: '#app' })
@@ -189,6 +190,7 @@ export default class ReviewConfirm extends Vue {
   @Watch('registrationIncomplete')
   private registrationIncomplete (): void {
     this.showStepErrors = true
+    this.setShowStepErrors(true)
     alert('Error saving draft. Replace when design complete.')
   }
 }
