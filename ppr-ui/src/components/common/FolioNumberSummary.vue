@@ -11,9 +11,9 @@
     </v-row>
 
     <v-row class="px-1">
-      <v-col cols="12">
+      <v-col cols="12" class="pa-0">
         <v-card flat>
-          <v-row>
+          <v-row no-gutters>
             <v-col cols="3" class="generic-label pt-10 px-8"
               >Folio Number</v-col
             >
