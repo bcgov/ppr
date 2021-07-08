@@ -142,6 +142,11 @@ export const isSearching = (state: StateIF): boolean => {
   return state.stateModel.searching
 }
 
+/** Whether the app should show the step errors */
+export const showStepErrors = (state: StateIF): boolean => {
+  return state.stateModel.showStepErrors
+}
+
 /**
  * Returns the array of steps.
  */

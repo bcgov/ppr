@@ -282,3 +282,22 @@ tbody {
   padding-top: 30px !important;
   height: 90px;
 }
+
+.collateral-table .v-data-table__wrapper > table > tbody > tr > td, 
+.collateral-table  > .v-data-table__wrapper > table > tbody > tr > th, 
+.collateral-table  > .v-data-table__wrapper > table > thead > tr > td, 
+.collateral-table > .v-data-table__wrapper > table > thead > tr > th, 
+.collateral-table  > .v-data-table__wrapper > table > tfoot > tr > td, 
+.collateral-table > .v-data-table__wrapper > table > tfoot > tr > th
+{
+  padding: 0 8px;
+}
+
+.v-application .collateral-table .v-btn.edit-btn {
+  padding: 0 2px;
+}
+
+.v-application .collateral-table .v-btn.actions__more-actions__btn {
+  padding: 0 2px;
+  min-width: 20px;
+}

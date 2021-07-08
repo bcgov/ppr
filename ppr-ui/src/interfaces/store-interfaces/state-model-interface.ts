@@ -19,6 +19,7 @@ export interface StateModelIF {
   searchedType: SearchTypeIF
   searchedValue: string
   searching: boolean
+  showStepErrors: boolean
   userInfo: UserInfoIF
   lengthTrustStep: LengthTrustIF
   addSecuredPartiesAndDebtorsStep: AddPartiesIF

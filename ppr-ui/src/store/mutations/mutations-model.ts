@@ -120,3 +120,7 @@ export const mutateAddCollateralStepValidity = (state: any, validity: boolean) =
 export const mutateLengthTrustStepValidity = (state: any, validity: boolean) => {
   state.stateModel.lengthTrustStep.valid = validity
 }
+
+export const mutateShowStepErrors = (state: any, show: boolean) => {
+  state.stateModel.showStepErrors = show
+}

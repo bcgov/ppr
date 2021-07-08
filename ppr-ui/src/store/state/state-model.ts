@@ -31,6 +31,7 @@ export const stateModel: StateModelIF = {
   searchedType: null,
   searchedValue: '',
   searching: false,
+  showStepErrors: false,
   userInfo: {
     contacts: [],
     firstname: '',
