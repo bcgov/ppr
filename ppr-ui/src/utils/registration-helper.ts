@@ -54,6 +54,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   } else {
     statement.generalCollateral = []
   }
+  statement.clientReferenceId = stateModel.folioOrReferenceNumber
   // Now save the draft.
   draft.financingStatement = statement
   var draftResponse:DraftIF = null

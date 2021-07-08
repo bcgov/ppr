@@ -7,7 +7,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { ReviewConfirm } from '@/views'
-import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonFooter, RegistrationFee, Stepper, FolioNumberSummary, FolioNumber } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
@@ -64,6 +64,7 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
 })
 

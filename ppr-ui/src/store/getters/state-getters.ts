@@ -142,6 +142,11 @@ export const isSearching = (state: StateIF): boolean => {
   return state.stateModel.searching
 }
 
+/** The folio or reference number. */
+export const getFolioOrReferenceNumber = (state: StateIF): string => {
+  return state.stateModel.folioOrReferenceNumber || ''
+}
+
 /** Whether the app should show the step errors */
 export const showStepErrors = (state: StateIF): boolean => {
   return state.stateModel.showStepErrors

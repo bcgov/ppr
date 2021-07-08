@@ -121,6 +121,10 @@ export const mutateLengthTrustStepValidity = (state: any, validity: boolean) => 
   state.stateModel.lengthTrustStep.valid = validity
 }
 
+export const mutateFolioOrReferenceNumber = (state: StateIF, refNumber: string) => {
+  state.stateModel.folioOrReferenceNumber = refNumber
+}
+
 export const mutateShowStepErrors = (state: any, show: boolean) => {
   state.stateModel.showStepErrors = show
 }

@@ -24,4 +24,5 @@ export interface StateModelIF {
   lengthTrustStep: LengthTrustIF
   addSecuredPartiesAndDebtorsStep: AddPartiesIF
   addCollateralStep: AddCollateralIF
+  folioOrReferenceNumber: string
 }
