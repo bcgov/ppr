@@ -67,8 +67,6 @@ class _Config():  # pylint: disable=too-few-public-methods
 
     POD_NAMESPACE = os.getenv('POD_NAMESPACE', '')
 
-#    GO_LIVE_DATE = os.getenv('GO_LIVE_DATE')
-
 #    SENTRY_DSN = os.getenv('SENTRY_DSN', None)
 #    LD_SDK_KEY = os.getenv('LD_SDK_KEY', None)
 #    SECRET_KEY = 'a secret'
@@ -150,13 +148,6 @@ class _Config():  # pylint: disable=too-few-public-methods
     except (TypeError, ValueError):
         JWT_OIDC_JWKS_CACHE_TIMEOUT = 300
 
-    # NATS / STAN
-#    NATS_SERVERS = os.getenv('NATS_SERVERS')
-#    NATS_CLIENT_NAME = os.getenv('NATS_CLIENT_NAME', 'entity.legal_api')
-#    NATS_CLUSTER_ID = os.getenv('NATS_CLUSTER_ID', 'test-cluster')
-#    NATS_FILER_SUBJECT = os.getenv('NATS_FILER_SUBJECT', 'entity.filing.filer')
-#    NATS_QUEUE = os.getenv('NATS_QUEUE', 'entity-filer-worker')
-
     # service accounts
     ACCOUNT_SVC_AUTH_URL = os.getenv('ACCOUNT_SVC_AUTH_URL')
     ACCOUNT_SVC_CLIENT_ID = os.getenv('ACCOUNT_SVC_CLIENT_ID')
@@ -182,21 +173,19 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
     DEBUG = True
     TESTING = True
     # POSTGRESQL
-#    DB_USER = os.getenv('DATABASE_TEST_USERNAME', '')
-#    DB_PASSWORD = os.getenv('DATABASE_TEST_PASSWORD', '')
-#    DB_NAME = os.getenv('DATABASE_TEST_NAME', '')
-#    DB_HOST = os.getenv('DATABASE_TEST_HOST', '')
-#    DB_PORT = os.getenv('DATABASE_TEST_PORT', '5432')
-#    DB_PORT = os.getenv('DATABASE_TEST_PORT', '1521')
-    # Don't need the URI: using oracle connection pool configured in resources/db.py using above settings.
-#    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
-#    SQLALCHEMY_DATABASE_URI = 'oracle://{user}:{password}@{host}:{port}/{name}'.format(
-#        user=DB_USER,
-#        password=DB_PASSWORD,
-#        host=DB_HOST,
-#        port=int(DB_PORT),
-#        name=DB_NAME,
-#    )
+    DB_USER = os.getenv('DATABASE_TEST_USERNAME', '')
+    DB_PASSWORD = os.getenv('DATABASE_TEST_PASSWORD', '')
+    DB_NAME = os.getenv('DATABASE_TEST_NAME', '')
+    DB_HOST = os.getenv('DATABASE_TEST_HOST', '')
+    DB_PORT = os.getenv('DATABASE_TEST_PORT', '5432')
+    DB_PORT = os.getenv('DATABASE_TEST_PORT', '1521')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=int(DB_PORT),
+        name=DB_NAME,
+    )
 
     # JWT OIDC settings
     # JWT_OIDC_TEST_MODE will set jwt_manager to use
