@@ -297,56 +297,34 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         db.session.commit()
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str = None, staff: bool = False):
+    def find_all_by_account_id(cls, account_id):
         """Return a summary list of recent financing statements belonging to an account."""
-        statement_list = None
-        if account_id:
-            # No date range restriction for staff?
-            if staff:
-                statement_list = db.session.query(Registration.registration_ts,
-                                                  Registration.registration_num,
-                                                  Registration.registration_type,
-                                                  FinancingStatement.state_type).\
-                                filter(FinancingStatement.id == Registration.financing_id,
-                                       Registration.account_id == account_id,
-                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
-                                order_by(FinancingStatement.id).all()
-            else:
-                days_ago = model_utils.now_ts_offset(10, False)
-                statement_list = db.session.query(Registration.registration_ts,
-                                                  Registration.registration_num,
-                                                  Registration.registration_type,
-                                                  FinancingStatement.state_type).\
-                                filter(FinancingStatement.id == Registration.financing_id,
-                                       Registration.account_id == account_id,
-                                       Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN']),
-                                       Registration.registration_ts > days_ago).\
-                                order_by(FinancingStatement.id).all()
-
         results_json = []
-        if not statement_list:
+        if not account_id:
             return results_json
-        #    raise BusinessException(
-        #        error=f'No Financing Statements found for Account ID {account_id}.',
-        #        status_code=HTTPStatus.NOT_FOUND
-        #    )
 
-        for statement in statement_list:
-            if staff or statement.state_type == model_utils.STATE_ACTIVE:
-                statement_json = {
-                    'matchType': 'EXACT',
-                    'createDateTime': model_utils.format_ts(statement.registration_ts),
-                    'baseRegistrationNumber': statement.registration_num,
-                    'registrationType': statement.registration_type
+        query = model_utils.QUERY_ACCOUNT_FINANCING_STATEMENTS.replace('?', account_id)
+        results = db.session.execute(query)
+        rows = results.fetchall()
+        if rows is not None:
+            for row in rows:
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                result = {
+                    'registrationNumber': str(mapping['registration_number']),
+                    'baseRegistrationNumber': str(mapping['registration_number']),
+                    'createDateTime': model_utils.format_ts(mapping['registration_ts']),
+                    'registrationType': str(mapping['registration_type']),
+                    'registrationClass': str(mapping['registration_type_cl']),
+                    'registrationDescription': str(mapping['registration_desc']),
+                    'statusType': str(mapping['state']),
+                    'expireDays': int(mapping['expire_days']),
+                    'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
+                    'registeringParty': str(mapping['registering_party']),
+                    'securedParties': str(mapping['secured_party']),
+                    'clientReferenceId': str(mapping['client_reference_id']),
+                    'path': '/ppr/api/v1/financing-statements/' + str(mapping['registration_number'])
                 }
-                results_json.append(statement_json)
-
-        # Non-staff, all historical/discharged
-        # if not results_json:
-        #    raise BusinessException(
-        #        error=f'No active Financing Statements found for Account ID {account_id}.',
-        #        status_code=HTTPStatus.NOT_FOUND
-        #    )
+                results_json.append(result)
         return results_json
 
     @classmethod
@@ -360,9 +338,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         return statement
 
     @classmethod
-    def find_by_registration_number(cls, registration_num: str = None,
-                                    staff: bool = False,
-                                    allow_historical: bool = False):
+    def find_by_registration_number(cls, registration_num: str,
+                                    account_id: str,
+                                    staff: bool = False):
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
@@ -374,16 +352,22 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         if not statement:
             raise BusinessException(
-                error=f'No Financing Statement found for registration number {registration_num}.',
+                error=model_utils.ERR_FINANCING_NOT_FOUND.format(registration_num=registration_num),
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        if not allow_historical and not staff and statement.state_type != model_utils.STATE_ACTIVE:
+        if not staff and account_id and statement.registration[0].account_id != account_id:
             raise BusinessException(
-                error=f'The Financing Statement for registration number {registration_num} has been discharged.',
+                error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
+                                                                  registration_num=registration_num),
                 status_code=HTTPStatus.BAD_REQUEST
             )
 
+        if not staff and model_utils.is_historical(statement):
+            raise BusinessException(
+                error=model_utils.ERR_FINANCING_HISTORICAL.format(registration_num=registration_num),
+                status_code=HTTPStatus.BAD_REQUEST
+            )
         return statement
 
     @classmethod

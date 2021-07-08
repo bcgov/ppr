@@ -120,7 +120,6 @@ REG_TYPE_TO_REG_CLASS = {
     'RE': 'RENEWAL'
 }
 
-
 # Map from API search type to DB search type
 TO_DB_SEARCH_TYPE = {
     'AIRCRAFT_DOT': 'AC',
@@ -130,6 +129,110 @@ TO_DB_SEARCH_TYPE = {
     'REGISTRATION_NUMBER': 'RG',
     'SERIAL_NUMBER': 'SS'
 }
+
+# Account financing statement/registration list queries.
+QUERY_ACCOUNT_FINANCING_STATEMENTS = """
+SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       CASE WHEN fs.life = 99 THEN -99
+            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
+       (SELECT MAX(r2.registration_ts)
+          FROM registrations r2
+         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    ELSE p.last_name || ', ' || p.first_name END
+          FROM parties p
+         WHERE p.registration_id = r.id
+           AND p.party_type = 'RG') AS registering_party,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    ELSE p.last_name || ', ' || p.first_name END
+          FROM parties p
+         WHERE p.financing_id = fs.id
+           AND p.registration_id_end IS NULL
+           AND p.party_type = 'SP'
+      ORDER BY p.id desc LIMIT 1) AS secured_party,
+      r.client_reference_id
+  FROM registrations r, registration_types rt, financing_statements fs
+ WHERE r.registration_type = rt.registration_type
+   AND fs.id = r.financing_id
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+   AND r.account_id = '?'
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+ORDER BY r.registration_ts DESC
+FETCH FIRST 1000 ROWS ONLY
+"""
+
+QUERY_ACCOUNT_REGISTRATIONS = """
+SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       CASE WHEN fs.life = 99 THEN -99
+            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
+       (SELECT MAX(r2.registration_ts)
+          FROM registrations r2
+         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    ELSE p.last_name || ', ' || p.first_name END
+          FROM parties p
+         WHERE p.registration_id = r.id
+           AND p.party_type = 'RG') AS registering_party,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    ELSE p.last_name || ', ' || p.first_name END
+          FROM parties p
+         WHERE p.financing_id = fs.id
+           AND p.registration_id_end IS NULL
+           AND p.party_type = 'SP'
+      ORDER BY p.id desc LIMIT 1) AS secured_party,
+      r.client_reference_id
+  FROM registrations r, registration_types rt, financing_statements fs
+ WHERE r.registration_type = rt.registration_type
+   AND fs.id = r.financing_id
+   AND r.account_id = '?'
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+ORDER BY r.registration_ts DESC
+FETCH FIRST 1000 ROWS ONLY
+"""
+
+QUERY_ACCOUNT_DRAFTS = """
+SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_cl, rt.registration_desc,
+       CASE WHEN d.registration_type_cl IN ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN') THEN ''
+            ELSE d.registration_number END base_reg_num,
+       d.draft ->> 'type' AS draft_type,
+       CASE WHEN d.update_ts IS NOT NULL THEN d.update_ts ELSE d.create_ts END last_update_ts,
+       CASE WHEN d.registration_type_cl IN ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN') THEN
+                 d.draft -> 'financingStatement' ->> 'clientReferenceId'
+            WHEN d.registration_type_cl = 'AMENDMENT' THEN d.draft -> 'amendmentStatement' ->> 'clientReferenceId'
+            WHEN d.registration_type_cl = 'CHANGE' THEN d.draft -> 'changeStatement' ->> 'clientReferenceId'
+            ELSE '' END client_reference_id
+  FROM drafts d, registration_types rt
+ WHERE d.account_id = '?'
+   AND d.registration_type = rt.registration_type
+   AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
+ORDER BY d.create_ts DESC
+FETCH FIRST 1000 ROWS ONLY
+"""
+
+# Error messages
+ERR_FINANCING_NOT_FOUND = 'No Financing Statement found for registration number {registration_num}.'
+ERR_REGISTRATION_NOT_FOUND = 'No registration found for registration number {registration_num}.'
+ERR_FINANCING_HISTORICAL = \
+    'The Financing Statement for registration number {registration_num} has expired or been discharged.'
+ERR_REGISTRATION_ACCOUNT = 'The account ID {account_id} does not match registration number {registration_num}.'
+ERR_REGISTRATION_MISMATCH = \
+    'The registration {registration_num} does not match the Financing Statement registration {base_reg_num}.'
 
 
 def format_ts(time_stamp):
@@ -209,3 +312,21 @@ def ts_from_date_iso_format(date_iso: str):
     Use the current UTC time.
     """
     return ts_from_iso_format(date_iso)
+
+
+def is_historical(financing_statement):
+    """Check if a financing statement is in a historical, non-viewable state."""
+    if financing_statement.state_type == STATE_ACTIVE:
+        return False
+
+    historical_ts = now_ts_offset(30).timestamp()
+    if financing_statement.state_type == STATE_DISCHARGED and financing_statement.registration:
+        for reg in reversed(financing_statement.registration):
+            if reg.registration_type_cl == REG_CLASS_DISCHARGE and reg.registration_ts.timestamp() < historical_ts:
+                return True
+    if financing_statement.state_type == STATE_EXPIRED and \
+       financing_statement.expire_date and \
+       financing_statement.expire_date.timestamp() < historical_ts:
+        return True
+
+    return False

@@ -33,6 +33,17 @@ TEST_REGISTRATION_DATA = [
     ('RL', 'PS12345', False),
     ('SA', None, False)
 ]
+# testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff})
+TEST_REGISTRATION_NUMBER_DATA = [
+    ('Valid', 'TEST0001', 'PS12345', HTTPStatus.OK, False),
+    ('Invalid reg num', 'TESTXXXX', 'PS12345', HTTPStatus.NOT_FOUND, False),
+    ('Mismatch account id non-staff', 'TEST0001', 'PS1234X', HTTPStatus.BAD_REQUEST, False),
+    ('Expired non-staff', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, False),
+    ('Discharged non-staff', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, False),
+    ('Mismatch staff', 'TEST0001', 'PS1234X', HTTPStatus.OK, True),
+    ('Expired staff', 'TEST0013', 'PS12345', HTTPStatus.OK, True),
+    ('Discharged staff', 'TEST0014', 'PS12345', HTTPStatus.OK, True)
+]
 
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)
@@ -81,40 +92,28 @@ def test_save(session, reg_type, account_id, create_draft):
 
 def test_find_all_by_account_id(session):
     """Assert that the financing statement summary list by account id first item contains all expected elements."""
-    statement_list = FinancingStatement.find_all_by_account_id('PS12345', True)
+    statement_list = FinancingStatement.find_all_by_account_id('PS12345')
 
     assert statement_list
-    assert statement_list[0]['matchType']
-    assert statement_list[0]['baseRegistrationNumber']
+    assert statement_list[0]['registrationNumber']
     assert statement_list[0]['registrationType']
+    assert statement_list[0]['registrationClass']
+    assert statement_list[0]['registrationDescription']
+    assert statement_list[0]['statusType']
     assert statement_list[0]['createDateTime']
+    assert statement_list[0]['lastUpdateDateTime']
+    assert statement_list[0]['expireDays']
+    assert statement_list[0]['registeringParty']
+    assert statement_list[0]['securedParties']
+    # assert statement_list[0]['clientReferenceId']
+    assert statement_list[0]['path']
 
 
 def test_find_all_by_account_id_no_result(session):
     """Assert that the financing statement summary list by invalid account id works as expected."""
-    statement_list = FinancingStatement.find_all_by_account_id('XXXXX45', True)
+    statement_list = FinancingStatement.find_all_by_account_id('XXXXX45')
 
     assert len(statement_list) == 0
-
-
-def test_find_by_registration_number_valid(session):
-    """Assert that a fetch individual financing statement on a valid registration number works as expected."""
-    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
-    assert statement
-    result = statement.json
-    assert result['type'] == 'SA'
-    assert result['baseRegistrationNumber'] == 'TEST0001'
-    assert result['registeringParty']
-    assert result['createDateTime']
-    assert result['debtors'][0]
-    assert result['securedParties'][0]
-    assert result['generalCollateral'][0]
-    assert result['vehicleCollateral'][0]
-    assert result['expiryDate']
-    assert result['lifeYears']
-    assert result['trustIndenture']
-    if statement.current_view_json:
-        assert result['courtOrderInformation']
 
 
 def test_find_by_id(session):
@@ -156,30 +155,34 @@ def test_find_by_financing_id(session):
         assert json_data['trustIndenture']
 
 
-def test_find_by_registration_number_invalid(session):
-    """Assert that a fetch financing statement on a non-existent registration number works as expected."""
-    with pytest.raises(BusinessException) as not_found_err:
-        FinancingStatement.find_by_registration_number('X12345X', False)
+@pytest.mark.parametrize('desc,reg_number,account_id,status,staff', TEST_REGISTRATION_NUMBER_DATA)
+def test_find_by_registration_number(session, desc, reg_number, account_id, status, staff):
+    """Assert that a fetch financing statement by registration number works as expected."""
+    if status == HTTPStatus.OK:
+        statement = FinancingStatement.find_by_registration_number(reg_number, account_id, staff)
+        assert statement
+        result = statement.json
+        assert result['type'] == 'SA'
+        assert result['baseRegistrationNumber'] == reg_number
+        assert result['registeringParty']
+        assert result['createDateTime']
+        assert result['debtors'][0]
+        assert result['securedParties'][0]
+        assert result['vehicleCollateral'][0]
+        assert result['expiryDate']
+        assert result['lifeYears']
+        if reg_number == 'TEST0001':
+            assert result['generalCollateral'][0]
+            assert result['trustIndenture']
+        if statement.current_view_json and reg_number == 'TEST0001':
+            assert result['courtOrderInformation']
+    else:
+        with pytest.raises(BusinessException) as request_err:
+            FinancingStatement.find_by_registration_number(reg_number, account_id, staff)
 
-    # check
-    assert not_found_err
-    assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_find_by_registration_number_historical(session):
-    """Assert that a fetch a discharged financing statement on a valid registration number works as expected."""
-    with pytest.raises(BusinessException) as historical_err:
-        FinancingStatement.find_by_registration_number('TEST0003', False)
-
-    # check
-    assert historical_err
-    assert historical_err.value.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_find_by_registration_number_historical_staff(session):
-    """Assert that a fetch discharged financing statement on a registration number works as expected for staff."""
-    result = FinancingStatement.find_by_registration_number('TEST0003', True)
-    assert result
+        # check
+        assert request_err
+        assert request_err.value.status_code == status
 
 
 def test_validate_base_debtor(session):
@@ -188,7 +191,7 @@ def test_validate_base_debtor(session):
     json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
 
 #    statement = FinancingStatement.find_by_financing_id(200000000)
-    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
+    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
     assert statement
 
     # valid business name

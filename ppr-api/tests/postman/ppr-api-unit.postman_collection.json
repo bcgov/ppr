@@ -502,6 +502,55 @@
 					"response": []
 				},
 				{
+					"name": "List Account Registrations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/registrations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"registrations"
+							]
+						},
+						"description": "Get the list of recent registrations created with the account ID."
+					},
+					"response": []
+				},
+				{
 					"name": "Retrieve an Account Financing Statement",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -547,6 +596,210 @@
 							]
 						},
 						"description": "Retrieve by registration number a Financing Statement previously created with the account ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Account Renewal Statement",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/TEST0002/renewals/TEST00R6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"TEST0002",
+								"renewals",
+								"TEST00R6"
+							]
+						},
+						"description": "Retrieve by registration number a Renewal Statement previously created with the account ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Account Amendment Statement",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/TEST0001/amendments/TEST0007",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"TEST0001",
+								"amendments",
+								"TEST0007"
+							]
+						},
+						"description": "Retrieve by registration number an Amendment Statement previously created with the account ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Account Change Statement",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/TEST0001/changes/TEST0010",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"TEST0001",
+								"changes",
+								"TEST0010"
+							]
+						},
+						"description": "Retrieve by registration number a Change Statement previously created with the account ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Account Discharge Statement",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/financing-statements/TEST0014/discharges/TEST0D14",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"financing-statements",
+								"TEST0014",
+								"discharges",
+								"TEST0D14"
+							]
+						},
+						"description": "Retrieve by registration number a Discharge Statement previously created with the account ID."
 					},
 					"response": []
 				},
@@ -1251,6 +1504,164 @@
 							]
 						},
 						"description": "Get party by code example"
+					},
+					"response": []
+				},
+				{
+					"name": "Get head office party codes by code",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/party-codes/head-offices/9999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"head-offices",
+								"9999"
+							]
+						},
+						"description": "Get party codes belonging to a head office searching by head office code."
+					},
+					"response": []
+				},
+				{
+					"name": "Get head office party codes no results",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/party-codes/head-offices/9998",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"head-offices",
+								"9998"
+							]
+						},
+						"description": "Get party codes belonging to a head office searching by head office code that does not exist, returning no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Get head office party codes by name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/party-codes/head-offices/rbc%20royal%20bank",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"head-offices",
+								"rbc%20royal%20bank"
+							]
+						},
+						"description": "Get party codes belonging to a head office searching by head office name (exact match, case insensitive)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get head office party codes by fuzzy name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/party-codes/head-offices/rbc?fuzzyNameSearch=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"head-offices",
+								"rbc"
+							],
+							"query": [
+								{
+									"key": "fuzzyNameSearch",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Get party codes belonging to a head office searching by head office name (starts with, case insensitive)."
 					},
 					"response": []
 				}

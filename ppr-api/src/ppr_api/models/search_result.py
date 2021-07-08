@@ -186,7 +186,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     if statement['financingStatement']['baseRegistrationNumber'] == reg_num:
                         found = True
             if not found:  # No duplicates.
-                financing = FinancingStatement.find_by_registration_number(reg_num, staff=False, allow_historical=True)
+                financing = FinancingStatement.find_by_registration_number(reg_num, account_id=None, staff=False)
                 financing.mark_update_json = mark_added  # Added for PDF, indicate if party or collateral was added.
                 # Special business rule: if search is by serial number, only include
                 # serial_collateral records where the serial number is an exact match.
@@ -224,7 +224,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         detail_results = []
         for result in search_json:
             reg_num = result['baseRegistrationNumber']
-            financing = FinancingStatement.find_by_registration_number(reg_num, staff=False, allow_historical=True)
+            financing = FinancingStatement.find_by_registration_number(reg_num, account_id=None, staff=False)
             # Special business rule: if search is by serial number, only include
             # serial_collateral records where the serial number is an exact match.
             # Do not include general_collateral records.

@@ -326,7 +326,7 @@ TEST_INVALID_DATA = [
 
 # testdata pattern is ({search type}, {JSON data}, {expected # of results})
 TEST_VALID_DATA_COUNT = [
-    ('SS', SERIAL_NUMBER_JSON, 6),
+    ('SS', SERIAL_NUMBER_JSON, 5),
     ('IS', INDIVIDUAL_DEBTOR_JSON, 4),
     ('BS', BUSINESS_DEBTOR_JSON, 2)
 ]

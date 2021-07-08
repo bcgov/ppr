@@ -90,25 +90,27 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a summary list of drafts belonging to an account."""
         drafts_json = []
         if account_id:
-            query = ACCOUNT_QUERY.replace('?', account_id)
-            result = db.session.execute(query)
-            rows = result.fetchall()
+            query = model_utils.QUERY_ACCOUNT_DRAFTS.replace('?', account_id)
+            results = db.session.execute(query)
+            rows = results.fetchall()
             if rows is not None:
                 for row in rows:
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     draft_json = {
                         'createDateTime': model_utils.format_ts(mapping['create_ts']),
                         'documentId': str(mapping['document_number']),
+                        'baseRegistrationNumber': str(mapping['base_reg_num']),
                         'registrationType': str(mapping['registration_type']),
-                        'path': '/api/v1/drafts/' + str(mapping['document_number'])
+                        'registrationDescription': str(mapping['registration_desc']),
+                        'type': str(mapping['draft_type']),
+                        'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
+                        'path': '/ppr/api/v1/drafts/' + str(mapping['document_number'])
                     }
-                    reg_class = str(mapping['registration_type_cl'])
-                    draft_json['type'] = model_utils.REG_CLASS_TO_DRAFT_TYPE[reg_class]
-                    if reg_class in (model_utils.REG_CLASS_AMEND,
-                                     model_utils.REG_CLASS_AMEND_COURT,
-                                     model_utils.REG_CLASS_CHANGE):
-                        draft_json['baseRegistrationNumber'] = str(mapping['registration_number'])
-
+                    ref_id = str(mapping['client_reference_id'])
+                    if ref_id and ref_id != '' and ref_id != 'None':
+                        draft_json['clientReferenceId'] = ref_id
+                    else:
+                        draft_json['clientReferenceId'] = ''
                     drafts_json.append(draft_json)
 
         return drafts_json

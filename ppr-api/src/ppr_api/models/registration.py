@@ -15,6 +15,7 @@
 # pylint: disable=too-many-statements, too-many-branches
 
 from enum import Enum
+from http import HTTPStatus
 import json
 
 from ppr_api.exceptions import BusinessException
@@ -248,13 +249,85 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @classmethod
-    def find_by_registration_number(cls, registration_num: str):
+    def find_by_registration_number(cls, registration_num: str,
+                                    account_id: str,
+                                    staff: bool = False,
+                                    base_reg_num: str = None):
         """Return the registration matching the registration number."""
         registration = None
         if registration_num:
             registration = cls.query.filter(Registration.registration_num == registration_num).one_or_none()
 
+        if not registration:
+            raise BusinessException(
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND.format(registration_num=registration_num),
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        if not staff and account_id and registration.account_id != account_id:
+            raise BusinessException(
+                error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
+                                                                  registration_num=registration_num),
+                status_code=HTTPStatus.BAD_REQUEST
+            )
+
+        if not staff and model_utils.is_historical(registration.financing_statement):
+            raise BusinessException(
+                error=model_utils.ERR_FINANCING_HISTORICAL.format(registration_num=registration_num),
+                status_code=HTTPStatus.BAD_REQUEST
+            )
+
+        if not staff and base_reg_num and base_reg_num != registration.base_registration_num:
+            raise BusinessException(
+                error=model_utils.ERR_REGISTRATION_MISMATCH.format(registration_num=registration_num,
+                                                                   base_reg_num=base_reg_num),
+                status_code=HTTPStatus.BAD_REQUEST
+            )
+
         return registration
+
+    @classmethod
+    def find_all_by_account_id(cls, account_id: str = None):
+        """Return a summary list of recent registrations belonging to an account."""
+        results_json = []
+        if account_id:
+            query = model_utils.QUERY_ACCOUNT_REGISTRATIONS.replace('?', account_id)
+            results = db.session.execute(query)
+            rows = results.fetchall()
+            if rows is not None:
+                for row in rows:
+                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                    reg_num = str(mapping['registration_number'])
+                    base_reg_num = str(mapping['base_reg_number'])
+                    result = {
+                        'registrationNumber': reg_num,
+                        'baseRegistrationNumber': base_reg_num,
+                        'createDateTime': model_utils.format_ts(mapping['registration_ts']),
+                        'registrationType': str(mapping['registration_type']),
+                        'registrationDescription': str(mapping['registration_desc']),
+                        'registrationClass': str(mapping['registration_type_cl']),
+                        'statusType': str(mapping['state']),
+                        'expireDays': int(mapping['expire_days']),
+                        'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
+                        'registeringParty': str(mapping['registering_party']),
+                        'securedParties': str(mapping['secured_party']),
+                        'clientReferenceId': str(mapping['client_reference_id'])
+                    }
+                    reg_class = result['registrationClass']
+                    path = '/ppr/api/v1/financing-statements/'
+                    if reg_class in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
+                        result['baseRegistrationNumber'] = reg_num
+                        result['path'] = path + reg_num
+                    elif reg_class == 'DISCHARGE':
+                        result['path'] = path + base_reg_num + '/discharges/' + reg_num
+                    elif reg_class == 'RENEWAL':
+                        result['path'] = path + base_reg_num + '/renewals/' + reg_num
+                    elif reg_class == 'CHANGE':
+                        result['path'] = path + base_reg_num + '/changes/' + reg_num
+                    else:
+                        result['path'] = path + base_reg_num + '/amendments/' + reg_num
+                    results_json.append(result)
+        return results_json
 
     @staticmethod
     def create_from_json(json_data,
