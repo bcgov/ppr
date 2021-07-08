@@ -10,9 +10,31 @@
     </v-row>
     <v-row no-gutters class="pt-6">
       <v-col class="ps-4" cols="auto">
-        <ul>
+        <div v-if="registeringParty">
+          <v-icon color="green darken-2" class="agreement-valid-icon"
+            >mdi-check</v-icon
+          >
+          The Registering Party
+        </div>
+        <ul v-else>
           <li>The Registering Party</li>
+        </ul>
+        <div v-if="securedParties.length > 0">
+          <v-icon color="green darken-2" class="agreement-valid-icon"
+            >mdi-check</v-icon
+          >
+          At least one Secured Party
+        </div>
+        <ul v-else>
           <li>At least one Secured Party</li>
+        </ul>
+        <div v-if="debtors.length > 0">
+          <v-icon color="green darken-2" class="agreement-valid-icon"
+            >mdi-check</v-icon
+          >
+          At least one Debtor
+        </div>
+        <ul v-else>
           <li>At least one Debtor</li>
         </ul>
       </v-col>
@@ -21,7 +43,7 @@
       <v-col>
         <h3>Registering Party</h3>
         <registering-party />
-       </v-col>
+      </v-col>
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
       <v-col>
@@ -51,6 +73,7 @@ import Debtors from './Debtors.vue'
 import SecuredParties from './SecuredParties.vue'
 import PartySummary from './PartySummary.vue'
 import RegisteringParty from './RegisteringParty.vue'
+import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   components: {
@@ -66,7 +89,14 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const localState = reactive({})
+    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors'
+    ])
+    const localState = reactive({
+      registeringParty: getAddSecuredPartiesAndDebtors.value.registeringParty,
+      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
+      debtors: getAddSecuredPartiesAndDebtors.value.debtors
+    })
     const summaryView = toRefs(props).isSummary
 
     return {
