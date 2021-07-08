@@ -51,6 +51,13 @@ jobs:
     needs: setup-job
     env:
       IMAGE_NAME: ppr-api
+      DATABASE_TEST_USERNAME: postgres
+      DATABASE_TEST_PASSWORD: postgres
+      DATABASE_TEST_NAME: postgres
+      DATABASE_TEST_HOST: localhost
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_PASSWORD: postgres
       NATS_SERVERS: "nats://nats:4222"
       NATS_CLIENT_NAME: entity.ppr_api
       NATS_CLUSTER_ID: test-cluster
@@ -59,6 +66,18 @@ jobs:
       JWT_OIDC_JWKS_CACHE_TIMEOUT: 300
 
     runs-on: ubuntu-20.04
+
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
