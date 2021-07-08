@@ -14,11 +14,12 @@
 """This module holds model data and database operations for draft statements."""
 # pylint: disable=singleton-comparison
 
-
 from __future__ import annotations
 
 from enum import Enum
 from http import HTTPStatus
+
+from flask import current_app
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
@@ -90,8 +91,9 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a summary list of drafts belonging to an account."""
         drafts_json = []
         if account_id:
-            query = model_utils.QUERY_ACCOUNT_DRAFTS.replace('?', account_id)
-            results = db.session.execute(query)
+            max_results_size = int(current_app.config.get('ACCOUNT_DRAFTS_MAX_RESULTS'))
+            results = db.session.execute(model_utils.QUERY_ACCOUNT_DRAFTS,
+                                         {'query_account': account_id, 'max_results_size': max_results_size})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:

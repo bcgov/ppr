@@ -158,7 +158,7 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.account_id = '?'
+   AND r.account_id = :query_account
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
@@ -166,7 +166,7 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
 ORDER BY r.registration_ts DESC
-FETCH FIRST 1000 ROWS ONLY
+FETCH FIRST :max_results_size ROWS ONLY
 """
 
 QUERY_ACCOUNT_REGISTRATIONS = """
@@ -195,7 +195,7 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
-   AND r.account_id = '?'
+   AND r.account_id = :query_account
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
@@ -203,7 +203,7 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
 ORDER BY r.registration_ts DESC
-FETCH FIRST 1000 ROWS ONLY
+FETCH FIRST :max_results_size ROWS ONLY
 """
 
 QUERY_ACCOUNT_DRAFTS = """
@@ -218,11 +218,11 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
             WHEN d.registration_type_cl = 'CHANGE' THEN d.draft -> 'changeStatement' ->> 'clientReferenceId'
             ELSE '' END client_reference_id
   FROM drafts d, registration_types rt
- WHERE d.account_id = '?'
+ WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
 ORDER BY d.create_ts DESC
-FETCH FIRST 1000 ROWS ONLY
+FETCH FIRST :max_results_size ROWS ONLY
 """
 
 # Error messages

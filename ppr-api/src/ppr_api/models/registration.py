@@ -18,6 +18,8 @@ from enum import Enum
 from http import HTTPStatus
 import json
 
+from flask import current_app
+
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -291,8 +293,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a summary list of recent registrations belonging to an account."""
         results_json = []
         if account_id:
-            query = model_utils.QUERY_ACCOUNT_REGISTRATIONS.replace('?', account_id)
-            results = db.session.execute(query)
+            max_results_size = int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
+            results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
+                                         {'query_account': account_id, 'max_results_size': max_results_size})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:

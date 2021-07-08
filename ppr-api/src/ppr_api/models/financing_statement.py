@@ -20,6 +20,8 @@ from __future__ import annotations
 from enum import Enum
 from http import HTTPStatus
 
+from flask import current_app
+
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -303,8 +305,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         if not account_id:
             return results_json
 
-        query = model_utils.QUERY_ACCOUNT_FINANCING_STATEMENTS.replace('?', account_id)
-        results = db.session.execute(query)
+        max_results_size = int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
+        results = db.session.execute(model_utils.QUERY_ACCOUNT_FINANCING_STATEMENTS,
+                                     {'query_account': account_id, 'max_results_size': max_results_size})
         rows = results.fetchall()
         if rows is not None:
             for row in rows:

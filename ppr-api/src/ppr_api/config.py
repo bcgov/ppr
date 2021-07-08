@@ -165,6 +165,11 @@ class _Config():  # pylint: disable=too-few-public-methods
     TESTING = False
     DEBUG = False
 
+    # DB Query limits on result set sizes
+    ACCOUNT_REGISTRATIONS_MAX_RESULTS = os.getenv('ACCOUNT_REGISTRATIONS_MAX_RESULTS', '1000')
+    ACCOUNT_DRAFTS_MAX_RESULTS = os.getenv('ACCOUNT_DRAFTS_MAX_RESULTS', '1000')
+    ACCOUNT_SEARCH_MAX_RESULTS = os.getenv('ACCOUNT_SEARCH_MAX_RESULTS', '1000')
+
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""
