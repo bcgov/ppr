@@ -58,5 +58,6 @@ export const stateModel: StateModelIF = {
     valid: false,
     vehicleCollateral: [],
     generalCollateral: ''
-  }
+  },
+  folioOrReferenceNumber: ''
 }

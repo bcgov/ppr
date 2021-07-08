@@ -51,6 +51,15 @@
                 </v-row>
               </v-container>
             </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="ps-1 pt-8">
+                <v-row no-gutters class='pt-1'>
+                  <v-col>
+                    <folio-number-summary />
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-row>
           </v-col>
           <v-col cols="3">
             <registration-fee :registrationType="registrationTypeUI"/>
@@ -95,6 +104,7 @@ import {
   setLengthTrust, // eslint-disable-line no-unused-vars
   setAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
 } from '@/store/actions'
+import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 
 @Component({
   components: {
@@ -103,7 +113,8 @@ import {
     RegistrationLengthTrust,
     Stepper,
     Collateral,
-    Parties
+    Parties,
+    FolioNumberSummary
   }
 })
 export default class ReviewConfirm extends Vue {

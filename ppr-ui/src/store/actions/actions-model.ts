@@ -110,6 +110,10 @@ export const setLengthTrustStepValidity = ({ commit }, validity) => {
   commit('mutateLengthTrustStepValidity', validity)
 }
 
+export const setFolioOrReferenceNumber: ActionIF = ({ commit }, refNumber: string): void => {
+  commit('mutateFolioOrReferenceNumber', refNumber)
+}
+
 export const setShowStepErrors: ActionIF = ({ commit }, show: boolean): void => {
   commit('mutateShowStepErrors', show)
 }
