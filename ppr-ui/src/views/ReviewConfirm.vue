@@ -14,7 +14,7 @@
             </v-row>
             <stepper class="mt-4" :showStepErrorsFlag="showStepErrors"/>
             <v-row class='pt-6'>
-              <v-col cols="auto" class="sub-header ps-4">
+              <v-col cols="auto" class="sub-header ps-5">
                 Review and Confirm
               </v-col>
             </v-row>

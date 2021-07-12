@@ -301,3 +301,7 @@ tbody {
   padding: 0 2px;
   min-width: 20px;
 }
+
+#party-summary .mdi-domain, #party-summary .mdi-account, #party-summary .list-item__title {
+  color: $gray9 !important;
+}

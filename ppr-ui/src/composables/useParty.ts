@@ -30,6 +30,9 @@ export const useParty = () => {
       party.address.region +
       ' ' +
       party.address.postalCode
+    if (party.address.country) {
+      address = address + '<br>' + party.address.country
+    }
     return address
   }
 
