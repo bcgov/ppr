@@ -6,6 +6,8 @@ import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedSecuredParties1, mockedSecuredParties2 } from './test-data'
+import { axios as pprAxios } from '@/utils/axios-ppr'
+import sinon from 'sinon'
 
 // Components
 import { EditParty } from '@/components/parties'
@@ -87,11 +89,24 @@ describe('Secured Party add individual tests', () => {
 
 describe('Secured Party add business tests', () => {
   let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
+  let sandbox
 
   beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    // GET autocomplete results
+    const get = sandbox.stub(pprAxios, 'get')
+    get.returns(
+      new Promise(resolve =>
+        resolve({
+          data: []
+        })
+      )
+    )
     wrapper = createComponent(-1, false)
   })
   afterEach(() => {
+    sandbox.restore()
     wrapper.destroy()
   })
 
