@@ -41,11 +41,11 @@
         Use my information and create a new Secured Party:
       </div>
 
-      <v-container>
+      <v-container class="currentParty">
         <v-row :class="$style['companyRow']">
           <v-col cols="1"><v-icon>mdi-domain</v-icon></v-col>
           <v-col cols="9">
-            <div :class="$style['companyText']">{{ party.businessName }}</div>
+            <div :class="$style['companyText']" class="businessName">{{ party.businessName }}</div>
             <div :class="$style['addressText']">
               {{ party.address.street }}, {{ party.address.city }}
               {{ party.address.region }} , {{ party.address.postalCode }},
@@ -70,13 +70,14 @@
       </div>
       <v-container>
         <v-row
+          class="searchResponse"
           :class="$style['companyRow']"
           v-for="(result, i) in results"
           :key="i"
         >
           <v-col cols="1"><v-icon>mdi-domain</v-icon></v-col>
           <v-col cols="9">
-            <div :class="$style['companyText']">{{ result.businessName }}</div>
+            <div :class="$style['companyText']" class="businessName">{{ result.businessName }}</div>
             <div :class="$style['addressText']">
               {{ result.address.street }}, {{ result.address.city }}
               {{ result.address.region }} , {{ result.address.postalCode }},
