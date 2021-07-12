@@ -293,6 +293,18 @@ tbody {
   padding: 0 8px;
 }
 
+
+.collateral-table.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th
+{
+  padding-top: 16px;
+} 
+
+.collateral-table.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child
+{
+  padding-left: 16px;
+} 
+
+
 .v-application .collateral-table .v-btn.edit-btn {
   padding: 0 2px;
 }

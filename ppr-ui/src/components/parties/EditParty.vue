@@ -1,5 +1,12 @@
 <template>
   <div id="edit-party" class="white pa-6">
+    <secured-party-dialog
+      attach="#app"
+      :defaultDialog="toggleDialog"
+      :defaultParty="currentSecuredParty"
+      :defaultResults="dialogResults"
+      @emitClose="toggleDialog = false"
+    />
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
@@ -205,11 +212,13 @@ import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
 import { useSecuredParty } from './composables/useSecuredParty'
 import AutoComplete from '@/components/search/AutoComplete.vue'
+import SecuredPartyDialog from '@/components/dialogs/SecuredPartyDialog.vue'
 
 export default defineComponent({
   components: {
     BaseAddress,
-    AutoComplete
+    AutoComplete,
+    SecuredPartyDialog
   },
   props: {
     activeIndex: {
@@ -231,7 +240,9 @@ export default defineComponent({
       removeSecuredParty,
       addSecuredParty,
       updateAddress,
-      addressSchema
+      addressSchema,
+      toggleDialog,
+      dialogResults
     } = useSecuredParty(props, context)
 
     const {
@@ -331,6 +342,8 @@ export default defineComponent({
       setSearchValue,
       setHideDetails,
       errors,
+      toggleDialog,
+      dialogResults,
       ...toRefs(localState)
     }
   }

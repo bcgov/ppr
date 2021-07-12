@@ -1,7 +1,8 @@
 import { reactive, toRefs, computed } from '@vue/composition-api'
-import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF, AddressIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
+import { partyCodeSearch } from '@/utils'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -28,7 +29,9 @@ export const useSecuredParty = (props, context) => {
       emailAddress: '',
       address: initAddress
     } as PartyIF,
-    currentIsBusiness: null
+    currentIsBusiness: null,
+    toggleDialog: false,
+    dialogResults: []
   })
 
   const getSecuredParty = () => {
@@ -64,12 +67,25 @@ export const useSecuredParty = (props, context) => {
     resetFormAndData(true)
   }
 
-  const addSecuredParty = () => {
+  const addSecuredParty = async () => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
-    // New debtor
+    // New secured party
     if (props.activeIndex === -1) {
-      // localState.currentDebtor.id = newList.length + 1
+      if (localState.currentSecuredParty.businessName) {
+        // go to the service and see if there are similar secured parties
+        const response: [SearchPartyIF] = await partyCodeSearch(
+          localState.currentSecuredParty.businessName
+        )
+        // check if any results
+        if (response?.length > 0) {
+          // show secured party selection popup
+          localState.toggleDialog = true
+          localState.dialogResults = response
+          console.log(localState.dialogResults)
+          return
+        }
+      }
       newList.push(localState.currentSecuredParty)
     } else {
       // Edit vehicle
