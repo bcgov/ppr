@@ -82,6 +82,7 @@
                     <auto-complete
                       :searchValue="autoCompleteSearchValue"
                       :setAutoCompleteIsActive="autoCompleteIsActive"
+                      v-click-outside="setCloseAutoComplete"
                       @search-value="setSearchValue"
                       @hide-details="setHideDetails"
                     >
@@ -335,6 +336,10 @@ export default defineComponent({
       localState.hideDetails = hideDetails
     }
 
+    const setCloseAutoComplete = () => {
+      localState.autoCompleteIsActive = false
+    }
+
     watch(
       () => localState.partyBusiness,
       currentValue => {
@@ -375,6 +380,7 @@ export default defineComponent({
       updateValidity,
       setSearchValue,
       setHideDetails,
+      setCloseAutoComplete,
       errors,
       closeAndReset,
       ...toRefs(localState)

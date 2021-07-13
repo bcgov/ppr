@@ -33,11 +33,11 @@
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title">
-                  <span v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></span
+                  <div class="icon-div" v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
                   >
-                  <span v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></span
+                  <div class="icon-div" v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
                   >
                   {{ getName(row.item) }}
                 </td>
@@ -69,11 +69,11 @@
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="party-row">
                 <td class="list-item__title">
-                  <span v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></span
+                  <div class="icon-div" v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
                   >
-                  <span v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></span
+                  <div class="icon-div" v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
                   >
                   {{ getName(row.item) }}
                 </td>
@@ -116,11 +116,11 @@
             <template v-slot:item="row" class="debtor-data-table">
               <tr :key="row.item.id" class="debtor-row">
                 <td class="list-item__title">
-                  <span v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></span
+                  <div class="icon-div" v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
                   >
-                  <span v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></span
+                  <div class="icon-div" v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
                   >
                   {{ getName(row.item) }}
                 </td>

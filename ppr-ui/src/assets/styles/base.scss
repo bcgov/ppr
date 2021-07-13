@@ -381,3 +381,12 @@ span.invalid-message {
 .rounded-top {
   border-radius: 4px 4px 0px 0px; 
 }
+
+.icon-div{
+  float: left;
+  height: 100%;
+  margin-bottom: 20px;
+}
+.icon-div .v-icon{
+  color: $gray9 !important;
+}
