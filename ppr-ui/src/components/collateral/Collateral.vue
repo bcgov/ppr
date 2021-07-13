@@ -127,7 +127,7 @@
               :key="row.item.id"
               class="vehicle-row"
             >
-              <td>
+              <td class="pl-4">
                 {{ getVehicleDescription(row.item.type) }}
               </td>
               <td>

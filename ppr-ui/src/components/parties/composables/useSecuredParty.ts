@@ -64,21 +64,27 @@ export const useSecuredParty = (props, context) => {
     resetFormAndData(true)
   }
 
-  const addSecuredParty = () => {
+  const addEditSecuredParty = async () => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
-    // New debtor
+    // New secured party
     if (props.activeIndex === -1) {
-      // localState.currentDebtor.id = newList.length + 1
       newList.push(localState.currentSecuredParty)
     } else {
       // Edit vehicle
       newList.splice(props.activeIndex, 1, localState.currentSecuredParty)
     }
     parties.securedParties = newList
-    // collateral.valid = true
     setAddSecuredPartiesAndDebtors(parties)
     context.emit('resetEvent')
+  }
+
+  const addSecuredParty = (newParty: PartyIF) => {
+    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+    newList.push(newParty)
+    parties.securedParties = newList
+    setAddSecuredPartiesAndDebtors(parties)
   }
 
   /**
@@ -90,11 +96,12 @@ export const useSecuredParty = (props, context) => {
 
   return {
     getSecuredParty,
-    addSecuredParty,
+    addEditSecuredParty,
     resetFormAndData,
     removeSecuredParty,
     addressSchema,
     updateAddress,
+    addSecuredParty,
     ...toRefs(localState)
   }
 }

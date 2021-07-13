@@ -11,7 +11,8 @@ import {
   PaymentIF,
   PartyIF,
   RegistrationTypeIF,
-  VehicleCollateralIF
+  VehicleCollateralIF,
+  SearchPartyIF
 } from '@/interfaces'
 
 export const mockedSelectSecurityAgreement: RegistrationTypeIF = {
@@ -199,3 +200,15 @@ export const mockedDraftFinancingStatementStep3: DraftIF = {
   type: DraftTypes.FINANCING_STATEMENT,
   financingStatement: mockedFinancingStatementStep3
 }
+
+export const mockedPartyCodeSearchResponse: Array<SearchPartyIF> = [{
+  businessName: 'SOMEBODYS BUSINESS',
+  code: '123',
+  address: mockedAddress1
+},
+{
+  businessName: 'SOMEBODYS PARTY',
+  code: '456',
+  address: mockedAddress1
+}]
+

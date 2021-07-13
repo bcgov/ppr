@@ -1,5 +1,13 @@
 <template>
   <div id="edit-party" class="white pa-6">
+    <secured-party-dialog
+      attach="#app"
+      :defaultDialog="toggleDialog"
+      :defaultParty="currentSecuredParty"
+      :defaultResults="dialogResults"
+      @emitResetClose="closeAndReset"
+      @emitClose="toggleDialog = false"
+    />
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
@@ -20,7 +28,12 @@
           >
             <v-row class="pb-6" no-gutters>
               <v-col cols="12">
-                <v-radio-group v-model="partyBusiness" class="mt-0" row hide-details="true">
+                <v-radio-group
+                  v-model="partyBusiness"
+                  class="mt-0"
+                  row
+                  hide-details="true"
+                >
                   <v-radio
                     :class="[
                       'individual-radio',
@@ -204,12 +217,16 @@ import {
 import BaseAddress from '@/composables/address/BaseAddress.vue'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
 import { useSecuredParty } from './composables/useSecuredParty'
+import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import AutoComplete from '@/components/search/AutoComplete.vue'
+import SecuredPartyDialog from '@/components/dialogs/SecuredPartyDialog.vue'
+import { partyCodeSearch } from '@/utils'
 
 export default defineComponent({
   components: {
     BaseAddress,
-    AutoComplete
+    AutoComplete,
+    SecuredPartyDialog
   },
   props: {
     activeIndex: {
@@ -229,7 +246,7 @@ export default defineComponent({
       getSecuredParty,
       resetFormAndData,
       removeSecuredParty,
-      addSecuredParty,
+      addEditSecuredParty,
       updateAddress,
       addressSchema
     } = useSecuredParty(props, context)
@@ -247,6 +264,8 @@ export default defineComponent({
       partyBusiness: '',
       searchValue: '',
       hideDetails: false,
+      toggleDialog: false,
+      dialogResults: [],
       isPartyType: computed((): boolean => {
         if (localState.partyBusiness === '') {
           return false
@@ -255,8 +274,18 @@ export default defineComponent({
       })
     })
 
+    const showDialog = () => {
+      // eslint-disable-line no-unused-vars
+      localState.toggleDialog = true
+    }
+
     const onBlur = fieldname => {
       validateInput(fieldname, currentSecuredParty.value[fieldname])
+    }
+
+    const closeAndReset = () => {
+      localState.toggleDialog = false
+      resetFormAndData(true)
     }
 
     const onSubmitForm = async () => {
@@ -266,7 +295,23 @@ export default defineComponent({
           currentSecuredParty
         ) === true
       ) {
-        addSecuredParty()
+        if (props.activeIndex === -1) {
+          if (currentSecuredParty.value.businessName) {
+            // go to the service and see if there are similar secured parties
+            const response: [SearchPartyIF] = await partyCodeSearch(
+              currentSecuredParty.value.businessName
+            )
+            // check if any results
+            if (response?.length > 0) {
+              // show secured party selection popup
+              showDialog()
+              localState.dialogResults = response?.slice(0, 3)
+              return
+            }
+          }
+        }
+
+        addEditSecuredParty()
       }
     }
 
@@ -331,6 +376,7 @@ export default defineComponent({
       setSearchValue,
       setHideDetails,
       errors,
+      closeAndReset,
       ...toRefs(localState)
     }
   }
