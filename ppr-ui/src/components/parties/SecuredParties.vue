@@ -62,7 +62,7 @@
               <td class="actions-cell  px-0 py-2">
                 <div class="actions" v-if="isRegisteringParty(row.item)">
                   <v-list class="actions__more-actions">
-                    <v-list-item @click="removeRegisteringParty()">
+                    <v-list-item :disabled="addEditInProgress" @click="removeRegisteringParty()">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Remove</span>
@@ -115,9 +115,9 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditParty[row.index]">
-              <td colspan="5" :class="{ 'invalid-section': invalidSection }">
+              <td colspan="5" class="pa-0" :class="{ 'invalid-section': invalidSection }">
                 <v-expand-transition>
-                  <div class="edit-Party-container col-12">
+                  <div class="edit-Party-container pa-0 col-12">
                     <edit-party
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
@@ -143,7 +143,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  computed
+  computed,
+  onMounted // eslint-disable-line
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { isEqual } from 'lodash'
@@ -252,6 +253,14 @@ export default defineComponent({
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
     }
+
+    onMounted(() => {
+      for (let i = 0; i < localState.securedParties.length; i++) {
+        if (isEqual(localState.securedParties[i], parties.registeringParty)) {
+          localState.registeringPartyAdded = true
+        }
+      }
+    })
 
     return {
       removeParty,

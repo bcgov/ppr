@@ -53,6 +53,7 @@
                 </v-radio-group>
               </v-col>
             </v-row>
+            <v-divider class="pb-4" />
             <v-row no-gutters v-if="isPartyType">
               <v-col cols="12">
                 <v-row v-if="partyBusiness === 'B'" no-gutters class="pb-4">
@@ -340,6 +341,7 @@ export default defineComponent({
       currentValue => {
         if (currentValue === 'I') {
           currentSecuredParty.value.businessName = ''
+          localState.searchValue = ''
         } else {
           currentSecuredParty.value.personName.first = ''
           currentSecuredParty.value.personName.middle = ''
@@ -360,6 +362,7 @@ export default defineComponent({
 
     onMounted(() => {
       getSecuredParty()
+      setSearchValue(currentSecuredParty.value.businessName)
       getPartyBusiness()
     })
 
