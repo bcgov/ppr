@@ -3,7 +3,7 @@
     <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="#38598A">mdi-account-multiple-plus</v-icon>
-        <label class="pl-3"
+        <label class="pl-3" :class="$style['sectionText']"
           ><strong
             >Registering Party, Secured Parties, and Debtors</strong
           ></label
@@ -222,4 +222,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module></style>
+<style lang="scss" module>
+@import '@/assets/styles/theme.scss';
+.sectionText {
+  color: $gray9;
+}
+</style>
