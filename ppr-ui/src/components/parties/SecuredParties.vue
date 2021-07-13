@@ -51,6 +51,12 @@
               class="party-row"
             >
               <td class="list-item__title">
+                <div class="icon-div" v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
+                  >
+                  <div class="icon-div" v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
+                  >
                 {{ getName(row.item) }}
               </td>
               <td>
@@ -174,12 +180,12 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress, isPartiesValid } = useParty()
+    const { getName, getFormattedAddress, isPartiesValid, isBusiness } = useParty()
 
     const localState = reactive({
       summaryView: props.isSummary,
       showAddSecuredParty: false,
-      isBusiness: true,
+      currentIsBusiness: true,
       addEditInProgress: false,
       invalidSection: false,
       activeIndex: -1,
@@ -257,6 +263,7 @@ export default defineComponent({
       removeParty,
       getName,
       getFormattedAddress,
+      isBusiness,
       initEdit,
       initAdd,
       resetData,
