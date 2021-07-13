@@ -75,9 +75,13 @@
     </v-row>
     <v-row no-gutters class="pt-6">
       <v-col cols="auto">
-        <ul>
+        <ul v-if="!collateralValid">
           <li>At least one form of collateral (vehicle or general)</li>
         </ul>
+        <span v-else>
+          <v-icon color="green darken-2" class="agreement-valid-icon">mdi-check</v-icon>
+          At least one form of collateral (vehicle or general)
+        </span>
       </v-col>
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
@@ -277,6 +281,7 @@ export default defineComponent({
       generalCollateralError: '',
       vehicleCollateral: collateral.vehicleCollateral,
       generalCollateral: collateral.generalCollateral,
+      collateralValid: collateral.valid,
       showErrorComponent: collateral.showInvalid,
       getNumCols: computed((): number => {
         if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
@@ -372,6 +377,7 @@ export default defineComponent({
       } else {
         collateral.valid = false
       }
+      localState.collateralValid = collateral.valid
       setAddCollateral(collateral)
     }
 
