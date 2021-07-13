@@ -16,25 +16,31 @@
 
 Test-Suite to ensure that the Draft Model is working as expected.
 """
-from http import HTTPStatus
 import copy
+from http import HTTPStatus
 
 import pytest
-
 from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT, DRAFT_CHANGE_STATEMENT
-from ppr_api.models import Draft
+
 from ppr_api.exceptions import BusinessException
+from ppr_api.models import Draft
 from ppr_api.models.utils import now_ts
 
 
 def test_find_all_by_account_id(session):
     """Assert that the draft summary list first item contains all expected elements."""
     draft_list = Draft.find_all_by_account_id('PS12345')
+    # print(draft_list)
     assert draft_list[0]['type']
     assert draft_list[0]['documentId']
     assert draft_list[0]['registrationType']
-    assert draft_list[0]['path']
+    assert draft_list[0]['registrationDescription']
     assert draft_list[0]['createDateTime']
+    assert draft_list[0]['lastUpdateDateTime']
+    # assert draft_list[0]['clientReferenceId']
+    assert draft_list[0]['path']
+    if draft_list[0]['type'] != 'FINANCING_STATEMENT':
+        assert draft_list[0]['baseRegistrationNumber']
     for draft in draft_list:
         assert draft['documentId'] != 'D-T-0001'
 

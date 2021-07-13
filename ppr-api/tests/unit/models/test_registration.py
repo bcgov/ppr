@@ -17,7 +17,9 @@
 Test-Suite to ensure that the Registration Model is working as expected.
 """
 import copy
+from http import HTTPStatus
 
+import pytest
 from registry_schemas.example_data.ppr import (
     AMENDMENT_STATEMENT,
     CHANGE_STATEMENT,
@@ -27,7 +29,23 @@ from registry_schemas.example_data.ppr import (
     RENEWAL_STATEMENT,
 )
 
+from ppr_api.exceptions import BusinessException
 from ppr_api.models import Draft, FinancingStatement, Registration
+
+
+# testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
+TEST_REGISTRATION_NUMBER_DATA = [
+    ('Valid Renewal', 'TEST00R5', 'PS12345', HTTPStatus.OK, False, 'TEST0005'),
+    ('Valid Change', 'TEST0010', 'PS12345', HTTPStatus.OK, False, 'TEST0001'),
+    ('Valid Amendment', 'TEST0007', 'PS12345', HTTPStatus.OK, False, 'TEST0001'),
+    ('Invalid reg num', 'TESTXXXX', 'PS12345', HTTPStatus.NOT_FOUND, False, 'TEST0005'),
+    ('Mismatch account id non-staff', 'TEST00R5', 'PS1234X', HTTPStatus.BAD_REQUEST, False, 'TEST0005'),
+    ('Mismatch registration numbers non-staff', 'TEST00R5', 'PS12345', HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
+    ('Discharged non-staff', 'TEST0D14', 'PS12345', HTTPStatus.BAD_REQUEST, False, 'TEST0014'),
+    ('Mismatch account id staff', 'TEST00R5', 'PS1234X', HTTPStatus.OK, True, 'TEST0005'),
+    ('Mismatch registration numbers staff', 'TEST00R5', 'PS12345', HTTPStatus.OK, True, 'TEST0001'),
+    ('Discharged staff', 'TEST0D14', 'PS12345', HTTPStatus.OK, True, 'TEST0014')
+]
 
 
 def test_find_by_id(session):
@@ -141,9 +159,60 @@ def test_find_by_id_cs_su(session):
     assert 'deleteSecuredParties' not in json_data
 
 
+def test_find_all_by_account_id(session):
+    """Assert that the financing statement summary list by account id first item contains all expected elements."""
+    statement_list = FinancingStatement.find_all_by_account_id('PS12345')
+
+    assert statement_list
+    assert statement_list[0]['registrationNumber']
+    assert statement_list[0]['registrationType']
+    assert statement_list[0]['registrationClass']
+    assert statement_list[0]['registrationDescription']
+    assert statement_list[0]['statusType']
+    assert statement_list[0]['createDateTime']
+    assert statement_list[0]['lastUpdateDateTime']
+    assert statement_list[0]['expireDays']
+    assert statement_list[0]['registeringParty']
+    assert statement_list[0]['securedParties']
+    # assert statement_list[0]['clientReferenceId']
+    assert statement_list[0]['path']
+    if statement_list[0]['registrationClass'] not in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
+        assert statement_list[0]['baseRegistrationNumber']
+
+
+def test_find_all_by_account_id_no_result(session):
+    """Assert that the financing statement summary list by invalid account id works as expected."""
+    statement_list = FinancingStatement.find_all_by_account_id('XXXXX45')
+
+    assert len(statement_list) == 0
+
+
+@pytest.mark.parametrize('desc,reg_number,account_id,status,staff,base_reg_number', TEST_REGISTRATION_NUMBER_DATA)
+def test_find_by_registration_number(session, desc, reg_number, account_id, status, staff, base_reg_number):
+    """Assert that a fetch financing statement by registration number works as expected."""
+    if status == HTTPStatus.OK:
+        registration = Registration.find_by_registration_number(reg_number, account_id, staff, base_reg_number)
+        assert registration.id >= 200000000
+        assert registration.registration_num == reg_number
+        assert registration.base_registration_num
+        assert registration.registration_type
+        assert registration.registration_type_cl
+        assert registration.registration_ts
+        assert registration.account_id
+        # assert registration.client_reference_id
+    else:
+        with pytest.raises(BusinessException) as request_err:
+            Registration.find_by_registration_number(reg_number, account_id, staff, base_reg_number)
+
+        # check
+        assert request_err
+        assert request_err.value.status_code == status
+        print(request_err.value.error)
+
+
 def test_find_by_registration_num_fs(session):
     """Assert that find a financing statement by registration number contains all expected elements."""
-    registration = Registration.find_by_registration_number('TEST0001')
+    registration = Registration.find_by_registration_number('TEST0001', 'PS12345', False)
     assert registration
     assert registration.id == 200000000
     assert registration.registration_num == 'TEST0001'
@@ -155,7 +224,7 @@ def test_find_by_registration_num_fs(session):
 
 def test_find_by_registration_num_ds(session):
     """Assert that find a discharge statement by registration number contains all expected elements."""
-    registration = Registration.find_by_registration_number('TEST00D4')
+    registration = Registration.find_by_registration_number('TEST00D4', 'PS12345', True)
     assert registration
     assert registration.id == 200000004
     assert registration.registration_num == 'TEST00D4'
@@ -176,12 +245,6 @@ def test_find_by_registration_num_ds(session):
 def test_find_by_id_invalid(session):
     """Assert that find registration by non-existent ID returns the expected result."""
     registration = Registration.find_by_id(100000234)
-    assert not registration
-
-
-def test_find_by_reg_num_invalid(session):
-    """Assert that find registration by non-existent registration number returns the expected result."""
-    registration = Registration.find_by_registration_number('100000234')
     assert not registration
 
 

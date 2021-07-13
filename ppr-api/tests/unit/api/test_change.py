@@ -223,6 +223,17 @@ TEST_CREATE_DATA = [
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
 ]
 
+# testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num}, {base_reg_num})
+TEST_GET_STATEMENT = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0010', 'TEST0001'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0010', 'TEST0001'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0010', 'TEST0001'),
+    ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0001'),
+    ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0010', 'TEST0002'),
+    ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0010', 'TEST0002'),
+    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0010', 'TEST0001')
+]
+
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
 def test_create_change(session, client, jwt, desc, json_data, roles, status, has_account, reg_num):
@@ -243,6 +254,24 @@ def test_create_change(session, client, jwt, desc, json_data, roles, status, has
     # check
     # print('Response data:')
     # print(response.json)
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
+def test_get_change(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
+    """Assert that a get change registration statement works as expected."""
+    headers = None
+    # setup
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.get('/api/v1/financing-statements/' + base_reg_num + '/changes/' + reg_num,
+                          headers=headers)
+
+    # check
     assert response.status_code == status
 
 

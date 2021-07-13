@@ -76,7 +76,7 @@ class FinancingResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch financing statement list for account ID
-            statement_list = FinancingStatement.find_all_by_account_id(account_id, is_staff(jwt))
+            statement_list = FinancingStatement.find_all_by_account_id(account_id)
 
             return jsonify(statement_list), HTTPStatus.OK
 
@@ -152,8 +152,8 @@ class GetFinancingResource(Resource):
             # Try to fetch financing statement by registration number
             # Not found throws a business exception.
             statement = FinancingStatement.find_by_registration_number(registration_num,
-                                                                       is_staff(jwt),
-                                                                       True)
+                                                                       account_id,
+                                                                       is_staff(jwt))
 
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
@@ -240,6 +240,48 @@ class AmendmentResource(Resource):
             return resource_utils.default_exception_response(default_exception)
 
 
+@cors_preflight('GET,OPTIONS')
+@API.route('/<path:registration_num>/amendments/<path:amendment_registration_num>', methods=['GET', 'OPTIONS'])
+class GetAmendmentResource(Resource):
+    """Resource to get an individual amendment registration statement by registration number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(registration_num, amendment_registration_num):
+        """Get an amendment registration statement by registration number."""
+        try:
+            if amendment_registration_num is None:
+                return resource_utils.path_param_error_response('amendment registration number')
+
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if not is_staff(jwt) and account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch registration statement by registration number
+            statement = Registration.find_by_registration_number(amendment_registration_num,
+                                                                 account_id,
+                                                                 is_staff(jwt),
+                                                                 registration_num)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(statement.json, account_id, ReportTypes.AMENDMENT_STATEMENT_REPORT.value, token['name'])
+
+            return statement.json, HTTPStatus.OK
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/changes', methods=['POST', 'OPTIONS'])
 class ChangeResource(Resource):
@@ -303,6 +345,48 @@ class ChangeResource(Resource):
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/<path:registration_num>/changes/<path:change_registration_num>', methods=['GET', 'OPTIONS'])
+class GetChangeResource(Resource):
+    """Resource to get an individual change registration statement by registration number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(registration_num, change_registration_num):
+        """Get a change registration statement by registration number."""
+        try:
+            if change_registration_num is None:
+                return resource_utils.path_param_error_response('change registration number')
+
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if not is_staff(jwt) and account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch registration statement by registration number
+            statement = Registration.find_by_registration_number(change_registration_num,
+                                                                 account_id,
+                                                                 is_staff(jwt),
+                                                                 registration_num)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(statement.json, account_id, ReportTypes.CHANGE_STATEMENT_REPORT.value, token['name'])
+
+            return statement.json, HTTPStatus.OK
+
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -375,6 +459,48 @@ class RenewalResource(Resource):
             return resource_utils.default_exception_response(default_exception)
 
 
+@cors_preflight('GET,OPTIONS')
+@API.route('/<path:registration_num>/renewals/<path:renewal_registration_num>', methods=['GET', 'OPTIONS'])
+class GetRenewalResource(Resource):
+    """Resource to get an individual renewal registration statement by registration number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(registration_num, renewal_registration_num):
+        """Get a renewal registration statement by registration number."""
+        try:
+            if renewal_registration_num is None:
+                return resource_utils.path_param_error_response('renewal registration number')
+
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if not is_staff(jwt) and account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch registration statement by registration number
+            statement = Registration.find_by_registration_number(renewal_registration_num,
+                                                                 account_id,
+                                                                 is_staff(jwt),
+                                                                 registration_num)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(statement.json, account_id, ReportTypes.RENEWAL_STATEMENT_REPORT.value, token['name'])
+
+            return statement.json, HTTPStatus.OK
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/discharges', methods=['POST', 'OPTIONS'])
 class DischargeResource(Resource):
@@ -437,6 +563,80 @@ class DischargeResource(Resource):
                                token['name'])
 
             return registration.json, HTTPStatus.CREATED
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/<path:registration_num>/discharges/<path:discharge_registration_num>', methods=['GET', 'OPTIONS'])
+class GetDischargeResource(Resource):
+    """Resource to get an individual discharge registration statement by registration number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(registration_num, discharge_registration_num):
+        """Get a discharge registration statement by registration number."""
+        try:
+            if discharge_registration_num is None:
+                return resource_utils.path_param_error_response('discharge registration number')
+
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if not is_staff(jwt) and account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch registration statement by registration number
+            statement = Registration.find_by_registration_number(discharge_registration_num,
+                                                                 account_id,
+                                                                 is_staff(jwt),
+                                                                 registration_num)
+
+            if resource_utils.is_pdf(request):
+                token = g.jwt_oidc_token_info
+                # Return report if request header Accept MIME type is application/pdf.
+                return get_pdf(statement.json, account_id, ReportTypes.DISCHARGE_STATEMENT_REPORT.value, token['name'])
+
+            return statement.json, HTTPStatus.OK
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/registrations', methods=['GET', 'OPTIONS'])
+class GetRegistrationResource(Resource):
+    """Resource to get a summary list of recent registrations by account ID."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get():
+        """Get the list of recent registrations created by the header account ID."""
+        try:
+
+            # Quick check: must provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch financing statement list for account ID
+            statement_list = Registration.find_all_by_account_id(account_id)
+
+            return jsonify(statement_list), HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)

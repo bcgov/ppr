@@ -292,6 +292,10 @@ TEST_GET_STATEMENT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX'),
+    ('Invalid expired non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0013'),
+    ('Invalid discharged non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0014'),
+    ('Valid expired staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0013'),
+    ('Valid discharged staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0014'),
     ('Valid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0001')
 ]
 
@@ -317,8 +321,8 @@ def test_create(session, client, jwt, desc, json_data, roles, status, has_accoun
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account', TEST_GET_LIST)
-def test_get_account_list(session, client, jwt, desc, roles, status, has_account):
-    """Assert that a get account financing statement list works as expected."""
+def test_get_account_financing_list(session, client, jwt, desc, roles, status, has_account):
+    """Assert that a request to get the list of financing statements by account works as expected."""
     headers = None
     # setup
     if has_account:
@@ -328,6 +332,24 @@ def test_get_account_list(session, client, jwt, desc, roles, status, has_account
 
     # test
     response = client.get('/api/v1/financing-statements',
+                          headers=headers)
+
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,has_account', TEST_GET_LIST)
+def test_get_account_registrations_list(session, client, jwt, desc, roles, status, has_account):
+    """Assert that a request to get the list of registrations by account works as expected."""
+    headers = None
+    # setup
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.get('/api/v1/financing-statements/registrations',
                           headers=headers)
 
     # check

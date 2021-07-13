@@ -42,7 +42,7 @@ TO_SEARCH_TYPE_DESCRIPTION = {
     'BUSINESS_DEBTOR': 'Debtor Business Name:',
     'INDIVIDUAL_DEBTOR': 'Debtor Individual Name:',
     'MHR_NUMBER': 'Manufactured Home Registration Number:',
-    'REGISTRATION_NUMBER': 'Search by Registration Number:',
+    'REGISTRATION_NUMBER': 'Registration Number:',
     'SERIAL_NUMBER': 'Serial/VIN Number:'
 }
 
