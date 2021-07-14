@@ -38,6 +38,9 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
       if (!searchValue) {
         validation.searchValue.message = 'Enter a serial number to search'
       }
+      if (searchValue?.length > 25) {
+        validation.searchValue.message = 'Maximum 25 characters'
+      }
       break
     case UISearchTypes.INDIVIDUAL_DEBTOR:
       if (!first) {
@@ -122,6 +125,9 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
           'You can search using this number but you might not obtain any results (the search fee will be applied).',
           'Select "Search" to continue with this serial number.'
         ]
+      }
+      if (searchValue?.length > 25) {
+        validation.searchValue.message = 'Maximum 25 characters'
       }
       break
     case UISearchTypes.INDIVIDUAL_DEBTOR:
