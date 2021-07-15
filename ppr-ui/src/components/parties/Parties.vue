@@ -41,7 +41,16 @@
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
       <v-col>
-        <h3>Registering Party</h3>
+        <h3>Registering Party
+        <v-tooltip top content-class="top-tooltip pa-5" transition="fade-transition">
+            <template v-slot:activator="{ on }">
+              <v-icon class="pl-1 mt-n1" color="primary" v-on="on">mdi-information-outline</v-icon>
+            </template>
+            The Registering Party is based on your account information and cannot be
+            changed here. This infromation can be changed by updating your BC Registries
+            account information.
+          </v-tooltip>
+          </h3>
         <registering-party />
       </v-col>
     </v-row>

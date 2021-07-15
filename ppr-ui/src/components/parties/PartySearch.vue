@@ -96,7 +96,7 @@
       </v-col>
     </v-row>
     <v-row class="px-6" align="center">
-      <v-col cols="auto">
+      <v-col cols="auto" class="pr-0">
         <v-checkbox
           id="add-registering-party"
           class="reg-checkbox pa-0 ma-0"
@@ -107,7 +107,7 @@
         >
         </v-checkbox>
       </v-col>
-      <v-col :class="{ 'disabled-text': autoCompleteDisabled }">
+      <v-col class="pl-0" :class="{ 'disabled-text': autoCompleteDisabled }">
         Include the registering party as a secured party
       </v-col>
     </v-row>

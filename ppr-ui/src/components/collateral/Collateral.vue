@@ -13,7 +13,7 @@
       >
         <v-row no-gutters class="pa-6">
           <v-col cols="auto">
-            <v-icon color="#D3272C">mdi-information-outline</v-icon>&nbsp;
+            <v-icon color="#D3272C">information-outline</v-icon>&nbsp;
             <span class="invalid-message">This step is unfinished. </span>
             <span id="router-link-collateral"
             class="invalid-link"
