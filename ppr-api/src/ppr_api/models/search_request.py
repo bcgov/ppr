@@ -147,7 +147,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         elif self.search_type == 'AC':
             query = search_utils.AIRCRAFT_DOT_QUERY
 
-        result = db.session.execute(query, {'query_value': search_value})
+        max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
+        result = db.session.execute(query, {'query_value': search_value,'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -191,8 +192,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_business_name(self):
         """Execute a debtor business name search query."""
         search_value = self.request_json['criteria']['debtorName']['business']
+        max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
         result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
-                                    {'query_bus_name': search_value.strip().upper()})
+                                    {'query_bus_name': search_value.strip().upper(),
+                                    'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -225,9 +228,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Execute a debtor individual name search query."""
         last_name = self.request_json['criteria']['debtorName']['last']
         first_name = self.request_json['criteria']['debtorName']['first']
+        max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
         result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
                                     {'query_last': last_name.strip().upper(),
-                                     'query_first': first_name.strip().upper()})
+                                     'query_first': first_name.strip().upper(),
+                                     'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
