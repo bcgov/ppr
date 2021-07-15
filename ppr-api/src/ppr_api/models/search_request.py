@@ -148,7 +148,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             query = search_utils.AIRCRAFT_DOT_QUERY
 
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
-        result = db.session.execute(query, {'query_value': search_value,'max_results_size': max_results_size})
+        result = db.session.execute(query, {'query_value': search_value, 'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -195,7 +195,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
         result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
                                     {'query_bus_name': search_value.strip().upper(),
-                                    'max_results_size': max_results_size})
+                                     'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
