@@ -67,8 +67,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     # parent keys
     financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False)
-    draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('drafts.id'), nullable=False)
+                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('drafts.id'), nullable=False, index=True)
     registration_type = db.Column('registration_type', db.String(2),
                                   db.ForeignKey('registration_types.registration_type'), nullable=False)
     registration_type_cl = db.Column('registration_type_cl', db.String(10),
@@ -430,10 +430,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @staticmethod
-    def create_financing_from_json(json_data, account_id: str = None):
+    def create_financing_from_json(json_data, account_id: str = None, user_id: str = None):
         """Create a registraion object from dict/json."""
         registration = Registration()
         registration.account_id = account_id
+        registration.user_id = user_id
         registration.registration_ts = model_utils.now_ts()
         reg_type = json_data['type']
         registration.registration_type_cl = model_utils.REG_TYPE_TO_REG_CLASS[reg_type]

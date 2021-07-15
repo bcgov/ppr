@@ -56,6 +56,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
     total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
     returned_results_size = db.Column('returned_results_size', db.Integer, nullable=True)
+    user_id = db.Column('user_id', db.String(1000), nullable=True)
 
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
@@ -113,8 +114,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_registration_number(self):
         """Execute a search by registration number query."""
         reg_num = self.request_json['criteria']['value']
-        query = search_utils.REG_NUM_QUERY.replace('?', reg_num)
-        result = db.session.execute(query)
+        result = db.session.execute(search_utils.REG_NUM_QUERY, {'query_value': reg_num})
         row = result.first()
         if row is not None:
             mapping = row._mapping  # pylint: disable=protected-access; follows documentation
@@ -147,8 +147,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         elif self.search_type == 'AC':
             query = search_utils.AIRCRAFT_DOT_QUERY
 
-        query = query.replace('?', search_value)
-        result = db.session.execute(query)
+        result = db.session.execute(query, {'query_value': search_value})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -190,10 +189,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             self.total_results_size = 0
 
     def search_by_business_name(self):
-        """Execute a search query debtor business_name search type."""
+        """Execute a debtor business name search query."""
         search_value = self.request_json['criteria']['debtorName']['business']
-        query = search_utils.BUSINESS_NAME_QUERY.replace('?', search_value.strip().upper())
-        result = db.session.execute(query)
+        result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
+                                    {'query_bus_name': search_value.strip().upper()})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -223,12 +222,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             self.total_results_size = 0
 
     def search_by_individual_name(self):
-        """Execute a search query debtor individual name search type."""
+        """Execute a debtor individual name search query."""
         last_name = self.request_json['criteria']['debtorName']['last']
         first_name = self.request_json['criteria']['debtorName']['first']
-        query = search_utils.INDIVIDUAL_NAME_QUERY.replace('LNAME?', last_name.strip().upper())
-        query = query.replace('FNAME?', first_name.strip().upper())
-        result = db.session.execute(query)
+        result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
+                                    {'query_last': last_name.strip().upper(),
+                                     'query_first': first_name.strip().upper()})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -268,20 +267,22 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
         count_query = search_utils.COUNT_QUERY_FROM_SEARCH_TYPE[self.search_type]
         if count_query:
+            result = None
             if self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json['criteria']['debtorName']['business']
-                count_query = count_query.replace('?', search_value.strip().upper())
+                result = db.session.execute(count_query, {'query_bus_name': search_value})
             elif self.search_type == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
                 last_name = self.request_json['criteria']['debtorName']['last']
                 first_name = self.request_json['criteria']['debtorName']['first']
-                count_query = count_query.replace('LNAME?', last_name.strip().upper())
-                count_query = count_query.replace('FNAME?', first_name.strip().upper())
+                result = db.session.execute(count_query, {'query_last': last_name.strip().upper(),
+                                                          'query_first': first_name.strip().upper()})
             else:
-                count_query = count_query.replace('?', self.request_json['criteria']['value'])
+                search_value = self.request_json['criteria']['value']
+                result = db.session.execute(count_query, {'query_value': search_value})
 
-            result = db.session.execute(count_query)
-            row = result.first()
-            self.total_results_size = int(row._mapping['query_count'])  # pylint: disable=protected-access
+            if result:
+                row = result.first()
+                self.total_results_size = int(row._mapping['query_count'])  # pylint: disable=protected-access
 
     def search(self):
         """Execute a search with the previously set search type and criteria."""
@@ -351,7 +352,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def create_from_json(search_json,
-                         account_id: str = None):
+                         account_id: str = None,
+                         user_id: str = None):
         """Create a search object from dict/json."""
         new_search = SearchRequest()
         new_search.request_json = search_json
@@ -363,7 +365,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             new_search.account_id = account_id
         if 'clientReferenceId' in search_json and search_json['clientReferenceId'].strip() != '':
             new_search.client_reference_id = search_json['clientReferenceId']
-
+        new_search.user_id = user_id
         return new_search
 
     @staticmethod

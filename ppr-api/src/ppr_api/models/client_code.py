@@ -40,8 +40,8 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     date_ts = db.Column('date_ts', db.DateTime, nullable=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=False)
-    users_id = db.Column('users_id', db.Integer, db.ForeignKey('users.id'), nullable=True)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=False, index=True)
+    users_id = db.Column('users_id', db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
 
     # Relationships
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,

@@ -71,10 +71,11 @@ def test_save(session, reg_type, account_id, create_draft):
         assert draft.document_number
         json_data['documentId'] = draft.document_number
 
-    statement = FinancingStatement.create_from_json(json_data, account_id)
+    statement = FinancingStatement.create_from_json(json_data, account_id, 'UNIT_TEST')
     statement.save()
     assert statement.id
-
+    assert statement.registration[0].account_id == account_id
+    assert statement.registration[0].user_id == 'UNIT_TEST'
     result = statement.json
     assert result
     assert result['baseRegistrationNumber']

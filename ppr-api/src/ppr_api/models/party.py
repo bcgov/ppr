@@ -47,22 +47,26 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     party_type = db.Column('party_type', db.String(30), db.ForeignKey('party_types.party_type'), nullable=False)
     # party person
     first_name = db.Column('first_name', db.String(50), nullable=True)
-    middle_initial = db.Column('middle_initial', db.String(50), nullable=True)
+    middle_initial = db.Column('middle_initial', db.String(50), nullable=True, index=True)
     last_name = db.Column('last_name', db.String(50), nullable=True)
     # or party business
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
     birth_date = db.Column('birth_date', db.DateTime, nullable=True)
+    email_id = db.Column('email_address', db.String(250), nullable=True)
+
     # Search keys
     first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
     last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
 
     # parent keys
-    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True)
-    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True)
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
+    address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
+    branch_id = db.Column('branch_id', db.Integer, db.ForeignKey('client_codes.id'), nullable=True, index=True)
+    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
+                                index=True)
+    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False,
+                             index=True)
+    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Address
@@ -119,8 +123,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 cp_address = self.address.json
                 party['address'] = cp_address
 
-#            if self.email_id:
-#                party['emailAddress'] = self.email_id
+            if self.email_id:
+                party['emailAddress'] = self.email_id
 
             if self.birth_date:
                 party['birthDate'] = model_utils.format_ts(self.birth_date)
@@ -189,8 +193,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 if 'middle' in json_data['personName']:
                     party.middle_initial = json_data['personName']['middle'].strip().upper()
 
-            # if 'emailAddress' in json_data:
-            #   party.email_id = json_data['emailAddress']
+            if 'emailAddress' in json_data:
+                party.email_id = json_data['emailAddress']
 
             party.address = Address.create_from_json(json_data['address'])
 

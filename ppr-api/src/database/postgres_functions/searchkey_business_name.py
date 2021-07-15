@@ -14,58 +14,53 @@ searchkey_business_name = PGFunction(
     v_search_key VARCHAR(150);
     BEGIN
         v_search_key :=
-        REGEXP_REPLACE(
-            REGEXP_REPLACE(
-            REGEXP_REPLACE(
-            REGEXP_REPLACE(
-            REGEXP_REPLACE(
-                REGEXP_REPLACE(
-                REGEXP_REPLACE(
-                REGEXP_REPLACE(
-                REGEXP_REPLACE(
-                    REGEXP_REPLACE(
-                    REGEXP_REPLACE(
-                    REGEXP_REPLACE(
-                    REGEXP_REPLACE(
-                        REGEXP_REPLACE(
-                        REGEXP_REPLACE(
-                        REGEXP_REPLACE(
-                        REGEXP_REPLACE(
-                            REGEXP_REPLACE(
-                            REGEXP_REPLACE(
-                            REGEXP_REPLACE(
-                            REGEXP_REPLACE(
-                                REGEXP_REPLACE(
-                                REGEXP_REPLACE(
-                                REGEXP_REPLACE(
-                                REGEXP_REPLACE(
-                                    REGEXP_REPLACE(actual_name,'^0000|^000|^00|^0|^THE | THE |\([^()]*\)',''),
-                                    'CORPORATION|CORP|COMPANY|CO\.|LTD|INCORPORATED|INC$|INC.|INCORPOREE|LIMITED|LIMITEE|LTEE|LTD|ASSOCIATION$|ASSOC$|ASSN$|NON PERSONAL LIABILITY$|UNLIMITED LIABILITY COMPANY|N P L$|NPL$|PARTNERSHIP|SOCIETY$|SOC$',''),
-                                'BRITISH COLUMBIA|BRITISHCOLUMBIA','BC'),
-                                '&','AND'),
-                                '#','NUMBER'),
-                                '1','ONE'),
-                            '2','TWO'),
-                            '3','THREE'),
-                            '4','FOUR'),
-                            '5','FIVE'),
-                        '6','SIX'),
-                        '7','SEVEN'),
-                        '8','EIGHT'),
-                        '9','NINE'),
-                    '0','ZERO'),
-                    'TEN','ONEZERO'),
-                    'TWENTY','TWOZERO'),
-                    'THIRTY','THREEERO'),
-                'FORTY','FOURZERO'),
-                'FOURTY','FOURZERO'),
-                'FIFTY','FIVEZERO'),
-                'SIXTY','SIXZERO'),
-            'SEVENTY','SEVENZERO'),
-            'EIGHTY','EIGHTZERO'),
-            'NINETY','NINEZERO'),
-            '[^0-9A-Za-z]','','gi');
-        RETURN UPPER(v_search_key);
+        regexp_replace(
+        regexp_replace(
+        regexp_replace(
+            regexp_replace(
+            regexp_replace(
+            regexp_replace(
+            regexp_replace(
+                regexp_replace(
+                regexp_replace(
+                regexp_replace(
+                regexp_replace(
+                    regexp_replace(
+                    regexp_replace(
+                    regexp_replace(
+                    regexp_replace(
+                        regexp_replace(actual_name, '[[:<:]](BC|B C |B.C)[[:>:]]', ' ', 'gi'
+                                    ),
+                                    '[[:<:]](BRITISH COLUMBIA|BRITISHCOLUMBIA)[[:>:]]', ' ', 'gi'
+                                    ),
+                                    '[[:<:]](INCORPORATED|INCORPOREE)[[:>:]]', ' ', 'gi'
+                                    ),
+                                    '[[:<:]](CORPORATION)[[:>:]]', ' ', 'gi'
+                                ),
+                                '[[:<:]](ULC|HOLDINGS|HOLDING|ASSOCIATION|ASSOCIATES| ASSOC| ASSN|NON PERSONAL LIABILITY|UNLIMITED LIABILITY COMPANY|N P L|NPL|PARTNERSHIP|SOCIETY)[[:>:]]', ' ', 'gi'
+                                ),
+                                '[[:<:]](^THE|AND)[[:>:]]', ' ', 'gi'
+                                ),
+                                '[[:<:]](^DR)[[:>:]]', ' ', 'gi'
+                                ),
+                                '[[:<:]](CONSTRUCTION|CONTRACTING|CONTRACTOR)[[:>:]]', ' ', 'gi'
+                            ),
+                            '[[:<:]](CONSULTANTS|CONSULTANT|CONSULTING)[[:>:]]', ' ', 'gi'
+                            ),
+                            '[[:<:]](SERVICES|SERVICE)[[:>:]]', ' ', 'gi'
+                            ),
+                            '[[:<:]](TRUST)[[:>:]]', ' ', 'gi'
+                            ),
+                            '[[:<:]](CORP|COMPANY|CO\|LTD|LIMITED|LIMITEE|LTEE)[[:>:]]', ' ', 'gi'
+                        ),
+                        '[[:<:]](LTD|LIMITED|LIMITEE|LTEE)[[:>:]]', ' ', 'gi'
+                        ),
+                        '[[:<:]](CO|INC)[[:>:]]', ' ', 'gi'
+                        ),
+                        '[^a-zA-Z0-9]+', '', 'gi'
+                        ),
+                        '( ){2,}', '');    
+    RETURN TRIM(v_search_key);
     END
     ; 
     $$;

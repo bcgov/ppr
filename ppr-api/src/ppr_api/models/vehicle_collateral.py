@@ -19,9 +19,9 @@ from enum import Enum
 from .db import db
 
 
-SEARCH_VIN_STATEMENT = "SELECT searchkey_vehicle('?') AS search_key"  # noqa: Q000
-SEARCH_VIN_STATEMENT_AC = "SELECT searchkey_aircraft('?') AS search_key"  # noqa: Q000
-SEARCH_VIN_STATEMENT_MH = "SELECT searchkey_mhr('?') AS search_key"  # noqa: Q000
+SEARCH_VIN_STATEMENT = "SELECT searchkey_vehicle(:serial_number) AS search_key"  # noqa: Q000
+SEARCH_VIN_STATEMENT_AC = "SELECT searchkey_aircraft(:serial_number) AS search_key"  # noqa: Q000
+SEARCH_STATEMENT_MH = "SELECT searchkey_mhr(:mhr_number) AS search_key"  # noqa: Q000
 
 
 class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -49,15 +49,15 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     make = db.Column('make', db.String(60), nullable=True)
     model = db.Column('model', db.String(60), nullable=True)
     serial_number = db.Column('serial_number', db.String(30), nullable=True)
-    mhr_number = db.Column('mhr_number', db.String(6), nullable=True)
+    mhr_number = db.Column('mhr_number', db.String(6), nullable=True, index=True)
     search_vin = db.Column('srch_vin', db.String(6), nullable=True, index=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registrations.id'), nullable=False)
+                                db.ForeignKey('registrations.id'), nullable=False, index=True)
     financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
+                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
@@ -141,14 +141,15 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             collateral.make = json_data['make']
         if 'model' in json_data:
             collateral.model = json_data['model']
-        if 'manufacturedHomeRegistrationNumber' in json_data and \
-                collateral.vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
-            collateral.mhr_number = json_data['manufacturedHomeRegistrationNumber']
-            collateral.search_vin = VehicleCollateral.get_search_vin(collateral.vehicle_type,
-                                                                     collateral.mhr_number)
-        elif collateral.serial_number:
+        if collateral.serial_number:
             collateral.search_vin = VehicleCollateral.get_search_vin(collateral.vehicle_type,
                                                                      collateral.serial_number)
+        if collateral.vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
+            if 'manufacturedHomeRegistrationNumber' in json_data:
+                collateral.mhr_number = \
+                    VehicleCollateral.get_formatted_mhr_number(json_data['manufacturedHomeRegistrationNumber'])
+            else:  # From Bob
+                collateral.mhr_number = 'NR'
 
         return collateral
 
@@ -184,13 +185,20 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         if not vehicle_type or not serial_number:
             return None
 
-        statement = SEARCH_VIN_STATEMENT.replace('?', serial_number)
+        statement = SEARCH_VIN_STATEMENT
         if vehicle_type == VehicleCollateral.SerialTypes.AIRCRAFT.value:
-            statement = SEARCH_VIN_STATEMENT_AC.replace('?', serial_number)
-        elif vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
-            statement = SEARCH_VIN_STATEMENT_MH.replace('?', serial_number)
+            statement = SEARCH_VIN_STATEMENT_AC
 
-        result = db.session.execute(statement)
+        result = db.session.execute(statement, {'serial_number': serial_number})
         row = result.first()
-        search_vin = str(row._mapping['search_key'])  # pylint: disable=protected-access; follows documentation
-        return search_vin
+        return str(row._mapping['search_key'])  # pylint: disable=protected-access; follows documentation
+
+    @staticmethod
+    def get_formatted_mhr_number(mhr_number: str):
+        """Conditionally format the MHR number value from a database function."""
+        if not mhr_number:  # From Bob
+            return 'NR'
+
+        result = db.session.execute(SEARCH_STATEMENT_MH, {'mhr_number': mhr_number})
+        row = result.first()
+        return str(row._mapping['search_key'])  # pylint: disable=protected-access; follows documentation
