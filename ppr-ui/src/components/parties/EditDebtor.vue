@@ -47,6 +47,7 @@
                 <auto-complete
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
+                  v-click-outside="setCloseAutoComplete"
                   @search-value="setSearchValue"
                   @hide-details="setHideDetails"
                 >
@@ -105,6 +106,7 @@
                   :error-messages="
                     errors.month.message ? errors.month.message : ''
                   "
+                  @keyup="validateBirthdateIfAlreadyValidated"
                   persistent-hint
                   return-object
                 ></v-autocomplete>
@@ -115,6 +117,7 @@
                   label="Day"
                   id="txt-day"
                   v-model="day"
+                  @keyup="validateBirthdateIfAlreadyValidated"
                   :error-messages="errors.day.message ? errors.day.message : ''"
                   persistent-hint
                 />
@@ -125,6 +128,7 @@
                   label="Year"
                   id="txt-year"
                   v-model="year"
+                  @keyup="validateBirthdateIfAlreadyValidated"
                   :error-messages="
                     errors.year.message ? errors.year.message : ''
                   "
@@ -237,7 +241,7 @@ export default defineComponent({
       addressSchema
     } = useDebtor(props, context)
 
-    const { errors, updateValidity, validateDebtorForm } = useDebtorValidation()
+    const { errors, updateValidity, validateDebtorForm, validateBirthdate } = useDebtorValidation()
 
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -253,6 +257,12 @@ export default defineComponent({
       }
     }
 
+    const validateBirthdateIfAlreadyValidated = () => {
+      if ((!errors.value.year.succeeded) || (!errors.value.month.succeeded) || (!errors.value.day.succeeded)) {
+        validateBirthdate(year.value, monthValue.value, day.value)
+      }
+    }
+
     const setSearchValue = (searchValueTyped: string) => {
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
@@ -261,6 +271,10 @@ export default defineComponent({
 
     const setHideDetails = (hideDetails: boolean) => {
       localState.hideDetails = hideDetails
+    }
+
+    const setCloseAutoComplete = () => {
+      localState.autoCompleteIsActive = false
     }
 
     onMounted(() => {
@@ -297,8 +311,10 @@ export default defineComponent({
       resetFormAndData,
       removeDebtor,
       onSubmitForm,
+      validateBirthdateIfAlreadyValidated,
       setSearchValue,
       setHideDetails,
+      setCloseAutoComplete,
       addressSchema,
       updateValidity,
       errors,

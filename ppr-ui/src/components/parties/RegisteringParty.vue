@@ -15,6 +15,12 @@
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title">
+                  <div class="icon-div" v-if="isBusiness(row.item)"
+                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
+                  >
+                  <div class="icon-div" v-else
+                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
+                  >
                   {{ getName(row.item) }}
                 </td>
                 <td>
@@ -74,7 +80,7 @@ export default defineComponent({
         localState.registeringParty = [parties.registeringParty]
       }
     })
-    const { getName, getFormattedAddress } = useParty()
+    const { getName, getFormattedAddress, isBusiness } = useParty()
     const localState = reactive({
       registeringParty: null,
       partyHeaders: registeringTableHeaders
@@ -83,6 +89,7 @@ export default defineComponent({
     return {
       getName,
       getFormattedAddress,
+      isBusiness,
       ...toRefs(localState)
     }
   }
