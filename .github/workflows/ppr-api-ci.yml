@@ -55,6 +55,7 @@ jobs:
       DATABASE_TEST_PASSWORD: postgres
       DATABASE_TEST_NAME: postgres
       DATABASE_TEST_HOST: localhost
+      DATABASE_TEST_PORT: 5432
       DATABASE_HOST: localhost
       DATABASE_PORT: 5432
       DATABASE_PASSWORD: postgres
