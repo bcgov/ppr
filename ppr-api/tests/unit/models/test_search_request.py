@@ -327,7 +327,7 @@ TEST_INVALID_DATA = [
 # testdata pattern is ({search type}, {JSON data}, {expected # of results})
 TEST_VALID_DATA_COUNT = [
     ('SS', SERIAL_NUMBER_JSON, 5),
-    ('IS', INDIVIDUAL_DEBTOR_JSON, 4),
+    ('IS', INDIVIDUAL_DEBTOR_JSON, 3),
     ('BS', BUSINESS_DEBTOR_JSON, 2)
 ]
 
@@ -353,7 +353,7 @@ TEST_EXPIRED_DATA = [
 
 
 def test_search_no_account(session):
-    """Assert that a search query with not account id returns the expected result."""
+    """Assert that a search query with no account id returns the expected result."""
     json_data = {
         'type': 'REGISTRATION_NUMBER',
         'criteria': {
@@ -371,13 +371,15 @@ def test_search_no_account(session):
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
 def test_search_valid(session, search_type, json_data):
     """Assert that a valid search returns the expected search type result."""
-    query = SearchRequest.create_from_json(json_data, None)
+    query = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
     query.search()
 
     result = query.json
 #    print(result)
     assert query.id
     assert query.search_response
+    assert query.account_id == 'PS12345'
+    assert query.user_id == 'UNIT_TEST'
     assert result['searchId']
     assert result['searchQuery']
     assert result['searchDateTime']
@@ -554,13 +556,14 @@ def test_create_from_json(session):
         },
         'clientReferenceId': 'T-SQ-SS-1'
     }
-    search_client = SearchRequest.create_from_json(json_data, 'PS12345')
+    search_client = SearchRequest.create_from_json(json_data, 'PS12345', 'USERID')
 
     assert search_client.account_id == 'PS12345'
     assert search_client.search_type == 'SS'
     assert search_client.client_reference_id == 'T-SQ-SS-1'
     assert search_client.search_ts
     assert search_client.search_criteria
+    assert search_client.user_id == 'USERID'
 
 
 def test_search_autosave(session):

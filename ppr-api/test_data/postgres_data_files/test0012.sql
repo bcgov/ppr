@@ -35,8 +35,8 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
 ;
 INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
-  VALUES(200000011, 'MH', 200000013, 200000006, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '9999', '22000',
-         searchkey_mhr('22000'))
+  VALUES(200000011, 'MH', 200000013, 200000006, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '9999', searchkey_mhr('22000'),
+         searchkey_vehicle('sfsf212122000'))
 ;
 INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)

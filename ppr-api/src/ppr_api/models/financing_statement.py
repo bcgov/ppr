@@ -385,7 +385,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         return statement
 
     @staticmethod
-    def create_from_json(json_data, account_id: str):
+    def create_from_json(json_data, account_id: str, user_id: str = None):
         """Create a financing statement object from a json Financing Statement schema object: map json to db."""
         statement = FinancingStatement()
         statement.state_type = model_utils.STATE_ACTIVE
@@ -407,7 +407,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if 'expiryDate' in json_data and not statement.expire_date:
                 statement.expire_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
 
-        statement.registration = [Registration.create_financing_from_json(json_data, account_id)]
+        statement.registration = [Registration.create_financing_from_json(json_data, account_id, user_id)]
         # statement.registration_num = statement.registration[0].registration_num
         registration_id = statement.registration[0].id
         statement.trust_indenture = TrustIndenture.create_from_json(json_data, registration_id)

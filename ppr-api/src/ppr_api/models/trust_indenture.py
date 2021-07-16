@@ -28,9 +28,12 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     trust_indenture = db.Column('trust_indenture', db.String(1), nullable=False)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False)
-    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
+    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
+                                index=True)
+    financing_id = db.Column('financing_id', db.Integer, db.ForeignKey('financing_statements.id'), nullable=False,
+                             index=True)
+    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True,
+                                    index=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration

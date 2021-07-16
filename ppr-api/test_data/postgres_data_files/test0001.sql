@@ -56,7 +56,7 @@ INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, re
 ;
 INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
-  VALUES(200000001, 'MH', 200000000, 200000000, null, 2001, 'HOMCO IND. LTD DIPLOMAT', null, '9407', '21324', 
-         searchkey_mhr('9407'))
+  VALUES(200000001, 'MH', 200000000, 200000000, null, 2001, 'HOMCO IND. LTD DIPLOMAT', null, '9407', searchkey_mhr('21324'), 
+         searchkey_vehicle('asfsf23429407'))
 ;
 -- TEST0001 end

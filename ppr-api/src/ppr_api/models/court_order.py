@@ -31,7 +31,8 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
     effect_of_order = db.Column('effect_of_order', db.String(512), nullable=True)
 
     # parent keys
-    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False)
+    registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('registrations.id'), nullable=False,
+                                index=True)
 
     # Relationships - Registration
     registration = db.relationship('Registration', foreign_keys=[registration_id],
