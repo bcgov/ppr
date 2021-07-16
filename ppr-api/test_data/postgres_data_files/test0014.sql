@@ -45,8 +45,8 @@ INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, re
 ;
 INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)
-  VALUES(200000019, 'MH', 200000015, 200000008, null, 2012, 'DISCHARGED MH', 'MODEL', 'ZZZZZ999999', '399999',
-        searchkey_mhr('399999'))
+  VALUES(200000019, 'MH', 200000015, 200000008, null, 2012, 'DISCHARGED MH', 'MODEL', 'ZZZZZ999999', searchkey_mhr('399999'),
+        searchkey_vehicle('sdfsfs399999'))
 ;
 INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)

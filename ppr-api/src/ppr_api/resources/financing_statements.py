@@ -646,11 +646,13 @@ class GetRegistrationResource(Resource):
 
 def pay_and_save(request_json, registration_class, financing_statement, registration_num, account_id):
     """Set up the registration, pay if there is an account id, and save the data."""
+    token: dict = g.jwt_oidc_token_info
     registration = Registration.create_from_json(request_json,
                                                  registration_class,
                                                  financing_statement,
                                                  registration_num,
                                                  account_id)
+    registration.user_id = token.get('username', None)
     invoice_id = None
     if account_id:
         fee_code = TransactionTypes.CHANGE.value
@@ -692,7 +694,8 @@ def pay_and_save(request_json, registration_class, financing_statement, registra
 def pay_and_save_financing(request_json, account_id):
     """Set up the financing statement, pay if there is an account id, and save the data."""
     # Charge a fee.
-    statement = FinancingStatement.create_from_json(request_json, account_id)
+    token: dict = g.jwt_oidc_token_info
+    statement = FinancingStatement.create_from_json(request_json, account_id, token.get('username', None))
     invoice_id = None
     if account_id:
         fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value

@@ -30,14 +30,14 @@ ACCOUNT_SEARCH_HISTORY_MAX_SIZE = 1000
 SEARCH_RESULTS_MAX_SIZE = 1000
 
 # Result set size limit clause
-RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST ' + str(SEARCH_RESULTS_MAX_SIZE) + ' ROWS ONLY'
+RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
 
 # Serial number search base where clause
 SERIAL_SEARCH_BASE = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
         sc.serial_type,sc.serial_number,sc.year,sc.make,sc.model,
         r.registration_number AS base_registration_num,
-        CASE WHEN serial_number = '?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+        CASE WHEN serial_number = :query_value THEN 'EXACT' ELSE 'SIMILAR' END match_type,
         fs.expire_date,fs.state_type,sc.id AS vehicle_id, sc.mhr_number
   FROM registrations r, financing_statements fs, serial_collateral sc 
  WHERE r.financing_id = fs.id
@@ -69,32 +69,32 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND r2.registration_number = '?'
+   AND r2.registration_number = :query_value
 """
 
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
 MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type = 'MH' " + \
-     "AND sc.srch_vin = (SELECT searchkey_mhr('?')) " + \
+     "AND sc.mhr_number = (SELECT searchkey_mhr(:query_value)) " + \
 "ORDER BY match_type, r.registration_ts ASC " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type NOT IN ('AC', 'AF', 'AP') " + \
-     "AND sc.srch_vin = (SELECT searchkey_vehicle('?')) " + \
+     "AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value)) " + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
 AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type IN ('AC', 'AF', 'AP') " + \
-     "AND sc.srch_vin = (SELECT searchkey_aircraft('?')) " + \
+     "AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value)) " + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 BUSINESS_NAME_QUERY = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN p.business_name = '?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN p.business_name = :query_bus_name THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
@@ -109,22 +109,16 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND p.business_srch_key = (SELECT searchkey_business_name('?'))
+   AND (SELECT searchkey_business_name(:query_bus_name)) <% p.business_srch_key
+   AND word_similarity(p.business_srch_key, (SELECT searchkey_business_name(:query_bus_name))) >= .60
 ORDER BY match_type, p.business_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
-
-# Replace with POSTGRES algorithm when available
-#    AND UTL_MATCH.JARO_WINKLER_SIMILARITY(p.business_srch_key, searchkey_business_name('?')) >=
-#       NVL((SELECT MAX(JARO_VALUE)
-#              FROM THESAURUS A, JARO  B
-#             WHERE REGEXP_LIKE(searchkey_business_name('?'),WORD,'i')
-#               AND A.WORD_ID = B.WORD_ID), 85)
 
 INDIVIDUAL_NAME_QUERY = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
-       CASE WHEN p.last_name = 'LNAME?' AND p.first_name = 'FNAME?' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN p.last_name = :query_last AND p.first_name = :query_first THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
@@ -139,7 +133,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name('LNAME?', 'FNAME?'))) 
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first))) 
 ORDER BY match_type, p.last_name, p.first_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
@@ -159,15 +153,9 @@ SELECT COUNT(r.id) AS query_count
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND p.business_srch_key = searchkey_business_name('?')
+   AND (SELECT searchkey_business_name(:query_bus_name)) <% p.business_srch_key
+   AND word_similarity(p.business_srch_key, (SELECT searchkey_business_name(:query_bus_name))) >= .60
 """
-
-# Replace in POSTGRES when available
-#   AND UTL_MATCH.JARO_WINKLER_SIMILARITY(p.business_srch_key, searchkey_business_name('?')) >=
-#       NVL((SELECT MAX(JARO_VALUE)
-#              FROM THESAURUS A, JARO  B
-#             WHERE REGEXP_LIKE(searchkey_business_name('?'),WORD,'i')
-#               AND A.WORD_ID = B.WORD_ID), 85)
 
 INDIVIDUAL_NAME_TOTAL_COUNT = """
 SELECT COUNT(r.id) AS query_count
@@ -184,7 +172,7 @@ SELECT COUNT(r.id) AS query_count
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name('LNAME?', 'FNAME?')))
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first)))
 """
 
 SERIAL_SEARCH_COUNT_BASE = """
@@ -205,15 +193,15 @@ SELECT COUNT(r.id) AS query_count
 
 MHR_NUM_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
   " AND sc.serial_type = 'MH' " + \
-   "AND sc.srch_vin = searchkey_mhr('?')"
+   "AND sc.mhr_number = searchkey_mhr(:query_value)"
 
 SERIAL_NUM_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
   " AND sc.serial_type NOT IN ('AC', 'AF') " + \
-   "AND sc.srch_vin = searchkey_vehicle('?')"
+   "AND sc.srch_vin = searchkey_vehicle(:query_value)"
 
 AIRCRAFT_DOT_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
   " AND sc.serial_type IN ('AC', 'AF') " + \
-   "AND sc.srch_vin = searchkey_aircraft('?')"
+   "AND sc.srch_vin = searchkey_aircraft(:query_value)"
 
 COUNT_QUERY_FROM_SEARCH_TYPE = {
     'AC': AIRCRAFT_DOT_TOTAL_COUNT,

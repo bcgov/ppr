@@ -17,7 +17,7 @@
 
 from http import HTTPStatus
 
-from flask import request, current_app, jsonify
+from flask import request, current_app, jsonify, g
 from flask_restx import Namespace, Resource, cors
 
 from registry_schemas import utils as schema_utils
@@ -76,7 +76,8 @@ class SearchResource(Resource):
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
             # Perform any extra data validation such as start and end dates here
             SearchRequest.validate_query(request_json)
-            query = SearchRequest.create_from_json(request_json, account_id)
+            token: dict = g.jwt_oidc_token_info
+            query = SearchRequest.create_from_json(request_json, account_id, token.get('username', None))
 
             # Charge a search fee.
             invoice_id = None

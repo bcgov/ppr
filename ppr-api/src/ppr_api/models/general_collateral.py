@@ -29,10 +29,10 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer,
-                                db.ForeignKey('registrations.id'), nullable=False)
+                                db.ForeignKey('registrations.id'), nullable=False, index=True)
     financing_id = db.Column('financing_id', db.Integer,
-                             db.ForeignKey('financing_statements.id'), nullable=False)
-    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True)
+                             db.ForeignKey('financing_statements.id'), nullable=False, index=True)
+    registration_id_end = db.Column('registration_id_end', db.Integer, nullable=True, index=True)
 #                                db.ForeignKey('registration.registration_id'), nullable=True)
 
     # Relationships - Registration
