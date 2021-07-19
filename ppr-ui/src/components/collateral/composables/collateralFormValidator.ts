@@ -7,19 +7,21 @@ const validationSchema = {
     type: [
       {
         validator: Validators.required.validator,
-        message: 'Type is required'
+        message: 'Type is required',
+        customArgs: { trim: true }
       }
     ],
     model: [
       {
         validator: Validators.required.validator,
-        message: 'Enter the vehicle model'
+        message: 'Enter the vehicle model',
+        customArgs: { trim: true }
       }
     ],
     manufacturedHomeRegistrationNumber: [
       {
         validator: Validators.maxLength.validator,
-        customArgs: { length: 6 },
+        customArgs: { length: 6, trim: true },
         message: 'Manufactured Home Registration Number must contain 6 digits'
       }
     ],
@@ -43,7 +45,8 @@ const validationSchema = {
     make: [
       {
         validator: Validators.required.validator,
-        message: 'Enter the vehicle make'
+        message: 'Enter the vehicle make',
+        customArgs: { trim: true }
       }
     ]
   },
