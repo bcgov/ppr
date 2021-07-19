@@ -246,7 +246,8 @@ tbody {
   opacity: 0.4 !important;
 }
 
-.theme--light.v-btn.v-btn--disabled .v-icon, .theme--light.v-btn.v-btn--disabled .v-btn__loading {
+.theme--light.v-btn.v-btn--disabled .v-icon, .theme--light.v-btn.v-btn--disabled .v-btn__loading,
+.v-list.actions__more-actions.v-list--disabled {
   color: #1669bb !important;
   opacity: 0.4 !important;
 }
@@ -314,6 +315,7 @@ tbody {
   min-width: 20px;
 }
 
-#party-summary .mdi-domain, #party-summary .mdi-account, #party-summary .list-item__title {
+#party-summary .mdi-domain, #party-summary .mdi-account, #party-summary .list-item__title,
+.registering-table item__title {
   color: $gray9 !important;
 }

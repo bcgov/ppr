@@ -169,6 +169,8 @@ export default defineComponent({
     })
 
     const goToAddSecuredParty = () => {
+      localState.searchValue = ''
+      closeAutoComplete()
       context.emit('showSecuredPartyAdd')
     }
 
@@ -187,7 +189,8 @@ export default defineComponent({
         code: party.code,
         businessName: party.businessName,
         emailAddress: party.emailAddress,
-        address: party.address
+        address: party.address,
+        personName: { first: '', middle: '', last: '' }
       }
       currentParties.securedParties.push(newParty)
       setAddSecuredPartiesAndDebtors(currentParties)
