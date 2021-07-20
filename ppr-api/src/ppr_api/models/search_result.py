@@ -188,24 +188,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             if not found:  # No duplicates.
                 financing = FinancingStatement.find_by_registration_number(reg_num, account_id=None, staff=False)
                 financing.mark_update_json = mark_added  # Added for PDF, indicate if party or collateral was added.
-                # Special business rule: if search is by serial number, only include
-                # serial_collateral records where the serial number is an exact match.
-                # Do not include general_collateral records.
+                # Set to true to include change history.
+                financing.include_changes_json = True
                 financing_json = {
                     'matchType': match_type,
                     'financingStatement': financing.json
                 }
-                # Build an array of changes
-                changes = []
-                if financing.registration:
-                    for reg in reversed(financing.registration):
-                        if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
-                            statement_json = reg.json
-                            statement_json['statementType'] = \
-                                model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
-                            changes.append(statement_json)
-                if changes:
-                    financing_json['financingStatement']['changes'] = changes
                 detail_results.append(financing_json)
                 if match_type == model_utils.SEARCH_MATCH_EXACT:
                     search_result.exact_match_count += 1
@@ -225,23 +213,11 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         for result in search_json:
             reg_num = result['baseRegistrationNumber']
             financing = FinancingStatement.find_by_registration_number(reg_num, account_id=None, staff=False)
-            # Special business rule: if search is by serial number, only include
-            # serial_collateral records where the serial number is an exact match.
-            # Do not include general_collateral records.
+            # Set to true to include change history.
+            financing.include_changes_json = True
             financing_json = {
                 'financingStatement': financing.json
             }
-            # Build an array of changes
-            changes = []
-            if financing.registration:
-                for reg in financing.registration:
-                    if reg.registration_num != financing.registration_num:
-                        statement_json = reg.json
-                        statement_json['statementType'] = \
-                            model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
-                        changes.append(statement_json)
-            if changes:
-                financing_json['financingStatement']['changes'] = changes
             detail_results.append(financing_json)
         search.search_response = detail_results
 

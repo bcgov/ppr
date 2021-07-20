@@ -1,71 +1,68 @@
 {
-  "baseRegistrationNumber": "100001B",
-  "clientReferenceId": "T-FS-RL-0002",
-  "createDateTime": "2021-06-11T22:46:30+00:00",
+  "baseRegistrationNumber": "TEST0002", 
+  "clientReferenceId": "TEST-RL-0001", 
+  "createDateTime": "2021-07-15T15:41:58+00:00", 
   "debtors": [
     {
       "address": {
-        "city": "VICTORIA",
-        "country": "CA",
-        "postalCode": "A1A 1A1",
-        "region": "BC",
-        "street": "721 DEBTOR AVE"
-      },
-      "birthDate": "1990-06-15T07:00:00+00:00",
-      "businessName": "MY COMPANY INC",
-      "partyId": 7
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0002", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST BUS 2 DEBTOR", 
+      "partyId": 200000006
     }
-  ],
-  "expiryDate": "2021-12-08T22:46:30+00:00",
-  "generalCollateral": [
-    {
-      "collateralId": 2,
-      "description": "ALL THE DEBTOR'S PRESENT AND AFTER ACQUIRED PERSONAL PROPERTY,INCLUDING BUT NOT RESTRICTED TO MACHINERY, EQUIPMENT, FURNITURE,FIXTURES, INVENTORY AND RECEIVABLES."
-    }
-  ],
-  "lienAmount": "10,000.00",
-  "lifeYears": 1,
-  "payment": {
-    "invoiceId": "10092",
-    "receipt": "/api/v1/payment-requests/10092/receipts"
-  },
+  ], 
+  "expiryDate": "2021-10-13T15:41:58+00:00", 
+  "lienAmount": "2000.00", 
   "registeringParty": {
     "address": {
-      "city": "VICTORIA",
-      "country": "CA",
-      "postalCode": "V8W 2V8",
-      "region": "BC",
-      "street": "222 SUMMER STREET"
-    },
-    "businessName": "ABC SEARCHING COMPANY"
-  },
-  "registrationAct": "REPAIRERS LIEN ACT",
-  "registrationDescription": "REPAIRERS LIEN",
+      "city": "city", 
+      "country": "CA", 
+      "postalCode": "V8R3A5", 
+      "region": "BC", 
+      "street": "TEST-0002", 
+      "streetAdditional": "line 2"
+    }, 
+    "personName": {
+      "first": "TEST", 
+      "last": "REGISTERING", 
+      "middle": "2"
+    }
+  }, 
+  "registrationAct": "REPAIRERS LIEN ACT", 
+  "registrationDescription": "REPAIRERS LIEN", 
   "securedParties": [
     {
       "address": {
-        "city": "SIDNEY",
-        "country": "CA",
-        "postalCode": "V7R 1R7",
-        "region": "BC",
-        "street": "3721 BEACON AVENUE"
-      },
-      "businessName": "BANK OF BRITISH COLUMBIA",
-      "partyId": 6
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST 200000000", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST PARTY CODE 1", 
+      "code": "200000000", 
+      "emailAddress": "test-sp-client@gmail.com", 
+      "partyId": 200000007
     }
-  ],
-  "statusType": "ACT",
-  "surrenderDate": "2021-06-10T07:00:00+00:00",
-  "trustIndenture": false,
-  "type": "RL",
+  ], 
+  "statusType": "ACT", 
+  "surrenderDate": "2021-10-13T15:41:58+00:00", 
+  "trustIndenture": false, 
+  "type": "RL", 
   "vehicleCollateral": [
     {
-      "make": "HYUNDAI",
-      "model": "TUCSON",
-      "serialNumber": "KM8J3CA46JU622994",
-      "type": "MV",
-      "vehicleId": 3,
-      "year": 2018
+      "make": "HYUNDAI", 
+      "model": "TUSCON", 
+      "serialNumber": "KX8J3CA46JU622994", 
+      "type": "MV", 
+      "vehicleId": 200000002, 
+      "year": 2014
     }
   ]
 }

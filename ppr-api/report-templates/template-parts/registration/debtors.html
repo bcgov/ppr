@@ -1,38 +1,11 @@
 <div class="no-page-break">
-    <div class="section-title mt-4">Debtor Information</div>
-{% if debtors is defined and change is not defined %}
-    <table class="section-data section-data-table mt-4" role="presentation">
-    {% for party in debtors %}
-        <tr class="no-page-break">
-            <td class="col-33">
-                <div class="section-sub-title">
-                    {% if party.businessName is defined %}
-                        {{ party.businessName }}
-                    {% elif party.personName is defined %}
-                        {{ party.personName.last }},
-                        {{ party.personName.first }}
-                        {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
-                    {% endif %}
-                </div>
-            </td>
-            <td class="col-33">
-                <div class="section-sub-title">Address</div>
-                <div class="pt-2">{{ party.address.street }}</div>
-                <div>{{ party.address.streetAdditional }}</div>
-                <div>{{ party.address.city }} {{ party.address.region }}</div>
-                <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-            </td>
-            <td class="col-33">
-                <div class="section-sub-title">Birthdate</div>
-                <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
-            </td>
-     </tr>
-    {% endfor %}
-    </table>    
-{% elif change is not defined and (addDebtors is defined or deleteDebtors is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
-    {% if addDebtors is defined %}
-        {% for party in addDebtors %}
+    {% if debtors is defined and change is not defined %}
+        <div class="separator mt-5"></div>
+    {% endif %}
+        <div class="section-title mt-3">Debtor Information</div>
+    {% if debtors is defined and change is not defined %}
+        <table class="section-data section-data-table mt-4" role="presentation">
+        {% for party in debtors %}
             <tr class="no-page-break">
                 <td class="col-33">
                     <div class="section-sub-title">
@@ -44,136 +17,170 @@
                             {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
                         {% endif %}
                     </div>
-                    <div>
-                        <span class="label">
-                            {% if party.name_change is defined %}
-                                Name Changed
-                            {% elif party.address_change is defined %}
-                                Address Changed
-                            {% else %}
-                                Added
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Address</div>
+                    <div class="pt-2">{{ party.address.street }}</div>
+                    <div>{{ party.address.streetAdditional }}</div>
+                    <div>{{ party.address.city }} {{ party.address.region }}</div>
+                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Birthdate</div>
+                    <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
+                </td>
+         </tr>
+        {% endfor %}
+        </table>    
+    {% elif change is not defined and (addDebtors is defined or deleteDebtors is defined) %}
+        <table class="section-data section-data-table mt-4" role="presentation">
+        {% if addDebtors is defined %}
+            {% for party in addDebtors %}
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">
+                            {% if party.businessName is defined %}
+                                {{ party.businessName }}
+                            {% elif party.personName is defined %}
+                                {{ party.personName.last }},
+                                {{ party.personName.first }}
+                                {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
                             {% endif %}
-                        </span>
-                    </div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Address</div>
-                    <div class="pt-2">{{ party.address.street }}</div>
-                    <div>{{ party.address.streetAdditional }}</div>
-                    <div>{{ party.address.city }} {{ party.address.region }}</div>
-                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Birthdate</div>
-                    <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
-                </td>
-            </tr>
-        {% endfor %}
-    {% endif %}
-    {% if deleteDebtors is defined %}
-        {% for party in deleteDebtors %}
-            {% if party.edit is not defined %}
-            <tr class="no-page-break">
-                <td class="col-33">
-                    <div class="section-sub-title">
-                        {% if party.businessName is defined %}
-                            {{ party.businessName }}
-                        {% elif party.personName is defined %}
-                            {{ party.personName.last }},
-                            {{ party.personName.first }}
-                            {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                        </div>
+                        {% if party.former_name is defined and party.former_name != '' %}
+                            <div><span class="section-data-italic">(Formerly&nbsp;{{ party.former_name }})</span></div>
                         {% endif %}
-                    </div>
-                    <div><span class="label">Removed</span></div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Address</div>
-                    <div class="pt-2">{{ party.address.street }}</div>
-                    <div>{{ party.address.streetAdditional }}</div>
-                    <div>{{ party.address.city }} {{ party.address.region }}</div>
-                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Birthdate</div>
-                    <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
-                </td>
-            </tr>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    </table>
-{% elif change is defined and (change.addDebtors is defined or change.deleteDebtors is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
-    {% if change.addDebtors is defined %}
-        {% for party in change.addDebtors %}
-            <tr class="no-page-break">
-                <td class="col-33">
-                    <div class="section-sub-title">
-                        {% if party.businessName is defined %}
-                            {{ party.businessName }}
-                        {% elif party.personName is defined %}
-                            {{ party.personName.last }},
-                            {{ party.personName.first }}
-                            {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
-                        {% endif %}
-                    </div>
-                    <div>
-                        <span class="label">
+                        {% if party.name_change is defined or party.address_change is defined %}
                             {% if party.name_change is defined %}
-                                Name Changed
-                            {% elif party.address_change is defined %}
-                                Address Changed
-                            {% else %}
-                                Added
+                               <div class="pt-1"><span class="label">NAME CHANGED</span></div>
                             {% endif %}
-                        </span>
-                    </div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Address</div>
-                    <div class="pt-2">{{ party.address.street }}</div>
-                    <div>{{ party.address.streetAdditional }}</div>
-                    <div>{{ party.address.city }} {{ party.address.region }}</div>
-                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Birthdate</div>
-                    <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
-                </td>
-            </tr>
-        {% endfor %}
-    {% endif %}
-    {% if change.deleteDebtors is defined %}
-        {% for party in change.deleteDebtors %}
-            {% if party.edit is not defined %}
-            <tr class="no-page-break">
-                <td class="col-33">
-                    <div class="section-sub-title">
-                        {% if party.businessName is defined %}
-                            {{ party.businessName }}
-                        {% elif party.personName is defined %}
-                            {{ party.personName.last }},
-                            {{ party.personName.first }}
-                            {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                            {% if party.address_change is defined %}
+                                <div class="pt-1"><span class="label">ADDRESS CHANGED</span></div>
+                            {% endif %}
+                        {% else %}
+                            <div class="pt-1"><span class="label">ADDED</span></div>
                         {% endif %}
-                    </div>
-                    <div><span class="label">Removed</span></div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Address</div>
-                    <div class="pt-2">{{ party.address.street }}</div>
-                    <div>{{ party.address.streetAdditional }}</div>
-                    <div>{{ party.address.city }} {{ party.address.region }}</div>
-                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Birthdate</div>
-                    <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
-                </td>
-            </tr>
-            {% endif %}
-        {% endfor %}
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ party.address.street }}</div>
+                        <div>{{ party.address.streetAdditional }}</div>
+                        <div>{{ party.address.city }} {{ party.address.region }}</div>
+                        <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Birthdate</div>
+                        <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        {% if deleteDebtors is defined %}
+            {% for party in deleteDebtors %}
+                {% if party.edit is not defined %}
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">
+                            {% if party.businessName is defined %}
+                                {{ party.businessName }}
+                            {% elif party.personName is defined %}
+                                {{ party.personName.last }},
+                                {{ party.personName.first }}
+                                {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                            {% endif %}
+                        </div>
+                        <div><span class="label">REMOVED</span></div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ party.address.street }}</div>
+                        <div>{{ party.address.streetAdditional }}</div>
+                        <div>{{ party.address.city }} {{ party.address.region }}</div>
+                        <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Birthdate</div>
+                        <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        </table>
+    {% elif change is defined and (change.addDebtors is defined or change.deleteDebtors is defined) %}
+        <table class="section-data section-data-table mt-4" role="presentation">
+        {% if change.addDebtors is defined %}
+            {% for party in change.addDebtors %}
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">
+                            {% if party.businessName is defined %}
+                                {{ party.businessName }}
+                            {% elif party.personName is defined %}
+                                {{ party.personName.last }},
+                                {{ party.personName.first }}
+                                {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                            {% endif %}
+                        </div>
+                        {% if party.former_name is defined and party.former_name != '' %}
+                            <div><span class="section-data-italic">(Formerly&nbsp;{{ party.former_name }})</span></div>
+                        {% endif %}
+                        {% if party.name_change is defined or party.address_change is defined %}
+                            {% if party.name_change is defined %}
+                               <div class="pt-1"><span class="label">NAME CHANGED</span></div>
+                            {% endif %}
+                            {% if party.address_change is defined %}
+                                <div class="pt-1"><span class="label">ADDRESS CHANGED</span></div>
+                            {% endif %}
+                        {% else %}
+                            <div class="pt-1"><span class="label">ADDED</span></div>
+                        {% endif %}
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ party.address.street }}</div>
+                        <div>{{ party.address.streetAdditional }}</div>
+                        <div>{{ party.address.city }} {{ party.address.region }}</div>
+                        <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Birthdate</div>
+                        <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        {% if change.deleteDebtors is defined %}
+            {% for party in change.deleteDebtors %}
+                {% if party.edit is not defined %}
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">
+                            {% if party.businessName is defined %}
+                                {{ party.businessName }}
+                            {% elif party.personName is defined %}
+                                {{ party.personName.last }},
+                                {{ party.personName.first }}
+                                {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                            {% endif %}
+                        </div>
+                        <div><span class="label">REMOVED</span></div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ party.address.street }}</div>
+                        <div>{{ party.address.streetAdditional }}</div>
+                        <div>{{ party.address.city }} {{ party.address.region }}</div>
+                        <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Birthdate</div>
+                        <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        </table>
     {% endif %}
-    </table>
-{% endif %}
 </div>

@@ -21,7 +21,7 @@
             [[logo.html]]
           </td>
           <td>
-            <div class="report-type">{{ environment }} {{ meta_title }}</div>
+            <div class="report-type">{{ meta_title }}</div>
             <div class="report-type-desc">BC Registries and Online Services</div>
           </td>
         </tr>
@@ -29,29 +29,39 @@
     </div>
 
     <div class="business-details-container">
-      <div class="financing-type">{{ changeType }}</div>
-        <div class="business-name-header">
-          <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
-            Base Registration Number: {{ baseRegistrationNumber }}
-          </h2>
-        </div>
   
-        <table class="business-details-table" role="presentation">
-            <tr>
-                <td>
-                    <div class="bold pt-2">Registration Date and Time:</div>
-                    <div class="bold pt-2">Registration Number:</div>
-                    <div class="bold pt-2">Details Description:</div>
-                </td>
-                <td>
-                    <div class="pt-2">{{createDateTime}}</div>
-                    <div class="pt-2">{{amendmentRegistrationNumber}}</div>
-                    <div class="pt-2">{{description}}</div>
-                </td>
-            </tr>
-        </table>
+      <div class="business-name-header pt-3">
+        <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
+          Base Registration Number: {{ baseRegistrationNumber }}
+          {% if statusType == 'HDC' %} 
+            <span class="lbl-business-name-gold">DISCHARGED</span>
+          {% elif statusType == 'HEX' %} 
+            <span class="lbl-business-name-gold">EXPIRED</span>
+          {% endif %}
+        </h2>
+      </div>
+
+      <table class="business-details-table-grey" role="presentation">
+        <tr>
+          <td class="section-sub-title">Registration Date and Time:</td>
+          <td>{{createDateTime}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Registration Number:</td>
+            <td>{{amendmentRegistrationNumber}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Description:</td>
+            <td>{{description}}</td>
+        </tr>
+      </table>          
+    </div>      
+  
+    <div class="container pt-4">
+      <div class="statement-title">{{changeType}}</div>
+      <div class="separator-statement mt-1"></div>
     </div>
- 
+
     {% if courtOrderInformation is defined %}
         <div class="container pt-4">
             [[registration/courtOrderInformation.html]]

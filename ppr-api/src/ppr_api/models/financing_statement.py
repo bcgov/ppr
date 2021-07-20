@@ -84,6 +84,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     mark_update_json = False
     # Use to specify if generated json content is current state or original financing statement.
     current_view_json = True
+    # Use to include/exclude all change statement data in the financing statement json.
+    include_changes_json = False
 
     @property
     def json(self) -> dict:
@@ -161,7 +163,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
     def set_changes_json(self, statement):
         """Add history of changes in reverse chronological order to financing statement json."""
-        if self.registration and len(self.registration) > 1:
+        if self.include_changes_json and self.registration and len(self.registration) > 1:
             changes = []
             for reg in reversed(self.registration):
                 if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):

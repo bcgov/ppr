@@ -1,50 +1,38 @@
 <div class="container pt-4 no-page-break">
 
-    <div class="section-title mt-4">Renewal</div>
-
-    <table class="business-details-table" role="presentation">
+    <div class="statement-title">RENEWAL</div>
+    <div class="separator-statement mt-1"></div>
+    <table class="no-page-break section-data statement-table mt-4" role="presentation">
         <tr>
-            <td>
-                <div class="bold pt-2">Registration Date and Time:</div>
-                <div class="bold pt-2">Registration Number:</div>
-                <div class="bold pt-2">Registration Life:</div>
-                <div class="bold pt-2">New Expiration Date and Time:</div>
-            </td>
-            <td>
-                <div class="pt-2">{{change.createDateTime}}</div>
-                <div class="pt-2">{{change.renewalRegistrationNumber}}</div>
-                <div class="pt-2">
-                    {% if change.lifeInfinite is defined and change.lifeInfinite %}
-                        Infinite
-                    {% elif change.lifeYears is defined %}
-                        {{change.lifeYears}} {% if change.lifeYears > 1 %} Years {% else %} Year {% endif %}
-                    {% endif %}
-                </div>
-                <div class="pt-2">
-                    {% if change.lifeInfinite is defined and change.lifeInfinite %}
-                        Never
-                    {% else %}
-                        {{change.expiryDate}}
-                    {% endif %}
-                </div>
-           </td>
+            <td class="section-sub-title">Registration Date and Time:</td>
+            <td>{{change.createDateTime}}</td>
         </tr>
         <tr>
-            <td colspan="2" style="height:5px"></td>
+            <td class="section-sub-title">Registration Number:</td>
+            <td>{{change.renewalRegistrationNumber}}</td>
         </tr>
         <tr>
+            <td class="section-sub-title">Registration Life:</td>
             <td>
-                <div class="bold pt-2">Base Registration Type:</div>
-                <div class="bold pt-2">Base Registration Number:</div>
-                <div class="bold pt-2">Base Registration Date and Time:</div>
+                {% if change.lifeInfinite is defined and change.lifeInfinite %}
+                    Infinite
+                {% elif change.lifeYears is defined %}
+                    {{change.lifeYears}} {% if change.lifeYears != 1 %} Years {% else %} Year {% endif %}
+                {% endif %}
             </td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">New Expiration Date and Time:</td>
             <td>
-                <div class="pt-2">{{detail.financingStatement.registrationDescription}}</div>
-                <div class="pt-2">{{ detail.financingStatement.baseRegistrationNumber }}</div>
-                <div class="pt-2">{{detail.financingStatement.createDateTime}}</div>
+                {% if change.lifeInfinite is defined and change.lifeInfinite %}
+                    Never
+                {% else %}
+                    {{change.expiryDate}}
+                {% endif %}
             </td>
         </tr>
     </table>
+
 </div>
 
 {% if change.courtOrderInformation is defined %}

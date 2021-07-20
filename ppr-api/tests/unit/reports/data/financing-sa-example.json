@@ -1,256 +1,113 @@
 {
-  "baseRegistrationNumber": "100098B", 
-  "changes": [
-    {
-      "baseRegistrationNumber": "100098B", 
-      "clientReferenceId": "T-DS-0098-1", 
-      "createDateTime": "2021-06-02T21:39:47+00:00", 
-      "dischargeRegistrationNumber": "100124B", 
-      "registeringParty": {
-        "address": {
-          "city": "VICTORIA", 
-          "country": "CA", 
-          "postalCode": "V8V 4V6", 
-          "region": "BC", 
-          "street": "222 SUMMER STREET"
-        }, 
-        "businessName": "ABC SEARCHING COMPANY"
-      }, 
-      "statementType": "DISCHARGE_STATEMENT"
-    }, 
-    {
-      "addVehicleCollateral": [
-        {
-          "make": "BMW", 
-          "model": "i3", 
-          "serialNumber": "BMWKK21F81F233350", 
-          "type": "MV", 
-          "vehicleId": 89, 
-          "year": 2019
-        }
-      ], 
-      "amendmentRegistrationNumber": "100123B", 
-      "baseRegistrationNumber": "100098B", 
-      "changeType": "AM", 
-      "clientReferenceId": "T-AS-AM-0098-1", 
-      "createDateTime": "2021-06-02T21:37:00+00:00", 
-      "description": "Add vehicle collateral.", 
-      "registeringParty": {
-        "address": {
-          "city": "VICTORIA", 
-          "country": "CA", 
-          "postalCode": "V8W 2V8", 
-          "region": "BC", 
-          "street": "222 SUMMER STREET"
-        }, 
-        "businessName": "ABC SEARCHING COMPANY"
-      }, 
-      "statementType": "AMENDMENT_STATEMENT"
-    }, 
-    {
-      "addDebtors": [
-        {
-          "address": {
-            "city": "VICTORIA", 
-            "country": "CA", 
-            "postalCode": "V8S 3J5", 
-            "region": "BC", 
-            "street": "1234 BLANSHARD ST"
-          }, 
-          "businessName": "BROWNING WINDOW CLEANING INC.", 
-          "partyId": 267
-        }
-      ], 
-      "baseRegistrationNumber": "100098B", 
-      "changeRegistrationNumber": "100122B", 
-      "changeType": "DT", 
-      "clientReferenceId": "T-CS-DT-0098-1", 
-      "createDateTime": "2021-06-02T20:40:41+00:00", 
-      "deleteDebtors": [
-        {
-          "address": {
-            "city": "VICTORIA", 
-            "country": "CA", 
-            "postalCode": "V8S 2V4", 
-            "region": "BC", 
-            "street": "520 JOHNSON ST"
-          }, 
-          "birthDate": "1986-12-02T03:20:20+00:00", 
-          "partyId": 219, 
-          "personName": {
-            "first": "MICHAEL", 
-            "last": "SMITH", 
-            "middle": "J"
-          }
-        }
-      ], 
-      "registeringParty": {
-        "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST 200000000", 
-          "streetAdditional": "line 2"
-        }, 
-        "businessName": "TEST PARTY CODE 1", 
-        "code": "200000000", 
-        "emailAddress": "test-sp-client@gmail.com"
-      }, 
-      "statementType": "CHANGE_STATEMENT"
-    }, 
-    {
-      "addVehicleCollateral": [
-        {
-          "make": "Honda", 
-          "model": "Accord", 
-          "serialNumber": "RVBKK21F81F9300350", 
-          "type": "MV", 
-          "vehicleId": 88, 
-          "year": 2019
-        }
-      ], 
-      "baseRegistrationNumber": "100098B", 
-      "changeRegistrationNumber": "100121B", 
-      "changeType": "AC", 
-      "clientReferenceId": "T-CS-AC-0098-1", 
-      "createDateTime": "2021-06-02T20:35:53+00:00", 
-      "registeringParty": {
-        "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST 200000000", 
-          "streetAdditional": "line 2"
-        }, 
-        "businessName": "TEST PARTY CODE 1", 
-        "code": "200000000", 
-        "emailAddress": "test-sp-client@gmail.com"
-      }, 
-      "statementType": "CHANGE_STATEMENT"
-    }, 
-    {
-      "baseRegistrationNumber": "100098B", 
-      "clientReferenceId": "T-RS-SA-0098-1", 
-      "createDateTime": "2021-06-02T17:44:40+00:00", 
-      "expiryDate": "2026-06-02T23:59:59+00:00", 
-      "lifeYears": 5, 
-      "registeringParty": {
-        "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST 200000000", 
-          "streetAdditional": "line 2"
-        }, 
-        "businessName": "TEST PARTY CODE 1", 
-        "code": "200000000", 
-        "emailAddress": "test-sp-client@gmail.com"
-      }, 
-      "renewalRegistrationNumber": "100120B", 
-      "statementType": "RENEWAL_STATEMENT"
-    }
-  ], 
-  "clientReferenceId": "T-API-DL-001", 
-  "createDateTime": "2021-06-01T19:12:50+00:00", 
+  "baseRegistrationNumber": "TEST0001", 
+  "clientReferenceId": "TEST-SA-0001", 
+  "createDateTime": "2021-07-15T15:41:58+00:00", 
   "debtors": [
     {
       "address": {
-        "city": "VICTORIA", 
+        "city": "city", 
         "country": "CA", 
-        "postalCode": "A1A 1A1", 
+        "postalCode": "V8R3A5", 
         "region": "BC", 
-        "street": "721 DEBTOR AVE"
+        "street": "TEST-0001", 
+        "streetAdditional": "line 2"
       }, 
-      "businessName": "MY COMPANY INC", 
-      "partyId": 218
+      "partyId": 200000001, 
+      "personName": {
+        "first": "TEST IND", 
+        "last": "DEBTOR", 
+        "middle": "1"
+      }
     }, 
     {
       "address": {
-        "city": "VICTORIA", 
+        "city": "city", 
         "country": "CA", 
-        "postalCode": "V8S 3J5", 
+        "postalCode": "V8R3A5", 
         "region": "BC", 
-        "street": "1234 BLANSHARD ST"
+        "street": "TEST-0001", 
+        "streetAdditional": "line 2"
       }, 
-      "businessName": "BROWNING WINDOW CLEANING INC.", 
-      "partyId": 267
+      "businessName": "TEST BUS 2 DEBTOR", 
+      "partyId": 200000002
     }
   ], 
-  "dischargedDateTime": "2021-06-02T21:39:47+00:00", 
-  "expiryDate": "2026-06-02T23:59:59+00:00", 
+  "expiryDate": "2023-07-15T15:41:58+00:00", 
   "generalCollateral": [
     {
-      "collateralId": 47, 
-      "description": "1972 White Fender Stratocaster Guitar serial number 1234."
+      "collateralId": 200000000, 
+      "description": "TEST0001 GC 1"
+    }, 
+    {
+      "collateralId": 200000001, 
+      "description": "TEST0001 GC 2"
     }
   ], 
-  "lifeYears": 5, 
+  "lifeYears": 2, 
   "registeringParty": {
     "address": {
       "city": "city", 
       "country": "CA", 
       "postalCode": "V8R3A5", 
       "region": "BC", 
-      "street": "TEST 200000001", 
+      "street": "TEST-0001", 
       "streetAdditional": "line 2"
     }, 
-    "businessName": "TEST PARTY CODE 2", 
-    "code": "200000001", 
-    "emailAddress": "test-rp-client@gmail.com"
+    "personName": {
+      "first": "TEST", 
+      "last": "REGISTERING", 
+      "middle": "1"
+    }
   }, 
   "registrationAct": "PPSA SECURITY ACT", 
   "registrationDescription": "PPSA SECURITY AGREEMENT", 
   "securedParties": [
     {
       "address": {
-        "city": "SIDNEY", 
+        "city": "city", 
         "country": "CA", 
-        "postalCode": "V7R 1R7", 
+        "postalCode": "V8R3A5", 
         "region": "BC", 
-        "street": "3721 BEACON AVENUE"
+        "street": "TEST-0001", 
+        "streetAdditional": "line 2"
       }, 
-      "businessName": "BANK OF BRITISH COLUMBIA", 
-      "partyId": 217
+      "businessName": "TEST 1 SECURED PARTY", 
+      "partyId": 200000003
+    }, 
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST 200000000", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST PARTY CODE 1", 
+      "code": "200000000", 
+      "emailAddress": "test-sp-client@gmail.com", 
+      "partyId": 200000004
     }
   ], 
-  "statusType": "HDC", 
-  "trustIndenture": false, 
+  "statusType": "ACT", 
+  "trustIndenture": true, 
   "type": "SA", 
   "vehicleCollateral": [
     {
-      "make": "JAGUAR", 
-      "model": "F-TYPE", 
-      "serialNumber": "XKFJ3CA46JU900994", 
+      "make": "HYUNDAI", 
+      "model": "TUSCON", 
+      "serialNumber": "KM8J3CA46JU622994", 
       "type": "MV", 
-      "vehicleId": 71, 
-      "year": 2017
+      "vehicleId": 200000000, 
+      "year": 2018
     }, 
     {
-      "make": "JAGUAR", 
-      "model": "E-TYPE", 
-      "serialNumber": "XKEJ3CA46JU900994", 
-      "type": "MV", 
-      "vehicleId": 72, 
-      "year": 1966
-    }, 
-    {
-      "make": "Honda", 
-      "model": "Accord", 
-      "serialNumber": "RVBKK21F81F9300350", 
-      "type": "MV", 
-      "vehicleId": 88, 
-      "year": 2019
-    }, 
-    {
-      "make": "BMW", 
-      "model": "i3", 
-      "serialNumber": "BMWKK21F81F233350", 
-      "type": "MV", 
-      "vehicleId": 89, 
-      "year": 2019
+      "make": "HOMCO IND. LTD DIPLOMAT", 
+      "manufacturedHomeRegistrationNumber": "021324", 
+      "serialNumber": "9407", 
+      "type": "MH", 
+      "vehicleId": 200000001, 
+      "year": 2001
     }
   ]
 }

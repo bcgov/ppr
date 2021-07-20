@@ -1,32 +1,16 @@
 <div class="container pt-4 no-page-break">
 
-    <div class="section-title mt-4">{{change.changeType}}</div>
+    <div class="statement-title">{{change.changeType}}</div>
+    <div class="separator-statement mt-1"></div>
 
-    <table class="business-details-table" role="presentation">
+    <table class="no-page-break section-data statement-table mt-4" role="presentation">
         <tr>
-            <td>
-                <div class="bold pt-2">Registration Date and Time:</div>
-                <div class="bold pt-2">Registration Number:</div>
-            </td>
-            <td>
-                <div class="pt-2">{{change.createDateTime}}</div>
-                <div class="pt-2">{{change.changeRegistrationNumber}}</div>
-            </td>
+            <td class="section-sub-title">Registration Date and Time:</td>
+            <td>{{change.createDateTime}}</td>
         </tr>
         <tr>
-            <td colspan="2" style="height:5px"></td>
-        </tr>
-        <tr>
-            <td>
-                <div class="bold pt-2">Base Registration Type:</div>
-                <div class="bold pt-2">Base Registration Number:</div>
-                <div class="bold pt-2">Base Registration Date and Time:</div>
-            </td>
-            <td>
-                <div class="pt-2">{{detail.financingStatement.registrationDescription}}</div>
-                <div class="pt-2">{{ change.baseRegistrationNumber }}</div>
-                <div class="pt-2">{{detail.financingStatement.createDateTime}}</div>
-            </td>
+            <td class="section-sub-title">Registration Number:</td>
+            <td>{{change.changeRegistrationNumber}}</td>
         </tr>
     </table>
 </div>
@@ -66,9 +50,11 @@
 
 {% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined or
     change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
-    <div class="section-sub-title">Other vehicle or general collateral/proceeds description exists on this registration.  
+<div class="container pt-4">
+    <div class="section-data">Other vehicle or general collateral/proceeds description exists on this registration.  
         To obtain complete details, it will be necessary to request a registration number search.
-    </div>    
+    </div>
+</div>
 {% endif %}
 
 <div class="container pt-4">

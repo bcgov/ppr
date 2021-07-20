@@ -21,7 +21,7 @@
             [[logo.html]]
           </td>
           <td>
-            <div class="report-type">{{ environment }} {{ meta_title }}</div>
+            <div class="report-type">{{ meta_title }}</div>
             <div class="report-type-desc">BC Registries and Online Services</div>
           </td>
         </tr>
@@ -29,54 +29,54 @@
     </div>
 
     <div class="business-details-container">
-        <div class="business-name-header">
-          <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
-            Base Registration Number: {{ baseRegistrationNumber }}
-          </h2>
-        </div>
+      <div class="business-name-header pt-3">
+        <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
+          Base Registration Number: {{ baseRegistrationNumber }}
+          {% if statusType == 'HDC' %} 
+            <span class="lbl-business-name-gold">DISCHARGED</span>
+          {% elif statusType == 'HEX' %} 
+            <span class="lbl-business-name-gold">EXPIRED</span>
+          {% endif %}
+        </h2>
+      </div>
+
+      <table class="business-details-table-grey" role="presentation">
+        <tr>
+          <td>Registration Date and Time:</td>
+          <td>{{createDateTime}}</td>
+        </tr>
+        <tr>
+          <td>Registration Number:</td>
+          <td>{{renewalRegistrationNumber}}</td>
+        </tr>
+        <tr>
+          <td class="section-sub-title">Registration Life:</td>
+          <td>
+              {% if lifeInfinite is defined and lifeInfinite %}
+                  Infinite
+              {% elif lifeYears is defined %}
+                  {{lifeYears}} {% if lifeYears != 1 %} Years {% else %} Year {% endif %}
+              {% endif %}
+          </td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">New Expiration Date and Time:</td>
+            <td>
+                {% if lifeInfinite is defined and lifeInfinite %}
+                    Never
+                {% else %}
+                    {{expiryDate}}
+                {% endif %}
+            </td>
+        </tr>
+      </table>          
+    </div>      
   
-        <table class="business-details-table" role="presentation">
-            <tr>
-                <td>
-                    <div class="bold pt-2">Registration Date and Time:</div>
-                    <div class="bold pt-2">Registration Number:</div>
-                    <div class="bold pt-2">Registration Life:</div>
-                    <div class="bold pt-2">New Expiration Date and Time:</div>
-                </td>
-                <td>
-                    <div class="pt-2">{{createDateTime}}</div>
-                    <div class="pt-2">{{renewalRegistrationNumber}}</div>
-                    <div class="pt-2">
-                        {% if lifeInfinite is defined and lifeInfinite %}
-                            Infinite
-                        {% elif lifeYears is defined %}
-                            {{lifeYears}} {% if lifeYears > 1 %} Years {% else %} Year {% endif %}
-                        {% endif %}
-                    </div>
-                    <div class="pt-2">
-                        {% if lifeInfinite is defined and lifeInfinite %}
-                            Never
-                        {% else %}
-                            {{expiryDate}}
-                        {% endif %}
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-    
-    {% if courtOrderInformation is defined %}
     <div class="container pt-4">
-    
+      {% if courtOrderInformation is defined %}
         [[registration/courtOrderInformation.html]]
-    
-    </div>
-    {% endif %}
-    
-    <div class="container pt-4">
-    
+      {% endif %}  
       [[registration/registeringParty.html]]
-    
     </div>
     
   </body>

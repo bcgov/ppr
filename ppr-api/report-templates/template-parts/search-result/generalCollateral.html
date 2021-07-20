@@ -1,13 +1,14 @@
 <div class="no-page-break">
-   <div class="section-title mt-4">General Collateral</div>
+   {% if detail.financingStatement.generalCollateral is defined and change is not defined %}
+      <div class="separator mt-5"></div>
+   {% endif %}
+   <div class="section-title mt-3">General Collateral</div>
 
 {% if detail.financingStatement.generalCollateral is defined and change is not defined %}
    <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in detail.financingStatement.generalCollateral %}
          <tr class="no-page-break">
-            <td class="col-50">
-               <div class="section-data">{{ collateral.description }}</div>
-            </td>
+            <td class="section-data">{{ collateral.description }}</td>
          </tr>
       {% endfor %}
    </table>
@@ -17,8 +18,8 @@
       {% for collateral in change.addGeneralCollateral %}
       <tr class="no-page-break">
             <td>
-               <div><span class="label">Added</span></div>
-               <div class="section-data">{{ collateral.description }}</div>
+               <div><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+               <div class="section-data pt-3">{{ collateral.description }}</div>
             </td>
          </tr>
       {% endfor %}
@@ -27,17 +28,19 @@
    {% if change.deleteGeneralCollateral is defined %}
    <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in change.deleteGeneralCollateral %}
+         {% if collateral.edit is not defined %}
          <tr class="no-page-break">
             <td>
-               <span class="label">Removed</span>
-               <div class="section-data">{{ collateral.description }}</div>
+               <span class="label">REMOVED</span>
+               <div class="section-data pt-3">{{ collateral.description }}</div>
             </td>
          </tr>
+         {% endif %}
       {% endfor %}
    </table>
    {% endif %}
 {% else %}
-   <div class="title">None.</div>
+   <div class="section-data">None.</div>
 {% endif %}
 
 </div>

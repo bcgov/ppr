@@ -1,0 +1,30 @@
+{
+  "baseRegistrationNumber": "TEST0002", 
+  "clientReferenceId": "TEST-REN-0006", 
+  "courtOrderInformation": {
+    "courtName": "Supreme Court of British Columbia", 
+    "courtRegistry": "Victoria", 
+    "effectOfOrder": "Court Order to renew Repairer's Lien.", 
+    "fileNumber": "BC123495", 
+    "orderDate": "2022-01-31T15:41:58+00:00"
+  }, 
+  "createDateTime": "2021-07-15T15:46:58+00:00", 
+  "expiryDate": "2021-10-13T15:41:58+00:00", 
+  "lifeYears": 0, 
+  "registeringParty": {
+    "address": {
+      "city": "city", 
+      "country": "CA", 
+      "postalCode": "V8R3A5", 
+      "region": "BC", 
+      "street": "TEST-00R6", 
+      "streetAdditional": "line 2"
+    }, 
+    "personName": {
+      "first": "TEST-RENEWAL-RL", 
+      "last": "REGISTERING", 
+      "middle": "6"
+    }
+  }, 
+  "renewalRegistrationNumber": "TEST00R6"
+}

@@ -2,18 +2,19 @@
   "addVehicleCollateral": [
     {
       "make": "Honda", 
-      "model": "Accord EX", 
-      "serialNumber": "RVBKK21F81F9301351", 
+      "model": "Accord", 
+      "reg_id": 203, 
+      "serialNumber": "RVBKK21F81F9300350", 
       "type": "MV", 
-      "vehicleId": 120, 
+      "vehicleId": 117, 
       "year": 2019
     }
   ], 
-  "baseRegistrationNumber": "100208B", 
-  "changeRegistrationNumber": "100210B", 
+  "baseRegistrationNumber": "100195B", 
+  "changeRegistrationNumber": "100202B", 
   "changeType": "AC", 
-  "clientReferenceId": "T-CS-AC-0208-1", 
-  "createDateTime": "2021-06-11T23:18:48+00:00", 
+  "clientReferenceId": "T-CS-AC-0095-1", 
+  "createDateTime": "2021-06-07T17:53:41+00:00", 
   "registeringParty": {
     "address": {
       "city": "VICTORIA", 

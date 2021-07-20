@@ -27,6 +27,7 @@ FINANCING_SA_DATAFILE = 'tests/unit/reports/data/financing-sa-example.json'
 FINANCING_RL_DATAFILE = 'tests/unit/reports/data/financing-rl-example.json'
 FINANCING_NO_CHANGE_DATAFILE = 'tests/unit/reports/data/financing-sa-no-changes-example.json'
 RENEWAL_DATAFILE = 'tests/unit/reports/data/renewal-example.json'
+RENEWAL_RL_DATAFILE = 'tests/unit/reports/data/renewal-rl-example.json'
 CHANGE_DT_DATAFILE = 'tests/unit/reports/data/change-dt-example.json'
 CHANGE_AC_DATAFILE = 'tests/unit/reports/data/change-ac-example.json'
 AMENDMENT_DATAFILE = 'tests/unit/reports/data/amendment-example.json'
@@ -38,6 +39,7 @@ TEST_REPORT_DATA = [
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, FINANCING_SA_DATAFILE),
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, FINANCING_NO_CHANGE_DATAFILE),
     (ReportTypes.RENEWAL_STATEMENT_REPORT.value, RENEWAL_DATAFILE),
+    (ReportTypes.RENEWAL_STATEMENT_REPORT.value, RENEWAL_RL_DATAFILE),
     (ReportTypes.AMENDMENT_STATEMENT_REPORT.value, AMENDMENT_DATAFILE),
     (ReportTypes.AMENDMENT_STATEMENT_REPORT.value, AMENDMENT_CO_DATAFILE),
     (ReportTypes.CHANGE_STATEMENT_REPORT.value, CHANGE_AC_DATAFILE),

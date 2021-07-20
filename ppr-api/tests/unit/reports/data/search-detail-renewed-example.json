@@ -7,8 +7,9 @@
           {
             "baseRegistrationNumber": "TEST0005", 
             "clientReferenceId": "TEST-REN-0005", 
-            "createDateTime": "2021-03-16T15:39:38+00:00", 
-            "expiryDate": "2023-03-16T15:34:38+00:00", 
+            "createDateTime": "2021-07-15T15:46:58+00:00", 
+            "expiryDate": "2023-07-15T15:41:58+00:00", 
+            "lifeYears": 2, 
             "registeringParty": {
               "address": {
                 "city": "city", 
@@ -29,7 +30,7 @@
           }
         ], 
         "clientReferenceId": "TEST-SA-0005", 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "createDateTime": "2021-07-15T15:41:58+00:00", 
         "debtors": [
           {
             "address": {
@@ -48,7 +49,7 @@
             }
           }
         ], 
-        "expiryDate": "2023-03-16T15:34:38+00:00", 
+        "expiryDate": "2023-07-15T15:41:58+00:00", 
         "lifeYears": 2, 
         "registeringParty": {
           "address": {
@@ -100,10 +101,10 @@
   ], 
   "exactResultsSize": 1, 
   "payment": {
-    "invoiceId": "1000001", 
-    "receipt": "/api/v1/payment-requests/1000001/receipts"
+    "invoiceId": "10757", 
+    "receipt": "/api/v1/payment-requests/10757/receipts"
   }, 
-  "searchDateTime": "2021-03-25T15:48:28+00:00", 
+  "searchDateTime": "2021-07-20T16:16:37+00:00", 
   "searchQuery": {
     "clientReferenceId": "T-S-RN-005D", 
     "criteria": {

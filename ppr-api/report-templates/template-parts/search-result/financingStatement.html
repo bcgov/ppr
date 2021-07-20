@@ -1,10 +1,11 @@
+
 <div class="business-details-container">
   <div class="financing-type">{{ detail.financingStatement.registrationDescription }}</div>
   <div class="financing-act">{{ detail.financingStatement.registrationAct }}</div>
 {#
   <div class="business-name-header" id="{{ detail.financingStatement.baseRegistrationNumber }}">
 #}
-  <div class="business-name-header">
+  <div class="business-name-header pt-3">
     <h2 id="{{ detail.financingStatement.baseRegistrationNumber }}" class="lbl-business-name">
       Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}
       {% if detail.financingStatement.statusType == 'HDC' %} 
@@ -14,44 +15,65 @@
       {% endif %}
     </h2>
   </div>
-  <table class="business-details-table" role="presentation">
+  <table class="business-details-table-grey" role="presentation">
     <tr>
+      <td>Base Registration Date and Time:</td>
+      <td>{{detail.financingStatement.createDateTime}}}</td>
+    </tr>
+    {% if detail.financingStatement.dischargedDateTime is defined %}
+    <tr>
+      <td>Discharge Date and Time:</td>
+      <td>{{detail.financingStatement.dischargedDateTime}}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td>Current Expiry Date and Time:</td>
       <td>
-        <div class="bold pt-2">Base Registration Date and Time:</div>
-        {% if detail.financingStatement.dischargedDateTime is defined %}
-          <div class="bold pt-2">Discharge Date and Time:</div>
+        {% if detail.financingStatement.lifeInfinite is defined and detail.financingStatement.lifeInfinite %} 
+          Never
+        {% else %}
+          {{detail.financingStatement.expiryDate}}
+          {% if detail.financingStatement.statusType == 'HEX' %} 
+            <span style="color: #d3272c">(Expired)</span>
+          {% endif %}
+          <br/>
+          <span class="business-details-note pt-2">Expiry date includes subsequent registered renewal(s)</span>  
         {% endif %}
-        <div class="bold pt-2">Current Expiry Date and Time:</div>
-      </td>
-      <td>
-        <div class="pt-2">{{detail.financingStatement.createDateTime}}</div>
-        {% if detail.financingStatement.dischargedDateTime is defined %}
-          <div class="pt-2">{{detail.financingStatement.dischargedDateTime}}</div>
-        {% endif %}
-        <div class="pt-2">{% if lifeInfinite is defined and lifeInfinite %} 
-                            Never
-                          {% else %}
-                            {{detail.financingStatement.expiryDate}}
-                          {% endif %}</div>
-        <div class="business-details-note pt-2">Expiry date includes subsequent registered renewal(s)</div>
       </td>
     </tr>
+    {% if detail.financingStatement.type == 'RL' %}
+    <tr>
+      <td>Surrender Date:</td>
+      <td>{{detail.financingStatement.surrenderDate}}</td>
+    </tr>
+    <tr>
+      <td>Lien Amount:</td>
+      <td>{{detail.financingStatement.lienAmount}}</td>
+    </tr>
+    {% endif %}
+    {% if detail.financingStatement.type == 'SA' %}
+    <tr>
+      <td>Trust Indenture:</td>
+      <td>{% if detail.financingStatement.trustIndenture == true %}Yes{% else %}No{% endif %}</td>
+    </tr>
+    {% endif %}
   </table>
 </div>
-  
-<div class="container pt-4">
-  <div class="no-page-break">
-    <div class="separator mt-4"></div>
-    <div class="section-statement mt-4">Current Registration Information as of {{searchDateTime}}</div>
-    <div class="separator mt-4"></div>
-  </div>
 
+<div class="no-page-break">
+  <div class="separator-header mt-4"></div>
+  <div class="section-title-centre mt-4">Current Registration Information</div>
+  <div class="section-statement">(as of {{searchDateTime}})</div>
+  <div class="separator-header mt-4"></div>
+</div>
+
+<div class="container pt-4">
   [[search-result/securedParties.html]]
   [[search-result/debtors.html]]
-  [[search-result/registeringParty.html]]
   [[search-result/vehicleCollateral.html]]
   [[search-result/generalCollateral.html]]
   {% if detail.financingStatement.courtOrderInformation is defined %}
     [[search-result/courtOrderInformation.html]]
   {% endif %}
+  [[search-result/registeringParty.html]]
 </div>

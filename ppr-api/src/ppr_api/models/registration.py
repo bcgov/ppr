@@ -144,9 +144,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             for party in self.parties:
                 if party.party_type in (model_utils.PARTY_DEBTOR_BUS, model_utils.PARTY_DEBTOR_IND) and \
                         party.registration_id == registration_id:
-                    debtors.append(party.json)
+                    party_json = party.json
+                    party_json['reg_id'] = party.registration_id
+                    party_json['former_name'] = self.get_former_party_name(party)
+                    debtors.append(party_json)
                 elif party.party_type == model_utils.PARTY_SECURED and party.registration_id == registration_id:
-                    secured.append(party.json)
+                    party_json = party.json
+                    party_json['reg_id'] = party.registration_id
+                    party_json['former_name'] = self.get_former_party_name(party)
+                    secured.append(party_json)
 
             if debtors:
                 registration['addDebtors'] = debtors
@@ -163,9 +169,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             for party in self.financing_statement.parties:
                 if party.party_type in (model_utils.PARTY_DEBTOR_BUS, model_utils.PARTY_DEBTOR_IND) and \
                         party.registration_id_end == registration_id:
-                    debtors.append(party.json)
+                    party_json = party.json
+                    party_json['reg_id'] = party.registration_id_end
+                    debtors.append(party_json)
                 elif party.party_type == model_utils.PARTY_SECURED and party.registration_id_end == registration_id:
-                    secured.append(party.json)
+                    party_json = party.json
+                    party_json['reg_id'] = party.registration_id_end
+                    secured.append(party_json)
 
             if debtors:
                 registration['deleteDebtors'] = debtors
@@ -180,7 +190,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             collateral = []
             for gen_c in self.general_collateral:
                 if gen_c.registration_id == registration_id:
-                    collateral.append(gen_c.json)
+                    collateral_json = gen_c.json
+                    collateral_json['reg_id'] = registration_id
+                    collateral.append(collateral_json)
             if collateral:
                 registration['addGeneralCollateral'] = collateral
 
@@ -192,7 +204,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             collateral = []
             for gen_c in self.financing_statement.general_collateral:
                 if gen_c.registration_id_end == registration_id:
-                    collateral.append(gen_c.json)
+                    collateral_json = gen_c.json
+                    collateral_json['reg_id'] = registration_id
+                    collateral.append(collateral_json)
             if collateral:
                 registration['deleteGeneralCollateral'] = collateral
 
@@ -204,7 +218,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             collateral = []
             for vehicle_c in self.vehicle_collateral:
                 if vehicle_c.registration_id == registration_id:
-                    collateral.append(vehicle_c.json)
+                    collateral_json = vehicle_c.json
+                    collateral_json['reg_id'] = registration_id
+                    collateral.append(collateral_json)
             if collateral:
                 registration['addVehicleCollateral'] = collateral
 
@@ -216,7 +232,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             collateral = []
             for vehicle_c in self.financing_statement.vehicle_collateral:
                 if vehicle_c.registration_id_end == registration_id:
-                    collateral.append(vehicle_c.json)
+                    collateral_json = vehicle_c.json
+                    collateral_json['reg_id'] = registration_id
+                    collateral.append(collateral_json)
             if collateral:
                 registration['deleteVehicleCollateral'] = collateral
 
@@ -588,3 +606,18 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if g_collateral.id == collateral_id and not g_collateral.registration_id_end:
                     collateral = g_collateral
         return collateral
+
+    def get_former_party_name(self, new_party: Party):
+        """Search parties for a party former name."""
+        former_name = ''
+        for party in self.financing_statement.parties:
+            if new_party.party_type == party.party_type and new_party.registration_id == party.registration_id_end:
+                if party.client_code and party.client_code.name:
+                    former_name = party.client_code.name
+                elif party.business_name:
+                    former_name = party.business_name
+                else:
+                    former_name = party.last_name + ', ' + party.first_name
+                    if party.middle_initial:
+                        former_name += ' ' + party.middle_initial
+        return former_name
