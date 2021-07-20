@@ -1,30 +1,42 @@
-import { required, maxLength } from 'vuelidate/lib/validators'
+import { ValidationRule } from '@/composables/address/enums'
+import { baseRules, spaceRules } from '@/composables/address/factories/validation-factory'
 
 // The Party Address schema containing Vuelidate rules.
 // NB: This should match the subject JSON schema.
 export const PartyAddressSchema = {
-  street: {
-    // required,
-    // maxLength: maxLength(50)
-  },
-  streetAdditional: {
-    // maxLength: maxLength(30)
-  },
-  city: {
-    // required,
-    // maxLength: maxLength(40)
-  },
-  country: {
-    // required
-  },
-  region: {
-    // maxLength: maxLength(2)
-  },
-  postalCode: {
-    // required,
-    // maxLength: maxLength(15)
-  },
-  deliveryInstructions: {
-    // maxLength: maxLength(80)
-  }
+  street: [
+    baseRules[ValidationRule.REQUIRED],
+    baseRules[ValidationRule.MAX_LENGTH](50),
+    ...spaceRules
+  ],
+  streetAdditional: [
+    baseRules[ValidationRule.MAX_LENGTH](30),
+    ...spaceRules
+  ],
+  city: [
+    baseRules[ValidationRule.REQUIRED],
+    baseRules[ValidationRule.MAX_LENGTH](40),
+    ...spaceRules
+  ],
+  country: [
+    baseRules[ValidationRule.REQUIRED],
+    ...spaceRules
+  ],
+  region: [
+    baseRules[ValidationRule.REQUIRED],
+    ...spaceRules
+  ],
+  /* NOTE: Canada/US postal code and zip code regex rules
+   * are added automatically as extra rules based on country
+   * inside the address components
+   */
+  postalCode: [
+    baseRules[ValidationRule.REQUIRED],
+    baseRules[ValidationRule.MAX_LENGTH](15),
+    ...spaceRules
+  ],
+  deliveryInstructions: [
+    baseRules[ValidationRule.MAX_LENGTH](80),
+    ...spaceRules
+  ]
 }

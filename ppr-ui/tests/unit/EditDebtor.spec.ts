@@ -75,6 +75,13 @@ describe('Debtor add individual tests', () => {
     await Vue.nextTick()
     wrapper.find('#txt-day').setValue('25')
     wrapper.find('#txt-year').setValue(1980)
+    // for address
+    wrapper.vm.$data.currentDebtor.address.street = 'street'
+    wrapper.vm.$data.currentDebtor.address.city = 'victoria'
+    wrapper.vm.$data.currentDebtor.address.region = 'BC'
+    wrapper.vm.$data.currentDebtor.address.country = 'CA'
+    wrapper.vm.$data.currentDebtor.address.postalCode = 'v8r1w3'
+    await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
@@ -107,6 +114,12 @@ describe('Debtor add business tests', () => {
     wrapper.find('#txt-name').setValue('TONYS TOOLS')
     // for the autocomplete
     wrapper.vm.$data.searchValue = 'TONYS TOOLS'
+    // for address
+    wrapper.vm.$data.currentDebtor.address.street = 'street'
+    wrapper.vm.$data.currentDebtor.address.city = 'victoria'
+    wrapper.vm.$data.currentDebtor.address.region = 'BC'
+    wrapper.vm.$data.currentDebtor.address.country = 'CA'
+    wrapper.vm.$data.currentDebtor.address.postalCode = 'v8r1w3'
     await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()

@@ -160,6 +160,7 @@
                   v-model="currentSecuredParty.address"
                   :editing="true"
                   :schema="addressSchema"
+                  :triggerErrors="showAllAddressErrors"
                   @valid="updateValidity($event)"
                 />
               </v-col>
@@ -273,7 +274,8 @@ export default defineComponent({
           return false
         }
         return true
-      })
+      }),
+      showAllAddressErrors: false
     })
 
     const showDialog = () => {
@@ -314,6 +316,8 @@ export default defineComponent({
         }
 
         addEditSecuredParty()
+      } else {
+        localState.showAllAddressErrors = true
       }
     }
 

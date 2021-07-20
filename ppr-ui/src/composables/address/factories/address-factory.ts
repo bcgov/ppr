@@ -12,7 +12,13 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
   })
   const schemaLocal = schema
   const isSchemaRequired = (prop: string): boolean => {
-    return Boolean(schemaLocal && schemaLocal.value[prop] && schemaLocal.value[prop].required)
+    if (!schemaLocal || !schemaLocal.value[prop]) return false
+
+    // check for any rule that does not allow an empty string
+    for (let index in schemaLocal.value[prop]) {
+      if (schemaLocal.value[prop][index]('') !== true) return true
+    }
+    return false
   }
   const labels = {
     /** The Street Address Additional label with 'optional' as needed. */
@@ -40,7 +46,7 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
         label = 'State'
         required = true
       } else {
-        label = 'Province/State'
+        label = 'Region'
       }
       return label + (required ? '' : ' (Optional)')
     }),

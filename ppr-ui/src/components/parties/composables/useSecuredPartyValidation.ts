@@ -8,10 +8,7 @@ const createEmptyErrors = () => ({
   first: createDefaultValidationResult(),
   last: createDefaultValidationResult(),
   emailAddress: createDefaultValidationResult(),
-  street: createDefaultValidationResult(),
-  city: createDefaultValidationResult(),
-  region: createDefaultValidationResult(),
-  postalCode: createDefaultValidationResult()
+  address: createDefaultValidationResult()
 })
 
 export const useSecuredPartyValidation = () => {
@@ -61,12 +58,17 @@ export const useSecuredPartyValidation = () => {
     const currentIsBusiness = partyBusiness === 'B'
     validateName(currentIsBusiness, currentParty.value)
     if (currentIsBusiness === true) {
-      return errors.value.businessName.succeeded && errors.value.emailAddress.succeeded
+      return (
+        errors.value.businessName.succeeded &&
+        errors.value.emailAddress.succeeded &&
+        errors.value.address.succeeded
+      )
     } else {
       return (
         errors.value.first.succeeded &&
         errors.value.last.succeeded &&
-        errors.value.emailAddress.succeeded
+        errors.value.emailAddress.succeeded &&
+        errors.value.address.succeeded
       )
     }
   }
@@ -76,7 +78,9 @@ export const useSecuredPartyValidation = () => {
    * @param addressToValidate the address to set the validity of
    * @param isValid whether the address is valid
    */
-  const updateValidity = (isValid: boolean): void => {}
+  const updateValidity = (valid: boolean): void => {
+    errors.value.address.succeeded = valid
+  }
 
   return {
     errors,

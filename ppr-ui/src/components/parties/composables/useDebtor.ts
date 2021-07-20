@@ -3,6 +3,7 @@ import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unus
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
+import { DefaultSchema } from '@/composables/address/resources'
 import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -35,7 +36,8 @@ export const useDebtor = (props, context) => {
     day: '',
     monthValue: 0,
     months: Months,
-    currentIsBusiness: props.isBusiness
+    currentIsBusiness: props.isBusiness,
+    showAllAddressErrors: false
   })
 
   const getDebtor = () => {
@@ -60,7 +62,7 @@ export const useDebtor = (props, context) => {
     }
   }
 
-  const addressSchema = PartyAddressSchema
+  const addressSchema = DefaultSchema
 
   const resetFormAndData = (emitEvent: boolean): void => {
     if (emitEvent) {

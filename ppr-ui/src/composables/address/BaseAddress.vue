@@ -4,6 +4,7 @@
     <v-expand-transition>
       <div v-if="!editing" class="address-block">
         <div class="address-block__info pre-wrap">
+          <div class="address-block__info-row">{{ getCountryName(country) }}</div>
           <div class="address-block__info-row">{{ addressLocal.street }}</div>
           <div class="address-block__info-row">{{ addressLocal.streetAdditional }}</div>
           <div class="address-block__info-row">
@@ -11,7 +12,6 @@
             <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}</span>
             <span v-if="addressLocal.postalCode">&nbsp;{{ addressLocal.postalCode }}</span>
           </div>
-          <div class="address-block__info-row">{{ getCountryName(country) }}</div>
           <div class="address-block__info-row">{{ addressLocal.deliveryInstructions }}</div>
         </div>
       </div>
@@ -20,6 +20,21 @@
     <!-- Edit fields -->
     <v-expand-transition>
       <v-form v-if="editing" ref="addressForm" name="address-form" lazy-validation>
+        <div class="form__row">
+          <v-autocomplete
+            filled
+            class="address-country"
+            hide-no-data
+            item-text="name"
+            item-value="code"
+            :items="getCountries()"
+            :label="countryLabel"
+            :rules="[...schemaLocal.country]"
+            v-model="addressLocal.country"
+          />
+          <!-- special field to select AddressComplete country, separate from our model field -->
+          <input type="hidden" :id="countryId" :value="country" />
+        </div>
         <div class="form__row">
           <!-- NB1: AddressComplete needs to be enabled each time user clicks in this search field.
                NB2: Only process first keypress -- assumes if user moves between instances of this
@@ -31,7 +46,7 @@
                         :id="streetId"
                         :label="streetLabel"
                         v-model="addressLocal.street"
-                        :rules="[...rules.street, ...spaceRules]"
+                        :rules="[...schemaLocal.street]"
                         @keypress.once="enableAddressComplete()"
                         @click="enableAddressComplete()"
           />
@@ -43,7 +58,7 @@
                       :label="streetAdditionalLabel"
                       rows="1"
                       v-model="addressLocal.streetAdditional"
-                      :rules="[...rules.streetAdditional, ...spaceRules]"
+                      :rules="[...schemaLocal.streetAdditional]"
           />
         </div>
         <div class="form__row three-column">
@@ -51,46 +66,33 @@
                         class="item address-city"
                         :label="cityLabel"
                         v-model="addressLocal.city"
-                        :rules="[...rules.city, ...spaceRules]"
+                        :rules="[...schemaLocal.city]"
           />
-          <v-select v-if="useCountryRegions(country)"
+          <v-autocomplete v-if="useCountryRegions(country)"
                     filled
                     class="item address-region"
-                    :menu-props="{maxHeight:'40rem'}"
-                    :label="regionLabel"
+                    hide-no-data
                     item-text="name"
                     item-value="short"
-                    v-model="addressLocal.region"
                     :items="getCountryRegions(country)"
-                    :rules="[...rules.region, ...spaceRules]"
+                    :label="regionLabel"
+                    :menu-props="{ maxHeight: '14rem' }"
+                    :rules="[...schemaLocal.region]"
+                    v-model="addressLocal.region"
           />
           <v-text-field v-else
                         filled
                         class="item address-region"
                         :label="regionLabel"
                         v-model="addressLocal.region"
-                        :rules="[...rules.region, ...spaceRules]"
+                        :rules="[...schemaLocal.region]"
           />
           <v-text-field filled
                         class="item postal-code"
                         :label="postalCodeLabel"
                         v-model="addressLocal.postalCode"
-                        :rules="[...rules.postalCode, ...spaceRules]"
+                        :rules="[...schemaLocal.postalCode]"
           />
-        </div>
-        <div class="form__row">
-          <v-select filled
-                    class="address-country"
-                    :label="countryLabel"
-                    menu-props="auto"
-                    item-text="name"
-                    item-value="code"
-                    v-model="addressLocal.country"
-                    :items="getCountries()"
-                    :rules="[...rules.country, ...spaceRules]"
-          />
-          <!-- special field to select AddressComplete country, separate from our model field -->
-          <input type="hidden" :id="countryId" :value="country" />
         </div>
         <div class="form__row">
           <v-textarea auto-grow
@@ -99,7 +101,7 @@
                       :label="deliveryInstructionsLabel"
                       rows="2"
                       v-model="addressLocal.deliveryInstructions"
-                      :rules="[...rules.deliveryInstructions, ...spaceRules]"
+                      :rules="[...schemaLocal.deliveryInstructions]"
           />
         </div>
       </v-form>
@@ -109,14 +111,14 @@
 
 <script lang="ts">
 import { defineComponent, toRefs, watch } from '@vue/composition-api'
-import { required } from 'vuelidate/lib/validators'
 
 import {
   useAddress,
   useAddressComplete,
   useCountryRegions,
   useCountriesProvinces,
-  useValidations
+  useBaseValidations,
+  baseRules
 } from '@/composables/address/factories'
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces' // eslint-disable-line no-unused-vars
 
@@ -135,21 +137,24 @@ export default defineComponent({
         deliveryInstructions: ''
       })
     },
+    /* used for readonly mode vs edit mode */
     editing: {
       type: Boolean,
       default: false
     },
+    /* contains validation for each field */
     schema: {
       type: Object as () => SchemaIF,
       default: null
+    },
+    /* triggers all current form validation errors */
+    triggerErrors: {
+      type: Boolean,
+      default: false
     }
   },
+  emits: ['valid'],
   setup (props, { emit }) {
-    /**
-     * NOTE: since toRefs(props).address / toRefs(props).schema are being passed in to useAddress
-     * both addressLocal / schemaLocal will update/be updated by the parent component even though
-     * neither one has a watcher or an emit
-     */
     const {
       addressLocal,
       country,
@@ -158,48 +163,57 @@ export default defineComponent({
       labels
     } = useAddress(toRefs(props).value, toRefs(props).schema)
 
-    const { $v, rules, spaceRules } = useValidations(schemaLocal, addressLocal)
+    const origPostalCodeRules = schemaLocal.value.postalCode
+
+    const { addressForm, validate } = useBaseValidations()
 
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
     const countryProvincesHelpers = useCountriesProvinces()
 
-    /**
-     * Watches changes to the Address Country and updates the schema accordingly.
-     */
-    watch(() => country, () => {
-      // skip this if component is called without a schema (eg, display mode)
-      if (schemaLocal) {
-        if (useCountryRegions(addressLocal.value.country)) {
-          // we are using a region list for the current country so make region a required field
-          const region = { ...schemaLocal.value.region, required }
-          // re-assign the local schema because Vue does not detect property addition
-          schemaLocal.value = { ...schemaLocal.value, region }
-        } else {
-          // we are not using a region list for the current country so remove required property
-          const { required, ...region } = schemaLocal.value.region
-          // re-assign the local schema because Vue does not detect property deletion
-          schemaLocal.value = { ...schemaLocal.value, region }
+    watch(() => addressLocal.value, (val) => {
+      let valid = true
+      /** checks each field against the schema rules to see if the address is valid or not
+       * NOTE: we don't want it to trigger error msgs yet which is why this does not call validate()
+      */
+      for (const key in val) {
+        for (const index in schemaLocal.value[key]) {
+          if (schemaLocal.value[key][index](val[key]) !== true) {
+            valid = false
+            break
+          }
         }
+        if (!valid) break
+      }
+      emit('valid', valid)
+    }, { immediate: true, deep: true })
+
+    watch(() => country.value, (val) => {
+      if (val === 'CA') {
+        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
+      } else if (val === 'US') {
+        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
       }
     })
-    watch(() => $v.value, (val) => {
-      emit('valid', !val.$invalid)
-    }, { deep: true, immediate: true })
+
+    watch(() => props.triggerErrors, (val) => {
+      if (val) {
+        validate()
+      }
+    })
 
     return {
+      addressForm,
       addressLocal,
       country,
       ...countryProvincesHelpers,
       enableAddressComplete,
       isSchemaRequired,
       ...labels,
-      rules,
       schemaLocal,
-      spaceRules,
       useCountryRegions,
       ...uniqueIds,
-      $v
+      validate
     }
   }
 })
