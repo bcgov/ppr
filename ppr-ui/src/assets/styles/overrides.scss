@@ -306,11 +306,13 @@ tbody {
 } 
 
 
-.v-application . .v-btn.edit-btn {
+.v-application .collateral-table .v-btn.edit-btn,
+.v-application .registration-table .v-btn.edit-btn {
   padding: 0 2px;
 }
 
-.v-application .collateral-table .v-btn.actions__more-actions__btn {
+.v-application .collateral-table .v-btn.actions__more-actions__btn,
+.v-application .registration-table .v-btn.actions__more-actions__btn  {
   padding: 0 2px;
   min-width: 20px;
 }

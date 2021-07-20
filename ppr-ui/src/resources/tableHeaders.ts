@@ -296,7 +296,7 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds py-4',
+    class: 'column-sm py-4',
     sortable: false,
     text: 'Registration Number',
     value: 'number'
@@ -344,13 +344,13 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     value: 'sp'
   },
   {
-    class: 'column-sm py-4',
+    class: 'column-mds py-4',
     sortable: false,
     text: 'Last Modified',
     value: 'sp'
   },
   {
-    class: 'column-sm py-4',
+    class: 'column-xs py-4',
     sortable: false,
     text: 'PDF',
     value: 'sp'
