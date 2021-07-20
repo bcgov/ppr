@@ -51,12 +51,12 @@
               class="party-row"
             >
               <td class="list-item__title">
-                <div class="icon-div" v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
-                  >
-                  <div class="icon-div" v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
-                  >
+                <div class="icon-div" v-if="isBusiness(row.item)">
+                  <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
+                </div>
+                <div class="icon-div" v-else>
+                  <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
+                </div>
                 {{ getName(row.item) }}
               </td>
               <td>
@@ -66,9 +66,15 @@
               <td>{{ row.item.code }}</td>
               <!-- Action Btns -->
               <td class="actions-cell  px-0 py-2">
-                <div class="actions float-right" v-if="isRegisteringParty(row.item)">
-                  <v-list class="actions__more-actions">
-                    <v-list-item :disabled="addEditInProgress" @click="removeRegisteringParty()">
+                <div
+                  class="actions float-right"
+                  v-if="isRegisteringParty(row.item)"
+                >
+                  <v-list class="actions__more-actions" :disabled="addEditInProgress">
+                    <v-list-item
+                      :class="$style['v-remove']"
+                      @click="removeRegisteringParty()"
+                    >
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Remove</span>
@@ -121,7 +127,11 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditParty[row.index]">
-              <td colspan="5" class="pa-0" :class="{ 'invalid-section': invalidSection }">
+              <td
+                colspan="5"
+                class="pa-0"
+                :class="{ 'invalid-section': invalidSection }"
+              >
                 <v-expand-transition>
                   <div class="edit-Party-container pa-0 col-12">
                     <edit-party
@@ -150,7 +160,7 @@ import {
   reactive,
   toRefs,
   computed,
-  onMounted // eslint-disable-line
+  onMounted, // eslint-disable-line
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { isEqual } from 'lodash'
@@ -181,7 +191,12 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const { getName, getFormattedAddress, isPartiesValid, isBusiness } = useParty()
+    const {
+      getName,
+      getFormattedAddress,
+      isPartiesValid,
+      isBusiness
+    } = useParty()
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -299,5 +314,11 @@ export default defineComponent({
   overflow: visible;
   text-overflow: inherit;
   white-space: inherit;
+}
+.v-remove {
+  padding-right: 40px;
+}
+.v-remove:hover {
+  background-color: white important;
 }
 </style>

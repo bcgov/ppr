@@ -4,8 +4,8 @@
   </v-container>
   <v-container fluid no-gutters v-else class="pa-0">
     <v-row no-gutters>
-      <v-col cols="auto"
-        ><b>Your registration must include one of the following:</b></v-col
+      <v-col cols="auto" class="generic-label"
+        >Your registration must include the following:</v-col
       >
     </v-row>
     <v-row no-gutters class="pt-6">
@@ -51,7 +51,7 @@
             account information.
           </v-tooltip>
           </h3>
-        <registering-party />
+        <registering-party @setRegisteringParty="setRegisteringParty" />
       </v-col>
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
@@ -108,13 +108,19 @@ export default defineComponent({
     })
     const summaryView = toRefs(props).isSummary
 
+    const setRegisteringParty = () => {
+      localState.registeringParty = getAddSecuredPartiesAndDebtors.value.registeringParty
+    }
+
     return {
       summaryView,
-
+      setRegisteringParty,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module></style>
+<style lang="scss" module>
+
+</style>

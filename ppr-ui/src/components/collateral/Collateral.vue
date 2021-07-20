@@ -227,7 +227,7 @@
                   filled
                   label="Description of General Collateral"
                   class="white pt-2 text-input-field"
-                  @blur="validateGeneral()"
+                  @keyup="validateGeneral()"
                   :error-messages="generalCollateralError"
                 >
                 </v-textarea>
@@ -363,6 +363,9 @@ export default defineComponent({
       if (collateral.generalCollateral.length > 4000) {
         collateral.valid = false
         localState.generalCollateralError = 'Maximum 4000 characters'
+      } else {
+        localState.generalCollateralError = ''
+        setValid()
       }
     }
 

@@ -72,6 +72,7 @@ export default defineComponent({
           parties.registeringParty = regParty
           setAddSecuredPartiesAndDebtors(parties)
           localState.registeringParty = [regParty]
+          context.emit('setRegisteringParty')
         } catch (e) {
           localState.registeringParty = null
           console.error('RegisteringParty.vue onMounted error: ' + e.message)
