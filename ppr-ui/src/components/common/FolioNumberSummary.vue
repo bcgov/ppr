@@ -57,7 +57,7 @@ export default defineComponent({
       folioNumber: '',
       rules: [
         (v: string) => /^[0-9A-Za-z]*$/.test(v) || 'Invalid character', // numbers and letters only
-        (v: string) => !v || v.length <= 30 || 'Maximum 30 characters reached' // maximum character count
+        (v: string) => !v || v.length <= 15 || 'Maximum 15 characters reached' // maximum character count
       ]
     })
 
