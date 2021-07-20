@@ -49,7 +49,9 @@
                 <b>My Registrations</b>
               </v-col>
             </v-row>
-            <v-row no-gutters class="white" style="height:500px"></v-row>
+            <v-row no-gutters class="white" style="height:500px">
+              <v-col cols="12"><registration-table /></v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-container>
@@ -74,14 +76,15 @@ import { getFeatureFlag, searchHistory } from '@/utils'
 import { Tombstone } from '@/components/common'
 import { SearchBar } from '@/components/search'
 import { SearchHistory } from '@/components/tables'
-import { RegistrationBar } from '@/components/registration'
+import { RegistrationBar, RegistrationTable } from '@/components/registration'
 
 @Component({
   components: {
     RegistrationBar,
     SearchHistory,
     SearchBar,
-    Tombstone
+    Tombstone,
+    RegistrationTable
   }
 })
 export default class Dashboard extends Vue {

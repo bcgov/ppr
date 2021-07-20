@@ -293,3 +293,72 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     value: 'code'
   }
 ]
+
+export const registrationTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-mds py-4',
+    sortable: false,
+    text: 'Registration Number',
+    value: 'number'
+  },
+  {
+    class: 'column-md py-4',
+    sortable: false,
+    text: 'Registration Type',
+    value: 'type'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Status',
+    value: 'status'
+  },
+  {
+    class: 'column-mds py-4',
+    sortable: false,
+    text: 'Secured Parties',
+    value: 'sp'
+  },
+  {
+    class: 'column-mds py-4',
+    sortable: false,
+    text: 'Registration Date and Time (Pacific Time)',
+    value: 'sp'
+  },
+  {
+    class: 'column-mds py-4',
+    sortable: false,
+    text: 'Registering Party',
+    value: 'sp'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Folio / Reference',
+    value: 'sp'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Days to Expiry',
+    value: 'sp'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Last Modified',
+    value: 'sp'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'PDF',
+    value: 'sp'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Actions',
+    value: 'sp'
+  }
+]
