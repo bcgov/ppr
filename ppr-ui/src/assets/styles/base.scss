@@ -374,7 +374,7 @@ span.invalid-message {
   opacity: 0.4;
 }
 
-.auto-complete-added, .v-list .v-list-item--active .v-icon.auto-complete-added {
+.auto-complete-added, .v-list .v-list-item--active .v-icon.mdi-check {
   color: #2e8540 !important;
 }
 
@@ -387,7 +387,7 @@ span.invalid-message {
   height: 100%;
   margin-bottom: 20px;
 }
-.icon-div .v-icon{
+.icon-div .v-icon, .title-text{
   color: $gray9 !important;
 }
 

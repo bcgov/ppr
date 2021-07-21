@@ -137,7 +137,7 @@
                     <v-text-field
                       filled
                       id="txt-email"
-                      label="Email Address"
+                      label="Email Address (Optional)"
                       v-model="currentSecuredParty.emailAddress"
                       :error-messages="
                         errors.emailAddress.message

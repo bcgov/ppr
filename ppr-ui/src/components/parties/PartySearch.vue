@@ -11,30 +11,31 @@
           persistent-hint
           :disabled="autoCompleteDisabled"
         />
+      </v-col>
+      <v-col cols="6" :class="{ 'disabled-text': autoCompleteDisabled }">
+        or
+        <a
+          id="add-party"
+          class="generic-link"
+          :class="{ 'disabled-text': autoCompleteDisabled }"
+          @click="goToAddSecuredParty"
+          :disabled="autoCompleteDisabled"
+          >Add a Secured Party that doesn't have a code</a
+        >
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col cols="12">
         <v-card
           v-if="showAutoComplete"
           id="party-search-auto-complete"
           :class="['mt-1', $style['auto-complete-card']]"
           elevation="5"
+          v-click-outside="closeAutoComplete"
         >
-          <v-row no-gutters justify="end" :class="$style['close-btn-row']">
-            <v-col cols="auto" justify="end" class="pt-0">
-              <v-btn
-                append
-                icon
-                x-small
-                right
-                :id="$style['auto-complete-close-btn']"
-                class="auto-complete-close-btn"
-                @click="closeAutoComplete()"
-              >
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
           <v-row no-gutters justify="center" class="pl-2 pr-5">
-            <v-col no-gutters cols="auto">
-              <v-list class="pt-0">
+            <v-col no-gutters cols="12">
+              <v-list :class="$style['auto-complete-list']" class="pt-0">
                 <v-list-item-group v-model="autoCompleteSelected">
                   <v-list-item
                     v-for="(result, i) in autoCompleteResults"
@@ -55,7 +56,7 @@
                             {{ result.address.street }},
                             {{ result.address.city }}
                             {{ result.address.region }}
-                            {{ result.address.country }},
+                            {{ getCountryName(result.address.country) }},
                             {{ result.address.postalCode }}
                           </v-col>
                         </v-row>
@@ -83,17 +84,6 @@
           </v-row>
         </v-card>
       </v-col>
-      <v-col cols="6" :class="{ 'disabled-text': autoCompleteDisabled }">
-        or
-        <a
-          id="add-party"
-          class="generic-link"
-          :class="{ 'disabled-text': autoCompleteDisabled }"
-          @click="goToAddSecuredParty"
-          :disabled="autoCompleteDisabled"
-          >Add a Secured Party that doesn't have a code</a
-        >
-      </v-col>
     </v-row>
     <v-row class="px-6" align="center">
       <v-col cols="auto" class="pr-0">
@@ -108,7 +98,7 @@
         </v-checkbox>
       </v-col>
       <v-col class="pl-0" :class="{ 'disabled-text': autoCompleteDisabled }">
-        Include the registering party as a secured party
+        Include the Registering Party as a Secured Party
       </v-col>
     </v-row>
   </v-container>
@@ -125,6 +115,9 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { partyCodeSearch } from '@/utils'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import {
+  useCountriesProvinces
+} from '@/composables/address/factories'
 
 export default defineComponent({
   props: {
@@ -149,6 +142,7 @@ export default defineComponent({
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
     ])
+    const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
       searchValue: '',
       autoCompleteIsActive: false,
@@ -246,6 +240,7 @@ export default defineComponent({
       addRegisteringParty,
       addResult,
       closeAutoComplete,
+      ...countryProvincesHelpers,
       ...toRefs(localState)
     }
   }
@@ -254,21 +249,44 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-#auto-complete-close-btn {
-  color: $gray5 !important;
-  background-color: transparent !important;
-}
 .auto-complete-item {
   min-height: 0;
 }
+
+.auto-complete-item:hover {
+  background-color: $gray1 !important;
+}
+
+.auto-complete-item:focus {
+  color: $primary-blue !important;
+  background-color: $blueSelected !important;
+}
+
+@media (min-width: 960px) {
+  .auto-complete-card {
+    width: 960px;
+  }
+}
+
 .auto-complete-card {
-  max-width: 60rem;
   position: absolute;
   z-index: 3;
+  margin-left: 20px;
 }
 .auto-complete-row {
   width: 35rem;
+  color: $gray7 !important;
 }
+
+.auto-complete-row:hover {
+  color: $primary-blue !important;
+}
+
+.auto-complete-list {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
 .auto-complete-action {
   width: 150px;
   flex-direction: row;

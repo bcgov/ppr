@@ -54,13 +54,13 @@
         <registering-party @setRegisteringParty="setRegisteringParty" />
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10">
+    <v-row no-gutters class="py-4">
       <v-col>
         <h3>Secured Parties</h3>
         <secured-parties />
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10">
+    <v-row no-gutters class="py-4">
       <v-col>
         <h3>Debtors</h3>
         <debtors />

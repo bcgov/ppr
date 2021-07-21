@@ -70,7 +70,7 @@
               :key="row.item.id"
               class="debtor-row"
             >
-              <td class="list-item__title" :class="$style['title-text']">
+              <td class="list-item__title title-text">
                 <div class="icon-div" v-if="isBusiness(row.item)">
                   <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
                 </div>
@@ -264,9 +264,7 @@ export default defineComponent({
   font-size: 14px;
   color: $gray7;
 }
-.title-text {
-  color: $gray9 !important;
-}
+
 .summary-cell {
   overflow: visible;
   text-overflow: inherit;

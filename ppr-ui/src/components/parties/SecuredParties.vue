@@ -8,7 +8,7 @@
         you can add their information manually.
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10">
+    <v-row no-gutters class="pb-4 pt-6">
       <party-search
         :isAutoCompleteDisabled="addEditInProgress"
         :registeringPartyAdded="registeringPartyAdded"
@@ -32,7 +32,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-4">
+    <v-row no-gutters class="pt-2">
       <v-col>
         <v-data-table
           class="party-table"
@@ -50,7 +50,7 @@
               :key="row.item.id"
               class="party-row"
             >
-              <td class="list-item__title">
+              <td class="list-item__title title-text">
                 <div class="icon-div" v-if="isBusiness(row.item)">
                   <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
                 </div>
