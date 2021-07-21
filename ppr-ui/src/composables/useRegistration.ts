@@ -16,7 +16,11 @@ export const useRegistration = () => {
   }
 
   const getStatusDescription = (status: string): string => {
-    return ''
+    if (status) {
+      return 'Other'
+    } else {
+      return 'Draft'
+    }
   }
 
   const getPdfLink = (reg: string): string => {
@@ -24,12 +28,10 @@ export const useRegistration = () => {
   }
 
   const getRegistrationType = (status: string): string => {
-    console.log(status)
     if (status) {
       const keyValue = Object.keys(APIRegistrationTypes).find(
         name => APIRegistrationTypes[name] === status
       )
-      console.log(keyValue)
       return UIRegistrationTypes[keyValue]
     }
     return ''

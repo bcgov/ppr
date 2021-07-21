@@ -16,7 +16,7 @@
           <td>
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
-          <td>{{ row.item.statusType || 'Draft' }}</td>
+          <td>{{ getStatusDescription(row.item.statusType) }}</td>
           <td>{{ row.item.securedParties || '' }}</td>
           <td>{{ getFormattedDate(row.item.createDateTime) }}</td>
           <td>{{ row.item.registeringParty || '' }}</td>
