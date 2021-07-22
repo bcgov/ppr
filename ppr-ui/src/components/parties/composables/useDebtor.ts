@@ -1,9 +1,8 @@
-import { reactive, toRefs, computed } from '@vue/composition-api'
-import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { reactive, toRefs } from '@vue/composition-api'
+import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
-import { DefaultSchema } from '@/composables/address/resources'
 import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -62,7 +61,7 @@ export const useDebtor = (props, context) => {
     }
   }
 
-  const addressSchema = DefaultSchema
+  const addressSchema = PartyAddressSchema
 
   const resetFormAndData = (emitEvent: boolean): void => {
     if (emitEvent) {

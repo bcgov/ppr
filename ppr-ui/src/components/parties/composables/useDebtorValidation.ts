@@ -91,7 +91,7 @@ export const useDebtorValidation = () => {
     validateBirthdate(year.value, month.value, day.value)
     validateName(currentIsBusiness.value, currentDebtor.value)
     if (currentIsBusiness.value === true) {
-      return errors.value.businessName.succeeded && errors.value.address.succeeded && errors.value.address.succeeded
+      return errors.value.businessName.succeeded && errors.value.address.succeeded
     } else {
       return (
         errors.value.first.succeeded &&
