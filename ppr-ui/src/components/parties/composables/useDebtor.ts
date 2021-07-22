@@ -1,5 +1,5 @@
-import { reactive, toRefs, computed } from '@vue/composition-api'
-import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { reactive, toRefs } from '@vue/composition-api'
+import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
@@ -35,7 +35,8 @@ export const useDebtor = (props, context) => {
     day: '',
     monthValue: 0,
     months: Months,
-    currentIsBusiness: props.isBusiness
+    currentIsBusiness: props.isBusiness,
+    showAllAddressErrors: false
   })
 
   const getDebtor = () => {

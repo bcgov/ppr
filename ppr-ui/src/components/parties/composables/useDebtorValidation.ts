@@ -8,10 +8,7 @@ const createEmptyErrors = () => ({
   year: createDefaultValidationResult(),
   month: createDefaultValidationResult(),
   day: createDefaultValidationResult(),
-  street: createDefaultValidationResult(),
-  city: createDefaultValidationResult(),
-  region: createDefaultValidationResult(),
-  postalCode: createDefaultValidationResult()
+  address: createDefaultValidationResult()
 })
 
 export const useDebtorValidation = () => {
@@ -94,14 +91,15 @@ export const useDebtorValidation = () => {
     validateBirthdate(year.value, month.value, day.value)
     validateName(currentIsBusiness.value, currentDebtor.value)
     if (currentIsBusiness.value === true) {
-      return errors.value.businessName.succeeded
+      return errors.value.businessName.succeeded && errors.value.address.succeeded
     } else {
       return (
         errors.value.first.succeeded &&
         errors.value.last.succeeded &&
         errors.value.year.succeeded &&
         errors.value.month.succeeded &&
-        errors.value.day.succeeded
+        errors.value.day.succeeded &&
+        errors.value.address.succeeded
       )
     }
   }
@@ -119,7 +117,9 @@ export const useDebtorValidation = () => {
    * @param addressToValidate the address to set the validity of
    * @param isValid whether the address is valid
    */
-  const updateValidity = (isValid: boolean): void => {}
+  const updateValidity = (valid: boolean): void => {
+    errors.value.address.succeeded = valid
+  }
 
   return {
     errors,

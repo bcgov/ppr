@@ -99,6 +99,24 @@ describe('Serial number validation', () => {
     expect(getLastEvent(wrapper, searchData)).toBeNull()
   })
 
+  it('prevents searching and gives validation when the search is over 25 characters', async () => {
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = '12345678901234567890123456'
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.searchValue).toBe('12345678901234567890123456')
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Maximum 25 characters')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  })
+
   it('gives validation messages/hints as user types', async () => {
     const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
     // hint
@@ -123,6 +141,14 @@ describe('Serial number validation', () => {
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toContain("don't normally contain special characters")
+    // maximum 25 characters
+    wrapper.vm.$data.searchValue = '12345678901234567890123456'
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
+    await Vue.nextTick()
+    const errorMessages = wrapper.findAll('.v-messages__message')
+    expect(errorMessages.length).toBe(1)
+    expect(errorMessages.at(0).text()).toBe('Maximum 25 characters')
   })
 })
 

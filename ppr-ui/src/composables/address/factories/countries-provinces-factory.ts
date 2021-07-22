@@ -21,7 +21,13 @@ export function useCountriesProvinces () {
    * @returns An array of country objects, sorted alphabetically.
    */
   const getCountries = (): Array<object> => {
-    return window['countries']
+    let countries = []
+    countries.push({ code: 'CA', name: 'Canada' })
+    countries.push({ code: 'US', name: 'United States of America' })
+    // name is set this way to ensure the divider is there in the search when CA/US are not the only options
+    countries.push({ code: '0', name: 'Can.nada. United States .Of.America', divider: true })
+    countries = countries.concat(window['countries'])
+    return countries
   }
   /**
    * Helper function to return a country's name.
@@ -42,16 +48,23 @@ export function useCountriesProvinces () {
    * @returns An array of province objects, sorted alphabetically.
    */
   const getCountryRegions = (code: string): Array<object> => {
-    if (!code) return null
+    if (!code) return []
     if (window['countryRegionsCache'][code]) return window['countryRegionsCache'][code]
+    let regions = []
+    if (code === 'CA') {
+      regions.push({ name: 'British Columbia', short: 'BC' })
+      // name is set this way to ensure the divider is there in the search when BC is not the only option
+      regions.push({ code: '0', name: 'Br.it.is.h.Co.l.u.m.b.ia', divider: true })
+    }
     const result = window['provinces']
       .filter(p => p.country === code)
       .map(p => ({
         name: p.english || p.name,
         short: (p.short && p.short.length <= 2) ? p.short : '--'
       }))
-    window['countryRegionsCache'][code] = result
-    return result
+    regions = regions.concat(result)
+    window['countryRegionsCache'][code] = regions
+    return regions
   }
   return {
     getCountries,

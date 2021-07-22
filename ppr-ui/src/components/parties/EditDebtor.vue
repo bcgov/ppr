@@ -147,6 +147,7 @@
               v-model="currentDebtor.address"
               :editing="true"
               :schema="addressSchema"
+              :triggerErrors="showAllAddressErrors"
               @valid="updateValidity($event)"
             />
 
@@ -248,12 +249,15 @@ export default defineComponent({
       autoCompleteSearchValue: '',
       searchValue: '',
       hideDetails: false,
-      month: { value: 0, text: '' }
+      month: { value: 0, text: '' },
+      showAllAddressErrors: false
     })
 
     const onSubmitForm = async () => {
       if (validateDebtorForm(currentIsBusiness, currentDebtor, year, monthValue, day) === true) {
         addDebtor()
+      } else {
+        localState.showAllAddressErrors = true
       }
     }
 

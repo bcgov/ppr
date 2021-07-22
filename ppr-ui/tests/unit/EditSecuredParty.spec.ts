@@ -11,6 +11,7 @@ import sinon from 'sinon'
 
 // Components
 import { EditParty } from '@/components/parties'
+import { VehicleTypes } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -76,6 +77,13 @@ describe('Secured Party add individual tests', () => {
     wrapper.find('#txt-first').setValue('JOE')
     wrapper.find('#txt-last').setValue('SCHMOE')
     wrapper.find('#txt-email').setValue('joe@apples.com')
+    // for address
+    wrapper.vm.$data.currentSecuredParty.address.street = 'street'
+    wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'
+    wrapper.vm.$data.currentSecuredParty.address.region = 'BC'
+    wrapper.vm.$data.currentSecuredParty.address.country = 'CA'
+    wrapper.vm.$data.currentSecuredParty.address.postalCode = 'v8r1w3'
+    await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
@@ -122,6 +130,12 @@ describe('Secured Party add business tests', () => {
     await radioIsBusiness.trigger('click')
     await Vue.nextTick()
     wrapper.find('#txt-name').setValue('TONYS TOOLS')
+    // for address
+    wrapper.vm.$data.currentSecuredParty.address.street = 'street'
+    wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'
+    wrapper.vm.$data.currentSecuredParty.address.region = 'BC'
+    wrapper.vm.$data.currentSecuredParty.address.country = 'CA'
+    wrapper.vm.$data.currentSecuredParty.address.postalCode = 'v8r1w3'
     await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
