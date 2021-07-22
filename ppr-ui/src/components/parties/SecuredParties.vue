@@ -60,7 +60,7 @@
                 {{ getName(row.item) }}
               </td>
               <td>
-                <span v-html="getFormattedAddress(row.item)"> </span>
+                <base-address :editing="false" :value="row.item.address" />
               </td>
               <td>{{ row.item.emailAddress }}</td>
               <td>{{ row.item.code }}</td>
@@ -168,13 +168,15 @@ import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-u
 import EditParty from './EditParty.vue'
 import PartySearch from './PartySearch.vue'
 import { useParty } from '@/composables/useParty'
+import { BaseAddress } from '@/composables/address'
 
 import { partyTableHeaders } from '@/resources'
 
 export default defineComponent({
   components: {
     EditParty,
-    PartySearch
+    PartySearch,
+    BaseAddress
   },
   props: {
     isSummary: {

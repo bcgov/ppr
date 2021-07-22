@@ -24,7 +24,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address :editing="false" :value="row.item.address" />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -50,11 +50,15 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
+import { BaseAddress } from '@/composables/address'
 
 import { registeringTableHeaders } from '@/resources'
 import { getRegisteringPartyFromAuth } from '@/utils'
 
 export default defineComponent({
+  components: {
+    BaseAddress
+  },
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'

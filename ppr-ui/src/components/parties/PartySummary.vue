@@ -42,7 +42,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address :editing="false" :value="row.item.address" />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -78,7 +78,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address :editing="false" :value="row.item.address" />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -125,7 +125,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address :editing="false" :value="row.item.address" />
                 </td>
                 <td>{{ getFormattedBirthdate(row.item) }}</td>
               </tr>
@@ -159,6 +159,7 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
+import { BaseAddress } from '@/composables/address'
 
 import {
   partyTableHeaders,
@@ -167,6 +168,9 @@ import {
 } from '@/resources'
 
 export default defineComponent({
+  components: {
+    BaseAddress
+  },
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
