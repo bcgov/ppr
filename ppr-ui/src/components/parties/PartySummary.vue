@@ -42,7 +42,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <base-address :editing="false" :value="row.item.address" />
+                  <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -78,7 +78,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <base-address :editing="false" :value="row.item.address" />
+                  <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -125,7 +125,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <base-address :editing="false" :value="row.item.address" />
+                  <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
                 </td>
                 <td>{{ getFormattedBirthdate(row.item) }}</td>
               </tr>
@@ -160,6 +160,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
+import { PartyAddressSchema } from '@/schemas'
 
 import {
   partyTableHeaders,
@@ -181,9 +182,10 @@ export default defineComponent({
     const router = context.root.$router
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const addressSchema = PartyAddressSchema
+    
     const {
       getName,
-      getFormattedAddress,
       getFormattedBirthdate,
       isBusiness
     } = useParty()
@@ -217,7 +219,7 @@ export default defineComponent({
     return {
       getName,
       isBusiness,
-      getFormattedAddress,
+      addressSchema,
       getFormattedBirthdate,
       goToParties,
       ...toRefs(localState)

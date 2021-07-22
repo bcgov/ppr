@@ -17,8 +17,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
-
 // Input field selectors / buttons
 const addIndividualSelector: string = '#btn-add-individual'
 const addBusinessSelector: string = '#btn-add-business'

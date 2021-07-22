@@ -1,9 +1,5 @@
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useCountriesProvinces } from '@/composables/address/factories'
-
 export const useParty = () => {
-  const countryProvincesHelpers = useCountriesProvinces()
-
   const getName = (party: PartyIF): string => {
     if (party.businessName) {
       return party.businessName
@@ -18,35 +14,6 @@ export const useParty = () => {
     } else {
       return false
     }
-  }
-
-  const getFormattedAddress = (party: PartyIF): string => {
-    let address = party.address.street
-    if (party.address.streetAdditional) {
-      address = address + '<br>' + party.address.streetAdditional
-    }
-    address =
-      address +
-      '<br>' +
-      party.address.city +
-      ' ' +
-      party.address.region +
-      ' ' +
-      party.address.postalCode
-    if (party.address.country) {
-      address =
-        address +
-        '<br>' +
-        countryProvincesHelpers.getCountryName(party.address.country)
-    }
-    if (party.address.deliveryInstructions) {
-      address =
-        address +
-        '<br><br><span class="delivery">' +
-        party.address.deliveryInstructions +
-        '</span>'
-    }
-    return address
   }
 
   const getFormattedBirthdate = (party: PartyIF): string => {
@@ -104,7 +71,6 @@ export const useParty = () => {
   return {
     getName,
     isBusiness,
-    getFormattedAddress,
     getFormattedBirthdate,
     getMonth,
     getMonthFull,

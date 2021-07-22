@@ -80,7 +80,7 @@
                 {{ getName(row.item) }}
               </td>
               <td>
-                <base-address :editing="false" :value="row.item.address" />
+                <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
               </td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
@@ -164,6 +164,7 @@ import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
 
 import { debtorTableHeaders } from '@/resources'
+import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
   components: {
@@ -185,9 +186,9 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const addressSchema = PartyAddressSchema
     const {
       getName,
-      getFormattedAddress,
       getFormattedBirthdate,
       isPartiesValid,
       isBusiness
@@ -245,12 +246,12 @@ export default defineComponent({
     return {
       removeDebtor,
       getName,
-      getFormattedAddress,
       getFormattedBirthdate,
       initEdit,
       initAdd,
       resetData,
       isBusiness,
+      addressSchema,
       ...toRefs(localState)
     }
   }
