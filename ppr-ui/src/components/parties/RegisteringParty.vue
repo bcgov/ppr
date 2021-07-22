@@ -14,7 +14,7 @@
           >
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
-                <td class="list-item__title">
+                <td class="list-item__title title-text">
                   <div class="icon-div" v-if="isBusiness(row.item)"
                     ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
                   >
