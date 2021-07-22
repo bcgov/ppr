@@ -13,7 +13,7 @@
           </div>
           <div class="address-block__info-row">{{ getCountryName(country) }}</div>
           <div v-if="addressLocal.deliveryInstructions"
-          class="address-block__info-row delivery-instructions"
+          class="address-block__info-row delivery-text"
           >{{ addressLocal.deliveryInstructions }}
           </div>
         </div>
@@ -225,7 +225,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-.delivery-instructions {
+.delivery-text {
   font-style: italic;
   margin-top: 10px;
 }
