@@ -63,7 +63,7 @@ TEST_REPORT_DATA = [
 ]
 
 TEST_DATETIME_DATA = [
-    ('2021-03-12T01:53:54+00:00', 'March 11, 2021 05:53:54 PM Pacific Time', True),
+    ('2021-03-12T01:53:54+00:00', 'March 11, 2021 5:53:54 pm Pacific Time', True),
     ('2021-03-12T01:53:54+00:00', 'March 11, 2021', False)
 ]
 

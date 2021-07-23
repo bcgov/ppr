@@ -155,6 +155,10 @@ class GetFinancingResource(Resource):
                                                                        account_id,
                                                                        is_staff(jwt))
 
+            # Set to false to exclude change history.
+            statement.include_changes_json = False
+            # Set to false to generate json with original financing statement data.
+            statement.current_view_json = False
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.

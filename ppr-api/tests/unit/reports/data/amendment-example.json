@@ -3,17 +3,18 @@
     {
       "make": "BMW", 
       "model": "i3", 
+      "reg_id": 202, 
       "serialNumber": "BMWKK21F81F233350", 
       "type": "MV", 
-      "vehicleId": 26, 
+      "vehicleId": 116, 
       "year": 2019
     }
   ], 
-  "amendmentRegistrationNumber": "100035B", 
-  "baseRegistrationNumber": "100032B", 
+  "amendmentRegistrationNumber": "100201B", 
+  "baseRegistrationNumber": "100195B", 
   "changeType": "AM", 
-  "clientReferenceId": "T-AS-AM-0032-1", 
-  "createDateTime": "2021-06-03T16:30:07+00:00", 
+  "clientReferenceId": "T-AS-AM-0095-1", 
+  "createDateTime": "2021-06-07T17:53:41+00:00", 
   "description": "Add vehicle collateral.", 
   "registeringParty": {
     "address": {

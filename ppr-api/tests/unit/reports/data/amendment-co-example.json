@@ -8,11 +8,13 @@
         "region": "BC", 
         "street": "620 JOHNSON ST"
       }, 
+      "former_name": "", 
       "partyId": 382, 
       "personName": {
         "first": "JAMES", 
         "last": "FOX"
-      }
+      }, 
+      "reg_id": 210
     }
   ], 
   "amendmentRegistrationNumber": "100209B", 

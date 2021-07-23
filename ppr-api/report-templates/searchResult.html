@@ -14,6 +14,7 @@
     [[style.html]]
   </head>
   <body>
+    <article id="search-toc">
     <div class="header">
       <table class="header-table" role="presentation">
         <tr class="no-page-break">
@@ -21,7 +22,7 @@
             [[logo.html]]
           </td>
           <td>
-            <div class="report-type">{{ environment }} {{ meta_title }}</div>
+            <div class="report-type">{{ meta_title }}</div>
             <div class="report-type-desc">BC Registries and Online Services</div>
           </td>
         </tr>
@@ -29,58 +30,77 @@
     </div>
 
     <div class="business-details-container">
-      <div class="business-name-header">
+      <div class="business-name-header pt-4">
         <span class="lbl-business-name">{{ meta_subject }}</span>
       </div>
   
       <table class="business-details-table" role="presentation">
         <tr>
+          <td class="lbl-business-detail">Search Date and Time:</td>
+          <td>{{searchDateTime}}</td>
+        </tr>
+        <tr>
+          <td class="lbl-business-detail">Account Name:</td>
           <td>
-            <div class="bold pt-2">Search Date and Time:</div>
             {% if meta_account_name is defined %}
-              <div class="bold pt-2">Account Name:</div>
-            {% endif %}
-            {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
-              <div class="bold pt-2">Folio Number:</div>
+              {{meta_account_name}}
             {% endif %}
           </td>
+        </tr>
+        <tr>
+          <td class="lbl-business-detail">Folio Number:</td>
           <td>
-            <div class="pt-2">{{searchDateTime}}</div>
-            {% if meta_account_name is defined %}
-              <div class="pt-2">{{meta_account_name}}</div>
-            {% endif %}
             {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
-              <div class="pt-2">{{searchQuery.clientReferenceId}}</div>
+              {{searchQuery.clientReferenceId}}
             {% endif %}
           </td>
         </tr>
       </table>
     </div>
   
-    <div class="container pt-4">
-      <table class="header-table mt-4" role="presentation">
-        <tr>
-            <td class="section-sub-title col-50">Registrations in this Search Result: {{ totalResultsSize }}</td>
-            <td class="section-data right-align col-50"><span id="pagesCounter"></span> pages</td>
-        </tr>
-      </table>
-    </div>
+    <table class="header-table-toc mt-4" role="presentation">
+      <tr>
+        <th colspan="3" class="header-toc-title pt-3">
+          {% if totalResultsSize > 0 %}
+            TABLE OF CONTENTS
+          {% else %}
+            NIL RESULT
+          {% endif %}  
+        </th>
+      </tr>
+      <tr>
+          <td>Registrations in this Report: {{ totalResultsSize }}</td>
+          <td>Exact Matches: {{ exactResultsSize }}</td>
+          <td>Total Search Report Pages:
+            {% if totalResultsSize > 0 %}
+              <span id="pagesCounter"></span>
+            {% else %}
+              0
+            {% endif %}  
+          </td>
+      </tr>
+    </table>
       
     {% if totalResultsSize > 0 %}
       {% if selected is defined and searchQuery.type != "REGISTRATION_NUMBER" %}
         [[search-result/selected.html]]
       {% endif %}
+    {% else %}
+      <div class="nil-message pt-4">The search returned a NIL result. 0 registrations were found.</div> 
+    {% endif %}
+  </article>
 
+    {% if totalResultsSize > 0 %}
       {% for detail in details %}
         <p style="page-break-before: always" ></p>
         [[search-result/financingStatement.html]]
 
         {% if detail.financingStatement.changes is defined %}
           <p style="page-break-before: always" ></p>
-
-          <div class="separator-strong mt-4"></div>
-          <div class="section-statement mt-4">History</div>
-          <div class="separator-strong mt-4"></div>
+          <div class="separator-header mt-4"></div>
+          <div class="section-title-centre mt-4">HISTORY</div>
+          <div class="section-statement">(Showing most recent first)</div>
+          <div class="separator-header mt-4"></div>
 
           <div class="container pt-4">
             {% for change in detail.financingStatement.changes %}

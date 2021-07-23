@@ -2,12 +2,12 @@
   "details": [
     {
       "financingStatement": {
-        "baseRegistrationNumber": "TEST0004",
+        "baseRegistrationNumber": "TEST0004", 
         "changes": [
           {
             "baseRegistrationNumber": "TEST0004", 
             "clientReferenceId": "TEST-DIS-0004", 
-            "createDateTime": "2021-03-16T15:34:38+00:00", 
+            "createDateTime": "2021-07-16T15:41:58+00:00", 
             "dischargeRegistrationNumber": "TEST00D4", 
             "registeringParty": {
               "address": {
@@ -27,11 +27,10 @@
             "statementType": "DISCHARGE_STATEMENT"
           }
         ], 
-        "clientReferenceId": "TEST-DIS-0004", 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "clientReferenceId": "TEST-SA-0004", 
+        "createDateTime": "2021-07-15T15:41:58+00:00", 
         "debtors": [
           {
-            "added": true, 
             "address": {
               "city": "city", 
               "country": "CA", 
@@ -48,8 +47,8 @@
             }
           }
         ], 
-        "dischargedDateTime": "2021-03-16T15:34:38+00:00", 
-        "expiryDate": "2023-03-16T15:34:38+00:00", 
+        "dischargedDateTime": "2021-07-16T15:41:58+00:00", 
+        "expiryDate": "2023-07-15T15:41:58+00:00", 
         "lifeYears": 2, 
         "registeringParty": {
           "address": {
@@ -57,11 +56,11 @@
             "country": "CA", 
             "postalCode": "V8R3A5", 
             "region": "BC", 
-            "street": "TEST-00D4", 
+            "street": "TEST-0004", 
             "streetAdditional": "line 2"
           }, 
           "personName": {
-            "first": "TEST-DISCHARGE", 
+            "first": "TEST", 
             "last": "REGISTERING", 
             "middle": "4"
           }
@@ -70,7 +69,6 @@
         "registrationDescription": "PPSA SECURITY AGREEMENT", 
         "securedParties": [
           {
-            "added": true, 
             "address": {
               "city": "city", 
               "country": "CA", 
@@ -88,7 +86,6 @@
         "type": "SA", 
         "vehicleCollateral": [
           {
-            "added": true, 
             "make": "HONDA", 
             "model": "CIVIC", 
             "serialNumber": "JU622994", 
@@ -102,9 +99,35 @@
     }, 
     {
       "financingStatement": {
-        "baseRegistrationNumber": "TEST0012", 
-        "clientReferenceId": "TEST-SA-0012", 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "baseRegistrationNumber": "TEST0005", 
+        "changes": [
+          {
+            "baseRegistrationNumber": "TEST0005", 
+            "clientReferenceId": "TEST-REN-0005", 
+            "createDateTime": "2021-07-15T15:46:58+00:00", 
+            "expiryDate": "2023-07-15T15:41:58+00:00", 
+            "lifeYears": 2, 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00R5", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-RENEWAL", 
+                "last": "REGISTERING", 
+                "middle": "5"
+              }
+            }, 
+            "renewalRegistrationNumber": "TEST00R5", 
+            "statementType": "RENEWAL_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-SA-0005", 
+        "createDateTime": "2021-07-15T15:41:58+00:00", 
         "debtors": [
           {
             "address": {
@@ -112,32 +135,32 @@
               "country": "CA", 
               "postalCode": "V8R3A5", 
               "region": "BC", 
-              "street": "TEST-0012", 
+              "street": "TEST-0005", 
               "streetAdditional": "line 2"
             }, 
-            "partyId": 200000032, 
+            "partyId": 200000016, 
             "personName": {
               "first": "TEST IND", 
               "last": "DEBTOR", 
-              "middle": "12"
+              "middle": "5"
             }
           }
         ], 
-        "expiryDate": "2022-03-16T15:34:38+00:00", 
-        "lifeYears": 1, 
+        "expiryDate": "2023-07-15T15:41:58+00:00", 
+        "lifeYears": 2, 
         "registeringParty": {
           "address": {
             "city": "city", 
             "country": "CA", 
             "postalCode": "V8R3A5", 
             "region": "BC", 
-            "street": "TEST-0012", 
+            "street": "TEST-0005", 
             "streetAdditional": "line 2"
           }, 
           "personName": {
             "first": "TEST", 
             "last": "REGISTERING", 
-            "middle": "12"
+            "middle": "5"
           }
         }, 
         "registrationAct": "PPSA SECURITY ACT", 
@@ -149,40 +172,24 @@
               "country": "CA", 
               "postalCode": "V8R3A5", 
               "region": "BC", 
-              "street": "TEST-0012", 
+              "street": "TEST-0005", 
               "streetAdditional": "line 2"
             }, 
-            "businessName": "TEST 12 SECURED PARTY", 
-            "partyId": 200000033
+            "businessName": "TEST 5 SECURED PARTY", 
+            "partyId": 200000017
           }
         ], 
         "statusType": "ACT", 
-        "trustIndenture": true, 
+        "trustIndenture": false, 
         "type": "SA", 
         "vehicleCollateral": [
           {
-            "make": "HOMCO IND. LTD DIPLOMAT", 
-            "manufacturedHomeRegistrationNumber": "22000", 
-            "serialNumber": "9999", 
-            "type": "MH", 
-            "vehicleId": 200000011, 
-            "year": 2012
-          }, 
-          {
-            "make": "CESSNA", 
-            "model": "172R SKYHAWK", 
-            "serialNumber": "CFYX", 
-            "type": "AC", 
-            "vehicleId": 200000012, 
-            "year": 1998
-          }, 
-          {
-            "make": "AIRFRAME make", 
-            "model": "AIRFRAME model", 
-            "serialNumber": "AF16031", 
-            "type": "AF", 
-            "vehicleId": 200000013, 
-            "year": 1998
+            "make": "TESLA", 
+            "model": "MODEL 3", 
+            "serialNumber": "YJ46JU622994", 
+            "type": "MV", 
+            "vehicleId": 200000005, 
+            "year": 2018
           }
         ]
       }, 
@@ -192,7 +199,7 @@
       "financingStatement": {
         "baseRegistrationNumber": "TEST0011", 
         "clientReferenceId": "TEST-SA-0011", 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "createDateTime": "2021-07-15T15:41:58+00:00", 
         "debtors": [
           {
             "address": {
@@ -211,7 +218,7 @@
             }
           }
         ], 
-        "expiryDate": "2022-03-16T15:34:38+00:00", 
+        "expiryDate": "2022-07-15T15:41:58+00:00", 
         "lifeYears": 1, 
         "registeringParty": {
           "address": {
@@ -270,34 +277,9 @@
     }, 
     {
       "financingStatement": {
-        "baseRegistrationNumber": "TEST0005", 
-        "changes": [
-          {
-            "baseRegistrationNumber": "TEST0005", 
-            "clientReferenceId": "TEST-REN-0005", 
-            "createDateTime": "2021-03-16T15:39:38+00:00", 
-            "expiryDate": "2023-03-16T15:34:38+00:00", 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00R5", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-RENEWAL", 
-                "last": "REGISTERING", 
-                "middle": "5"
-              }
-            }, 
-            "renewalRegistrationNumber": "TEST00R5", 
-            "statementType": "RENEWAL_STATEMENT"
-          }
-        ], 
-        "clientReferenceId": "TEST-SA-0005", 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "baseRegistrationNumber": "TEST0012", 
+        "clientReferenceId": "TEST-SA-0012", 
+        "createDateTime": "2021-07-15T15:41:58+00:00", 
         "debtors": [
           {
             "address": {
@@ -305,32 +287,32 @@
               "country": "CA", 
               "postalCode": "V8R3A5", 
               "region": "BC", 
-              "street": "TEST-0005", 
+              "street": "TEST-0012", 
               "streetAdditional": "line 2"
             }, 
-            "partyId": 200000016, 
+            "partyId": 200000032, 
             "personName": {
               "first": "TEST IND", 
               "last": "DEBTOR", 
-              "middle": "5"
+              "middle": "12"
             }
           }
         ], 
-        "expiryDate": "2023-03-16T15:34:38+00:00", 
-        "lifeYears": 2, 
+        "expiryDate": "2022-07-15T15:41:58+00:00", 
+        "lifeYears": 1, 
         "registeringParty": {
           "address": {
             "city": "city", 
             "country": "CA", 
             "postalCode": "V8R3A5", 
             "region": "BC", 
-            "street": "TEST-0005", 
+            "street": "TEST-0012", 
             "streetAdditional": "line 2"
           }, 
           "personName": {
             "first": "TEST", 
             "last": "REGISTERING", 
-            "middle": "5"
+            "middle": "12"
           }
         }, 
         "registrationAct": "PPSA SECURITY ACT", 
@@ -342,24 +324,40 @@
               "country": "CA", 
               "postalCode": "V8R3A5", 
               "region": "BC", 
-              "street": "TEST-0005", 
+              "street": "TEST-0012", 
               "streetAdditional": "line 2"
             }, 
-            "businessName": "TEST 5 SECURED PARTY", 
-            "partyId": 200000017
+            "businessName": "TEST 12 SECURED PARTY", 
+            "partyId": 200000033
           }
         ], 
         "statusType": "ACT", 
-        "trustIndenture": false, 
+        "trustIndenture": true, 
         "type": "SA", 
         "vehicleCollateral": [
           {
-            "make": "TESLA", 
-            "model": "MODEL 3", 
-            "serialNumber": "YJ46JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000005, 
-            "year": 2018
+            "make": "HOMCO IND. LTD DIPLOMAT", 
+            "manufacturedHomeRegistrationNumber": "022000", 
+            "serialNumber": "9999", 
+            "type": "MH", 
+            "vehicleId": 200000011, 
+            "year": 2012
+          }, 
+          {
+            "make": "CESSNA", 
+            "model": "172R SKYHAWK", 
+            "serialNumber": "CFYX", 
+            "type": "AC", 
+            "vehicleId": 200000012, 
+            "year": 1998
+          }, 
+          {
+            "make": "AIRFRAME make", 
+            "model": "AIRFRAME model", 
+            "serialNumber": "AF16031", 
+            "type": "AF", 
+            "vehicleId": 200000013, 
+            "year": 1998
           }
         ]
       }, 
@@ -368,10 +366,10 @@
   ], 
   "exactResultsSize": 4, 
   "payment": {
-    "invoiceId": "1000001", 
-    "receipt": "/api/v1/payment-requests/1000001/receipts"
+    "invoiceId": "10754", 
+    "receipt": "/api/v1/payment-requests/10754/receipts"
   }, 
-  "searchDateTime": "2021-03-25T16:34:57+00:00", 
+  "searchDateTime": "2021-07-20T16:06:36+00:00", 
   "searchQuery": {
     "clientReferenceId": "T-S-DI-001", 
     "criteria": {

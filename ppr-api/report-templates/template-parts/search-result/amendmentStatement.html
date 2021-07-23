@@ -1,19 +1,20 @@
 <div class="container pt-4 no-page-break">
 
-    <div class="section-title mt-4">{{change.changeType}}</div>
+    <div class="statement-title">{{change.changeType}}</div>
+    <div class="separator-statement mt-1"></div>
 
-    <table class="business-details-table" role="presentation">
+    <table class="no-page-break section-data statement-table mt-4" role="presentation">
         <tr>
-            <td>
-                <div class="bold pt-2">Registration Date and Time:</div>
-                <div class="bold pt-2">Registration Number:</div>
-                <div class="bold pt-2">Details Description:</div>
-            </td>
-            <td>
-                <div class="pt-2">{{change.createDateTime}}</div>
-                <div class="pt-2">{{change.amendmentRegistrationNumber}}</div>
-                <div class="pt-2">{{change.description}}</div>
-            </td>
+            <td class="section-sub-title">Registration Date and Time:</td>
+            <td>{{change.createDateTime}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Registration Number:</td>
+            <td>{{change.amendmentRegistrationNumber}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Description:</td>
+            <td>{{change.description}}</td>
         </tr>
     </table>
 </div>
@@ -21,49 +22,36 @@
 
 {% if change.courtOrderInformation is defined %}
 <div class="container pt-4">
-
     [[search-result/courtOrderInformation.html]]
-
 </div>
 {% endif %}
 
-
 {% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined %}
 <div class="container pt-4">
-
     [[search-result/vehicleCollateral.html]]
-
 </div>
 {% endif %}
 
 {% if change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
 <div class="container pt-4">
-
     [[search-result/generalCollateral.html]]
-
 </div>
 {% endif %}
 
 {% if change.addDebtors is defined or change.deleteDebtors is defined %}
 <div class="container pt-4">
-
     [[search-result/debtors.html]]
-
 </div>
 {% endif %}
 
 {% if change.addSecuredParties is defined or change.deleteSecuredParties is defined %}
 <div class="container pt-4">
-
     [[search-result/securedParties.html]]
-
 </div>
 {% endif %}
 
 <div class="container pt-4">
-
   [[search-result/registeringParty.html]]
-
 </div>
 
 <div class="separator mt-4"></div> 

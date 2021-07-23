@@ -1,21 +1,23 @@
 {
-  "baseRegistrationNumber": "100032B", 
-  "clientReferenceId": "T-RS-SA-0032-1", 
-  "createDateTime": "2021-06-03T16:27:55+00:00", 
-  "expiryDate": "2026-06-03T23:59:59+00:00", 
-  "lifeYears": 5, 
+  "baseRegistrationNumber": "TEST0005", 
+  "clientReferenceId": "TEST-REN-0005", 
+  "createDateTime": "2021-07-15T15:46:58+00:00", 
+  "expiryDate": "2023-07-15T15:41:58+00:00", 
+  "lifeYears": 2, 
   "registeringParty": {
     "address": {
       "city": "city", 
       "country": "CA", 
       "postalCode": "V8R3A5", 
       "region": "BC", 
-      "street": "TEST 200000000", 
+      "street": "TEST-00R5", 
       "streetAdditional": "line 2"
     }, 
-    "businessName": "TEST PARTY CODE 1", 
-    "code": "200000000", 
-    "emailAddress": "test-sp-client@gmail.com"
+    "personName": {
+      "first": "TEST-RENEWAL", 
+      "last": "REGISTERING", 
+      "middle": "5"
+    }
   }, 
-  "renewalRegistrationNumber": "100033B"
+  "renewalRegistrationNumber": "TEST00R5"
 }

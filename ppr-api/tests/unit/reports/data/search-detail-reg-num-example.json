@@ -5,49 +5,40 @@
         "baseRegistrationNumber": "TEST0001", 
         "changes": [
           {
-            "addGeneralCollateral": [
+            "addSecuredParties": [
               {
-                "collateralId": 200000003, 
-                "description": "TEST GENERAL COLLATERAL CHANGE ADD."
-              }
-            ], 
-            "addVehicleCollateral": [
-              {
-                "make": "BMW", 
-                "model": "Z4", 
-                "serialNumber": "JU622994", 
-                "type": "MV", 
-                "vehicleId": 200000007, 
-                "year": 2014
-              }, 
-              {
-                "make": "HOMCO IND. LTD DIPLOMAT", 
-                "manufacturedHomeRegistrationNumber": "220000", 
-                "serialNumber": "999999", 
-                "type": "MH", 
-                "vehicleId": 200000008, 
-                "year": 2012
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00C9", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
+                "former_name": "TEST 7 AMEND SECURED PARTY", 
+                "partyId": 200000026, 
+                "reg_id": 200000010
               }
             ], 
             "baseRegistrationNumber": "TEST0001", 
-            "changeRegistrationNumber": "TEST0010", 
-            "changeType": "SU", 
-            "clientReferenceId": "TEST-CH-0010", 
-            "createDateTime": "2021-03-16T15:34:38+00:00", 
-            "deleteGeneralCollateral": [
+            "changeRegistrationNumber": "TEST0009", 
+            "changeType": "ST", 
+            "clientReferenceId": "TEST-CH-0009", 
+            "createDateTime": "2021-07-15T15:56:58+00:00", 
+            "deleteSecuredParties": [
               {
-                "collateralId": 200000002, 
-                "description": "TEST GENERAL COLLATERAL AMEND ADD."
-              }
-            ], 
-            "deleteVehicleCollateral": [
-              {
-                "make": "FORD", 
-                "model": "FIESTA", 
-                "serialNumber": "T346JU622994", 
-                "type": "MV", 
-                "vehicleId": 200000006, 
-                "year": 2018
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00A7", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 7 AMEND SECURED PARTY", 
+                "partyId": 200000022, 
+                "reg_id": 200000010
               }
             ], 
             "registeringParty": {
@@ -56,13 +47,67 @@
                 "country": "CA", 
                 "postalCode": "V8R3A5", 
                 "region": "BC", 
-                "street": "TEST-0010", 
+                "street": "TEST-00C9", 
                 "streetAdditional": "line 2"
               }, 
               "personName": {
-                "first": "TEST-CHANGE-SU", 
+                "first": "TEST-CHANGE-DT", 
                 "last": "REGISTERING", 
-                "middle": "10"
+                "middle": "9"
+              }
+            }, 
+            "statementType": "CHANGE_STATEMENT"
+          }, 
+          {
+            "addDebtors": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00C8", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 8 TRANSFER DEBTOR", 
+                "former_name": "TEST 7 AMEND DEBTOR", 
+                "partyId": 200000024, 
+                "reg_id": 200000009
+              }
+            ], 
+            "baseRegistrationNumber": "TEST0001", 
+            "changeRegistrationNumber": "TEST0008", 
+            "changeType": "DT", 
+            "clientReferenceId": "TEST-CH-0008", 
+            "createDateTime": "2021-07-15T15:51:58+00:00", 
+            "deleteDebtors": [
+              {
+                "address": {
+                  "city": "city", 
+                  "country": "CA", 
+                  "postalCode": "V8R3A5", 
+                  "region": "BC", 
+                  "street": "TEST-00A7", 
+                  "streetAdditional": "line 2"
+                }, 
+                "businessName": "TEST 7 AMEND DEBTOR", 
+                "partyId": 200000021, 
+                "reg_id": 200000009
+              }
+            ], 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-00C8", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-CHANGE-DT", 
+                "last": "REGISTERING", 
+                "middle": "8"
               }
             }, 
             "statementType": "CHANGE_STATEMENT"
@@ -79,13 +124,16 @@
                   "streetAdditional": "line 2"
                 }, 
                 "businessName": "TEST 7 AMEND DEBTOR", 
-                "partyId": 200000021
+                "former_name": "", 
+                "partyId": 200000021, 
+                "reg_id": 200000008
               }
             ], 
             "addGeneralCollateral": [
               {
                 "collateralId": 200000002, 
-                "description": "TEST GENERAL COLLATERAL AMEND ADD."
+                "description": "TEST GENERAL COLLATERAL AMEND ADD.", 
+                "reg_id": 200000008
               }
             ], 
             "addSecuredParties": [
@@ -99,13 +147,16 @@
                   "streetAdditional": "line 2"
                 }, 
                 "businessName": "TEST 7 AMEND SECURED PARTY", 
-                "partyId": 200000022
+                "former_name": "TEST 1 SECURED PARTY", 
+                "partyId": 200000022, 
+                "reg_id": 200000008
               }
             ], 
             "addVehicleCollateral": [
               {
                 "make": "FORD", 
                 "model": "FIESTA", 
+                "reg_id": 200000008, 
                 "serialNumber": "T346JU622994", 
                 "type": "MV", 
                 "vehicleId": 200000006, 
@@ -121,9 +172,9 @@
               "courtRegistry": "Victoria", 
               "effectOfOrder": "Court Order to change something.", 
               "fileNumber": "BC123495", 
-              "orderDate": "2021-10-02T15:34:38+00:00"
+              "orderDate": "2022-01-31T15:41:58+00:00"
             }, 
-            "createDateTime": "2021-03-16T15:39:38+00:00", 
+            "createDateTime": "2021-07-15T15:46:58+00:00", 
             "deleteDebtors": [
               {
                 "address": {
@@ -139,13 +190,15 @@
                   "first": "TEST IND", 
                   "last": "DEBTOR", 
                   "middle": "1"
-                }
+                }, 
+                "reg_id": 200000008
               }
             ], 
             "deleteGeneralCollateral": [
               {
                 "collateralId": 200000001, 
-                "description": "TEST0001 GC 2"
+                "description": "TEST0001 GC 2", 
+                "reg_id": 200000008
               }
             ], 
             "deleteSecuredParties": [
@@ -159,13 +212,15 @@
                   "streetAdditional": "line 2"
                 }, 
                 "businessName": "TEST 1 SECURED PARTY", 
-                "partyId": 200000003
+                "partyId": 200000003, 
+                "reg_id": 200000008
               }
             ], 
             "deleteVehicleCollateral": [
               {
                 "make": "HOMCO IND. LTD DIPLOMAT", 
-                "manufacturedHomeRegistrationNumber": "21324", 
+                "manufacturedHomeRegistrationNumber": "021324", 
+                "reg_id": 200000008, 
                 "serialNumber": "9407", 
                 "type": "MH", 
                 "vehicleId": 200000001, 
@@ -191,37 +246,54 @@
             "statementType": "AMENDMENT_STATEMENT"
           }, 
           {
-            "addDebtors": [
+            "addGeneralCollateral": [
               {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00C8", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 8 TRANSFER DEBTOR", 
-                "partyId": 200000024
+                "collateralId": 200000003, 
+                "description": "TEST GENERAL COLLATERAL CHANGE ADD.", 
+                "reg_id": 200000011
+              }
+            ], 
+            "addVehicleCollateral": [
+              {
+                "make": "BMW", 
+                "model": "Z4", 
+                "reg_id": 200000011, 
+                "serialNumber": "JU622994", 
+                "type": "MV", 
+                "vehicleId": 200000007, 
+                "year": 2014
+              }, 
+              {
+                "make": "HOMCO IND. LTD DIPLOMAT", 
+                "manufacturedHomeRegistrationNumber": "220000", 
+                "reg_id": 200000011, 
+                "serialNumber": "999999", 
+                "type": "MH", 
+                "vehicleId": 200000008, 
+                "year": 2012
               }
             ], 
             "baseRegistrationNumber": "TEST0001", 
-            "changeRegistrationNumber": "TEST0008", 
-            "changeType": "DT", 
-            "clientReferenceId": "TEST-CH-0008", 
-            "createDateTime": "2021-03-16T15:44:38+00:00", 
-            "deleteDebtors": [
+            "changeRegistrationNumber": "TEST0010", 
+            "changeType": "SU", 
+            "clientReferenceId": "TEST-CH-0010", 
+            "createDateTime": "2021-07-15T15:41:58+00:00", 
+            "deleteGeneralCollateral": [
               {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00A7", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 7 AMEND DEBTOR", 
-                "partyId": 200000021
+                "collateralId": 200000002, 
+                "description": "TEST GENERAL COLLATERAL AMEND ADD.", 
+                "reg_id": 200000011
+              }
+            ], 
+            "deleteVehicleCollateral": [
+              {
+                "make": "FORD", 
+                "model": "FIESTA", 
+                "reg_id": 200000011, 
+                "serialNumber": "T346JU622994", 
+                "type": "MV", 
+                "vehicleId": 200000006, 
+                "year": 2018
               }
             ], 
             "registeringParty": {
@@ -230,64 +302,13 @@
                 "country": "CA", 
                 "postalCode": "V8R3A5", 
                 "region": "BC", 
-                "street": "TEST-00C8", 
+                "street": "TEST-0010", 
                 "streetAdditional": "line 2"
               }, 
               "personName": {
-                "first": "TEST-CHANGE-DT", 
+                "first": "TEST-CHANGE-SU", 
                 "last": "REGISTERING", 
-                "middle": "8"
-              }
-            }, 
-            "statementType": "CHANGE_STATEMENT"
-          }, 
-          {
-            "addSecuredParties": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00C9", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
-                "partyId": 200000026
-              }
-            ], 
-            "baseRegistrationNumber": "TEST0001", 
-            "changeRegistrationNumber": "TEST0009", 
-            "changeType": "ST", 
-            "clientReferenceId": "TEST-CH-0009", 
-            "createDateTime": "2021-03-16T15:49:38+00:00", 
-            "deleteSecuredParties": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00A7", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 7 AMEND SECURED PARTY", 
-                "partyId": 200000022
-              }
-            ], 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00C9", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-CHANGE-DT", 
-                "last": "REGISTERING", 
-                "middle": "9"
+                "middle": "10"
               }
             }, 
             "statementType": "CHANGE_STATEMENT"
@@ -299,9 +320,9 @@
           "courtRegistry": "Victoria", 
           "effectOfOrder": "Court Order to change something.", 
           "fileNumber": "BC123495", 
-          "orderDate": "2021-10-02T15:34:38+00:00"
+          "orderDate": "2022-01-31T15:41:58+00:00"
         }, 
-        "createDateTime": "2021-03-16T15:34:38+00:00", 
+        "createDateTime": "2021-07-15T15:41:58+00:00", 
         "debtors": [
           {
             "address": {
@@ -329,7 +350,7 @@
             "partyId": 200000024
           }
         ], 
-        "expiryDate": "2023-03-16T15:34:38+00:00", 
+        "expiryDate": "2023-07-15T15:41:58+00:00", 
         "generalCollateral": [
           {
             "collateralId": 200000000, 
@@ -369,7 +390,7 @@
               "street": "TEST 200000000", 
               "streetAdditional": "line 2"
             }, 
-            "businessName": "TEST SECURED PARTY", 
+            "businessName": "TEST PARTY CODE 1", 
             "code": "200000000", 
             "emailAddress": "test-sp-client@gmail.com", 
             "partyId": 200000004
@@ -425,12 +446,12 @@
   ], 
   "exactResultsSize": 1, 
   "payment": {
-    "invoiceId": "1000001", 
-    "receipt": "/api/v1/payment-requests/1000001/receipts"
+    "invoiceId": "10751", 
+    "receipt": "/api/v1/payment-requests/10751/receipts"
   }, 
-  "searchDateTime": "2021-03-29T17:36:56+00:00", 
+  "searchDateTime": "2021-07-20T06:58:02+00:00", 
   "searchQuery": {
-    "clientReferenceId": "T-S-RN-005", 
+    "clientReferenceId": "T-S-RN-006", 
     "criteria": {
       "value": "TEST0001"
     }, 

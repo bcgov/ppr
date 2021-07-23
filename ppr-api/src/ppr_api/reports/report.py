@@ -36,27 +36,27 @@ TO_SEARCH_DESCRIPTION = {
 
 # Map from API vehicle type to report description
 TO_VEHICLE_TYPE_DESCRIPTION = {
-    'AC': 'Aircraft',
-    'AF': 'Aircraft Airframe',
-    'AP': 'Airplane',
-    'BO': 'Boat',
-    'EV': 'Electric Motor Vehhicle',
-    'MV': 'Motor Vehicle',
-    'MH': 'Manufactured Home',
-    'OB': 'Outboard Boat Motor',
-    'TR': 'Trailer'
+    'AC': 'Aircraft (AC)',
+    'AF': 'Aircraft Airframe (AF)',
+    'AP': 'Airplane (AP)',
+    'BO': 'Boat (BO)',
+    'EV': 'Electric Motor Vehhicle (EV)',
+    'MV': 'Motor Vehicle (MV)',
+    'MH': 'Manufactured or Mobile Home (MH)',
+    'OB': 'Outboard Boat Motor (OB)',
+    'TR': 'Trailer (TR)'
 }
 
 # Map from API change/amendment registration change type to report description
 TO_CHANGE_TYPE_DESCRIPTION = {
-    'AC': 'Addition of Collateral Proceeds',
-    'AM': 'Amendment/Other Change',
-    'CO': 'Court Order',
-    'DR': 'Debtor Release',
-    'DT': 'Debtor Transfer',
-    'PD': 'Partial Discharge',
-    'ST': 'Secured Party Transfer',
-    'SU': 'Substitution of Collateral'
+    'AC': 'ADDITION OF COLLATERAL / PROCEEDS',
+    'AM': 'AMENDMENT / OTHER CHANGE',
+    'CO': 'COURT ORDER',
+    'DR': 'DEBTOR RELEASE',
+    'DT': 'DEBTOR TRANSFER',
+    'PD': 'PARTIAL DISCHARGE',
+    'ST': 'SECURED PARTY TRANSFER',
+    'SU': 'SUBSTITUTION OF COLLATERAL / PROCEEDS'
 }
 
 
@@ -247,15 +247,15 @@ class Report:  # pylint: disable=too-few-public-methods
             if 'changes' in self._report_data:
                 for change in self._report_data['changes']:
                     if change['statementType'] == 'CHANGE_STATEMENT':
-                        self._set_amend_change_addresses(change)
+                        self._set_modified_parties(change)
                     elif change['statementType'] == 'AMENDMENT_STATEMENT':
-                        self._set_amend_party_addresses(change)
+                        self._set_modified_parties(change)
                     else:
                         self._format_address(change['registeringParty']['address'])
         elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value:
-            self._set_amend_party_addresses(self._report_data)
+            self._set_modified_parties(self._report_data)
         elif self._report_key == ReportTypes.CHANGE_STATEMENT_REPORT.value:
-            self._set_amend_change_addresses(self._report_data)
+            self._set_modified_parties(self._report_data)
         elif self._report_key != ReportTypes.SEARCH_DETAIL_REPORT.value:
             self._format_address(self._report_data['registeringParty']['address'])
 
@@ -266,9 +266,9 @@ class Report:  # pylint: disable=too-few-public-methods
             if 'changes' in detail['financingStatement']:
                 for change in detail['financingStatement']['changes']:
                     if change['statementType'] == 'CHANGE_STATEMENT':
-                        self._set_amend_change_addresses(change)
+                        self._set_modified_parties(change)
                     elif change['statementType'] == 'AMENDMENT_STATEMENT':
-                        self._set_amend_party_addresses(change)
+                        self._set_modified_parties(change)
                     else:
                         self._format_address(change['registeringParty']['address'])
 
@@ -284,21 +284,32 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_financing_vehicle_collateral(statement):
         """Replace financing statement vehicle collateral type code with description."""
         if 'vehicleCollateral' in statement:
+            mh_count = 0
             for collateral in statement['vehicleCollateral']:
+                if collateral['type'] == 'MH':
+                    mh_count += 1
                 desc = TO_VEHICLE_TYPE_DESCRIPTION[collateral['type']]
                 collateral['type'] = desc
+            statement['mhCollateralCount'] = mh_count
 
     @staticmethod
     def _set_amend_change_vehicle_collateral(statement):
         """Replace amendment/change statement vehicle collateral type code with description."""
-        if 'deleteVehicleCollateral' in statement:
-            for delete_collateral in statement['deleteVehicleCollateral']:
-                desc = TO_VEHICLE_TYPE_DESCRIPTION[delete_collateral['type']]
-                delete_collateral['type'] = desc
-        if 'addVehicleCollateral' in statement:
-            for add_collateral in statement['addVehicleCollateral']:
-                desc = TO_VEHICLE_TYPE_DESCRIPTION[add_collateral['type']]
-                add_collateral['type'] = desc
+        if 'deleteVehicleCollateral' in statement or 'addVehicleCollateral' in statement:
+            mh_count = 0
+            if 'deleteVehicleCollateral' in statement:
+                for delete_collateral in statement['deleteVehicleCollateral']:
+                    if delete_collateral['type'] == 'MH':
+                        mh_count += 1
+                    desc = TO_VEHICLE_TYPE_DESCRIPTION[delete_collateral['type']]
+                    delete_collateral['type'] = desc
+            if 'addVehicleCollateral' in statement:
+                for add_collateral in statement['addVehicleCollateral']:
+                    if add_collateral['type'] == 'MH':
+                        mh_count += 1
+                    desc = TO_VEHICLE_TYPE_DESCRIPTION[add_collateral['type']]
+                    add_collateral['type'] = desc
+            statement['mhCollateralCount'] = mh_count
 
     @staticmethod
     def _set_amend_vehicle_collateral(statement):
@@ -307,7 +318,13 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'deleteVehicleCollateral' in statement and 'addVehicleCollateral' in statement:
             for add in statement['addVehicleCollateral']:
                 for delete in statement['deleteVehicleCollateral']:
-                    if add['serialNumber'] == delete['serialNumber']:
+                    if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id']:
+                        add['edit'] = True
+                        delete['edit'] = True
+        if 'deleteGeneralCollateral' in statement and 'addGeneralCollateral' in statement:
+            for add in statement['addGeneralCollateral']:
+                for delete in statement['deleteGeneralCollateral']:
+                    if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id']:
                         add['edit'] = True
                         delete['edit'] = True
 
@@ -388,13 +405,39 @@ class Report:  # pylint: disable=too-few-public-methods
                         delete['edit'] = True
 
     @staticmethod
+    def _set_modified_party(add_party, delete_party):
+        """Set the update flags for a single party ."""
+        if 'reg_id' in add_party and 'reg_id' in delete_party and add_party['reg_id'] == delete_party['reg_id']:
+            delete_party['edit'] = True
+            if add_party['address'] != delete_party['address']:
+                add_party['address_change'] = True
+            if 'businessName' in add_party and 'businessName' in delete_party and \
+                    add_party['businessName'] != delete_party['businessName']:
+                add_party['name_change'] = True
+            elif 'personName' in add_party and 'personName' in delete_party and \
+                    add_party['personName'] != delete_party['personName']:
+                add_party['name_change'] = True
+
+    def _set_modified_parties(self, statement):
+        """Replace amendment or change address country code with description. Set if party edited."""
+        self._set_amend_change_addresses(statement)
+        if 'deleteSecuredParties' in statement and 'addSecuredParties' in statement:
+            for add_secured in statement['addSecuredParties']:
+                for delete_secured in statement['deleteSecuredParties']:
+                    Report._set_modified_party(add_secured, delete_secured)
+        if 'deleteDebtors' in statement and 'addDebtors' in statement:
+            for add_debtor in statement['addDebtors']:
+                for delete_debtor in statement['deleteDebtors']:
+                    Report._set_modified_party(add_debtor, delete_debtor)
+
+    @staticmethod
     def _set_financing_date_time(statement):
         """Replace financing statement API ISO UTC strings with local report format strings."""
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'expiryDate' in statement:
             statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'])
         if 'surrenderDate' in statement:
-            statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'])
+            statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'dischargedDateTime' in statement:
             statement['dischargedDateTime'] = Report._to_report_datetime(statement['dischargedDateTime'])
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
@@ -417,7 +460,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'expiryDate' in statement:
             statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'])
         if 'surrenderDate' in statement:
-            statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'])
+            statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'deleteDebtors' in statement:
             for delete_debtor in statement['deleteDebtors']:
                 if 'birthDate' in delete_debtor:
@@ -474,7 +517,7 @@ class Report:  # pylint: disable=too-few-public-methods
 
         # Get source ???
         # Appears in the Description section of the PDF Document Properties as Title.
-        self._report_data['meta_title'] = ReportMeta.reports[self._report_key]['metaTitle']
+        self._report_data['meta_title'] = ReportMeta.reports[self._report_key]['metaTitle'].upper()
 
         # Appears in the Description section of the PDF Document Properties as Subject.
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value:
@@ -490,7 +533,7 @@ class Report:  # pylint: disable=too-few-public-methods
                     criteria += ' ' + self._report_data['searchQuery']['criteria']['debtorName']['middle']
             else:
                 criteria = self._report_data['searchQuery']['criteria']['value']
-            self._report_data['meta_subject'] = f'{search_desc} - {criteria}'
+            self._report_data['meta_subject'] = f'{search_desc} - "{criteria}"'
 
     @staticmethod
     def _get_environment():
@@ -511,7 +554,10 @@ class Report:  # pylint: disable=too-few-public-methods
         # local_datetime = datetime.fromtimestamp(utc_datetime.timestamp())
         local_datetime = utc_datetime.astimezone(pytz.timezone('Canada/Pacific'))
         if include_time:
-            return local_datetime.strftime('%B %d, %Y %I:%M:%S %p Pacific Time')
+            timestamp = local_datetime.strftime('%B %-d, %Y %-I:%M:%S %p Pacific Time')
+            if timestamp.find(' AM ') > 0:
+                return timestamp.replace(' AM ', ' am ')
+            return timestamp.replace(' PM ', ' pm ')
 
         return local_datetime.strftime('%B %d, %Y')
 

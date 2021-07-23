@@ -1,136 +1,189 @@
 <div class="no-page-break">
-   <div class="section-title mt-4">Vehicle Collateral</div>
-{% if vehicleCollateral is defined and change is not defined %}
-   <table class="vehicle-collateral-table mt-4" role="presentation">
-      <tr class="solid-row-separator vehicle-collateral-table-header no-page-break">
-         <td class="top-align"></td>
-         <td class="top-align">Type</td>
-         <td class="top-align">Year</td>
-         <td class="top-align">Make/Model</td>
-         <td class="top-align">Serial Number</td>
-         <td class="top-align">MHR Number</td>
-      </tr>
-      {% for collateral in vehicleCollateral %}
-         <tr class="no-page-break">
-            <td>{{ loop.index }}</td>
-            <td>{{collateral.type}}</td>
-            <td>{{collateral.year}}</td>
-            <td>{{collateral.make}} 
-               {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
-            <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
-                  {{collateral.manufacturedHomeRegistrationNumber}}
-                {% endif %}
-            </td>
+   {% if vehicleCollateral is defined and change is not defined %}
+      <div class="separator mt-5"></div>
+      <div class="section-title mt-3">Vehicle Collateral</div>
+      {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+         <table class="vehicle-collateral-table-mh mt-4" role="presentation">
+      {% else %}
+         <table class="vehicle-collateral-table mt-4" role="presentation">
+      {% endif %}
+            
+         <tr class="solid-row-separator vehicle-collateral-table-header no-page-break">
+            <td class="top-align">Type</td>
+            <td class="top-align">Year</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">Serial/VIN/DOT Number</td>
+            {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+               <td class="top-align">MH Number</td>
+            {% endif %}
          </tr>
-         <tr class="solid-row-separator no-page-break">
-            <td colspan="6" style="height:1px"/>
-         </tr>
-      {% endfor %}
-   </table>
-{% elif change is not defined and  (addVehicleCollateral is defined or deleteVehicleCollateral is defined) %}
-   <table class="vehicle-collateral-table mt-4" role="presentation">
-      <tr class="solid-row-separator vehicle-collateral-table-header no-page-break">
-         <td class="top-align"></td>
-         <td class="top-align">Type</td>
-         <td class="top-align">Year</td>
-         <td class="top-align">Make/Model</td>
-         <td class="top-align">Serial Number</td>
-         <td class="top-align">MHR Number</td>
-      </tr>
-   {% if addVehicleCollateral is defined %}
-      {% for collateral in addVehicleCollateral %}
-         <tr class="no-page-break">
-            <td><span class="label">{% if collateral.edit is not defined %} Added {% else %} Edited{% endif %}</span></td>
-            <td>{{collateral.type}}</td>
-            <td>{{collateral.year}}</td>
-            <td>{{collateral.make}} 
-               {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
-            <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
-                  {{collateral.manufacturedHomeRegistrationNumber}}
-                {% endif %}
-            </td>
-         </tr>
-         <tr class="solid-row-separator no-page-break">
-            <td colspan="6" style="height:1px"/>
-         </tr>
-      {% endfor %}
-   {% endif %}
-   {% if deleteVehicleCollateral is defined %}
-      {% for collateral in deleteVehicleCollateral %}
-         {% if collateral.edit is not defined %}
-         <tr class="no-page-break">
-            <td><span class="label">Removed</h4></td>
-            <td>{{collateral.type}}</td>
-            <td>{{collateral.year}}</td>
-            <td>{{collateral.make}} 
-               {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
-            <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
-                  {{collateral.manufacturedHomeRegistrationNumber}}
+         {% for collateral in vehicleCollateral %}
+            <tr class="no-page-break">
+               <td>{{collateral.type}}</td>
+               <td>{{collateral.year}}</td>
+               <td>{{collateral.make}} 
+                  {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
+               <td>{{collateral.serialNumber}}</td>
+               {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+                  <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
+                     {{collateral.manufacturedHomeRegistrationNumber}}
+                  {% endif %}
+                  </td>
                {% endif %}
-            </td>
-         </tr>
-         <tr class="solid-row-separator no-page-break">
-            <td colspan="6" style="height:1px"/>
-         </tr>
-         {% endif %}
-      {% endfor %}
-   {% endif %}
-   </table>
-{% elif change is defined and (change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined) %}
-   <table class="vehicle-collateral-table mt-4" role="presentation">
-      <tr class="solid-row-separator vehicle-collateral-table-header no-page-break">
-         <td class="top-align"></td>
-         <td class="top-align">Type</td>
-         <td class="top-align">Year</td>
-         <td class="top-align">Make/Model</td>
-         <td class="top-align">Serial Number</td>
-         <td class="top-align">MHR Number</td>
-      </tr>
-   {% if change.addVehicleCollateral is defined %}
-      {% for collateral in change.addVehicleCollateral %}
-         <tr class="no-page-break">
-            <td><span class="label">{% if collateral.edit is not defined %} Added {% else %} Edited{% endif %}</span></td>
-            <td>{{collateral.type}}</td>
-            <td>{{collateral.year}}</td>
-            <td>{{collateral.make}} 
-               {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
-            <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
-                  {{collateral.manufacturedHomeRegistrationNumber}}
-                {% endif %}
-            </td>
-         </tr>
-         <tr class="solid-row-separator no-page-break">
-            <td colspan="6" style="height:1px"/>
-         </tr>
-      {% endfor %}
-   {% endif %}
-   {% if change.deleteVehicleCollateral is defined %}
-      {% for collateral in change.deleteVehicleCollateral %}
-         {% if collateral.edit is not defined %}
-         <tr class="no-page-break">
-            <td><span class="label">Removed</h4></td>
-            <td>{{collateral.type}}</td>
-            <td>{{collateral.year}}</td>
-            <td>{{collateral.make}} 
-               {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
-            <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
-                  {{collateral.manufacturedHomeRegistrationNumber}}
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+               {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+                  <td colspan="5" style="height:1px"/>
+               {% else %}
+                  <td colspan="4" style="height:1px"/>
                {% endif %}
-            </td>
-         </tr>
-         <tr class="solid-row-separator no-page-break">
-            <td colspan="6" style="height:1px"/>
-         </tr>
+            </tr>
+         {% endfor %}
+      </table>
+
+   {% elif change is not defined and  (addVehicleCollateral is defined or deleteVehicleCollateral is defined) %}
+      <div class="section-title mt-3">Vehicle Collateral</div>
+      {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+            <table class="vehicle-collateral-table-mh mt-4" role="presentation">
+         {% else %}
+            <table class="vehicle-collateral-table mt-4" role="presentation">
          {% endif %}
-      {% endfor %}
+            
+         <tr class="solid-row-separator vehicle-collateral-table-header no-page-break">
+            <td class="top-align">Type</td>
+            <td class="top-align">Year</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">Serial/VIN/DOT Number</td>
+            {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+               <td class="top-align">MH Number</td>
+            {% endif %}
+         </tr>
+      {% if addVehicleCollateral is defined %}
+         {% for collateral in addVehicleCollateral %}
+            <tr class="no-page-break">
+               <td>
+                  <div><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+                  {{collateral.type}}
+               </td>
+               <td>{{collateral.year}}</td>
+               <td>{{collateral.make}} 
+                  {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
+               <td>{{collateral.serialNumber}}</td>
+               {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+                  <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
+                        {{collateral.manufacturedHomeRegistrationNumber}}
+                     {% endif %}
+                  </td>
+               {% endif %}
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+               {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+                  <td colspan="5" style="height:1px"/>
+               {% else %}
+                  <td colspan="4" style="height:1px"/>
+               {% endif %}
+            </tr>
+         {% endfor %}
+      {% endif %}
+      {% if deleteVehicleCollateral is defined %}
+         {% for collateral in deleteVehicleCollateral %}
+            {% if collateral.edit is not defined %}
+            <tr class="no-page-break">
+               <td><div><span class="label">REMOVED</span></div> {{collateral.type}}</td>
+               <td>{{collateral.year}}</td>
+               <td>{{collateral.make}} 
+                  {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
+               <td>{{collateral.serialNumber}}</td>
+               {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+                  <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
+                        {{collateral.manufacturedHomeRegistrationNumber}}
+                     {% endif %}
+                  </td>
+               {% endif %}
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+               {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+                  <td colspan="5" style="height:1px"/>
+               {% else %}
+                  <td colspan="4" style="height:1px"/>
+               {% endif %}
+            </tr>
+            {% endif %}
+         {% endfor %}
+      {% endif %}
+      </table>
+   {% elif change is defined and (change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined) %}
+      <div class="section-title mt-3">Vehicle Collateral</div>
+      {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+            <table class="vehicle-collateral-table-mh mt-4" role="presentation">
+         {% else %}
+            <table class="vehicle-collateral-table mt-4" role="presentation">
+         {% endif %}
+            
+         <tr class="solid-row-separator vehicle-collateral-table-header no-page-break">
+            <td class="top-align">Type</td>
+            <td class="top-align">Year</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">Serial/VIN/DOT Number</td>
+            {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+               <td class="top-align">MH Number</td>
+            {% endif %}
+         </tr>
+      {% if change.addVehicleCollateral is defined %}
+         {% for collateral in change.addVehicleCollateral %}
+            <tr class="no-page-break">
+               <td>
+                  <div><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+                  {{collateral.type}}
+               </td>
+               <td>{{collateral.year}}</td>
+               <td>{{collateral.make}} 
+                  {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
+               <td>{{collateral.serialNumber}}</td>
+               {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+                  <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
+                        {{collateral.manufacturedHomeRegistrationNumber}}
+                     {% endif %}
+                  </td>
+               {% endif %}
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+               {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+                  <td colspan="5" style="height:1px"/>
+               {% else %}
+                  <td colspan="4" style="height:1px"/>
+               {% endif %}
+            </tr>
+         {% endfor %}
+      {% endif %}
+      {% if change.deleteVehicleCollateral is defined %}
+         {% for collateral in change.deleteVehicleCollateral %}
+            {% if collateral.edit is not defined %}
+            <tr class="no-page-break">
+               <td><div><span class="label">REMOVED</span></div> {{collateral.type}}</td>
+               <td>{{collateral.year}}</td>
+               <td>{{collateral.make}} 
+                  {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
+               <td>{{collateral.serialNumber}}</td>
+               {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+                  <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
+                        {{collateral.manufacturedHomeRegistrationNumber}}
+                     {% endif %}
+                  </td>
+               {% endif %}
+            </tr>
+            <tr class="solid-row-separator no-page-break">
+               {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+                  <td colspan="5" style="height:1px"/>
+               {% else %}
+                  <td colspan="4" style="height:1px"/>
+               {% endif %}
+            </tr>
+            {% endif %}
+         {% endfor %}
+      {% endif %}
+      </table>
+   {% else %}
+      <div class="section-data">None</div>
    {% endif %}
-   </table>
-{% else %}
-   <div class="title">None.</div>
-{% endif %}
 </div>

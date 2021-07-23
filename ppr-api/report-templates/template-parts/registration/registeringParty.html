@@ -1,6 +1,7 @@
-{% if registeringParty is defined and change is not defined %}
+{% if registeringParty is defined and change is not defined  %}
 <div class="no-page-break">
-    <div class="section-title mt-4">Registering Party Information</div>
+    <div class="separator mt-5"></div>
+    <div class="section-title mt-3">Registering Party Information</div>
     <table class="section-data section-data-table mt-4" role="presentation">
         <tr class="no-page-break">
             <td class="col-33">
@@ -32,10 +33,10 @@
 </div>
 {% elif change.registeringParty is defined %}
 <div class="no-page-break">
-    <div class="section-title mt-4">Registering Party</div>
+    <div class="section-title mt-3">Registering Party Information</div>
     <table class="section-data section-data-table mt-4" role="presentation">
         <tr class="no-page-break">
-            <td class="col-33 pr-4">
+            <td class="col-33">
                 <div class="section-sub-title">
                     {% if change.registeringParty.businessName is defined %}
                         {{ change.registeringParty.businessName }}
