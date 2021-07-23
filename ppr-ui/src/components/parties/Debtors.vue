@@ -80,7 +80,7 @@
                 {{ getName(row.item) }}
               </td>
               <td>
-                <span v-html="getFormattedAddress(row.item)"> </span>
+                <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
               </td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
@@ -161,12 +161,15 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
+import { BaseAddress } from '@/composables/address'
 
 import { debtorTableHeaders } from '@/resources'
+import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
   components: {
-    EditDebtor
+    EditDebtor,
+    BaseAddress
   },
   props: {
     isSummary: {
@@ -183,9 +186,9 @@ export default defineComponent({
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const addressSchema = PartyAddressSchema
     const {
       getName,
-      getFormattedAddress,
       getFormattedBirthdate,
       isPartiesValid,
       isBusiness
@@ -243,12 +246,12 @@ export default defineComponent({
     return {
       removeDebtor,
       getName,
-      getFormattedAddress,
       getFormattedBirthdate,
       initEdit,
       initAdd,
       resetData,
       isBusiness,
+      addressSchema,
       ...toRefs(localState)
     }
   }

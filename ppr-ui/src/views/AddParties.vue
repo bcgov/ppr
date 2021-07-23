@@ -15,7 +15,7 @@
               </v-col>
             </v-row>
             <stepper class="mt-4" />
-            <v-row no-gutters class="pt-6">
+            <v-row no-gutters class="pt-10">
               <v-col cols="auto" class="sub-header">
                 Add Secured Parties and Debtors
               </v-col>

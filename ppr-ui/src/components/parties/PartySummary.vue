@@ -11,15 +11,10 @@
       </v-col>
     </v-row>
     <v-container class="pa-0">
-      <v-row
-        class="pt-6 px-1"
-      >
+      <v-row class="pt-6 px-1">
         <v-col class="generic-label">Registering Party</v-col>
       </v-row>
-      <v-row
-        no-gutters
-        class="pb-6 pt-4"
-       >
+      <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
             class="registering-table"
@@ -33,16 +28,20 @@
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title">
-                  <div class="icon-div" v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
-                  >
-                  <div class="icon-div" v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
-                  >
+                  <div class="icon-div" v-if="isBusiness(row.item)">
+                    <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
+                  </div>
+                  <div class="icon-div" v-else>
+                    <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
+                  </div>
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address
+                    :editing="false"
+                    :schema="addressSchema"
+                    :value="row.item.address"
+                  />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -69,32 +68,36 @@
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="party-row">
                 <td class="list-item__title">
-                  <div class="icon-div" v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
-                  >
-                  <div class="icon-div" v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
-                  >
+                  <div class="icon-div" v-if="isBusiness(row.item)">
+                    <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
+                  </div>
+                  <div class="icon-div" v-else>
+                    <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
+                  </div>
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address
+                    :editing="false"
+                    :schema="addressSchema"
+                    :value="row.item.address"
+                  />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
               </tr>
             </template>
             <template slot="no-data">
-                  <v-icon color="#D3272C">mdi-information-outline</v-icon>
-                  <span class="invalid-message">
-                    This step is unfinished.
-                  </span>
-                  <span
-                    id="router-link-parties"
-                    class="invalid-link"
-                    @click="goToParties()"
-                    >Return to this step to complete it.</span
-                  >
+              <v-icon color="#D3272C">mdi-information-outline</v-icon>
+              <span class="invalid-message">
+                This step is unfinished.
+              </span>
+              <span
+                id="router-link-parties"
+                class="invalid-link"
+                @click="goToParties()"
+                >Return to this step to complete it.</span
+              >
             </template>
           </v-data-table>
         </v-col>
@@ -116,31 +119,35 @@
             <template v-slot:item="row" class="debtor-data-table">
               <tr :key="row.item.id" class="debtor-row">
                 <td class="list-item__title">
-                  <div class="icon-div" v-if="isBusiness(row.item)"
-                    ><v-icon class="mt-n2 pr-4">mdi-domain</v-icon></div
-                  >
-                  <div class="icon-div" v-else
-                    ><v-icon class="mt-n2 pr-4">mdi-account</v-icon></div
-                  >
+                  <div class="icon-div" v-if="isBusiness(row.item)">
+                    <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
+                  </div>
+                  <div class="icon-div" v-else>
+                    <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
+                  </div>
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address
+                    :editing="false"
+                    :schema="addressSchema"
+                    :value="row.item.address"
+                  />
                 </td>
                 <td>{{ getFormattedBirthdate(row.item) }}</td>
               </tr>
             </template>
             <template slot="no-data">
-                  <v-icon color="#D3272C">mdi-information-outline</v-icon>
-                  <span class="invalid-message">
-                    This step is unfinished.
-                  </span>
-                  <span
-                    id="router-link-parties"
-                    class="invalid-link"
-                    @click="goToParties()"
-                    >Return to this step to complete it.</span
-                  >
+              <v-icon color="#D3272C">mdi-information-outline</v-icon>
+              <span class="invalid-message">
+                This step is unfinished.
+              </span>
+              <span
+                id="router-link-parties"
+                class="invalid-link"
+                @click="goToParties()"
+                >Return to this step to complete it.</span
+              >
             </template>
           </v-data-table>
         </v-col>
@@ -159,6 +166,8 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
+import { BaseAddress } from '@/composables/address'
+import { PartyAddressSchema } from '@/schemas'
 
 import {
   partyTableHeaders,
@@ -167,6 +176,9 @@ import {
 } from '@/resources'
 
 export default defineComponent({
+  components: {
+    BaseAddress
+  },
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
@@ -177,12 +189,9 @@ export default defineComponent({
     const router = context.root.$router
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const {
-      getName,
-      getFormattedAddress,
-      getFormattedBirthdate,
-      isBusiness
-    } = useParty()
+    const addressSchema = PartyAddressSchema
+
+    const { getName, getFormattedBirthdate, isBusiness } = useParty()
     const localState = reactive({
       debtors: parties.debtors,
       securedParties: parties.securedParties,
@@ -213,7 +222,7 @@ export default defineComponent({
     return {
       getName,
       isBusiness,
-      getFormattedAddress,
+      addressSchema,
       getFormattedBirthdate,
       goToParties,
       ...toRefs(localState)

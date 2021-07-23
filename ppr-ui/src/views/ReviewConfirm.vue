@@ -13,13 +13,13 @@
               </v-col>
             </v-row>
             <stepper class="mt-4" :showStepErrorsFlag="showStepErrors"/>
-            <v-row class='pt-6'>
-              <v-col cols="auto" class="sub-header ps-5">
+            <v-row class='pt-10' no-gutters>
+              <v-col cols="auto" class="sub-header">
                 Review and Confirm
               </v-col>
             </v-row>
-            <v-row class="pa-2">
-              <v-col>
+            <v-row no-gutters>
+              <v-col class="pt-2 pb-6">
                 Review the information in your registration. If you need to change anything,
                 return to the step to make the necessary change.
               </v-col>

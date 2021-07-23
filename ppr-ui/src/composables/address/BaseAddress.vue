@@ -4,7 +4,6 @@
     <v-expand-transition>
       <div v-if="!editing" class="address-block">
         <div class="address-block__info pre-wrap">
-          <div class="address-block__info-row">{{ getCountryName(country) }}</div>
           <div class="address-block__info-row">{{ addressLocal.street }}</div>
           <div class="address-block__info-row">{{ addressLocal.streetAdditional }}</div>
           <div class="address-block__info-row">
@@ -12,7 +11,11 @@
             <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}</span>
             <span v-if="addressLocal.postalCode">&nbsp;{{ addressLocal.postalCode }}</span>
           </div>
-          <div class="address-block__info-row">{{ addressLocal.deliveryInstructions }}</div>
+          <div class="address-block__info-row">{{ getCountryName(country) }}</div>
+          <div v-if="addressLocal.deliveryInstructions"
+          class="address-block__info-row delivery-text"
+          >{{ addressLocal.deliveryInstructions }}
+          </div>
         </div>
       </div>
     </v-expand-transition>
@@ -221,6 +224,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.delivery-text {
+  font-style: italic;
+  margin-top: 10px;
+}
 
 // Address Block Layout
 .address-block {

@@ -24,7 +24,7 @@
                   {{ getName(row.item) }}
                 </td>
                 <td>
-                  <span v-html="getFormattedAddress(row.item)"> </span>
+                  <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
@@ -50,11 +50,16 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
+import { BaseAddress } from '@/composables/address'
 
 import { registeringTableHeaders } from '@/resources'
 import { getRegisteringPartyFromAuth } from '@/utils'
+import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
+  components: {
+    BaseAddress
+  },
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
@@ -63,6 +68,7 @@ export default defineComponent({
       'getAddSecuredPartiesAndDebtors'
     ])
     var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const addressSchema = PartyAddressSchema
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
@@ -81,7 +87,7 @@ export default defineComponent({
         localState.registeringParty = [parties.registeringParty]
       }
     })
-    const { getName, getFormattedAddress, isBusiness } = useParty()
+    const { getName, isBusiness } = useParty()
     const localState = reactive({
       registeringParty: null,
       partyHeaders: registeringTableHeaders
@@ -89,8 +95,8 @@ export default defineComponent({
 
     return {
       getName,
-      getFormattedAddress,
       isBusiness,
+      addressSchema,
       ...toRefs(localState)
     }
   }
