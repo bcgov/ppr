@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes'
 // Interfaces
 import {
   DraftIF,
+  FinancingStatementIF,
   SearchCriteriaIF,
   SearchResponseIF,
   SearchResultIF,
@@ -246,7 +247,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
     })
 }
 
-// Submit a search query (search step 1) request.
+// Submit a party code lookup request.
 export async function partyCodeSearch (nameOrCode: string): Promise<[SearchPartyIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
@@ -270,4 +271,22 @@ export async function partyCodeSearch (nameOrCode: string): Promise<[SearchParty
         }
       }
     )
+}
+
+// Save a new financing statement.
+export async function createFinancingStatement (statement: FinancingStatementIF): Promise<FinancingStatementIF> {
+  return axios.post<FinancingStatementIF>('financing-statements', statement, getDefaultConfig())
+    .then(response => {
+      const data: FinancingStatementIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    }).catch(error => {
+      statement.error = {
+        statusCode: error?.response?.status,
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause
+      }
+      return statement
+    })
 }

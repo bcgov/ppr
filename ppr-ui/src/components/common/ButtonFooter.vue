@@ -71,12 +71,13 @@ import {
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
-import { saveFinancingStatementDraft } from '@/utils'
+import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
 import {
   ButtonConfigIF, // eslint-disable-line no-unused-vars
   DraftIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
+  FinancingStatementIF, // eslint-disable-line no-unused-vars
   StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
@@ -142,7 +143,7 @@ export default defineComponent({
             draft.error.message
         )
         // Emit error message.
-        emit('draft-save-error', draft.error)
+        emit('save-draft-error', draft.error)
         return false
       }
       return true
@@ -178,7 +179,7 @@ export default defineComponent({
     }
 
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
-    const submitFinancingStatement = () => {
+    const submitFinancingStatement = async () => {
       const stateModel: StateModelIF = getStateModel.value
       if (
         stateModel.lengthTrustStep.valid &&
@@ -186,10 +187,15 @@ export default defineComponent({
         stateModel.addCollateralStep.valid
       ) {
         // API call here
-        // Handle API call error here
-        props.router.push({
-          name: localState.buttonConfig.nextRouteName
-        })
+        const apiResponse: FinancingStatementIF = await saveFinancingStatement(stateModel)
+        if (apiResponse.error !== undefined) {
+          // Emit error message.
+          emit('error', apiResponse.error)
+        } else {
+          props.router.push({
+            name: localState.buttonConfig.nextRouteName
+          })
+        }
       } else {
         // emit registation incomplete error
         const error: ErrorIF = {
