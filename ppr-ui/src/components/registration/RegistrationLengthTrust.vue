@@ -244,11 +244,6 @@ export default defineComponent({
       setLengthTrust(lengthTrust)
     })
 
-    onMounted(() => {
-      console.log(localState.lifeInfinite)
-      console.log(lengthTrust)
-    })
-
     return {
       goToLengthTrust,
       setLifeInfinite,
