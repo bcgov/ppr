@@ -184,6 +184,7 @@ export default defineComponent({
         localState.lifeYearsEdit = ''
         lengthTrust.lifeYears = 0
         lengthTrust.valid = true
+        lengthTrust.showInvalid = false
         feeSummary.quantity = feeInfoInfinite.quantityMin
         feeSummary.feeAmount = feeInfoInfinite.feeAmount
         setLengthTrust(lengthTrust)
@@ -225,7 +226,9 @@ export default defineComponent({
           }
         }
       } else {
-        lengthTrust.valid = false
+        if (!lengthTrust.lifeInfinite) {
+          lengthTrust.valid = false
+        }
       }
       if (!lengthTrust.valid && !lengthTrust.lifeInfinite) {
         lengthTrust.valid = false
