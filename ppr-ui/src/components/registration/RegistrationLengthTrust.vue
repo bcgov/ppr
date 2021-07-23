@@ -105,7 +105,7 @@ Select if the security interest is contained in a Trust Indenture.
 
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { LengthTrustIF, FeeSummaryIF, FeeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -184,6 +184,7 @@ export default defineComponent({
         localState.lifeYearsEdit = ''
         lengthTrust.lifeYears = 0
         lengthTrust.valid = true
+        lengthTrust.showInvalid = false
         feeSummary.quantity = feeInfoInfinite.quantityMin
         feeSummary.feeAmount = feeInfoInfinite.feeAmount
         setLengthTrust(lengthTrust)
@@ -225,7 +226,9 @@ export default defineComponent({
           }
         }
       } else {
-        lengthTrust.valid = false
+        if (!lengthTrust.lifeInfinite) {
+          lengthTrust.valid = false
+        }
       }
       if (!lengthTrust.valid && !lengthTrust.lifeInfinite) {
         lengthTrust.valid = false
@@ -239,6 +242,11 @@ export default defineComponent({
     watch(() => localState.trustIndenture, (val: boolean) => {
       lengthTrust.trustIndenture = val
       setLengthTrust(lengthTrust)
+    })
+
+    onMounted(() => {
+      console.log(localState.lifeInfinite)
+      console.log(lengthTrust)
     })
 
     return {
