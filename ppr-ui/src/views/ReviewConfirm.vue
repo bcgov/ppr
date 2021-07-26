@@ -71,7 +71,9 @@
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
                        :router="this.$router"
-                       @draft-save-error="saveDraftError" @registration-incomplete="registrationIncomplete" />
+                       @draft-save-error="saveDraftError"
+                       @registration-incomplete="registrationIncomplete"
+                       @error="emitError" />
       </v-col>
     </v-row>
   </v-container>
@@ -191,6 +193,7 @@ export default class ReviewConfirm extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
+    alert('Error saving registration. Replace when design complete.')
   }
 
   @Watch('saveDraftError')
@@ -202,7 +205,7 @@ export default class ReviewConfirm extends Vue {
   private registrationIncomplete (): void {
     this.showStepErrors = true
     this.setShowStepErrors(true)
-    alert('Error saving draft. Replace when design complete.')
+    alert('Registration incomplete. Replace when design complete.')
   }
 }
 </script>

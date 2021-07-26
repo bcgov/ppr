@@ -6,12 +6,12 @@ import {
   DraftIF,
   ErrorIF,
   FinancingStatementIF,
-  LengthTrustIF,
   GeneralCollateralIF,
+  PartyIF,
   RegistrationTypeIF,
   StateModelIF
 } from '@/interfaces'
-import { createDraft, updateDraft } from '@/utils'
+import { createDraft, createFinancingStatement, updateDraft } from '@/utils'
 
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
@@ -75,4 +75,98 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
                   draftResponse.error.message)
   }
   return draftResponse
+}
+
+/** Save new financing statement. Data to be saved is in the store state model. */
+export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
+  const registrationType: RegistrationTypeIF = stateModel.registrationType
+  var error:ErrorIF = null
+  var draft:DraftIF = stateModel.draft
+  const trustLength = stateModel.lengthTrustStep
+  const parties:AddPartiesIF = stateModel.addSecuredPartiesAndDebtorsStep
+  const collateral:AddCollateralIF = stateModel.addCollateralStep
+  var statement:FinancingStatementIF = {
+    type: stateModel.registrationType.registrationTypeAPI,
+    lifeInfinite: trustLength.lifeInfinite,
+    lifeYears: trustLength.lifeYears,
+    registeringParty: parties.registeringParty,
+    securedParties: parties.securedParties,
+    debtors: parties.debtors,
+    vehicleCollateral: collateral.vehicleCollateral,
+    generalCollateral: [],
+    clientReferenceId: stateModel.folioOrReferenceNumber
+  }
+  if (draft !== null && draft.financingStatement !== null) {
+    statement.documentId = draft.financingStatement.documentId
+  }
+  if (statement.type === 'SA') {
+    statement.trustIndenture = trustLength.trustIndenture
+  }
+  if (collateral.generalCollateral !== null && collateral.generalCollateral !== '') {
+    var generalCollateral: GeneralCollateralIF = { description: collateral.generalCollateral }
+    statement.generalCollateral = [generalCollateral]
+  }
+  // Now tidy up, deleting objects that are empty strings to pass validation.
+  // For example, party.birthDate = '' will fail validation.
+  statement.registeringParty = cleanupParty(statement.registeringParty)
+  for (let i = 0; i < statement.debtors.length; i++) {
+    statement.debtors[i] = cleanupParty(statement.debtors[i])
+  }
+  for (let i = 0; i < statement.securedParties.length; i++) {
+    statement.securedParties[i] = cleanupParty(statement.securedParties[i])
+  }
+  if (statement.vehicleCollateral !== null) {
+    for (let i = 0; i < statement.vehicleCollateral.length; i++) {
+      if (statement.vehicleCollateral[i].year !== null) {
+        if (statement.vehicleCollateral[i].year === '') {
+          delete statement.vehicleCollateral[i].year
+        } else if (typeof statement.vehicleCollateral[i].year === 'string') {
+          statement.vehicleCollateral[i].year = Number(statement.vehicleCollateral[i].year)
+        }
+      }
+    }
+  }
+  // Now save the financing statement.
+  const apiResponse = await createFinancingStatement(statement)
+
+  if (apiResponse !== undefined && apiResponse.error !== undefined) {
+    console.error('saveFinancingStatement failed: ' + apiResponse.error.statusCode + ': ' +
+                  apiResponse.error.message)
+  }
+  return apiResponse
+}
+
+export function cleanupParty (party: PartyIF): PartyIF {
+  if (party.emailAddress !== null && party.emailAddress === '') {
+    delete party.emailAddress
+  }
+  if (party.code !== null && party.code === '') {
+    delete party.code
+  }
+  if (party.code !== null && party.code !== undefined) {
+    delete party.emailAddress
+    delete party.birthDate
+    delete party.personName
+    delete party.businessName
+    delete party.address
+  } else {
+    if (party.birthDate !== null && party.birthDate === '') {
+      delete party.birthDate
+    }
+    if (party.businessName !== null && party.businessName !== '') {
+      delete party.personName
+    } else {
+      delete party.businessName
+      if (party.personName.middle !== null && party.personName.middle === '') {
+        delete party.personName.middle
+      }
+    }
+    if (party.address.streetAdditional !== null && party.address.streetAdditional === '') {
+      delete party.address.streetAdditional
+    }
+    if (party.address.deliveryInstructions !== null && party.address.deliveryInstructions === '') {
+      delete party.address.deliveryInstructions
+    }
+  }
+  return party
 }
