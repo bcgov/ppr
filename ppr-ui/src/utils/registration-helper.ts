@@ -126,13 +126,10 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
       }
     }
   }
-  // console.log('Save Financing Statement: ' + JSON.stringify(statement))
   // Now save the financing statement.
   const apiResponse = await createFinancingStatement(statement)
 
-  if (apiResponse !== undefined && apiResponse.error === undefined) {
-    console.log('saveFinancingStatement successful for registration number ' + apiResponse.baseRegistrationNumber)
-  } else if (apiResponse !== undefined) {
+  if (apiResponse !== undefined && apiResponse.error !== undefined) {
     console.error('saveFinancingStatement failed: ' + apiResponse.error.statusCode + ': ' +
                   apiResponse.error.message)
   }
