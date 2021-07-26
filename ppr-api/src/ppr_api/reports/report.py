@@ -56,7 +56,8 @@ TO_CHANGE_TYPE_DESCRIPTION = {
     'DT': 'DEBTOR TRANSFER',
     'PD': 'PARTIAL DISCHARGE',
     'ST': 'SECURED PARTY TRANSFER',
-    'SU': 'SUBSTITUTION OF COLLATERAL / PROCEEDS'
+    'SU': 'SUBSTITUTION OF COLLATERAL / PROCEEDS',
+    'RC': 'REGISTRY CORRECTION'
 }
 
 
@@ -107,11 +108,15 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _setup_report_data(self):
         """Set up the report service request data."""
+        # current_app.logger.debug('Setup report data template starting.')
+        template = base64.b64encode(bytes(self._get_template(), 'utf-8')).decode() + "'"
+        current_app.logger.debug('Setup report data template completed, setup data starting.')
         data = {
             'reportName': self._get_report_filename(),
-            'template': "'" + base64.b64encode(bytes(self._get_template(), 'utf-8')).decode() + "'",
+            'template': template,
             'templateVars': self._get_template_data()
         }
+        current_app.logger.debug('Setup report data completed.')
         return data
 
     def _get_report_filename(self):
@@ -504,8 +509,13 @@ class Report:  # pylint: disable=too-few-public-methods
     def _format_address(address):
         """Replace address country code with description."""
         country = address['country']
-        country = pycountry.countries.search_fuzzy(country)[0].name
-        address['country'] = country
+        if country == 'CA':
+            address['country'] = 'Canada'
+        elif country == 'US':
+            address['country'] = 'United States of America'
+        else:
+            country = pycountry.countries.search_fuzzy(country)[0].name
+            address['country'] = country
         return address
 
     def _set_meta_info(self):

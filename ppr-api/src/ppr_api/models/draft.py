@@ -58,6 +58,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     draft = db.Column('draft', db.JSON, nullable=False)
     registration_number = db.Column('registration_number', db.String(10), nullable=True)
     update_ts = db.Column('update_ts', db.DateTime, nullable=True)
+    user_id = db.Column('user_id', db.String(1000), nullable=True)
 
     # parent keys
     registration_type = db.Column('registration_type', db.String(2),
@@ -98,6 +99,12 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             if rows is not None:
                 for row in rows:
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                    registering_name = str(mapping['registering_name'])
+                    if not registering_name or registering_name == 'None':
+                        registering_name = ''
+                    ref_id = str(mapping['client_reference_id'])
+                    if not ref_id or ref_id == 'None':
+                        ref_id = ''
                     draft_json = {
                         'createDateTime': model_utils.format_ts(mapping['create_ts']),
                         'documentId': str(mapping['document_number']),
@@ -106,13 +113,10 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                         'registrationDescription': str(mapping['registration_desc']),
                         'type': str(mapping['draft_type']),
                         'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
-                        'path': '/ppr/api/v1/drafts/' + str(mapping['document_number'])
+                        'path': '/ppr/api/v1/drafts/' + str(mapping['document_number']),
+                        'registeringName': registering_name,
+                        'client_reference_id': ref_id
                     }
-                    ref_id = str(mapping['client_reference_id'])
-                    if ref_id and ref_id != '' and ref_id != 'None':
-                        draft_json['clientReferenceId'] = ref_id
-                    else:
-                        draft_json['clientReferenceId'] = ''
                     drafts_json.append(draft_json)
 
         return drafts_json
@@ -190,10 +194,11 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         return draft
 
     @staticmethod
-    def create_from_json(json_data, account_id: str):
+    def create_from_json(json_data, account_id: str, user_id: str = None):
         """Create a draft object from a json Draft schema object: map json to db."""
         draft = Draft()
         draft.account_id = account_id
+        draft.user_id = user_id
         draft_type = json_data['type']
         draft.registration_type_cl = model_utils.DRAFT_TYPE_TO_REG_CLASS[draft_type]
         if 'amendmentStatement' in json_data and 'courtOrderInformation' in json_data['amendmentStatement']:
@@ -216,7 +221,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         return draft
 
     @staticmethod
-    def create_from_registration(registration, json_data):
+    def create_from_registration(registration, json_data, user_id: str = None):
         """Create a draft object from a registration."""
         draft = Draft()
         draft.account_id = registration.account_id
@@ -225,6 +230,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         draft.document_number = registration.document_number
         draft.registration_type_cl = registration.registration_type_cl
         draft.registration_type = registration.registration_type
+        draft.user_id = user_id
         draft.draft = json_data
         # Not null constraint: should be removed.
         if not draft.account_id:

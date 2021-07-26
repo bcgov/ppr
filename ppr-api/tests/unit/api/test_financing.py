@@ -298,6 +298,12 @@ TEST_GET_STATEMENT = [
     ('Valid discharged staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0014'),
     ('Valid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0001')
 ]
+# testdata pattern is ({description}, {registration_number}, {current_state}, {param_value})
+TEST_CURRENT_STATE = [
+    ('Current Financing Statement', 'TEST0001', True, 'true'),
+    ('Original Financing Statement', 'TEST0001', False, ''),
+    ('Invalid Financing Statement param', 'TEST0001', False, 'junk')
+]
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
@@ -385,3 +391,53 @@ def test_get_payment_details_financing(session, client, jwt):
     assert details
     assert details['label'] == 'Create Financing Statement Type:'
     assert details['value'] == 'SA'
+
+
+def test_get_account_registrations_collapsed(session, client, jwt):
+    """Assert that a request to get the collapsed list of registrations by account works as expected."""
+    # setup
+
+    # test
+    response = client.get('/api/v1/financing-statements/registrations?collapse=true',
+                          headers=create_header_account(jwt, [PPR_ROLE]))
+
+    # check
+    assert response.status_code == HTTPStatus.OK
+    json_data = response.json
+    assert json_data
+    # print(json_data)
+    assert len(json_data) > 0
+    for statement in json_data:
+        assert statement['registrationClass'] in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+        if statement['registrationNumber'] == 'TEST0001':
+            assert statement['changes']
+            for change in statement['changes']:
+                assert change['baseRegistrationNumber'] == 'TEST0001'
+                assert change['registrationClass'] not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+
+
+@pytest.mark.parametrize('desc,reg_number,current_state,param_value', TEST_CURRENT_STATE)
+def test_get_registration_current(session, client, jwt, desc, reg_number, current_state, param_value):
+    """Assert that a request to get the current data for a registration works as expected."""
+    # setup
+
+    # test
+    path = '/api/v1/financing-statements/' + reg_number
+    if current_state:
+        path += '?current=' + param_value
+    elif param_value != '':
+        path += '?current=' + param_value
+
+    response = client.get(path,
+                          headers=create_header_account(jwt, [PPR_ROLE]))
+
+    # check
+    assert response.status_code == HTTPStatus.OK
+    json_data = response.json
+    assert json_data
+    # print(json_data)
+    assert 'changes' not in json_data
+    if current_state:
+        assert 'courtOrderInformation' in json_data
+    else:
+        assert 'courtOrderInformation' not in json_data

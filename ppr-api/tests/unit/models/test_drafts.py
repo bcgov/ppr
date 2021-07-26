@@ -28,20 +28,22 @@ from ppr_api.models.utils import now_ts
 
 
 def test_find_all_by_account_id(session):
-    """Assert that the draft summary list first item contains all expected elements."""
+    """Assert that the draft summary list items contains all expected elements."""
     draft_list = Draft.find_all_by_account_id('PS12345')
     # print(draft_list)
-    assert draft_list[0]['type']
-    assert draft_list[0]['documentId']
-    assert draft_list[0]['registrationType']
-    assert draft_list[0]['registrationDescription']
-    assert draft_list[0]['createDateTime']
-    assert draft_list[0]['lastUpdateDateTime']
-    # assert draft_list[0]['clientReferenceId']
-    assert draft_list[0]['path']
-    if draft_list[0]['type'] != 'FINANCING_STATEMENT':
-        assert draft_list[0]['baseRegistrationNumber']
+    assert draft_list
     for draft in draft_list:
+        assert draft['type']
+        assert draft['documentId']
+        assert draft['registrationType']
+        assert draft['registrationDescription']
+        assert draft['createDateTime']
+        assert draft['lastUpdateDateTime']
+        # assert draft['clientReferenceId']
+        assert draft['path']
+        assert draft['registeringName']
+        if draft['type'] != 'FINANCING_STATEMENT':
+            assert draft['baseRegistrationNumber']
         assert draft['documentId'] != 'D-T-0001'
 
 

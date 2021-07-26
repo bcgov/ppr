@@ -17,7 +17,7 @@
 
 from http import HTTPStatus
 
-from flask import request, jsonify
+from flask import request, jsonify, g
 from flask_restx import Namespace, Resource, cors
 
 from ppr_api.utils.auth import jwt
@@ -89,7 +89,8 @@ class DraftResource(Resource):
             #   return validation_error_response(errors, VAL_ERROR)
 
             # Save new draft statement: BusinessException raised if failure.
-            draft = Draft.create_from_json(request_json, account_id)
+            token: dict = g.jwt_oidc_token_info
+            draft = Draft.create_from_json(request_json, account_id, token.get('username', None))
             draft.save()
 
             return draft.json, HTTPStatus.CREATED
