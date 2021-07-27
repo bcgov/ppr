@@ -17,17 +17,23 @@
 
 from http import HTTPStatus
 
-from flask import request, jsonify, g
+from flask import g, jsonify, request
 from flask_restx import Namespace, Resource, cors
 
+from ppr_api.exceptions import BusinessException
+from ppr_api.models import Draft
+from ppr_api.services.authz import authorized, is_staff
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.exceptions import BusinessException
-from ppr_api.services.authz import is_staff, authorized
-from ppr_api.models import Draft
 
-from .utils import get_account_id, account_required_response, business_exception_response, \
-                   default_exception_response, unauthorized_error_response, path_param_error_response
+from .utils import (
+    account_required_response,
+    business_exception_response,
+    default_exception_response,
+    get_account_id,
+    path_param_error_response,
+    unauthorized_error_response,
+)
 
 
 API = Namespace('drafts', description='Endpoints for maintaining draft statements.')
