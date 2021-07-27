@@ -9,8 +9,8 @@
           >
             <span v-if="activeIndex === -1">Add</span>
             <span v-else>Edit</span>
-            <span v-if="currentIsBusiness"> a Business<br>Debtor</span>
-            <span v-else> an Individual<br>Debtor</span>
+            <span v-if="currentIsBusiness"> a Business<br />Debtor</span>
+            <span v-else> an Individual<br />Debtor</span>
           </label>
         </v-col>
         <v-col cols="9">
@@ -138,6 +138,28 @@
             </v-row>
             <v-row no-gutters class="pb-4">
               <v-col>
+                <label class="generic-label">Email Address</label>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field
+                  filled
+                  id="txt-email"
+                  label="Email Address (Optional)"
+                  v-model="currentDebtor.emailAddress"
+                  :error-messages="
+                    errors.emailAddress.message
+                      ? errors.emailAddress.message
+                      : ''
+                  "
+                  @blur="onBlur('emailAddress')"
+                  persistent-hint
+                />
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="pb-4">
+              <v-col>
                 <label class="generic-label">Address</label>
               </v-col>
             </v-row>
@@ -242,7 +264,12 @@ export default defineComponent({
       addressSchema
     } = useDebtor(props, context)
 
-    const { errors, updateValidity, validateDebtorForm, validateBirthdate } = useDebtorValidation()
+    const {
+      errors,
+      updateValidity,
+      validateDebtorForm,
+      validateBirthdate
+    } = useDebtorValidation()
 
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -254,7 +281,15 @@ export default defineComponent({
     })
 
     const onSubmitForm = async () => {
-      if (validateDebtorForm(currentIsBusiness, currentDebtor, year, monthValue, day) === true) {
+      if (
+        validateDebtorForm(
+          currentIsBusiness,
+          currentDebtor,
+          year,
+          monthValue,
+          day
+        ) === true
+      ) {
         addDebtor()
       } else {
         localState.showAllAddressErrors = true
@@ -262,7 +297,11 @@ export default defineComponent({
     }
 
     const validateBirthdateIfAlreadyValidated = () => {
-      if ((!errors.value.year.succeeded) || (!errors.value.month.succeeded) || (!errors.value.day.succeeded)) {
+      if (
+        !errors.value.year.succeeded ||
+        !errors.value.month.succeeded ||
+        !errors.value.day.succeeded
+      ) {
         validateBirthdate(year.value, monthValue.value, day.value)
       }
     }

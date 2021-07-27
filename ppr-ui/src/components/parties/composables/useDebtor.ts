@@ -29,6 +29,7 @@ export const useDebtor = (props, context) => {
       businessName: '',
       personName: initPerson,
       birthDate: '',
+      emailAddress: '',
       address: initAddress
     } as PartyIF,
     year: '',

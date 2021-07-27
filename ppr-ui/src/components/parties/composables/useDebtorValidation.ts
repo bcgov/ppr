@@ -8,6 +8,7 @@ const createEmptyErrors = () => ({
   year: createDefaultValidationResult(),
   month: createDefaultValidationResult(),
   day: createDefaultValidationResult(),
+  emailAddress: createDefaultValidationResult(),
   address: createDefaultValidationResult()
 })
 
@@ -81,6 +82,26 @@ export const useDebtorValidation = () => {
     }
   }
 
+  const validateEmail = (email: string) => {
+    let isValid = true
+    if (email) {
+      // eslint-disable-line
+      const VALID_FORMAT = new RegExp(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+      isValid = VALID_FORMAT.test(email)
+    }
+    if (!isValid) {
+      errors.value.emailAddress = {
+        type: 'EMAIL',
+        succeeded: false,
+        message: 'Please enter a valid email address'
+      }
+    } else {
+      resetError('emailAddress')
+    }
+  }
+
   const validateDebtorForm = (
     currentIsBusiness,
     currentDebtor,
@@ -90,8 +111,13 @@ export const useDebtorValidation = () => {
   ): boolean => {
     validateBirthdate(year.value, month.value, day.value)
     validateName(currentIsBusiness.value, currentDebtor.value)
+    validateEmail(currentDebtor.value.emailAddress)
     if (currentIsBusiness.value === true) {
-      return errors.value.businessName.succeeded && errors.value.address.succeeded
+      return (
+        errors.value.businessName.succeeded &&
+        errors.value.address.succeeded &&
+        errors.value.emailAddress.succeeded
+      )
     } else {
       return (
         errors.value.first.succeeded &&
@@ -99,7 +125,8 @@ export const useDebtorValidation = () => {
         errors.value.year.succeeded &&
         errors.value.month.succeeded &&
         errors.value.day.succeeded &&
-        errors.value.address.succeeded
+        errors.value.address.succeeded &&
+        errors.value.emailAddress.succeeded
       )
     }
   }
