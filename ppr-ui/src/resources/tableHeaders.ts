@@ -296,69 +296,71 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-sm py-4',
-    sortable: false,
+    class: 'column-mds py-4',
+    sortable: true,
     text: 'Registration Number',
     value: 'number'
   },
   {
     class: 'column-md py-4',
-    sortable: false,
+    sortable: true,
     text: 'Registration Type',
     value: 'type'
   },
   {
+    class: 'column-mds py-4',
+    sortable: true,
+    text: 'Registration Date',
+    value: 'sp'
+  },
+  {
     class: 'column-sm py-4',
-    sortable: false,
+    sortable: true,
     text: 'Status',
     value: 'status'
   },
   {
     class: 'column-mds py-4',
-    sortable: false,
-    text: 'Secured Parties',
+    sortable: true,
+    text: 'Registered By',
     value: 'sp'
   },
   {
     class: 'column-mds py-4',
-    sortable: false,
-    text: 'Registration Date and Time (Pacific Time)',
-    value: 'sp'
-  },
-  {
-    class: 'column-mds py-4',
-    sortable: false,
+    sortable: true,
     text: 'Registering Party',
     value: 'sp'
   },
   {
-    class: 'column-sm py-4',
-    sortable: false,
-    text: 'Folio / Reference',
+    class: 'column-mds py-4',
+    sortable: true,
+    text: 'Secured Parties',
     value: 'sp'
   },
-  {
-    class: 'column-sm py-4',
-    sortable: false,
-    text: 'Days to Expiry',
-    value: 'sp'
-  },
+
   {
     class: 'column-mds py-4',
-    sortable: false,
-    text: 'Last Modified',
+    sortable: true,
+    text: 'Folio/Reference Number',
+    value: 'sp'
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: true,
+    text: 'Days to Expiry',
     value: 'sp'
   },
   {
     class: 'column-xs py-4',
     sortable: false,
-    text: 'PDF',
+    text: 'Verification Statement',
     value: 'sp'
   },
   {
     class: 'column-sm py-4',
     sortable: false,
     text: 'Actions',
-    value: 'sp'
+    value: 'sp',
+    fixed: true
   }
 ]

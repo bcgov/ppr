@@ -406,6 +406,26 @@ span.invalid-message {
   font-style: italic;
 }
 
+.actions-cell {
+  font-style: normal;
+}
+
+.v-data-table .filter-row {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+
+  td {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    height: 30px;
+  }
+
+  input,
+  label {
+    font-size: 13px !important;
+  }
+}
+
 .primaryRow {
   border: 1px solid $primary-blue;
 }

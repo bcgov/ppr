@@ -2,27 +2,117 @@
   <v-container fluid no-gutters class="pa-0">
     <v-data-table
       class="registration-table"
+      :class="$style['reg-table']"
       :headers="headers"
       :items="tableData"
       disable-pagination
       hide-default-footer
       no-data-text="No registrations created yet."
     >
+      <template v-slot:body.prepend>
+        <tr class="filter-row">
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="registrationNumber"
+              type="text"
+              label="Number"
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td></td>
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="registrationDate"
+              type="text"
+              label="Date"
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td></td>
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="registeredBy"
+              type="text"
+              label="Registered By"
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="registeringParty"
+              type="text"
+              label="Registering Party"
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="securedParties"
+              type="text"
+              label="Secured Parties"
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="folioNumber"
+              type="text"
+              label=""
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td>
+            <v-text-field
+              filled
+              single-line
+              hide-details="true"
+              v-model="daysToExpiry"
+              type="text"
+              label="Days to Expiry"
+              dense="true"
+            ></v-text-field>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </template>
       <template v-slot:item="row" class="registration-data-table">
-        <tr :key="row.item.id" class="registration-row">
+        <tr
+          :key="row.item.id"
+          class="registration-row"
+          :class="draftClass(row.item.statusType)"
+        >
           <td>
             {{ row.item.baseRegistrationNumber }}
           </td>
           <td>
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
-          <td>{{ getStatusDescription(row.item.statusType) }}</td>
-          <td>{{ row.item.securedParties || '' }}</td>
           <td>{{ getFormattedDate(row.item.createDateTime) }}</td>
+          <td>{{ getStatusDescription(row.item.statusType) }}</td>
+          <td></td>
           <td>{{ row.item.registeringParty || '' }}</td>
+          <td>{{ row.item.securedParties || '' }}</td>
           <td>{{ row.item.clientReferenceId }}</td>
           <td>{{ row.item.expireDays || '' }}</td>
-          <td>{{ getFormattedDate(row.item.lastUpdateDateTime) }}</td>
           <td></td>
 
           <!-- Action Btns -->
@@ -91,12 +181,30 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { getFormattedDate, getRegistrationType } = useRegistration()
+    const {
+      getFormattedDate,
+      getRegistrationType,
+      getStatusDescription
+    } = useRegistration()
 
     const localState = reactive({
       tableData: [],
-      headers: registrationTableHeaders
+      headers: registrationTableHeaders,
+      registrationNumber: '',
+      registrationDate: '',
+      registeredBy: '',
+      registeringParty: '',
+      securedParties: '',
+      folioNumber: '',
+      daysToExpiry: ''
     })
+
+    const draftClass = (val: string): string => {
+      if (!val) {
+        return 'font-italic'
+      }
+      return ''
+    }
 
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
@@ -109,6 +217,8 @@ export default defineComponent({
     return {
       getFormattedDate,
       getRegistrationType,
+      getStatusDescription,
+      draftClass,
       ...toRefs(localState)
     }
   }
@@ -117,6 +227,20 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+.reg-table {
+  max-height: 550px;
+  tbody > tr > td:nth-child(1),
+  thead > tr > th:nth-child(1) {
+    position: sticky !important;
+    position: -webkit-sticky !important;
+    left: 0;
+    z-index: 9998;
+    background: white;
+  }
+  thead > tr > th:nth-child(1) {
+    z-index: 9999;
+  }
+}
 .length-trust-label {
   font-size: 0.875rem;
 }
