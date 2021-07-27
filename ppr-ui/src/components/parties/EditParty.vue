@@ -309,7 +309,7 @@ export default defineComponent({
             if (response?.length > 0) {
               // show secured party selection popup
               showDialog()
-              localState.dialogResults = response?.slice(0, 3)
+              localState.dialogResults = response?.slice(0, 50)
               return
             }
           }

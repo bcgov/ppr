@@ -1,32 +1,35 @@
-@import "theme.scss";
+@import 'theme.scss';
 
 @font-face {
   font-family: 'BCSans';
   font-style: normal;
   font-weight: 400;
-  src: url('../fonts/BCSans/BCSans-Regular.woff2') format('woff2'), /* Optimized for very modern browsers */
-       url('../fonts/BCSans/BCSans-Regular.woff') format('woff'); /* Modern Browsers */
+  src: url('../fonts/BCSans/BCSans-Regular.woff2') format('woff2'),
+    /* Optimized for very modern browsers */
+      url('../fonts/BCSans/BCSans-Regular.woff') format('woff'); /* Modern Browsers */
 }
 @font-face {
   font-family: 'BCSans';
   font-style: italic;
   font-weight: 400;
-  src: url('../fonts/BCSans/BCSans-Italic.woff2') format('woff2'), /* Optimized for very modern browsers */
-       url('../fonts/BCSans/BCSans-Italic.woff') format('woff'); /* Modern Browsers */
+  src: url('../fonts/BCSans/BCSans-Italic.woff2') format('woff2'),
+    /* Optimized for very modern browsers */
+      url('../fonts/BCSans/BCSans-Italic.woff') format('woff'); /* Modern Browsers */
 }
 @font-face {
   font-family: 'BCSans';
   font-style: normal;
   font-weight: 700;
-  src: url('../fonts/BCSans/BCSans-Bold.woff2') format('woff2'), /* Modern Browsers */
-       url('../fonts/BCSans/BCSans-Bold.woff') format('woff'); /* Optimized for very modern browsers */
+  src: url('../fonts/BCSans/BCSans-Bold.woff2') format('woff2'),
+    /* Modern Browsers */ url('../fonts/BCSans/BCSans-Bold.woff') format('woff'); /* Optimized for very modern browsers */
 }
 @font-face {
   font-family: 'BCSans';
   font-style: italic;
   font-weight: 700;
-  src: url('../fonts/BCSans/BCSans-BoldItalic.woff2') format('woff2'), /* Modern Browsers */
-       url('../fonts/BCSans/BCSans-BoldItalic.woff') format('woff'); /* Optimized for very modern browsers */
+  src: url('../fonts/BCSans/BCSans-BoldItalic.woff2') format('woff2'),
+    /* Modern Browsers */ url('../fonts/BCSans/BCSans-BoldItalic.woff')
+      format('woff'); /* Optimized for very modern browsers */
 }
 
 html,
@@ -50,11 +53,15 @@ body {
   font-size: 1rem;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   color: $gray9;
 }
 
-h1, h2{
+h1,
+h2 {
   letter-spacing: -0.04rem;
   font-weight: 700;
 }
@@ -69,7 +76,7 @@ h2 {
 }
 
 h3 {
-  font-size: 16px;   
+  font-size: 16px;
   font-weight: 700;
   line-height: 2.25rem;
 }
@@ -79,7 +86,7 @@ p {
 }
 
 .v-application {
-  font-family: 'BCSans', Verdana, Arial, sans-serif;  // BC Government Font
+  font-family: 'BCSans', Verdana, Arial, sans-serif; // BC Government Font
 }
 
 .theme--light.v-application {
@@ -186,7 +193,7 @@ p {
 // NB: 'fade enter' looks better without transition
 // .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .5s;
+  transition: opacity 0.5s;
 }
 // .fade-enter,
 .fade-leave-to {
@@ -308,7 +315,6 @@ ul.list {
   font-weight: bold;
 }
 
-
 .sub-header {
   color: #212529;
   font-size: 18px;
@@ -316,18 +322,18 @@ ul.list {
 }
 
 .v-application div.invalid-message {
-  border-left: 3px solid #D3272C !important;
+  border-left: 3px solid #d3272c !important;
 }
 
 span.invalid-message {
   font-size: 16px;
-  color: #D3272C !important;
+  color: #d3272c !important;
 }
 
 .invalid-link {
   padding: 0.25rem;
   font-size: 16px;
-  color: #1669BB;
+  color: #1669bb;
 }
 
 .summary-header {
@@ -349,7 +355,8 @@ span.invalid-message {
   border-right: 1px solid #f1f3f5;
 }
 
-.actions .v-list-item__subtitle, .actions .v-list-item__subtitle .v-icon {
+.actions .v-list-item__subtitle,
+.actions .v-list-item__subtitle .v-icon {
   color: $primary-blue;
 }
 
@@ -360,13 +367,13 @@ span.invalid-message {
 .invalid-link {
   padding: 0.25rem;
   font-size: 16px;
-  color: #1669BB;
+  color: #1669bb;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .generic-link {
-  color: #1669BB;
+  color: #1669bb;
   text-decoration: underline;
 }
 
@@ -374,23 +381,36 @@ span.invalid-message {
   opacity: 0.4;
 }
 
-.auto-complete-added, .v-list .v-list-item--active .v-icon.mdi-check {
+.auto-complete-added,
+.v-list .v-list-item--active .v-icon.mdi-check {
   color: #2e8540 !important;
 }
 
 .rounded-top {
-  border-radius: 4px 4px 0px 0px; 
+  border-radius: 4px 4px 0px 0px;
 }
 
-.icon-div{
+.icon-div {
   float: left;
   height: 100%;
   margin-bottom: 20px;
 }
-.icon-div .v-icon, .title-text{
+.icon-div .v-icon,
+.title-text {
   color: $gray9 !important;
 }
 
 .delivery {
   font-style: italic;
+}
+
+@media (max-height: 800px) {
+  #secured-party-dialog {
+    max-height: 60vh;
+  }
+}
+@media (min-height: 800px) {
+  #secured-party-dialog {
+    max-height: 90vh;
+  }
 }

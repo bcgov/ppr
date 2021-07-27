@@ -31,19 +31,19 @@
 
       <div>
         <p class="text-md-center px-6 pt-3">
-          One or more similar Secured Parties were found. Do you want to use one
-          ofthe existing Secured Parties listed below or use your information to
+          One or more similar Secured Parties were found. Do you want to use an
+          existing Secured Parties listed below or use your information to
           create a new Secured Party?
         </p>
       </div>
-
+      <div :class="$style['partyWindow']">
       <div class="text-md-center generic-label">
         Use my information and create a new Secured Party:
       </div>
 
       <v-container class="currentParty">
-        <v-row :class="$style['companyRow']">
-          <v-col cols="1"><v-icon>mdi-domain</v-icon></v-col>
+        <v-row :class="[$style['companyRow'], $style['primaryRow']]">
+          <v-col cols="1"><v-icon :class="$style['companyIcon']">mdi-domain</v-icon></v-col>
           <v-col cols="9">
             <div :class="$style['companyText']" class="businessName">{{ party.businessName }}</div>
             <div :class="$style['addressText']">
@@ -58,7 +58,7 @@
             </div>
           </v-col>
           <v-col cols="2" class="pt-5"
-            ><v-btn class="ml-auto" color="primary" @click="createParty()">
+            ><v-btn class="ml-auto" color="primary" :class="$style['partyButton']" @click="createParty()">
               Select
             </v-btn></v-col
           >
@@ -75,7 +75,7 @@
           v-for="(result, i) in results"
           :key="i"
         >
-          <v-col cols="1"><v-icon>mdi-domain</v-icon></v-col>
+          <v-col cols="1"><v-icon :class="$style['companyIcon']">mdi-domain</v-icon></v-col>
           <v-col cols="9">
             <div :class="$style['companyText']" class="businessName">{{ result.businessName }}</div>
             <div :class="$style['addressText']">
@@ -88,13 +88,13 @@
             </div>
           </v-col>
           <v-col cols="2" class="pt-5"
-            ><v-btn class="ml-auto" color="primary" @click="selectParty(i)">
+            ><v-btn class="ml-auto" color="primary" :class="$style['partyButton']" @click="selectParty(i)">
               Select
             </v-btn></v-col
           >
         </v-row>
       </v-container>
-
+      </div>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
@@ -201,8 +201,39 @@ export default defineComponent({
 }
 
 .companyRow {
-  background-color: $gray2;
+  background-color: #f1f1f1;
   border-radius: 4px 4px 4px 4px;
   margin-bottom: 10px;
+}
+
+.primaryRow {
+  border: 1px solid $primary-blue;
+}
+
+.companyIcon {
+  color: $gray9 !important;
+}
+
+@media (min-height: 800px) {
+  .partyWindow {
+    max-height: 420px;
+    overflow-y: auto;
+  }
+}
+@media (max-height: 800px) {
+  .partyWindow {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+}
+
+.partyButton {
+  span {
+    font-weight: normal;
+  }
+}
+
+.partyDialog {
+  height: 90%;
 }
 </style>
