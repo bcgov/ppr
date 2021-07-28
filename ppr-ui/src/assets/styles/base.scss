@@ -382,7 +382,9 @@ span.invalid-message {
 }
 
 .auto-complete-added,
-.v-list .v-list-item--active .v-icon.mdi-check {
+.v-list .v-list-item--active .v-icon.mdi-check,
+.v-list-item__action .v-icon.mdi-check
+{
   color: #2e8540 !important;
 }
 
