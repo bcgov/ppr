@@ -44,6 +44,12 @@ TEST_REGISTRATION_NUMBER_DATA = [
     ('Expired staff', 'TEST0013', 'PS12345', HTTPStatus.OK, True),
     ('Discharged staff', 'TEST0014', 'PS12345', HTTPStatus.OK, True)
 ]
+# testdata pattern is ({description}, {registration number}, {type}, {debtor name}, {is valid})
+TEST_DEBTOR_NAME_DATA = [
+    ('Valid Individual', 'TEST0001', 'DI', 'Debtor', True),
+    ('Valid Business', 'TEST0002', 'DB', 'Test Bus', True),
+    ('Invalid Business', 'TEST0002', 'DB', 'Text Bus', False),
+]
 
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)
@@ -186,39 +192,30 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
         assert request_err.value.status_code == status
 
 
-def test_validate_base_debtor(session):
+@pytest.mark.parametrize('desc,reg_number,type,debtor_name,valid', TEST_DEBTOR_NAME_DATA)
+def test_validate_base_debtor(session, desc, reg_number, type, debtor_name, valid):
     """Assert that base debtor check on an existing registration works as expected."""
     json_data = copy.deepcopy(DISCHARGE_STATEMENT)
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
+    if type == 'DB':
+        json_data['baseDebtor']['businessName'] = debtor_name
+    else:
+        person = {
+            'last': debtor_name,
+            'first': 'Test ind',
+            'middle': '1'
+        }
+        del json_data['baseDebtor']['businessName']
+        json_data['baseDebtor']['personName'] = person
 
-#    statement = FinancingStatement.find_by_financing_id(200000000)
-    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
+    statement = FinancingStatement.find_by_registration_number(reg_number, 'PS12345', False)
     assert statement
 
     # valid business name
-    valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert valid
-
-    # invalid business name
-    json_data['baseDebtor']['businessName'] = 'xxx debtor'
-    valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert not valid
-
-    # invalid individual name
-    person = {
-        'last': 'Debtor',
-        'first': 'Test ind',
-        'middle': '1'
-    }
-    del json_data['baseDebtor']['businessName']
-    json_data['baseDebtor']['personName'] = person
-    valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert not valid
-
-    # invalid individual name
-    json_data['baseDebtor']['personName']['first'] = 'John'
-    valid = statement.validate_base_debtor(json_data['baseDebtor'], False)
-    assert not valid
+    valid_debtor = statement.validate_base_debtor(json_data['baseDebtor'], False)
+    if valid:
+        assert valid_debtor
+    else:
+        assert not valid_debtor
 
 
 def test_current_json(session):
