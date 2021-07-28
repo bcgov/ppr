@@ -153,6 +153,7 @@ export const useDebtorValidation = () => {
     updateValidity,
     validateName,
     validateBirthdate,
+    validateEmail,
     validateDebtorForm
   }
 }

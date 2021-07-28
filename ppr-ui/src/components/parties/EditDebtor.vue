@@ -153,7 +153,7 @@
                       ? errors.emailAddress.message
                       : ''
                   "
-                  @blur="onBlur('emailAddress')"
+                  @blur="validateEmail(currentDebtor.emailAddress)"
                   persistent-hint
                 />
               </v-col>
@@ -268,7 +268,8 @@ export default defineComponent({
       errors,
       updateValidity,
       validateDebtorForm,
-      validateBirthdate
+      validateBirthdate,
+      validateEmail
     } = useDebtorValidation()
 
     const localState = reactive({
@@ -360,6 +361,7 @@ export default defineComponent({
       setCloseAutoComplete,
       addressSchema,
       updateValidity,
+      validateEmail,
       errors,
       ...toRefs(localState)
     }

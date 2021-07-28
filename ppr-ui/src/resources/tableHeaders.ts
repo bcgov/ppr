@@ -208,7 +208,7 @@ export const debtorTableHeaders: Array<BaseHeaderIF> = [
     value: 'party.name'
   },
   {
-    class: 'column-mdl py-4',
+    class: 'column-md py-4',
     sortable: false,
     text: 'Address',
     value: 'party.address'

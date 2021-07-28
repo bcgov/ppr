@@ -414,3 +414,7 @@ span.invalid-message {
     max-height: 90vh;
   }
 }
+
+#party-search-auto-complete .v-item--active .row .col {
+  color: $primary-blue !important;
+}
