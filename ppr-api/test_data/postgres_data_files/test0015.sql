@@ -6,6 +6,17 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
   VALUES(200000009, 'ACT', CURRENT_TIMESTAMP + interval '1500 days', 5, 'Y' , null)
 ;
+INSERT INTO previous_financing_statements(financing_id, registration_type, cb_date, cb_number, cr_date, cr_number,
+                                          mhr_date, mhr_number)
+  VALUES(200000009, 
+         'COMPANY ACT DOCUMENT',
+         CURRENT_TIMESTAMP at time zone 'utc' - interval '20 years', 
+         'CB12345678', 
+         CURRENT_TIMESTAMP at time zone 'utc' - interval '19 years', 
+         'CR12345', 
+         CURRENT_TIMESTAMP at time zone 'utc' - interval '18 years', 
+         'MH12345')
+;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)

@@ -13,8 +13,7 @@ match_individual_name = PGFunction(
     DECLARE
         v_ids  integer ARRAY;
     BEGIN
-        -- SET pg_trgm.word_similarity_threshold = 0.8;
-        -- SET pg_trgm.similarity_threshold = 0.8;
+        SET pg_trgm.word_similarity_threshold = 0.4;
         
         SELECT array_agg(p.id)
         INTO v_ids
@@ -22,7 +21,6 @@ match_individual_name = PGFunction(
         WHERE p.registration_id_end IS NULL
         AND p.party_type = 'DI'
         AND lastname <% p.last_name_key
-        AND word_similarity(lastname, p.last_name_key) >= .40
         AND ((firstname <% p.first_name_key AND word_similarity(firstname, p.first_name_key) >= .50) OR
                 (firstname <% p.middle_initial AND word_similarity(firstname, p.middle_initial) >= .50) OR
                 p.first_name_key IN (SELECT n.name 

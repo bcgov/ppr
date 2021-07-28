@@ -1,5 +1,9 @@
 -- Intended to run after test_reset.sql. Put any statements that should run first here if sequence matters.
 
+INSERT INTO users(id, creation_date, username, sub, account_id, firstname, lastname, email, iss)
+  VALUES(200000000, current_timestamp, 'TESTUSER', 'subject', 'PS12345', 'TEST', 'USER', null, 'issuer')
+;
+
 -- Client Party Addresses
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(200000000, 'TEST 200000000', 'line 2', 'city', 'BC', 'V8R3A5', 'CA');

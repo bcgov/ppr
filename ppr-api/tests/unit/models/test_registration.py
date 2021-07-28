@@ -46,6 +46,11 @@ TEST_REGISTRATION_NUMBER_DATA = [
     ('Mismatch registration numbers staff', 'TEST00R5', 'PS12345', HTTPStatus.OK, True, 'TEST0001'),
     ('Discharged staff', 'TEST0D14', 'PS12345', HTTPStatus.OK, True, 'TEST0014')
 ]
+# testdata pattern is ({description}, {account ID}, {collapse results})
+TEST_ACCOUNT_REGISTRATION_DATA = [
+    ('Default registration format', 'PS12345', False),
+    ('Collapsed parent/child registration format', 'PS12345', True)
+]
 
 
 def test_find_by_id(session):
@@ -159,30 +164,35 @@ def test_find_by_id_cs_su(session):
     assert 'deleteSecuredParties' not in json_data
 
 
-def test_find_all_by_account_id(session):
+@pytest.mark.parametrize('desc,account_id,collapse', TEST_ACCOUNT_REGISTRATION_DATA)
+def test_find_all_by_account_id(session, desc, account_id, collapse):
     """Assert that the financing statement summary list by account id first item contains all expected elements."""
-    statement_list = FinancingStatement.find_all_by_account_id('PS12345')
+    statement_list = Registration.find_all_by_account_id(account_id, collapse)
 
     assert statement_list
-    assert statement_list[0]['registrationNumber']
-    assert statement_list[0]['registrationType']
-    assert statement_list[0]['registrationClass']
-    assert statement_list[0]['registrationDescription']
-    assert statement_list[0]['statusType']
-    assert statement_list[0]['createDateTime']
-    assert statement_list[0]['lastUpdateDateTime']
-    assert statement_list[0]['expireDays']
-    assert statement_list[0]['registeringParty']
-    assert statement_list[0]['securedParties']
-    # assert statement_list[0]['clientReferenceId']
-    assert statement_list[0]['path']
-    if statement_list[0]['registrationClass'] not in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
-        assert statement_list[0]['baseRegistrationNumber']
+    for statement in statement_list:
+        assert statement['registrationNumber']
+        assert statement['registrationType']
+        assert statement['registrationClass']
+        assert statement['registrationDescription']
+        assert statement['statusType']
+        assert statement['createDateTime']
+        assert statement['lastUpdateDateTime']
+        assert statement['registeringName']
+        assert statement['path']
+        if statement['registrationClass'] not in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
+            assert statement['baseRegistrationNumber']
+        if not collapse or statement['registrationClass'] in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
+            assert statement['expireDays']
+            assert statement['registeringParty']
+            assert statement['securedParties']
+        if not collapse:
+            assert 'changes' not in statement
 
 
 def test_find_all_by_account_id_no_result(session):
     """Assert that the financing statement summary list by invalid account id works as expected."""
-    statement_list = FinancingStatement.find_all_by_account_id('XXXXX45')
+    statement_list = Registration.find_all_by_account_id('XXXXX45')
 
     assert len(statement_list) == 0
 

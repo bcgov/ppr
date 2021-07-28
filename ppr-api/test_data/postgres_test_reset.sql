@@ -15,6 +15,8 @@ DELETE FROM court_orders
   WHERE registration_id >= 200000000;
 DELETE FROM registrations
   WHERE financing_id >= 200000000;
+DELETE FROM previous_financing_statements
+  WHERE financing_id >= 200000000;
 DELETE FROM financing_statements
   WHERE id >= 200000000;
 DELETE FROM drafts
@@ -29,4 +31,6 @@ DELETE FROM client_codes
   WHERE id BETWEEN 99990001 AND 99990004;
 DELETE FROM addresses
   WHERE id BETWEEN 99990001 AND 99990004;
+DELETE FROM users
+  WHERE id >= 200000000;
 -- Delete test data end

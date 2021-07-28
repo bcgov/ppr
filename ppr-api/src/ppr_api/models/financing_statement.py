@@ -76,6 +76,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                          order_by='asc(GeneralCollateral.id)',
                                          back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
+    previous_statement = db.relationship('PreviousFinancingStatement', back_populates='financing_statement')
     # Relationships - StateType
     fin_state_type = db.relationship('StateType', foreign_keys=[state_type],
                                      back_populates='financing_statement', cascade='all, delete', uselist=False)
@@ -252,43 +253,36 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         return collateral_list
 
     def validate_base_debtor(self, base_debtor_json, staff: bool = False):
-        """Verify supplied base debtor when registering non-financing statements. Bypass the check for staff."""
-        valid = False
-
+        """Verify supplied base debtor when registering non-financing statements. Bypass the check for staff.
+        Base debtor match rules:
+        The base debtor is the first debtor in the financing statement and may be historical/removed.
+        Match on first five characters, or all if less than 5, on the business name or the individual last name.
+        """
         if staff:
             return True
 
         if not base_debtor_json:
             return False
 
-        bus_name = None
-        last = None
-        first = None
-        middle = None
+        check_name = None
+        party_id = 0
+        db_name = None
         if 'businessName' in base_debtor_json:
-            bus_name = base_debtor_json['businessName'].strip().upper()
-        elif 'personName' in base_debtor_json:
-            last = base_debtor_json['personName']['last'].strip().upper()
-            first = base_debtor_json['personName']['first'].strip().upper()
-            if 'middle' in base_debtor_json['personName']:
-                middle = base_debtor_json['personName']['middle'].strip().upper()
+            check_name = base_debtor_json['businessName'].upper()[:5]
+        elif 'personName' in base_debtor_json and 'last' in base_debtor_json['personName']:
+            check_name = base_debtor_json['personName']['last'].upper()[:5]
+        else:
+            return False
 
         if self.parties:
             for party in self.parties:
-                if (party.party_type == 'DB' or party.party_type == 'DI') and \
-                        not party.registration_id_end:
-                    if bus_name and party.business_name and \
-                            bus_name == party.business_name.upper():
-                        valid = True
-                    else:
-                        last_match = (last and party.last_name and last == party.last_name.upper())
-                        first_match = (first and party.first_name and first == party.first_name.upper())
-                        middle_match = (not middle and not party.middle_initial) or \
-                                       (middle and party.middle_initial and middle == party.middle_initial.upper())
-                        if last_match and first_match and middle_match:
-                            valid = True
-
-        return valid
+                if party.party_type == 'DB' and (party_id == 0 or party.id < party_id):
+                    party_id = party.id
+                    db_name = party.business_name.upper()[:5]
+                elif party.party_type == 'DI' and (party_id == 0 or party.id < party_id):
+                    party_id = party.id
+                    db_name = party.last_name.upper()[:5]
+        return db_name and check_name == db_name
 
     def save(self):
         """Save the object to the database immediately."""

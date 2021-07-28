@@ -32,6 +32,9 @@ from .vehicle_collateral import VehicleCollateral
 # noqa: I003
 
 
+FINANCING_PATH = '/ppr/api/v1/financing-statements/'
+
+
 class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all statement registration information."""
 
@@ -307,9 +310,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str = None):
+    def find_all_by_account_id(cls, account_id: str = None, collapse: bool = False):
         """Return a summary list of recent registrations belonging to an account."""
         results_json = []
+        registrations_json = []
         if account_id:
             max_results_size = int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
             results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
@@ -320,6 +324,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     reg_num = str(mapping['registration_number'])
                     base_reg_num = str(mapping['base_reg_number'])
+                    registering_name = str(mapping['registering_name'])
+                    if not registering_name:
+                        registering_name = ''
                     result = {
                         'registrationNumber': reg_num,
                         'baseRegistrationNumber': base_reg_num,
@@ -332,23 +339,42 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
                         'registeringParty': str(mapping['registering_party']),
                         'securedParties': str(mapping['secured_party']),
-                        'clientReferenceId': str(mapping['client_reference_id'])
+                        'clientReferenceId': str(mapping['client_reference_id']),
+                        'registeringName': registering_name
                     }
                     reg_class = result['registrationClass']
-                    path = '/ppr/api/v1/financing-statements/'
                     if reg_class in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
                         result['baseRegistrationNumber'] = reg_num
-                        result['path'] = path + reg_num
+                        result['path'] = FINANCING_PATH + reg_num
                     elif reg_class == 'DISCHARGE':
-                        result['path'] = path + base_reg_num + '/discharges/' + reg_num
+                        result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
                     elif reg_class == 'RENEWAL':
-                        result['path'] = path + base_reg_num + '/renewals/' + reg_num
+                        result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
                     elif reg_class == 'CHANGE':
-                        result['path'] = path + base_reg_num + '/changes/' + reg_num
+                        result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
                     else:
-                        result['path'] = path + base_reg_num + '/amendments/' + reg_num
-                    results_json.append(result)
+                        result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
+
+                    if collapse and reg_class not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
+                        registrations_json.append(result)
+                    else:
+                        results_json.append(result)
+                if collapse:
+                    return Registration.build_account_collapsed_json(results_json, registrations_json)
+
         return results_json
+
+    @staticmethod
+    def build_account_collapsed_json(financing_json, registrations_json):
+        """Organize account registrations as parent/child financing statement/change registrations."""
+        for statement in financing_json:
+            changes = []
+            for registration in registrations_json:
+                if statement['registrationNumber'] == registration['baseRegistrationNumber']:
+                    changes.append(registration)
+            if changes:
+                statement['changes'] = changes
+        return financing_json
 
     @staticmethod
     def create_from_json(json_data,
@@ -480,7 +506,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.registration_num = reg_vals.registration_num
         if not draft:
             registration.document_number = reg_vals.document_number
-            draft = Draft.create_from_registration(registration, json_data)
+            draft = Draft.create_from_registration(registration, json_data, user_id)
         registration.draft = draft
 
         return registration

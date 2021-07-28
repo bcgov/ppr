@@ -52,6 +52,8 @@ REG_CLASS_TO_STATEMENT_TYPE = {
     'RENEWAL': 'Register a Renewal Statement',
     'DISCHARGE': 'Register a Discharge Statement'
 }
+COLLAPSE_PARAM = 'collapse'
+CURRENT_PARAM = 'current'
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -157,8 +159,16 @@ class GetFinancingResource(Resource):
 
             # Set to false to exclude change history.
             statement.include_changes_json = False
-            # Set to false to generate json with original financing statement data.
-            statement.current_view_json = False
+            # Set to false as default to generate json with original financing statement data.
+            current_param = request.args.get(CURRENT_PARAM)
+            if current_param is None or not isinstance(current_param, (bool, str)):
+                statement.current_view_json = False
+            elif isinstance(current_param, str) and current_param.lower() in ['true', '1', 'y', 'yes']:
+                statement.current_view_json = True
+            elif isinstance(current_param, str):
+                statement.current_view_json = False
+            else:
+                statement.current_view_json = current_param
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
@@ -637,8 +647,16 @@ class GetRegistrationResource(Resource):
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
 
+            collapse_param = request.args.get(COLLAPSE_PARAM)
+            if collapse_param is None or not isinstance(collapse_param, (bool, str)):
+                collapse_param = False
+            elif isinstance(collapse_param, str) and collapse_param.lower() in ['true', '1', 'y', 'yes']:
+                collapse_param = True
+            elif isinstance(collapse_param, str):
+                collapse_param = False
+
             # Try to fetch financing statement list for account ID
-            statement_list = Registration.find_all_by_account_id(account_id)
+            statement_list = Registration.find_all_by_account_id(account_id, collapse_param)
 
             return jsonify(statement_list), HTTPStatus.OK
 

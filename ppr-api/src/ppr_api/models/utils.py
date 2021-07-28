@@ -141,19 +141,22 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
        (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                     WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    ELSE p.last_name || ', ' || p.first_name END
+                    ELSE p.first_name || ' ' || p.last_name END
           FROM parties p
          WHERE p.registration_id = r.id
            AND p.party_type = 'RG') AS registering_party,
-       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    ELSE p.last_name || ', ' || p.first_name END
+       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                ELSE p.first_name || ' ' || p.last_name END), ', ')
           FROM parties p
          WHERE p.financing_id = fs.id
            AND p.registration_id_end IS NULL
-           AND p.party_type = 'SP'
-      ORDER BY p.id desc LIMIT 1) AS secured_party,
-      r.client_reference_id
+           AND p.party_type = 'SP') AS secured_party,
+       r.client_reference_id,
+       (SELECT CASE WHEN r.user_id IS NULL THEN ''
+                    ELSE (SELECT u.firstname || ' ' || u.lastname
+                            FROM users u
+                           WHERE u.username = r.user_id) END) AS registering_name
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -170,7 +173,7 @@ FETCH FIRST :max_results_size ROWS ONLY
 """
 
 QUERY_ACCOUNT_REGISTRATIONS = """
-SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
        CASE WHEN fs.life = 99 THEN -99
             ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
@@ -179,19 +182,22 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
        (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                     WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    ELSE p.last_name || ', ' || p.first_name END
+                    ELSE p.first_name || ' ' || p.last_name END
           FROM parties p
          WHERE p.registration_id = r.id
            AND p.party_type = 'RG') AS registering_party,
-       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    ELSE p.last_name || ', ' || p.first_name END
+       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                ELSE p.first_name || ' ' || p.last_name END), ', ')
           FROM parties p
          WHERE p.financing_id = fs.id
            AND p.registration_id_end IS NULL
-           AND p.party_type = 'SP'
-      ORDER BY p.id desc LIMIT 1) AS secured_party,
-      r.client_reference_id
+           AND p.party_type = 'SP') AS secured_party,
+       r.client_reference_id,
+       (SELECT CASE WHEN r.user_id IS NULL THEN ''
+                    ELSE (SELECT u.firstname || ' ' || u.lastname
+                            FROM users u
+                           WHERE u.username = r.user_id) END) AS registering_name
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -216,7 +222,11 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
                  d.draft -> 'financingStatement' ->> 'clientReferenceId'
             WHEN d.registration_type_cl = 'AMENDMENT' THEN d.draft -> 'amendmentStatement' ->> 'clientReferenceId'
             WHEN d.registration_type_cl = 'CHANGE' THEN d.draft -> 'changeStatement' ->> 'clientReferenceId'
-            ELSE '' END client_reference_id
+            ELSE '' END client_reference_id,
+       (SELECT CASE WHEN d.user_id IS NULL THEN ''
+                    ELSE (SELECT u.firstname || ' ' || u.lastname
+                            FROM users u
+                           WHERE u.username = d.user_id) END) AS registering_name
   FROM drafts d, registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
