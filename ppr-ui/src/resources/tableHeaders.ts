@@ -214,6 +214,12 @@ export const debtorTableHeaders: Array<BaseHeaderIF> = [
     value: 'party.address'
   },
   {
+    class: 'column-md py-4',
+    sortable: false,
+    text: 'Email Address',
+    value: 'emailAddress'
+  },
+  {
     class: 'column-mds py-4',
     sortable: false,
     text: 'Birthdate',
