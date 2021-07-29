@@ -82,7 +82,7 @@ describe('Collateral store tests', () => {
   it('renders debtor table and headers', async () => {
     expect(wrapper.find('.debtor-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.text-start').length).toBe(4)
+    expect(wrapper.findAll('.text-start').length).toBe(5)
   })
 
   it('displays the correct rows when data is present', () => {
@@ -95,8 +95,8 @@ describe('Collateral store tests', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
-    expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    expect(item1.querySelectorAll('td')[2].textContent).toContain('June 16, 1990')
+    expect(item1.querySelectorAll('td')[2].textContent).toContain('1234 Fort St.')
+    expect(item1.querySelectorAll('td')[3].textContent).toContain('June 16, 1990')
 
   })
 })
