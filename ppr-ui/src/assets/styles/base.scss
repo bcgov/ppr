@@ -421,7 +421,9 @@ span.invalid-message {
   }
 
   input,
-  label {
+  label,
+  .v-list-item,
+  v-select__selection {
     font-size: 13px !important;
   }
 }

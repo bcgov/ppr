@@ -20,9 +20,29 @@
               type="text"
               label="Number"
               dense="true"
+              @keypress="filterRow"
             ></v-text-field>
           </td>
-          <td></td>
+          <td>
+            <v-select
+              :items="registrationTypes"
+              single-line
+              item-text="registrationTypeUI"
+              item-value="registrationTypeAPI"
+              filled
+              dense="true"
+              label="Registration Type"
+              v-model="registrationType"
+              id="txt-type"
+              @change="filterRow"
+            >
+              <template slot="item" slot-scope="data">
+                <span class="list-item">
+                  {{ data.item.registrationTypeUI }}
+                </span>
+              </template>
+            </v-select>
+          </td>
           <td>
             <v-text-field
               filled
@@ -184,20 +204,28 @@ export default defineComponent({
     const {
       getFormattedDate,
       getRegistrationType,
-      getStatusDescription
+      getStatusDescription,
+      registrationNumber,
+      registrationDate,
+      registeredBy,
+      registeringParty,
+      securedParties,
+      folioNumber,
+      registrationType,
+      registrationTypes,
+      daysToExpiry,
+      filterResults
     } = useRegistration()
 
     const localState = reactive({
       tableData: [],
-      headers: registrationTableHeaders,
-      registrationNumber: '',
-      registrationDate: '',
-      registeredBy: '',
-      registeringParty: '',
-      securedParties: '',
-      folioNumber: '',
-      daysToExpiry: ''
+      originalData: [],
+      headers: registrationTableHeaders
     })
+
+    const filterRow = () => {
+      localState.tableData = filterResults(localState.originalData)
+    }
 
     const draftClass = (val: string): string => {
       if (!val) {
@@ -212,6 +240,7 @@ export default defineComponent({
       const drafts = await draftHistory()
       // Array.prototype.push.apply(localState.tableData, drafts)
       localState.tableData = drafts
+      localState.originalData = drafts
     })
 
     return {
@@ -219,6 +248,16 @@ export default defineComponent({
       getRegistrationType,
       getStatusDescription,
       draftClass,
+      registrationNumber,
+      registrationType,
+      registrationTypes,
+      registrationDate,
+      registeredBy,
+      registeringParty,
+      securedParties,
+      folioNumber,
+      daysToExpiry,
+      filterRow,
       ...toRefs(localState)
     }
   }

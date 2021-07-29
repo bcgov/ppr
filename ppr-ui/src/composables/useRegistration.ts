@@ -1,7 +1,21 @@
 import { RegistrationIF, DraftIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { reactive, toRefs } from '@vue/composition-api'
+import { RegistrationTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
 
 export const useRegistration = () => {
+  const localState = reactive({
+    registrationNumber: '',
+    registrationType: '',
+    registrationDate: '',
+    registeredBy: '',
+    registeringParty: '',
+    securedParties: '',
+    folioNumber: '',
+    daysToExpiry: '',
+    registrationTypes: RegistrationTypes
+  })
+
   const getFormattedDate = (dateStr: string): string => {
     if (dateStr) {
       const date = new Date(dateStr)
@@ -37,10 +51,16 @@ export const useRegistration = () => {
     return ''
   }
 
+  const filterResults = (tableData: Array<any>): Array<any> => {
+    return tableData
+  }
+
   return {
     getFormattedDate,
     getStatusDescription,
     getPdfLink,
-    getRegistrationType
+    getRegistrationType,
+    filterResults,
+    ...toRefs(localState)
   }
 }
