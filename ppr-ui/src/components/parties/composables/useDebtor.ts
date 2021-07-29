@@ -92,7 +92,7 @@ export const useDebtor = (props, context) => {
         parseInt(localState.day)
       )
       if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
-        localState.currentDebtor.birthDate = dateOfBirth.toUTCString()
+        localState.currentDebtor.birthDate = dateOfBirth.toISOString()
       }
     }
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
