@@ -44,17 +44,55 @@
             </v-select>
           </td>
           <td>
-            <v-text-field
-              filled
-              single-line
-              hide-details="true"
-              v-model="registrationDate"
-              type="text"
-              label="Date"
-              dense="true"
-            ></v-text-field>
+            <v-menu
+              ref="menu"
+              v-model="menu"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="18rem"
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  filled
+                  single-line
+                  id="reg-textfield"
+                  data-test-id="reg-date-text"
+                  v-model="registrationDateFormatted"
+                  hint="YYYY/MM/DD"
+                  append-icon="mdi-calendar"
+                  v-on="on"
+                  dense="true"
+                  hide-details="true"
+                />
+              </template>
+              <v-date-picker
+                id="reg-datepicker"
+                data-test-id="reg-date-picker"
+                v-model="registrationDate"
+                no-title
+                @input="menu = true"
+              />
+            </v-menu>
           </td>
-          <td></td>
+          <td>
+            <v-select
+              :items="statusTypes"
+              single-line
+              filled
+              dense="true"
+              label="Status"
+              v-model="status"
+              id="txt-status"
+              @change="filterRow"
+            >
+              <template slot="item" slot-scope="data">
+                <span class="list-item">
+                  {{ data.item.text }}
+                </span>
+              </template>
+            </v-select>
+          </td>
           <td>
             <v-text-field
               filled
@@ -186,6 +224,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
+  watch,
   onMounted
 } from '@vue/composition-api'
 
@@ -206,21 +245,24 @@ export default defineComponent({
       getRegistrationType,
       getStatusDescription,
       registrationNumber,
-      registrationDate,
       registeredBy,
       registeringParty,
       securedParties,
       folioNumber,
+      status,
       registrationType,
       registrationTypes,
       daysToExpiry,
+      statusTypes,
       filterResults
     } = useRegistration()
 
     const localState = reactive({
       tableData: [],
       originalData: [],
-      headers: registrationTableHeaders
+      headers: registrationTableHeaders,
+      registrationDateFormatted: '',
+      registrationDate: ''
     })
 
     const filterRow = () => {
@@ -234,6 +276,12 @@ export default defineComponent({
       return ''
     }
 
+    const formatDate = (date: string): string => {
+      if (!date) return ''
+      const [year, month, day] = date.split('-')
+      return `${year}/${month}/${day}`
+    }
+
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
       localState.tableData = await registrationHistory()
@@ -243,6 +291,13 @@ export default defineComponent({
       localState.originalData = drafts
     })
 
+    watch(
+      () => localState.registrationDate,
+      (val: string) => {
+        localState.registrationDateFormatted = formatDate(val)
+      }
+    )
+
     return {
       getFormattedDate,
       getRegistrationType,
@@ -251,12 +306,13 @@ export default defineComponent({
       registrationNumber,
       registrationType,
       registrationTypes,
-      registrationDate,
       registeredBy,
       registeringParty,
       securedParties,
       folioNumber,
       daysToExpiry,
+      status,
+      statusTypes,
       filterRow,
       ...toRefs(localState)
     }

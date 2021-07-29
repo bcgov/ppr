@@ -1,19 +1,20 @@
 import { RegistrationIF, DraftIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { reactive, toRefs } from '@vue/composition-api'
-import { RegistrationTypes } from '@/resources'
+import { RegistrationTypes, StatusTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
 
 export const useRegistration = () => {
   const localState = reactive({
     registrationNumber: '',
     registrationType: '',
-    registrationDate: '',
+    status: '',
     registeredBy: '',
     registeringParty: '',
     securedParties: '',
     folioNumber: '',
     daysToExpiry: '',
-    registrationTypes: RegistrationTypes
+    registrationTypes: RegistrationTypes,
+    statusTypes: StatusTypes
   })
 
   const getFormattedDate = (dateStr: string): string => {
