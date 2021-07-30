@@ -1,5 +1,5 @@
 <div class="no-page-break">
-   {% if detail.financingStatement.generalCollateral is defined and change is not defined %}
+   {% if detail.financingStatement is defined and change is not defined %}
       <div class="separator mt-5"></div>
    {% endif %}
    <div class="section-title mt-3">General Collateral</div>
@@ -18,8 +18,8 @@
       {% for collateral in change.addGeneralCollateral %}
       <tr class="no-page-break">
             <td>
-               <div><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
-               <div class="section-data pt-3">{{ collateral.description }}</div>
+               <div class="section-data">{{ collateral.description }}</div>
+               <div><span class="label pt-1">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
             </td>
          </tr>
       {% endfor %}
@@ -31,8 +31,8 @@
          {% if collateral.edit is not defined %}
          <tr class="no-page-break">
             <td>
-               <span class="label">REMOVED</span>
-               <div class="section-data pt-3">{{ collateral.description }}</div>
+               <div class="section-data">{{ collateral.description }}</div>
+               <span class="label pt-1">REMOVED</span>
             </td>
          </tr>
          {% endif %}

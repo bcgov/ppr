@@ -501,7 +501,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 if result['matchType'] == 'EXACT' or 'selected' not in result or result['selected']:
                     if 'vehicleCollateral' in result:
                         code = result['vehicleCollateral']['type']
-                        result['vehicleCollateral']['type'] = TO_VEHICLE_TYPE_DESCRIPTION[code] + f' ({code})'
+                        result['vehicleCollateral']['type'] = TO_VEHICLE_TYPE_DESCRIPTION[code]
                     new_selected.append(result)
             self._report_data['selected'] = new_selected
 

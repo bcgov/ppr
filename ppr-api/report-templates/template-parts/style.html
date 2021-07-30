@@ -24,20 +24,20 @@
 	.report-type {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #234075;
-		font-size: 18px;
+		font-size: 15pt !important;
 		text-align: right;
 	}
 	.report-type-desc {
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #1A5A96;
-		font-size: 14px;
+		font-size: 12pt !important;
 		text-align: right;
 	}
 
 	.financing-type {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #234075;
-		font-size: 18px;
+		font-size: 15pt;
 		text-align: right;
 		background-color: white;
 	}
@@ -45,7 +45,7 @@
 	.financing-act {
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #1A5A96;
-		font-size: 14px;
+		font-size: 12pt;
 		text-align: right;
 		background-color: white;
 	}
@@ -55,33 +55,35 @@
 		background-color: #234075;
 		height: 44px;
 		text-align: left;
-		vertical-align: middle !important;
+		line-height: 44px;
 	}
 
 	.lbl-business-name {
-		padding-left: 1.5rem;
+		padding-left: 27px;
 		font-family: 'BCSans-Bold', sans-serif !important;
-		font-size: 14px;
+		font-size: 14pt !important;
 		color: white;
 		text-transform: capitalize;
 	}
 
 	.lbl-business-name-gold {
 		font-family: 'BCSans-Bold', sans-serif !important;
-		font-size: 7px;
-		line-height: 9px;
+		font-size: 7pt;
+		max-height: 13pt;
 		text-align: center;
 		color: #234075;
 		background-color: #e3a82b;
 		padding: 3px 8px;
-		margin: 0px 3px 0px 12px;
-		border-radius: 6px;
+		margin: 0px 3px 6px 12px !important;
+		border-radius: 4px;
+		vertical-align: middle;
 	}
 
 
 	.lbl-business-detail {
+		font-family: 'BCSans-Bold', sans-serif !important;
 		color: white !important;
-		font-size: 11px;
+		font-size: 11pt;
 		line-height: 18px;
 		text-align: left;
 	}
@@ -89,14 +91,14 @@
 	.nil-message {
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #313132 !important;
-		font-size: 11px;
+		font-size: 11pt;
 		line-height: 15px;
 		text-align: center;
 	}
 
 	.business-details-container {
 		width: 100%;
-		background-color: #38698A;
+		background-color: white; /* #38698A; */
 		vertical-align: middle;
 		text-align: center;
 		/* margin-top: -90px; */ /* -43px approx 0.45 in */
@@ -106,7 +108,8 @@
 		width: 100%;
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: white !important;
-		font-size: 11px;
+		background-color: #37598A;
+		font-size: 11pt;
 		line-height: 18px;
 		text-align: left;
 		padding: 1rem 1rem 1rem 1.5rem;
@@ -130,7 +133,7 @@
 		width: 100%;
 		font-family: 'BCSans-Regular', sans-serif;
 		color: #313132!important;
-		font-size: 11px;
+		font-size: 11pt;
 		line-height: 18px;
 		text-align: left;
 		padding: 1rem 1rem 1rem 1.5rem;
@@ -142,13 +145,13 @@
 	}
 
 	.business-details-table-grey td:nth-child(1) {
-		width: 35%;
+		width: 40%; /* 35 */
 		font-family: 'BCSans-Bold', sans-serif !important;
 		font-weight: bold;
 	}
 
 	.business-details-table-grey td:nth-child(2) {
-		width: 65%;
+		width: 60%;
 	}
 
 	.header-table-toc {
@@ -157,34 +160,33 @@
 		color: #234075;
 		border-top: 2px solid #234075;
 		border-bottom: 2px solid #234075;
+		padding-bottom: 8px;
 	}
 	.header-table-toc td {
-		font-size: 10px;
+		font-size: 10pt;
 		vertical-align: middle;
-		padding-top: 0.875rem;
-		padding-bottom: 0.875rem;
 	}
 	.header-table-toc td:nth-child(1) {
-		width: 40%;
+		width: 35%;
 		text-align: right;
 	}
 	.header-table-toc td:nth-child(2) {
-		width: 20%;
+		width: 30%;
 		text-align: center;
 	}
 	.header-table-toc td:nth-child(3) {
-		width: 40%;
+		width: 35%;
 		text-align: left;
 	}
 
 	.header-toc-title {
 		font-family: 'BCSans-Bold', sans-serif !important;
-		font-size: 14px;
+		font-size: 14pt;
 		text-align: center;
 	}
 
 	.business-details-note {
-		font-size: 9px;
+		font-size: 9pt;
 	}
 
 	.section-header {
@@ -193,7 +195,7 @@
 		height: 33px;
 		font-family: 'BCSans-Bold', sans-serif !important;
 		text-align: center;
-		font-size: 14px;
+		font-size: 14pt;
 		line-height: 1rem;
 		color: #234075;
 	}
@@ -237,17 +239,17 @@
 	}
 
 	.statement-table td:nth-child(1) {
-		width: 30%;
+		width: 40%; /* 30 */
 	}
 
 	.statement-table td:nth-child(2) {
-		width: 70%;
+		width: 60%;
 	}
 
 	.section-title {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #234075;
-		font-size: 12px;
+		font-size: 12pt;
 		font-weight: bold;
 		text-align: left;
 		line-height: 22px;
@@ -256,38 +258,38 @@
 	.section-title-centre {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #234075;
-		font-size: 14px;
+		font-size: 14pt;
 		text-align: center;
 	}
 
 	.section-sub-title {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #313132;
-		font-size: 11px;
+		font-size: 11pt;
 		font-weight: bold;
 		text-align: left;
 		line-height: 15px;
 	}
 
 	.section-statement {
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #234075;
-		font-size: 10px;
+		font-size: 12pt;
 		text-align: center;
 	}
 
 	.section-data {
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #313132;
-		font-size: 11px;
-		line-height: 13px;
+		font-size: 11pt;
+		line-height: 13pt;
 		text-align: left;
 	}
 
 	.section-data-italic {
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #313132;
-		font-size: 9px;
+		font-size: 9pt;
 		font-style: italic;
 		line-height: 15px;
 		text-align: left;
@@ -328,7 +330,7 @@
 		font-family: 'BCSans-Bold', sans-serif !important;
 		font-weight: bold;
 		color: #234075;
-		font-size: 12px;
+		font-size: 12pt;
 		line-height: 22px;
 		text-align: center;
 	}
@@ -339,12 +341,12 @@
 
 	.director-former-name {
 		font-family: 'BCSans-Italic', sans-serif !important;
-		font-size: 12px;
+		font-size: 12pt;
 	}
 
 	.delivery-instructions {
 		font-family: 'BCSans-Italic', sans-serif !important;
-		font-size: 12px;
+		font-size: 12pt;
 	}
 
 	.nr-name-table {
@@ -375,6 +377,7 @@
 
 	.bold {
 		font-family: 'BCSans-Bold', sans-serif !important;
+		font-weight: bold !important;
 		color: #313132;
 	}
 
@@ -383,6 +386,7 @@
 		text-align: center;
 		width: 110px;
 		height: 100px;
+		margin-left: 10px;
 	}
 
 	.column-logo img {
@@ -395,7 +399,7 @@
 	}
 
 	.certified-copy-text {
-		font-size: 11px;
+		font-size: 11pt;
 		color: #234075;
 		font-family: 'BCSans-Bold', sans-serif !important;
 		text-align: center
@@ -403,7 +407,7 @@
 
 	.doc-description,
 	.registrar-title {
-		font-size: 9px;
+		font-size: 9pt;
 		text-align: center;
 		line-height: 9px;
 		height: 10px;
@@ -416,7 +420,7 @@
 	}
 
 	.registrar-name {
-		font-size: 9px;
+		font-size: 9pt;
 		font-family: 'BCSans-Bold', sans-serif !important;
 		text-align: center
 	}
@@ -424,14 +428,14 @@
 	.share-structure-table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 13px;
+		font-size: 13pt;
 		font-family: 'BCSans-Regular', sans-serif !important;
 	}
 
 	.share-structure-table-header {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #313132;
-		font-size: 12px;
+		font-size: 12pt;
 	}
 
 	.share-structure-table td {
@@ -462,7 +466,7 @@
 	}
 
 	.share-structure-table .series-name {
-		font-size: 12px;
+		font-size: 12pt;
 		padding-left: 1rem;
 	}
 
@@ -499,7 +503,7 @@
 
 	.series-name {
 		padding-left: 1rem;
-		font-size: 12px
+		font-size: 12pt
 	}
 
 	.capitalize-text {
@@ -541,10 +545,29 @@
 	.pr-7 { padding-right: 1.75rem; }
 	.pr-8 { padding-right: 2rem; }
 
+	.mb-1 { margin-bottom: 0.25rem; }
+	.mb-2 { margin-bottom: 0.5rem; }
+	.mb-3 { margin-bottom: 0.75rem; }
+	.mb-4 { margin-bottom: 1rem; }
+	.mb-5 { margin-bottom: 1.25rem; }
+	.mb-6 { margin-bottom: 1.5rem; }
+	.mb-7 { margin-bottom: 1.75rem; }
+	.mb-8 { margin-bottom: 2rem; }
+
+	.pb-1 { padding-bottom: 0.25rem; }
+	.pb-2 { padding-bottom: 0.5rem; }
+	.pb-3 { padding-bottom: 0.75rem; }
+	.pb-4 { padding-bottom: 1rem; }
+	.pb-5 { padding-bottom: 1.25rem; }
+	.pb-6 { padding-bottom: 1.5rem; }
+	.pb-7 { padding-bottom: 1.75rem; }
+	.pb-8 { padding-bottom: 2rem; }
+
+
 	.vehicle-collateral-table-mh {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 10px;
+		font-size: 10pt;
 		line-height: 15px;
 		font-family: 'BCSans-Regular', sans-serif !important;
 	}
@@ -552,11 +575,18 @@
 	.vehicle-collateral-table-header {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #313132;
-		font-size: 10px;
+		font-size: 10pt;
 		font-weight: bold;
 		line-height: 15px;
+		border-collapse: collapse;
 	}
 
+	.vehicle-collateral-table-mh tr {
+		border-bottom: solid 0.5px #BCBEC5;
+	}
+	.vehicle-collateral-table-mh tr:last-child {
+		border-bottom: none;
+	}
 	.vehicle-collateral-table-mh td {
 		height: 40px;
 		vertical-align: middle;
@@ -585,9 +615,17 @@
 	.vehicle-collateral-table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 10px;
+		font-size: 10pt;
 		line-height: 15px;
 		font-family: 'BCSans-Regular', sans-serif !important;
+		border-collapse: collapse;
+	}
+
+	.vehicle-collateral-table tr {
+		border-bottom: solid 0.5px #BCBEC5;
+	}
+	.vehicle-collateral-table tr:last-child {
+		border-bottom: none;
 	}
 
 	.vehicle-collateral-table td {
@@ -615,14 +653,15 @@
 	.selected-debtor-table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 9px;
+		font-size: 9pt;
 		font-family: 'BCSans-Regular', sans-serif !important;
 	}
 
 	.selected-debtor-table-header {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #313132;
-		font-size: 9px;
+		font-size: 9pt;
+		font-weight: bold;
 		border-bottom: 2px solid #BCBEC5;
 	}
 
@@ -654,14 +693,15 @@
 	.selected-serial-table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 9px;
+		font-size: 9pt;
 		font-family: 'BCSans-Regular', sans-serif !important;
 	}
 
 	.selected-serial-table-header {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #313132;
-		font-size: 9px;
+		font-size: 9pt;
+		font-weight: bold;
 		border-bottom: 2px solid #BCBEC5;
 	}
 
@@ -701,14 +741,15 @@
 	.selected-mhr-table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 10px;
+		font-size: 10pt;
 		font-family: 'BCSans-Regular', sans-serif !important;
 	}
 
 	.selected-mhr-table-header {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		color: #313132;
-		font-size: 10px;
+		font-size: 9pt;
+		font-weight: bold;
 	}
 
 	.selected-mhr-table td {
@@ -749,13 +790,50 @@
 	}
 
 
+	.selected-reg-num-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 9px;
+		font-family: 'BCSans-Regular', sans-serif !important;
+	}
+
+	.selected-reg-num-table-header {
+		font-family: 'BCSans-Bold', sans-serif !important;
+		color: #313132;
+		font-size: 9pt;
+		font-weight: bold;
+		border-bottom: 2px solid #BCBEC5;
+	}
+
+	.selected-reg-num-table td {
+		height: 40px;
+		vertical-align: middle;
+	}
+
+	.selected-reg-num-table td:nth-child(1) {
+		width: 5%;
+	}
+
+	.selected-reg-num-table td:nth-child(2) {
+		width: 20%;
+	}
+
+	.selected-reg-num-table td:nth-child(3) {
+		width: 70%;
+	}
+
+	.selected-reg-num-table td:nth-child(4) {
+		width: 5%;
+	}
+
+
 	#pagesCounter::after {
      display: inline;
      content: counter(pages);
 }
 
 	.chip {
-		font-size: 8px;
+		font-size: 8pt;
 		padding: 3px 8px;
 		background-color: #E2E7ED;
 		color: #313132;
@@ -777,14 +855,14 @@
 	}
 
 	.label {
-		font-size: 7px;
-		line-height: 9px;
+		font-size: 7pt;
+		line-height: 13px;
 		font-family: 'BCSans-Bold', sans-serif !important;
 		font-weight: bold;
 		color: #313132;
 		padding: 3px 8px !important;
 		margin: 0 3px !important;
-		border-radius: 6px;
+		border-radius: 4px;
 		background-color: #e7e7e7;
 	}
 

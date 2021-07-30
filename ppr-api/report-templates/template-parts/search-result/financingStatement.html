@@ -1,24 +1,24 @@
 
 <div class="business-details-container">
-  <div class="financing-type">{{ detail.financingStatement.registrationDescription }}</div>
-  <div class="financing-act">{{ detail.financingStatement.registrationAct }}</div>
+  <div class="financing-type pt-0">{{ detail.financingStatement.registrationDescription }}</div>
+  <div class="financing-act pt-0">{{ detail.financingStatement.registrationAct }}</div>
 {#
   <div class="business-name-header" id="{{ detail.financingStatement.baseRegistrationNumber }}">
 #}
-  <div class="business-name-header pt-3">
-    <h2 id="{{ detail.financingStatement.baseRegistrationNumber }}" class="lbl-business-name">
+  <div class="business-name-header" id="{{ detail.financingStatement.baseRegistrationNumber }}">
+    <span class="lbl-business-name">
       Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}
-      {% if detail.financingStatement.statusType == 'HDC' %} 
-        <span class="lbl-business-name-gold">DISCHARGED</span>
-      {% elif detail.financingStatement.statusType == 'HEX' %} 
-        <span class="lbl-business-name-gold">EXPIRED</span>
-      {% endif %}
-    </h2>
-  </div>
+    </span>
+    {% if detail.financingStatement.statusType == 'HDC' %} 
+      <span class="lbl-business-name-gold">DISCHARGED</span>
+    {% elif detail.financingStatement.statusType == 'HEX' %} 
+      <span class="lbl-business-name-gold">EXPIRED</span>
+    {% endif %}
+</div>
   <table class="business-details-table-grey" role="presentation">
     <tr>
       <td>Base Registration Date and Time:</td>
-      <td>{{detail.financingStatement.createDateTime}}}</td>
+      <td>{{detail.financingStatement.createDateTime}}</td>
     </tr>
     {% if detail.financingStatement.dischargedDateTime is defined %}
     <tr>
@@ -61,10 +61,10 @@
 </div>
 
 <div class="no-page-break">
-  <div class="separator-header mt-4"></div>
-  <div class="section-title-centre mt-4">Current Registration Information</div>
-  <div class="section-statement">(as of {{searchDateTime}})</div>
-  <div class="separator-header mt-4"></div>
+  <div class="separator-header mt-6"></div>
+  <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
+  <div class="section-statement mt-0">(as of {{searchDateTime}})</div>
+  <div class="separator-header mt-2"></div>
 </div>
 
 <div class="container pt-4">
