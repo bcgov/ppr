@@ -382,7 +382,9 @@ span.invalid-message {
 }
 
 .auto-complete-added,
-.v-list .v-list-item--active .v-icon.mdi-check {
+.v-list .v-list-item--active .v-icon.mdi-check,
+.v-list-item__action .v-icon.mdi-check
+{
   color: #2e8540 !important;
 }
 
@@ -413,4 +415,8 @@ span.invalid-message {
   #secured-party-dialog {
     max-height: 90vh;
   }
+}
+
+#party-search-auto-complete .v-item--active .row .col {
+  color: $primary-blue !important;
 }

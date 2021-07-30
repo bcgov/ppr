@@ -134,6 +134,7 @@
                     :value="row.item.address"
                   />
                 </td>
+                <td>{{ row.item.emailAddress }}</td>
                 <td>{{ getFormattedBirthdate(row.item) }}</td>
               </tr>
             </template>

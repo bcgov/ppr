@@ -104,7 +104,7 @@ describe('Debtor list tests', () => {
   it('renders debtor table and headers', async () => {
     expect(wrapper.find('.debtor-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.debtor-summary-table .text-start').length).toBe(3)
+    expect(wrapper.findAll('.debtor-summary-table .text-start').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
@@ -118,7 +118,7 @@ describe('Debtor list tests', () => {
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    expect(item1.querySelectorAll('td')[2].textContent).toContain('June 16, 1990')
+    expect(item1.querySelectorAll('td')[3].textContent).toContain('June 16, 1990')
   })
 })
 

@@ -254,12 +254,17 @@ export default defineComponent({
 }
 
 .auto-complete-item:hover {
-  background-color: $gray1 !important;
+  color: $primary-blue !important;
+  background-color: #e0e0e05c !important;
+}
+
+.auto-complete-item[aria-selected=true] {
+  color: $primary-blue !important;
+  background-color: #E4EDF7 !important;
 }
 
 .auto-complete-item:focus {
-  color: $primary-blue !important;
-  background-color: $blueSelected !important;
+  background-color: #dee2e6b8 !important;
 }
 
 @media (min-width: 960px) {
