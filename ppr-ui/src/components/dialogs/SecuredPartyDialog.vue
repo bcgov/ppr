@@ -11,7 +11,7 @@
         <v-col cols="11">
           <v-row no-gutters>
             <v-col class="text-md-center">
-              <v-icon color="red">mdi-information-outline</v-icon>
+              <v-icon style="font-size: 30px" color="red">mdi-information-outline</v-icon>
             </v-col>
           </v-row>
           <v-row no-gutters class="pt-5">
@@ -21,7 +21,7 @@
           </v-row>
         </v-col>
         <v-col cols="1">
-          <v-row no-gutters justify="end">
+          <v-row no-gutters justify="end" style="margin-top: -10px">
             <v-btn color="primary" icon :ripple="false" @click="exit()">
               <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -30,70 +30,89 @@
       </v-row>
 
       <div>
-        <p class="text-md-center px-6 pt-3">
+        <p class="text-md-center px-6 pt-3" :class="$style['intro']">
           One or more similar Secured Parties were found. Do you want to use an
-          existing Secured Parties listed below or use your information to
-          create a new Secured Party?
+          existing Secured Party listed below or use your information to create
+          a new Secured Party?
         </p>
       </div>
       <div :class="$style['partyWindow']">
-      <div class="text-md-center generic-label">
-        Use my information and create a new Secured Party:
-      </div>
+        <div class="text-md-center generic-label">
+          Use my information and create a new Secured Party:
+        </div>
 
-      <v-container class="currentParty">
-        <v-row :class="[$style['companyRow'], $style['primaryRow']]">
-          <v-col cols="1"><v-icon :class="$style['companyIcon']">mdi-domain</v-icon></v-col>
-          <v-col cols="9">
-            <div :class="$style['companyText']" class="businessName">{{ party.businessName }}</div>
-            <div :class="$style['addressText']">
-              {{ party.address.street }}, {{ party.address.city }}
-              {{ party.address.region }} , {{ party.address.postalCode }},
-              {{ party.address.country }}
-            </div>
-            <div>
-              <v-chip x-small label color="primary" text-color="white"
-                >New</v-chip
+        <v-container class="currentParty">
+          <v-row :class="[$style['companyRow'], { 'primaryRow': showSelected }]">
+            <v-col cols="auto" :class="$style['iconColumn']"
+              ><v-icon :class="$style['companyIcon']">mdi-domain</v-icon></v-col
+            >
+            <v-col cols="9">
+              <div :class="$style['companyText']" class="businessName">
+                {{ party.businessName }}
+              </div>
+              <div :class="$style['addressText']">
+                {{ party.address.street }}, {{ party.address.city }}
+                {{ party.address.region }} , {{ party.address.postalCode }},
+                {{ getCountryName(party.address.country) }}
+              </div>
+              <div>
+                <v-chip x-small label color="primary" text-color="white"
+                  >NEW</v-chip
+                >
+              </div>
+            </v-col>
+            <v-col cols="2" class="pt-5"
+              ><v-btn
+                class="ml-auto float-right"
+                color="primary"
+                :class="$style['partyButton']"
+                @click="createParty()"
               >
-            </div>
-          </v-col>
-          <v-col cols="2" class="pt-5"
-            ><v-btn class="ml-auto" color="primary" :class="$style['partyButton']" @click="createParty()">
-              Select
-            </v-btn></v-col
-          >
-        </v-row>
-      </v-container>
+                Select
+              </v-btn></v-col
+            >
+          </v-row>
+        </v-container>
 
-      <div class="text-md-center generic-label">
-        Use one of the existing Secured Parties:
-      </div>
-      <v-container>
-        <v-row
-          class="searchResponse"
-          :class="$style['companyRow']"
-          v-for="(result, i) in results"
-          :key="i"
-        >
-          <v-col cols="1"><v-icon :class="$style['companyIcon']">mdi-domain</v-icon></v-col>
-          <v-col cols="9">
-            <div :class="$style['companyText']" class="businessName">{{ result.businessName }}</div>
-            <div :class="$style['addressText']">
-              {{ result.address.street }}, {{ result.address.city }}
-              {{ result.address.region }} , {{ result.address.postalCode }},
-              {{ result.address.country }}
-            </div>
-            <div :class="$style['addressText']">
-              Secured Party Code: {{ result.code }}
-            </div>
-          </v-col>
-          <v-col cols="2" class="pt-5"
-            ><v-btn class="ml-auto" color="primary" :class="$style['partyButton']" @click="selectParty(i)">
-              Select
-            </v-btn></v-col
+        <div class="text-md-center generic-label">
+          Use an existing Secured Party:
+        </div>
+        <v-container>
+          <v-row
+            class="searchResponse"
+            :class="$style['companyRow']"
+            v-for="(result, i) in results"
+            :key="i"
+            @mouseover="onHover"
           >
-        </v-row>
-      </v-container>
+            <v-col cols="auto" :class="$style['iconColumn']"
+              ><v-icon :class="$style['companyIcon']">mdi-domain</v-icon></v-col
+            >
+            <v-col cols="9">
+              <div :class="$style['companyText']" class="businessName">
+                {{ result.businessName }}
+              </div>
+              <div :class="$style['addressText']">
+                {{ result.address.street }}, {{ result.address.city }}
+                {{ result.address.region }} , {{ result.address.postalCode }},
+                {{ getCountryName(result.address.country) }}
+              </div>
+              <div :class="$style['addressText']">
+                Secured Party Code: {{ result.code }}
+              </div>
+            </v-col>
+            <v-col cols="2" class="pt-5"
+              ><v-btn
+                class="ml-auto float-right"
+                color="primary"
+                :class="$style['partyButton']"
+                @click="selectParty(i)"
+              >
+                Select
+              </v-btn></v-col
+            >
+          </v-row>
+        </v-container>
       </div>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -114,11 +133,13 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  ref, // eslint-disable-line no-unused-vars
   watch
 } from '@vue/composition-api'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
+import {
+  useCountriesProvinces
+} from '@/composables/address/factories'
 
 export default defineComponent({
   props: {
@@ -134,8 +155,11 @@ export default defineComponent({
     const localState = reactive({
       results: props.defaultResults,
       party: props.defaultParty,
-      dialog: props.defaultDialog
+      dialog: props.defaultDialog,
+      showSelected: true
     })
+
+    const countryProvincesHelpers = useCountriesProvinces()
 
     const { addSecuredParty } = useSecuredParty(props, context)
 
@@ -158,6 +182,10 @@ export default defineComponent({
 
     const exit = () => {
       context.emit('emitClose')
+    }
+
+    const onHover = () => {
+      localState.showSelected = false
     }
 
     watch(
@@ -185,6 +213,8 @@ export default defineComponent({
       selectParty,
       createParty,
       exit,
+      onHover,
+      ...countryProvincesHelpers,
       ...toRefs(localState)
     }
   }
@@ -195,6 +225,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .addressText {
   font-size: 12px;
+  color: $gray7;
 }
 .companyText {
   font-weight: 700;
@@ -204,14 +235,26 @@ export default defineComponent({
   background-color: #f1f1f1;
   border-radius: 4px 4px 4px 4px;
   margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
-.primaryRow {
+.companyRow:hover {
+  border: 1px solid $primary-blue;
+}
+
+.companyRow:focus {
   border: 1px solid $primary-blue;
 }
 
 .companyIcon {
   color: $gray9 !important;
+}
+
+.intro {
+  color: $gray7;
 }
 
 @media (min-height: 800px) {
@@ -235,5 +278,10 @@ export default defineComponent({
 
 .partyDialog {
   height: 90%;
+}
+
+.iconColumn {
+  padding-right: 5px;
+  padding-left: 20px;
 }
 </style>

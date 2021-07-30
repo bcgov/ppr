@@ -406,6 +406,10 @@ span.invalid-message {
   font-style: italic;
 }
 
+.primaryRow {
+  border: 1px solid $primary-blue;
+}
+
 @media (max-height: 800px) {
   #secured-party-dialog {
     max-height: 60vh;
