@@ -66,7 +66,7 @@
 		text-transform: capitalize;
 	}
 
-	.lbl-business-name-gold {
+	.badge-gold {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		font-size: 7pt;
 		max-height: 13pt;
@@ -74,7 +74,7 @@
 		color: #234075;
 		background-color: #e3a82b;
 		padding: 3px 8px;
-		margin: 0px 3px 6px 12px !important;
+		margin: 0px 3px 6px 0px;
 		border-radius: 4px;
 		vertical-align: middle;
 	}
@@ -102,6 +102,30 @@
 		vertical-align: middle;
 		text-align: center;
 		/* margin-top: -90px; */ /* -43px approx 0.45 in */
+	}
+
+	.registration-header-table {
+		width: 100%;
+		background-color: #234075;
+		height: 44px;
+		text-align: left;
+		line-height: 44px;
+	}
+
+	.registration-header-table td {
+		vertical-align: middle;
+	}
+
+	.registration-header-table td:nth-child(1) {
+		width: 55%;
+		padding-left: 27px;
+		font-family: 'BCSans-Bold', sans-serif !important;
+		font-size: 14pt !important;
+		color: white;
+	}
+
+	.registration-header-table td:nth-child(2) {
+		width: 45%;
 	}
 
 	.business-details-table {
@@ -142,6 +166,7 @@
 
 	.business-details-table-grey td {
 		vertical-align: top;
+		padding-bottom: 2px;
 	}
 
 	.business-details-table-grey td:nth-child(1) {
@@ -405,69 +430,11 @@
 		text-align: center
 	}
 
-	.doc-description,
-	.registrar-title {
+	.doc-description {
 		font-size: 9pt;
 		text-align: center;
 		line-height: 9px;
 		height: 10px;
-	}
-
-	.registrar-signature img {
-		width: 64px;
-		height: 29px;
-		vertical-align: center;
-	}
-
-	.registrar-name {
-		font-size: 9pt;
-		font-family: 'BCSans-Bold', sans-serif !important;
-		text-align: center
-	}
-
-	.share-structure-table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: 13pt;
-		font-family: 'BCSans-Regular', sans-serif !important;
-	}
-
-	.share-structure-table-header {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
-		font-size: 12pt;
-	}
-
-	.share-structure-table td {
-		height: 40px;
-		vertical-align: middle;
-	}
-
-	.share-structure-table td:nth-child(1) {
-		width: 30%;
-		font-family: 'BCSans-Bold', sans-serif !important;
-	}
-
-	.share-structure-table td:nth-child(2) {
-		width: 20%;
-	}
-
-	.share-structure-table td:nth-child(3) {
-		width: 16%;
-	}
-
-	.share-structure-table td:nth-child(4) {
-		width: 16%;
-		padding-left: 2rem;
-	}
-
-	.share-structure-table td:nth-child(5) {
-		width: 18%;
-	}
-
-	.share-structure-table .series-name {
-		font-size: 12pt;
-		padding-left: 1rem;
 	}
 
 	.separator-statement {
@@ -839,7 +806,6 @@
 		color: #313132;
 		border-radius: 2px;
 		margin: 0 3px;
-		text-transform: upper;
 	}
 
 	.resolution-date-list {
