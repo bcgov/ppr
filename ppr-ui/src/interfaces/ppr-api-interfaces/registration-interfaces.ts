@@ -58,6 +58,7 @@ export interface RegistrationIF {
   securedParties: string,
   expireDays?: string, // Number of days until expiry
   statusType?: string,
+  documentId?: string,
   path: string,
   baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
   createDateTime?: string, // Included in a successful response.

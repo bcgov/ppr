@@ -1,9 +1,80 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
+    <div :class="$style['col-selection']">
+      <v-select
+        id="column-selection"
+        dense
+        :class="[$style['text-input-style'], 'column-selection']"
+        attach
+        browser-autocomplete="off"
+        :items="colheaders"
+        :menu-props="dropdownPropsXl"
+        multiple
+        hide-details="true"
+        placeholder="Columns to Show"
+        style="width: 200px;"
+        v-model="selectedHeaderValues"
+      >
+        <template v-slot:selection="{ index }">
+          <span v-if="index === 0">Columns to Show</span>
+        </template>
+      </v-select>
+    </div>
+    <v-container
+      v-if="showSubmittedDatePicker"
+      :class="[$style['date-selection'], 'registration-date']"
+      elevation="6"
+    >
+      <v-row no-gutters>
+        <v-col cols="6" :class="$style['picker-title']"
+          >Select Start Date:</v-col
+        >
+        <v-col cols="6" :class="[$style['picker-title'], 'pl-4']"
+          >Select End Date:</v-col
+        >
+      </v-row>
+      <v-row>
+        <v-col cols="6">
+          <v-date-picker
+            color="#1A5A96"
+            :max="submittedEndDateTmp"
+            v-model="submittedStartDateTmp"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-date-picker
+            color="#1A5A96"
+            :min="submittedStartDateTmp"
+            v-model="submittedEndDateTmp"
+          />
+        </v-col>
+      </v-row>
+      <v-row no-gutters justify="end">
+        <v-col cols="auto pr-4">
+          <v-btn
+            class="date-selection-btn bold"
+            flat
+            ripple
+            small
+            @click="updateSubmittedRange"
+            >OK</v-btn
+          >
+          <v-btn
+            class="date-selection-btn ml-4"
+            flat
+            ripple
+            small
+            @click="resetSubmittedRange"
+            >Cancel</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-container>
+
     <v-data-table
-      class="registration-table"
+      class="registration-table pt-4"
       :class="$style['reg-table']"
-      :headers="headers"
+      :headers="getDisplayedHeaders"
       :items="tableData"
       disable-pagination
       hide-default-footer
@@ -11,7 +82,7 @@
     >
       <template v-slot:body.prepend>
         <tr class="filter-row">
-          <td>
+          <td v-if="selectedHeaderValues.includes('number')">
             <v-text-field
               filled
               single-line
@@ -19,18 +90,18 @@
               v-model="registrationNumber"
               type="text"
               label="Number"
-              dense="true"
+              dense
               @keypress="filterRow"
             ></v-text-field>
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('type')">
             <v-select
               :items="registrationTypes"
               single-line
               item-text="registrationTypeUI"
               item-value="registrationTypeAPI"
               filled
-              dense="true"
+              dense
               label="Registration Type"
               v-model="registrationType"
               id="txt-type"
@@ -43,44 +114,26 @@
               </template>
             </v-select>
           </td>
-          <td>
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :nudge-right="40"
-              transition="scale-transition"
-              offset-y
-              min-width="18rem"
-            >
-              <template v-slot:activator="{ on }">
-                <v-text-field
-                  filled
-                  single-line
-                  id="reg-textfield"
-                  data-test-id="reg-date-text"
-                  v-model="registrationDateFormatted"
-                  hint="YYYY/MM/DD"
-                  append-icon="mdi-calendar"
-                  v-on="on"
-                  dense="true"
-                  hide-details="true"
-                />
-              </template>
-              <v-date-picker
-                id="reg-datepicker"
-                data-test-id="reg-date-picker"
-                v-model="registrationDate"
-                no-title
-                @input="menu = true"
-              />
-            </v-menu>
+          <td v-if="selectedHeaderValues.includes('rdate')">
+            <v-text-field
+              filled
+              single-line
+              id="reg-textfield"
+              data-test-id="reg-date-text"
+              v-model="registrationDateFormatted"
+              hint="YYYY/MM/DD"
+              append-icon="mdi-calendar"
+              @click="showSubmittedDatePicker = true"
+              dense
+              hide-details="true"
+            />
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('status')">
             <v-select
               :items="statusTypes"
               single-line
               filled
-              dense="true"
+              dense
               label="Status"
               v-model="status"
               id="txt-status"
@@ -93,7 +146,7 @@
               </template>
             </v-select>
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('rby')">
             <v-text-field
               filled
               single-line
@@ -101,10 +154,10 @@
               v-model="registeredBy"
               type="text"
               label="Registered By"
-              dense="true"
+              dense
             ></v-text-field>
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('rparty')">
             <v-text-field
               filled
               single-line
@@ -112,10 +165,10 @@
               v-model="registeringParty"
               type="text"
               label="Registering Party"
-              dense="true"
+              dense
             ></v-text-field>
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('sp')">
             <v-text-field
               filled
               single-line
@@ -123,10 +176,10 @@
               v-model="securedParties"
               type="text"
               label="Secured Parties"
-              dense="true"
+              dense
             ></v-text-field>
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('folio')">
             <v-text-field
               filled
               single-line
@@ -134,10 +187,10 @@
               v-model="folioNumber"
               type="text"
               label=""
-              dense="true"
+              dense
             ></v-text-field>
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('edays')">
             <v-text-field
               filled
               single-line
@@ -145,7 +198,7 @@
               v-model="daysToExpiry"
               type="text"
               label="Days to Expiry"
-              dense="true"
+              dense
             ></v-text-field>
           </td>
           <td></td>
@@ -158,24 +211,47 @@
           class="registration-row"
           :class="draftClass(row.item.statusType)"
         >
-          <td>
+          <td v-if="selectedHeaderValues.includes('number')">
             {{ row.item.baseRegistrationNumber }}
           </td>
-          <td>
+          <td v-if="selectedHeaderValues.includes('type')">
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
-          <td>{{ getFormattedDate(row.item.createDateTime) }}</td>
-          <td>{{ getStatusDescription(row.item.statusType) }}</td>
-          <td></td>
-          <td>{{ row.item.registeringParty || '' }}</td>
-          <td>{{ row.item.securedParties || '' }}</td>
-          <td>{{ row.item.clientReferenceId }}</td>
-          <td>{{ row.item.expireDays || '' }}</td>
-          <td></td>
+          <td v-if="selectedHeaderValues.includes('rdate')">
+            {{ getFormattedDate(row.item.createDateTime) }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('status')">
+            {{ getStatusDescription(row.item.statusType) }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('rby')"></td>
+          <td v-if="selectedHeaderValues.includes('rparty')">
+            {{ row.item.registeringParty || '' }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('sp')">
+            {{ row.item.securedParties || '' }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('folio')">
+            {{ row.item.clientReferenceId }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('edays')">
+            {{ row.item.expireDays || '' }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('vs')">
+            <v-btn
+              :id="`pdf-btn-${row.item.id}`"
+              :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
+              depressed
+              :loading="row.item.documendId === loadingPDF"
+              @click="downloadPDF(row.item.documendId)"
+            >
+              <v-icon class="ma-0" left small>mdi-file-pdf-outline</v-icon>
+              <span :class="[$style['pdf-btn-text'], 'ma-0']">PDF</span>
+            </v-btn>
+          </td>
 
           <!-- Action Btns -->
           <td class="actions-cell px-0 py-2">
-            <div class="actions float-right">
+            <div class="actions">
               <span class="edit-action">
                 <v-btn
                   text
@@ -225,11 +301,12 @@ import {
   reactive,
   toRefs,
   watch,
+  computed,
   onMounted
 } from '@vue/composition-api'
 
 import { registrationTableHeaders } from '@/resources'
-import { registrationHistory, draftHistory } from '@/utils' // eslint-disable-line
+import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
 import { useRegistration } from '@/composables/useRegistration'
 
 export default defineComponent({
@@ -262,7 +339,44 @@ export default defineComponent({
       originalData: [],
       headers: registrationTableHeaders,
       registrationDateFormatted: '',
-      registrationDate: ''
+      showSubmittedDatePicker: false,
+      submittedStartDate: null,
+      submittedEndDate: null,
+      submittedStartDateTmp: null,
+      submittedEndDateTmp: null,
+      datePickerErr: false,
+      registrationDate: '',
+      loadingPDF: '',
+      selectedHeaderValues: [
+        'number',
+        'type',
+        'rdate',
+        'status',
+        'rby',
+        'rparty',
+        'sp',
+        'folio',
+        'edays',
+        'vs'
+      ],
+      dropdownPropsXl: {
+        minWidth: '200px',
+        maxHeight: 'none'
+      },
+      colheaders: computed(function () {
+        const columns = [...localState.headers]
+        columns.pop()
+        return columns
+      }),
+      getDisplayedHeaders: computed(function () {
+        const displayed = []
+        for (let i = 0; i < localState.headers.length; i++) {
+          if (localState.headers[i].display) {
+            displayed.push(localState.headers[i])
+          }
+        }
+        return displayed
+      })
     })
 
     const filterRow = () => {
@@ -282,19 +396,99 @@ export default defineComponent({
       return `${year}/${month}/${day}`
     }
 
+    const updateSubmittedRange = () => {
+      if (
+        !localState.submittedStartDateTmp ||
+        !localState.submittedEndDateTmp
+      ) {
+        localState.datePickerErr = true
+        return
+      }
+      localState.datePickerErr = false
+      // watchers on these will update current.. versions in store as well
+      localState.submittedStartDate = localState.submittedStartDateTmp
+      localState.submittedEndDate = localState.submittedEndDateTmp
+      localState.showSubmittedDatePicker = false
+      localState.registrationDateFormatted = 'Custom'
+      // update query with start/end dates and search
+      // this.updateQuery('submittedStartDate', this.submittedStartDate)
+      // this.updateQuery('submittedEndDate', this.submittedEndDate)
+      // this.sort()
+    }
+
+    const resetSubmittedRange = () => {
+      // reset validation
+      localState.datePickerErr = false
+      // reset tmp values
+      localState.submittedStartDateTmp = localState.submittedStartDate
+      localState.submittedEndDateTmp = localState.submittedEndDate
+      // reset submittedInterval (will not trigger a search)
+      // hide date picker
+      localState.showSubmittedDatePicker = false
+    }
+
+    const downloadPDF = async (regId: string): Promise<any> => {
+      localState.loadingPDF = regId
+      const pdf = await registrationPDF(regId)
+      if (!pdf || pdf?.error) {
+        emit('error', { statusCode: 404 })
+      } else {
+        /* solution from https://github.com/axios/axios/issues/1392 */
+
+        // it is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        const blob = new Blob([pdf], { type: 'application/pdf' })
+
+        // IE doesn't allow using a blob object directly as link href
+        // instead it is necessary to use msSaveOrOpenBlob
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, regId)
+        } else {
+          // for other browsers, create a link pointing to the ObjectURL containing the blob
+          const url = window.URL.createObjectURL(blob)
+          const a = window.document.createElement('a')
+          window.document.body.appendChild(a)
+          a.setAttribute('style', 'display: none')
+          a.href = url
+          a.download = regId
+          a.click()
+          window.URL.revokeObjectURL(url)
+          a.remove()
+        }
+      }
+      localState.loadingPDF = ''
+    }
+
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
       localState.tableData = await registrationHistory()
       const drafts = await draftHistory()
-      // Array.prototype.push.apply(localState.tableData, drafts)
-      localState.tableData = drafts
-      localState.originalData = drafts
+      Array.prototype.push.apply(localState.tableData, drafts)
+      console.log(localState.tableData)
+
+      // localState.tableData = drafts
+      // localState.originalData = drafts
     })
 
     watch(
       () => localState.registrationDate,
       (val: string) => {
         localState.registrationDateFormatted = formatDate(val)
+      }
+    )
+
+    watch(
+      () => localState.selectedHeaderValues,
+      val => {
+        if (val) {
+          for (let i = 0; i < localState.headers.length; i++) {
+            if (!val.includes(localState.headers[i].value)) {
+              localState.headers[i].display = false
+            } else {
+              localState.headers[i].display = true
+            }
+          }
+        }
       }
     )
 
@@ -314,6 +508,9 @@ export default defineComponent({
       status,
       statusTypes,
       filterRow,
+      updateSubmittedRange,
+      resetSubmittedRange,
+      downloadPDF,
       ...toRefs(localState)
     }
   }
@@ -350,5 +547,52 @@ export default defineComponent({
   overflow: visible;
   text-overflow: inherit;
   white-space: inherit;
+}
+.date-selection {
+  border-radius: 5px;
+  left: 50%;
+  margin-top: 110px;
+  overflow: auto;
+  padding: 24px 34px 24px 34px;
+  position: absolute;
+  transform: translate(-50%, 0);
+  background-color: white;
+  width: 700px;
+  td {
+    padding: 0;
+  }
+}
+.picker-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: $gray9;
+}
+
+.col-selection {
+  position: relative;
+  top: -100px;
+  float: right;
+  height: 0px;
+}
+.text-input-style {
+  background-color: white !important;
+  border: 1px solid var(--outline);
+  height: 45px;
+  /* padding: 0 0 5px 8px; */
+  font-size: 13px;
+  margin: 0;
+  color: var(--text);
+}
+.pdf-btn {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+  justify-content: start;
+}
+.pdf-btn::before {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+}
+.pdf-btn-text {
+  text-decoration: underline;
 }
 </style>

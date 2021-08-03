@@ -11,7 +11,6 @@ import {
   SearchResultIF,
   UserSettingsIF,
   SearchPartyIF,
-  FinancingStatementIF,
   RegistrationIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
@@ -313,6 +312,7 @@ export async function registrationHistory (): Promise<[RegistrationIF]> {
   return axios
     .get('financing-statements/registrations', config)
     .then(response => {
+      console.log(response)
       const data = response?.data
       if (!data) {
         throw new Error('Invalid API response')
@@ -338,6 +338,7 @@ export async function draftHistory (): Promise<[DraftIF]> {
   return axios
     .get('drafts', config)
     .then(response => {
+      console.log(response)
       const data = response?.data
       if (!data) {
         throw new Error('Invalid API response')
@@ -357,19 +358,56 @@ export async function draftHistory (): Promise<[DraftIF]> {
 }
 
 // Save a new financing statement.
-export async function createFinancingStatement (statement: FinancingStatementIF): Promise<FinancingStatementIF> {
-  return axios.post<FinancingStatementIF>('financing-statements', statement, getDefaultConfig())
+export async function createFinancingStatement (
+  statement: FinancingStatementIF
+): Promise<FinancingStatementIF> {
+  return axios
+    .post<FinancingStatementIF>(
+      'financing-statements',
+      statement,
+      getDefaultConfig()
+    )
     .then(response => {
       const data: FinancingStatementIF = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }
       return data
-    }).catch(error => {
+    })
+    .catch(error => {
       statement.error = {
         statusCode: error?.response?.status,
-        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause
+        message:
+          error?.response?.data?.errorMessage +
+          ' ' +
+          error?.response?.data?.rootCause
       }
       return statement
+    })
+}
+
+// Get pdf for a registration
+export async function registrationPDF (registrationId: string): Promise<any> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = {
+    baseURL: url,
+    headers: { Accept: 'application/pdf' },
+    responseType: 'blob' as 'json'
+  }
+  return axios
+    .get(`financing-statements/${registrationId}`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        error: {
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+        }
+      }
     })
 }

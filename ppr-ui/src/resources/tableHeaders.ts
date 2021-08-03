@@ -296,71 +296,82 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds py-4',
+    class: 'column-md py-4',
     sortable: true,
     text: 'Registration Number',
-    value: 'number'
+    value: 'number',
+    display: true
   },
   {
     class: 'column-md py-4',
     sortable: true,
     text: 'Registration Type',
-    value: 'type'
+    value: 'type',
+    display: true
   },
   {
-    class: 'column-mds py-4',
+    class: 'column-md py-4',
     sortable: true,
     text: 'Registration Date',
-    value: 'sp'
+    value: 'rdate',
+    display: true
   },
   {
-    class: 'column-sm py-4',
+    class: 'column-mds py-4',
     sortable: true,
     text: 'Status',
-    value: 'status'
+    value: 'status',
+    display: true
   },
   {
-    class: 'column-mds py-4',
+    class: 'column-md py-4',
     sortable: true,
     text: 'Registered By',
-    value: 'sp'
+    value: 'rby',
+    display: true
   },
   {
-    class: 'column-mds py-4',
+    class: 'column-md py-4',
     sortable: true,
     text: 'Registering Party',
-    value: 'sp'
+    value: 'rparty',
+    display: true
   },
   {
-    class: 'column-mds py-4',
+    class: 'column-md py-4',
     sortable: true,
     text: 'Secured Parties',
-    value: 'sp'
+    value: 'sp',
+    display: true
   },
 
   {
-    class: 'column-mds py-4',
+    class: 'column-md py-4',
     sortable: true,
     text: 'Folio/Reference Number',
-    value: 'sp'
+    value: 'folio',
+    display: true
   },
   {
     class: 'column-sm py-4',
     sortable: true,
     text: 'Days to Expiry',
-    value: 'sp'
+    value: 'edays',
+    display: true
   },
   {
-    class: 'column-xs py-4',
+    class: 'column-sm py-4',
     sortable: false,
     text: 'Verification Statement',
-    value: 'sp'
+    value: 'vs',
+    display: true
   },
   {
     class: 'column-sm py-4',
     sortable: false,
     text: 'Actions',
-    value: 'sp',
+    value: 'actions',
+    display: true,
     fixed: true
   }
 ]

@@ -49,7 +49,7 @@
                 <b>My Registrations</b>
               </v-col>
             </v-row>
-            <v-row no-gutters class="white" style="height:500px">
+            <v-row no-gutters class="white" style="min-height:300px">
               <v-col cols="12"><registration-table /></v-col>
             </v-row>
           </v-col>

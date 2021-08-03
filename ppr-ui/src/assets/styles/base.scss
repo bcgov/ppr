@@ -446,3 +446,18 @@ span.invalid-message {
 #party-search-auto-complete .v-item--active .row .col {
   color: $primary-blue !important;
 }
+
+.date-selection-btn {
+  color: $primary-blue;
+  margin: 0;
+  opacity: 1;
+  padding: 0;
+  min-width: 20px;
+  box-shadow: none;
+}
+.date-selection-btn:hover {
+  opacity: 0.7;
+}
+.date-selection-btn.bold {
+  font-weight: 800 !important;
+}
