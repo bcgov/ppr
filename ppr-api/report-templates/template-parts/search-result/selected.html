@@ -37,6 +37,26 @@
          </tr>
       {% endfor %}
     </table>
+    {% elif searchQuery.type == 'REGISTRATION_NUMBER' %}
+    <table class="selected-reg-num-table mt-4" role="presentation">
+        <tr class="selected-reg-num-table-header no-page-break">
+           <td class="top-align"></td>
+           <td class="top-align">Base Registration</td>
+           <td class="top-align">Registration Type</td>
+           <td class="top-align">Page Number</td>
+          </tr>
+          <tr class="no-page-break bold">
+            <td>1</td>
+            <td><a href="#{{selected[0].baseRegistrationNumber}}">{{selected[0].baseRegistrationNumber}}</a></td>
+            <td>{{details[0].financingStatement.registrationDescription}}</td>
+            <td class="right-align">
+                <a href="#{{selected[0].baseRegistrationNumber}}" class="tocpagenr"></a>
+            </td>
+         </tr>
+         <tr class="solid-row-separator no-page-break">
+            <td colspan="4" style="height:1px"/>
+         </tr>
+      </table>
     {% elif searchQuery.type != 'MHR_NUMBER' %}
     <table class="selected-serial-table mt-4" role="presentation">
         <tr class="solid-row-separator selected-serial-table-header no-page-break">

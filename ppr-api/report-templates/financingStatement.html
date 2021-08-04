@@ -14,7 +14,8 @@
     [[style.html]]
   </head>
   <body>
-    <div class="header">
+    <article id="registration">
+    <div class="header-registration">
       <table class="header-table" role="presentation">
         <tr class="no-page-break">
           <td>
@@ -26,20 +27,17 @@
           </td>
         </tr>
       </table>
+      <table class="registration-header-table" role="presentation">
+        <tr>
+          <td>Base Registration Number: {{ baseRegistrationNumber }}</td>
+        </tr>
+      </table>
     </div>
-
+    <div class="footer-reg-num">
+      {% if environment != '' %}TEST DATA |  {% endif %}Base Registration #{{ baseRegistrationNumber }}:
+    </div>
+  
     <div class="business-details-container">
-      <div class="business-name-header pt-3">
-        <h2 id="{{ baseRegistrationNumber }}" class="lbl-business-name">
-          Base Registration Number: {{ baseRegistrationNumber }}
-          {% if statusType == 'HDC' %} 
-            <span class="lbl-business-name-gold">DISCHARGED</span>
-          {% elif statusType == 'HEX' %} 
-            <span class="lbl-business-name-gold">EXPIRED</span>
-          {% endif %}
-        </h2>
-      </div>
-
       <table class="business-details-table-grey" role="presentation">
         <tr>
           <td>Base Registration Date and Time:</td>
@@ -80,6 +78,16 @@
           <td>{% if trustIndenture == true %}Yes{% else %}No{% endif %}</td>
         </tr>
         {% endif %}
+        <tr>
+          <td>Folio Number:</td>
+          <td>
+            {% if clientReferenceId is defined and clientReferenceId != "" %}
+              {{clientReferenceId}}
+            {% else %}
+              Not available.
+            {% endif %}
+          </td>
+        </tr>
       </table>          
     </div>      
 
@@ -117,5 +125,6 @@
       </div>
     {% endif %} 
 
-  </body>
+  </article>
+</body>
 </html>

@@ -56,20 +56,19 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
 # Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
 REG_NUM_QUERY = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
-        r.registration_number AS base_registration_num,
-        'EXACT' AS match_type,fs.state_type, fs.expire_date
-  FROM registrations r, financing_statements fs, registrations r2
- WHERE r2.financing_id = r.financing_id
-   AND r.financing_id = fs.id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.base_reg_number IS NULL
+       CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+            THEN r.registration_number 
+            ELSE r.base_reg_number END base_registration_num,
+       'EXACT' AS match_type,fs.state_type, fs.expire_date
+  FROM registrations r, financing_statements fs
+ WHERE r.financing_id = fs.id
+   AND r.registration_number = :query_value
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND r2.registration_number = :query_value
 """
 
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.

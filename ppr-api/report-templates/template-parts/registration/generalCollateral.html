@@ -18,11 +18,11 @@
    <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in addGeneralCollateral %}
       <tr class="no-page-break">
-            <td>
-               <div><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
-               <div class="section-data pt-3">{{ collateral.description }}</div>
-            </td>
-         </tr>
+         <td>
+            <div class="section-data">{{ collateral.description }}</div>
+            <div><span class="label pt-1">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+         </td>
+      </tr>
       {% endfor %}
    </table>
    {% endif %}
@@ -32,8 +32,8 @@
          {% if collateral.edit is not defined %}
          <tr class="no-page-break">
             <td>
-               <span class="label">REMOVED</span>
-               <div class="section-data pt-3">{{ collateral.description }}</div>
+               <div class="section-data">{{ collateral.description }}</div>
+               <span class="label pt-1">REMOVED</span>
             </td>
          </tr>
          {% endif %}
@@ -45,11 +45,11 @@
    <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in change.addGeneralCollateral %}
       <tr class="no-page-break">
-            <td>
-               <div><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
-               <div class="section-data pt-3">{{ collateral.description }}</div>
-            </td>
-         </tr>
+         <td>
+            <div class="section-data">{{ collateral.description }}</div>
+            <div><span class="label pt-1">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+         </td>
+      </tr>
       {% endfor %}
    </table>
    {% endif %}
@@ -59,8 +59,8 @@
          {% if collateral.edit is not defined %}
          <tr class="no-page-break">
             <td>
-               <span class="label">REMOVED</span>
-               <div class="section-data pt-3">{{ collateral.description }}</div>
+               <div class="section-data">{{ collateral.description }}</div>
+               <span class="label pt-1">REMOVED</span>
             </td>
          </tr>
          {% endif %}

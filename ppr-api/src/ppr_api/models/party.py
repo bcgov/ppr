@@ -44,7 +44,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     __tablename__ = 'parties'
 
     id = db.Column('id', db.Integer, db.Sequence('party_id_seq'), primary_key=True)
-    party_type = db.Column('party_type', db.String(30), db.ForeignKey('party_types.party_type'), nullable=False)
+    party_type = db.Column('party_type', db.String(2), db.ForeignKey('party_types.party_type'), nullable=False)
     # party person
     first_name = db.Column('first_name', db.String(50), nullable=True)
     middle_initial = db.Column('middle_initial', db.String(50), nullable=True, index=True)
