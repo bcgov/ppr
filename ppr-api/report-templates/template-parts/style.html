@@ -3,6 +3,9 @@
 		page: search-toc;
 	}
 
+	html body article#registration {
+		page: registration;
+	}
 	.fixed-header {
 		/* NB: repeats on every page due to fixed position */
 		position: fixed;
@@ -14,6 +17,13 @@
 		/* NB: repeats on every page due to fixed position */
 		position: fixed;
 		top: -110px; /* -192 approx 2 in */
+		width: 98%;
+	}
+	
+	.header-registration {
+		/* NB: repeats on every page due to fixed position */
+		position: fixed;
+		top: -132px; /* -192 approx 2 in */
 		width: 98%;
 	}
 
@@ -795,9 +805,9 @@
 
 
 	#pagesCounter::after {
-     display: inline;
-     content: counter(pages);
-}
+     	display: inline;
+     	content: counter(pages);
+	}
 
 	.chip {
 		font-size: 8pt;
@@ -838,6 +848,15 @@
 
 	.tocpagenr::after {
  		content: target-counter(attr(href), page);
+	}
+
+	.footer-reg-num {
+		position: running(reg_num_footer);
+		font-family: 'BCSans-Regular', sans-serif !important;
+		font-size: 10px;
+		font-weight: bold;
+		color: #003366;
+		text-align: right;
 	}
 
 </style>
