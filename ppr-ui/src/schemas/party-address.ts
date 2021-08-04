@@ -31,9 +31,7 @@ export const PartyAddressSchema = {
    * inside the address components
    */
   postalCode: [
-    baseRules[ValidationRule.REQUIRED],
-    baseRules[ValidationRule.MAX_LENGTH](15),
-    ...spaceRules
+    baseRules[ValidationRule.REQUIRED]
   ],
   deliveryInstructions: [
     baseRules[ValidationRule.MAX_LENGTH](80),

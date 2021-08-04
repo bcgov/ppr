@@ -23,11 +23,11 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
   const labels = {
     /** The Street Address Additional label with 'optional' as needed. */
     streetAdditionalLabel: computed((): string => {
-      return 'Additional Street Address' + (isSchemaRequired('streetAdditional') ? '' : ' (Optional)')
+      return 'Address Line 2' + (isSchemaRequired('streetAdditional') ? '' : ' (Optional)')
     }),
     /** The Street Address label with 'optional' as needed. */
     streetLabel: computed((): string => {
-      return 'Street Address' + (isSchemaRequired('street') ? '' : ' (Optional)')
+      return 'Address Line 1' + (isSchemaRequired('street') ? '' : ' (Optional)')
     }),
     /** The Address City label with 'optional' as needed. */
     cityLabel: computed((): string => {

@@ -25,6 +25,8 @@
       <v-form v-if="editing" ref="addressForm" name="address-form" lazy-validation>
         <div class="form__row">
           <v-autocomplete
+            autocomplete="new-password"
+            :name="Math.random()"
             filled
             class="address-country"
             hide-no-data
@@ -42,69 +44,80 @@
           <!-- NB1: AddressComplete needs to be enabled each time user clicks in this search field.
                NB2: Only process first keypress -- assumes if user moves between instances of this
                    component then they are using the mouse (and thus, clicking). -->
-          <v-text-field autocomplete="chrome-off"
-                        :name="Math.random()"
-                        filled
-                        class="street-address"
-                        :id="streetId"
-                        :label="streetLabel"
-                        v-model="addressLocal.street"
-                        :rules="[...schemaLocal.street]"
-                        @keypress.once="enableAddressComplete()"
-                        @click="enableAddressComplete()"
+          <v-text-field
+            autocomplete="new-password"
+            class="street-address"
+            filled
+            hint="Street address, PO box, rural route, or general delivery address"
+            :id="streetId"
+            :label="streetLabel"
+            persistent-hint
+            :rules="[...schemaLocal.street]"
+            v-model="addressLocal.street"
+            @keypress.once="enableAddressComplete()"
+            @click="enableAddressComplete()"
           />
         </div>
         <div class="form__row">
-          <v-textarea auto-grow
-                      filled
-                      class="street-address-additional"
-                      :label="streetAdditionalLabel"
-                      rows="1"
-                      v-model="addressLocal.streetAdditional"
-                      :rules="[...schemaLocal.streetAdditional]"
+          <v-textarea
+            autocomplete="new-password"
+            auto-grow
+            filled
+            class="street-address-additional"
+            :label="streetAdditionalLabel"
+            rows="1"
+            v-model="addressLocal.streetAdditional"
+            :rules="[...schemaLocal.streetAdditional]"
           />
         </div>
         <div class="form__row three-column">
-          <v-text-field filled
-                        class="item address-city"
-                        :label="cityLabel"
-                        v-model="addressLocal.city"
-                        :rules="[...schemaLocal.city]"
+          <v-text-field
+            autocomplete="new-password"
+            filled
+            class="item address-city"
+            :label="cityLabel"
+            v-model="addressLocal.city"
+            :rules="[...schemaLocal.city]"
           />
           <v-autocomplete v-if="useCountryRegions(country)"
-                    filled
-                    class="item address-region"
-                    hide-no-data
-                    item-text="name"
-                    item-value="short"
-                    :items="getCountryRegions(country)"
-                    :label="regionLabel"
-                    :menu-props="{ maxHeight: '14rem' }"
-                    :rules="[...schemaLocal.region]"
-                    v-model="addressLocal.region"
+            autocomplete="new-password"
+            filled
+            class="item address-region"
+            hide-no-data
+            item-text="name"
+            item-value="short"
+            :items="getCountryRegions(country)"
+            :label="regionLabel"
+            :menu-props="{ maxHeight: '14rem' }"
+            :rules="[...schemaLocal.region]"
+            v-model="addressLocal.region"
           />
           <v-text-field v-else
-                        filled
-                        class="item address-region"
-                        :label="regionLabel"
-                        v-model="addressLocal.region"
-                        :rules="[...schemaLocal.region]"
+            autocomplete="new-password"
+            filled
+            class="item address-region"
+            :label="regionLabel"
+            v-model="addressLocal.region"
+            :rules="[...schemaLocal.region]"
           />
-          <v-text-field filled
-                        class="item postal-code"
-                        :label="postalCodeLabel"
-                        v-model="addressLocal.postalCode"
-                        :rules="[...schemaLocal.postalCode]"
+          <v-text-field
+            autocomplete="new-password"
+            filled
+            class="item postal-code"
+            :label="postalCodeLabel"
+            v-model="addressLocal.postalCode"
+            :rules="[...schemaLocal.postalCode]"
           />
         </div>
         <div class="form__row">
-          <v-textarea auto-grow
-                      filled
-                      class="delivery-instructions"
-                      :label="deliveryInstructionsLabel"
-                      rows="2"
-                      v-model="addressLocal.deliveryInstructions"
-                      :rules="[...schemaLocal.deliveryInstructions]"
+          <v-textarea
+            auto-grow
+            filled
+            class="delivery-instructions"
+            :label="deliveryInstructionsLabel"
+            rows="2"
+            v-model="addressLocal.deliveryInstructions"
+            :rules="[...schemaLocal.deliveryInstructions]"
           />
         </div>
       </v-form>
@@ -191,16 +204,33 @@ export default defineComponent({
       emit('valid', valid)
     }, { immediate: true, deep: true })
 
-    watch(() => country.value, (val) => {
+    watch(() => country.value, (val, oldVal) => {
+      console.log(val)
       if (val === 'CA') {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
       } else if (val === 'US') {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
+      } else {
+        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
+      }
+      // reset other address fields (check is for loading an existing address)
+      if (oldVal) {
+        addressLocal.value.street = ''
+        addressLocal.value.streetAdditional = ''
+        addressLocal.value.city = ''
+        addressLocal.value.region = ''
+        addressLocal.value.postalCode = ''
       }
     })
 
     watch(() => props.triggerErrors, (val) => {
       if (val) {
+        // trim all extra white space
+        addressLocal.value.street = addressLocal.value.street.trim()
+        addressLocal.value.streetAdditional = addressLocal.value.streetAdditional.trim()
+        addressLocal.value.city = addressLocal.value.city.trim()
+        addressLocal.value.region = addressLocal.value.region.trim()
+        addressLocal.value.postalCode = addressLocal.value.postalCode.trim()
         validate()
       }
     })
