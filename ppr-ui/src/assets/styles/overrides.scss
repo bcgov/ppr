@@ -375,7 +375,8 @@ tbody {
 }
 
 .column-selection .v-list-item [aria-selected='true'] {
-  background-color: white;
+  background-color: white !important;
+  z-index: 99999;
 }
 
 .column-selection .v-list .v-list-item__title {
@@ -395,4 +396,10 @@ tbody {
   height: 45px;
   padding-left: 10px;
   padding-top: 4px;
+}
+
+.registration-date .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined)
+{
+  background-color: white;
+  color: $primary-blue !important;
 }

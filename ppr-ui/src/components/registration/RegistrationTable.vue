@@ -20,7 +20,7 @@
         </template>
       </v-select>
     </div>
-    <v-container
+    <v-card
       v-if="showSubmittedDatePicker"
       :class="[$style['date-selection'], 'registration-date']"
       elevation="6"
@@ -69,9 +69,10 @@
           >
         </v-col>
       </v-row>
-    </v-container>
+    </v-card>
 
     <v-data-table
+      v-if="!loadingData"
       class="registration-table pt-4"
       :class="$style['reg-table']"
       :headers="getDisplayedHeaders"
@@ -209,6 +210,7 @@
         <tr
           :key="row.item.id"
           class="registration-row"
+          v-if="!row.item.hide"
           :class="draftClass(row.item.statusType)"
         >
           <td v-if="selectedHeaderValues.includes('number')">
@@ -250,16 +252,14 @@
           </td>
 
           <!-- Action Btns -->
-          <td class="actions-cell px-0 py-2">
-            <div class="actions">
+          <td class="actions-cell px-0 py-4">
+            <div class="actions" v-if="!row.item.statusType">
               <span class="edit-action">
                 <v-btn
-                  text
                   color="primary"
-                  class="edit-btn"
+                  :class="$style['edit-btn']"
                   :id="'class-' + row.index + '-change-added-btn'"
                 >
-                  <v-icon small>mdi-pencil</v-icon>
                   <span>Edit</span>
                 </v-btn>
               </span>
@@ -268,11 +268,11 @@
                 <v-menu offset-y left nudge-bottom="4">
                   <template v-slot:activator="{ on }">
                     <v-btn
-                      text
                       small
                       v-on="on"
                       color="primary"
                       class="actions__more-actions__btn"
+                      :class="$style['down-btn']"
                     >
                       <v-icon>mdi-menu-down</v-icon>
                     </v-btn>
@@ -281,7 +281,61 @@
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
-                        <span class="ml-1">Remove</span>
+                        <span class="ml-1">Delete</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </span>
+            </div>
+
+            <div class="actions" v-if="row.item.statusType">
+              <span class="edit-action">
+                <v-btn
+                  color="primary"
+                  :class="$style['edit-btn']"
+                  :id="'class-' + row.index + '-change-added-btn'"
+                >
+                  <span>Open</span>
+                </v-btn>
+              </span>
+
+              <span class="actions__more">
+                <v-menu offset-y left nudge-bottom="4">
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      small
+                      v-on="on"
+                      color="primary"
+                      class="actions__more-actions__btn"
+                      :class="$style['down-btn']"
+                    >
+                      <v-icon>mdi-menu-down</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list class="actions__more-actions">
+                    <v-list-item>
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-pencil</v-icon>
+                        <span class="ml-1">Amend</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-clipboard-check-outline</v-icon>
+                        <span class="ml-1">Total Discharge</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-calendar-clock</v-icon>
+                        <span class="ml-1">Renew</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-delete</v-icon>
+                        <span class="ml-1">Remove from table</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -331,12 +385,12 @@ export default defineComponent({
       registrationTypes,
       daysToExpiry,
       statusTypes,
+      tableData,
+      originalData,
       filterResults
     } = useRegistration()
 
     const localState = reactive({
-      tableData: [],
-      originalData: [],
       headers: registrationTableHeaders,
       registrationDateFormatted: '',
       showSubmittedDatePicker: false,
@@ -347,6 +401,7 @@ export default defineComponent({
       datePickerErr: false,
       registrationDate: '',
       loadingPDF: '',
+      loadingData: true,
       selectedHeaderValues: [
         'number',
         'type',
@@ -461,13 +516,20 @@ export default defineComponent({
 
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
-      localState.tableData = await registrationHistory()
-      const drafts = await draftHistory()
-      Array.prototype.push.apply(localState.tableData, drafts)
-      console.log(localState.tableData)
-
-      // localState.tableData = drafts
-      // localState.originalData = drafts
+      try {
+        const registrations = await registrationHistory()
+        const drafts = await draftHistory()
+        if (registrations) {
+          Array.prototype.push.apply(tableData.value, registrations)
+        }
+        if (drafts) {
+          Array.prototype.push.apply(tableData.value, drafts)
+        }
+        localState.loadingData = false
+        originalData.value = tableData.value
+      } catch (error) {
+        alert(error)
+      }
     })
 
     watch(
@@ -482,7 +544,11 @@ export default defineComponent({
       val => {
         if (val) {
           for (let i = 0; i < localState.headers.length; i++) {
-            if (!val.includes(localState.headers[i].value)) {
+            // disclude the unchecked values, always include actions
+            if (
+              !val.includes(localState.headers[i].value) &&
+              localState.headers[i].value !== 'actions'
+            ) {
               localState.headers[i].display = false
             } else {
               localState.headers[i].display = true
@@ -508,6 +574,7 @@ export default defineComponent({
       status,
       statusTypes,
       filterRow,
+      tableData,
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
@@ -521,8 +588,8 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .reg-table {
   max-height: 550px;
-  tbody > tr > td:nth-child(1),
-  thead > tr > th:nth-child(1) {
+  /*tbody > tr > td:nth-last-child(1),
+  thead > tr > th:nth-last-child(1) {
     position: sticky !important;
     position: -webkit-sticky !important;
     left: 0;
@@ -531,7 +598,7 @@ export default defineComponent({
   }
   thead > tr > th:nth-child(1) {
     z-index: 9999;
-  }
+  }*/
 }
 .length-trust-label {
   font-size: 0.875rem;
@@ -551,7 +618,7 @@ export default defineComponent({
 .date-selection {
   border-radius: 5px;
   left: 50%;
-  margin-top: 110px;
+  margin-top: 140px;
   overflow: auto;
   padding: 24px 34px 24px 34px;
   position: absolute;
@@ -594,5 +661,17 @@ export default defineComponent({
 }
 .pdf-btn-text {
   text-decoration: underline;
+}
+.edit-btn {
+  font-weight: normal !important;
+  height: 30px !important;
+  font-size: 12px !important;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.down-btn {
+  height: 30px !important;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 </style>

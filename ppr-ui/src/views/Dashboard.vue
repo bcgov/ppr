@@ -40,7 +40,7 @@
         <v-row class="pt-3" no-gutters>
               <registration-bar class="soft-corners-bottom" :registrationTitle="''"/>
         </v-row>
-        <v-row no-gutters class='pt-3'>
+        <v-row no-gutters class='pt-3' style="margin-bottom:300px;">
           <v-col>
             <v-row no-gutters
                    id="registration-header"

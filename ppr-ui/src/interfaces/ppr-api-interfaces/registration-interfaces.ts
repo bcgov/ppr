@@ -63,5 +63,6 @@ export interface RegistrationIF {
   baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
   createDateTime?: string, // Included in a successful response.
   lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
-  error?: ErrorIF
+  error?: ErrorIF,
+  hide?: boolean
 }
