@@ -218,6 +218,7 @@ import {
   watch
 } from '@vue/composition-api'
 import BaseAddress from '@/composables/address/BaseAddress.vue'
+import { trimAddress } from '@/composables/address/factories'
 import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
 import { useSecuredParty } from './composables/useSecuredParty'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -293,6 +294,7 @@ export default defineComponent({
     }
 
     const onSubmitForm = async () => {
+      currentSecuredParty.value.address = trimAddress(currentSecuredParty.value.address)
       if (
         validateSecuredPartyForm(
           localState.partyBusiness,

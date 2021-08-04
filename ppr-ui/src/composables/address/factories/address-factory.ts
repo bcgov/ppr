@@ -185,3 +185,15 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
 export function useCountryRegions (code: string): boolean {
   return (code === 'CA' || code === 'US')
 }
+
+export function trimAddress (address: AddressIF): AddressIF {
+  return {
+    country: address.country?.trim(),
+    street: address.street?.trim(),
+    streetAdditional: address.streetAdditional?.trim(),
+    city: address.city?.trim(),
+    region: address.region?.trim(),
+    postalCode: address.postalCode?.trim(),
+    deliveryInstructions: address.deliveryInstructions?.trim()
+  }
+}

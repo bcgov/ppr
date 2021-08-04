@@ -129,12 +129,12 @@
 import { defineComponent, toRefs, watch } from '@vue/composition-api'
 
 import {
+  baseRules,
   useAddress,
   useAddressComplete,
   useCountryRegions,
   useCountriesProvinces,
-  useBaseValidations,
-  baseRules
+  useBaseValidations
 } from '@/composables/address/factories'
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces' // eslint-disable-line no-unused-vars
 
@@ -225,12 +225,6 @@ export default defineComponent({
 
     watch(() => props.triggerErrors, (val) => {
       if (val) {
-        // trim all extra white space
-        addressLocal.value.street = addressLocal.value.street.trim()
-        addressLocal.value.streetAdditional = addressLocal.value.streetAdditional.trim()
-        addressLocal.value.city = addressLocal.value.city.trim()
-        addressLocal.value.region = addressLocal.value.region.trim()
-        addressLocal.value.postalCode = addressLocal.value.postalCode.trim()
         validate()
       }
     })
