@@ -1,19 +1,5 @@
 
 <div class="business-details-container">
-  <div class="financing-type pt-0">{{ detail.financingStatement.registrationDescription }}</div>
-  <div class="financing-act pt-0">{{ detail.financingStatement.registrationAct }}</div>
-{#
-  <div class="business-name-header" id="{{ detail.financingStatement.baseRegistrationNumber }}">
-    <span class="lbl-business-name">
-      Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}
-    </span>
-    {% if detail.financingStatement.statusType == 'HDC' %} 
-      <span class="lbl-business-name-gold">DISCHARGED</span>
-    {% elif detail.financingStatement.statusType == 'HEX' %} 
-      <span class="lbl-business-name-gold">EXPIRED</span>
-    {% endif %}
-</div>
-#}
   <table class="registration-header-table" id="{{ detail.financingStatement.baseRegistrationNumber }}"  role="presentation">
     <tr>
       <td>Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}</td>
@@ -28,6 +14,14 @@
   </table>
 
   <table class="business-details-table-grey" role="presentation">
+    <tr>
+      <td>Registration Type:</td>
+      <td>{{ detail.financingStatement.registrationDescription }}</td>
+    </tr>
+    <tr>
+      <td>Act:</td>
+      <td>{{ detail.financingStatement.registrationAct }}</td>
+    </tr>
     <tr>
       <td>Base Registration Date and Time:</td>
       <td>{{detail.financingStatement.createDateTime}}</td>
