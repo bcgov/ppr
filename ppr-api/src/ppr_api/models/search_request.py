@@ -240,7 +240,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                 registration_type = str(mapping['registration_type'])
                 timestamp = mapping['base_registration_ts']
-                birth_date = mapping['birth_date']
                 person = {
                     'last': str(mapping['last_name']),
                     'first': str(mapping['first_name'])
@@ -252,8 +251,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     'personName': person,
                     'partyId': int(mapping['id'])
                 }
-                if birth_date:
-                    debtor['birthDate'] = model_utils.format_ts(birth_date)
+                if mapping['birth_date']:
+                    debtor['birthDate'] = model_utils.format_ts(mapping['birth_date'])
                 result_json = {
                     'baseRegistrationNumber': str(mapping['base_registration_num']),
                     'matchType': str(mapping['match_type']),
