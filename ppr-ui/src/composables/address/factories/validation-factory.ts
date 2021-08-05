@@ -23,12 +23,12 @@ export const baseRules = {
     return (v: string) => v?.length >= min || `Minimum length is ${min}`
   },
   [ValidationRule.POSTAL_CODE]: (v: string) => (
-    /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i.test(v) ||
+    /^\s*[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][\s-]?\d[ABCEGHJ-NPRSTV-Z]\d\s*$/i.test(v) ||
     'Must be a valid postal code'
   ),
   [ValidationRule.REQUIRED]: (v: string) => v?.length > 0 || 'This field is required',
   [ValidationRule.ZIP_CODE]: (v: string) => (
-    /^[0-9]{5}([ -]?[0-9]{4})?$/i.test(v) ||
+    /^\s*[0-9]{5}([\s-]?[0-9]{4})?\s*$/i.test(v) ||
     'Must be a valid zip code'
   )
 }

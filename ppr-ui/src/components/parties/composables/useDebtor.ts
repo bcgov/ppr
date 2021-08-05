@@ -25,6 +25,7 @@ export const useDebtor = (props, context) => {
     'getAddSecuredPartiesAndDebtors'
   ])
   const localState = reactive({
+    addressSchema: { ...PartyAddressSchema },
     currentDebtor: {
       businessName: '',
       personName: initPerson,
@@ -61,8 +62,6 @@ export const useDebtor = (props, context) => {
       localState.currentDebtor = blankDebtor
     }
   }
-
-  const addressSchema = PartyAddressSchema
 
   const resetFormAndData = (emitEvent: boolean): void => {
     if (emitEvent) {
@@ -116,7 +115,6 @@ export const useDebtor = (props, context) => {
     addDebtor,
     resetFormAndData,
     removeDebtor,
-    addressSchema,
     getMonthObject,
     ...toRefs(localState)
   }

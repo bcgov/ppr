@@ -224,6 +224,7 @@ import {
   toRefs
 } from '@vue/composition-api'
 import BaseAddress from '@/composables/address/BaseAddress.vue'
+import { trimAddress } from '@/composables/address/factories'
 import { useDebtorValidation } from './composables/useDebtorValidation'
 import { useDebtor } from './composables/useDebtor'
 import AutoComplete from '@/components/search/AutoComplete.vue'
@@ -282,6 +283,7 @@ export default defineComponent({
     })
 
     const onSubmitForm = async () => {
+      currentDebtor.value.address = trimAddress(currentDebtor.value.address)
       if (
         validateDebtorForm(
           currentIsBusiness,

@@ -87,7 +87,8 @@ describe('Debtor add individual tests', () => {
 
     //no validation messages
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(0)
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Street address, PO box, rural route, or general delivery address')
   
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
@@ -126,7 +127,7 @@ describe('Debtor add business tests', () => {
 
     //no validation messages
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(0)
+    expect(messages.length).toBe(1)
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now

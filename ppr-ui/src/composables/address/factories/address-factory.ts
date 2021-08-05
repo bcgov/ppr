@@ -23,11 +23,11 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
   const labels = {
     /** The Street Address Additional label with 'optional' as needed. */
     streetAdditionalLabel: computed((): string => {
-      return 'Additional Street Address' + (isSchemaRequired('streetAdditional') ? '' : ' (Optional)')
+      return 'Address Line 2' + (isSchemaRequired('streetAdditional') ? '' : ' (Optional)')
     }),
     /** The Street Address label with 'optional' as needed. */
     streetLabel: computed((): string => {
-      return 'Street Address' + (isSchemaRequired('street') ? '' : ' (Optional)')
+      return 'Address Line 1' + (isSchemaRequired('street') ? '' : ' (Optional)')
     }),
     /** The Address City label with 'optional' as needed. */
     cityLabel: computed((): string => {
@@ -184,4 +184,16 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
  */
 export function useCountryRegions (code: string): boolean {
   return (code === 'CA' || code === 'US')
+}
+
+export function trimAddress (address: AddressIF): AddressIF {
+  return {
+    country: address.country?.trim(),
+    street: address.street?.trim(),
+    streetAdditional: address.streetAdditional?.trim(),
+    city: address.city?.trim(),
+    region: address.region?.trim(),
+    postalCode: address.postalCode?.trim(),
+    deliveryInstructions: address.deliveryInstructions?.trim()
+  }
 }
