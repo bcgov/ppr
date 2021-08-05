@@ -92,7 +92,6 @@
               type="text"
               label="Number"
               dense
-              @keypress="filterRow"
             ></v-text-field>
           </td>
           <td v-if="selectedHeaderValues.includes('type')">
@@ -103,10 +102,10 @@
               item-value="registrationTypeAPI"
               filled
               dense
+              clearable
               label="Registration Type"
               v-model="registrationType"
               id="txt-type"
-              @change="filterRow"
             >
               <template slot="item" slot-scope="data">
                 <span class="list-item">
@@ -138,7 +137,8 @@
               label="Status"
               v-model="status"
               id="txt-status"
-              @change="filterRow"
+              @change="filterResults"
+              clearable
             >
               <template slot="item" slot-scope="data">
                 <span class="list-item">
@@ -384,18 +384,18 @@ export default defineComponent({
       registrationType,
       registrationTypes,
       daysToExpiry,
+      submittedStartDate,
+      submittedEndDate,
       statusTypes,
       tableData,
-      originalData,
-      filterResults
+      filterResults,
+      originalData
     } = useRegistration()
 
     const localState = reactive({
       headers: registrationTableHeaders,
       registrationDateFormatted: '',
       showSubmittedDatePicker: false,
-      submittedStartDate: null,
-      submittedEndDate: null,
       submittedStartDateTmp: null,
       submittedEndDateTmp: null,
       datePickerErr: false,
@@ -434,12 +434,8 @@ export default defineComponent({
       })
     })
 
-    const filterRow = () => {
-      localState.tableData = filterResults(localState.originalData)
-    }
-
     const draftClass = (val: string): string => {
-      if (!val) {
+      if (val === 'D') {
         return 'font-italic'
       }
       return ''
@@ -461,8 +457,8 @@ export default defineComponent({
       }
       localState.datePickerErr = false
       // watchers on these will update current.. versions in store as well
-      localState.submittedStartDate = localState.submittedStartDateTmp
-      localState.submittedEndDate = localState.submittedEndDateTmp
+      submittedStartDate.value = localState.submittedStartDateTmp
+      submittedEndDate.value = localState.submittedEndDateTmp
       localState.showSubmittedDatePicker = false
       localState.registrationDateFormatted = 'Custom'
       // update query with start/end dates and search
@@ -519,11 +515,15 @@ export default defineComponent({
       try {
         const registrations = await registrationHistory()
         const drafts = await draftHistory()
-        if (registrations) {
-          Array.prototype.push.apply(tableData.value, registrations)
-        }
         if (drafts) {
           Array.prototype.push.apply(tableData.value, drafts)
+          // assign a draft status to draft agreements
+          for (let i = 0; i < tableData.value.length; i++) {
+            tableData.value[i].statusType = 'D'
+          }
+        }
+        if (registrations) {
+          Array.prototype.push.apply(tableData.value, registrations)
         }
         localState.loadingData = false
         originalData.value = tableData.value
@@ -573,8 +573,8 @@ export default defineComponent({
       daysToExpiry,
       status,
       statusTypes,
-      filterRow,
       tableData,
+      filterResults,
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,

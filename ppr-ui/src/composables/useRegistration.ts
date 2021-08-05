@@ -15,6 +15,8 @@ export const useRegistration = () => {
     securedParties: '',
     folioNumber: '',
     daysToExpiry: '',
+    submittedStartDate: null,
+    submittedEndDate: null,
     registrationTypes: RegistrationTypes,
     statusTypes: StatusTypes
   })
@@ -33,10 +35,10 @@ export const useRegistration = () => {
   }
 
   const getStatusDescription = (status: string): string => {
-    if (status) {
-      return 'Other'
-    } else {
-      return 'Draft'
+    for (let i = 0; i < StatusTypes.length; i++) {
+      if (StatusTypes[i].value === status) {
+        return StatusTypes[i].text
+      }
     }
   }
 
@@ -54,87 +56,154 @@ export const useRegistration = () => {
     return ''
   }
 
-  const filterResults = (tableData: Array<any>): void => {
+  const filterResults = (originalData: Array<any>): void => {
+    const newTableData = [...originalData]
+    // start off by showing everthing
+    for (let i = 0; i < newTableData.length; i++) {
+      newTableData[i].hide = false
+    }
+    // then filter values one at a time, if they contain a value
     if (localState.registeringParty) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].registeringParty) {
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].registeringParty) {
           if (
-            !tableData[i].registeringParty.includes(localState.registeringParty)
+            !originalData[i].registeringParty.includes(
+              localState.registeringParty
+            )
           ) {
-            tableData[i].hide = true
+            newTableData[i].hide = true
           }
         }
       }
     }
 
     if (localState.registeredBy) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].registeredBy) {
-          if (!tableData[i].registeredBy.includes(localState.registeredBy)) {
-            tableData[i].hide = true
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].registeredBy) {
+          if (!originalData[i].registeredBy.includes(localState.registeredBy)) {
+            newTableData[i].hide = true
           }
+        } else {
+          newTableData[i].hide = true
+        }
+      }
+    }
+
+    if (localState.registrationType) {
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].registrationType) {
+          if (
+            originalData[i].registrationType !== localState.registrationType
+          ) {
+            newTableData[i].hide = true
+          }
+        }
+      }
+    }
+
+    if (localState.registeringParty) {
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].registeringParty) {
+          if (
+            !originalData[i].registeringParty.includes(
+              localState.registeringParty
+            )
+          ) {
+            newTableData[i].hide = true
+          }
+        } else {
+          newTableData[i].hide = true
         }
       }
     }
 
     if (localState.securedParties) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].securedParties) {
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].securedParties) {
           if (
-            !tableData[i].securedParties.includes(localState.securedParties)
+            !originalData[i].securedParties.includes(localState.securedParties)
           ) {
-            tableData[i].hide = true
+            newTableData[i].hide = true
           }
+        } else {
+          newTableData[i].hide = true
         }
       }
     }
 
     if (localState.folioNumber) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].clientReferenceId) {
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].clientReferenceId) {
           if (
-            !tableData[i].clientReferenceId.includes(localState.folioNumber)
+            !originalData[i].clientReferenceId.includes(localState.folioNumber)
           ) {
-            tableData[i].hide = true
+            newTableData[i].hide = true
           }
+        } else {
+          newTableData[i].hide = true
         }
       }
     }
 
     if (localState.registrationNumber) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].registrationNumber) {
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].registrationNumber) {
           if (
-            !tableData[i].registrationNumber.includes(
+            !originalData[i].registrationNumber.includes(
               localState.registrationNumber
             )
           ) {
-            tableData[i].hide = true
+            newTableData[i].hide = true
           }
         }
       }
     }
 
     if (localState.status) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].statusType) {
-          if (tableData[i].statusType !== localState.status) {
-            tableData[i].hide = true
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].statusType) {
+          if (originalData[i].statusType !== localState.status) {
+            newTableData[i].hide = true
           }
         }
       }
     }
 
     if (localState.daysToExpiry) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].expireDays) {
-          if (tableData[i].expireDays === localState.daysToExpiry) {
-            tableData[i].hide = true
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].expireDays) {
+          if (originalData[i].expireDays === localState.daysToExpiry) {
+            newTableData[i].hide = true
           }
         }
       }
     }
-    localState.tableData = tableData
+
+    if (localState.submittedStartDate) {
+      const startDate = new Date(localState.submittedStartDate)
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].createDateTime) {
+          const originalStartDate = new Date(originalData[i].createDateTime)
+          if (startDate > originalStartDate) {
+            newTableData[i].hide = true
+          }
+        }
+      }
+    }
+
+    if (localState.submittedEndDate) {
+      const endDate = new Date(localState.submittedEndDate)
+      for (let i = 0; i < originalData.length; i++) {
+        if (originalData[i].createDateTime) {
+          const originalEndDate = new Date(originalData[i].createDateTime)
+          if (endDate < originalEndDate) {
+            newTableData[i].hide = true
+          }
+        }
+      }
+    }
+
+    localState.tableData = newTableData
   }
 
   watch(
@@ -186,6 +255,20 @@ export const useRegistration = () => {
 
   watch(
     () => localState.daysToExpiry,
+    () => {
+      filterResults(localState.originalData)
+    }
+  )
+
+  watch(
+    () => localState.submittedStartDate,
+    () => {
+      filterResults(localState.originalData)
+    }
+  )
+
+  watch(
+    () => localState.submittedEndDate,
     () => {
       filterResults(localState.originalData)
     }
