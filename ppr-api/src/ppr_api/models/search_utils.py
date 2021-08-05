@@ -55,7 +55,16 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
 
 # Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
 REG_NUM_QUERY = """
-SELECT r.registration_type,r.registration_ts AS base_registration_ts,
+SELECT CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+            THEN r.registration_type 
+            ELSE (SELECT r2.registration_type 
+                   FROM registrations r2 
+                  WHERE r2.registration_number = r.base_reg_number) END registration_type,
+       CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+            THEN r.registration_ts
+            ELSE (SELECT r2.registration_ts 
+                   FROM registrations r2 
+                  WHERE r2.registration_number = r.base_reg_number) END base_registration_ts,
        CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
             THEN r.registration_number 
             ELSE r.base_reg_number END base_registration_num,
