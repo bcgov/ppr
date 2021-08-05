@@ -35,7 +35,7 @@ export const mockedDraft1: DraftIF = {
     registrationDescription: '',
     path: '/path/to/doc',
     createDateTime: '2021-08-03T17:21:17+00:00',
-    clientReferenceId: ''
+    clientReferenceId: 'FFF555'
 }
 
 export const mockedDraft2: DraftIF = {

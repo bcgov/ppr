@@ -77,6 +77,10 @@ describe('ReviewConfirm step 1 tests', () => {
     await store.dispatch('resetNewRegistration')
     const resetDraft:DraftIF = {
       type: '',
+      registrationDescription: '',
+      registrationType: '',
+      clientReferenceId: '',
+      path: '',
       financingStatement: null,
       createDateTime: null,
       lastUpdateDateTime: null

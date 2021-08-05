@@ -215,7 +215,10 @@
           :class="draftClass(row.item.statusType)"
         >
           <td v-if="selectedHeaderValues.includes('number')">
+            {{ row.item.registrationNumber }}
+            <span v-if="row.item.registrationNumber !== row.item.baseRegistrationNumber">
             {{ row.item.baseRegistrationNumber }}
+            </span>
           </td>
           <td v-if="selectedHeaderValues.includes('type')">
             {{ getRegistrationType(row.item.registrationType) }}
@@ -254,7 +257,7 @@
 
           <!-- Action Btns -->
           <td class="actions-cell px-0 py-4">
-            <div class="actions" v-if="!row.item.statusType">
+            <div class="actions" v-if="row.item.statusType === 'D'">
               <span class="edit-action">
                 <v-btn
                   color="primary"
@@ -290,7 +293,7 @@
               </span>
             </div>
 
-            <div class="actions" v-if="row.item.statusType">
+            <div class="actions" v-if="row.item.statusType !== 'D'">
               <span class="edit-action">
                 <v-btn
                   color="primary"

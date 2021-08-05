@@ -15,13 +15,17 @@ export const stateModel: StateModelIF = {
   debtorName: null,
   draft: {
     type: '',
+    registrationDescription: '',
+    registrationType: '',
+    clientReferenceId: '',
+    path: '',
     financingStatement: null,
     createDateTime: null,
     lastUpdateDateTime: null
   },
   feeSummary: {
     feeAmount: 0,
-    serviceFee: 1.50,
+    serviceFee: 1.5,
     quantity: 0,
     feeCode: ''
   },
