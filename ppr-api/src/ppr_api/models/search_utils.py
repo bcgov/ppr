@@ -127,7 +127,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = :query_last AND p.first_name = :query_first THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type
+       fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
