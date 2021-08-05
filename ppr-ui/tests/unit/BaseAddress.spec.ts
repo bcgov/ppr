@@ -134,3 +134,54 @@ describe('Base Address component edit', () => {
     expect(getLastEvent(wrapper, valid)).toBe(false)
   })
 })
+
+describe('Base Address component edit existing address', () => {
+  let wrapper: Wrapper<any>
+  let address: AddressIF = null
+
+  beforeEach(async () => {
+    address = { ...emptyAddress }
+    address.city = 'Victoria'
+    address.country = 'CA'
+    address.postalCode = 'V8V 1S9'
+    address.region = 'BC'
+    address.street = '1234'
+    address.streetAdditional = 'bla'
+    address.deliveryInstructions = 'deliver'
+    wrapper = createComponent(address, DefaultSchema, true, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays all address values in edit block', async () => {
+    expect(wrapper.findComponent(BaseAddress).exists()).toBe(true)
+    expect(wrapper.find(readOnlyAddressBlock).exists()).toBe(false)
+    // displays address in edit mode
+    expect(wrapper.find(countryEdit).exists()).toBe(true)
+    expect(wrapper.find(streetEdit).exists()).toBe(true)
+    expect(wrapper.find(streetAdditionalEdit).exists()).toBe(true)
+    expect(wrapper.find(cityEdit).exists()).toBe(true)
+    expect(wrapper.find(regionEdit).exists()).toBe(true)
+    expect(wrapper.find(postalCodeEdit).exists()).toBe(true)
+    expect(wrapper.find(deliveryEdit).exists()).toBe(true)
+
+    const country = wrapper.find(countryEdit).props().value
+    const street = wrapper.find(streetEdit).props().value
+    const streetAdditional = wrapper.find(streetAdditionalEdit).props().value
+    const city = wrapper.find(cityEdit).props().value
+    const region = wrapper.find(regionEdit).props().value
+    const postalCode = wrapper.find(postalCodeEdit).props().value
+    const delivery = wrapper.find(deliveryEdit).props().value
+
+    expect(country).toEqual(address.country)
+    expect(street).toEqual(address.street)
+    expect(streetAdditional).toEqual(address.streetAdditional)
+    expect(city).toEqual(address.city)
+    expect(region).toEqual(address.region)
+    expect(postalCode).toEqual(address.postalCode)
+    expect(delivery).toEqual(address.deliveryInstructions)
+
+    expect(getLastEvent(wrapper, valid)).toBe(true)
+  })
+})

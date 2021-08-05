@@ -205,7 +205,6 @@ export default defineComponent({
     }, { immediate: true, deep: true })
 
     watch(() => country.value, (val, oldVal) => {
-      console.log(val)
       if (val === 'CA') {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
       } else if (val === 'US') {
