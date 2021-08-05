@@ -251,6 +251,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     'personName': person,
                     'partyId': int(mapping['id'])
                 }
+                if mapping['birth_date']:
+                    debtor['birthDate'] = model_utils.format_ts(mapping['birth_date'])
                 result_json = {
                     'baseRegistrationNumber': str(mapping['base_registration_num']),
                     'matchType': str(mapping['match_type']),

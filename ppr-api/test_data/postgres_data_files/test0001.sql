@@ -26,7 +26,8 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id, first_name_key, last_name_key)
     VALUES(200000001, 'DI', 200000000, 200000000, null, null, 'TEST IND', '1', 'DEBTOR', null,
-           null, 200000002, searchkey_first_name('TEST IND'), searchkey_last_name('DEBTOR'))
+           timestamp with time zone '2005-04-02 07:00:00-0700', 200000002, searchkey_first_name('TEST IND'), 
+           searchkey_last_name('DEBTOR'))
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id, business_srch_key)

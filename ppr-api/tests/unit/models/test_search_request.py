@@ -399,6 +399,8 @@ def test_search_valid(session, search_type, json_data):
         assert result['results'][0]['debtor']['personName']
         assert result['results'][0]['debtor']['personName']['last'] == 'DEBTOR'
         assert result['results'][0]['debtor']['personName']['first'] == 'TEST IND'
+        if result['results'][0]['baseRegistrationNumber'] == 'TEST0004':
+            assert result['results'][0]['debtor']['birthDate']
     elif search_type == 'AM':
         assert result['results'][0]['baseRegistrationNumber'] == 'TEST0001'
         assert result['results'][0]['registrationNumber'] == 'TEST0007'

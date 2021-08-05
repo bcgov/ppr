@@ -55,7 +55,16 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
 
 # Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
 REG_NUM_QUERY = """
-SELECT r.registration_type,r.registration_ts AS base_registration_ts,
+SELECT CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+            THEN r.registration_type 
+            ELSE (SELECT r2.registration_type 
+                   FROM registrations r2 
+                  WHERE r2.registration_number = r.base_reg_number) END registration_type,
+       CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+            THEN r.registration_ts
+            ELSE (SELECT r2.registration_ts 
+                   FROM registrations r2 
+                  WHERE r2.registration_number = r.base_reg_number) END base_registration_ts,
        CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
             THEN r.registration_number 
             ELSE r.base_reg_number END base_registration_num,
@@ -118,7 +127,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = :query_last AND p.first_name = :query_first THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type
+       fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
