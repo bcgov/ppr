@@ -73,6 +73,7 @@
 
     <v-data-table
       v-if="!loadingData"
+      id="registration-table"
       class="registration-table pt-4"
       :class="$style['reg-table']"
       :headers="getDisplayedHeaders"
@@ -456,15 +457,10 @@ export default defineComponent({
         return
       }
       localState.datePickerErr = false
-      // watchers on these will update current.. versions in store as well
       submittedStartDate.value = localState.submittedStartDateTmp
       submittedEndDate.value = localState.submittedEndDateTmp
       localState.showSubmittedDatePicker = false
       localState.registrationDateFormatted = 'Custom'
-      // update query with start/end dates and search
-      // this.updateQuery('submittedStartDate', this.submittedStartDate)
-      // this.updateQuery('submittedEndDate', this.submittedEndDate)
-      // this.sort()
     }
 
     const resetSubmittedRange = () => {

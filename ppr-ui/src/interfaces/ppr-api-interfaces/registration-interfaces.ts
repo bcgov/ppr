@@ -49,9 +49,9 @@ export interface DraftIF {
 // Financing Statement registration interface. 
 // All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
 export interface RegistrationIF {
-  registrationNumber: string, // One of enum APIRegistrationTypes.
+  registrationNumber: string, 
   clientReferenceId?: string, // AKA folio max length 20.
-  registrationType: string,
+  registrationType: string, // One of enum APIRegistrationTypes.
   registrationDescription?: string, // Returned on creation.
   registrationClass?: string, // Returned on creation.
   registeringParty: string,

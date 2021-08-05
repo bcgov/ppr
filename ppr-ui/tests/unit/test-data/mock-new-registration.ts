@@ -186,18 +186,34 @@ export const mockedFinancingStatementStep3: FinancingStatementIF = {
 
 export const mockedDraftFinancingStatementAll: DraftIF = {
   type: DraftTypes.FINANCING_STATEMENT,
+  registrationType:  APIRegistrationTypes.SECURITY_AGREEMENT,
+  registrationDescription: '',
+  path: '',
+  clientReferenceId: '',
   financingStatement: mockedFinancingStatementAll
 }
 export const mockedDraftFinancingStatementStep1: DraftIF = {
   type: DraftTypes.FINANCING_STATEMENT,
+  registrationType:  APIRegistrationTypes.SECURITY_AGREEMENT,
+  registrationDescription: '',
+  path: '',
+  clientReferenceId: '',
   financingStatement: mockedFinancingStatementStep1
 }
 export const mockedDraftFinancingStatementStep2: DraftIF = {
   type: DraftTypes.FINANCING_STATEMENT,
+  registrationType:  APIRegistrationTypes.SECURITY_AGREEMENT,
+  registrationDescription: '',
+  path: '',
+  clientReferenceId: '',
   financingStatement: mockedFinancingStatementStep2
 }
 export const mockedDraftFinancingStatementStep3: DraftIF = {
   type: DraftTypes.FINANCING_STATEMENT,
+  registrationType:  APIRegistrationTypes.SECURITY_AGREEMENT,
+  registrationDescription: '',
+  path: '',
+  clientReferenceId: '',
   financingStatement: mockedFinancingStatementStep3
 }
 
