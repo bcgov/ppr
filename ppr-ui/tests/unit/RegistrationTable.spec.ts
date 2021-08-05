@@ -122,7 +122,7 @@ describe('Test draft table with results', () => {
     localVue = null;
   })
 
-  it('renders and displays correct registration elements', async () => {
+  it('renders and displays correct draft elements', async () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // the api is going to be called twice, once for drafts and once for registrations
     // the tests can't tell the difference, so the same one is called twice 
