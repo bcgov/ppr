@@ -39,10 +39,10 @@
     </v-card>
   </v-container>
   <v-container fluid no-gutters class="white pt-10 pa-6 pr-10 rounded"
-  :class="{'invalid-message': showErrorComponent}" v-else>
+  :class="{'invalid-message': lengthTrust.showInvalid}" v-else>
     <v-row no-gutters>
       <v-col cols="3" class="generic-label">
-        <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
+        <span :class="{'invalid-message': lengthTrust.showInvalid}">Registration Length</span>
       </v-col>
       <v-col cols="auto">
         <v-radio-group v-model="lifeInfinite">
@@ -152,9 +152,6 @@ export default defineComponent({
       showErrorSummary: computed((): boolean => {
         return (!lengthTrust.valid)
       }),
-      showErrorComponent: computed((): boolean => {
-        return (lengthTrust.showInvalid)
-      }),
       lengthSummary: computed((): string => {
         if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
           return 'Not entered'
@@ -227,6 +224,8 @@ export default defineComponent({
         }
       } else {
         if (!lengthTrust.lifeInfinite) {
+          lengthTrust.lifeYears = 0
+          setLengthTrust(lengthTrust)
           lengthTrust.valid = false
         }
       }
@@ -247,6 +246,7 @@ export default defineComponent({
     return {
       goToLengthTrust,
       setLifeInfinite,
+      lengthTrust,
       ...toRefs(localState)
     }
   }
