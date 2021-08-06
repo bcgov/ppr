@@ -56,9 +56,12 @@ export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) =>
 
 export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.lengthTrustStep.valid = false
+  state.stateModel.lengthTrustStep.showInvalid = false
   state.stateModel.lengthTrustStep.lifeInfinite = false
   state.stateModel.lengthTrustStep.trustIndenture = false
   state.stateModel.lengthTrustStep.lifeYears = 0
+  state.stateModel.lengthTrustStep.lienAmount = ''
+  state.stateModel.lengthTrustStep.surrenderDate = ''
   state.stateModel.feeSummary.feeAmount = 0
   state.stateModel.feeSummary.quantity = 0
   state.stateModel.feeSummary.feeCode = ''

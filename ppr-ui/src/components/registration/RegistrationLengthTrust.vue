@@ -4,7 +4,12 @@
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
           <v-icon color="#38598A">mdi-calendar-clock</v-icon>
-          <label class="pl-3"><strong>Registration Length and Trust Indenture</strong></label>
+          <label class="pl-3" v-if="registrationType !== 'RL'">
+            <strong>Registration Length and Trust Indenture</strong>
+          </label>
+          <label class="pl-3" v-else>
+            <strong>Amount and Date of Surrender</strong>
+          </label>
         </v-col>
       </v-row>
       <v-container class="pt-4 px-4" :class="{'invalid-message': showErrorSummary}">
@@ -27,7 +32,7 @@
           {{lengthSummary}}
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pb-6">
+      <v-row no-gutters class="ps-6 pb-6"  v-if="registrationType === 'SA'">
         <v-col cols="3" class="generic-label">
           Trust Indenture
         </v-col>
@@ -35,71 +40,167 @@
           {{trustIndentureSummary}}
         </v-col>
       </v-row>
+      <v-row no-gutters class="ps-6 pb-3"  v-if="registrationType === 'RL'">
+        <v-col cols="3" class="generic-label">
+          Amount of Lien
+        </v-col>
+        <v-col :class="$style['summary-text']">
+          {{lienAmountSummary}}
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="ps-6 pb-6"  v-if="registrationType === 'RL'">
+        <v-col cols="3" class="generic-label">
+          Surrender Date
+        </v-col>
+        <v-col :class="$style['summary-text']">
+          {{surrenderDateSummary}}
+        </v-col>
+      </v-row>
       </v-container>
     </v-card>
   </v-container>
   <v-container fluid no-gutters class="white pt-10 pa-6 pr-10 rounded"
   :class="{'invalid-message': showErrorComponent}" v-else>
-    <v-row no-gutters>
-      <v-col cols="3" class="generic-label">
-        <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
-      </v-col>
-      <v-col cols="auto">
-        <v-radio-group v-model="lifeInfinite">
-            <v-radio class="years-radio pa-0 ma-0"
-                        :hide-details="false"
-                        label=""
-                        value="false"
-                        @click="setLifeInfinite('false')">
-            </v-radio>
-            <v-radio class="infinite-radio pt-15 ma-0"
-                        :hide-details="false"
-                        label=""
-                        value="true"
-                        @click="setLifeInfinite('true')">
-            </v-radio>
-        </v-radio-group>
-      </v-col>
-      <v-col>
-        <v-text-field id="life-years-field"
+    <div v-if="registrationType === 'RL'">
+      <v-row no-gutters class="ps-6 pt-6 pb-3">
+        <v-col cols="3" class="generic-label">
+          Registration Length
+        </v-col>
+        <v-col class="summary-text pl-2">
+          {{lengthSummary}}
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="ps-6 pt-6">
+        <v-col cols="3" class="generic-label pt-3">
+          <span :class="{'invalid-message': showErrorLienAmount}">Amount of Lien</span>
+        </v-col>
+        <v-col>
+          <v-text-field id="lien-amount"
                         autocomplete="off"
-                        :error-messages="lifeYearsMessage || ''"
+                        :error-messages="lienAmountMessage || ''"
                         filled
-                        :readonly="lifeYearsDisabled"
-                        :hint="lifeYearsHint"
+                        hint="Example: 10,500.50"
                         persistent-hint
-label="Length in Years"
-
-                        v-model="lifeYearsEdit"/>
-        <div class="pt-5">Infinite ($500.00 non-refundable)</div>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="3"></v-col>
-      <v-col cols="9"><v-divider /></v-col>
-    </v-row>
-    <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
-      <v-col cols="3" class="generic-label">
-        Trust Indenture
-      </v-col>
-      <v-col cols="auto">
-        <v-checkbox class="trust-checkbox pa-0 ma-0"
-                    :hide-details="false"
-                    :hint="trustIndentureHint"
-                    label=""
-                    v-model="trustIndenture">
-        </v-checkbox>
-      </v-col>
-      <v-col cols="8">
-        <v-tooltip top content-class="top-tooltip pa-5" transition="fade-transition">
-            <template v-slot:activator="{ on }">
-              <span v-on="on" class="trust-indenture">Trust Indenture</span>
+                        label="Amount in Canadian Dollars ($)"
+                        v-model="lienAmount"/>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="ps-6 pt-4">
+        <v-col cols="3" class="generic-label pt-3">
+          <span :class="{'invalid-message': showErrorSurrenderDate}">Surrender Date</span>
+        </v-col>
+        <v-col>
+          <v-dialog
+            ref="dialog"
+            v-model="modal"
+            :return-value.sync="surrenderDate"
+            persistent
+            width="450px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="surrenderDate"
+                :error-messages="surrenderDateMessage || ''"
+                filled
+                hint="Must be within the last 21 days"
+                persistent-hint
+                label="Date"
+                append-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
             </template>
-Select if the security interest is contained in a Trust Indenture.
+            <v-date-picker
+              v-model="surrenderDate"
+              elevation="15"
+              :min="minSurrenderDate"
+              :max="maxSurrenderDate"
+              scrollable
+              width="450px"
+            >
+              <v-spacer></v-spacer>
+              <v-btn
+                text
+                color="primary"
+                @click="$refs.dialog.save(surrenderDate)"
+              >
+                <strong>OK</strong>
+              </v-btn>
+              <v-btn
+                text
+                color="primary"
+                @click="modal = false"
+              >
+                Cancel
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-col>
+      </v-row>
+    </div>
+    <div v-else>
+      <v-row no-gutters>
+        <v-col cols="3" class="generic-label">
+          <span :class="{'invalid-message': showErrorComponent}">Registration Length</span>
+        </v-col>
+        <v-col cols="auto">
+          <v-radio-group v-model="lifeInfinite">
+              <v-radio class="years-radio pa-0 ma-0"
+                          :hide-details="false"
+                          label=""
+                          value="false"
+                          @click="setLifeInfinite('false')">
+              </v-radio>
+              <v-radio class="infinite-radio pt-15 ma-0"
+                          :hide-details="false"
+                          label=""
+                          value="true"
+                          @click="setLifeInfinite('true')">
+              </v-radio>
+          </v-radio-group>
+        </v-col>
+        <v-col>
+          <v-text-field id="life-years-field"
+                          autocomplete="off"
+                          :error-messages="lifeYearsMessage || ''"
+                          filled
+                          :readonly="lifeYearsDisabled"
+                          :hint="lifeYearsHint"
+                          persistent-hint
+  label="Length in Years"
 
-          </v-tooltip>
-      </v-col>
-    </v-row>
+                          v-model="lifeYearsEdit"/>
+          <div class="pt-5">Infinite ($500.00 non-refundable)</div>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="3"></v-col>
+        <v-col cols="9"><v-divider /></v-col>
+      </v-row>
+      <v-row no-gutters class='pt-10' v-if="showTrustIndenture">
+        <v-col cols="3" class="generic-label">
+          Trust Indenture
+        </v-col>
+        <v-col cols="auto">
+          <v-checkbox class="trust-checkbox pa-0 ma-0"
+                      :hide-details="false"
+                      :hint="trustIndentureHint"
+                      label=""
+                      v-model="trustIndenture">
+          </v-checkbox>
+        </v-col>
+        <v-col cols="8">
+          <v-tooltip top content-class="top-tooltip pa-5" transition="fade-transition">
+              <template v-slot:activator="{ on }">
+                <span v-on="on" class="trust-indenture">Trust Indenture</span>
+              </template>
+  Select if the security interest is contained in a Trust Indenture.
+
+            </v-tooltip>
+        </v-col>
+      </v-row>
+    </div>
   </v-container>
 </template>
 
@@ -107,9 +208,10 @@ Select if the security interest is contained in a Trust Indenture.
 // external
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+
 // local
 import { LengthTrustIF, FeeSummaryIF, FeeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { getFinancingFee } from '@/utils'
+import { convertDate, getFinancingFee } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -133,6 +235,13 @@ export default defineComponent({
     const feeInfoInfinite = getFinancingFee(true)
     const router = context.root.$router
 
+    if (props.defaultRegistrationType === 'RL' && lengthTrust.lifeYears !== 1) {
+      lengthTrust.lifeYears = 1
+      feeSummary.quantity = 1
+      feeSummary.feeAmount = feeInfoYears.feeAmount
+      setFeeSummary(feeSummary)
+    }
+
     const localState = reactive({
       summaryView: props.isSummary,
       registrationType: props.defaultRegistrationType,
@@ -143,6 +252,8 @@ export default defineComponent({
       lifeYearsEdit: (lengthTrust.lifeYears > 0) ? lengthTrust.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
+      surrenderDate: lengthTrust.surrenderDate,
+      lienAmount: lengthTrust.lienAmount,
       lifeYearsHint: 'Minimum 1 year, Maximum ' + feeInfoYears.quantityMax.toString() + ' years ($' +
                      feeInfoYears.feeAmount.toFixed(2) + ' per year)',
       showTrustIndenture: computed((): boolean => {
@@ -155,7 +266,37 @@ export default defineComponent({
       showErrorComponent: computed((): boolean => {
         return (lengthTrust.showInvalid)
       }),
+      showErrorLienAmount: computed((): boolean => {
+        return (lengthTrust.showInvalid && lengthTrust.lienAmount === '')
+      }),
+      showErrorSurrenderDate: computed((): boolean => {
+        return (lengthTrust.showInvalid && lengthTrust.surrenderDate === '')
+      }),
+      lienAmountMessage: computed((): string => {
+        if (lengthTrust.showInvalid && lengthTrust.lienAmount === '') {
+          return 'This field is required'
+        }
+        return ''
+      }),
+      surrenderDateMessage: computed((): string => {
+        if (lengthTrust.showInvalid && lengthTrust.surrenderDate === '') {
+          return 'This field is required'
+        }
+        return ''
+      }),
+      minSurrenderDate: computed((): string => {
+        var dateOffset = (24 * 60 * 60 * 1000) * 21
+        var minDate = new Date()
+        minDate.setTime(minDate.getTime() - dateOffset)
+        return minDate.toISOString()
+      }),
+      maxSurrenderDate: computed((): string => {
+        return new Date().toISOString()
+      }),
       lengthSummary: computed((): string => {
+        if (localState.registrationType === 'RL') {
+          return '180 Days'
+        }
         if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
           return 'Not entered'
         }
@@ -169,6 +310,26 @@ export default defineComponent({
       }),
       trustIndentureSummary: computed((): string => {
         return (lengthTrust.trustIndenture ? 'Yes' : 'No')
+      }),
+      lienAmountSummary: computed((): string => {
+        if (lengthTrust.lienAmount !== '') {
+          var currency = lengthTrust.lienAmount.replace('$', '').replaceAll(',', '')
+          var lienFloat = parseFloat(currency)
+          if (isNaN(lienFloat)) {
+            return lengthTrust.lienAmount
+          }
+          return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+        }
+        return 'Not entered'
+      }),
+      surrenderDateSummary: computed((): string => {
+        if (lengthTrust.surrenderDate !== '' && lengthTrust.surrenderDate.length >= 10) {
+          return convertDate(new Date(lengthTrust.surrenderDate.substring(0, 10)), false, false)
+        }
+        if (lengthTrust.surrenderDate === '') {
+          return 'Not entered'
+        }
+        return lengthTrust.surrenderDate
       })
     })
     const goToLengthTrust = (): void => {
@@ -241,6 +402,26 @@ export default defineComponent({
     })
     watch(() => localState.trustIndenture, (val: boolean) => {
       lengthTrust.trustIndenture = val
+      setLengthTrust(lengthTrust)
+    })
+    watch(() => localState.lienAmount, (val: string) => {
+      lengthTrust.lienAmount = val.trimRight().trimLeft()
+      if (lengthTrust.lienAmount !== '' && lengthTrust.surrenderDate !== '') {
+        lengthTrust.valid = true
+        lengthTrust.showInvalid = false
+      } else {
+        lengthTrust.valid = false
+      }
+      setLengthTrust(lengthTrust)
+    })
+    watch(() => localState.surrenderDate, (val: string) => {
+      lengthTrust.surrenderDate = val
+      if (lengthTrust.lienAmount !== '' && lengthTrust.surrenderDate !== '') {
+        lengthTrust.valid = true
+        lengthTrust.showInvalid = false
+      } else {
+        lengthTrust.valid = false
+      }
       setLengthTrust(lengthTrust)
     })
 

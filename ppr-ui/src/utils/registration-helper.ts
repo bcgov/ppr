@@ -40,6 +40,10 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   statement.lifeInfinite = trustLength.lifeInfinite
   statement.lifeYears = trustLength.lifeYears
   statement.trustIndenture = trustLength.trustIndenture
+  if (registrationType.registrationTypeAPI === 'RL') {
+    statement.lienAmount = trustLength.lienAmount
+    statement.surrenderDate = trustLength.surrenderDate
+  }
   // Step 2. setup
   const parties:AddPartiesIF = stateModel.addSecuredPartiesAndDebtorsStep
   statement.registeringParty = parties.registeringParty
@@ -101,6 +105,9 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   }
   if (statement.type === 'SA') {
     statement.trustIndenture = trustLength.trustIndenture
+  } else if (statement.type === 'RL') {
+    statement.lienAmount = trustLength.lienAmount
+    statement.surrenderDate = trustLength.surrenderDate + 'T08:00:00+00:00'
   }
   if (collateral.generalCollateral !== null && collateral.generalCollateral !== '') {
     var generalCollateral: GeneralCollateralIF = { description: collateral.generalCollateral }

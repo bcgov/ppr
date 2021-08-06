@@ -10,6 +10,11 @@ import { shallowMount } from '@vue/test-utils'
 import { Stepper } from '@/components/common'
 // import { FeeSummaryIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
+// Other
+import {
+  mockedSelectSecurityAgreement
+} from './test-data'
+
 Vue.use(Vuetify)
 Vue.use(VueRouter)
 const router = new VueRouter()
@@ -20,7 +25,8 @@ const store = getVuexStore()
 describe('Stepper component', () => {
   let wrapper: any
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = shallowMount(Stepper, { store, vuetify, router })
   })
 

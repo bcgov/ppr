@@ -111,8 +111,17 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(false)
     expect(wrapper.vm.lifeInfinite).toBe('')
-    expect(wrapper.vm.lifeYearsEdit).toBe('3')
+    expect(wrapper.vm.surrenderDate).toBe('')
+    expect(wrapper.vm.showErrorLienAmount).toBe(false)
+    expect(wrapper.vm.showErrorSurrenderDate).toBe(false)
+    expect(wrapper.vm.minSurrenderDate).toBeDefined()
+    expect(wrapper.vm.maxSurrenderDate).toBeDefined()
+    expect(wrapper.vm.lienAmount).toBe('')
+    expect(wrapper.vm.lengthSummary).toBe('180 Days')
+    expect(wrapper.vm.lifeYearsEdit).toBe('1')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
+    expect(wrapper.vm.lienAmountSummary).toBe('Not entered')
+    expect(wrapper.vm.surrenderDateSummary).toBe('Not entered')
   })
 })
 
@@ -124,7 +133,10 @@ describe('RegistrationLengthTrust SG tests', () => {
       valid: false,
       trustIndenture: true,
       lifeInfinite: false,
-      lifeYears: 3
+      lifeYears: 3,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
     })
     wrapper = createComponent(defaultRegistrationType)
   })
@@ -148,9 +160,12 @@ describe('RegistrationLengthTrust life infinite tests', () => {
   beforeEach(async () => {
     await store.dispatch('setLengthTrust', {
       valid: true,
-      trustIndenture: true,
+      trustIndenture: false,
       lifeInfinite: true,
-      lifeYears: 0
+      lifeYears: 0,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
     })
     wrapper = createComponent(defaultRegistrationType)
   })
@@ -160,10 +175,9 @@ describe('RegistrationLengthTrust life infinite tests', () => {
 
   it('life infinite renders with SG values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
-    expect(wrapper.vm.showTrustIndenture).toBe(true)
     expect(wrapper.vm.lifeInfinite).toBe('true')
     expect(wrapper.vm.lifeYearsEdit).toBe('')
     expect(wrapper.vm.lifeYearsDisabled).toBe(true)
-    expect(wrapper.vm.trustIndenture).toBe(true)
+    expect(wrapper.vm.trustIndenture).toBe(false)
   })
 })
