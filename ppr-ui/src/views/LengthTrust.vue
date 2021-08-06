@@ -16,15 +16,23 @@
             </v-row>
             <stepper class="mt-4" />
             <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header">
+              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypeRL">
                 Registration Length and Trust Indenture
+              </v-col>
+              <v-col cols="auto" class="sub-header" v-else>
+                Terms of Repairers Lien
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
+              <v-col class="pt-2 pb-6"  v-if="registrationType !== registrationTypeRL">
                 Enter the length of time you want the
                 {{ registrationTypeUI }} to be in effect. You can renew the
                 registration in the future (for a fee).
+              </v-col>
+              <v-col class="pt-2 pb-6"  v-else>
+                Enter the amount of the Lien and the date the vehicle was surrendered.
+                Please note that this must be within the last 21 days. The length of the Lien is automatically set to
+                180 days.
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -68,7 +76,7 @@ import {
 // local components
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { RouteNames, StatementTypes } from '@/enums'
+import { APIRegistrationTypes, RouteNames, StatementTypes } from '@/enums' // eslint-disable-line no-unused-vars
 
 @Component({
   components: {
@@ -110,6 +118,10 @@ export default class LengthTrust extends Vue {
 
   private get registrationType (): string {
     return this.getRegistrationType?.registrationTypeAPI || ''
+  }
+
+  private get registrationTypeRL (): string {
+    return APIRegistrationTypes.REPAIRERS_LIEN
   }
 
   private get statementType (): string {

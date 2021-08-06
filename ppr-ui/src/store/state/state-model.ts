@@ -46,7 +46,9 @@ export const stateModel: StateModelIF = {
     valid: false,
     lifeYears: 0,
     lifeInfinite: false,
-    trustIndenture: false
+    trustIndenture: false,
+    lienAmount: '',
+    surrenderDate: ''
   },
   addSecuredPartiesAndDebtorsStep: {
     valid: false,
