@@ -180,11 +180,10 @@ export const useRegistration = () => {
     }
 
     if (localState.submittedStartDate) {
-      const startDate = new Date(localState.submittedStartDate)
       for (let i = 0; i < originalData.length; i++) {
         if (originalData[i].createDateTime) {
-          const originalStartDate = new Date(originalData[i].createDateTime)
-          if (startDate > originalStartDate) {
+          const originalStartDate = originalData[i].createDateTime.substring(0, 10)
+          if (localState.submittedStartDate > originalStartDate) {
             newTableData[i].hide = true
           }
         }
@@ -192,11 +191,10 @@ export const useRegistration = () => {
     }
 
     if (localState.submittedEndDate) {
-      const endDate = new Date(localState.submittedEndDate)
       for (let i = 0; i < originalData.length; i++) {
         if (originalData[i].createDateTime) {
-          const originalEndDate = new Date(originalData[i].createDateTime)
-          if (endDate < originalEndDate) {
+          const originalEndDate = originalData[i].createDateTime.substring(0, 10)
+          if (localState.submittedEndDate < originalEndDate) {
             newTableData[i].hide = true
           }
         }
