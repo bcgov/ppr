@@ -114,7 +114,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_registration_number(self):
         """Execute a search by registration number query."""
         reg_num = self.request_json['criteria']['value']
-        result = db.session.execute(search_utils.REG_NUM_QUERY, {'query_value': reg_num})
+        result = db.session.execute(search_utils.REG_NUM_QUERY, {'query_value': reg_num.strip().upper()})
         row = result.first()
         if row is not None:
             mapping = row._mapping  # pylint: disable=protected-access; follows documentation
@@ -148,7 +148,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             query = search_utils.AIRCRAFT_DOT_QUERY
 
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
-        result = db.session.execute(query, {'query_value': search_value, 'max_results_size': max_results_size})
+        result = db.session.execute(query, {'query_value': search_value.strip().upper(),
+                                            'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []

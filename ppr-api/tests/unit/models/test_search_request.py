@@ -30,14 +30,14 @@ from ppr_api.exceptions import BusinessException
 AIRCRAFT_DOT_AC_JSON = {
     'type': 'AIRCRAFT_DOT',
     'criteria': {
-        'value': 'CFYXW'
+        'value': 'cfyxw'
     },
     'clientReferenceId': 'T-SQ-AC-1'
 }
 AIRCRAFT_DOT_AF_JSON = {
     'type': 'AIRCRAFT_DOT',
     'criteria': {
-        'value': 'AF16031'
+        'value': 'af16031'
     },
     'clientReferenceId': 'T-SQ-AF-1'
 }
@@ -51,7 +51,7 @@ MHR_NUMBER_JSON = {
 REGISTRATION_NUMBER_JSON = {
     'type': 'REGISTRATION_NUMBER',
     'criteria': {
-        'value': 'TEST0001'
+        'value': 'test0001'
     },
     'clientReferenceId': 'T-SQ-RG-3'
 }
@@ -72,7 +72,7 @@ CHANGE_NUMBER_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': 'JU622994'
+        'value': 'ju622994'
     },
     'clientReferenceId': 'T-SQ-SS-1'
 }
@@ -159,14 +159,14 @@ BS_DISCHARGED_JSON = {
 AC_DISCHARGED_JSON = {
     'type': 'AIRCRAFT_DOT',
     'criteria': {
-        'value': 'ZZZZZ999999'
+        'value': 'zzzzz999999'
     },
     'clientReferenceId': 'T-SQ-AC-4'
 }
 SS_DISCHARGED_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': 'ZZZZZ999999'
+        'value': 'zzzzz999999'
     },
     'clientReferenceId': 'T-SQ-SS-4'
 }
@@ -189,7 +189,7 @@ IS_DISCHARGED_JSON = {
     'criteria': {
         'debtorName': {
             'last': 'TEST IND DEBTOR',
-            'first': 'ZZZZZ99'
+            'first': 'zzzzz99'
         }
     },
     'clientReferenceId': 'T-SQ-IS-3'
@@ -207,7 +207,7 @@ BS_EXPIRED_JSON = {
 AC_EXPIRED_JSON = {
     'type': 'AIRCRAFT_DOT',
     'criteria': {
-        'value': 'XXXXX999999'
+        'value': 'xxxxx999999'
     },
     'clientReferenceId': 'T-SQ-AC-4'
 }
@@ -351,6 +351,15 @@ TEST_EXPIRED_DATA = [
     ('BS', BS_EXPIRED_JSON, 'XXXXX99')
 ]
 
+# testdata pattern is ({description}, {reg number})
+TEST_REGISTRATION_TYPES = [
+    ('Financing Statement', 'TEST0001'),
+    ('Amendment', 'TEST0007'),
+    ('Change', 'TEST0008'),
+    ('Discharge', 'TEST00D4'),
+    ('Renewal', 'TEST00R5')
+]
+
 
 def test_search_no_account(session):
     """Assert that a search query with no account id returns the expected result."""
@@ -477,6 +486,39 @@ def test_search_discharged(session, search_type, json_data, excluded_match):
                 assert r['debtor']['personName']['first'] != excluded_match
             else:
                 assert r['vehicleCollateral']['serialNumber'] != excluded_match
+
+
+@pytest.mark.parametrize('desc,reg_num', TEST_REGISTRATION_TYPES)
+def test_registration_types(session, desc, reg_num):
+    """Assert that a reg num searches on different registations returns the expected result."""
+    # setup
+    json_data = {
+        'type': 'REGISTRATION_NUMBER',
+        'criteria': {
+            'value': reg_num
+        }
+    }
+
+    query = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
+    query.search()
+
+    result = query.json
+#    print(result)
+    assert query.id
+    assert query.search_response
+    assert query.account_id == 'PS12345'
+    assert query.user_id == 'UNIT_TEST'
+    assert result['searchId']
+    assert result['searchQuery']
+    assert result['searchDateTime']
+    assert result['totalResultsSize'] == 1
+    assert result['maxResultsSize']
+    assert result['returnedResultsSize'] == 1
+    assert len(result['results']) == 1
+    assert result['results'][0]['baseRegistrationNumber']
+    assert result['results'][0]['createDateTime']
+    assert result['results'][0]['matchType'] == 'EXACT'
+    assert result['results'][0]['registrationType']
 
 
 def test_search_startdatetime_invalid(session, client, jwt):

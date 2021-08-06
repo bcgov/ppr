@@ -55,22 +55,13 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
 
 # Equivalent logic as DB view search_by_reg_num_vw, but API determines the where clause.
 REG_NUM_QUERY = """
-SELECT CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-            THEN r.registration_type 
-            ELSE (SELECT r2.registration_type 
-                   FROM registrations r2 
-                  WHERE r2.registration_number = r.base_reg_number) END registration_type,
-       CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-            THEN r.registration_ts
-            ELSE (SELECT r2.registration_ts 
-                   FROM registrations r2 
-                  WHERE r2.registration_number = r.base_reg_number) END base_registration_ts,
-       CASE WHEN r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-            THEN r.registration_number 
-            ELSE r.base_reg_number END base_registration_num,
-       'EXACT' AS match_type,fs.state_type, fs.expire_date
-  FROM registrations r, financing_statements fs
+SELECT r2.registration_type, r2.registration_ts AS base_registration_ts, 
+       r2.registration_number AS base_registration_num,
+       'EXACT' AS match_type, fs.state_type, fs.expire_date
+  FROM registrations r, financing_statements fs, registrations r2
  WHERE r.financing_id = fs.id
+   AND r2.financing_id = fs.id
+   AND r2.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.registration_number = :query_value
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
