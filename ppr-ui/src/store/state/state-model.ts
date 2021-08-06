@@ -15,10 +15,6 @@ export const stateModel: StateModelIF = {
   debtorName: null,
   draft: {
     type: '',
-    registrationDescription: '',
-    registrationType: '',
-    clientReferenceId: '',
-    path: '',
     financingStatement: null,
     createDateTime: null,
     lastUpdateDateTime: null

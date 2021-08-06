@@ -388,7 +388,7 @@ export async function createFinancingStatement (
 }
 
 // Get pdf for a registration
-export async function registrationPDF (registrationId: string): Promise<any> {
+export async function registrationPDF (pdfPath: string): Promise<any> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = {
     baseURL: url,
@@ -396,7 +396,7 @@ export async function registrationPDF (registrationId: string): Promise<any> {
     responseType: 'blob' as 'json'
   }
   return axios
-    .get(`financing-statements/${registrationId}`, config)
+    .get(pdfPath, config)
     .then(response => {
       const data = response?.data
       if (!data) {

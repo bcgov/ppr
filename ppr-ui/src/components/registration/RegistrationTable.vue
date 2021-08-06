@@ -247,8 +247,8 @@
               :id="`pdf-btn-${row.item.id}`"
               :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
               depressed
-              :loading="row.item.documendId === loadingPDF"
-              @click="downloadPDF(row.item.documendId)"
+              :loading="row.item.path === loadingPDF"
+              @click="downloadPDF(row.item.path)"
             >
               <v-icon class="ma-0" left small>mdi-file-pdf-outline</v-icon>
               <span :class="[$style['pdf-btn-text'], 'ma-0']">PDF</span>
@@ -477,9 +477,9 @@ export default defineComponent({
       localState.showSubmittedDatePicker = false
     }
 
-    const downloadPDF = async (regId: string): Promise<any> => {
-      localState.loadingPDF = regId
-      const pdf = await registrationPDF(regId)
+    const downloadPDF = async (path: string): Promise<any> => {
+      localState.loadingPDF = path
+      const pdf = await registrationPDF(path)
       if (!pdf || pdf?.error) {
         emit('error', { statusCode: 404 })
       } else {
@@ -492,7 +492,7 @@ export default defineComponent({
         // IE doesn't allow using a blob object directly as link href
         // instead it is necessary to use msSaveOrOpenBlob
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(blob, regId)
+          window.navigator.msSaveOrOpenBlob(blob, path)
         } else {
           // for other browsers, create a link pointing to the ObjectURL containing the blob
           const url = window.URL.createObjectURL(blob)
@@ -500,7 +500,7 @@ export default defineComponent({
           window.document.body.appendChild(a)
           a.setAttribute('style', 'display: none')
           a.href = url
-          a.download = regId
+          a.download = path
           a.click()
           window.URL.revokeObjectURL(url)
           a.remove()
