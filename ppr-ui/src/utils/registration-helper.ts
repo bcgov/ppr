@@ -1,5 +1,5 @@
 // Libraries
-import { DraftTypes } from '@/enums'
+import { APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
   AddPartiesIF,
   AddCollateralIF,
@@ -40,7 +40,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   statement.lifeInfinite = trustLength.lifeInfinite
   statement.lifeYears = trustLength.lifeYears
   statement.trustIndenture = trustLength.trustIndenture
-  if (registrationType.registrationTypeAPI === 'RL') {
+  if (registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     statement.lienAmount = trustLength.lienAmount
     statement.surrenderDate = trustLength.surrenderDate
   }
@@ -105,7 +105,7 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   }
   if (statement.type === 'SA') {
     statement.trustIndenture = trustLength.trustIndenture
-  } else if (statement.type === 'RL') {
+  } else if (statement.type === APIRegistrationTypes.REPAIRERS_LIEN) {
     statement.lienAmount = trustLength.lienAmount
     statement.surrenderDate = trustLength.surrenderDate + 'T08:00:00+00:00'
   }

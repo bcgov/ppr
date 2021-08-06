@@ -4,7 +4,7 @@
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
           <v-icon color="#38598A">mdi-calendar-clock</v-icon>
-          <label class="pl-3" v-if="registrationType !== 'RL'">
+          <label class="pl-3" v-if="registrationType !== registrationTypeRL">
             <strong>Registration Length and Trust Indenture</strong>
           </label>
           <label class="pl-3" v-else>
@@ -40,7 +40,7 @@
           {{trustIndentureSummary}}
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pb-3"  v-if="registrationType === 'RL'">
+      <v-row no-gutters class="ps-6 pb-3"  v-if="registrationType === registrationTypeRL">
         <v-col cols="3" class="generic-label">
           Amount of Lien
         </v-col>
@@ -48,7 +48,7 @@
           {{lienAmountSummary}}
         </v-col>
       </v-row>
-      <v-row no-gutters class="ps-6 pb-6"  v-if="registrationType === 'RL'">
+      <v-row no-gutters class="ps-6 pb-6"  v-if="registrationType === registrationTypeRL">
         <v-col cols="3" class="generic-label">
           Surrender Date
         </v-col>
@@ -61,7 +61,7 @@
   </v-container>
   <v-container fluid no-gutters class="white pt-10 pa-6 pr-10 rounded"
   :class="{'invalid-message': showErrorComponent}" v-else>
-    <div v-if="registrationType === 'RL'">
+    <div v-if="registrationType === registrationTypeRL">
       <v-row no-gutters class="ps-6 pt-6 pb-3">
         <v-col cols="3" class="generic-label">
           Registration Length
@@ -212,6 +212,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { LengthTrustIF, FeeSummaryIF, FeeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, getFinancingFee } from '@/utils'
+import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -235,7 +236,7 @@ export default defineComponent({
     const feeInfoInfinite = getFinancingFee(true)
     const router = context.root.$router
 
-    if (props.defaultRegistrationType === 'RL' && lengthTrust.lifeYears !== 1) {
+    if (props.defaultRegistrationType === APIRegistrationTypes.REPAIRERS_LIEN && lengthTrust.lifeYears !== 1) {
       lengthTrust.lifeYears = 1
       feeSummary.quantity = 1
       feeSummary.feeAmount = feeInfoYears.feeAmount
@@ -245,6 +246,7 @@ export default defineComponent({
     const localState = reactive({
       summaryView: props.isSummary,
       registrationType: props.defaultRegistrationType,
+      registrationTypeRL: APIRegistrationTypes.REPAIRERS_LIEN,
       trustIndenture: lengthTrust.trustIndenture,
       lifeYearsDisabled: lengthTrust.lifeInfinite,
       lifeInfinite: lengthTrust.valid ? lengthTrust.lifeInfinite.toString() : '',
@@ -257,8 +259,8 @@ export default defineComponent({
       lifeYearsHint: 'Minimum 1 year, Maximum ' + feeInfoYears.quantityMax.toString() + ' years ($' +
                      feeInfoYears.feeAmount.toFixed(2) + ' per year)',
       showTrustIndenture: computed((): boolean => {
-        return (localState.registrationType === '' || localState.registrationType === 'SA' ||
-                localState.registrationType === 'SG')
+        return (localState.registrationType === '' ||
+                localState.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT)
       }),
       showErrorSummary: computed((): boolean => {
         return (!lengthTrust.valid)
@@ -285,7 +287,7 @@ export default defineComponent({
         return ''
       }),
       minSurrenderDate: computed((): string => {
-        var dateOffset = (24 * 60 * 60 * 1000) * 21
+        var dateOffset = (24 * 60 * 60 * 1000) * 21 // 21 days in milliseconds
         var minDate = new Date()
         minDate.setTime(minDate.getTime() - dateOffset)
         return minDate.toISOString()
@@ -294,7 +296,7 @@ export default defineComponent({
         return new Date().toISOString()
       }),
       lengthSummary: computed((): string => {
-        if (localState.registrationType === 'RL') {
+        if (localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
         if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {

@@ -1,5 +1,5 @@
 // Enums and Interfaces
-import { AccountTypes, RouteNames } from '@/enums'
+import { AccountTypes, APIRegistrationTypes, RouteNames } from '@/enums'
 import {
   AddCollateralIF,
   AddPartiesIF,
@@ -158,7 +158,7 @@ export const showStepErrors = (state: StateIF): boolean => {
 export const getSteps = (state: any, getters: any): Array<any> => {
   const regType:RegistrationTypeIF = getRegistrationType(state)
   var lengthTrustText = 'Length and<br />Trust Indenture'
-  if (regType.registrationTypeAPI === 'RL') {
+  if (regType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     lengthTrustText = 'Amount and Date<br /> of Surrender'
   }
   const steps: Array<any> = [{

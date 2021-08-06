@@ -7,6 +7,7 @@ import { mount, createLocalVue } from '@vue/test-utils'
 
 import { cleanupParty, saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { PartyIF, FinancingStatementIF, DraftIF, StateModelIF } from '@/interfaces'
+import { APIRegistrationTypes } from '@/enums'
 
 // Components
 import { FolioNumberSummary } from '@/components/common'
@@ -99,7 +100,7 @@ describe('Registration API Helper Tests', () => {
 
   it('save new RL financing statement draft', async () => {
     const testDraft = (JSON.parse(JSON.stringify(mockedDraftFinancingStatementAll)))
-    testDraft.financingStatement.type = 'RL'
+    testDraft.financingStatement.type = APIRegistrationTypes.REPAIRERS_LIEN
     testDraft.financingStatement.surrenderDate = '2021-07-28T07:00:00+00:00'
     testDraft.financingStatement.lienAmount = '1000'
     testDraft.financingStatement.lifeYears = 1

@@ -16,7 +16,7 @@
             </v-row>
             <stepper class="mt-4" />
             <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header" v-if="registrationType !== 'RL'">
+              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypeRL">
                 Registration Length and Trust Indenture
               </v-col>
               <v-col cols="auto" class="sub-header" v-else>
@@ -24,7 +24,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6"  v-if="registrationType !== 'RL'">
+              <v-col class="pt-2 pb-6"  v-if="registrationType !== registrationTypeRL">
                 Enter the length of time you want the
                 {{ registrationTypeUI }} to be in effect. You can renew the
                 registration in the future (for a fee).
@@ -76,7 +76,7 @@ import {
 // local components
 import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { RouteNames, StatementTypes } from '@/enums'
+import { APIRegistrationTypes, RouteNames, StatementTypes } from '@/enums' // eslint-disable-line no-unused-vars
 
 @Component({
   components: {
@@ -118,6 +118,10 @@ export default class LengthTrust extends Vue {
 
   private get registrationType (): string {
     return this.getRegistrationType?.registrationTypeAPI || ''
+  }
+
+  private get registrationTypeRL (): string {
+    return APIRegistrationTypes.REPAIRERS_LIEN
   }
 
   private get statementType (): string {

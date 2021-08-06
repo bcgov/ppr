@@ -131,7 +131,7 @@ describe('RegistrationLengthTrust SG tests', () => {
   beforeEach(async () => {
     await store.dispatch('setLengthTrust', {
       valid: false,
-      trustIndenture: true,
+      trustIndenture: false,
       lifeInfinite: false,
       lifeYears: 3,
       showInvalid: false,
@@ -146,11 +146,11 @@ describe('RegistrationLengthTrust SG tests', () => {
 
   it('renders with SG values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
-    expect(wrapper.vm.showTrustIndenture).toBe(true)
+    expect(wrapper.vm.showTrustIndenture).toBe(false)
     expect(wrapper.vm.lifeInfinite).toBe('')
     expect(wrapper.vm.lifeYearsEdit).toBe('3')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
-    expect(wrapper.vm.trustIndenture).toBe(true)
+    expect(wrapper.vm.trustIndenture).toBe(false)
   })
 })
 
