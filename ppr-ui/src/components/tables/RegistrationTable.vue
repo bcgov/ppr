@@ -36,14 +36,14 @@
       <v-row>
         <v-col cols="6">
           <v-date-picker
-            color="#1A5A96"
+            color="primary"
             :max="submittedEndDateTmp"
             v-model="submittedStartDateTmp"
           />
         </v-col>
         <v-col cols="6">
           <v-date-picker
-            color="#1A5A96"
+            color="primary"
             :min="submittedStartDateTmp"
             v-model="submittedEndDateTmp"
           />
@@ -587,17 +587,6 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .reg-table {
   max-height: 550px;
-  /*tbody > tr > td:nth-last-child(1),
-  thead > tr > th:nth-last-child(1) {
-    position: sticky !important;
-    position: -webkit-sticky !important;
-    left: 0;
-    z-index: 9998;
-    background: white;
-  }
-  thead > tr > th:nth-child(1) {
-    z-index: 9999;
-  }*/
 }
 .length-trust-label {
   font-size: 0.875rem;
@@ -644,7 +633,6 @@ export default defineComponent({
   background-color: white !important;
   border: 1px solid var(--outline);
   height: 45px;
-  /* padding: 0 0 5px 8px; */
   font-size: 13px;
   margin: 0;
   color: var(--text);

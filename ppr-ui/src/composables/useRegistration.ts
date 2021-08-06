@@ -248,7 +248,6 @@ export const useRegistration = () => {
   watch(
     () => localState.status,
     () => {
-      console.log(localState.status)
       filterResults(localState.originalData)
     }
   )

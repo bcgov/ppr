@@ -1,10 +1,12 @@
+import { APIStatusTypes, UIStatusTypes } from '@/enums'
+
 export const StatusTypes: Array<any> = [
   {
-    value: 'D',
-    text: 'Draft'
+    value: APIStatusTypes.DRAFT,
+    text: UIStatusTypes.DRAFT
   },
   {
-    value: 'ACT',
-    text: 'Active'
+    value: APIStatusTypes.ACTIVE,
+    text: UIStatusTypes.ACTIVE
   }
 ]

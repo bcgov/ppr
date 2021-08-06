@@ -7,7 +7,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 
 // Components
-import { RegistrationTable } from '@/components/registration'
+import { RegistrationTable } from '@/components/tables'
 
 // Other
 import {

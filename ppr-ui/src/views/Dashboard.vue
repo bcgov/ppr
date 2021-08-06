@@ -75,8 +75,8 @@ import { getFeatureFlag, searchHistory } from '@/utils'
 // local components
 import { Tombstone } from '@/components/common'
 import { SearchBar } from '@/components/search'
-import { SearchHistory } from '@/components/tables'
-import { RegistrationBar, RegistrationTable } from '@/components/registration'
+import { SearchHistory, RegistrationTable } from '@/components/tables'
+import { RegistrationBar } from '@/components/registration'
 
 @Component({
   components: {

@@ -313,7 +313,6 @@ export async function registrationHistory (): Promise<[RegistrationSummaryIF]> {
   return axios
     .get('financing-statements/registrations', config)
     .then(response => {
-      console.log(response)
       const data = response?.data
       if (!data) {
         throw new Error('Invalid API response')
@@ -339,7 +338,6 @@ export async function draftHistory (): Promise<[DraftResultIF]> {
   return axios
     .get('drafts', config)
     .then(response => {
-      console.log(response)
       const data = response?.data
       if (!data) {
         throw new Error('Invalid API response')
