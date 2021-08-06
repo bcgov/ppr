@@ -390,6 +390,8 @@ export async function createFinancingStatement (
 // Get pdf for a registration
 export async function registrationPDF (pdfPath: string): Promise<any> {
   const url = sessionStorage.getItem('PPR_API_URL')
+  // remove ppr/api/v1 from path
+  pdfPath = pdfPath.replace('/ppr/api/v1', '')
   const config = {
     baseURL: url,
     headers: { Accept: 'application/pdf' },

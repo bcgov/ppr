@@ -500,7 +500,7 @@ export default defineComponent({
           window.document.body.appendChild(a)
           a.setAttribute('style', 'display: none')
           a.href = url
-          a.download = path
+          a.download = path.replace('/ppr/api/v1/', '')
           a.click()
           window.URL.revokeObjectURL(url)
           a.remove()
