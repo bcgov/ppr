@@ -40,7 +40,7 @@
         <v-row class="pt-3" no-gutters>
               <registration-bar class="soft-corners-bottom" :registrationTitle="''"/>
         </v-row>
-        <v-row no-gutters class='pt-3'>
+        <v-row no-gutters class='pt-3' style="margin-bottom:300px;">
           <v-col>
             <v-row no-gutters
                    id="registration-header"
@@ -49,7 +49,9 @@
                 <b>My Registrations</b>
               </v-col>
             </v-row>
-            <v-row no-gutters class="white" style="height:500px"></v-row>
+            <v-row no-gutters class="white" style="min-height:300px">
+              <v-col cols="12"><registration-table /></v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-container>
@@ -73,7 +75,7 @@ import { getFeatureFlag, searchHistory } from '@/utils'
 // local components
 import { Tombstone } from '@/components/common'
 import { SearchBar } from '@/components/search'
-import { SearchHistory } from '@/components/tables'
+import { SearchHistory, RegistrationTable } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 
 @Component({
@@ -81,7 +83,8 @@ import { RegistrationBar } from '@/components/registration'
     RegistrationBar,
     SearchHistory,
     SearchBar,
-    Tombstone
+    Tombstone,
+    RegistrationTable
   }
 })
 export default class Dashboard extends Vue {

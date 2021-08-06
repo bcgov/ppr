@@ -21,7 +21,7 @@ export const stateModel: StateModelIF = {
   },
   feeSummary: {
     feeAmount: 0,
-    serviceFee: 1.50,
+    serviceFee: 1.5,
     quantity: 0,
     feeCode: ''
   },

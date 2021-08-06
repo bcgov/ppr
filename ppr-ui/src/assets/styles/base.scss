@@ -406,6 +406,28 @@ span.invalid-message {
   font-style: italic;
 }
 
+.actions-cell {
+  font-style: normal;
+}
+
+.v-data-table .filter-row {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+
+  td {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    height: 30px;
+  }
+
+  input,
+  label,
+  .v-list-item,
+  v-select__selection {
+    font-size: 13px !important;
+  }
+}
+
 .primaryRow {
   border: 1px solid $primary-blue;
 }
@@ -423,4 +445,19 @@ span.invalid-message {
 
 #party-search-auto-complete .v-item--active .row .col {
   color: $primary-blue !important;
+}
+
+.date-selection-btn {
+  color: $primary-blue;
+  margin: 0;
+  opacity: 1;
+  padding: 0;
+  min-width: 20px;
+  box-shadow: none;
+}
+.date-selection-btn:hover {
+  opacity: 0.7;
+}
+.date-selection-btn.bold {
+  font-weight: 800 !important;
 }
