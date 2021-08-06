@@ -142,6 +142,7 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         if 'model' in json_data:
             collateral.model = json_data['model']
         if collateral.serial_number:
+            collateral.serial_number = collateral.serial_number.strip().upper()
             collateral.search_vin = VehicleCollateral.get_search_vin(collateral.vehicle_type,
                                                                      collateral.serial_number)
         if collateral.vehicle_type == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
