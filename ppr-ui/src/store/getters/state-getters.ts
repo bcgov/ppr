@@ -254,7 +254,7 @@ export const getFinancingButtons = (state: any): Array<ButtonConfigIF> => {
  * Returns the maximum step number.
  */
 export const getMaxStep = (state: any, getters: any): number => {
-  return getters.getSteps ? getters.getSteps.filter(step => step.step !== -1).length : -1
+  return getters.getSteps ? getters.filter(step => step.step !== -1).length : -1
 }
 
 /**
@@ -268,7 +268,6 @@ export const isBusySaving = (state: any): boolean => {
  * Whether all the registration steps are valid.
  */
 export const isRegistrationValid = (state: any): boolean => {
-  // return (state.stateModel.lengthTrustStep.valid && state.stateModel.addSecuredPartiesAndDebtorsStep.valid &&
-  //  state.stateModel.addCollateralStep.valid)
-  return false
+  return (state.stateModel.lengthTrustStep.valid && state.stateModel.addSecuredPartiesAndDebtorsStep.valid &&
+    state.stateModel.addCollateralStep.valid)
 }
