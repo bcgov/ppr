@@ -16,7 +16,7 @@ import {
   mockedDraft1,
   mockedDraft2
 } from './test-data'
-import { DraftIF, RegistrationIF } from '@/interfaces'
+import { DraftIF, RegistrationSummaryIF } from '@/interfaces'
 import { axios as pprAxios } from '@/utils/axios-ppr'
 import { UIRegistrationTypes } from '@/enums'
 
@@ -43,7 +43,7 @@ function createComponent (localVue): Wrapper<any> {
 
 describe('Test registration table with results', () => {
   let wrapper: Wrapper<any>
-  const pprResp: RegistrationIF[] = [mockedRegistration1]
+  const pprResp: RegistrationSummaryIF[] = [mockedRegistration1]
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
   let sandbox
   let localVue = null

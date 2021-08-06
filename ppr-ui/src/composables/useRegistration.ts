@@ -1,4 +1,4 @@
-import { RegistrationIF, DraftIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationSummaryIF, DraftResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { reactive, toRefs, watch, ref } from '@vue/composition-api'
 import { RegistrationTypes, StatusTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'

@@ -1,8 +1,8 @@
 import { APIRegistrationTypes, DraftTypes } from '@/enums'
-import { DraftIF, RegistrationIF } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 
 
-export const mockedRegistration1: RegistrationIF = {
+export const mockedRegistration1: RegistrationSummaryIF = {
   registrationNumber: 'GOV12343',
   clientReferenceId: 'ABC123', 
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
@@ -15,7 +15,7 @@ export const mockedRegistration1: RegistrationIF = {
 }
 
 
-export const mockedRegistration2: RegistrationIF = {
+export const mockedRegistration2: RegistrationSummaryIF = {
   registrationNumber: 'BC456789',
   clientReferenceId: '', 
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
@@ -27,7 +27,7 @@ export const mockedRegistration2: RegistrationIF = {
   createDateTime: '2021-07-20T17:21:17+00:00'
 }
 
-export const mockedDraft1: DraftIF = {
+export const mockedDraft1: DraftResultIF = {
   type: DraftTypes.FINANCING_STATEMENT,
     documentId: 'D9000018',
     baseRegistrationNumber: '',
@@ -38,7 +38,7 @@ export const mockedDraft1: DraftIF = {
     clientReferenceId: 'FFF555'
 }
 
-export const mockedDraft2: DraftIF = {
+export const mockedDraft2: DraftResultIF = {
   type: DraftTypes.FINANCING_STATEMENT,
     documentId: 'D9000338',
     baseRegistrationNumber: '',

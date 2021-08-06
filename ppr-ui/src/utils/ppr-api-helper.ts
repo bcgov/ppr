@@ -5,13 +5,14 @@ import { StatusCodes } from 'http-status-codes'
 // Interfaces
 import {
   DraftIF,
+  DraftResultIF,
   FinancingStatementIF,
   SearchCriteriaIF,
   SearchResponseIF,
   SearchResultIF,
   UserSettingsIF,
   SearchPartyIF,
-  RegistrationIF
+  RegistrationSummaryIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
@@ -306,7 +307,7 @@ export async function partyCodeSearch (
 }
 
 // Get registration history
-export async function registrationHistory (): Promise<[RegistrationIF]> {
+export async function registrationHistory (): Promise<[RegistrationSummaryIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
@@ -332,7 +333,7 @@ export async function registrationHistory (): Promise<[RegistrationIF]> {
 }
 
 // Get registration history
-export async function draftHistory (): Promise<[DraftIF]> {
+export async function draftHistory (): Promise<[DraftResultIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
