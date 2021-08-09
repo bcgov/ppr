@@ -273,7 +273,6 @@ export const isBusySaving = (state: any): boolean => {
  * Whether all the registration steps are valid.
  */
 export const isRegistrationValid = (state: any): boolean => {
-  // return (state.stateModel.lengthTrustStep.valid && state.stateModel.addSecuredPartiesAndDebtorsStep.valid &&
-  //  state.stateModel.addCollateralStep.valid)
-  return false
+  return (state.stateModel.lengthTrustStep.valid && state.stateModel.addSecuredPartiesAndDebtorsStep.valid &&
+    state.stateModel.addCollateralStep.valid)
 }
