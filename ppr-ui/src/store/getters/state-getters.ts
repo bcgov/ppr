@@ -1,5 +1,5 @@
 // Enums and Interfaces
-import { AccountTypes, RouteNames } from '@/enums'
+import { AccountTypes, APIRegistrationTypes, RouteNames } from '@/enums'
 import {
   AddCollateralIF,
   AddPartiesIF,
@@ -156,11 +156,16 @@ export const showStepErrors = (state: StateIF): boolean => {
  * Returns the array of steps.
  */
 export const getSteps = (state: any, getters: any): Array<any> => {
+  const regType:RegistrationTypeIF = getRegistrationType(state)
+  var lengthTrustText = 'Length and<br />Trust Indenture'
+  if (regType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+    lengthTrustText = 'Amount and Date<br /> of Surrender'
+  }
   const steps: Array<any> = [{
     id: 'step-1-btn',
     step: 1,
     icon: 'mdi-calendar-clock',
-    text: 'Length and<br />Trust Indenture',
+    text: lengthTrustText,
     to: RouteNames.LENGTH_TRUST,
     disabled: getters.isBusySaving,
     valid: state.stateModel.lengthTrustStep.valid,

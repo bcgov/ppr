@@ -28,7 +28,7 @@
               <v-container fluid class="pa-1">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
-                    <registration-length-trust :isSummary="true"/>
+                    <registration-length-trust :isSummary="true" :defaultRegistrationType="registrationType" />
                   </v-col>
                 </v-row>
               </v-container>

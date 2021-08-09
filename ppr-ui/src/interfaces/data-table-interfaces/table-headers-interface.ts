@@ -6,6 +6,8 @@ export interface BaseHeaderIF {
     class?: string
     sortable?: boolean
     width?: string
+    fixed?: boolean
+    display?: boolean
 }
 export interface TableHeadersIF {
     [APISearchTypes.AIRCRAFT]?: Array<BaseHeaderIF>

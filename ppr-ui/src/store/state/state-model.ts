@@ -21,7 +21,7 @@ export const stateModel: StateModelIF = {
   },
   feeSummary: {
     feeAmount: 0,
-    serviceFee: 1.50,
+    serviceFee: 1.5,
     quantity: 0,
     feeCode: ''
   },
@@ -46,7 +46,9 @@ export const stateModel: StateModelIF = {
     valid: false,
     lifeYears: 0,
     lifeInfinite: false,
-    trustIndenture: false
+    trustIndenture: false,
+    lienAmount: '',
+    surrenderDate: ''
   },
   addSecuredPartiesAndDebtorsStep: {
     valid: false,

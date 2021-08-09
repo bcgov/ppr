@@ -39,3 +39,36 @@ export interface DraftIF {
     lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
     error?: ErrorIF
 }
+
+export interface DraftResultIF {
+  type: string, // One of enum DraftTypes.
+  documentId?: string,
+  baseRegistrationNumber?: string,
+  registrationType: string,
+  registrationDescription: string,
+  path: string,
+  createDateTime?: string, // Included in a successful response. Generated on first draft save.
+  lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
+  clientReferenceId: string,
+  error?: ErrorIF
+}
+
+// Financing Statement registration interface. 
+// All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
+export interface RegistrationSummaryIF {
+  registrationNumber: string, 
+  clientReferenceId?: string, // AKA folio max length 20.
+  registrationType: string, // One of enum APIRegistrationTypes.
+  registrationDescription?: string, // Returned on creation.
+  registrationClass?: string, // Returned on creation.
+  registeringParty: string,
+  securedParties: string,
+  expireDays?: string, // Number of days until expiry
+  statusType?: string,
+  path: string,
+  baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
+  createDateTime?: string, // Included in a successful response.
+  lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
+  error?: ErrorIF,
+  hide?: boolean
+}

@@ -293,3 +293,85 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     value: 'code'
   }
 ]
+
+export const registrationTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Registration Number',
+    value: 'number',
+    display: true
+  },
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Registration Type',
+    value: 'type',
+    display: true
+  },
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Registration Date',
+    value: 'rdate',
+    display: true
+  },
+  {
+    class: 'column-mds py-4',
+    sortable: true,
+    text: 'Status',
+    value: 'status',
+    display: true
+  },
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Registered By',
+    value: 'rby',
+    display: true
+  },
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Registering Party',
+    value: 'rparty',
+    display: true
+  },
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Secured Parties',
+    value: 'sp',
+    display: true
+  },
+
+  {
+    class: 'column-md py-4',
+    sortable: true,
+    text: 'Folio/Reference Number',
+    value: 'folio',
+    display: true
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: true,
+    text: 'Days to Expiry',
+    value: 'edays',
+    display: true
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Verification Statement',
+    value: 'vs',
+    display: true
+  },
+  {
+    class: 'column-sm py-4',
+    sortable: false,
+    text: 'Actions',
+    value: 'actions',
+    display: true,
+    fixed: true
+  }
+]
