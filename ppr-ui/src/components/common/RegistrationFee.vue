@@ -5,25 +5,43 @@
     </header>
     <v-slide-y-transition group tag="ul" :class="$style['fee-list']">
       <template>
-        <li :class="[$style['fee-container'], $style['fee-list__item']]"
+        <li
+          :class="[$style['fee-container'], $style['fee-list__item']]"
           :key="registrationTypeFee"
-          >
-          <div :class="$style['fee-list__item-name']" class="pl-3">{{registrationTypeFee}}</div>
-          <div :class="$style['fee-list__item-value']" v-if="!isComplete">
+        >
+          <div :class="$style['fee-list__item-name']" class="pl-3">
+            {{ registrationTypeFee }}
+          </div>
+          <div :class="$style['fee-list__item-value']" v-if="hasNoCharge()">
+            No Fee
+          </div>
+          <div :class="$style['fee-list__item-value']" v-else-if="!isComplete">
             -
           </div>
           <div :class="$style['fee-list__item-value']" v-else>
-            ${{totalFees.toFixed(2)}}
+            ${{ totalFees.toFixed(2) }}
           </div>
         </li>
-        <li :class="[$style['fee-container'], $style['fee-list__hint']]" :key="hintFee" v-if="!isComplete">
-          <div class="fee-list__hint pl-3">{{hintFee}}</div>
+        <li
+          :class="[$style['fee-container'], $style['fee-list__hint']]"
+          :key="hintFee"
+          v-if="!isComplete && !hasNoCharge()"
+        >
+          <div class="fee-list__hint pl-3">{{ hintFee }}</div>
         </li>
-        <li :class="[$style['fee-container'], $style['fee-list__item']]"
+        <li
+          :class="[$style['fee-container'], $style['fee-list__item']]"
           :key="serviceFee"
-          >
-          <div :class="$style['fee-list__item-name']" class="pl-3">Service Fee</div>
-          <div :class="$style['fee-list__item-value']">${{serviceFee.toFixed(2)}}</div>
+        >
+          <div :class="$style['fee-list__item-name']" class="pl-3">
+            Service Fee
+          </div>
+          <div :class="$style['fee-list__item-value']" v-if="hasNoCharge()">
+            No Fee
+          </div>
+          <div :class="$style['fee-list__item-value']" v-else>
+            ${{ serviceFee.toFixed(2) }}
+          </div>
         </li>
       </template>
     </v-slide-y-transition>
@@ -32,7 +50,10 @@
       <div :class="$style['fee-total__currency']">CAD</div>
       <div :class="$style['fee-total__value']">
         <v-slide-y-reverse-transition name="slide" mode="out-in">
-          <div v-if="isComplete" class="float-right"><b>${{totalAmount.toFixed(2)}}</b></div>
+          <div v-if="hasNoCharge()" class="float-right"><b>$0.00</b></div>
+          <div v-else-if="isComplete" class="float-right">
+            <b>${{ totalAmount.toFixed(2) }}</b>
+          </div>
           <div v-else class="float-right"><b>-</b></div>
         </v-slide-y-reverse-transition>
       </div>
@@ -42,11 +63,19 @@
 
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs,
+  watch,
+  onMounted
+} from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { FeeSummaryIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { getServiceFee, getFinancingFee } from '@/utils'
+import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -68,7 +97,20 @@ export default defineComponent({
   },
   setup (props) {
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
+    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
     const feeSummary: FeeSummaryIF = getFeeSummary.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
+
+    const hasNoCharge = (): boolean => {
+      const hfArray = [
+        APIRegistrationTypes.LAND_TAX_LIEN,
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
+        APIRegistrationTypes.MISCELLANEOUS_OTHER
+      ]
+      return hfArray.includes(registrationType)
+    }
+
     const localState = reactive({
       attachFee: props.attach,
       displayFee: props.display,
@@ -80,10 +122,12 @@ export default defineComponent({
         return getFinancingFee(false).hint
       }),
       isComplete: computed((): boolean => {
-        return (localState.quantity > 0 && localState.feeAmount > 0)
+        return localState.quantity > 0 && localState.feeAmount > 0
       }),
       totalAmount: computed((): number => {
-        return (localState.feeAmount * localState.quantity + localState.serviceFee)
+        return (
+          localState.feeAmount * localState.quantity + localState.serviceFee
+        )
       }),
       totalFees: computed((): number => {
         return localState.feeAmount * localState.quantity
@@ -92,12 +136,31 @@ export default defineComponent({
         return getServiceFee()
       })
     })
-    watch(() => props.updatedFeeSummary, (val: FeeSummaryIF) => {
-      localState.feeAmount = feeSummary.feeAmount
-      localState.quantity = feeSummary.quantity
-    }, { immediate: true, deep: true })
+
+    watch(
+      () => props.updatedFeeSummary,
+      (val: FeeSummaryIF) => {
+        localState.feeAmount = feeSummary.feeAmount
+        localState.quantity = feeSummary.quantity
+      },
+      { immediate: true, deep: true }
+    )
+
+    onMounted(() => {
+      switch (registrationType) {
+        case APIRegistrationTypes.REPAIRERS_LIEN:
+          localState.feeAmount = 5
+          localState.quantity = 1
+          break
+        case APIRegistrationTypes.MARRIAGE_MH:
+          localState.feeAmount = 10
+          localState.quantity = 1
+          break
+      }
+    })
 
     return {
+      hasNoCharge,
       ...toRefs(localState)
     }
   }
@@ -132,7 +195,8 @@ header {
 }
 
 .fee-list__item {
-  &-name, &-value {
+  &-name,
+  &-value {
     font-weight: 700;
   }
 
@@ -173,5 +237,4 @@ header {
     font-weight: 700;
   }
 }
-
 </style>

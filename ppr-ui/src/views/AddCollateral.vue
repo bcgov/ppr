@@ -24,7 +24,7 @@
               </v-col>
             </v-row>
         <v-row no-gutters>
-          <v-col cols="auto">
+          <v-col cols="12">
             <collateral />
           </v-col>
         </v-row>

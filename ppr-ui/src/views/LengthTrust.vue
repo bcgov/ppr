@@ -16,7 +16,7 @@
             </v-row>
             <stepper class="mt-4" />
             <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypeRL">
+              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypes['REPAIRERS_LIEN']">
                 Registration Length and Trust Indenture
               </v-col>
               <v-col cols="auto" class="sub-header" v-else>
@@ -24,15 +24,8 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6"  v-if="registrationType !== registrationTypeRL">
-                Enter the length of time you want the
-                {{ registrationTypeUI }} to be in effect. You can renew the
-                registration in the future (for a fee).
-              </v-col>
-              <v-col class="pt-2 pb-6"  v-else>
-                Enter the amount of the Lien and the date the vehicle was surrendered.
-                Please note that this must be within the last 21 days. The length of the Lien is automatically set to
-                180 days.
+              <v-col class="pt-2 pb-6">
+                {{registrationLengthMessage}}
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -104,6 +97,8 @@ export default class LengthTrust extends Vue {
 
   private updatedFeeSummary: FeeSummaryIF = null
 
+  private regTypes: APIRegistrationTypes[] = Object.keys(APIRegistrationTypes).map(k => APIRegistrationTypes[k])
+
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
@@ -120,8 +115,28 @@ export default class LengthTrust extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
 
-  private get registrationTypeRL (): string {
-    return APIRegistrationTypes.REPAIRERS_LIEN
+  private get registrationTypes (): Array<string> {
+    return this.regTypes
+  }
+
+  private get registrationLengthMessage (): string {
+    switch (this.getRegistrationType) {
+      case APIRegistrationTypes.REPAIRERS_LIEN:
+        return 'Enter the amount of the Lien and the date the vehicle was surrendered.' +
+                'Please note that this must be within the last 21 days. The length of the Lien is automatically set ' +
+                'to 180 days.'
+      case APIRegistrationTypes.MARRIAGE_MH:
+      case APIRegistrationTypes.LAND_TAX_LIEN:
+      case APIRegistrationTypes.MANUFACTURED_HOME_LIEN:
+        return 'The registration length for this registration is automatically set to infinite. ' +
+        'There is a $10.00 fee for this registration.'
+      case APIRegistrationTypes.MISCELLANEOUS_OTHER:
+        return 'The registration length for this registration is automatically set to infinite. ' +
+        'There is no fee for this registration.'
+      default:
+        return 'Enter the length of time you want the ' + this.getRegistrationType?.registrationTypeUI +
+                ' to be in effect. You can renew the registration in the future (for a fee).'
+    }
   }
 
   private get statementType (): string {
