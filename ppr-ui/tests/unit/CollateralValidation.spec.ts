@@ -5,6 +5,9 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
+import {
+  mockedSelectSecurityAgreement
+} from './test-data'
 
 // Components
 import { EditCollateral } from '@/components/collateral'
@@ -13,8 +16,6 @@ Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
-// Events
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn'
@@ -46,6 +47,7 @@ describe('Collateral validation tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = await createComponent(-1, false)
   })
   afterEach(() => {

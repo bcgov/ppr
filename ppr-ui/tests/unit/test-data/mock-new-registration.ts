@@ -23,6 +23,22 @@ export const mockedSelectSecurityAgreement: RegistrationTypeIF = {
   textLabel: ''
 }
 
+export const mockedRepairersLien: RegistrationTypeIF = {
+  divider: false,
+  selectDisabled: false,
+  registrationTypeUI: UIRegistrationTypes.REPAIRERS_LIEN,
+  registrationTypeAPI: APIRegistrationTypes.REPAIRERS_LIEN,
+  textLabel: ''
+}
+
+export const mockedSaleOfGoods: RegistrationTypeIF = {
+  divider: false,
+  selectDisabled: false,
+  registrationTypeUI: UIRegistrationTypes.SALE_OF_GOODS,
+  registrationTypeAPI: APIRegistrationTypes.SALE_OF_GOODS,
+  textLabel: ''
+}
+
 export const mockedError: ErrorIF = {
   statusCode: 500,
   message: 'mock error'

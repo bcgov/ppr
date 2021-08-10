@@ -4,6 +4,9 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import {
+  mockedSelectSecurityAgreement
+} from './test-data'
 
 // Components
 import { RegistrationFee } from '@/components/common'
@@ -13,8 +16,6 @@ Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
-// Events
 
 // Input field selectors / buttons
 
@@ -75,6 +76,7 @@ describe('Registration Fee component tests', () => {
   }
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = createComponent(defaultRegistrationType, defaultHint, feeSummary)
   })
   afterEach(() => {

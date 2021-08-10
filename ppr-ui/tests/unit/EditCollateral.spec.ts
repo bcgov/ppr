@@ -7,7 +7,8 @@ import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedGeneralCollateral1,
-  mockedVehicleCollateral1
+  mockedVehicleCollateral1,
+  mockedSelectSecurityAgreement
 } from './test-data'
 
 // Components
@@ -50,6 +51,7 @@ describe('Collateral add tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = createComponent(-1, false)
   })
   afterEach(() => {
@@ -94,6 +96,7 @@ describe('Collateral edit tests', () => {
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: mockedVehicleCollateral1
     })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = createComponent(0, false)
   })
   afterEach(() => {

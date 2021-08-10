@@ -192,7 +192,8 @@ export default defineComponent({
       getVehicle,
       resetFormAndData,
       removeVehicle,
-      addVehicle
+      addVehicle,
+      mustHaveManufacturedHomeCollateral
     } = useVehicle(props, context)
     const {
       errors,
@@ -201,7 +202,10 @@ export default defineComponent({
       validateCollateralForm,
       resetSerialError
     } = useCollateralValidation()
-    onMounted(getVehicle)
+
+    onMounted(() => {
+      getVehicle()
+    })
 
     const onSubmitForm = async () => {
       const isValid = await validateCollateralForm(currentVehicle.value)
@@ -234,6 +238,7 @@ export default defineComponent({
       vehicleTypes,
       getSerialLabel,
       getSerialDisabled,
+      mustHaveManufacturedHomeCollateral,
       changeVehicleType
     }
   }

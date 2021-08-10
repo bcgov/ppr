@@ -6,7 +6,8 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedGeneralCollateral1,
-  mockedVehicleCollateral1
+  mockedVehicleCollateral1,
+  mockedSelectSecurityAgreement
 } from './test-data'
 
 // Components
@@ -16,7 +17,6 @@ Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
 
 // Input field selectors / buttons
 const addButtonSelector: string = '#btn-add-collateral'
@@ -45,6 +45,8 @@ describe('Collateral SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+
     wrapper = createComponent()
   })
   afterEach(() => {

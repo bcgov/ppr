@@ -2,10 +2,13 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { VehicleTypes } from '@/resources'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import { APIRegistrationTypes } from '@/enums'
 
 export const useVehicle = (props, context) => {
   const { setAddCollateral } = useActions<any>(['setAddCollateral'])
   const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
+  const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+  const registrationType = getRegistrationType.value.registrationTypeAPI
   const localState = reactive({
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
@@ -70,11 +73,48 @@ export const useVehicle = (props, context) => {
     context.emit('resetEvent')
   }
 
+  const hasVehicleCollateral = (): boolean => {
+    const vhArray = [
+      APIRegistrationTypes.SECURITY_AGREEMENT,
+      APIRegistrationTypes.REPAIRERS_LIEN,
+      APIRegistrationTypes.MARRIAGE_MH,
+      APIRegistrationTypes.LAND_TAX_LIEN,
+      APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+      APIRegistrationTypes.SALE_OF_GOODS
+    ]
+    return vhArray.includes(registrationType)
+  }
+
+  const hasGeneralCollateral = (): boolean => {
+    const ghArray = [
+      APIRegistrationTypes.SECURITY_AGREEMENT,
+      APIRegistrationTypes.SALE_OF_GOODS,
+      APIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
+      APIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
+      APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN,
+      APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
+      APIRegistrationTypes.MISCELLANEOUS_OTHER
+    ]
+    return ghArray.includes(registrationType)
+  }
+
+  const mustHaveManufacturedHomeCollateral = (): boolean => {
+    const mhArray = [
+      APIRegistrationTypes.MARRIAGE_MH,
+      APIRegistrationTypes.LAND_TAX_LIEN,
+      APIRegistrationTypes.MANUFACTURED_HOME_LIEN
+    ]
+    return mhArray.includes(registrationType)
+  }
+
   return {
     getVehicle,
     addVehicle,
     resetFormAndData,
     removeVehicle,
+    hasVehicleCollateral,
+    hasGeneralCollateral,
+    mustHaveManufacturedHomeCollateral,
     ...toRefs(localState)
   }
 }

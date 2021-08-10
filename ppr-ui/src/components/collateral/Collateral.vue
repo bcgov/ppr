@@ -15,9 +15,12 @@
           <v-col cols="auto">
             <v-icon color="#D3272C">information-outline</v-icon>&nbsp;
             <span class="invalid-message">This step is unfinished. </span>
-            <span id="router-link-collateral"
-            class="invalid-link"
-            @click="goToCollateral()">Return to this step to complete it.</span>
+            <span
+              id="router-link-collateral"
+              class="invalid-link"
+              @click="goToCollateral()"
+              >Return to this step to complete it.</span
+            >
           </v-col>
         </v-row>
       </v-container>
@@ -45,7 +48,9 @@
                   <td>{{ row.item.year }}</td>
                   <td>{{ row.item.make }}</td>
                   <td>{{ row.item.model }}</td>
-                  <td :class="[$style['vehicle-cell']]">{{ row.item.serialNumber }}</td>
+                  <td :class="[$style['vehicle-cell']]">
+                    {{ row.item.serialNumber }}
+                  </td>
                   <td v-if="getMH">
                     {{ row.item.manufacturedHomeRegistrationNumber }}
                   </td>
@@ -54,7 +59,11 @@
             </v-data-table>
           </v-col>
         </v-row>
-        <v-row no-gutters class="ps-6 pt-4 pb-3" v-if="generalCollateral.length > 0">
+        <v-row
+          no-gutters
+          class="ps-6 pt-4 pb-3"
+          v-if="generalCollateral.length > 0"
+        >
           <v-col cols="3" class="generic-label">
             General Collateral
           </v-col>
@@ -76,15 +85,17 @@
     <v-row no-gutters class="pt-6">
       <v-col cols="auto">
         <ul v-if="!collateralValid">
-          <li>At least one form of collateral (vehicle or general)</li>
+          <li>{{ getCollateralDescription() }}</li>
         </ul>
         <span v-else>
-          <v-icon color="green darken-2" class="agreement-valid-icon">mdi-check</v-icon>
-          At least one form of collateral (vehicle or general)
+          <v-icon color="green darken-2" class="agreement-valid-icon"
+            >mdi-check</v-icon
+          >
+          {{ getCollateralDescription() }}
         </span>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10">
+    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral()">
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -98,7 +109,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row no-gutters v-if="hasVehicleCollateral()">
       <v-col>
         <div>
           <v-expand-transition>
@@ -113,11 +124,11 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-4">
+    <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral()">
       <v-col>
         <v-data-table
           class="collateral-table"
-          :class="{'invalid-message': showErrorComponent}"
+          :class="{ 'invalid-message': showErrorComponent }"
           :headers="headers"
           :items="vehicleCollateral"
           disable-pagination
@@ -210,9 +221,13 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row class="pt-8">
+    <v-row class="pt-8" v-if="hasGeneralCollateral()">
       <v-col>
-        <v-card flat id="general-collateral" :class="{'invalid-message': showErrorComponent}" >
+        <v-card
+          flat
+          id="general-collateral"
+          :class="{ 'invalid-message': showErrorComponent }"
+        >
           <v-container fluid no-gutters class="pa-0">
             <v-row no-gutters class="py-6">
               <v-col cols="3" class="generic-label pa-4">
@@ -246,12 +261,15 @@ import {
   reactive,
   toRefs,
   watch,
+  onMounted,
   computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddCollateralIF, VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditCollateral from './EditCollateral.vue'
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
+import { useVehicle } from './composables/useVehicle'
+import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   components: {
@@ -266,10 +284,18 @@ export default defineComponent({
   setup (props, context) {
     const { setAddCollateral } = useActions<any>(['setAddCollateral'])
     const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
+    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
 
     const collateral: AddCollateralIF = getAddCollateral.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const router = context.root.$router
+
+    const {
+      hasVehicleCollateral,
+      hasGeneralCollateral,
+      mustHaveManufacturedHomeCollateral
+    } = useVehicle(props, context)
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -327,6 +353,21 @@ export default defineComponent({
       }
     )
 
+    const getCollateralDescription = (): string => {
+      if (hasVehicleCollateral() && hasGeneralCollateral()) {
+        return 'At least one form of collateral (vehicle or general)'
+      }
+      if (mustHaveManufacturedHomeCollateral()) {
+        return 'At least one manufactured home as vehicle collateral'
+      }
+      if (hasGeneralCollateral()) {
+        return 'General collateral'
+      }
+      if (hasVehicleCollateral()) {
+        return 'At least one vehicle as collateral'
+      }
+    }
+
     const removeVehicle = (index: number): void => {
       let collateral = getAddCollateral.value // eslint-disable-line
       localState.vehicleCollateral.splice(index, 1)
@@ -370,9 +411,10 @@ export default defineComponent({
     }
 
     const setValid = () => {
-      if ((collateral.vehicleCollateral.length > 0) ||
-        ((collateral.generalCollateral.length <= 4000) &&
-        (collateral.generalCollateral.length > 0))
+      if (
+        collateral.vehicleCollateral.length > 0 ||
+        (collateral.generalCollateral.length <= 4000 &&
+          collateral.generalCollateral.length > 0)
       ) {
         collateral.valid = true
         collateral.showInvalid = false
@@ -390,6 +432,15 @@ export default defineComponent({
       router.push({ path: '/add-collateral' })
     }
 
+    onMounted(() => {
+      if (hasGeneralCollateral() && !collateral.generalCollateral) {
+        if (registrationType === APIRegistrationTypes.MISCELLANEOUS_OTHER) {
+          localState.generalCollateral =
+            'All the Personal Property of the Debtor'
+        }
+      }
+    })
+
     return {
       removeVehicle,
       initEdit,
@@ -398,6 +449,11 @@ export default defineComponent({
       getVehicleDescription,
       validateGeneral,
       goToCollateral,
+      registrationType,
+      hasVehicleCollateral,
+      hasGeneralCollateral,
+      mustHaveManufacturedHomeCollateral,
+      getCollateralDescription,
       ...toRefs(localState)
     }
   }
