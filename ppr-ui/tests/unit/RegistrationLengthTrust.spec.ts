@@ -4,6 +4,11 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import {
+  mockedSelectSecurityAgreement,
+  mockedRepairersLien,
+  mockedSaleOfGoods
+} from './test-data'
 
 // Components
 import { RegistrationLengthTrust } from '@/components/registration'
@@ -12,8 +17,6 @@ Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
-// Events
 
 // Input field selectors / buttons
 const selectDropDown: string = '.registration-bar-type-select'
@@ -60,6 +63,7 @@ describe('RegistrationLengthTrust SA tests', () => {
   const defaultRegistrationType: String = String('SA')
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
@@ -68,6 +72,7 @@ describe('RegistrationLengthTrust SA tests', () => {
 
   it('renders with default values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    // show trust indenture will be true for security agreement only
     expect(wrapper.vm.showTrustIndenture).toBe(true)
     expect(wrapper.vm.lifeInfinite).toBe('')
     expect(wrapper.vm.trustIndenture).toBe(false)
@@ -101,6 +106,7 @@ describe('RegistrationLengthTrust RL tests', () => {
   const defaultRegistrationType: String = String('RL')
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedRepairersLien)
     wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
@@ -138,6 +144,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
+    await store.dispatch('setRegistrationType', mockedSaleOfGoods)
     wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
@@ -146,6 +153,7 @@ describe('RegistrationLengthTrust SG tests', () => {
 
   it('renders with SG values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    // show trust indenture will be true for security agreement only
     expect(wrapper.vm.showTrustIndenture).toBe(false)
     expect(wrapper.vm.lifeInfinite).toBe('')
     expect(wrapper.vm.lifeYearsEdit).toBe('3')

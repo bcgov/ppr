@@ -172,7 +172,7 @@
           >
         </v-col>
         <v-col cols="auto">
-          <span v-if="infinityPreselected">
+          <span v-if="infinityPreselected()">
             Infinite
           </span>
           <v-radio-group v-else v-model="lifeInfinite">
@@ -194,7 +194,7 @@
             </v-radio>
           </v-radio-group>
         </v-col>
-        <v-col v-if="!infinityPreselected">
+        <v-col v-if="!infinityPreselected()">
           <v-text-field
             id="life-years-field"
             autocomplete="off"
@@ -211,7 +211,7 @@
       </v-row>
       <v-row>
         <v-col cols="3"></v-col>
-        <v-col cols="9" v-if="!infinityPreselected"><v-divider /></v-col>
+        <v-col cols="9" v-if="!infinityPreselected()"><v-divider /></v-col>
       </v-row>
       <v-row no-gutters class="pt-10" v-if="showTrustIndenture">
         <v-col cols="3" class="generic-label">
@@ -276,6 +276,8 @@ export default defineComponent({
     const { setFeeSummary } = useActions<any>(['setFeeSummary'])
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
+    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+    const registrationType = getRegistrationType.value.registrationTypeAPI
     const lengthTrust: LengthTrustIF = getLengthTrust.value
     const feeSummary: FeeSummaryIF = getFeeSummary.value
     const feeInfoYears = getFinancingFee(false)
@@ -283,7 +285,7 @@ export default defineComponent({
     const router = context.root.$router
 
     if (
-      props.defaultRegistrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
+      registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
       lengthTrust.lifeYears !== 1
     ) {
       lengthTrust.lifeYears = 1
@@ -294,7 +296,6 @@ export default defineComponent({
 
     const localState = reactive({
       summaryView: props.isSummary,
-      registrationType: props.defaultRegistrationType,
       trustIndenture: lengthTrust.trustIndenture,
       lifeYearsDisabled: lengthTrust.lifeInfinite,
       lifeInfinite: lengthTrust.valid
@@ -315,8 +316,7 @@ export default defineComponent({
         ' per year)',
       showTrustIndenture: computed((): boolean => {
         return (
-          localState.registrationType === '' ||
-          localState.registrationType ===
+          registrationType ===
             APIRegistrationTypes.SECURITY_AGREEMENT
         )
       }),
@@ -352,7 +352,7 @@ export default defineComponent({
       }),
       lengthSummary: computed((): string => {
         if (
-          localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
+          registrationType === APIRegistrationTypes.REPAIRERS_LIEN
         ) {
           return '180 Days'
         }
@@ -413,7 +413,7 @@ export default defineComponent({
         APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
         APIRegistrationTypes.MISCELLANEOUS_REGISTRATION
       ]
-      return ipArray.includes(localState.registrationType)
+      return ipArray.includes(registrationType)
     }
 
     const setLifeInfinite = (val: string): void => {
@@ -525,6 +525,7 @@ export default defineComponent({
       lengthTrust,
       infinityPreselected,
       APIRegistrationTypes,
+      registrationType,
       ...toRefs(localState)
     }
   }

@@ -7,6 +7,8 @@ import { APIRegistrationTypes } from '@/enums'
 export const useVehicle = (props, context) => {
   const { setAddCollateral } = useActions<any>(['setAddCollateral'])
   const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
+  const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+  const registrationType = getRegistrationType.value.registrationTypeAPI
   const localState = reactive({
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
@@ -71,7 +73,7 @@ export const useVehicle = (props, context) => {
     context.emit('resetEvent')
   }
 
-  const hasVehicleCollateral = (registrationType: string): boolean => {
+  const hasVehicleCollateral = (): boolean => {
     const vhArray = [
       APIRegistrationTypes.SECURITY_AGREEMENT,
       APIRegistrationTypes.REPAIRERS_LIEN,
@@ -83,7 +85,7 @@ export const useVehicle = (props, context) => {
     return vhArray.includes(registrationType)
   }
 
-  const hasGeneralCollateral = (registrationType: string): boolean => {
+  const hasGeneralCollateral = (): boolean => {
     const ghArray = [
       APIRegistrationTypes.SECURITY_AGREEMENT,
       APIRegistrationTypes.SALE_OF_GOODS,
@@ -96,7 +98,7 @@ export const useVehicle = (props, context) => {
     return ghArray.includes(registrationType)
   }
 
-  const mustHaveManufacturedHomeCollateral = (registrationType: string): boolean => {
+  const mustHaveManufacturedHomeCollateral = (): boolean => {
     const mhArray = [
       APIRegistrationTypes.MARRIAGE_MH,
       APIRegistrationTypes.LAND_TAX_LIEN,

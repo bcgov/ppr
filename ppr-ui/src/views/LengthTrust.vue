@@ -120,7 +120,7 @@ export default class LengthTrust extends Vue {
   }
 
   private get registrationLengthMessage (): string {
-    switch (this.getRegistrationType) {
+    switch (this.registrationType) {
       case APIRegistrationTypes.REPAIRERS_LIEN:
         return 'Enter the amount of the Lien and the date the vehicle was surrendered.' +
                 'Please note that this must be within the last 21 days. The length of the Lien is automatically set ' +

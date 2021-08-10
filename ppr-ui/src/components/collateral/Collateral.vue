@@ -95,7 +95,7 @@
         </span>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral(registrationType)">
+    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral()">
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -109,7 +109,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters v-if="hasVehicleCollateral(registrationType)">
+    <v-row no-gutters v-if="hasVehicleCollateral()">
       <v-col>
         <div>
           <v-expand-transition>
@@ -124,7 +124,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral(registrationType)">
+    <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral()">
       <v-col>
         <v-data-table
           class="collateral-table"
@@ -221,7 +221,7 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row class="pt-8" v-if="hasGeneralCollateral(registrationType)">
+    <v-row class="pt-8" v-if="hasGeneralCollateral()">
       <v-col>
         <v-card
           flat
@@ -354,16 +354,16 @@ export default defineComponent({
     )
 
     const getCollateralDescription = (): string => {
-      if (hasVehicleCollateral(registrationType) && hasGeneralCollateral(registrationType)) {
+      if (hasVehicleCollateral() && hasGeneralCollateral()) {
         return 'At least one form of collateral (vehicle or general)'
       }
-      if (mustHaveManufacturedHomeCollateral(registrationType)) {
+      if (mustHaveManufacturedHomeCollateral()) {
         return 'At least one manufactured home as vehicle collateral'
       }
-      if (hasGeneralCollateral(registrationType)) {
+      if (hasGeneralCollateral()) {
         return 'General collateral'
       }
-      if (hasVehicleCollateral(registrationType)) {
+      if (hasVehicleCollateral()) {
         return 'At least one vehicle as collateral'
       }
     }
@@ -433,7 +433,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      if (hasGeneralCollateral(registrationType) && !collateral.generalCollateral) {
+      if (hasGeneralCollateral() && !collateral.generalCollateral) {
         if (registrationType === APIRegistrationTypes.MISCELLANEOUS_OTHER) {
           localState.generalCollateral =
             'All the Personal Property of the Debtor'
