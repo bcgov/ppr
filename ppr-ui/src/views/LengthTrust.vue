@@ -16,7 +16,7 @@
             </v-row>
             <stepper class="mt-4" />
             <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypes['REPAIRERS_LIEN']">
+              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypeRL">
                 Registration Length and Trust Indenture
               </v-col>
               <v-col cols="auto" class="sub-header" v-else>
@@ -97,8 +97,6 @@ export default class LengthTrust extends Vue {
 
   private updatedFeeSummary: FeeSummaryIF = null
 
-  private regTypes: APIRegistrationTypes[] = Object.keys(APIRegistrationTypes).map(k => APIRegistrationTypes[k])
-
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
@@ -115,8 +113,8 @@ export default class LengthTrust extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
 
-  private get registrationTypes (): Array<string> {
-    return this.regTypes
+  private get registrationTypeRL (): string {
+    return APIRegistrationTypes.REPAIRERS_LIEN
   }
 
   private get registrationLengthMessage (): string {
