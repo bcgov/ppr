@@ -95,7 +95,7 @@
         </span>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral()">
+    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral(registrationType)">
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -109,7 +109,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters v-if="hasVehicleCollateral()">
+    <v-row no-gutters v-if="hasVehicleCollateral(registrationType)">
       <v-col>
         <div>
           <v-expand-transition>
@@ -124,7 +124,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral()">
+    <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral(registrationType)">
       <v-col>
         <v-data-table
           class="collateral-table"
@@ -221,7 +221,7 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row class="pt-8" v-if="hasGeneralCollateral()">
+    <v-row class="pt-8" v-if="hasGeneralCollateral(registrationType)">
       <v-col>
         <v-card
           flat
@@ -268,6 +268,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddCollateralIF, VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditCollateral from './EditCollateral.vue'
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
+import { useVehicle } from './composables/useVehicle'
 import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
@@ -289,6 +290,12 @@ export default defineComponent({
     const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const router = context.root.$router
+
+    const {
+      hasVehicleCollateral,
+      hasGeneralCollateral,
+      mustHaveManufacturedHomeCollateral
+    } = useVehicle(props, context)
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -346,17 +353,17 @@ export default defineComponent({
       }
     )
 
-    const getCollateralDescription = ():string => {
-      if (hasVehicleCollateral() && hasGeneralCollateral()) {
+    const getCollateralDescription = (): string => {
+      if (hasVehicleCollateral(registrationType) && hasGeneralCollateral(registrationType)) {
         return 'At least one form of collateral (vehicle or general)'
       }
-      if (mustHaveManufacturedHomeCollateral()) {
+      if (mustHaveManufacturedHomeCollateral(registrationType)) {
         return 'At least one manufactured home as vehicle collateral'
       }
-      if (hasGeneralCollateral()) {
+      if (hasGeneralCollateral(registrationType)) {
         return 'General collateral'
       }
-      if (hasVehicleCollateral()) {
+      if (hasVehicleCollateral(registrationType)) {
         return 'At least one vehicle as collateral'
       }
     }
@@ -372,40 +379,6 @@ export default defineComponent({
     const getVehicleDescription = (code: string): string => {
       const vehicle = VehicleTypes.find(obj => obj.value === code)
       return vehicle.text
-    }
-
-    const hasVehicleCollateral = (): boolean => {
-      const vhArray = [
-        APIRegistrationTypes.SECURITY_AGREEMENT,
-        APIRegistrationTypes.REPAIRERS_LIEN,
-        APIRegistrationTypes.MARRIAGE_MH,
-        APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
-        APIRegistrationTypes.SALE_OF_GOODS
-      ]
-      return vhArray.includes(registrationType)
-    }
-
-    const hasGeneralCollateral = (): boolean => {
-      const ghArray = [
-        APIRegistrationTypes.SECURITY_AGREEMENT,
-        APIRegistrationTypes.SALE_OF_GOODS,
-        APIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
-        APIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
-        APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN,
-        APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
-        APIRegistrationTypes.MISCELLANEOUS_OTHER
-      ]
-      return ghArray.includes(registrationType)
-    }
-
-    const mustHaveManufacturedHomeCollateral = (): boolean => {
-      const mhArray = [
-        APIRegistrationTypes.MARRIAGE_MH,
-        APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN
-      ]
-      return mhArray.includes(registrationType)
     }
 
     const initEdit = (index: number) => {
@@ -460,9 +433,10 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      if (hasGeneralCollateral() && (!collateral.generalCollateral)) {
+      if (hasGeneralCollateral(registrationType) && !collateral.generalCollateral) {
         if (registrationType === APIRegistrationTypes.MISCELLANEOUS_OTHER) {
-          localState.generalCollateral = 'All the Personal Property of the Debtor'
+          localState.generalCollateral =
+            'All the Personal Property of the Debtor'
         }
       }
     })
