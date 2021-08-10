@@ -107,6 +107,7 @@
                     errors.month.message ? errors.month.message : ''
                   "
                   @keyup="validateBirthdateIfAlreadyValidated"
+                  @blur="validateBirthdateIfAlreadyValidated"
                   persistent-hint
                   return-object
                 ></v-autocomplete>
