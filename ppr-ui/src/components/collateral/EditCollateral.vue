@@ -34,7 +34,7 @@
                   filled
                   label="Vehicle Type"
                   v-model="currentVehicle.type"
-                  id="txt-type"
+                  id="txt-type-drop"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "

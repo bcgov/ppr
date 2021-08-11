@@ -8,7 +8,8 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedGeneralCollateral1,
   mockedVehicleCollateral1,
-  mockedSelectSecurityAgreement
+  mockedSelectSecurityAgreement,
+  mockedMarriageMH
 } from './test-data'
 
 // Components
@@ -71,7 +72,7 @@ describe('Collateral add tests', () => {
   })
 
   it('adds a vehicle to the store', async () => {
-    wrapper.find('#txt-type').setValue('MV')
+    wrapper.find('#txt-type-drop').setValue('MV')
     await Vue.nextTick()
     wrapper.vm.$data.currentVehicle.type = 'MV'
     wrapper.find('#txt-serial').setValue('293847298374')
@@ -86,6 +87,30 @@ describe('Collateral add tests', () => {
     // store should have 1 item now
     expect(store.getters.getAddCollateral.vehicleCollateral.length).toBe(1)
   })
+})
+
+
+describe('Collateral tests for MH', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedMarriageMH)
+    wrapper = createComponent(-1, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with readonly type and manufactured home input', async () => {
+    expect(wrapper.findComponent(EditCollateral).exists()).toBe(true)
+    expect(wrapper.find('#txt-type').exists()).toBe(true)
+    // show read only text box
+    expect(wrapper.find('#txt-man').exists()).toBe(true)
+
+    // no drop down
+    expect(wrapper.find('#txt-type-drop').exists()).toBe(false)
+  })
+
 })
 
 describe('Collateral edit tests', () => {

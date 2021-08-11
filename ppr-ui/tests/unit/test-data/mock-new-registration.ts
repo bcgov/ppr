@@ -39,6 +39,14 @@ export const mockedSaleOfGoods: RegistrationTypeIF = {
   textLabel: ''
 }
 
+export const mockedMarriageMH: RegistrationTypeIF = {
+  divider: false,
+  selectDisabled: false,
+  registrationTypeUI: UIRegistrationTypes.MARRIAGE_MH,
+  registrationTypeAPI: APIRegistrationTypes.MARRIAGE_MH,
+  textLabel: ''
+}
+
 export const mockedError: ErrorIF = {
   statusCode: 500,
   message: 'mock error'
