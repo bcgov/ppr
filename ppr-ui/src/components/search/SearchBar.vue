@@ -63,6 +63,7 @@
                           :disabled="!selectedSearchType"
                           :error-messages="searchMessage ? searchMessage : ''"
                           filled
+                          id="search-bar-field"
                           :hint="searchHint"
                           :hide-details="hideDetails"
                           persistent-hint

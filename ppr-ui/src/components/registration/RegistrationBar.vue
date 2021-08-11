@@ -6,6 +6,7 @@
         <v-btn
           :class="$style['registration-bar-btn']"
           color="primary"
+          id="registration-bar-button"
           :error-messages="categoryMessage ? categoryMessage : ''"
           :disabled="selectDisabled"
           @click="newRegistration(registrationTypeValues.SECURITY_AGREEMENT)"

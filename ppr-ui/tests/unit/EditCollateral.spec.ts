@@ -22,9 +22,9 @@ const store = getVuexStore()
 // Events
 
 // Input field selectors / buttons
-const doneButtonSelector: string = '#done-btn'
-const cancelButtonSelector: string = '#cancel-btn'
-const removeButtonSelector: string = '#remove-btn'
+const doneButtonSelector: string = '#done-btn-collateral'
+const cancelButtonSelector: string = '#cancel-btn-collateral'
+const removeButtonSelector: string = '#remove-btn-collateral'
 
 /**
  * Creates and mounts a component, so that it can be tested.
