@@ -251,7 +251,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
@@ -315,10 +316,7 @@ export default defineComponent({
         feeInfoYears.feeAmount.toFixed(2) +
         ' per year)',
       showTrustIndenture: computed((): boolean => {
-        return (
-          registrationType ===
-            APIRegistrationTypes.SECURITY_AGREEMENT
-        )
+        return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
         return !lengthTrust.valid
@@ -351,9 +349,7 @@ export default defineComponent({
         return new Date().toISOString()
       }),
       lengthSummary: computed((): string => {
-        if (
-          registrationType === APIRegistrationTypes.REPAIRERS_LIEN
-        ) {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
         if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
@@ -416,12 +412,21 @@ export default defineComponent({
       return ipArray.includes(registrationType)
     }
 
+    onMounted(() => {
+      if (infinityPreselected()) {
+        lengthTrust.valid = true
+        lengthTrust.lifeInfinite = true
+        lengthTrust.lifeYears = null
+        setLengthTrust(lengthTrust)
+      }
+    })
+
     const setLifeInfinite = (val: string): void => {
       lengthTrust.lifeInfinite = String(val) === 'true'
       localState.lifeYearsDisabled = lengthTrust.lifeInfinite
       if (lengthTrust.lifeInfinite) {
         localState.lifeYearsEdit = ''
-        lengthTrust.lifeYears = 0
+        lengthTrust.lifeYears = null
         lengthTrust.valid = true
         lengthTrust.showInvalid = false
         feeSummary.quantity = feeInfoInfinite.quantityMin

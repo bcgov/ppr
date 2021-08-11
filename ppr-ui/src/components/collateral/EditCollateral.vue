@@ -18,7 +18,17 @@
             v-on:submit.prevent="addVehicle"
           >
             <v-row no-gutters>
-              <v-col>
+              <v-col v-if="mustHaveManufacturedHomeCollateral()">
+                <v-text-field
+                  filled
+                  id="txt-type"
+                  label="Vehicle Type"
+                  value="Manufactured Home (MH)"
+                  readonly
+                  persistent-hint
+                />
+              </v-col>
+              <v-col v-else>
                 <v-select
                   :items="vehicleTypes"
                   filled
@@ -205,6 +215,10 @@ export default defineComponent({
 
     onMounted(() => {
       getVehicle()
+      if (mustHaveManufacturedHomeCollateral()) {
+        // set the current vehicle type to motor home
+        currentVehicle.value.type = 'MH'
+      }
     })
 
     const onSubmitForm = async () => {
