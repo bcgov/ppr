@@ -16,11 +16,13 @@ import {
 } from '@/interfaces'
 
 export const mockedSelectSecurityAgreement: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.SECURITY_AGREEMENT,
   registrationTypeAPI: APIRegistrationTypes.SECURITY_AGREEMENT,
-  textLabel: ''
+  text: `${UIRegistrationTypes.SECURITY_AGREEMENT} (${APIRegistrationTypes.SECURITY_AGREEMENT})`
 }
 
 export const mockedRepairersLien: RegistrationTypeIF = {

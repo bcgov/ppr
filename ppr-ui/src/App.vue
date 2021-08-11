@@ -75,17 +75,13 @@ import { Tombstone } from '@/components/common'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import {
-  fetchError, loginError, paymentError, saveSearchError
-} from '@/resources'
-
-import { getKeycloakRoles, getPPRUserSettings, updateLdUser } from '@/utils'
+import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
+import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
 import {
-  ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, // eslint-disable-line
-  UserSettingsIF, BreadcrumbIF, RegistrationTypeIF // eslint-disable-line
-  } from '@/interfaces' // eslint-disable-line
-import { RouteNames } from './enums'
+  ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+} from '@/interfaces'
+import { AccountProductCodes, RouteNames } from './enums'
 
 @Component({
   components: {
@@ -108,6 +104,7 @@ export default class App extends Mixins(AuthMixin) {
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
+  @Action setAccountProductSubscribtion!: ActionBindingIF
   @Action setAccountInformation!: ActionBindingIF
   @Action setKeycloakRoles!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
@@ -252,7 +249,7 @@ export default class App extends Mixins(AuthMixin) {
       const keycloakRoles = getKeycloakRoles()
       this.setKeycloakRoles(keycloakRoles)
     } catch (error) {
-      console.log('Keycloak error =', error) // eslint-disable-line no-console
+      console.log('Keycloak error =', error)
       this.haveData = true
       this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
@@ -262,7 +259,7 @@ export default class App extends Mixins(AuthMixin) {
     try {
       await this.loadAuth()
     } catch (error) {
-      console.log('Auth error =', error) // eslint-disable-line no-console
+      console.log('Auth error =', error)
       this.haveData = true
       this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
@@ -272,9 +269,18 @@ export default class App extends Mixins(AuthMixin) {
     try {
       await this.loadUserInfo()
     } catch (error) {
-      console.log('User info error =', error) // eslint-disable-line no-console
+      console.log('User info error =', error)
       this.haveData = true
       this.handleError({ statusCode: StatusCodes.NOT_FOUND })
+      return
+    }
+
+    try {
+      await this.loadAccountProductSubscriptions()
+    } catch (error) {
+      console.log('Auth product subscription error =', error)
+      this.haveData = true
+      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
     }
 
@@ -284,7 +290,7 @@ export default class App extends Mixins(AuthMixin) {
         await this.updateLaunchDarkly()
       } catch (error) {
         // just log the error -- no need to halt app
-        console.log('Launch Darkly update error =', error) // eslint-disable-line no-console
+        console.log('Launch Darkly update error =', error)
       }
     }
 
@@ -299,7 +305,7 @@ export default class App extends Mixins(AuthMixin) {
     if (this.tokenService || this.isJestRunning) return
 
     try {
-      console.info('Starting token refresh service...') // eslint-disable-line no-console
+      console.info('Starting token refresh service...')
       await KeycloakService.initializeToken()
       this.tokenService = true
     } catch (e) {
@@ -361,6 +367,12 @@ export default class App extends Mixins(AuthMixin) {
       const accountInfo = JSON.parse(currentAccount)
       this.setAccountInformation(accountInfo)
     }
+  }
+
+  /** Gets product subscription autorizations (for now just RPPR) and stores it. */
+  private async loadAccountProductSubscriptions (): Promise<any> {
+    const rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
+    this.setAccountProductSubscribtion(rpprSubscription)
   }
 
   /** Updates Launch Darkly with user info. */

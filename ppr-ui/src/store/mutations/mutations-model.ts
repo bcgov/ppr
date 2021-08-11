@@ -11,8 +11,15 @@ import {
   SearchTypeIF,
   StateIF,
   UserInfoIF,
-  UserSettingsIF
+  UserSettingsIF,
+  AccountProductSubscriptionIF
 } from '@/interfaces'
+
+export const mutateAccountProductSubscribtion = (
+  state: StateIF, productSubscriptions: AccountProductSubscriptionIF
+) => {
+  state.stateModel.accountProductSubscriptions = productSubscriptions
+}
 
 export const mutateAccountInformation = (state: StateIF, accountInformation: AccountInformationIF) => {
   state.stateModel.accountInformation = accountInformation
@@ -82,6 +89,10 @@ export const mutateNewRegistration = (state: StateIF) => {
 
 export const mutateRegistrationType = (state: StateIF, registrationType: RegistrationTypeIF) => {
   state.stateModel.registrationType = registrationType
+}
+
+export const mutateRegistrationTypeOtherDesc = (state: StateIF, description: string) => {
+  state.stateModel.registrationTypeOtherDesc = description
 }
 
 export const mutateSearchedType = (state: StateIF, searchedType: SearchTypeIF) => {

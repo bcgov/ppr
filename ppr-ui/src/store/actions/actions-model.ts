@@ -10,12 +10,20 @@ import {
   SearchResponseIF,
   SearchTypeIF,
   UserInfoIF,
-  UserSettingsIF
+  UserSettingsIF,
+  AccountProductSubscriptionIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 
 export const resetNewRegistration: ActionIF = ({ commit }): void => {
   commit('mutateNewRegistration')
+}
+
+export const setAccountProductSubscribtion: ActionIF = (
+  { commit },
+  productSubscriptions: AccountProductSubscriptionIF
+): void => {
+  commit('mutateAccountProductSubscribtion', productSubscriptions)
 }
 
 export const setAccountInformation: ActionIF = ({ commit }, account: AccountInformationIF): void => {
@@ -60,6 +68,10 @@ export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF)
 
 export const setRegistrationType: ActionIF = ({ commit }, registrationType: RegistrationTypeIF): void => {
   commit('mutateRegistrationType', registrationType)
+}
+
+export const setRegistrationTypeOtherDesc: ActionIF = ({ commit }, description: string): void => {
+  commit('mutateRegistrationTypeOtherDesc', description)
 }
 
 export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<SearchResponseIF>): void => {

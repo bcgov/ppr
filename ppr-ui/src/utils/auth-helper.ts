@@ -4,8 +4,9 @@ import { StatusCodes } from 'http-status-codes'
 
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
-// Interfaces
-import { AddressIF, PartyIF } from '@/interfaces'
+// Interfaces, Enums
+import { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
+import { AccountProductSubscriptionIF, AddressIF, PartyIF } from '@/interfaces'
 
 /** Gets Keycloak JWT and parses it. */
 function getJWT (): any {
@@ -77,6 +78,38 @@ export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
     ).catch(
       error => {
         throw new Error('Auth API error getting Registering Party: status code = ' +
+                        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+      }
+    )
+}
+
+// get product subscription authorizations
+export async function getProductSubscription (
+  productCode: AccountProductCodes.RPPR
+): Promise<AccountProductSubscriptionIF> {
+  const url = sessionStorage.getItem('AUTH_API_URL')
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountInfo = JSON.parse(currentAccount)
+  const accountId = accountInfo.id
+
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios.get(`accounts/${accountId}/products/${productCode}/authorizations`, config)
+    .then(
+      response => {
+        const data = response?.data as { membership: AccountProductMemberships, roles: Array<AccountProductRoles> }
+        if (!data) {
+          throw new Error('Unable to obtain Account Product Subscription Information.')
+        }
+        return {
+          [productCode]: {
+            membership: data.membership,
+            roles: data.roles
+          }
+        }
+      }
+    ).catch(
+      error => {
+        throw new Error('Auth API error getting Account Product Subscription: status code = ' +
                         error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
       }
     )
