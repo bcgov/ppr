@@ -17,9 +17,9 @@ const store = getVuexStore()
 // Events
 
 // Input field selectors / buttons
-const doneButtonSelector: string = '#done-btn'
-const cancelButtonSelector: string = '#cancel-btn'
-const removeButtonSelector: string = '#remove-btn'
+const doneButtonSelector: string = '#done-btn-debtor'
+const cancelButtonSelector: string = '#cancel-btn-debtor'
+const removeButtonSelector: string = '#remove-btn-debtor'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -55,7 +55,7 @@ describe('Debtor validation tests - business', () => {
 
   it('validates blank inputs', async () => {
     // no input added
-    wrapper.find('#txt-name').setValue('')
+    wrapper.find('#txt-name-debtor').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
@@ -79,8 +79,8 @@ describe('Debtor validation tests - individual', () => {
 
   it('validates blank inputs', async () => {
     // no input added
-    wrapper.find('#txt-first').setValue('')
-    wrapper.find('#txt-last').setValue('')
+    wrapper.find('#txt-first-debtor').setValue('')
+    wrapper.find('#txt-last-debtor').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
@@ -93,8 +93,8 @@ describe('Debtor validation tests - individual', () => {
 
   it('validates the birthday', async () => {
     // no input added
-    wrapper.find('#txt-first').setValue('Joe')
-    wrapper.find('#txt-last').setValue('Louis')
+    wrapper.find('#txt-first-debtor').setValue('Joe')
+    wrapper.find('#txt-last-debtor').setValue('Louis')
     wrapper.find('#txt-month').setValue('13')
     wrapper.find('#txt-year').setValue('1700')
     wrapper.find('#txt-day').setValue('99')
