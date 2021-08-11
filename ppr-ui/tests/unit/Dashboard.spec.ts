@@ -21,6 +21,9 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
+// Events
+const selectedType = 'selected-registration-type'
+
 // selectors
 const searchHeader: string = '#search-header'
 const historyHeader: string = '#search-history-header'
@@ -84,7 +87,7 @@ describe('Dashboard component', () => {
     expect(wrapper.vm.$route.name).toBe('search')
   })
   it('routes to new registration after selecting registration type', async () => {
-    wrapper.vm.setRegistrationType(mockedSelectSecurityAgreement)
+    wrapper.findComponent(RegistrationBar).vm.$emit(selectedType, mockedSelectSecurityAgreement)
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
   })
