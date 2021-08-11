@@ -95,7 +95,7 @@ describe('Collateral store tests', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST INDIVIDUAL DEBTOR')
-    expect(item1.querySelectorAll('td')[2].textContent).toContain('1234 Fort St.')
+    expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
     expect(item1.querySelectorAll('td')[3].textContent).toContain('June 16, 1990')
 
   })
