@@ -16,7 +16,7 @@
           </v-row>
           <v-row no-gutters class="pt-5">
             <v-col class="text-md-center ml-8">
-              <h1 :class="$style['dialogTitle']">2 Similar Secured Parties Found</h1>
+              <h1 :class="$style['dialogTitle']">{{ totalParties }} Similar Secured Parties Found</h1>
             </v-col>
           </v-row>
         </v-col>
@@ -114,8 +114,9 @@
           </v-row>
         </v-container>
       </div>
-      <v-card-actions class="pt-6 pb-8" style="display:block">
+      <v-card-actions class="pt-6 pb-8">
         <v-btn
+          :class="$style['dialogButton']"
           id="dialog-cancel-button"
           color="primary"
           outlined
@@ -132,7 +133,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  computed
 } from '@vue/composition-api'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
@@ -155,7 +157,10 @@ export default defineComponent({
       results: props.defaultResults,
       party: props.defaultParty,
       dialog: props.defaultDialog,
-      showSelected: true
+      showSelected: true,
+      totalParties: computed((): number => {
+        return props.defaultResults.length
+      })
     })
 
     const countryProvincesHelpers = useCountriesProvinces()
@@ -238,6 +243,7 @@ export default defineComponent({
   padding-bottom: 10px;
   margin-right: 10px;
   margin-left: 10px;
+  border: 1px solid white;
 }
 
 .companyRow:hover {
@@ -291,5 +297,9 @@ export default defineComponent({
 
 .dialogTitle {
   font-size: 24px;
+}
+
+.dialogButton {
+  margin-left: 330px;
 }
 </style>
