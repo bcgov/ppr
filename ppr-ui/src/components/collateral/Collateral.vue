@@ -434,7 +434,7 @@ export default defineComponent({
 
     onMounted(() => {
       if (hasGeneralCollateral() && !collateral.generalCollateral) {
-        if (registrationType === APIRegistrationTypes.MISCELLANEOUS_OTHER) {
+        if (registrationType === APIRegistrationTypes.OTHER) {
           localState.generalCollateral =
             'All the Personal Property of the Debtor'
         }

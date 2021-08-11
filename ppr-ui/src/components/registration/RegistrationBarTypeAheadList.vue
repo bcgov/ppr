@@ -41,7 +41,7 @@
         </template>
         <template v-else>
           <v-list-item-content>
-            <span :id="'item-' + item.registrationTypeAPI" class='registration-list-item' v-html="`${parent.genFilteredText(item.text)}`"></span>
+            <span class='registration-list-item' v-html="`${parent.genFilteredText(item.text)}`"></span>
           </v-list-item-content>
         </template>
       </template>

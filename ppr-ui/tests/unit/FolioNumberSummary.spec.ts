@@ -40,7 +40,7 @@ describe('Folio number on the summarty page', () => {
 
   it('renders the view with text box', () => {
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
-    expect(wrapper.find("#txt-folio").exists()).toBe(true)
+    expect(wrapper.find('#txt-folio').exists()).toBe(true)
   })
 
   it('renders the folio data from the store', async () => {

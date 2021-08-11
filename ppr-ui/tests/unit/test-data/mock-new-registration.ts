@@ -26,19 +26,23 @@ export const mockedSelectSecurityAgreement: RegistrationTypeIF = {
 }
 
 export const mockedRepairersLien: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.REPAIRERS_LIEN,
   registrationTypeAPI: APIRegistrationTypes.REPAIRERS_LIEN,
-  textLabel: ''
+  text: ''
 }
 
 export const mockedSaleOfGoods: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.SALE_OF_GOODS,
   registrationTypeAPI: APIRegistrationTypes.SALE_OF_GOODS,
-  textLabel: ''
+  text: ''
 }
 
 export const mockedMarriageMH: RegistrationTypeIF = {
@@ -237,4 +241,3 @@ export const mockedPartyCodeSearchResponse: Array<SearchPartyIF> = [{
   code: '456',
   address: mockedAddress1
 }]
-

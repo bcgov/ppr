@@ -104,9 +104,9 @@ export default defineComponent({
     const hasNoCharge = (): boolean => {
       const hfArray = [
         APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
-        APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
-        APIRegistrationTypes.MISCELLANEOUS_OTHER
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN
+        // APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
+        // APIRegistrationTypes.MISCELLANEOUS_OTHER
       ]
       return hfArray.includes(registrationType)
     }

@@ -7,8 +7,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
 // Local
-import { RegistrationBar } from '@/components/registration'
-import { RegistrationBarTypeAheadList } from '@/components/registration'
+import { RegistrationBar, RegistrationBarTypeAheadList } from '@/components/registration'
 import {
   RegistrationTypesMiscellaneousCC,
   RegistrationTypesStandard
@@ -163,7 +162,8 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.find(registrationBar).exists()).toBe(true)
     // verify edit role set
-    expect(wrapper.vm.$store.state.stateModel.accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual(['edit'])
+    const accountProductSubscriptions = wrapper.vm.$store.state.stateModel.accountProductSubscriptions
+    expect(accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual(['edit'])
     // check autocomplete displayed
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Start a new Registration')

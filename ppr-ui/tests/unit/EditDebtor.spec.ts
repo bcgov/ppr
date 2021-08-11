@@ -85,11 +85,11 @@ describe('Debtor add individual tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
-    //no validation messages
+    // no validation messages
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Street address, PO box, rural route, or general delivery address')
-  
+
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
     expect(store.getters.getAddSecuredPartiesAndDebtors.debtors.length).toBe(1)
@@ -125,7 +125,7 @@ describe('Debtor add business tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
-    //no validation messages
+    // no validation messages
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
 

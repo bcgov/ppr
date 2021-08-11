@@ -43,7 +43,7 @@ const registrationTypeAhead = '#registrationTypeAhead'
  *
  * @returns the value of the last named event for the wrapper.
  */
- function getLastEvent (wrapper: Wrapper<any>, name: string): any {
+function getLastEvent (wrapper: Wrapper<any>, name: string): any {
   const eventsList: Array<any> = wrapper.emitted(name)
   if (!eventsList) {
     return null
@@ -93,7 +93,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
   })
 
   it('renders gives dialog when other is selected', async () => {
-    const otherRegistration = miscCrownChargeRegistrations[miscCrownChargeRegistrations.length-1]
+    const otherRegistration = miscCrownChargeRegistrations[miscCrownChargeRegistrations.length - 1]
     expect(otherRegistration.registrationTypeUI).toBe(UIRegistrationTypes.OTHER)
     wrapper.vm.$data.selected = otherRegistration
     await flushPromises()

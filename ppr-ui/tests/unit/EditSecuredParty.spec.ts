@@ -139,7 +139,7 @@ describe('Secured Party add business tests', () => {
     await Vue.nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
-    
+
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
     expect(

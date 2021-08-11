@@ -409,8 +409,8 @@ export default defineComponent({
       const ipArray = [
         APIRegistrationTypes.MARRIAGE_MH,
         APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
-        APIRegistrationTypes.MISCELLANEOUS_REGISTRATION
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN
+        // APIRegistrationTypes.MISCELLANEOUS_REGISTRATION
       ]
       return ipArray.includes(registrationType)
     }
