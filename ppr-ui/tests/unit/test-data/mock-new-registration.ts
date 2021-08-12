@@ -46,11 +46,13 @@ export const mockedSaleOfGoods: RegistrationTypeIF = {
 }
 
 export const mockedMarriageMH: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.MARRIAGE_MH,
   registrationTypeAPI: APIRegistrationTypes.MARRIAGE_MH,
-  textLabel: ''
+  text: ''
 }
 
 export const mockedError: ErrorIF = {
