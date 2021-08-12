@@ -19,9 +19,9 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Input field selectors / buttons
-const doneButtonSelector: string = '#done-btn'
-const cancelButtonSelector: string = '#cancel-btn'
-const removeButtonSelector: string = '#remove-btn'
+const doneButtonSelector: string = '#done-btn-party'
+const cancelButtonSelector: string = '#cancel-btn-party'
+const removeButtonSelector: string = '#remove-btn-party'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -74,9 +74,9 @@ describe('Secured Party add individual tests', () => {
     const radioIsIndividual = radioInput.at(0)
 
     await radioIsIndividual.trigger('click')
-    wrapper.find('#txt-first').setValue('JOE')
-    wrapper.find('#txt-last').setValue('SCHMOE')
-    wrapper.find('#txt-email').setValue('joe@apples.com')
+    wrapper.find('#txt-first-party').setValue('JOE')
+    wrapper.find('#txt-last-party').setValue('SCHMOE')
+    wrapper.find('#txt-email-party').setValue('joe@apples.com')
     // for address
     wrapper.vm.$data.currentSecuredParty.address.street = 'street'
     wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'
@@ -129,7 +129,7 @@ describe('Secured Party add business tests', () => {
 
     await radioIsBusiness.trigger('click')
     await Vue.nextTick()
-    wrapper.find('#txt-name').setValue('TONYS TOOLS')
+    wrapper.find('#txt-name-party').setValue('TONYS TOOLS')
     // for address
     wrapper.vm.$data.currentSecuredParty.address.street = 'street'
     wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'

@@ -181,6 +181,7 @@
               :hide-details="false"
               label=""
               value="false"
+              id="length-in-years"
               @click="setLifeInfinite('false')"
             >
             </v-radio>
@@ -189,6 +190,7 @@
               :hide-details="false"
               label=""
               value="true"
+              id="length-infinite"
               @click="setLifeInfinite('true')"
             >
             </v-radio>
@@ -223,6 +225,7 @@
             :hide-details="false"
             :hint="trustIndentureHint"
             label=""
+            id="trust-indenture-checkbox"
             v-model="trustIndenture"
           >
           </v-checkbox>

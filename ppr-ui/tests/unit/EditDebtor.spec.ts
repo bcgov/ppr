@@ -19,9 +19,9 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Input field selectors / buttons
-const doneButtonSelector: string = '#done-btn'
-const cancelButtonSelector: string = '#cancel-btn'
-const removeButtonSelector: string = '#remove-btn'
+const doneButtonSelector: string = '#done-btn-debtor'
+const cancelButtonSelector: string = '#cancel-btn-debtor'
+const removeButtonSelector: string = '#remove-btn-debtor'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -68,8 +68,8 @@ describe('Debtor add individual tests', () => {
   })
 
   it('adds a debtor to the store', async () => {
-    wrapper.find('#txt-first').setValue('JOE')
-    wrapper.find('#txt-last').setValue('SCHMOE')
+    wrapper.find('#txt-first-debtor').setValue('JOE')
+    wrapper.find('#txt-last-debtor').setValue('SCHMOE')
     await wrapper.find('#txt-month').setValue(6)
     wrapper.vm.$data.month = { value: 6, text: 'June' }
     await Vue.nextTick()
@@ -112,7 +112,7 @@ describe('Debtor add business tests', () => {
   })
 
   it('adds a debtor to the store', async () => {
-    wrapper.find('#txt-name').setValue('TONYS TOOLS')
+    wrapper.find('#txt-name-debtor').setValue('TONYS TOOLS')
     // for the autocomplete
     wrapper.vm.$data.searchValue = 'TONYS TOOLS'
     // for address

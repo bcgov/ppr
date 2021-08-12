@@ -79,10 +79,10 @@
                 </div>
                 {{ getName(row.item) }}
               </td>
-              <td>{{ row.item.emailAddress }}</td>
               <td>
                 <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
               </td>
+              <td>{{ row.item.emailAddress }}</td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
               <td class="actions-cell px-0 py-2">
