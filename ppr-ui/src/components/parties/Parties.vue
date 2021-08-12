@@ -47,7 +47,7 @@
               <v-icon class="pl-1 mt-n1" color="primary" v-on="on">mdi-information-outline</v-icon>
             </template>
             The Registering Party is based on your account information and cannot be
-            changed here. This infromation can be changed by updating your BC Registries
+            changed here. This information can be changed by updating your BC Registries
             account information.
           </v-tooltip>
           </h3>
