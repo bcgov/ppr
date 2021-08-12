@@ -51,12 +51,12 @@ describe('Secured Party validation tests - business', () => {
   })
 
   it('validates blank inputs', async () => {
-    //click business
+    // click business
     const radios = wrapper.findAll('input[type=radio]')
     expect(radios.length).toBe(2)
     radios.at(1).trigger('click')
     await Vue.nextTick()
-    
+
     // no input added
     wrapper.find('#txt-name-party').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
@@ -66,8 +66,6 @@ describe('Secured Party validation tests - business', () => {
     expect(messages.at(0).text()).toBe('Please enter a business name')
     expect(messages.at(1).text()).toBe('This field is required')
   })
-
-  
 })
 
 describe('Secured Party validation tests - individual', () => {
@@ -86,7 +84,7 @@ describe('Secured Party validation tests - individual', () => {
     expect(radios.length).toBe(2)
     radios.at(0).trigger('click')
     await Vue.nextTick()
-    
+
     // no input added
     wrapper.find('#txt-first-party').setValue('')
     wrapper.find('#txt-last-party').setValue('')
@@ -117,6 +115,4 @@ describe('Secured Party validation tests - individual', () => {
     expect(messages.at(0).text()).toBe('Please enter a valid email address.')
     expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
   })
-  
 })
-

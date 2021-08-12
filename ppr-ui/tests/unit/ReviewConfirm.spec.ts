@@ -12,7 +12,6 @@ import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 
-
 // Other
 import mockRouter from './MockRouter'
 import { mockedNewRegStep1, mockedSelectSecurityAgreement } from './test-data'

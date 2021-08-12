@@ -76,7 +76,7 @@ describe('App component', () => {
     wrapper.destroy()
   })
 
-  it('renders the sub-components properly', () => {
+  it('renders the sub-components properly', async () => {
     expect(wrapper.findComponent(App).exists()).toBe(true)
     expect(wrapper.findComponent(SbcHeader).exists()).toBe(true)
     expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)

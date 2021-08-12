@@ -63,8 +63,6 @@ describe('Debtor validation tests - business', () => {
     expect(messages.at(0).text()).toBe('Please enter a business name')
     expect(messages.at(1).text()).toBe('This field is required')
   })
-
-  
 })
 
 describe('Debtor validation tests - individual', () => {
@@ -107,7 +105,4 @@ describe('Debtor validation tests - individual', () => {
     expect(messages.at(2).text()).toBe('Please enter a valid year')
     expect(messages.at(3).text()).toBe('This field is required')
   })
-
-  
 })
-

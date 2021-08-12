@@ -1,3 +1,4 @@
+export * from './account-interfaces'
 export * from './breadcrumb-interface'
 export * from './data-table-interfaces'
 export * from './dialog-inerfaces'

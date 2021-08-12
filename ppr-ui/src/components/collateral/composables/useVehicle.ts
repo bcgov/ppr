@@ -91,9 +91,9 @@ export const useVehicle = (props, context) => {
       APIRegistrationTypes.SALE_OF_GOODS,
       APIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
       APIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
-      APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN,
-      APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
-      APIRegistrationTypes.MISCELLANEOUS_OTHER
+      APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN
+      // APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
+      // APIRegistrationTypes.MISCELLANEOUS_OTHER
     ]
     return ghArray.includes(registrationType)
   }

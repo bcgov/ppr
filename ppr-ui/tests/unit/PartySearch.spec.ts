@@ -123,4 +123,5 @@ describe('Secured Party search autocomplete tests', () => {
     expect(
       store.getters.getAddSecuredPartiesAndDebtors.securedParties[0].businessName
     ).toBe('TONY SCOTT REVENUE ADMINISTRATION BRANCH')
-  })})
+  })
+})

@@ -43,7 +43,17 @@ export const selectionConfirmaionDialog = {
   cancelText: 'Change Selected Registrations',
   title: 'Confirm Selections',
   text: 'registrations will be included in your PDF search results report ' +
-        'along with an overview of the search results. Click the <i>Change ' +
-        'Selected Registrations</i> button if you would like to edit your ' +
-        'selection before returning to the dashboard.'
+    'along with an overview of the search results. Click the <i>Change ' +
+    'Selected Registrations</i> button if you would like to edit your ' +
+    'selection before returning to the dashboard.'
+}
+
+// other registration dialog
+export const registrationOtherDialog = {
+  acceptText: 'Start Registration',
+  cancelText: 'Cancel',
+  label: 'Name of Statute',
+  title: 'Other Crown Charge Registration',
+  text: 'If you need to register a Security Interest under a statute not listed' +
+    'enter the name of the statute below.'
 }

@@ -37,7 +37,7 @@
       <v-col align-self="end" cols="1" class="pl-3"/>
     </v-row>
     <v-row no-gutters class="pt-1">
-      <v-col cols="3">
+      <v-col class="ml-n6 pl-6" cols="4">
         <v-select :id="$style['search-type-select']"
                   class="search-bar-type-select"
                   :error-messages="categoryMessage ? categoryMessage : ''"
@@ -50,7 +50,7 @@
                   v-model="selectedSearchType">
         </v-select>
       </v-col>
-      <v-col v-if="!isIndividualDebtor" cols="8" class="pl-3">
+      <v-col v-if="!isIndividualDebtor" cols="7" class="pl-3">
         <v-tooltip content-class="bottom-tooltip"
                    bottom
                    :open-on-hover="false"

@@ -1,4 +1,5 @@
 export enum APIRegistrationTypes {
+    // standard
     SECURITY_AGREEMENT = 'SA',
     REPAIRERS_LIEN = 'RL',
     MARRIAGE_MH = 'FR',
@@ -8,11 +9,43 @@ export enum APIRegistrationTypes {
     FORESTRY_CONTRACTOR_LIEN = 'FL',
     FORESTRY_CONTRACTOR_CHARGE = 'FA',
     FORESTRY_SUBCONTRACTOR_LIEN = 'FS',
-    MISCELLANEOUS_REGISTRATION = 'MR',
-    MISCELLANEOUS_OTHER = 'OT'
+    // miscelaneous registration cc
+    CARBON_TAX = 'CT',
+    EXCISE_TAX = 'ET',
+    FOREST = 'FO',
+    INCOME_TAX = 'IT',
+    INSURANCE_PREMIUM_TAX = 'IP',
+    LOGGING_TAX = 'LO',
+    MINERAL_LAND_TAX = 'MD',
+    MOTOR_FUEL_TAX = 'FT',
+    PETROLEUM_NATURAL_GAS_TAX = 'DP',
+    PROPERTY_TRANSFER_TAX = 'PT',
+    PROVINCIAL_SALES_TAX = 'PS',
+    RURAL_PROPERTY_TAX = 'RA',
+    SCHOOL_ACT = 'SC',
+    OTHER = 'OT',
+    // miscelaneous registration other
+    LIEN_UNPAID_WAGES = 'WL',
+    HERITAGE_CONSERVATION_NOTICE = 'HN',
+    MANUFACTURED_HOME_NOTICE = 'MN',
+    MAINTENANCE_LIEN = 'ML',
+    PROCEEDS_CRIME_NOTICE = 'PN'
 }
 
+// Will need to add these later for existing registrations (no longer able to create new ones though)
+// MR - MISCELLANEOUS REGULATIONS ACT
+// CC - CROWN CHARGE FILED PURSUANT TO CORPORATION CAPITAL TAX
+// DP - CROWN CHARGE FILED PURSUANT TO CONSUMPTION, TRANSITION TAX
+// HR - CROWN CHARGE FILED PURSUANT TO HOTEL ROOM TAX
+// SS - CROWN CHARGE FILED PURSUANT TO SOCIAL SERVICE TAX
+// TA - SECURITY AGREEMENT TRANSITION FINANCING STATEMENT
+// TF - PPSA TRANSITION FINANCING STATEMENT
+// TG - SALES OF GOODS TRANSITION FINANCING STATEMENT
+// TL - TAX LIEN UNDER SOCIAL SERVICE OR HOTEL ROOM TAX ACTS
+// TM - M.H. TRANSITION FINANCING STATEMENT
+
 export enum UIRegistrationTypes {
+    // standard
     SECURITY_AGREEMENT = 'Security Agreement',
     REPAIRERS_LIEN = 'Repairers Lien',
     MARRIAGE_MH = 'Marriage / Separation Agreement affecting Manufactured Home under Family Law Act',
@@ -22,8 +55,27 @@ export enum UIRegistrationTypes {
     FORESTRY_CONTRACTOR_LIEN = 'Forestry - Contractor Lien',
     FORESTRY_CONTRACTOR_CHARGE = 'Forestry - Contractor Charge',
     FORESTRY_SUBCONTRACTOR_LIEN = 'Forestry - Sub-contractor Charge',
-    MISCELLANEOUS_REGISTRATION = 'Miscellaneous Registration Act - Crown Charge Registration',
-    MISCELLANEOUS_OTHER = 'Miscellaneous Registration Act - Others'
+    // miscelaneous registration cc
+    CARBON_TAX = 'Carbon Tax Act',
+    EXCISE_TAX = 'Excise Tax Act',
+    FOREST = 'Forest Act',
+    INCOME_TAX = 'Income Tax Act',
+    INSURANCE_PREMIUM_TAX = 'Insurance Premium Tax Act',
+    LOGGING_TAX = 'Logging Tax Act',
+    MINERAL_LAND_TAX = 'Mineral Land Tax Act',
+    MOTOR_FUEL_TAX = 'Motor Fuel Tax Act',
+    PROPERTY_TRANSFER_TAX = 'Property Transfer Tax Act',
+    PETROLEUM_NATURAL_GAS_TAX = 'Petroleum and Natural Gas Act',
+    PROVINCIAL_SALES_TAX = 'Provincial Sales Tax Act',
+    RURAL_PROPERTY_TAX = 'Rural Property Tax Act',
+    SCHOOL_ACT = 'School Act',
+    OTHER = 'Other...',
+    // miscelaneous registration other
+    LIEN_UNPAID_WAGES = 'Lien for Unpaid Wages',
+    HERITAGE_CONSERVATION_NOTICE = 'Heritage Conservation Notice',
+    MANUFACTURED_HOME_NOTICE = 'Manufactured Home Notice',
+    MAINTENANCE_LIEN = 'Maintenance Lien',
+    PROCEEDS_CRIME_NOTICE = 'Proceeds of Crime Notice'
 }
 
 export enum StatementTypes {

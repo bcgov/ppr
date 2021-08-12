@@ -20,7 +20,6 @@ import { DraftIF, RegistrationSummaryIF } from '@/interfaces'
 import { axios as pprAxios } from '@/utils/axios-ppr'
 import { UIRegistrationTypes } from '@/enums'
 
-
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
@@ -58,21 +57,21 @@ describe('Test registration table with results', () => {
         })
       )
     )
-    localVue = require('vue');
-    localVue.use(Vuetify);
+    localVue = require('vue')
+    localVue.use(Vuetify)
     wrapper = createComponent(localVue)
   })
 
   afterEach(() => {
     sandbox.restore()
     wrapper.destroy()
-    localVue = null;
+    localVue = null
   })
 
   it('renders and displays correct registration elements', async () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // the api is going to be called twice, once for drafts and once for registrations
-    // the tests can't tell the difference, so the same one is called twice 
+    // the tests can't tell the difference, so the same one is called twice
     await Vue.nextTick()
     await Vue.nextTick()
     expect(wrapper.vm.tableData.length).toBe(2)
@@ -89,10 +88,8 @@ describe('Test registration table with results', () => {
     expect(rows.at(2).text()).toContain(mockedRegistration1.registeringParty)
     expect(rows.at(2).text()).toContain(mockedRegistration1.securedParties)
     expect(rows.at(2).text()).toContain(mockedRegistration1.registrationNumber)
-
   })
 })
-
 
 describe('Test draft table with results', () => {
   let wrapper: Wrapper<any>
@@ -111,21 +108,21 @@ describe('Test draft table with results', () => {
         })
       )
     )
-    localVue = require('vue');
-    localVue.use(Vuetify);
+    localVue = require('vue')
+    localVue.use(Vuetify)
     wrapper = createComponent(localVue)
   })
 
   afterEach(() => {
     sandbox.restore()
     wrapper.destroy()
-    localVue = null;
+    localVue = null
   })
 
   it('renders and displays correct draft elements', async () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // the api is going to be called twice, once for drafts and once for registrations
-    // the tests can't tell the difference, so the same one is called twice 
+    // the tests can't tell the difference, so the same one is called twice
     await Vue.nextTick()
     await Vue.nextTick()
     expect(wrapper.vm.tableData.length).toBe(2)

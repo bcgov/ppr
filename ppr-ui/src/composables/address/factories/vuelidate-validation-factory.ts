@@ -1,4 +1,4 @@
-/* FUTURE: 
+/* FUTURE:
  * Delete this if we decide not to move forward with vuelidate
  * Fix it to work otherwise
  */
@@ -6,11 +6,11 @@ import { computed, Ref, reactive } from '@vue/composition-api'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
-const useVuelidate = require("@vuelidate/core").default;
+const useVuelidate = require('@vuelidate/core').default
 
 export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) {
   const validations = reactive({ addressLocal: schema.value })
-  const $v = useVuelidate(validations, reactive({ addressLocal: address.value } ))
+  const $v = useVuelidate(validations, reactive({ addressLocal: address.value }))
 
   /**
    * Misc Vuetify rules.
@@ -34,11 +34,11 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
     },
     // FUTURE: generalize this rule to take a validation parameter (ie, 'CA')
     isCanadaRule: (prop: string, key: string): boolean | string => {
-      return Boolean($v.value[prop] && !$v.value[prop][key].isCanada.$invalid) || `Address must be in Canada`
+      return Boolean($v.value[prop] && !$v.value[prop][key].isCanada.$invalid) || 'Address must be in Canada'
     },
     // FUTURE: generalize this rule to take a validation parameter (ie, 'BC')
     isBCRule: (prop: string, key: string): boolean | string => {
-      return Boolean($v.value[prop] && !$v.value[prop][key].isBC.$invalid) || `Address must be in BC`
+      return Boolean($v.value[prop] && !$v.value[prop][key].isBC.$invalid) || 'Address must be in BC'
     }
   }
 
@@ -47,8 +47,8 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
    * @param model The name of the model we are validating.
    * @returns A Vuetify rules object.
    */
-  const createVuetifyRulesObject = (model: string): { [attr: string]: Array<Function> } =>  {
-    let obj = {
+  const createVuetifyRulesObject = (model: string): { [attr: string]: Array<Function> } => {
+    const obj = {
       street: [],
       streetAdditional: [],
       city: [],
@@ -57,7 +57,7 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
       country: [],
       deliveryInstructions: []
     }
-  
+
     // ensure Vuelidate state object is initialized
     if ($v && $v.value[model]) {
       // iterate over Vuelidate object properties
@@ -83,7 +83,7 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
             })
         })
     }
-  
+
     // sample return object
     // street: [
     //   () => this.requiredRule('addressLocal', 'street'),
@@ -91,7 +91,7 @@ export function useValidations (schema: Ref<SchemaIF>, address: Ref<AddressIF>) 
     //   () => this.maxLengthRule('addressLocal', 'street')
     // ],
     // ...
-  
+
     return obj
   }
 

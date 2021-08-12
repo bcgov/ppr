@@ -7,6 +7,7 @@ export const stateModel: StateModelIF = {
     label: '',
     type: ''
   },
+  accountProductSubscriptions: null,
   authorization: {
     keycloakRoles: [],
     authRoles: []
@@ -26,6 +27,7 @@ export const stateModel: StateModelIF = {
     feeCode: ''
   },
   registrationType: null,
+  registrationTypeOtherDesc: null,
   searchHistory: null,
   searchResults: null,
   searchedType: null,

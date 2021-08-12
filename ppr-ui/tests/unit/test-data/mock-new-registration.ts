@@ -16,35 +16,43 @@ import {
 } from '@/interfaces'
 
 export const mockedSelectSecurityAgreement: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.SECURITY_AGREEMENT,
   registrationTypeAPI: APIRegistrationTypes.SECURITY_AGREEMENT,
-  textLabel: ''
+  text: `${UIRegistrationTypes.SECURITY_AGREEMENT} (${APIRegistrationTypes.SECURITY_AGREEMENT})`
 }
 
 export const mockedRepairersLien: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.REPAIRERS_LIEN,
   registrationTypeAPI: APIRegistrationTypes.REPAIRERS_LIEN,
-  textLabel: ''
+  text: ''
 }
 
 export const mockedSaleOfGoods: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.SALE_OF_GOODS,
   registrationTypeAPI: APIRegistrationTypes.SALE_OF_GOODS,
-  textLabel: ''
+  text: ''
 }
 
 export const mockedMarriageMH: RegistrationTypeIF = {
+  class: 'registration-list-item',
   divider: false,
-  selectDisabled: false,
+  disabled: false,
+  group: 3,
   registrationTypeUI: UIRegistrationTypes.MARRIAGE_MH,
   registrationTypeAPI: APIRegistrationTypes.MARRIAGE_MH,
-  textLabel: ''
+  text: ''
 }
 
 export const mockedError: ErrorIF = {
@@ -235,4 +243,3 @@ export const mockedPartyCodeSearchResponse: Array<SearchPartyIF> = [{
   code: '456',
   address: mockedAddress1
 }]
-

@@ -128,7 +128,7 @@ export default class LengthTrust extends Vue {
       case APIRegistrationTypes.MANUFACTURED_HOME_LIEN:
         return 'The registration length for this registration is automatically set to infinite. ' +
         'There is a $10.00 fee for this registration.'
-      case APIRegistrationTypes.MISCELLANEOUS_OTHER:
+      case APIRegistrationTypes.OTHER:
         return 'The registration length for this registration is automatically set to infinite. ' +
         'There is no fee for this registration.'
       default:

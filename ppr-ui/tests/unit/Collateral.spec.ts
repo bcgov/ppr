@@ -40,7 +40,6 @@ function createComponent (
   })
 }
 
-
 describe('Collateral SA tests', () => {
   let wrapper: Wrapper<any>
 

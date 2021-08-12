@@ -37,10 +37,10 @@
             </v-row>
           </v-col>
         </v-row>
-        <v-row class="pt-3" no-gutters>
-              <registration-bar class="soft-corners-bottom" :registrationTitle="''"/>
+        <v-row class="pt-15" no-gutters>
+          <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
         </v-row>
-        <v-row no-gutters class='pt-3' style="margin-bottom:300px;">
+        <v-row no-gutters class="pt-7" style="margin-top: 2px">
           <v-col>
             <v-row no-gutters
                    id="registration-header"
@@ -135,6 +135,12 @@ export default class Dashboard extends Vue {
     window.location.assign(this.registryUrl)
   }
 
+  /** Set registration type in the store and route to the first registration step */
+  private startRegistration (selectedRegistration: RegistrationTypeIF): void {
+    this.setRegistrationType(selectedRegistration)
+    this.$router.push({ name: RouteNames.LENGTH_TRUST })
+  }
+
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
   private async onAppReady (val: boolean): Promise<void> {
@@ -157,17 +163,6 @@ export default class Dashboard extends Vue {
     }
     // tell App that we're finished loading
     this.emitHaveData()
-  }
-
-  @Watch('getRegistrationType')
-  private startRegistration (val: RegistrationTypeIF): void {
-    // navigate to registration page if not null/reset
-    if (val) {
-      // alert(val.registrationTypeAPI)
-      this.$router.push({
-        name: RouteNames.LENGTH_TRUST
-      })
-    }
   }
 
   @Watch('getSearchResults')

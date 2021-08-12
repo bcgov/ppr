@@ -1,6 +1,7 @@
 // Enums and Interfaces
 import { AccountTypes, APIRegistrationTypes, RouteNames } from '@/enums'
 import {
+  AccountProductSubscriptionIF,
   AddCollateralIF,
   AddPartiesIF,
   ButtonConfigIF,
@@ -24,6 +25,12 @@ export const getAccountId = (state: StateIF): number => {
 /** The current account label/name. */
 export const getAccountLabel = (state: StateIF): string => {
   return state.stateModel.accountInformation?.label
+}
+
+export const getAccountProductSubscriptions = (
+  state: StateIF
+): AccountProductSubscriptionIF => {
+  return state.stateModel.accountProductSubscriptions
 }
 
 /** The registration collateral object. */

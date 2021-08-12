@@ -1,4 +1,3 @@
-// Account information interface
 export interface AccountInformationIF {
   accountType: string
   id: number
