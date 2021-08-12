@@ -186,7 +186,13 @@ export function useCountryRegions (code: string): boolean {
   return (code === 'CA' || code === 'US')
 }
 
-export function trimAddress (address: AddressIF): AddressIF {
+export function formatAddress (address: AddressIF): AddressIF {
+  if (address.country === 'CA') {
+    address.postalCode = address.postalCode.replace('-', ' ')
+    if (address.postalCode[3] !== ' ') {
+      address.postalCode = address.postalCode.slice(0, 3) + ' ' + address.postalCode.slice(3,)
+    }
+  }
   return {
     country: address.country?.trim(),
     street: address.street?.trim(),
