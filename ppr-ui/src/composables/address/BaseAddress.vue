@@ -51,6 +51,7 @@
             hint="Street address, PO box, rural route, or general delivery address"
             :id="streetId"
             :label="streetLabel"
+            :name="Math.random()"
             persistent-hint
             :rules="[...schemaLocal.street]"
             v-model="addressLocal.street"
@@ -65,6 +66,7 @@
             filled
             class="street-address-additional"
             :label="streetAdditionalLabel"
+            :name="Math.random()"
             rows="1"
             v-model="addressLocal.streetAdditional"
             :rules="[...schemaLocal.streetAdditional]"
@@ -76,6 +78,7 @@
             filled
             class="item address-city"
             :label="cityLabel"
+            :name="Math.random()"
             v-model="addressLocal.city"
             :rules="[...schemaLocal.city]"
           />
@@ -89,6 +92,7 @@
             :items="getCountryRegions(country)"
             :label="regionLabel"
             :menu-props="{ maxHeight: '14rem' }"
+            :name="Math.random()"
             :rules="[...schemaLocal.region]"
             v-model="addressLocal.region"
           />
@@ -97,6 +101,7 @@
             filled
             class="item address-region"
             :label="regionLabel"
+            :name="Math.random()"
             v-model="addressLocal.region"
             :rules="[...schemaLocal.region]"
           />
@@ -105,6 +110,7 @@
             filled
             class="item postal-code"
             :label="postalCodeLabel"
+            :name="Math.random()"
             v-model="addressLocal.postalCode"
             :rules="[...schemaLocal.postalCode]"
           />
@@ -115,6 +121,7 @@
             filled
             class="delivery-instructions"
             :label="deliveryInstructionsLabel"
+            :name="Math.random()"
             rows="2"
             v-model="addressLocal.deliveryInstructions"
             :rules="[...schemaLocal.deliveryInstructions]"
