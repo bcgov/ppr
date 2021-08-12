@@ -11,6 +11,7 @@ import {
   mockedSelectSecurityAgreement,
   mockedMarriageMH
 } from './test-data'
+import { APIVehicleTypes } from '@/enums'
 
 // Components
 import { EditCollateral } from '@/components/collateral'
@@ -26,6 +27,7 @@ const store = getVuexStore()
 const doneButtonSelector: string = '#done-btn'
 const cancelButtonSelector: string = '#cancel-btn'
 const removeButtonSelector: string = '#remove-btn'
+const vehicleTypeDrop: string ='#txt-type-drop'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -72,9 +74,9 @@ describe('Collateral add tests', () => {
   })
 
   it('adds a vehicle to the store', async () => {
-    wrapper.find('#txt-type-drop').setValue('MV')
+    wrapper.find(vehicleTypeDrop).setValue(APIVehicleTypes.MOTOR_VEHICLE)
     await Vue.nextTick()
-    wrapper.vm.$data.currentVehicle.type = 'MV'
+    wrapper.vm.$data.currentVehicle.type = APIVehicleTypes.MOTOR_VEHICLE
     wrapper.find('#txt-serial').setValue('293847298374')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-years').setValue(2012)
@@ -108,7 +110,7 @@ describe('Collateral tests for MH', () => {
     expect(wrapper.find('#txt-man').exists()).toBe(true)
 
     // no drop down
-    expect(wrapper.find('#txt-type-drop').exists()).toBe(false)
+    expect(wrapper.find(vehicleTypeDrop).exists()).toBe(false)
   })
 
 })

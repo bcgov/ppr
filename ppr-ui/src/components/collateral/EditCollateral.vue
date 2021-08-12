@@ -176,6 +176,7 @@ import { defineComponent, onMounted } from '@vue/composition-api'
 
 import { useCollateralValidation } from './composables/useCollateralValidation'
 import { useVehicle } from './composables/useVehicle'
+import { APIVehicleTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -217,7 +218,7 @@ export default defineComponent({
       getVehicle()
       if (mustHaveManufacturedHomeCollateral()) {
         // set the current vehicle type to motor home
-        currentVehicle.value.type = 'MH'
+        currentVehicle.value.type = APIVehicleTypes.MANUFACTURED_HOME
       }
     })
 
