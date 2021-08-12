@@ -80,19 +80,19 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     wrapper.destroy()
   })
 
-  it('renders registration autocomplete list', async () => {
+  it('renders registration autocomplete type ahead box', async () => {
     expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(true)
-    expect(wrapper.find(registrationTypeAhead).exists()).toBe(true)
     // check autocomplete displayed
+    expect(wrapper.find(registrationTypeAhead).exists()).toBe(true)
   })
 
-  it('renders emits registration on select', async () => {
+  it('emits registration on select', async () => {
     wrapper.vm.$data.selected = miscCrownChargeRegistrations[4]
     await flushPromises()
     expect(getLastEvent(wrapper, selected)).toBe(miscCrownChargeRegistrations[4])
   })
 
-  it('renders gives dialog when other is selected', async () => {
+  it('gives dialog when *other* type is selected', async () => {
     const otherRegistration = miscCrownChargeRegistrations[miscCrownChargeRegistrations.length - 1]
     expect(otherRegistration.registrationTypeUI).toBe(UIRegistrationTypes.OTHER)
     wrapper.vm.$data.selected = otherRegistration
