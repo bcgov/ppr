@@ -18,13 +18,23 @@
             v-on:submit.prevent="addVehicle"
           >
             <v-row no-gutters>
-              <v-col>
+              <v-col v-if="mustHaveManufacturedHomeCollateral()">
+                <v-text-field
+                  filled
+                  id="txt-type"
+                  label="Vehicle Type"
+                  value="Manufactured Home (MH)"
+                  readonly
+                  persistent-hint
+                />
+              </v-col>
+              <v-col v-else>
                 <v-select
                   :items="vehicleTypes"
                   filled
                   label="Vehicle Type"
                   v-model="currentVehicle.type"
-                  id="txt-type"
+                  id="txt-type-drop"
                   :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
@@ -166,6 +176,7 @@ import { defineComponent, onMounted } from '@vue/composition-api'
 
 import { useCollateralValidation } from './composables/useCollateralValidation'
 import { useVehicle } from './composables/useVehicle'
+import { APIVehicleTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -205,6 +216,10 @@ export default defineComponent({
 
     onMounted(() => {
       getVehicle()
+      if (mustHaveManufacturedHomeCollateral()) {
+        // set the current vehicle type to motor home
+        currentVehicle.value.type = APIVehicleTypes.MANUFACTURED_HOME
+      }
     })
 
     const onSubmitForm = async () => {

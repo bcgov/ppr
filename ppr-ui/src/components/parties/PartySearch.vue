@@ -182,7 +182,7 @@ export default defineComponent({
       const newParty: PartyIF = {
         code: party.code,
         businessName: party.businessName,
-        emailAddress: party.emailAddress,
+        emailAddress: party.emailAddress || '',
         address: party.address,
         personName: { first: '', middle: '', last: '' }
       }

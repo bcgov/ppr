@@ -8,8 +8,10 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedGeneralCollateral1,
   mockedVehicleCollateral1,
-  mockedSelectSecurityAgreement
+  mockedSelectSecurityAgreement,
+  mockedMarriageMH
 } from './test-data'
+import { APIVehicleTypes } from '@/enums'
 
 // Components
 import { EditCollateral } from '@/components/collateral'
@@ -25,6 +27,8 @@ const store = getVuexStore()
 const doneButtonSelector: string = '#done-btn-collateral'
 const cancelButtonSelector: string = '#cancel-btn-collateral'
 const removeButtonSelector: string = '#remove-btn-collateral'
+const vehicleTypeDrop: string ='#txt-type-drop'
+
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -71,9 +75,9 @@ describe('Collateral add tests', () => {
   })
 
   it('adds a vehicle to the store', async () => {
-    wrapper.find('#txt-type').setValue('MV')
+    wrapper.find(vehicleTypeDrop).setValue(APIVehicleTypes.MOTOR_VEHICLE)
     await Vue.nextTick()
-    wrapper.vm.$data.currentVehicle.type = 'MV'
+    wrapper.vm.$data.currentVehicle.type = APIVehicleTypes.MOTOR_VEHICLE
     wrapper.find('#txt-serial').setValue('293847298374')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-years').setValue(2012)
@@ -86,6 +90,30 @@ describe('Collateral add tests', () => {
     // store should have 1 item now
     expect(store.getters.getAddCollateral.vehicleCollateral.length).toBe(1)
   })
+})
+
+
+describe('Collateral tests for MH', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedMarriageMH)
+    wrapper = createComponent(-1, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with readonly type and manufactured home input', async () => {
+    expect(wrapper.findComponent(EditCollateral).exists()).toBe(true)
+    expect(wrapper.find('#txt-type').exists()).toBe(true)
+    // show read only text box
+    expect(wrapper.find('#txt-man').exists()).toBe(true)
+
+    // no drop down
+    expect(wrapper.find(vehicleTypeDrop).exists()).toBe(false)
+  })
+
 })
 
 describe('Collateral edit tests', () => {

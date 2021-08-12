@@ -70,7 +70,7 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates invalid year', async () => {
-    await wrapper.find('#txt-type').setValue('MV')
+    await wrapper.find('#txt-type-drop').setValue('MV')
     wrapper.find('#txt-serial').setValue('293847298374')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
@@ -84,7 +84,7 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates serial number for vehicle', async () => {
-    await wrapper.find('#txt-type').setValue('MV')
+    await wrapper.find('#txt-type-drop').setValue('MV')
     await Vue.nextTick()
     wrapper.find('#txt-serial').setValue('234627834628736428734634234872364')
     wrapper.find('#txt-make').setValue('Honda')
@@ -101,7 +101,7 @@ describe('Collateral validation tests', () => {
   })
 
   it('validates number for manufactured home', async () => {
-    wrapper.find('#txt-type').setValue('MH')
+    wrapper.find('#txt-type-drop').setValue('MH')
     await Vue.nextTick()
     wrapper.find('#txt-man').setValue('ABCDEF123')
     wrapper.find('#txt-make').setValue('Honda')
