@@ -29,11 +29,11 @@
 
     <div class="app-body">
       <main v-if="!isErrorDialog">
-    <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: #FCBA19;" align="center" justify="center">
-      <v-col class="env-info">
-        This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
-      </v-col>
-    </v-row>
+        <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: #FCBA19;" align="center" justify="center">
+          <v-col class="env-info">
+            This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
+          </v-col>
+        </v-row>
         <tombstone :backURL="dashboardURL" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
@@ -278,9 +278,8 @@ export default class App extends Mixins(AuthMixin) {
     try {
       await this.loadAccountProductSubscriptions()
     } catch (error) {
+      // may want to do something about this later, for now just log the error and let user continue
       console.log('Auth product subscription error =', error)
-      this.haveData = true
-      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
       return
     }
 
