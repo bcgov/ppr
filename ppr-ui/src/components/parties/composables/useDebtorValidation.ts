@@ -49,6 +49,10 @@ export const useDebtorValidation = () => {
   }
 
   const validateBirthdate = (year, month, day) => {
+    // reset errors before validation
+    resetError('year')
+    resetError('month')
+    resetError('day')
     if (year > 0 || month > 0 || day > 0) {
       if (year < 1800 || year > new Date().getFullYear()) {
         errors.value.year = {
@@ -56,8 +60,6 @@ export const useDebtorValidation = () => {
           succeeded: false,
           message: 'Please enter a valid year'
         }
-      } else {
-        resetError('year')
       }
 
       if (!month || month < 1 || month > 12) {
@@ -66,8 +68,6 @@ export const useDebtorValidation = () => {
           succeeded: false,
           message: 'Please enter a valid month'
         }
-      } else {
-        resetError('month')
       }
 
       if (day < 1 || day > 31) {
@@ -76,8 +76,6 @@ export const useDebtorValidation = () => {
           succeeded: false,
           message: 'Please enter a valid day'
         }
-      } else {
-        resetError('day')
       }
     }
   }

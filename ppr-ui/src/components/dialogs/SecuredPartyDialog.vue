@@ -10,13 +10,13 @@
       <v-row no-gutters>
         <v-col cols="11">
           <v-row no-gutters>
-            <v-col class="text-md-center">
-              <v-icon style="font-size: 30px" color="red">mdi-information-outline</v-icon>
+            <v-col class="text-md-center ml-8">
+              <v-icon :class="$style['iconRed']">mdi-information-outline</v-icon>
             </v-col>
           </v-row>
           <v-row no-gutters class="pt-5">
-            <v-col class="text-md-center">
-              <h2>2 Similar Secured Parties Found</h2>
+            <v-col class="text-md-center ml-8">
+              <h1 :class="$style['dialogTitle']">{{ totalParties }} Similar Secured Parties Found</h1>
             </v-col>
           </v-row>
         </v-col>
@@ -114,9 +114,9 @@
           </v-row>
         </v-container>
       </div>
-      <v-card-actions>
-        <v-spacer></v-spacer>
+      <v-card-actions class="pt-6 pb-8">
         <v-btn
+          :class="$style['dialogButton']"
           id="dialog-cancel-button"
           color="primary"
           outlined
@@ -133,7 +133,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  computed
 } from '@vue/composition-api'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
@@ -156,7 +157,10 @@ export default defineComponent({
       results: props.defaultResults,
       party: props.defaultParty,
       dialog: props.defaultDialog,
-      showSelected: true
+      showSelected: true,
+      totalParties: computed((): number => {
+        return props.defaultResults.length
+      })
     })
 
     const countryProvincesHelpers = useCountriesProvinces()
@@ -224,7 +228,7 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .addressText {
-  font-size: 12px;
+  font-size: 0.875rem;
   color: $gray7;
 }
 .companyText {
@@ -239,6 +243,7 @@ export default defineComponent({
   padding-bottom: 10px;
   margin-right: 10px;
   margin-left: 10px;
+  border: 1px solid white;
 }
 
 .companyRow:hover {
@@ -283,5 +288,18 @@ export default defineComponent({
 .iconColumn {
   padding-right: 5px;
   padding-left: 20px;
+}
+
+.iconRed {
+  color: #D3272C !important;
+  font-size: 32px !important;
+}
+
+.dialogTitle {
+  font-size: 1.5rem;
+}
+
+.dialogButton {
+  margin-left: 330px;
 }
 </style>

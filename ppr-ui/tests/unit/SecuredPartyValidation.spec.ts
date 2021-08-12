@@ -17,7 +17,7 @@ const store = getVuexStore()
 // Events
 
 // Input field selectors / buttons
-const doneButtonSelector: string = '#done-btn'
+const doneButtonSelector: string = '#done-btn-party'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -58,7 +58,7 @@ describe('Secured Party validation tests - business', () => {
     await Vue.nextTick()
     
     // no input added
-    wrapper.find('#txt-name').setValue('')
+    wrapper.find('#txt-name-party').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
@@ -88,8 +88,8 @@ describe('Secured Party validation tests - individual', () => {
     await Vue.nextTick()
     
     // no input added
-    wrapper.find('#txt-first').setValue('')
-    wrapper.find('#txt-last').setValue('')
+    wrapper.find('#txt-first-party').setValue('')
+    wrapper.find('#txt-last-party').setValue('')
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
@@ -105,11 +105,11 @@ describe('Secured Party validation tests - individual', () => {
     expect(radios.length).toBe(2)
     radios.at(0).trigger('click')
     await Vue.nextTick()
-    wrapper.find('#txt-first').setValue('first')
-    wrapper.find('#txt-last').setValue('person')
+    wrapper.find('#txt-first-party').setValue('first')
+    wrapper.find('#txt-last-party').setValue('person')
     
-    wrapper.find('#txt-email').setValue('person@')
-    wrapper.find('#txt-email').trigger('blur')
+    wrapper.find('#txt-email-party').setValue('person@')
+    wrapper.find('#txt-email-party').trigger('blur')
     
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')

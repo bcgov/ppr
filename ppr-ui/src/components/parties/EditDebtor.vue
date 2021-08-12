@@ -33,7 +33,7 @@
               <v-col>
                 <v-text-field
                   filled
-                  id="txt-name"
+                  id="txt-name-debtor"
                   label="Business Legal Name"
                   v-model="searchValue"
                   :error-messages="
@@ -59,7 +59,7 @@
                 <v-text-field
                   filled
                   label="First Name"
-                  id="txt-first"
+                  id="txt-first-debtor"
                   v-model="currentDebtor.personName.first"
                   persistent-hint
                   :error-messages="
@@ -71,7 +71,7 @@
                 <v-text-field
                   filled
                   label="Middle Name (Optional)"
-                  id="txt-middle"
+                  id="txt-middle-debtor"
                   v-model="currentDebtor.personName.middle"
                   persistent-hint
                 />
@@ -80,7 +80,7 @@
                 <v-text-field
                   filled
                   label="Last Name"
-                  id="txt-last"
+                  id="txt-last-debtor"
                   v-model="currentDebtor.personName.last"
                   persistent-hint
                   :error-messages="
@@ -107,6 +107,7 @@
                     errors.month.message ? errors.month.message : ''
                   "
                   @keyup="validateBirthdateIfAlreadyValidated"
+                  @blur="validateBirthdateIfAlreadyValidated"
                   persistent-hint
                   return-object
                 ></v-autocomplete>
@@ -145,7 +146,7 @@
               <v-col>
                 <v-text-field
                   filled
-                  id="txt-email"
+                  id="txt-email-debtor"
                   label="Email Address (Optional)"
                   v-model="currentDebtor.emailAddress"
                   :error-messages="
@@ -182,13 +183,13 @@
                     color="error"
                     :disabled="activeIndex === -1"
                     @click="removeDebtor()"
-                    id="remove-btn"
+                    id="remove-btn-debtor"
                     >Remove
                   </v-btn>
 
                   <v-btn
                     large
-                    id="done-btn"
+                    id="done-btn-debtor"
                     class="ml-auto"
                     color="primary"
                     @click="onSubmitForm()"
@@ -197,7 +198,7 @@
                   </v-btn>
 
                   <v-btn
-                    id="cancel-btn"
+                    id="cancel-btn-debtor"
                     large
                     outlined
                     color="primary"

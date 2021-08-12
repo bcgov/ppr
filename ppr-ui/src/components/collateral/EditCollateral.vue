@@ -138,13 +138,13 @@
                     color="error"
                     :disabled="activeIndex === -1"
                     @click="removeVehicle()"
-                    id="remove-btn"
+                    id="remove-btn-collateral"
                     >Remove
                   </v-btn>
 
                   <v-btn
                     large
-                    id="done-btn"
+                    id="done-btn-collateral"
                     class="ml-auto"
                     color="primary"
                     @click="onSubmitForm()"
@@ -153,7 +153,7 @@
                   </v-btn>
 
                   <v-btn
-                    id="cancel-btn"
+                    id="cancel-btn-collateral"
                     large
                     outlined
                     color="primary"

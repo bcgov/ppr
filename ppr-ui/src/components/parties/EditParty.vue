@@ -41,6 +41,7 @@
                     ]"
                     label="Individual Person"
                     value="I"
+                    id="party-individual"
                   >
                   </v-radio>
 
@@ -48,6 +49,7 @@
                     :class="['business-radio', $style['party-radio-business']]"
                     label="Business"
                     value="B"
+                    id="party-business"
                   >
                   </v-radio>
                 </v-radio-group>
@@ -70,7 +72,7 @@
                   <v-col>
                     <v-text-field
                       filled
-                      id="txt-name"
+                      id="txt-name-party"
                       label="Business Legal Name"
                       v-model="searchValue"
                       :error-messages="
@@ -95,7 +97,7 @@
                     <v-text-field
                       filled
                       label="First Name"
-                      id="txt-first"
+                      id="txt-first-party"
                       v-model="currentSecuredParty.personName.first"
                       persistent-hint
                       @blur="onBlur('first')"
@@ -108,7 +110,7 @@
                     <v-text-field
                       filled
                       label="Middle Name (Optional)"
-                      id="txt-middle"
+                      id="txt-middle-party"
                       v-model="currentSecuredParty.personName.middle"
                       persistent-hint
                     />
@@ -117,7 +119,7 @@
                     <v-text-field
                       filled
                       label="Last Name"
-                      id="txt-last"
+                      id="txt-last-party"
                       v-model="currentSecuredParty.personName.last"
                       persistent-hint
                       @blur="onBlur('last')"
@@ -136,7 +138,7 @@
                   <v-col>
                     <v-text-field
                       filled
-                      id="txt-email"
+                      id="txt-email-party"
                       label="Email Address (Optional)"
                       v-model="currentSecuredParty.emailAddress"
                       :error-messages="
@@ -174,13 +176,13 @@
                     color="error"
                     :disabled="activeIndex === -1"
                     @click="removeParty()"
-                    id="remove-btn"
+                    id="remove-btn-party"
                     >Remove
                   </v-btn>
 
                   <v-btn
                     large
-                    id="done-btn"
+                    id="done-btn-party"
                     class="ml-auto"
                     color="primary"
                     :disabled="!isPartyType"
@@ -190,7 +192,7 @@
                   </v-btn>
 
                   <v-btn
-                    id="cancel-btn"
+                    id="cancel-btn-party"
                     large
                     outlined
                     color="primary"
