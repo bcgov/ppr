@@ -228,7 +228,7 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .addressText {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: $gray7;
 }
 .companyText {
@@ -296,7 +296,7 @@ export default defineComponent({
 }
 
 .dialogTitle {
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
 .dialogButton {
