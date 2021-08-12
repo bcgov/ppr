@@ -80,7 +80,7 @@
                        @hide-details="setHideDetails">
         </auto-complete>
       </v-col>
-      <v-col v-else cols="8" class="pl-3">
+      <v-col v-else cols="7" class="pl-3">
         <v-row no-gutters>
           <v-col cols="4">
             <v-text-field id="first-name-field"
