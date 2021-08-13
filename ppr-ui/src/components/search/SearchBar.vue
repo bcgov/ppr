@@ -31,7 +31,7 @@
           </v-row>
         </v-tooltip>
       </v-col>
-      <v-col align-self="end" cols="3">
+      <v-col align-self="end" cols="4">
         <folio-number :defaultFolioNumber="folioNumber" @folio-number="updateFolioNumber"/>
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
