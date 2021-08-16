@@ -4,7 +4,7 @@ export const useParty = () => {
     if (party.businessName) {
       return party.businessName
     } else {
-      return party.personName.first + ' ' + party.personName.last
+      return party.personName.first + ' ' + party.personName.middle + ' ' + party.personName.last
     }
   }
 

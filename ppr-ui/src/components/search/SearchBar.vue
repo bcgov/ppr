@@ -31,7 +31,7 @@
           </v-row>
         </v-tooltip>
       </v-col>
-      <v-col align-self="end" cols="3">
+      <v-col align-self="end" cols="4">
         <folio-number :defaultFolioNumber="folioNumber" @folio-number="updateFolioNumber"/>
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
@@ -80,7 +80,7 @@
                        @hide-details="setHideDetails">
         </auto-complete>
       </v-col>
-      <v-col v-else cols="8" class="pl-3">
+      <v-col v-else cols="7" class="pl-3">
         <v-row no-gutters>
           <v-col cols="4">
             <v-text-field id="first-name-field"

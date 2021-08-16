@@ -587,6 +587,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .reg-table {
   max-height: 550px;
+  overflow-y: scroll;
 }
 .length-trust-label {
   font-size: 0.875rem;

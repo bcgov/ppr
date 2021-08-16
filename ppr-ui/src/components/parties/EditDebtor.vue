@@ -100,6 +100,7 @@
                   auto-select-first
                   :items="months"
                   filled
+                  clearable
                   label="Month"
                   id="txt-month"
                   v-model="month"
@@ -345,6 +346,8 @@ export default defineComponent({
       currentValue => {
         if (currentValue) {
           monthValue.value = currentValue.value
+        } else {
+          monthValue.value = 0
         }
       }
     )
