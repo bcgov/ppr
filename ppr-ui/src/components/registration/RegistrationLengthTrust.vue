@@ -6,12 +6,15 @@
           <v-icon color="#38598A">mdi-calendar-clock</v-icon>
           <label
             class="pl-3"
-            v-if="registrationType !== APIRegistrationTypes.REPAIRERS_LIEN"
+            v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
           >
             <strong>Registration Length and Trust Indenture</strong>
           </label>
-          <label class="pl-3" v-else>
+          <label class="pl-3" v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
             <strong>Amount and Date of Surrender</strong>
+          </label>
+          <label class="pl-3" v-else>
+            <strong>Registration Length</strong>
           </label>
         </v-col>
       </v-row>
