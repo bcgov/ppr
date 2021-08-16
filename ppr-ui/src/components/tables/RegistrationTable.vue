@@ -6,7 +6,7 @@
         dense
         :class="[$style['text-input-style'], 'column-selection']"
         attach
-        browser-autocomplete="off"
+        autocomplete="off"
         :items="colheaders"
         :menu-props="dropdownPropsXl"
         multiple

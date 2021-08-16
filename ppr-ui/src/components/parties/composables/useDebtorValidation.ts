@@ -16,6 +16,9 @@ export const useDebtorValidation = () => {
   const errors = ref(createEmptyErrors())
 
   const validateName = (isBusiness, form) => {
+    form.businessName = form.businessName.trim()
+    form.personName.first = form.personName.first.trim()
+    form.personName.last = form.personName.last.trim()
     if (isBusiness === true) {
       if (form.businessName.length === 0) {
         errors.value.businessName = {
