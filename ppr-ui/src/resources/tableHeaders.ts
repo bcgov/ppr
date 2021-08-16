@@ -303,7 +303,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'column-md py-4',
+    class: 'column-mdl py-4',
     sortable: true,
     text: 'Registration Type',
     value: 'type',
@@ -367,7 +367,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'column-sm py-4',
+    class: 'registration-action py-4',
     sortable: false,
     text: 'Actions',
     value: 'actions',
