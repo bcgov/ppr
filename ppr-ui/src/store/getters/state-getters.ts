@@ -164,7 +164,10 @@ export const showStepErrors = (state: StateIF): boolean => {
  */
 export const getSteps = (state: any, getters: any): Array<any> => {
   const regType:RegistrationTypeIF = getRegistrationType(state)
-  var lengthTrustText = 'Length and<br />Trust Indenture'
+  var lengthTrustText = 'Registration<br />Length'
+  if (regType.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
+    lengthTrustText = 'Length and<br />Trust Indenture'
+  }
   if (regType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     lengthTrustText = 'Amount and Date<br /> of Surrender'
   }

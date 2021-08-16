@@ -17,13 +17,13 @@
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
-            class="registering-table"
+            class="registering-summary-table"
             :headers="registeringHeaders"
             :items="registeringParty"
             disable-pagination
             disable-sort
             hide-default-footer
-            no-data-text="No Registering Party obtained yet from user Account Information."
+            no-data-text=""
           >
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
@@ -46,6 +46,18 @@
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
               </tr>
+            </template>
+            <template slot="no-data">
+              <v-icon color="#D3272C">mdi-information-outline</v-icon>
+              <span class="invalid-message">
+                This step is unfinished.
+              </span>
+              <span
+                id="router-link-parties"
+                class="invalid-link"
+                @click="goToParties()"
+                >Return to this step to complete it.</span
+              >
             </template>
           </v-data-table>
         </v-col>

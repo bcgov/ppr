@@ -16,11 +16,8 @@
             </v-row>
             <stepper class="mt-4" />
             <v-row no-gutters class="pt-10">
-              <v-col cols="auto" class="sub-header" v-if="registrationType !== registrationTypeRL">
-                Registration Length and Trust Indenture
-              </v-col>
-              <v-col cols="auto" class="sub-header" v-else>
-                Terms of Repairers Lien
+              <v-col cols="auto" class="sub-header">
+                {{ registrationTitle }}
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -115,6 +112,17 @@ export default class LengthTrust extends Vue {
 
   private get registrationTypeRL (): string {
     return APIRegistrationTypes.REPAIRERS_LIEN
+  }
+
+  private get registrationTitle (): string {
+    switch (this.registrationType) {
+      case APIRegistrationTypes.SECURITY_AGREEMENT:
+        return 'Registration Length and Trust Indenture'
+      case APIRegistrationTypes.REPAIRERS_LIEN:
+        return 'Terms of Repairers Lien'
+      default:
+        return 'Registration Length'
+    }
   }
 
   private get registrationLengthMessage (): string {
