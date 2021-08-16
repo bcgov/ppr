@@ -17,7 +17,7 @@
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           <v-data-table
-            class="registering-table"
+            class="registering-summary-table"
             :headers="registeringHeaders"
             :items="registeringParty"
             disable-pagination

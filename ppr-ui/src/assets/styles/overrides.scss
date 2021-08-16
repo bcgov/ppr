@@ -251,13 +251,13 @@ tbody {
 }
 
 // list items
-.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled).copy-normal {
+.registration-bar .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled).copy-normal {
   color: $gray7 !important;
   font-size: 14px;
   padding-left: 8px;
 }
 
-.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+.registration-bar .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
   color: $gray7 !important;
   font-size: 14px;
   padding-left: 30px;
@@ -268,7 +268,7 @@ tbody {
   color: $primary-blue !important;
 }
 
-.theme--light.v-list-item--disabled {
+.registration-bar .theme--light.v-list-item--disabled {
   color: $gray9;
   font-size: 14px;
   font-weight: bold;
@@ -282,7 +282,7 @@ tbody {
   font-size: 14px;
 }
 
-.actions__more-actions .v-list-item {
+.registration-bar .actions__more-actions .v-list-item {
   min-height: 30px;
 }
 
@@ -320,7 +320,8 @@ tbody {
 }
 
 .v-data-table.party-summary-table tr.v-data-table__empty-wrapper td,
-.v-data-table.debtor-summary-table tr.v-data-table__empty-wrapper td {
+.v-data-table.debtor-summary-table tr.v-data-table__empty-wrapper td,
+.v-data-table.registering-summary-table tr.v-data-table__empty-wrapper td {
   text-align: left;
   border-left: 3px solid #d3272c !important;
   padding-left: 35px;
