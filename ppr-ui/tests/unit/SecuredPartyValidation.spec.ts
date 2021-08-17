@@ -105,10 +105,10 @@ describe('Secured Party validation tests - individual', () => {
     await Vue.nextTick()
     wrapper.find('#txt-first-party').setValue('first')
     wrapper.find('#txt-last-party').setValue('person')
-    
+
     wrapper.find('#txt-email-party').setValue('person@')
     wrapper.find('#txt-email-party').trigger('blur')
-    
+
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)

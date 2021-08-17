@@ -319,9 +319,7 @@ tbody {
   vertical-align: bottom;
 }
 
-.v-data-table.party-summary-table tr.v-data-table__empty-wrapper td,
-.v-data-table.debtor-summary-table tr.v-data-table__empty-wrapper td,
-.v-data-table.registering-summary-table tr.v-data-table__empty-wrapper td {
+.v-data-table.party-summary-table tr.v-data-table__empty-wrapper td {
   text-align: left;
   border-left: 3px solid #d3272c !important;
   padding-left: 35px;
@@ -367,9 +365,9 @@ tbody {
   min-width: 20px;
 }
 
-#party-summary .mdi-domain,
-#party-summary .mdi-account,
-#party-summary .list-item__title,
+.party-summary .mdi-domain,
+.party-summary .mdi-account,
+.party-summary .list-item__title,
 .registering-table item__title {
   color: $gray9 !important;
 }

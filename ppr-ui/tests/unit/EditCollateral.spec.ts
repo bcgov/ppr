@@ -27,8 +27,7 @@ const store = getVuexStore()
 const doneButtonSelector: string = '#done-btn-collateral'
 const cancelButtonSelector: string = '#cancel-btn-collateral'
 const removeButtonSelector: string = '#remove-btn-collateral'
-const vehicleTypeDrop: string ='#txt-type-drop'
-
+const vehicleTypeDrop: string = '#txt-type-drop'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -92,7 +91,6 @@ describe('Collateral add tests', () => {
   })
 })
 
-
 describe('Collateral tests for MH', () => {
   let wrapper: Wrapper<any>
 
@@ -113,7 +111,6 @@ describe('Collateral tests for MH', () => {
     // no drop down
     expect(wrapper.find(vehicleTypeDrop).exists()).toBe(false)
   })
-
 })
 
 describe('Collateral edit tests', () => {

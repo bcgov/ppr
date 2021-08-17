@@ -291,7 +291,7 @@ export default defineComponent({
 }
 
 .iconRed {
-  color: #D3272C !important;
+  color: error !important;
   font-size: 32px !important;
 }
 

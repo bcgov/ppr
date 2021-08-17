@@ -25,7 +25,7 @@
           <v-icon :class="$style['step__btn2']" size="30" color="green darken-3" v-show=step.valid>
             mdi-check-circle
           </v-icon>
-          <v-icon :class="$style['step__btn2']" size="30" color="#D3272C" v-show=showInvalid(step)>
+          <v-icon :class="$style['step__btn2']" size="30" color="error" v-show=showInvalid(step)>
             mdi-close-circle
           </v-icon>
         </div>

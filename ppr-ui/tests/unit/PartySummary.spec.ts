@@ -49,7 +49,7 @@ describe('Party Summary SA tests', () => {
 
   it('renders with default values', async () => {
     expect(wrapper.findComponent(PartySummary).exists()).toBe(true)
-    expect(wrapper.find('#party-summary').exists()).toBeTruthy()
+    expect(wrapper.find('.secured-party-summary').exists()).toBeTruthy()
   })
 })
 
@@ -68,18 +68,18 @@ describe('Secured Party list tests', () => {
   })
 
   it('renders secured party table and headers', async () => {
-    expect(wrapper.find('.party-summary-table').exists()).toBeTruthy()
+    expect(wrapper.find('.secured-party-summary .party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.party-summary-table .text-start').length).toBe(4)
+    expect(wrapper.findAll('.secured-party-summary .party-summary-table .text-start').length).toBe(5)
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.secured-party-summary .v-data-table .party-row').length
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.secured-party-summary .v-data-table .party-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('SECURED PARTY COMPANY LTD.')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -102,19 +102,19 @@ describe('Debtor list tests', () => {
   })
 
   it('renders debtor table and headers', async () => {
-    expect(wrapper.find('.debtor-summary-table').exists()).toBeTruthy()
+    expect(wrapper.find('.debtor-summary .party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.debtor-summary-table .text-start').length).toBe(4)
+    expect(wrapper.findAll('.debtor-summary .party-summary-table .text-start').length).toBe(5)
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.debtor-summary .v-data-table .party-row').length
 
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.debtor-summary .v-data-table .party-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST 1 INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
@@ -136,18 +136,18 @@ describe('Registering Party tests', () => {
   })
 
   it('renders registering party table and headers', async () => {
-    expect(wrapper.find('.registering-summary-table').exists()).toBeTruthy()
+    expect(wrapper.find('.registering-party-summary .party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.registering-summary-table .text-start').length).toBe(4)
+    expect(wrapper.findAll('.registering-party-summary .party-summary-table .text-start').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.registering-party-summary .v-data-table .party-row').length
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
-    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row')[0]
+    const item1 = wrapper.vm.$el.querySelectorAll('.registering-party-summary .v-data-table .party-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')

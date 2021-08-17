@@ -29,7 +29,13 @@
 
     <div class="app-body">
       <main v-if="!isErrorDialog">
-        <v-row v-if="!isProd" no-gutters style="height: 40px;background-color: #FCBA19;" align="center" justify="center">
+        <v-row
+          v-if="!isProd"
+          no-gutters
+          style="height: 40px; background-color: #FCBA19;"
+          align="center"
+          justify="center"
+        >
           <v-col class="env-info">
             This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
           </v-col>
