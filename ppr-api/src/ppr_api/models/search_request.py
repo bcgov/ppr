@@ -234,7 +234,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'second' in self.request_json['criteria']['debtorName']:
             middle_name = self.request_json['criteria']['debtorName']['second']
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
-        if middle_name is not None and middle_name.strip() != '':
+        if middle_name is not None and middle_name.strip() != '' and middle_name.strip().upper() != 'NONE':
             result = db.session.execute(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY,
                                         {'query_last': last_name.strip().upper(),
                                          'query_first': first_name.strip().upper(),
