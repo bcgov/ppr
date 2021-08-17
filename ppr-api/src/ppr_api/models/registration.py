@@ -128,11 +128,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         party.registration_id == registration_id:
                     registration['registeringParty'] = party.json
 
-        if self.registration_type == model_utils.REG_TYPE_RENEWAL and \
-                self.financing_statement.expire_date:
-            registration['expiryDate'] = model_utils.format_ts(self.financing_statement.expire_date)
-            if self.life is not None:
-                registration['lifeYears'] = self.life
+        if self.registration_type == model_utils.REG_TYPE_RENEWAL and self.life is not None:
+            registration['lifeYears'] = self.life
+            registration['expiryDate'] = model_utils.expiry_dt_from_renewal(self.registration_ts, self.life)
 
         if self.court_order:
             registration['courtOrderInformation'] = self.court_order.json

@@ -293,6 +293,25 @@ def expiry_dt_from_years(life_years: int):
     return _datetime.combine(future_date, expiry_time)
 
 
+def expiry_dt_from_renewal(registration_ts, life_years: int):
+    """Create a date representing the expiry date for a renewal registration.
+
+    Adjust the registration timestamp by the life_years number of years in the future.
+    """
+    if life_years == LIFE_INFINITE:
+        return 'Never'
+
+    expiry_date = None
+    if life_years > 0:
+        expiry_date = date((registration_ts.year + life_years), registration_ts.month, registration_ts.day)
+    else:
+        expiry_ts = registration_ts + timedelta(days=REPAIRER_LIEN_DAYS)
+        expiry_date = date(expiry_ts.year, expiry_ts.month, expiry_ts.day)
+    expiry_time = time(23, 59, 59, tzinfo=timezone.utc)
+    expiry = _datetime.combine(expiry_date, expiry_time)
+    return format_ts(expiry)
+
+
 def expiry_dt_add_years(current_expiry, add_years: int):
     """For renewals add years to the existing expiry timestamp."""
     if current_expiry and add_years and add_years > 0:

@@ -14,7 +14,6 @@
 """This module holds data for legacy previous financing statement information only used in reports."""
 from __future__ import annotations
 
-from .utils import format_ts
 from .db import db
 
 
@@ -27,14 +26,18 @@ class PreviousFinancingStatement(db.Model):  # pylint: disable=too-many-instance
                              primary_key=True, nullable=False)
     # Free text description
     registration_type = db.Column('registration_type', db.String(30), nullable=False)
-    # cb is companies branch
-    cb_date = db.Column('cb_date', db.DateTime, nullable=True)
+    # From Bob: need to change the data type from date for the 3 columns to varchar(7) as I am not able
+    # to convert all of the values to a date those would have had to be a null value. Today all values
+    # are displayed in the search result even ones that are not a date so the new search result must do the same.
+
+    # cb is companies. Change from DateTime to String.
+    cb_date = db.Column('cb_date', db.String(10), nullable=True)
     cb_number = db.Column('cb_number', db.String(10), nullable=True)
-    # cr is central registry
-    cr_date = db.Column('cr_date', db.DateTime, nullable=True)
+    # cr is central registry. Change from DateTime to String.
+    cr_date = db.Column('cr_date', db.String(10), nullable=True)
     cr_number = db.Column('cr_number', db.String(10), nullable=True)
-    # mhr is manufactured homes registry
-    mhr_date = db.Column('mhr_date', db.DateTime, nullable=True)
+    # mhr is manufactured homes registry. Change from DateTime to String.
+    mhr_date = db.Column('mhr_date', db.String(10), nullable=True)
     mhr_number = db.Column('mhr_number', db.String(10), nullable=True)
 
     # parent keys
@@ -51,13 +54,13 @@ class PreviousFinancingStatement(db.Model):  # pylint: disable=too-many-instance
         }
         if self.mhr_number:
             previous_financing['mhrNumber'] = self.mhr_number
-            previous_financing['mhrDateTime'] = format_ts(self.mhr_date)
+            previous_financing['mhrDate'] = self.mhr_date
         if self.cr_number:
             previous_financing['crNumber'] = self.cr_number
-            previous_financing['crDateTime'] = format_ts(self.cr_date)
+            previous_financing['crDate'] = self.cr_date
         if self.cb_number:
             previous_financing['cbNumber'] = self.cb_number
-            previous_financing['cbDateTime'] = format_ts(self.cb_date)
+            previous_financing['cbDate'] = self.cb_date
 
         return previous_financing
 

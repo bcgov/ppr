@@ -109,3 +109,17 @@ def test_expiry_dt_add_years():
     print('Initial expiry: ' + model_utils.format_ts(expiry_ts))
     print('Updated expiry: ' + model_utils.format_ts(add_ts))
     assert (add_ts.year - expiry_ts.year) == 4
+
+
+def test_expiry_dt_from_renewal():
+    """Assert that creating a UTC datetime object from an ISO date-time formatted string is performing as expected."""
+    test_ts = model_utils.ts_from_iso_format('2021-02-16T08:00:00+00:00')
+    infinite_expiry = model_utils.expiry_dt_from_renewal(test_ts, 99)
+    # print('Renewal infinite expiry: ' + infinite_expiry)
+    assert infinite_expiry == 'Never'
+    rl_expiry = model_utils.expiry_dt_from_renewal(test_ts, 0)
+    # print('Renewal RL expiry: ' + rl_expiry)
+    assert rl_expiry == '2021-08-15T23:59:59+00:00'
+    five_year_expiry = model_utils.expiry_dt_from_renewal(test_ts, 5)
+    # print('Renewal 5 year expiry: ' + five_year_expiry)
+    assert five_year_expiry == '2026-02-16T23:59:59+00:00'

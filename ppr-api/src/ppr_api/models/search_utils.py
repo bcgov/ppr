@@ -136,6 +136,31 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
 ORDER BY match_type, p.last_name, p.first_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
+INDIVIDUAL_NAME_MIDDLE_QUERY = """
+SELECT r.registration_type,r.registration_ts AS base_registration_ts,
+       p.last_name,p.first_name,p.middle_initial,p.id,
+       r.registration_number AS base_registration_num,
+       CASE WHEN p.last_name = :query_last AND
+                 p.first_name = :query_first AND
+                 p.middle_initial = :query_middle THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       fs.expire_date,fs.state_type, p.birth_date
+  FROM registrations r, financing_statements fs, parties p
+ WHERE r.financing_id = fs.id
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+   AND r.base_reg_number IS NULL
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+   AND p.financing_id = fs.id
+   AND p.registration_id_end IS NULL
+   AND p.party_type = 'DI'
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first))) 
+ORDER BY match_type, p.last_name, p.first_name 
+"""  + RESULTS_SIZE_LIMIT_CLAUSE
+
 # Total result count queries for serial number, debtor name searches:
 BUSINESS_NAME_TOTAL_COUNT = """
 SELECT COUNT(r.id) AS query_count
