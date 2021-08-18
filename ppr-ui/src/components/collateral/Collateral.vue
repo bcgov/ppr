@@ -3,7 +3,7 @@
     <v-card flat id="collateral-summary">
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
-          <v-icon color="#38598A">mdi-car</v-icon>
+          <v-icon color="darkBlue">mdi-car</v-icon>
           <label class="pl-3"><strong>Collateral</strong></label>
         </v-col>
       </v-row>
@@ -13,7 +13,7 @@
       >
         <v-row no-gutters class="pa-6">
           <v-col cols="auto">
-            <v-icon color="#D3272C">information-outline</v-icon>&nbsp;
+            <v-icon color="error">information-outline</v-icon>&nbsp;
             <span class="invalid-message">This step is unfinished. </span>
             <span
               id="router-link-collateral"

@@ -71,7 +71,7 @@ async function start () {
         themes: {
           light: {
             primary: '#1669bb', // same as $$primary-blue
-            'app-dk-blue': '#38598a',
+            darkBlue: '#38598a',
             error: '#d3272c',
             success: '#1a9031'
           }

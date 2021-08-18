@@ -2,7 +2,7 @@
   <v-container flat class="pa-0" id="party-summary">
     <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
-        <v-icon color="#38598A">mdi-account-multiple-plus</v-icon>
+        <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
         <label class="pl-3" :class="$style['sectionText']"
           ><strong
             >Registering Party, Secured Parties, and Debtors</strong
@@ -16,50 +16,10 @@
       </v-row>
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
-          <v-data-table
-            class="registering-summary-table"
-            :headers="registeringHeaders"
-            :items="registeringParty"
-            disable-pagination
-            disable-sort
-            hide-default-footer
-            no-data-text=""
-          >
-            <template v-slot:item="row" class="party-data-table">
-              <tr :key="row.item.id" class="registering-row">
-                <td class="list-item__title">
-                  <div class="icon-div" v-if="isBusiness(row.item)">
-                    <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
-                  </div>
-                  <div class="icon-div" v-else>
-                    <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
-                  </div>
-                  {{ getName(row.item) }}
-                </td>
-                <td>
-                  <base-address
-                    :editing="false"
-                    :schema="addressSchema"
-                    :value="row.item.address"
-                  />
-                </td>
-                <td>{{ row.item.emailAddress }}</td>
-                <td>{{ row.item.code }}</td>
-              </tr>
-            </template>
-            <template slot="no-data">
-              <v-icon color="#D3272C">mdi-information-outline</v-icon>
-              <span class="invalid-message">
-                This step is unfinished.
-              </span>
-              <span
-                id="router-link-parties"
-                class="invalid-link"
-                @click="goToParties()"
-                >Return to this step to complete it.</span
-              >
-            </template>
-          </v-data-table>
+          <registering-party-summary
+            class="registering-party-summary"
+            :setEnableNoDataAction="true"
+          />
         </v-col>
       </v-row>
 
@@ -68,50 +28,10 @@
       </v-row>
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
-          <v-data-table
-            class="party-summary-table"
-            :headers="partyHeaders"
-            :items="securedParties"
-            disable-pagination
-            disable-sort
-            hide-default-footer
-            no-data-text=""
-          >
-            <template v-slot:item="row" class="party-data-table">
-              <tr :key="row.item.id" class="party-row">
-                <td class="list-item__title">
-                  <div class="icon-div" v-if="isBusiness(row.item)">
-                    <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
-                  </div>
-                  <div class="icon-div" v-else>
-                    <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
-                  </div>
-                  {{ getName(row.item) }}
-                </td>
-                <td>
-                  <base-address
-                    :editing="false"
-                    :schema="addressSchema"
-                    :value="row.item.address"
-                  />
-                </td>
-                <td>{{ row.item.emailAddress }}</td>
-                <td>{{ row.item.code }}</td>
-              </tr>
-            </template>
-            <template slot="no-data">
-              <v-icon color="#D3272C">mdi-information-outline</v-icon>
-              <span class="invalid-message">
-                This step is unfinished.
-              </span>
-              <span
-                id="router-link-parties"
-                class="invalid-link"
-                @click="goToParties()"
-                >Return to this step to complete it.</span
-              >
-            </template>
-          </v-data-table>
+          <secured-party-summary
+            class="secured-party-summary"
+            :setEnableNoDataAction="true"
+          />
         </v-col>
       </v-row>
       <v-row class="px-1">
@@ -119,50 +39,10 @@
       </v-row>
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
-          <v-data-table
-            class="debtor-summary-table"
-            :headers="debtorHeaders"
-            :items="debtors"
-            disable-pagination
-            disable-sort
-            hide-default-footer
-            no-data-text=""
-          >
-            <template v-slot:item="row" class="debtor-data-table">
-              <tr :key="row.item.id" class="debtor-row">
-                <td class="list-item__title">
-                  <div class="icon-div" v-if="isBusiness(row.item)">
-                    <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
-                  </div>
-                  <div class="icon-div" v-else>
-                    <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
-                  </div>
-                  {{ getName(row.item) }}
-                </td>
-                <td>
-                  <base-address
-                    :editing="false"
-                    :schema="addressSchema"
-                    :value="row.item.address"
-                  />
-                </td>
-                <td>{{ row.item.emailAddress }}</td>
-                <td>{{ getFormattedBirthdate(row.item) }}</td>
-              </tr>
-            </template>
-            <template slot="no-data">
-              <v-icon color="#D3272C">mdi-information-outline</v-icon>
-              <span class="invalid-message">
-                This step is unfinished.
-              </span>
-              <span
-                id="router-link-parties"
-                class="invalid-link"
-                @click="goToParties()"
-                >Return to this step to complete it.</span
-              >
-            </template>
-          </v-data-table>
+          <debtor-summary
+            class="debtor-summary"
+            :setEnableNoDataAction="true"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -177,7 +57,13 @@ import {
   toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+
+import {
+  DebtorSummary,
+  RegisteringPartySummary,
+  SecuredPartySummary
+} from '@/components/parties/summaries'
+import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
@@ -190,7 +76,10 @@ import {
 
 export default defineComponent({
   components: {
-    BaseAddress
+    BaseAddress,
+    DebtorSummary,
+    RegisteringPartySummary,
+    SecuredPartySummary
   },
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([

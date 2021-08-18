@@ -3,7 +3,7 @@
     <v-card flat id="length-trust-summary">
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
-          <v-icon color="#38598A">mdi-calendar-clock</v-icon>
+          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
           <label
             class="pl-3"
             v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
@@ -25,7 +25,7 @@
         <v-row no-gutters v-if="showErrorSummary" class="pa-6">
           <v-col cols="auto">
             <span :class="{ 'invalid-message': showErrorSummary }">
-              <v-icon color="#D3272C">mdi-information-outline</v-icon>
+              <v-icon color="error">mdi-information-outline</v-icon>
               This step is unfinished.
             </span>
             <span
