@@ -17,7 +17,6 @@
 Test-Suite to ensure that the Previous Financing Statement Model is working as expected.
 """
 from ppr_api.models import PreviousFinancingStatement
-from ppr_api.models.utils import ts_from_date_iso_format
 
 
 def test_find_by_financing_id(session):
@@ -45,20 +44,20 @@ def test_previous_financing_json(session):
     previous_statement = PreviousFinancingStatement(
         financing_id=1000,
         registration_type='TEST',
-        cr_date=ts_from_date_iso_format('2012-01-20T08:00:00+00:00'),
+        mhr_date='2012-01-20',
+        mhr_number='MH12345',
+        cr_date='2012-01-21',
         cr_number='CR12345',
-        cb_date=ts_from_date_iso_format('2012-01-20T08:00:00+00:00'),
-        cb_number='CB12345',
-        mhr_date=ts_from_date_iso_format('2012-01-20T08:00:00+00:00'),
-        mhr_number='MH12345'
+        cb_date='2012-01-22',
+        cb_number='CB12345'
     )
     previous_statement_json = {
         'registrationType': previous_statement.registration_type,
-        'mhrDateTime': '2012-01-20T08:00:00+00:00',
+        'mhrDate': '2012-01-20',
         'mhrNumber': 'MH12345',
-        'crDateTime': '2012-01-20T08:00:00+00:00',
+        'crDate': '2012-01-21',
         'crNumber': 'CR12345',
-        'cbDateTime': '2012-01-20T08:00:00+00:00',
+        'cbDate': '2012-01-22',
         'cbNumber': 'CB12345'
     }
 

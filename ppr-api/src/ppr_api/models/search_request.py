@@ -225,15 +225,26 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = 0
             self.total_results_size = 0
 
-    def search_by_individual_name(self):
+    def search_by_individual_name(self):  # pylint: disable=too-many-locals; easier to follow
         """Execute a debtor individual name search query."""
+        result = None
+        middle_name = None
         last_name = self.request_json['criteria']['debtorName']['last']
         first_name = self.request_json['criteria']['debtorName']['first']
+        if 'second' in self.request_json['criteria']['debtorName']:
+            middle_name = self.request_json['criteria']['debtorName']['second']
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
-        result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
-                                    {'query_last': last_name.strip().upper(),
-                                     'query_first': first_name.strip().upper(),
-                                     'max_results_size': max_results_size})
+        if middle_name is not None and middle_name.strip() != '' and middle_name.strip().upper() != 'NONE':
+            result = db.session.execute(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY,
+                                        {'query_last': last_name.strip().upper(),
+                                         'query_first': first_name.strip().upper(),
+                                         'query_middle': middle_name.strip().upper(),
+                                         'max_results_size': max_results_size})
+        else:
+            result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
+                                        {'query_last': last_name.strip().upper(),
+                                         'query_first': first_name.strip().upper(),
+                                         'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -246,7 +257,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     'first': str(mapping['first_name'])
                 }
                 middle = str(mapping['middle_initial'])
-                if middle:
+                if middle and middle != '' and middle.upper() != 'NONE':
                     person['middle'] = middle
                 debtor = {
                     'personName': person,

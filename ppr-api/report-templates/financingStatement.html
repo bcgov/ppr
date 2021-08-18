@@ -23,8 +23,8 @@
           </td>
           <td>
             <div class="report-type">{{ registrationDescription }}</div>
+            <div class="report-type-desc">{{ registrationAct }}</div>
             {# Add back when act descriptions are finalized.
-              <div class="report-type-desc">{{ registrationAct }}</div>
             #}
           </td>
         </tr>
@@ -40,7 +40,7 @@
     </div>
   
     <div class="business-details-container">
-      <table class="business-details-table-grey" role="presentation">
+      <table class="business-details-table-grey pt-4" role="presentation">
         <tr>
           <td>Base Registration Date and Time:</td>
           <td>{{createDateTime}}</td>
@@ -70,7 +70,7 @@
           <td>{{surrenderDate}}</td>
         </tr>
         <tr>
-          <td>Lien Amount:</td>
+          <td>Lien Amount (CAD):</td>
           <td>{{lienAmount}}</td>
         </tr>
         {% endif %}

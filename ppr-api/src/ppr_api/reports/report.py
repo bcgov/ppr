@@ -453,6 +453,11 @@ class Report:  # pylint: disable=too-few-public-methods
             if 'birthDate' in debtor:
                 debtor['birthDate'] = Report._to_report_datetime(debtor['birthDate'], False)
 
+        if statement['type'] == 'RL' and 'lienAmount' in statement:
+            lien_amount = str(statement['lienAmount'])
+            if lien_amount.isnumeric():
+                statement['lienAmount'] = '$' + '{:0,.2f}'.format(float(lien_amount))
+
     @staticmethod
     def _set_change_date_time(statement):
         """Replace non-financing statement API ISO UTC strings with local report format strings."""
@@ -502,6 +507,8 @@ class Report:  # pylint: disable=too-few-public-methods
                     if 'vehicleCollateral' in result:
                         code = result['vehicleCollateral']['type']
                         result['vehicleCollateral']['type'] = TO_VEHICLE_TYPE_DESCRIPTION[code]
+                    elif 'debtor' in result and 'birthDate' in result['debtor']:
+                        result['debtor']['birthDate'] = Report._to_report_datetime(result['debtor']['birthDate'], False)
                     new_selected.append(result)
             self._report_data['selected'] = new_selected
 
@@ -537,10 +544,10 @@ class Report:  # pylint: disable=too-few-public-methods
             if search_type == 'BUSINESS_DEBTOR':
                 criteria = self._report_data['searchQuery']['criteria']['debtorName']['business']
             elif search_type == 'INDIVIDUAL_DEBTOR':
-                criteria = self._report_data['searchQuery']['criteria']['debtorName']['last'] + ', ' +\
-                           self._report_data['searchQuery']['criteria']['debtorName']['first']
-                if 'middle' in self._report_data['searchQuery']['criteria']['debtorName']:
-                    criteria += ' ' + self._report_data['searchQuery']['criteria']['debtorName']['middle']
+                criteria = self._report_data['searchQuery']['criteria']['debtorName']['first'] + ' '
+                if 'second' in self._report_data['searchQuery']['criteria']['debtorName']:
+                    criteria += self._report_data['searchQuery']['criteria']['debtorName']['second'] + ' '
+                criteria += self._report_data['searchQuery']['criteria']['debtorName']['last']
             else:
                 criteria = self._report_data['searchQuery']['criteria']['value']
             self._report_data['meta_subject'] = f'{search_desc} - "{criteria}"'
@@ -564,7 +571,7 @@ class Report:  # pylint: disable=too-few-public-methods
         # local_datetime = datetime.fromtimestamp(utc_datetime.timestamp())
         local_datetime = utc_datetime.astimezone(pytz.timezone('Canada/Pacific'))
         if include_time:
-            timestamp = local_datetime.strftime('%B %-d, %Y %-I:%M:%S %p Pacific Time')
+            timestamp = local_datetime.strftime('%B %-d, %Y %-I:%M:%S %p Pacific time')
             if timestamp.find(' AM ') > 0:
                 return timestamp.replace(' AM ', ' am ')
             return timestamp.replace(' PM ', ' pm ')

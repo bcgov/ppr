@@ -521,6 +521,44 @@ def test_registration_types(session, desc, reg_num):
     assert result['results'][0]['registrationType']
 
 
+def test_debtor_middle_name(session):
+    """Assert that a individual debtor name searches with a middle name returns the expected result."""
+    # setup
+    json_data = {
+        'type': 'INDIVIDUAL_DEBTOR',
+        'criteria': {
+            'debtorName': {
+                'last': 'Debtor',
+                'second': '4',
+                'first': 'Test Ind'
+            }
+        }
+    }
+
+    query = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
+    query.search()
+
+    result = query.json
+    print(result)
+    assert query.id
+    assert query.search_response
+    assert query.account_id == 'PS12345'
+    assert query.user_id == 'UNIT_TEST'
+    assert result['searchId']
+    assert result['searchQuery']
+    assert result['searchDateTime']
+    assert result['totalResultsSize'] >= 1
+    assert result['maxResultsSize']
+    assert result['returnedResultsSize'] >= 1
+    assert len(result['results']) >= 1
+    for match in result['results']:
+        if 'middle' in match['debtor']['personName'] and match['debtor']['personName']['middle'] == '4':
+            assert match['matchType'] == 'EXACT'
+        else:
+            assert match['matchType'] == 'SIMILAR'
+        assert 'middle' not in match['debtor']['personName'] or match['debtor']['personName']['middle'] != 'None'
+
+
 def test_search_startdatetime_invalid(session, client, jwt):
     """Assert that validation of a search with an invalid startDateTime throws a BusinessException."""
     # setup
