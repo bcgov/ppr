@@ -1,10 +1,17 @@
 <div class="container pt-4">
     {% if searchQuery.type in ('INDIVIDUAL_DEBTOR', 'BUSINESS_DEBTOR') %}
+    {% if searchQuery.type == 'BUSINESS_DEBTOR' %}
     <table class="selected-debtor-table mt-4" role="presentation">
-      <tr class="selected-debtor-table-header no-page-break">
+    {% else %}
+    <table class="selected-ind-debtor-table mt-4" role="presentation">
+    {% endif %}
+        <tr class="selected-debtor-table-header no-page-break">
          <td class="top-align"></td>
          <td class="top-align">Base Registration</td>
          <td class="top-align">Debtor Name</td>
+         {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %}
+         <td class="top-align">Birth Date</td>
+         {% endif %}
          <td class="top-align">Type</td>
          <td class="top-align">Page Number</td>
         </tr>
@@ -25,6 +32,13 @@
                     {{ result.debtor.personName.last }}
                 {% endif %}
             </td>
+            {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %}
+            <td>
+                {% if result.debtor.birthDate is defined %}
+                    {{ result.debtor.birthDate }}
+                {% endif %}
+            </td>
+            {% endif %}
             <td>
                 {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %} Individual {% else %} Business{% endif %}
             </td>
