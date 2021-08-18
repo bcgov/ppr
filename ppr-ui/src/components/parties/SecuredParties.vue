@@ -1,6 +1,66 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
-    <v-row no-gutters>
+    <v-row v-if="isSecuredPartyRestrictedList(registrationType)">
+      <v-col cols="auto"
+        >Include Secured Party in your registration by adding their secured
+        party code or their name (business or person). The account number of the
+        Secured Party must match the account number of the Registering Party.<br/>
+        <div class="font-weight-bold pt-2">Only one Secured Party is allowed.</div>
+      </v-col>
+    </v-row>
+    <v-row
+      no-gutters
+      class="pb-4 pt-6"
+      v-if="isSecuredPartyRestrictedList(registrationType)"
+    >
+      <v-col cols="12" class="party-search">
+        <v-autocomplete
+          id="secured-party-autocomplete"
+          allow-overflow
+          filled
+          full-width
+          hide-details
+          :filter="filterList"
+          :loading="loading"
+          :items="partyResults"
+          item-text="businessName"
+          item-value="code"
+          label="Secured Party Code or Name"
+          no-data-text="No matches found."
+          :menu-props="{ maxHeight: '325px' }"
+          offset="1000"
+          return-object
+          v-model="searchValue"
+          class="mx-7 my-8"
+        >
+           <template v-slot:selection="{ item }">
+            <span v-text="item.code"></span>
+            <span class="ml-4" v-text="item.businessName"></span>
+          </template>
+          <template v-slot:item="{ item }">
+            <template>
+              <v-list-item-content @click="selectResult(item)">
+                <v-row class="auto-complete-row">
+                  <v-col cols="1">{{ item.code }}</v-col>
+                  <v-col cols="9"
+                    >{{ item.businessName }}<br />
+                    <div class="pt-2">
+                    {{ item.address.street }},
+                    {{ item.address.city }}
+                    {{ item.address.region }}
+                    {{ getCountryName(item.address.country) }},
+                    {{ item.address.postalCode }}
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-list-item-content>
+            </template>
+          </template>
+        </v-autocomplete>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters v-if="!isSecuredPartyRestrictedList(registrationType)">
       <v-col cols="auto"
         >Include Secured Parties in your registration by adding their secured
         party code or their name (business or person), or if the Secured Party
@@ -8,7 +68,11 @@
         you can add their information manually.
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-4 pt-6">
+    <v-row
+      no-gutters
+      class="pb-4 pt-6"
+      v-if="!isSecuredPartyRestrictedList(registrationType)"
+    >
       <party-search
         :isAutoCompleteDisabled="addEditInProgress"
         :registeringPartyAdded="registeringPartyAdded"
@@ -60,7 +124,11 @@
                 {{ getName(row.item) }}
               </td>
               <td>
-                <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
+                <base-address
+                  :editing="false"
+                  :schema="addressSchema"
+                  :value="row.item.address"
+                />
               </td>
               <td>{{ row.item.emailAddress }}</td>
               <td>{{ row.item.code }}</td>
@@ -68,12 +136,15 @@
               <td class="actions-cell  px-0 py-2">
                 <div
                   class="actions float-right"
-                  v-if="isRegisteringParty(row.item)"
+                  v-if="isRegisteringParty(row.item) || isSecuredPartyRestrictedList(registrationType)"
                 >
-                  <v-list class="actions__more-actions" :disabled="addEditInProgress">
+                  <v-list
+                    class="actions__more-actions"
+                    :disabled="addEditInProgress"
+                  >
                     <v-list-item
-                      :class="$style['v-remove']"
-                      @click="removeRegisteringParty()"
+                      class="v-remove"
+                      @click="removeParty(row.index)"
                     >
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
@@ -160,24 +231,31 @@ import {
   reactive,
   toRefs,
   computed,
-  onMounted, // eslint-disable-line
+  onMounted,
+  watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { isEqual } from 'lodash'
-import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditParty from './EditParty.vue'
 import PartySearch from './PartySearch.vue'
+import PartyAutocomplete from './PartyAutocomplete.vue'
 import { useParty } from '@/composables/useParty'
+import { useSecuredParty } from './composables/useSecuredParty'
 import { BaseAddress } from '@/composables/address'
 
 import { partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
+import { partyCodeSearch } from '@/utils'
+import { APIRegistrationTypes } from '@/enums'
+import { useCountriesProvinces } from '@/composables/address/factories'
 
 export default defineComponent({
   components: {
     EditParty,
     PartySearch,
-    BaseAddress
+    BaseAddress,
+    PartyAutocomplete
   },
   props: {
     isSummary: {
@@ -192,14 +270,14 @@ export default defineComponent({
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
     ])
+    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const countryProvincesHelpers = useCountriesProvinces()
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
-    const {
-      getName,
-      isPartiesValid,
-      isBusiness
-    } = useParty()
+    const { getName, isPartiesValid, isBusiness } = useParty()
+    const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -209,6 +287,10 @@ export default defineComponent({
       invalidSection: false,
       activeIndex: -1,
       showEditParty: [false],
+      partyResults: [],
+      savedPartyResults: [],
+      searchValue: { code: '', businessName: '' },
+      loading: false,
       securedParties: parties.securedParties,
       registeringPartyAdded: false,
       showErrorSummary: computed((): boolean => {
@@ -222,10 +304,14 @@ export default defineComponent({
 
     const removeParty = (index: number): void => {
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      if (isRegisteringParty(localState.securedParties[index])) {
+        localState.registeringPartyAdded = false
+      }
       localState.securedParties.splice(index, 1)
       currentParties.securedParties = localState.securedParties
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
+      localState.searchValue = { code: '', businessName: '' }
     }
 
     const removeRegisteringParty = (): void => {
@@ -278,13 +364,61 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors(currentParties)
     }
 
+    const fetchOtherSecuredParties = async () => {
+      localState.loading = true
+      if (parties.registeringParty) {
+        // go to the service and see if there are similar secured parties
+        const response: [SearchPartyIF] = await partyCodeSearch(
+          parties.registeringParty.businessName,
+          true
+        )
+        // check if any results
+        if (response?.length > 0) {
+          localState.partyResults = response
+          localState.loading = false
+        }
+      } else {
+        setTimeout(fetchOtherSecuredParties, 3000)
+      }
+    }
+
     onMounted(() => {
       for (let i = 0; i < localState.securedParties.length; i++) {
         if (isEqual(localState.securedParties[i], parties.registeringParty)) {
           localState.registeringPartyAdded = true
         }
       }
+
+      if (isSecuredPartyRestrictedList(registrationType)) {
+        fetchOtherSecuredParties()
+      }
     })
+
+    const filterList = (
+      item: SearchPartyIF,
+      queryText: string,
+      itemText: string
+    ) => {
+      const textOne = item.businessName.toLowerCase()
+      const searchText = queryText.toLowerCase()
+      return (
+        textOne.indexOf(searchText) > -1 || item.code.indexOf(searchText) > -1
+      )
+    }
+
+    const selectResult = (party: SearchPartyIF) => {
+      let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      const newParty: PartyIF = {
+        code: party.code,
+        businessName: party.businessName,
+        emailAddress: party.emailAddress || '',
+        address: party.address,
+        personName: { first: '', middle: '', last: '' }
+      }
+      parties.securedParties = [newParty]
+      setAddSecuredPartiesAndDebtors(parties)
+      localState.securedParties = [newParty]
+    }
 
     return {
       removeParty,
@@ -298,30 +432,46 @@ export default defineComponent({
       addRegisteringParty,
       removeRegisteringParty,
       addressSchema,
+      isSecuredPartyRestrictedList,
+      registrationType,
+      selectResult,
+      filterList,
+      ...countryProvincesHelpers,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  font-size: 0.875rem;
-}
-.summary-text {
-  font-size: 14px;
-  color: $gray7;
-}
-.summary-cell {
-  overflow: visible;
-  text-overflow: inherit;
-  white-space: inherit;
-}
+
 .v-remove {
   padding-right: 40px;
 }
 .v-remove:hover {
   background-color: white important;
+}
+
+.party-search {
+  background-color: white;
+}
+.auto-complete-row {
+  font-size: 14px;
+  width: 35rem;
+}
+
+::v-deep .party-search .v-select__selections {
+  color: $gray7 !important;
+}
+
+::v-deep .v-list-item--active {
+  padding-left: 30px;
+  color: $primary-blue !important;
+  font-size: 14px;
+}
+
+::v-deep .v-list-item__content {
+  padding: 6px 0;
 }
 </style>

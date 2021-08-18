@@ -307,7 +307,7 @@ export default defineComponent({
           if (currentSecuredParty.value.businessName) {
             // go to the service and see if there are similar secured parties
             const response: [SearchPartyIF] = await partyCodeSearch(
-              currentSecuredParty.value.businessName
+              currentSecuredParty.value.businessName, false
             )
             // check if any results
             if (response?.length > 0) {
