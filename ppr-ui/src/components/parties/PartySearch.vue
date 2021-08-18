@@ -56,7 +56,6 @@ import {
   watch,
   computed
 } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
 import { partyCodeSearch } from '@/utils'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import PartyAutocomplete from './PartyAutocomplete.vue'
@@ -81,12 +80,6 @@ export default defineComponent({
     'removeRegisteringParty'
   ],
   setup (props, context) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
 
     const localState = reactive({
       searchValue: '',

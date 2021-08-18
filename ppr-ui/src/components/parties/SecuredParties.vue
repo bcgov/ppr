@@ -231,8 +231,7 @@ import {
   reactive,
   toRefs,
   computed,
-  onMounted,
-  watch
+  onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { isEqual } from 'lodash'
@@ -247,7 +246,6 @@ import { BaseAddress } from '@/composables/address'
 import { partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeSearch } from '@/utils'
-import { APIRegistrationTypes } from '@/enums'
 import { useCountriesProvinces } from '@/composables/address/factories'
 
 export default defineComponent({

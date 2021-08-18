@@ -51,7 +51,6 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from './composables/useSecuredParty'
@@ -64,12 +63,6 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
     const { addSecuredParty } = useSecuredParty(props, context)
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
