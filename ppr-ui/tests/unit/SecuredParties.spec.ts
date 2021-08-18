@@ -6,16 +6,21 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
-  mockedSecuredParties2
+  mockedSecuredParties2,
+  mockedSelectSecurityAgreement,
+  mockedOtherCarbon
 } from './test-data'
 
+
 // Components
-import { SecuredParties, EditParty } from '@/components/parties'
+import { SecuredParties, EditParty, PartySearch } from '@/components/parties'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
+
+const partyAutoComplete = '#secured-party-autocomplete'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -40,6 +45,7 @@ describe('Secured Party SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -48,10 +54,12 @@ describe('Secured Party SA tests', () => {
 
   it('renders with default values', async () => {
     expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
+    expect(wrapper.findComponent(PartySearch).exists()).toBeTruthy()
     // won't show edit collateral component until click
     expect(wrapper.findComponent(EditParty).exists()).toBeFalsy()
   })
 })
+
 
 describe('Secured Party store tests', () => {
   let wrapper: Wrapper<any>
@@ -84,5 +92,29 @@ describe('Secured Party store tests', () => {
     expect(item1.querySelectorAll('td')[0].textContent).toContain('SECURED PARTY COMPANY LTD.')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
     expect(item1.querySelectorAll('td')[2].textContent).toContain('test@company.com')
+  })
+})
+
+
+describe('Secured Party Other registration type tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedOtherCarbon)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with default values', async () => {
+    expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
+    // won't show edit collateral component until click
+    expect(wrapper.findComponent(EditParty).exists()).toBeFalsy()
+    // shouldn't show party code search for other registration types
+    expect(wrapper.findComponent(PartySearch).exists()).toBeFalsy()
+    // should have autocomplete instead
+    expect(wrapper.find(partyAutoComplete).exists()).toBeTruthy()
+
   })
 })

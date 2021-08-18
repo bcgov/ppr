@@ -55,6 +55,16 @@ export const mockedMarriageMH: RegistrationTypeIF = {
   text: ''
 }
 
+export const mockedOtherCarbon: RegistrationTypeIF = {
+  class: 'registration-list-item',
+  divider: false,
+  disabled: false,
+  group: 3,
+  registrationTypeUI: UIRegistrationTypes.CARBON_TAX,
+  registrationTypeAPI: APIRegistrationTypes.CARBON_TAX,
+  text: ''
+}
+
 export const mockedError: ErrorIF = {
   statusCode: 500,
   message: 'mock error'
