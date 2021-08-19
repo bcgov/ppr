@@ -8,7 +8,6 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // Components
 import { PartySearch } from '@/components/parties'
 
-
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
@@ -68,4 +67,3 @@ describe('Secured Party search event tests', () => {
     expect(wrapper.emitted().addRegisteringParty).toBeTruthy()
   })
 })
-

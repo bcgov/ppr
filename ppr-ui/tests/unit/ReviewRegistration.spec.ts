@@ -24,7 +24,6 @@ import mockRouter from './MockRouter'
 import { mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
 
-
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
@@ -59,7 +58,7 @@ describe('ReviewConfirm new registration component', () => {
       query: { 'reg-num': '123456B' }
     })
     wrapper = shallowMount(ReviewRegistration, { localVue, store, router, vuetify })
-    wrapper.setProps({appReady: true})
+    wrapper.setProps({ appReady: true })
     await flushPromises()
   })
 

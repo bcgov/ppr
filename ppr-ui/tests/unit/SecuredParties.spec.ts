@@ -11,7 +11,6 @@ import {
   mockedOtherCarbon
 } from './test-data'
 
-
 // Components
 import { SecuredParties, EditParty, PartySearch } from '@/components/parties'
 
@@ -60,7 +59,6 @@ describe('Secured Party SA tests', () => {
   })
 })
 
-
 describe('Secured Party store tests', () => {
   let wrapper: Wrapper<any>
 
@@ -95,7 +93,6 @@ describe('Secured Party store tests', () => {
   })
 })
 
-
 describe('Secured Party Other registration type tests', () => {
   let wrapper: Wrapper<any>
 
@@ -115,6 +112,5 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.findComponent(PartySearch).exists()).toBeFalsy()
     // should have autocomplete instead
     expect(wrapper.find(partyAutoComplete).exists()).toBeTruthy()
-
   })
 })
