@@ -75,7 +75,7 @@ export default defineComponent({
 
     const addResult = (party: SearchPartyIF, resultIndex) => {
       localState.resultAdded[resultIndex] = true
-      
+
       const newParty: PartyIF = {
         code: party.code,
         businessName: party.businessName,
