@@ -1,6 +1,16 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
     <div :class="$style['col-selection']">
+      <v-text-field
+        v-model="search"
+        :class="[$style['text-input-style'], 'column-selection', 'mr-4']"
+        append-icon="mdi-magnify"
+        label="Find Registrations Containing"
+        dense
+        single-line
+        hide-details
+        style="width:250px"
+      ></v-text-field>
       <v-select
         id="column-selection"
         dense
@@ -76,14 +86,43 @@
       id="registration-table"
       class="registration-table pt-4"
       :class="$style['reg-table']"
-      :headers="getDisplayedHeaders"
+      :headers="headers"
       :items="tableData"
+      :search="search"
+      sort-by="number"
+      :sort-desc="[false, true]"
       disable-pagination
+      disable-sort
       hide-default-footer
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
+      hide-default-header
       no-data-text="No registrations created yet."
     >
+      <template slot="header" :headers="getDisplayedHeaders">
+        <thead>
+        <tr>
+              <th v-for="(header, i) in getDisplayedHeaders"
+                  :class="header.class"
+                  :key="'find-header-'+i"
+                  class="text-left header-row-1 pa-0 pl-2">
+                <span>
+                  {{ header.text }}
+                  <v-icon v-if="header.value === selectedSort && submittedOrder === 'asc' && header.sortable"
+                          small
+                          style="color: black;"
+                          @click="selectAndSort(header.value, 'desc')">
+                    mdi-arrow-down
+                  </v-icon>
+                  <v-icon v-else-if="header.value === selectedSort && submittedOrder === 'desc' && header.sortable"
+                          small
+                          style="color: black;"
+                          @click="selectAndSort(header.value, 'asc')">
+                    mdi-arrow-up
+                  </v-icon>
+                </span>
+              </th>
+              </tr>
+        </thead>
+      </template>
       <template v-slot:body.prepend>
         <tr class="filter-row">
           <td v-if="selectedHeaderValues.includes('number')">
@@ -405,8 +444,9 @@ export default defineComponent({
       registrationDate: '',
       loadingPDF: '',
       loadingData: true,
-      sortBy: 'number',
-      sortDesc: false,
+      submittedOrder: 'asc',
+      selectedSort: 'number',
+      search: '',
       selectedHeaderValues: [
         'number',
         'type',
@@ -461,6 +501,10 @@ export default defineComponent({
       if (!date) return ''
       const [year, month, day] = date.split('-')
       return `${year}/${month}/${day}`
+    }
+
+    const selectAndSort = (col: string, direction: string) => {
+
     }
 
     const updateSubmittedRange = () => {
@@ -596,6 +640,7 @@ export default defineComponent({
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
+      selectAndSort,
       ...toRefs(localState)
     }
   }
@@ -648,6 +693,7 @@ export default defineComponent({
   top: -100px;
   float: right;
   height: 0px;
+  display: inline-flex;
 }
 .text-input-style {
   background-color: white !important;
@@ -656,6 +702,13 @@ export default defineComponent({
   font-size: 13px;
   margin: 0;
   color: var(--text);
+  label {
+    font-size: 13px;
+    color: $gray7 !important;
+  }
+  span {
+    color: $gray7;
+  }
 }
 .pdf-btn {
   background-color: transparent !important;
