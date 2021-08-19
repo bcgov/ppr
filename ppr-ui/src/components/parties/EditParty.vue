@@ -161,7 +161,7 @@
                   id="address-secured-party"
                   v-model="currentSecuredParty.address"
                   :editing="true"
-                  :schema="addressSchema"
+                  :schema="{ ...addressSchema }"
                   :triggerErrors="showAllAddressErrors"
                   @valid="updateValidity($event)"
                 />

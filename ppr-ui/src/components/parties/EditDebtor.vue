@@ -170,7 +170,7 @@
               id="address-debtor"
               v-model="currentDebtor.address"
               :editing="true"
-              :schema="addressSchema"
+              :schema="{ ...addressSchema }"
               :triggerErrors="showAllAddressErrors"
               @valid="updateValidity($event)"
             />

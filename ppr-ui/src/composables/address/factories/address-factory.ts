@@ -187,9 +187,10 @@ export function useCountryRegions (code: string): boolean {
 }
 
 export function formatAddress (address: AddressIF): AddressIF {
+  address.postalCode?.toUpperCase()
   if (address.country === 'CA') {
     address.postalCode = address.postalCode.replace('-', ' ')
-    if (address.postalCode[3] !== ' ') {
+    if (address.postalCode.length > 4 && address.postalCode[3] !== ' ') {
       address.postalCode = address.postalCode.slice(0, 3) + ' ' + address.postalCode.slice(3,)
     }
   }
