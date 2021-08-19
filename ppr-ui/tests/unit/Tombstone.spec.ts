@@ -84,7 +84,7 @@ describe('Tombstone component', () => {
 
     await store.dispatch('setAccountInformation', accountInfo)
     await store.dispatch('setUserInfo', userInfo)
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
   })
 
   afterEach(() => {

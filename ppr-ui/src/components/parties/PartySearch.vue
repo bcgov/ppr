@@ -26,7 +26,10 @@
     </v-row>
     <v-row no-gutters>
       <v-col cols="12">
-        <party-autocomplete :autoCompleteItems="autoCompleteResults" :defaultClickToAdd="false" />
+        <party-autocomplete
+          :autoCompleteItems="autoCompleteResults"
+          :defaultClickToAdd="false"
+        />
       </v-col>
     </v-row>
     <v-row class="px-6" align="center">
@@ -61,7 +64,7 @@ import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-
 import PartyAutocomplete from './PartyAutocomplete.vue'
 
 export default defineComponent({
-   components: {
+  components: {
     PartyAutocomplete
   },
   props: {
@@ -80,7 +83,6 @@ export default defineComponent({
     'removeRegisteringParty'
   ],
   setup (props, context) {
-
     const localState = reactive({
       searchValue: '',
       autoCompleteResults: [],
@@ -111,7 +113,10 @@ export default defineComponent({
     }
 
     const updateAutoCompleteResults = async (searchValue: string) => {
-      const response: [SearchPartyIF] = await partyCodeSearch(searchValue, false)
+      const response: [SearchPartyIF] = await partyCodeSearch(
+        searchValue,
+        false
+      )
       // check if results are still relevant before updating list
       if (response?.length > 0) {
         // will take up to 25 results

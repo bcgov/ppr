@@ -45,7 +45,7 @@ describe('Secured Party SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -100,7 +100,7 @@ describe('Secured Party Other registration type tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedOtherCarbon)
+    await store.dispatch('setRegistrationType', mockedOtherCarbon())
     wrapper = createComponent()
   })
   afterEach(() => {

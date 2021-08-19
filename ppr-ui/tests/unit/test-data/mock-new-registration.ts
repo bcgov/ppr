@@ -1,5 +1,9 @@
 import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, APIVehicleTypes } from '@/enums'
 import {
+  RegistrationTypesMiscellaneousCC,
+  RegistrationTypesStandard
+} from '@/resources'
+import {
   AddPartiesIF,
   AddCollateralIF,
   AddressIF,
@@ -15,54 +19,34 @@ import {
   SearchPartyIF
 } from '@/interfaces'
 
-export const mockedSelectSecurityAgreement: RegistrationTypeIF = {
-  class: 'registration-list-item',
-  divider: false,
-  disabled: false,
-  group: 3,
-  registrationTypeUI: UIRegistrationTypes.SECURITY_AGREEMENT,
-  registrationTypeAPI: APIRegistrationTypes.SECURITY_AGREEMENT,
-  text: `${UIRegistrationTypes.SECURITY_AGREEMENT} (${APIRegistrationTypes.SECURITY_AGREEMENT})`
+export const mockedSelectSecurityAgreement = (): RegistrationTypeIF => {
+  return RegistrationTypesStandard.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT
+  })
 }
 
-export const mockedRepairersLien: RegistrationTypeIF = {
-  class: 'registration-list-item',
-  divider: false,
-  disabled: false,
-  group: 3,
-  registrationTypeUI: UIRegistrationTypes.REPAIRERS_LIEN,
-  registrationTypeAPI: APIRegistrationTypes.REPAIRERS_LIEN,
-  text: ''
+export const mockedRepairersLien = (): RegistrationTypeIF => {
+  return RegistrationTypesStandard.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
+  })
 }
 
-export const mockedSaleOfGoods: RegistrationTypeIF = {
-  class: 'registration-list-item',
-  divider: false,
-  disabled: false,
-  group: 3,
-  registrationTypeUI: UIRegistrationTypes.SALE_OF_GOODS,
-  registrationTypeAPI: APIRegistrationTypes.SALE_OF_GOODS,
-  text: ''
+export const mockedSaleOfGoods = (): RegistrationTypeIF => {
+  return RegistrationTypesStandard.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.SALE_OF_GOODS
+  })
 }
 
-export const mockedMarriageMH: RegistrationTypeIF = {
-  class: 'registration-list-item',
-  divider: false,
-  disabled: false,
-  group: 3,
-  registrationTypeUI: UIRegistrationTypes.MARRIAGE_MH,
-  registrationTypeAPI: APIRegistrationTypes.MARRIAGE_MH,
-  text: ''
+export const mockedMarriageMH = (): RegistrationTypeIF => {
+  return RegistrationTypesStandard.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.MARRIAGE_MH
+  })
 }
 
-export const mockedOtherCarbon: RegistrationTypeIF = {
-  class: 'registration-list-item',
-  divider: false,
-  disabled: false,
-  group: 3,
-  registrationTypeUI: UIRegistrationTypes.CARBON_TAX,
-  registrationTypeAPI: APIRegistrationTypes.CARBON_TAX,
-  text: ''
+export const mockedOtherCarbon = (): RegistrationTypeIF => {
+  return RegistrationTypesMiscellaneousCC.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.CARBON_TAX
+  })
 }
 
 export const mockedError: ErrorIF = {

@@ -63,7 +63,7 @@ describe('RegistrationLengthTrust SA tests', () => {
   const defaultRegistrationType: String = String('SA')
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
@@ -106,7 +106,7 @@ describe('RegistrationLengthTrust RL tests', () => {
   const defaultRegistrationType: String = String('RL')
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedRepairersLien)
+    await store.dispatch('setRegistrationType', mockedRepairersLien())
     wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {
@@ -144,7 +144,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setRegistrationType', mockedSaleOfGoods)
+    await store.dispatch('setRegistrationType', mockedSaleOfGoods())
     wrapper = createComponent(defaultRegistrationType)
   })
   afterEach(() => {

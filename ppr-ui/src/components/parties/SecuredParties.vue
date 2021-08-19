@@ -455,7 +455,7 @@ export default defineComponent({
   background-color: white;
 }
 .auto-complete-row {
-  font-size: 14px;
+  font-size: 0.875rem;
   width: 35rem;
 }
 
@@ -466,7 +466,7 @@ export default defineComponent({
 ::v-deep .v-list-item--active {
   padding-left: 30px;
   color: $primary-blue !important;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 ::v-deep .v-list-item__content {
