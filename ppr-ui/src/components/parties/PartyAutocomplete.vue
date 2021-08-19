@@ -6,7 +6,7 @@
     elevation="5"
     v-click-outside="closeAutoComplete"
   >
-    <v-row no-gutters justify="center" class="pl-2 pr-5">
+    <v-row no-gutters justify="center" class="pl-2">
       <v-col no-gutters cols="12">
         <v-list :class="$style['auto-complete-list']" class="pt-0">
           <v-list-item-group v-model="autoCompleteSelected">
@@ -18,27 +18,28 @@
               <v-list-item-content class="pt-2 pb-2">
                 <v-list-item-subtitle>
                   <v-row :class="$style['auto-complete-row']">
-                    <v-col cols="2">{{ result.code }}</v-col>
-                    <v-col cols="9"
-                      >{{ result.businessName }}<br />
+                    <v-col cols="2" :class="$style['title-size']" @click="addResult(result, i)">{{ result.code }}</v-col>
+                    <v-col cols="9" @click="addResult(result, i)"
+                      ><span :class="$style['title-size']">{{ result.businessName }}</span>
+                      <div class="mt-2">
                       {{ result.address.street }},
                       {{ result.address.city }}
                       {{ result.address.region }}
                       {{ getCountryName(result.address.country) }},
                       {{ result.address.postalCode }}
+                      </div>
                     </v-col>
                   </v-row>
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action
-                :class="$style['auto-complete-action']"
-                class="mt-n1"
+                :class="[$style['auto-complete-action'], 'mt-n1']"
               >
                 <span v-if="!resultAdded[i]" @click="addResult(result, i)">
-                  <v-icon>mdi-plus</v-icon>Add
+                  <v-icon :class="$style['icon-bump']">mdi-plus</v-icon>Add
                 </span>
                 <span class="auto-complete-added" v-else>
-                  <v-icon class="auto-complete-added">mdi-check</v-icon>Added
+                  <v-icon :class="[$style['icon-bump'], 'auto-complete-added']">mdi-check</v-icon>Added
                 </span>
               </v-list-item-action>
             </v-list-item>
@@ -166,5 +167,13 @@ export default defineComponent({
 }
 .close-btn-row {
   height: 1rem;
+}
+
+.title-size {
+  font-size: 1rem;
+}
+
+.icon-bump {
+  margin-bottom: 3px;
 }
 </style>
