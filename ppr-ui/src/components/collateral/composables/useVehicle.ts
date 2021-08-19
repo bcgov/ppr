@@ -1,5 +1,5 @@
 import { reactive, toRefs, computed } from '@vue/composition-api'
-import { VehicleTypes } from '@/resources'
+import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { APIRegistrationTypes } from '@/enums'
@@ -12,6 +12,7 @@ export const useVehicle = (props, context) => {
   const localState = reactive({
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
+    vehicleTypesNoMH: VehicleTypesNoMH,
     getSerialLabel: computed(function () {
       switch (localState.currentVehicle.type) {
         case '':
@@ -107,6 +108,13 @@ export const useVehicle = (props, context) => {
     return mhArray.includes(registrationType)
   }
 
+  const excludesManufacturedHomeCollateral = (): boolean => {
+    const mhArray = [
+      APIRegistrationTypes.REPAIRERS_LIEN
+    ]
+    return mhArray.includes(registrationType)
+  }
+
   return {
     getVehicle,
     addVehicle,
@@ -115,6 +123,7 @@ export const useVehicle = (props, context) => {
     hasVehicleCollateral,
     hasGeneralCollateral,
     mustHaveManufacturedHomeCollateral,
+    excludesManufacturedHomeCollateral,
     ...toRefs(localState)
   }
 }

@@ -121,7 +121,6 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
     expect(wrapper.vm.showErrorSurrenderDate).toBe(false)
     expect(wrapper.vm.minSurrenderDate).toBeDefined()
-    expect(wrapper.vm.maxSurrenderDate).toBeDefined()
     expect(wrapper.vm.lienAmount).toBe('')
     expect(wrapper.vm.lengthSummary).toBe('180 Days')
     expect(wrapper.vm.lifeYearsEdit).toBe('1')

@@ -41,7 +41,7 @@
           <v-col cols="3" class="generic-label">
             Registration Length
           </v-col>
-          <v-col :class="$style['summary-text']">
+          <v-col class="summary-text">
             {{ lengthSummary }}
           </v-col>
         </v-row>
@@ -49,7 +49,7 @@
           <v-col cols="3" class="generic-label">
             Trust Indenture
           </v-col>
-          <v-col :class="$style['summary-text']">
+          <v-col class="summary-text">
             {{ trustIndentureSummary }}
           </v-col>
         </v-row>
@@ -61,7 +61,7 @@
           <v-col cols="3" class="generic-label">
             Amount of Lien
           </v-col>
-          <v-col :class="$style['summary-text']">
+          <v-col class="summary-text">
             {{ lienAmountSummary }}
           </v-col>
         </v-row>
@@ -73,7 +73,7 @@
           <v-col cols="3" class="generic-label">
             Surrender Date
           </v-col>
-          <v-col :class="$style['summary-text']">
+          <v-col class="summary-text">
             {{ surrenderDateSummary }}
           </v-col>
         </v-row>
@@ -131,7 +131,8 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
-                v-model="surrenderDate"
+                id="date-text-field"
+                :value="computedDateFormatted"
                 :error-messages="surrenderDateMessage || ''"
                 filled
                 hint="Must be within the last 21 days"
@@ -141,13 +142,14 @@
                 readonly
                 v-bind="attrs"
                 v-on="on"
-              ></v-text-field>
+              >
+              </v-text-field>
             </template>
             <v-date-picker
+              id="date-picker-calendar"
               v-model="surrenderDate"
               elevation="15"
               :min="minSurrenderDate"
-              :max="maxSurrenderDate"
               scrollable
               width="450px"
             >
@@ -328,6 +330,9 @@ export default defineComponent({
         return !lengthTrust.valid
       }),
       showErrorLienAmount: computed((): boolean => {
+        if (lengthTrust.lienAmount !== '' && localState.lienAmountMessage.length > 0) {
+          return true
+        }
         return lengthTrust.showInvalid && lengthTrust.lienAmount === ''
       }),
       showErrorSurrenderDate: computed((): boolean => {
@@ -336,6 +341,12 @@ export default defineComponent({
       lienAmountMessage: computed((): string => {
         if (lengthTrust.showInvalid && lengthTrust.lienAmount === '') {
           return 'This field is required'
+        }
+        if (lengthTrust.lienAmount.length > 0) {
+          var amount = Number(lengthTrust.lienAmount.replace(',', ''))
+          if (isNaN(amount) || amount < 0.01) {
+            return 'Lien amount must be a number greater than 0.'
+          }
         }
         return ''
       }),
@@ -351,8 +362,8 @@ export default defineComponent({
         minDate.setTime(minDate.getTime() - dateOffset)
         return minDate.toISOString()
       }),
-      maxSurrenderDate: computed((): string => {
-        return new Date().toISOString()
+      computedDateFormatted: computed((): string => {
+        return localState.surrenderDate !== '' ? convertDate(new Date(localState.surrenderDate), false, false) : ''
       }),
       lengthSummary: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
@@ -507,9 +518,16 @@ export default defineComponent({
       () => localState.lienAmount,
       (val: string) => {
         lengthTrust.lienAmount = val.trimRight().trimLeft()
-        if (lengthTrust.lienAmount !== '' && lengthTrust.surrenderDate !== '') {
-          lengthTrust.valid = true
-          lengthTrust.showInvalid = false
+        if (lengthTrust.lienAmount.length > 0) {
+          var amount = Number(lengthTrust.lienAmount.replace(',', ''))
+          if (isNaN(amount) || amount < 0.01) {
+            lengthTrust.valid = false
+          } else if (lengthTrust.surrenderDate !== '') {
+            lengthTrust.valid = true
+            lengthTrust.showInvalid = false
+          } else {
+            lengthTrust.valid = false
+          }
         } else {
           lengthTrust.valid = false
         }
@@ -543,13 +561,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
+/* Need scoped for date picker v-deep style overrides to work */
 @import '@/assets/styles/theme.scss';
-.summary-text {
-  font-size: 16px;
-  color: $gray7;
-}
-
 .v-list-item {
   min-height: 0;
   padding: 0 1rem 0 0.5rem;
@@ -560,10 +574,41 @@ export default defineComponent({
     padding: 0 !important;
   }
 }
-.warning-text {
-  position: relative;
-  top: 2px;
-  left: 2px;
-  color: $BCgovGold9;
+
+::v-deep .v-icon.v-icon {
+  color: $primary-blue
 }
+::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+  opacity: 1;
+}
+::v-deep .v-date-picker-table__current {
+  border-color: $primary-blue !important;
+}
+::v-deep .v-date-picker-table__current .v-btn__content{
+  color: $primary-blue !important;
+}
+::v-deep .theme--light.v-date-picker-table th {
+  color: $gray9
+}
+::v-deep .v-date-picker-table .v-btn {
+  color: $gray7
+}
+::v-deep .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: $primary-blue !important;
+  border-color: $primary-blue !important;
+  color: white !important;
+}
+::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+  opacity: 0;
+}
+::v-deep .v-icon.v-icon.v-icon--link {
+  cursor: text;
+}
+::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+  color: $primary-blue !important;
+}
+::v-deep .v-input--is-disabled {
+  opacity: 0.4;
+}
+
 </style>
