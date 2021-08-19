@@ -2,6 +2,7 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
+import { APIRegistrationTypes } from '@/enums'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -94,6 +95,30 @@ export const useSecuredParty = (props, context) => {
     localState.currentSecuredParty.address = newAddress
   }
 
+  const isSecuredPartyRestrictedList = (regType: string): boolean => {
+    const restrictedList = [
+      APIRegistrationTypes.LIEN_UNPAID_WAGES,
+      APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+      APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+      APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+      APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+      APIRegistrationTypes.FOREST,
+      APIRegistrationTypes.LOGGING_TAX,
+      APIRegistrationTypes.CARBON_TAX,
+      APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+      APIRegistrationTypes.RURAL_PROPERTY_TAX,
+      APIRegistrationTypes.INCOME_TAX,
+      APIRegistrationTypes.MOTOR_FUEL_TAX,
+      APIRegistrationTypes.EXCISE_TAX,
+      APIRegistrationTypes.MAINTENANCE_LIEN
+    ]
+    // @ts-ignore - it doesn't like the string comparison for some reason
+    if (restrictedList.includes(regType)) {
+      return true
+    }
+    return false
+  }
+
   return {
     getSecuredParty,
     addEditSecuredParty,
@@ -102,6 +127,7 @@ export const useSecuredParty = (props, context) => {
     addressSchema,
     updateAddress,
     addSecuredParty,
+    isSecuredPartyRestrictedList,
     ...toRefs(localState)
   }
 }

@@ -54,7 +54,7 @@ describe('Collateral add tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     wrapper = createComponent(-1, false)
   })
   afterEach(() => {
@@ -95,7 +95,7 @@ describe('Collateral tests for MH', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedMarriageMH)
+    await store.dispatch('setRegistrationType', mockedMarriageMH())
     wrapper = createComponent(-1, false)
   })
   afterEach(() => {
@@ -121,7 +121,7 @@ describe('Collateral edit tests', () => {
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: mockedVehicleCollateral1
     })
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     wrapper = createComponent(0, false)
   })
   afterEach(() => {

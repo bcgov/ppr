@@ -80,6 +80,8 @@
       :items="tableData"
       disable-pagination
       hide-default-footer
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
       no-data-text="No registrations created yet."
     >
       <template v-slot:body.prepend>
@@ -214,11 +216,8 @@
           v-if="!row.item.hide"
           :class="draftClass(row.item.statusType)"
         >
-          <td v-if="selectedHeaderValues.includes('number')">
-            {{ row.item.registrationNumber }}
-            <span v-if="row.item.registrationNumber !== row.item.baseRegistrationNumber">
-            {{ row.item.baseRegistrationNumber }}
-            </span>
+          <td class="font-weight-bold" v-if="selectedHeaderValues.includes('number')"
+          v-html="displayRegistrationNumber(row.item.baseRegistrationNumber, row.item.registrationNumber)">
           </td>
           <td v-if="selectedHeaderValues.includes('type')">
             {{ getRegistrationType(row.item.registrationType) }}
@@ -406,6 +405,8 @@ export default defineComponent({
       registrationDate: '',
       loadingPDF: '',
       loadingData: true,
+      sortBy: 'number',
+      sortDesc: false,
       selectedHeaderValues: [
         'number',
         'type',
@@ -443,6 +444,17 @@ export default defineComponent({
         return 'font-italic'
       }
       return ''
+    }
+
+    const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
+      if (baseReg) {
+        if (baseReg === actualReg) {
+          return baseReg
+        }
+        return baseReg + '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
+          actualReg + '</span>'
+      }
+      return actualReg
     }
 
     const formatDate = (date: string): string => {
@@ -563,6 +575,7 @@ export default defineComponent({
       getStatusDescription,
       draftClass,
       registrationNumber,
+      displayRegistrationNumber,
       registrationType,
       registrationTypes,
       registeredBy,

@@ -280,12 +280,12 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
 
 // Search the party code db
 export async function partyCodeSearch (
-  nameOrCode: string
+  nameOrCode: string, exactSearch: boolean
 ): Promise<[SearchPartyIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   let fuzzyName = ''
-  if (!/^\d+$/.test(nameOrCode)) {
+  if (!/^\d+$/.test(nameOrCode) && !exactSearch) {
     fuzzyName = '?fuzzyNameSearch=true'
   }
   return axios

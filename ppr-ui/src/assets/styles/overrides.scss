@@ -430,3 +430,28 @@ tbody {
   background-color: white;
   color: $primary-blue !important;
 }
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td, 
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th, 
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td, 
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th, 
+#registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, 
+#registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
+  padding: 0 5px;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action {
+  width:130px !important;
+  text-align: right !important;
+  padding-right: 45px !important;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
+  width:130px !important;
+  text-align: right !important;
+  padding-right: 20px !important;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper div.v-select__selection {
+  font-size: 14px;
+}

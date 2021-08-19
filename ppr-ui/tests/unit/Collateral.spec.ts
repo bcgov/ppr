@@ -44,7 +44,7 @@ describe('Collateral SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
 
     wrapper = createComponent()
   })
