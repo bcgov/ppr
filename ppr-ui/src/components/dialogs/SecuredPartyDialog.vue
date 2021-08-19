@@ -301,5 +301,6 @@ export default defineComponent({
 
 .dialogButton {
   margin-left: 330px;
+  min-width: 60px;
 }
 </style>
