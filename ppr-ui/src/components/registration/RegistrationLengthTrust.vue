@@ -292,6 +292,7 @@ export default defineComponent({
     const feeInfoYears = getFinancingFee(false)
     const feeInfoInfinite = getFinancingFee(true)
     const router = context.root.$router
+    const modal = false
 
     if (
       registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
@@ -555,6 +556,7 @@ export default defineComponent({
       infinityPreselected,
       APIRegistrationTypes,
       registrationType,
+      modal,
       ...toRefs(localState)
     }
   }
