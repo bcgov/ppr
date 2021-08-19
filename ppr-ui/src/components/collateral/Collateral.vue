@@ -429,7 +429,7 @@ export default defineComponent({
     const goToCollateral = (): void => {
       collateral.showInvalid = true
       setAddCollateral(collateral)
-      router.push({ path: '/add-collateral' })
+      router.push({ path: '/new-registration/add-collateral' })
     }
 
     onMounted(() => {

@@ -30,6 +30,13 @@ import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-
  * 500 INTERNAL_SERVER_ERROR
  */
 
+// Create default request base URL and headers.
+function getDefaultConfig (): Object {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return config
+}
+
 export const successfulPPRResponses = [
   StatusCodes.OK,
   StatusCodes.CREATED,
@@ -216,13 +223,6 @@ export async function updateUserSettings (
     })
 }
 
-// Create default request base URL and headers.
-function getDefaultConfig (): Object {
-  const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return config
-}
-
 // Save a new draft.
 export async function createDraft (draft: DraftIF): Promise<DraftIF> {
   return axios
@@ -382,6 +382,40 @@ export async function createFinancingStatement (
           error?.response?.data?.rootCause
       }
       return statement
+    })
+}
+
+// Get an existing financing statement.
+export async function getFinancingStatement (
+  current: boolean,
+  registrationNum: string
+): Promise<FinancingStatementIF> {
+  return axios
+    .get<FinancingStatementIF>(
+      `financing-statements/${registrationNum}?current=${current}`,
+      getDefaultConfig()
+    )
+    .then(response => {
+      const data: FinancingStatementIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        type: null,
+        registeringParty: null,
+        securedParties: [],
+        debtors: [],
+        error: {
+          statusCode: error?.response?.status,
+          message:
+            error?.response?.data?.errorMessage +
+            ' ' +
+            error?.response?.data?.rootCause
+        }
+      }
     })
 }
 

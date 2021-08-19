@@ -55,8 +55,8 @@ export default defineComponent({
       }),
       registeringPartyOptions: {
         header: props.setHeader,
-        iconColor: '',
-        iconImage: '',
+        iconColor: 'darkBlue',
+        iconImage: 'mdi-account',
         isDebtorSummary: false,
         enableNoDataAction: props.setEnableNoDataAction
       } as PartySummaryOptionsI

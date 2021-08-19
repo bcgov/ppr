@@ -5,6 +5,7 @@ import {
   Dashboard,
   LengthTrust,
   ReviewConfirm,
+  ReviewRegistration,
   Search,
   Signin,
   Signout
@@ -41,7 +42,15 @@ export const routes = [
     }
   },
   {
-    path: '/length-trust',
+    path: '/discharge/review-discharge',
+    name: RouteNames.REVIEW_DISCHARGE,
+    component: ReviewRegistration,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/new-registration/length-trust',
     name: RouteNames.LENGTH_TRUST,
     component: LengthTrust,
     meta: {
@@ -51,7 +60,7 @@ export const routes = [
     }
   },
   {
-    path: '/add-securedparties-debtors',
+    path: '/new-registration/add-securedparties-debtors',
     name: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
     component: AddSecuredPartiesAndDebtors,
     meta: {
@@ -61,7 +70,7 @@ export const routes = [
     }
   },
   {
-    path: '/add-collateral',
+    path: '/new-registration/add-collateral',
     name: RouteNames.ADD_COLLATERAL,
     component: AddCollateral,
     meta: {
@@ -71,7 +80,7 @@ export const routes = [
     }
   },
   {
-    path: '/review-confirm',
+    path: '/new-registration/review-confirm',
     name: RouteNames.REVIEW_CONFIRM,
     component: ReviewConfirm,
     meta: {

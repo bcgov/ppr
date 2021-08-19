@@ -1,14 +1,14 @@
 <template>
   <v-container flat class="pa-0">
-    <v-row v-if="options.header" class="summary-header pa-2 rounded-top" no-gutters>
-      <v-col cols="auto" class="pa-2">
+    <v-row v-if="options.header" class="summary-header rounded-top" no-gutters>
+      <v-col cols="auto" class="pa-4">
         <v-icon v-if="options.iconImage" :color="options.iconColor">{{ options.iconImage }}</v-icon>
         <label class="pl-3" :class="$style['sectionText']">
           <strong>{{ options.header }}</strong>
         </label>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-6 pt-4">
+    <v-row no-gutters>
       <v-col>
         <v-data-table
           class="party-summary-table"

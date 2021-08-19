@@ -10,5 +10,6 @@ export enum RouteNames {
     LENGTH_TRUST = 'length-trust',
     ADD_SECUREDPARTIES_AND_DEBTORS = 'add-securedparties-debtors',
     ADD_COLLATERAL = 'add-collateral',
-    REVIEW_CONFIRM = 'review-confirm'
+    REVIEW_CONFIRM = 'review-confirm',
+    REVIEW_DISCHARGE = 'review-discharge'
 }

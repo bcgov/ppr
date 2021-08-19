@@ -26,6 +26,6 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
 
   const datetime = format12HourTime(date)
 
-  if (includeTz) return moment(date).format('MMMM D, Y') + ` ${datetime} ${timezone}`
+  if (includeTz) return moment(date).format('MMMM D, Y') + ` at ${datetime} ${timezone}`
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
