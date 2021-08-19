@@ -21,7 +21,7 @@
           </v-row>
         </v-col>
         <v-col cols="1">
-          <v-row no-gutters justify="end" style="margin-top: -10px">
+          <v-row no-gutters justify="end" style="margin-top: -10px; padding-right: 15px;">
             <v-btn color="primary" icon :ripple="false" @click="exit()">
               <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -301,6 +301,6 @@ export default defineComponent({
 
 .dialogButton {
   margin-left: 330px;
-  min-width: 60px;
+  width: 75px;
 }
 </style>
