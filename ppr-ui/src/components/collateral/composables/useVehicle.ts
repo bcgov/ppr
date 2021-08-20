@@ -81,7 +81,10 @@ export const useVehicle = (props, context) => {
       APIRegistrationTypes.MARRIAGE_MH,
       APIRegistrationTypes.LAND_TAX_LIEN,
       APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
-      APIRegistrationTypes.SALE_OF_GOODS
+      APIRegistrationTypes.SALE_OF_GOODS,
+      APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+      APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+      APIRegistrationTypes.MAINTENANCE_LIEN
     ]
     return vhArray.includes(registrationType)
   }
@@ -92,9 +95,21 @@ export const useVehicle = (props, context) => {
       APIRegistrationTypes.SALE_OF_GOODS,
       APIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
       APIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
-      APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN
-      // APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
-      // APIRegistrationTypes.MISCELLANEOUS_OTHER
+      APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN,
+      APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+      APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+      APIRegistrationTypes.FOREST,
+      APIRegistrationTypes.LOGGING_TAX,
+      APIRegistrationTypes.CARBON_TAX,
+      APIRegistrationTypes.RURAL_PROPERTY_TAX,
+      APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+      APIRegistrationTypes.INCOME_TAX,
+      APIRegistrationTypes.MOTOR_FUEL_TAX,
+      APIRegistrationTypes.EXCISE_TAX,
+      APIRegistrationTypes.LIEN_UNPAID_WAGES,
+      APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+      APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+      APIRegistrationTypes.MAINTENANCE_LIEN
     ]
     return ghArray.includes(registrationType)
   }
@@ -103,7 +118,8 @@ export const useVehicle = (props, context) => {
     const mhArray = [
       APIRegistrationTypes.MARRIAGE_MH,
       APIRegistrationTypes.LAND_TAX_LIEN,
-      APIRegistrationTypes.MANUFACTURED_HOME_LIEN
+      APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+      APIRegistrationTypes.MANUFACTURED_HOME_NOTICE
     ]
     return mhArray.includes(registrationType)
   }
