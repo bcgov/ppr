@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="registration-bar pa-0">
+  <v-container id="registration-bar" fluid no-gutters class="registration-bar pa-0">
     <v-row no-gutters class="px-6">
       <v-col class="ml-n6" cols="4">
         <div class="actions">
