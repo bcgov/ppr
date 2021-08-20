@@ -27,9 +27,8 @@
                 {% if result.debtor.businessName is defined %}
                     {{ result.debtor.businessName }}
                 {% else %}
-                    {{ result.debtor.personName.first }}&nbsp;
-                    {% if result.debtor.personName.middle is defined %} {{ result.debtor.personName.middle }}&nbsp;{% endif %}
-                    {{ result.debtor.personName.last }}
+                    {{ result.debtor.personName.last }}, {{ result.debtor.personName.first }}
+                    {% if result.debtor.personName.middle is defined %} &nbsp;{{ result.debtor.personName.middle }} {% endif %}
                 {% endif %}
             </td>
             {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %}
