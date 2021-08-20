@@ -1,39 +1,41 @@
 <template>
-  <v-container v-if="dataLoaded" fluid class="pa-15" style="min-width: 960px;">
-    <v-row no-gutters>
-      <v-col cols="9">
-        <h1>Total Discharge</h1>
-        <div style="padding-top: 30px; max-width: 875px;">
-          <p class="ma-0">
-            Review the current information for this registration as of
-            <b>{{ asOfDateTime }}.</b><br/>
-            If additional amendments including court orders are still required, ensure they are completed
-            prior to performing this Total Discharge.
-          </p>
-          <p class="ma-0 pt-5">
-            To view the full history of this registration including descriptions of any
-            amendments and any court orders, you will need to conduct a separate search.
-          </p>
-        </div>
-        <registration-length-trust class="mt-10" :isSummary="true" :defaultRegistrationType="registrationType" />
-        <div class="summary-header mt-15 pa-4 rounded-top">
-          <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
-          <label class="pl-3">
-            <strong>Registering Party, Secured Parties, and Debtors</strong>
-          </label>
-        </div>
-        <h3 class="pt-6 px-1">Original Registering Party</h3>
-        <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
-        <h3 class="pt-6 px-1">Secured Parties</h3>
-        <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
-        <h3 class="pt-6 px-1">Debtors</h3>
-        <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-        <collateral class="mt-15" :isSummary="true" />
-      </v-col>
-      <v-col class="pl-5" cols="3">
-        <registration-fee :registrationType="'Total Discharge'" />
-      </v-col>
-    </v-row>
+  <v-container v-if="dataLoaded" class="view-container pa-15" fluid style="min-width: 960px;">
+    <div class="container pa-0" style="min-width: 960px;">
+      <v-row no-gutters>
+        <v-col cols="9">
+          <h1>Total Discharge</h1>
+          <div style="padding-top: 30px; max-width: 875px;">
+            <p class="ma-0">
+              Review the current information for this registration as of
+              <b>{{ asOfDateTime }}.</b><br/>
+              If additional amendments including court orders are still required, ensure they are completed
+              prior to performing this Total Discharge.
+            </p>
+            <p class="ma-0 pt-5">
+              To view the full history of this registration including descriptions of any
+              amendments and any court orders, you will need to conduct a separate search.
+            </p>
+          </div>
+          <registration-length-trust class="mt-10" :isSummary="true" :defaultRegistrationType="registrationType" />
+          <div class="summary-header mt-15 pa-4 rounded-top">
+            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
+            <label class="pl-3">
+              <strong>Registering Party, Secured Parties, and Debtors</strong>
+            </label>
+          </div>
+          <h3 class="pt-6 px-1">Original Registering Party</h3>
+          <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <h3 class="pt-6 px-1">Secured Parties</h3>
+          <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <h3 class="pt-6 px-1">Debtors</h3>
+          <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
+          <collateral class="mt-15" :isSummary="true" />
+        </v-col>
+        <v-col class="pl-6" cols="3">
+          <registration-fee :registrationType="'Total Discharge'" />
+        </v-col>
+      </v-row>
+    </div>
   </v-container>
 </template>
 

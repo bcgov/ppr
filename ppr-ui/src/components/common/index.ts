@@ -1,3 +1,4 @@
+export { default as Breadcrumb } from './Breadcrumb.vue'
 export { default as ButtonFooter } from './ButtonFooter.vue'
 export { default as ErrorContact } from './ErrorContact.vue'
 export { default as RegistrationFee } from './RegistrationFee.vue'

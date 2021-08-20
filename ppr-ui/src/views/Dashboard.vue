@@ -1,61 +1,58 @@
 <template>
-  <v-container fluid class="pa-0 ma-0" style="max-width: none;">
-
-    <v-row no-gutters>
-      <v-container fluid class="py-10">
-        <v-row no-gutters>
-          <v-col>
-            <v-row no-gutters
-                   id="search-header"
-                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
-              <v-col cols="auto">
-                <b>Personal Property Search</b>
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <search-bar class="soft-corners-bottom"
-                          :searchTitle="''"
-                          @debtor-name="setDebtorName"
-                          @searched-type="setSearchedType"
-                          @searched-value="setSearchedValue"
-                          @search-data="setSearchResults"
-                          @search-error="emitError"/>
-            </v-row>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class='pt-12'>
-          <v-col>
-            <v-row no-gutters
-                   id="search-history-header"
-                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
-              <v-col cols="auto">
-                <b>My Searches</b> ({{ searchHistoryLength }})
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <search-history class="soft-corners-bottom" @error="emitError"/>
-            </v-row>
-          </v-col>
-        </v-row>
-        <v-row class="pt-15" no-gutters>
-          <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
-        </v-row>
-        <v-row no-gutters class="pt-7" style="margin-top: 2px">
-          <v-col>
-            <v-row no-gutters
-                   id="registration-header"
-                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
-              <v-col cols="auto">
-                <b>My Registrations</b>
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="white" style="min-height:300px">
-              <v-col cols="12"><registration-table @discharge="startDischarge($event)"/></v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-row>
+  <v-container fluid class="view-container px-15 py-10 ma-0">
+    <div class="container pa-0">
+      <v-row no-gutters>
+        <v-col>
+          <v-row no-gutters
+                  id="search-header"
+                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+            <v-col cols="auto">
+              <b>Personal Property Search</b>
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <search-bar class="soft-corners-bottom"
+                        :searchTitle="''"
+                        @debtor-name="setDebtorName"
+                        @searched-type="setSearchedType"
+                        @searched-value="setSearchedValue"
+                        @search-data="setSearchResults"
+                        @search-error="emitError"/>
+          </v-row>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class='pt-12'>
+        <v-col>
+          <v-row no-gutters
+                  id="search-history-header"
+                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+            <v-col cols="auto">
+              <b>My Searches</b> ({{ searchHistoryLength }})
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <search-history class="soft-corners-bottom" @error="emitError"/>
+          </v-row>
+        </v-col>
+      </v-row>
+      <v-row class="pt-15" no-gutters>
+        <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
+      </v-row>
+      <v-row no-gutters class="pt-7" style="margin-top: 2px">
+        <v-col>
+          <v-row no-gutters
+                  id="registration-header"
+                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+            <v-col cols="auto">
+              <b>My Registrations</b>
+            </v-col>
+          </v-row>
+          <v-row no-gutters class="white" style="min-height:300px">
+            <v-col cols="12"><registration-table @discharge="startDischarge($event)"/></v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </div>
   </v-container>
 </template>
 

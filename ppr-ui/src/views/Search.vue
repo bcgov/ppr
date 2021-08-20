@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-0" style="max-width: none;">
+  <v-container fluid class="view-container pa-15">
     <confirmation-dialog
       :attach="attachDialog"
       :options="options"
@@ -7,87 +7,85 @@
       :settingOption="settingOption"
       @proceed="submit"
     />
-    <v-row no-gutters>
-      <v-container fluid class="pa-10">
-        <v-row no-gutters>
-          <v-col>
-            <!-- v-if reason: setting the props to null will cause the select to display 'null' -->
-            <search-bar v-if="getSearchedType"
-                        class="soft-corners"
-                        :defaultDebtor="getDebtorName"
-                        :defaultFolioNumber="folioNumber"
-                        :defaultSearchValue="getSearchedValue"
-                        :defaultSelectedSearchType="getSearchedType"
-                        @debtor-name="setDebtorName"
-                        @searched-type="setSearchedType"
-                        @searched-value="setSearchedValue"
-                        @search-error="emitError"
-                        @search-data="setSearchResults"/>
-            <search-bar v-else
-                        class="soft-corners"
-                        @debtor-name="setDebtorName"
-                        @searched-type="setSearchedType"
-                        @searched-value="setSearchedValue"
-                        @search-error="emitError"
-                        @search-data="setSearchResults"/>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col>
-            <v-row no-gutters class="pt-8">
-              <v-col :class="$style['search-title']">
-                <b>Search Results</b>
-              </v-col>
-            </v-row>
-            <v-row v-if="!getSearchResults" no-gutters>
-              <v-col :class="$style['search-info']">
-                  Your search results will display below.
-              </v-col>
-            </v-row>
-            <v-row v-else no-gutters class="pt-2">
-              <v-col>
-                <v-row no-gutters id="search-meta-info">
-                  <p>
-                    <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
-                    <span :class="$style['search-time']">{{ searchTime }}</span>
-                  </p>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col cols="8" :class="$style['search-info']">
-                    <span v-if="totalResultsLength !== 0" id="results-info">
-                      Select the registrations you want to include in a printable search report.
-                      This report will contain the full record of each selected registration and will be
-                      automatically saved to your PPR Dashboard.
-                      A general record of your search results will also be saved.
-                    </span>
-                    <span v-else id="no-results-info">
-                      No Registrations were found. Your search results and a printable PDF have been automatically
-                      saved to My Searches on your PPR Dashboard.
-                    </span>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-            <v-row v-if="getSearchResults" no-gutters justify="end" class="pt-5">
-              <v-col v-if="folioNumber" id="results-folio-header" align-self="start">
-                <p class="pt-3 mb-0">
-                  <b :class="$style['search-table-title']">Folio Number: </b>
-                  <span :class="$style['search-info']">{{ folioNumber }}</span>
+    <div class="container pa-0">
+      <v-row no-gutters>
+        <v-col>
+          <!-- v-if reason: setting the props to null will cause the select to display 'null' -->
+          <search-bar v-if="getSearchedType"
+                      class="soft-corners"
+                      :defaultDebtor="getDebtorName"
+                      :defaultFolioNumber="folioNumber"
+                      :defaultSearchValue="getSearchedValue"
+                      :defaultSelectedSearchType="getSearchedType"
+                      @debtor-name="setDebtorName"
+                      @searched-type="setSearchedType"
+                      @searched-value="setSearchedValue"
+                      @search-error="emitError"
+                      @search-data="setSearchResults"/>
+          <search-bar v-else
+                      class="soft-corners"
+                      @debtor-name="setDebtorName"
+                      @searched-type="setSearchedType"
+                      @searched-value="setSearchedValue"
+                      @search-error="emitError"
+                      @search-data="setSearchResults"/>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col>
+          <v-row no-gutters class="pt-8">
+            <v-col :class="$style['search-title']">
+              <b>Search Results</b>
+            </v-col>
+          </v-row>
+          <v-row v-if="!getSearchResults" no-gutters>
+            <v-col :class="$style['search-info']">
+                Your search results will display below.
+            </v-col>
+          </v-row>
+          <v-row v-else no-gutters class="pt-2">
+            <v-col>
+              <v-row no-gutters id="search-meta-info">
+                <p>
+                  <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
+                  <span :class="$style['search-time']">{{ searchTime }}</span>
                 </p>
-              </v-col>
-              <v-col cols="auto" class="pl-3">
-                <v-btn :id="$style['done-btn']" class="search-done-btn pl-7 pr-7 primary" @click="submitCheck">
-                  Done
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row v-if="getSearchResults" no-gutters class='pt-5'>
-              <searched-result class="soft-corners" @selected-matches="updateSelectedMatches"/>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-row>
+              </v-row>
+              <v-row no-gutters>
+                <v-col cols="8" :class="$style['search-info']">
+                  <span v-if="totalResultsLength !== 0" id="results-info">
+                    Select the registrations you want to include in a printable search report.
+                    This report will contain the full record of each selected registration and will be
+                    automatically saved to your PPR Dashboard.
+                    A general record of your search results will also be saved.
+                  </span>
+                  <span v-else id="no-results-info">
+                    No Registrations were found. Your search results and a printable PDF have been automatically
+                    saved to My Searches on your PPR Dashboard.
+                  </span>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <v-row v-if="getSearchResults" no-gutters justify="end" class="pt-5">
+            <v-col v-if="folioNumber" id="results-folio-header" align-self="start">
+              <p class="pt-3 mb-0">
+                <b :class="$style['search-table-title']">Folio Number: </b>
+                <span :class="$style['search-info']">{{ folioNumber }}</span>
+              </p>
+            </v-col>
+            <v-col cols="auto" class="pl-3">
+              <v-btn :id="$style['done-btn']" class="search-done-btn pl-7 pr-7 primary" @click="submitCheck">
+                Done
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row v-if="getSearchResults" no-gutters class='pt-5'>
+            <searched-result class="soft-corners" @selected-matches="updateSelectedMatches"/>
+          </v-row>
+        </v-col>
+      </v-row>
+    </div>
   </v-container>
 </template>
 
