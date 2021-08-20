@@ -1,15 +1,14 @@
 <template>
-  <v-container fluid class="pa-0" style="max-width: none;">
-    <v-row no-gutters>
-      <v-container fluid class="pt-4">
-        <v-row>
+  <v-container class="view-container pa-0" fluid>
+    <div class="view-container px-15 py-0">
+      <div class="container pa-0 pt-4">
+        <v-row no-gutters>
           <v-col cols="9">
             <v-row no-gutters
                    id="registration-header"
                    class="length-trust-header pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
-<h1>{{ registrationTypeUI }}</h1>
-
+                <h1>{{ registrationTypeUI }}</h1>
               </v-col>
             </v-row>
             <stepper class="mt-4" :showStepErrorsFlag="showStepErrors"/>
@@ -61,12 +60,12 @@
               </v-container>
             </v-row>
           </v-col>
-          <v-col cols="3">
+          <v-col class="pl-6" cols="3">
             <registration-fee :registrationType="registrationTypeUI"/>
           </v-col>
         </v-row>
-      </v-container>
-    </v-row>
+      </div>
+    </div>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"

@@ -40,6 +40,7 @@
             This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
           </v-col>
         </v-row>
+        <breadcrumb />
         <tombstone :backURL="dashboardURL" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters style="overflow: scroll;">
@@ -77,7 +78,7 @@ import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components
 
 // local Components
 import * as Dialogs from '@/components/dialogs'
-import { Tombstone } from '@/components/common'
+import { Breadcrumb, Tombstone } from '@/components/common'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
@@ -91,6 +92,7 @@ import { AccountProductCodes, RouteNames } from './enums'
 
 @Component({
   components: {
+    Breadcrumb,
     SbcHeader,
     SbcFooter,
     SbcAuthenticationOptionsDialog,
