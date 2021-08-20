@@ -1,35 +1,53 @@
-<div class="no-page-break">
+<div>
    {% if detail.financingStatement is defined and change is not defined %}
       <div class="separator mt-5"></div>
    {% endif %}
-   <div class="section-title mt-3">General Collateral</div>
+   <div class="section-title mt-3 mb-3">General Collateral</div>
 
 {% if detail.financingStatement.generalCollateral is defined and change is not defined %}
-   <table class="section-data section-data-table mt-4" role="presentation">
-      {% for collateral in detail.financingStatement.generalCollateral %}
-         <tr class="no-page-break">
-            <td class="section-data">{{ collateral.description }}</td>
-         </tr>
-      {% endfor %}
-   </table>
+   {% for collateral in detail.financingStatement.generalCollateral %}
+      <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>
+      {% if loop.last == false  %}
+         <div class="separator-section mt-4 mb-4"></div>
+      {% endif %}
+   {% endfor %}
 {% elif change is defined and (change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined) %}
    {% if change.addGeneralCollateral is defined %}
-   <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in change.addGeneralCollateral %}
-      <tr class="no-page-break">
-            <td>
-               <div class="section-data">{{ collateral.description }}</div>
-               <div><span class="label pt-1">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
-            </td>
-         </tr>
+         <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>
+         <div><span class="label pt-1">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+         {% if loop.last == false  %}
+            <div class="separator-section mt-4 mb-4"></div>
+         {% endif %}
       {% endfor %}
+{#
+   <table class="section-data section-data-table mt-4" role="presentation">
+      <tr class="page-break-inside : auto">
+         <td>
+            <div class="section-data">{{ collateral.description }}</div>
+            <div><span class="label pt-1">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+         </td>
+      </tr>
    </table>
+#}
+
    {% endif %}
    {% if change.deleteGeneralCollateral is defined %}
+      {% for collateral in change.deleteGeneralCollateral %}
+         {% if collateral.edit is not defined %}
+            <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>
+            <div><span class="label pt-1">REMOVED</span></div>
+            {% if loop.last == false  %}
+               <div class="separator-section mt-4 mb-4"></div>
+            {% endif %}
+         {% endif %}
+      {% endfor %}
+
+{#
    <table class="section-data section-data-table mt-4" role="presentation">
       {% for collateral in change.deleteGeneralCollateral %}
          {% if collateral.edit is not defined %}
-         <tr class="no-page-break">
+         <tr class="page-break-inside : auto">
             <td>
                <div class="section-data">{{ collateral.description }}</div>
                <span class="label pt-1">REMOVED</span>
@@ -38,6 +56,7 @@
          {% endif %}
       {% endfor %}
    </table>
+#}   
    {% endif %}
 {% else %}
    <div class="section-data">None.</div>
