@@ -121,13 +121,22 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
     expect(wrapper.vm.showErrorSurrenderDate).toBe(false)
     expect(wrapper.vm.minSurrenderDate).toBeDefined()
-    expect(wrapper.vm.maxSurrenderDate).toBeDefined()
     expect(wrapper.vm.lienAmount).toBe('')
     expect(wrapper.vm.lengthSummary).toBe('180 Days')
     expect(wrapper.vm.lifeYearsEdit).toBe('1')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
     expect(wrapper.vm.lienAmountSummary).toBe('Not entered')
     expect(wrapper.vm.surrenderDateSummary).toBe('Not entered')
+  })
+  it('renders lienAmount', async () => {
+    wrapper.vm.$data.lienAmount = '20,000'
+    await Vue.nextTick()
+    expect(wrapper.vm.lienAmountMessage).toBe('')
+    expect(wrapper.vm.showErrorLienAmount).toBe(false)
+    wrapper.vm.$data.lienAmount = 'junk'
+    await Vue.nextTick()
+    expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
+    expect(wrapper.vm.showErrorLienAmount).toBe(true)
   })
 })
 

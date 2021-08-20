@@ -28,6 +28,25 @@
                   persistent-hint
                 />
               </v-col>
+              <v-col v-else-if="excludesManufacturedHomeCollateral()">
+                <v-select
+                  :items="vehicleTypesNoMH"
+                  filled
+                  label="Vehicle Type"
+                  v-model="currentVehicle.type"
+                  id="txt-type-drop"
+                  :error-messages="
+                    errors.type.message ? errors.type.message : ''
+                  "
+                  @change="changeVehicleType"
+                >
+                  <template slot="item" slot-scope="data">
+                    <span class="list-item">
+                      {{ data.item.text }}
+                    </span>
+                  </template>
+                </v-select>
+              </v-col>
               <v-col v-else>
                 <v-select
                   :items="vehicleTypes"
@@ -197,6 +216,8 @@ export default defineComponent({
       // @ts-ignore - returned by toRef
       vehicleTypes,
       // @ts-ignore - returned by toRef
+      vehicleTypesNoMH,
+      // @ts-ignore - returned by toRef
       getSerialLabel,
       // @ts-ignore - returned by toRef
       getSerialDisabled,
@@ -204,7 +225,8 @@ export default defineComponent({
       resetFormAndData,
       removeVehicle,
       addVehicle,
-      mustHaveManufacturedHomeCollateral
+      mustHaveManufacturedHomeCollateral,
+      excludesManufacturedHomeCollateral
     } = useVehicle(props, context)
     const {
       errors,
@@ -251,9 +273,11 @@ export default defineComponent({
       errors,
       currentVehicle,
       vehicleTypes,
+      vehicleTypesNoMH,
       getSerialLabel,
       getSerialDisabled,
       mustHaveManufacturedHomeCollateral,
+      excludesManufacturedHomeCollateral,
       changeVehicleType
     }
   }
