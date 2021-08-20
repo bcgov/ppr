@@ -326,7 +326,7 @@
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-clipboard-check-outline</v-icon>
-                        <span class="ml-1">Total Discharge</span>
+                        <span class="ml-1" @click="discharge(row.item)">Total Discharge</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
@@ -373,7 +373,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup (props, { emit, root }) {
     const {
       getFormattedDate,
       getRegistrationType,
@@ -521,6 +521,11 @@ export default defineComponent({
       localState.loadingPDF = ''
     }
 
+    const discharge = (item): void => {
+      const registrationNumber = item.registrationNumber as string
+      emit('discharge', registrationNumber)
+    }
+
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
       try {
@@ -573,6 +578,7 @@ export default defineComponent({
       getFormattedDate,
       getRegistrationType,
       getStatusDescription,
+      discharge,
       draftClass,
       registrationNumber,
       displayRegistrationNumber,

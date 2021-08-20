@@ -18,7 +18,9 @@
               <v-list-item-content class="pt-2 pb-2">
                 <v-list-item-subtitle>
                   <v-row :class="$style['auto-complete-row']">
-                    <v-col cols="2" :class="$style['title-size']" @click="addResult(result, i)">{{ result.code }}</v-col>
+                    <v-col cols="2" :class="$style['title-size']" @click="addResult(result, i)">
+                      {{ result.code }}
+                    </v-col>
                     <v-col cols="9" @click="addResult(result, i)"
                       ><span :class="$style['title-size']">{{ result.businessName }}</span>
                       <div class="mt-2">

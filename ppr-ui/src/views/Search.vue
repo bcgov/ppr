@@ -262,7 +262,7 @@ export default class Search extends Vue {
       this.redirectRegistryHome()
       return
     }
-    this.emitHaveData()
+    this.emitHaveData(true)
   }
 
   @Emit('error')

@@ -81,7 +81,7 @@ export default defineComponent({
           return tombstoneBreadcrumbDashboard
         } else {
           const registrationBreadcrumb = tombstoneBreadcrumbRegistration
-          registrationBreadcrumb[2].text = getRegistrationType.value.registrationTypeUI || 'New Registration'
+          registrationBreadcrumb[2].text = getRegistrationType.value?.registrationTypeUI || 'New Registration'
           return registrationBreadcrumb
         }
       }),

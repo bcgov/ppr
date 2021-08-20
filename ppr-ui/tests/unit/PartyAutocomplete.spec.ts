@@ -6,7 +6,6 @@ import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
-
 // Components
 import { PartyAutocomplete } from '@/components/parties'
 
@@ -43,7 +42,7 @@ function createComponent (
 
 describe('Secured Party search autocomplete tests', () => {
   let wrapper: Wrapper<any>
-  
+
   beforeEach(async () => {
     wrapper = createComponent(mockedPartyCodeSearchResults)
   })

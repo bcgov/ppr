@@ -50,7 +50,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters class="white" style="min-height:300px">
-              <v-col cols="12"><registration-table /></v-col>
+              <v-col cols="12"><registration-table @discharge="startDischarge($event)"/></v-col>
             </v-row>
           </v-col>
         </v-row>
@@ -130,6 +130,14 @@ export default class Dashboard extends Vue {
     return tombstoneBreadcrumbDashboard
   }
 
+  private startDischarge (regNum: string): void {
+    this.$router.push({
+      name: RouteNames.REVIEW_DISCHARGE,
+      query: { 'reg-num': regNum }
+    })
+    this.emitHaveData(false)
+  }
+
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
@@ -162,7 +170,7 @@ export default class Dashboard extends Vue {
       this.setSearchHistory(resp?.searches)
     }
     // tell App that we're finished loading
-    this.emitHaveData()
+    this.emitHaveData(true)
   }
 
   @Watch('getSearchResults')

@@ -296,7 +296,8 @@ export default defineComponent({
 
     if (
       registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
-      lengthTrust.lifeYears !== 1
+      lengthTrust.lifeYears !== 1 &&
+      !props.isSummary
     ) {
       lengthTrust.lifeYears = 1
       feeSummary.quantity = 1
@@ -385,10 +386,8 @@ export default defineComponent({
         return lengthTrust.trustIndenture ? 'Yes' : 'No'
       }),
       lienAmountSummary: computed((): string => {
-        if (lengthTrust.lienAmount !== '') {
-          var currency = lengthTrust.lienAmount
-            .replace('$', '')
-            .replaceAll(',', '')
+        if (lengthTrust.lienAmount) {
+          var currency = lengthTrust.lienAmount?.replace('$', '')?.replaceAll(',', '')
           var lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
             return lengthTrust.lienAmount
@@ -398,10 +397,7 @@ export default defineComponent({
         return 'Not entered'
       }),
       surrenderDateSummary: computed((): string => {
-        if (
-          lengthTrust.surrenderDate !== '' &&
-          lengthTrust.surrenderDate.length >= 10
-        ) {
+        if (lengthTrust.surrenderDate?.length >= 10) {
           return convertDate(
             new Date(lengthTrust.surrenderDate.substring(0, 10)),
             false,
@@ -417,7 +413,7 @@ export default defineComponent({
     const goToLengthTrust = (): void => {
       lengthTrust.showInvalid = true
       setLengthTrust(lengthTrust)
-      router.push({ path: '/length-trust' })
+      router.push({ path: '/new-registration/length-trust' })
     }
 
     const infinityPreselected = (): boolean => {

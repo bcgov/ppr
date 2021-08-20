@@ -1,3 +1,4 @@
+import { APIRegistrationTypes } from '@/enums'
 import { GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
 import { ErrorIF } from './error-interface'
 
@@ -9,7 +10,7 @@ export interface PaymentIF {
 
 // Financing Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
 export interface FinancingStatementIF {
-  type: string, // One of enum APIRegistrationTypes.
+  type: APIRegistrationTypes, // One of enum APIRegistrationTypes.
   clientReferenceId?: string, // AKA folio max length 20.
   documentId?: string, // Optional draft ID if draft created.
   registrationDescription?: string, // Returned on creation.
