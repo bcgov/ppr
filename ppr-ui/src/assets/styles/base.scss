@@ -467,3 +467,22 @@ span.invalid-message {
 .date-selection-btn.bold {
   font-weight: 800 !important;
 }
+
+// tombstone styles
+.tombstone-header {
+  color: $gray9;
+  font-size: 1.25rem;
+  font-weight: bold;
+  vertical-align: bottom;
+}
+.tombstone-info {
+  color: $gray7;
+  font-size: 0.875rem;
+  vertical-align: bottom;
+}
+.tombstone-sub-header {
+  color: $gray7;
+  font-size: 1rem;
+  padding: 16px 0 24px 0;
+  vertical-align: bottom;
+}

@@ -7,11 +7,10 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { Tombstone } from '@/components/common'
+import { Tombstone } from '@/components/tombstone'
 
 // Other
-import { AccountInformationIF, BreadcrumbIF, UserInfoIF } from '@/interfaces'
-import { tombstoneBreadcrumbSearch, tombstoneBreadcrumbRegistration } from '@/resources'
+import { AccountInformationIF, UserInfoIF } from '@/interfaces'
 import { mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 

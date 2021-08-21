@@ -13,7 +13,7 @@ import sinon from 'sinon'
 import App from '@/App.vue'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
-import { Tombstone } from '@/components/common'
+import { Tombstone } from '@/components/tombstone'
 
 // Other
 import mockRouter from './MockRouter'

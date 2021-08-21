@@ -75,21 +75,21 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.vm.dataLoaded).toBe(true)
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check length trust summary
-    expect(state.lengthTrustStep.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
-    expect(state.lengthTrustStep.lifeYears).toBe(mockedFinancingStatementAll.lifeYears)
-    expect(state.lengthTrustStep.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
+    expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
+    expect(state.registration.lengthTrust.lifeYears).toBe(mockedFinancingStatementAll.lifeYears)
+    expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // check registering party
-    expect(state.addSecuredPartiesAndDebtorsStep.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
-    expect(state.addSecuredPartiesAndDebtorsStep.securedParties).toBe(mockedFinancingStatementAll.securedParties)
+    expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
     expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
     // check debtors
-    expect(state.addSecuredPartiesAndDebtorsStep.debtors).toBe(mockedFinancingStatementAll.debtors)
+    expect(state.registration.parties.debtors).toBe(mockedFinancingStatementAll.debtors)
     expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
     // check vehicle collateral
-    expect(state.addCollateralStep.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
+    expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary (whether data for it is in store or by prop may change)
     expect(state.feeSummary.feeAmount).toBe(0)

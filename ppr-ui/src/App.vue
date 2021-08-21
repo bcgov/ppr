@@ -41,7 +41,7 @@
           </v-col>
         </v-row>
         <breadcrumb />
-        <tombstone :backURL="dashboardURL" />
+        <tombstone />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters style="overflow: scroll;">
             <v-col cols="12">
@@ -78,7 +78,8 @@ import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components
 
 // local Components
 import * as Dialogs from '@/components/dialogs'
-import { Breadcrumb, Tombstone } from '@/components/common'
+import { Breadcrumb } from '@/components/common'
+import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'

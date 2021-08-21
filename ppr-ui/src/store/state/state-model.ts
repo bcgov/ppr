@@ -12,28 +12,54 @@ export const stateModel: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
-  currentStep: 1,
-  debtorName: null,
-  draft: {
-    type: '',
-    financingStatement: null,
-    createDateTime: null,
-    lastUpdateDateTime: null
-  },
   feeSummary: {
     feeAmount: 0,
     serviceFee: 1.5,
     quantity: 0,
     feeCode: ''
   },
-  registrationType: null,
-  registrationTypeOtherDesc: null,
-  searchHistory: null,
-  searchResults: null,
-  searchedType: null,
-  searchedValue: '',
-  searching: false,
-  showStepErrors: false,
+  registration: {
+    collateral: {
+      valid: false,
+      vehicleCollateral: [],
+      generalCollateral: ''
+    },
+    creationDate: '',
+    currentStep: 1,
+    debtorName: null,
+    draft: {
+      type: '',
+      financingStatement: null,
+      createDateTime: null,
+      lastUpdateDateTime: null
+    },
+    expiryDate: '',
+    lengthTrust: {
+      valid: false,
+      lifeYears: 0,
+      lifeInfinite: false,
+      trustIndenture: false,
+      lienAmount: '',
+      surrenderDate: ''
+    },
+    registrationNumber: '',
+    registrationType: null,
+    registrationTypeOtherDesc: null,
+    showStepErrors: false,
+    parties: {
+      valid: false,
+      registeringParty: null,
+      securedParties: [],
+      debtors: []
+    }
+  },
+  search: {
+    searchHistory: null,
+    searchResults: null,
+    searchedType: null,
+    searchedValue: '',
+    searching: false
+  },
   userInfo: {
     contacts: [],
     firstname: '',
@@ -43,25 +69,6 @@ export const stateModel: StateModelIF = {
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
-  },
-  lengthTrustStep: {
-    valid: false,
-    lifeYears: 0,
-    lifeInfinite: false,
-    trustIndenture: false,
-    lienAmount: '',
-    surrenderDate: ''
-  },
-  addSecuredPartiesAndDebtorsStep: {
-    valid: false,
-    registeringParty: null,
-    securedParties: [],
-    debtors: []
-  },
-  addCollateralStep: {
-    valid: false,
-    vehicleCollateral: [],
-    generalCollateral: ''
   },
   folioOrReferenceNumber: ''
 }

@@ -182,9 +182,9 @@ export default defineComponent({
     const submitFinancingStatement = async () => {
       const stateModel: StateModelIF = getStateModel.value
       if (
-        stateModel.lengthTrustStep.valid &&
-        stateModel.addSecuredPartiesAndDebtorsStep.valid &&
-        stateModel.addCollateralStep.valid
+        stateModel.registration.lengthTrust.valid &&
+        stateModel.registration.parties.valid &&
+        stateModel.registration.collateral.valid
       ) {
         // API call here
         const apiResponse: FinancingStatementIF = await saveFinancingStatement(stateModel)

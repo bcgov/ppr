@@ -70,7 +70,7 @@ import { ActionBindingIF, BreadcrumbIF, ErrorIF, RegistrationTypeIF, // eslint-d
 import { tombstoneBreadcrumbDashboard } from '@/resources'
 import { getFeatureFlag, searchHistory } from '@/utils'
 // local components
-import { Tombstone } from '@/components/common'
+import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'

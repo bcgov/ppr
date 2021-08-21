@@ -66,6 +66,18 @@ export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF)
   commit('mutateLengthTrust', lengthTrust)
 }
 
+export const setRegistrationCreationDate: ActionIF = ({ commit }, date: string): void => {
+  commit('mutateRegistrationCreationDate', date)
+}
+
+export const setRegistrationExpiryDate: ActionIF = ({ commit }, date: string): void => {
+  commit('mutateRegistrationExpiryDate', date)
+}
+
+export const setRegistrationNumber: ActionIF = ({ commit }, regNum: string): void => {
+  commit('mutateRegistrationNumber', regNum)
+}
+
 export const setRegistrationType: ActionIF = ({ commit }, registrationType: RegistrationTypeIF): void => {
   commit('mutateRegistrationType', registrationType)
 }

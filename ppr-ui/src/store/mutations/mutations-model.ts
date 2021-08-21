@@ -26,11 +26,11 @@ export const mutateAccountInformation = (state: StateIF, accountInformation: Acc
 }
 
 export const mutateAddCollateral = (state: StateIF, addCollateral: AddCollateralIF) => {
-  state.stateModel.addCollateralStep = addCollateral
+  state.stateModel.registration.collateral = addCollateral
 }
 
 export const mutateAddSecuredPartiesAndDebtors = (state: StateIF, addParties: AddPartiesIF) => {
-  state.stateModel.addSecuredPartiesAndDebtorsStep = addParties
+  state.stateModel.registration.parties = addParties
 }
 
 export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
@@ -38,15 +38,15 @@ export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
 }
 
 export const mutateCurrentStep = (state: any, currentStep: boolean) => {
-  state.stateModel.currentStep = currentStep
+  state.stateModel.registration.currentStep = currentStep
 }
 
 export const mutateDebtorName = (state: StateIF, debtorName: IndividualNameIF) => {
-  state.stateModel.debtorName = debtorName
+  state.stateModel.registration.debtorName = debtorName
 }
 
 export const mutateDraft = (state: StateIF, draft: DraftIF) => {
-  state.stateModel.draft = draft
+  state.stateModel.registration.draft = draft
 }
 
 export const mutateFeeSummary = (state: StateIF, feeSummary: FeeSummaryIF) => {
@@ -58,28 +58,28 @@ export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>
 }
 
 export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) => {
-  state.stateModel.lengthTrustStep = lengthTrust
+  state.stateModel.registration.lengthTrust = lengthTrust
 }
 
 export const mutateNewRegistration = (state: StateIF) => {
-  state.stateModel.lengthTrustStep.valid = false
-  state.stateModel.lengthTrustStep.showInvalid = false
-  state.stateModel.lengthTrustStep.lifeInfinite = false
-  state.stateModel.lengthTrustStep.trustIndenture = false
-  state.stateModel.lengthTrustStep.lifeYears = 0
-  state.stateModel.lengthTrustStep.lienAmount = ''
-  state.stateModel.lengthTrustStep.surrenderDate = ''
+  state.stateModel.registration.lengthTrust.valid = false
+  state.stateModel.registration.lengthTrust.showInvalid = false
+  state.stateModel.registration.lengthTrust.lifeInfinite = false
+  state.stateModel.registration.lengthTrust.trustIndenture = false
+  state.stateModel.registration.lengthTrust.lifeYears = 0
+  state.stateModel.registration.lengthTrust.lienAmount = ''
+  state.stateModel.registration.lengthTrust.surrenderDate = ''
   state.stateModel.feeSummary.feeAmount = 0
   state.stateModel.feeSummary.quantity = 0
   state.stateModel.feeSummary.feeCode = ''
-  state.stateModel.addCollateralStep.valid = false
-  state.stateModel.addCollateralStep.generalCollateral = ''
-  state.stateModel.addCollateralStep.vehicleCollateral = []
-  state.stateModel.addSecuredPartiesAndDebtorsStep.valid = false
-  state.stateModel.addSecuredPartiesAndDebtorsStep.registeringParty = null
-  state.stateModel.addSecuredPartiesAndDebtorsStep.securedParties = []
-  state.stateModel.addSecuredPartiesAndDebtorsStep.debtors = []
-  state.stateModel.draft = {
+  state.stateModel.registration.collateral.valid = false
+  state.stateModel.registration.collateral.generalCollateral = ''
+  state.stateModel.registration.collateral.vehicleCollateral = []
+  state.stateModel.registration.parties.valid = false
+  state.stateModel.registration.parties.registeringParty = null
+  state.stateModel.registration.parties.securedParties = []
+  state.stateModel.registration.parties.debtors = []
+  state.stateModel.registration.draft = {
     type: '',
     financingStatement: null,
     createDateTime: null,
@@ -87,32 +87,44 @@ export const mutateNewRegistration = (state: StateIF) => {
   }
 }
 
+export const mutateRegistrationCreationDate = (state: StateIF, date: string) => {
+  state.stateModel.registration.creationDate = date
+}
+
+export const mutateRegistrationExpiryDate = (state: StateIF, date: string) => {
+  state.stateModel.registration.expiryDate = date
+}
+
+export const mutateRegistrationNumber = (state: StateIF, regNum: string) => {
+  state.stateModel.registration.registrationNumber = regNum
+}
+
 export const mutateRegistrationType = (state: StateIF, registrationType: RegistrationTypeIF) => {
-  state.stateModel.registrationType = registrationType
+  state.stateModel.registration.registrationType = registrationType
 }
 
 export const mutateRegistrationTypeOtherDesc = (state: StateIF, description: string) => {
-  state.stateModel.registrationTypeOtherDesc = description
+  state.stateModel.registration.registrationTypeOtherDesc = description
 }
 
 export const mutateSearchedType = (state: StateIF, searchedType: SearchTypeIF) => {
-  state.stateModel.searchedType = searchedType
+  state.stateModel.search.searchedType = searchedType
 }
 
 export const mutateSearchedValue = (state: StateIF, searchedValue: string) => {
-  state.stateModel.searchedValue = searchedValue
+  state.stateModel.search.searchedValue = searchedValue
 }
 
 export const mutateSearching = (state: StateIF, searching: boolean) => {
-  state.stateModel.searching = searching
+  state.stateModel.search.searching = searching
 }
 
 export const mutateSearchHistory = (state: StateIF, searchHistory: Array<SearchResponseIF>) => {
-  state.stateModel.searchHistory = searchHistory
+  state.stateModel.search.searchHistory = searchHistory
 }
 
 export const mutateSearchResults = (state: StateIF, searchResults: SearchResponseIF) => {
-  state.stateModel.searchResults = searchResults
+  state.stateModel.search.searchResults = searchResults
 }
 
 export const mutateUserInfo = (state: StateIF, userInfo: UserInfoIF) => {
@@ -124,15 +136,15 @@ export const mutateUserSettings = (state: StateIF, settings: UserSettingsIF) => 
 }
 
 export const mutateAddSecuredPartiesAndDebtorStepValidity = (state: any, validity: boolean) => {
-  state.stateModel.addSecuredPartiesAndDebtorsStep.valid = validity
+  state.stateModel.registration.parties.valid = validity
 }
 
 export const mutateAddCollateralStepValidity = (state: any, validity: boolean) => {
-  state.stateModel.addCollateralStep.valid = validity
+  state.stateModel.registration.collateral.valid = validity
 }
 
 export const mutateLengthTrustStepValidity = (state: any, validity: boolean) => {
-  state.stateModel.lengthTrustStep.valid = validity
+  state.stateModel.registration.lengthTrust.valid = validity
 }
 
 export const mutateFolioOrReferenceNumber = (state: StateIF, refNumber: string) => {
@@ -140,5 +152,5 @@ export const mutateFolioOrReferenceNumber = (state: StateIF, refNumber: string) 
 }
 
 export const mutateShowStepErrors = (state: any, show: boolean) => {
-  state.stateModel.showStepErrors = show
+  state.stateModel.registration.showStepErrors = show
 }

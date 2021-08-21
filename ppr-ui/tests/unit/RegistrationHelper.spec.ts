@@ -79,10 +79,10 @@ describe('Registration API Helper Tests', () => {
 
   it('save new repairers lien', async () => {
     const model:StateModelIF = wrapper.vm.$store.state.stateModel
-    model.lengthTrustStep.lienAmount = '1000.00'
-    model.lengthTrustStep.surrenderDate = '2021-07-28T07:00:00+00:00'
-    model.lengthTrustStep.trustIndenture = false
-    model.lengthTrustStep.lifeYears = 1
+    model.registration.lengthTrust.lienAmount = '1000.00'
+    model.registration.lengthTrust.surrenderDate = '2021-07-28T07:00:00+00:00'
+    model.registration.lengthTrust.trustIndenture = false
+    model.registration.lengthTrust.lifeYears = 1
     var statement:FinancingStatementIF = await saveFinancingStatement(model)
     // console.log(JSON.stringify(statement))
     expect(statement.createDateTime).toBeDefined()

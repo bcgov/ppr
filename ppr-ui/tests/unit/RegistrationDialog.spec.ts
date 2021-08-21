@@ -107,7 +107,7 @@ describe('Registration Other Dialog tests', () => {
     wrapper.find(dialogSubmit).trigger('click')
     await flushPromises()
     // check emitted other + set other name desc
-    expect(wrapper.vm.$store.state.stateModel.registrationTypeOtherDesc).toBe('test')
+    expect(wrapper.vm.$store.state.stateModel.registration.registrationTypeOtherDesc).toBe('test')
     expect(getLastEvent(wrapper, proceed)).toBe(true)
   })
 })
