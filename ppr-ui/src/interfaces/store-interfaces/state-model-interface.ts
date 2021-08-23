@@ -11,21 +11,28 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
   authorization: AuthorizationIF
-  currentStep: number,
-  debtorName: IndividualNameIF
-  draft: DraftIF,
   feeSummary: FeeSummaryIF
-  registrationType: RegistrationTypeIF
-  registrationTypeOtherDesc: string
-  searchHistory: Array<SearchResponseIF>
-  searchResults: SearchResponseIF
-  searchedType: SearchTypeIF
-  searchedValue: string
-  searching: boolean
-  showStepErrors: boolean
-  userInfo: UserInfoIF
-  lengthTrustStep: LengthTrustIF
-  addSecuredPartiesAndDebtorsStep: AddPartiesIF
-  addCollateralStep: AddCollateralIF
   folioOrReferenceNumber: string
+  registration: {
+    collateral: AddCollateralIF
+    creationDate: string
+    currentStep: number,
+    debtorName: IndividualNameIF
+    draft: DraftIF,
+    expiryDate: string
+    lengthTrust: LengthTrustIF
+    parties: AddPartiesIF
+    registrationNumber: string
+    registrationType: RegistrationTypeIF
+    registrationTypeOtherDesc: string
+    showStepErrors: boolean
+  }
+  search: {
+    searchHistory: Array<SearchResponseIF>
+    searchResults: SearchResponseIF
+    searchedType: SearchTypeIF
+    searchedValue: string
+    searching: boolean
+  }
+  userInfo: UserInfoIF
 }

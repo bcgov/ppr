@@ -81,6 +81,9 @@ export default class ReviewRegistration extends Vue {
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
+  @Action setRegistrationCreationDate: ActionBindingIF
+  @Action setRegistrationExpiryDate: ActionBindingIF
+  @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
 
   /** Whether App is ready. */
@@ -165,6 +168,13 @@ export default class ReviewRegistration extends Vue {
         quantity: 1,
         feeCode: ''
       } as FeeSummaryIF
+      console.log(financingStatement.createDateTime)
+      this.setRegistrationCreationDate(financingStatement.createDateTime)
+      console.log(financingStatement.expiryDate)
+      this.setRegistrationExpiryDate(financingStatement.expiryDate)
+      console.log(financingStatement.baseRegistrationNumber)
+      console.log(financingStatement)
+      this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)

@@ -35,22 +35,22 @@ export const getAccountProductSubscriptions = (
 
 /** The registration collateral object. */
 export const getAddCollateral = (state: StateIF): AddCollateralIF => {
-  return state.stateModel.addCollateralStep
+  return state.stateModel.registration.collateral
 }
 
 /** The registration parties object. */
 export const getAddSecuredPartiesAndDebtors = (state: StateIF): AddPartiesIF => {
-  return state.stateModel.addSecuredPartiesAndDebtorsStep
+  return state.stateModel.registration.parties
 }
 
 /** The search value for ppr search when search type is individual debtor. */
 export const getDebtorName = (state: StateIF): IndividualNameIF => {
-  return state.stateModel.debtorName
+  return state.stateModel.registration.debtorName
 }
 
 /** The current draft of a registration. */
 export const getDraft = (state: StateIF): DraftIF => {
-  return state.stateModel.draft
+  return state.stateModel.registration.draft
 }
 
 /** The registration fee summary object. */
@@ -60,32 +60,47 @@ export const getFeeSummary = (state: StateIF): FeeSummaryIF => {
 
 /** The registration life and trust indenture object. */
 export const getLengthTrust = (state: StateIF): LengthTrustIF => {
-  return state.stateModel.lengthTrustStep
+  return state.stateModel.registration.lengthTrust
 }
 
-/** The selected new registration type object. */
+/** The creation date of the selected registration. */
+export const getRegistrationCreationDate = (state: StateIF): String => {
+  return state.stateModel.registration.creationDate
+}
+
+/** The expiry date of the selected registration. */
+export const getRegistrationExpiryDate = (state: StateIF): String => {
+  return state.stateModel.registration.expiryDate
+}
+
+/** The reg number for the selected registration. */
+export const getRegistrationNumber = (state: StateIF): String => {
+  return state.stateModel.registration.registrationNumber
+}
+
+/** The selected registration type object. */
 export const getRegistrationType = (state: StateIF): RegistrationTypeIF => {
-  return state.stateModel.registrationType
+  return state.stateModel.registration.registrationType
 }
 
 /** The api response for ppr search. */
 export const getSearchResults = (state: StateIF): SearchResponseIF => {
-  return state.stateModel.searchResults
+  return state.stateModel.search.searchResults
 }
 
 /** The selected search type object. */
 export const getSearchedType = (state: StateIF): SearchTypeIF => {
-  return state.stateModel.searchedType
+  return state.stateModel.search.searchedType
 }
 
 /** The search value for ppr search (unless search type is individual debtor). */
 export const getSearchedValue = (state: StateIF): string => {
-  return state.stateModel.searchedValue
+  return state.stateModel.search.searchedValue
 }
 
 /** The list of past search responses for this account. */
 export const getSearchHistory = (state: StateIF): Array<SearchResponseIF> => {
-  return state.stateModel.searchHistory
+  return state.stateModel.search.searchHistory
 }
 
 /** Convenient when there is a need to access several properties. */
@@ -146,7 +161,7 @@ export const isRoleStaff = (state: StateIF): boolean => {
 
 /** Whether the app is processing a search request or not. */
 export const isSearching = (state: StateIF): boolean => {
-  return state.stateModel.searching
+  return state.stateModel.search.searching
 }
 
 /** The folio or reference number. */
@@ -156,7 +171,7 @@ export const getFolioOrReferenceNumber = (state: StateIF): string => {
 
 /** Whether the app should show the step errors */
 export const showStepErrors = (state: StateIF): boolean => {
-  return state.stateModel.showStepErrors
+  return state.stateModel.registration.showStepErrors
 }
 
 /**
@@ -178,7 +193,7 @@ export const getSteps = (state: any, getters: any): Array<any> => {
     text: lengthTrustText,
     to: RouteNames.LENGTH_TRUST,
     disabled: getters.isBusySaving,
-    valid: state.stateModel.lengthTrustStep.valid,
+    valid: state.stateModel.registration.lengthTrust.valid,
     component: 'length-trust'
   },
   {
@@ -188,7 +203,7 @@ export const getSteps = (state: any, getters: any): Array<any> => {
     text: 'Add Secured Parties<br />and Debtors',
     to: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
     disabled: getters.isBusySaving,
-    valid: state.stateModel.addSecuredPartiesAndDebtorsStep.valid,
+    valid: state.stateModel.registration.parties.valid,
     component: 'add-securedparties-debtors'
   },
   {
@@ -198,7 +213,7 @@ export const getSteps = (state: any, getters: any): Array<any> => {
     text: 'Add Collateral',
     to: RouteNames.ADD_COLLATERAL,
     disabled: getters.isBusySaving,
-    valid: state.stateModel.addCollateralStep.valid,
+    valid: state.stateModel.registration.collateral.valid,
     component: 'add-collateral'
   },
   {
@@ -283,6 +298,6 @@ export const isBusySaving = (state: any): boolean => {
  * Whether all the registration steps are valid.
  */
 export const isRegistrationValid = (state: any): boolean => {
-  return (state.stateModel.lengthTrustStep.valid && state.stateModel.addSecuredPartiesAndDebtorsStep.valid &&
-    state.stateModel.addCollateralStep.valid)
+  return (state.stateModel.registration.lengthTrust.valid && state.stateModel.registration.parties.valid &&
+    state.stateModel.registration.collateral.valid)
 }

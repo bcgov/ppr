@@ -286,7 +286,7 @@ export default defineComponent({
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
     const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const lengthTrust: LengthTrustIF = getLengthTrust.value
     const feeSummary: FeeSummaryIF = getFeeSummary.value
     const feeInfoYears = getFinancingFee(false)
@@ -332,7 +332,7 @@ export default defineComponent({
         return !lengthTrust.valid
       }),
       showErrorLienAmount: computed((): boolean => {
-        if (lengthTrust.lienAmount !== '' && localState.lienAmountMessage.length > 0) {
+        if (lengthTrust.lienAmount !== '' && localState.lienAmountMessage?.length > 0) {
           return true
         }
         return lengthTrust.showInvalid && lengthTrust.lienAmount === ''
@@ -344,7 +344,7 @@ export default defineComponent({
         if (lengthTrust.showInvalid && lengthTrust.lienAmount === '') {
           return 'This field is required'
         }
-        if (lengthTrust.lienAmount.length > 0) {
+        if (lengthTrust.lienAmount?.length > 0) {
           var amount = Number(lengthTrust.lienAmount.replace(',', ''))
           if (isNaN(amount) || amount < 0.01) {
             return 'Lien amount must be a number greater than 0.'
@@ -463,7 +463,7 @@ export default defineComponent({
       () => localState.lifeYearsEdit,
       (val: string) => {
         localState.lifeYearsMessage = ''
-        if (val.length > 0) {
+        if (val?.length > 0) {
           var life = parseInt(val)
           if (isNaN(life)) {
             localState.lifeYearsMessage =

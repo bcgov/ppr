@@ -15,10 +15,10 @@ import { createDraft, createFinancingStatement, updateDraft } from '@/utils'
 
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
-  const registrationType: RegistrationTypeIF = stateModel.registrationType
+  const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
   // console.log('registrationType: ' + JSON.stringify(registrationType))
   var error:ErrorIF = null
-  var draft:DraftIF = stateModel.draft
+  var draft:DraftIF = stateModel.registration.draft
   // console.log('draft: ' + JSON.stringify(draft))
   draft.type = DraftTypes.FINANCING_STATEMENT
   var statement:FinancingStatementIF = draft.financingStatement
@@ -36,7 +36,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
     statement.type = registrationType.registrationTypeAPI
   }
   // Step 1 setup
-  const trustLength = stateModel.lengthTrustStep
+  const trustLength = stateModel.registration.lengthTrust
   statement.lifeInfinite = trustLength.lifeInfinite
   statement.lifeYears = trustLength.lifeYears
   statement.trustIndenture = trustLength.trustIndenture
@@ -45,12 +45,12 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
     statement.surrenderDate = trustLength.surrenderDate
   }
   // Step 2. setup
-  const parties:AddPartiesIF = stateModel.addSecuredPartiesAndDebtorsStep
+  const parties:AddPartiesIF = stateModel.registration.parties
   statement.registeringParty = parties.registeringParty
   statement.securedParties = parties.securedParties
   statement.debtors = parties.debtors
   // Step 3 setup
-  const collateral:AddCollateralIF = stateModel.addCollateralStep
+  const collateral:AddCollateralIF = stateModel.registration.collateral
   statement.vehicleCollateral = collateral.vehicleCollateral
   if (collateral.generalCollateral !== null && collateral.generalCollateral !== '') {
     var generalCollateral: GeneralCollateralIF = { description: collateral.generalCollateral }
@@ -83,14 +83,14 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
 
 /** Save new financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
-  const registrationType: RegistrationTypeIF = stateModel.registrationType
+  const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
   var error:ErrorIF = null
-  var draft:DraftIF = stateModel.draft
-  const trustLength = stateModel.lengthTrustStep
-  const parties:AddPartiesIF = stateModel.addSecuredPartiesAndDebtorsStep
-  const collateral:AddCollateralIF = stateModel.addCollateralStep
+  var draft:DraftIF = stateModel.registration.draft
+  const trustLength = stateModel.registration.lengthTrust
+  const parties:AddPartiesIF = stateModel.registration.parties
+  const collateral:AddCollateralIF = stateModel.registration.collateral
   var statement:FinancingStatementIF = {
-    type: stateModel.registrationType.registrationTypeAPI,
+    type: stateModel.registration.registrationType.registrationTypeAPI,
     lifeInfinite: trustLength.lifeInfinite,
     lifeYears: trustLength.lifeYears,
     registeringParty: parties.registeringParty,
