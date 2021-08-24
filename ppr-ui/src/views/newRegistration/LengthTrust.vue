@@ -21,7 +21,7 @@
             </v-row>
             <v-row no-gutters>
               <v-col class="pt-2 pb-6">
-                {{registrationLengthMessage}}
+                {{ registrationLengthMessage }}
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -42,10 +42,14 @@
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class='pt-10'>
+    <v-row no-gutters class="pt-10">
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                       :router="this.$router" @draft-save-error="saveDraftError"/>
+        <button-footer
+          :currentStatementType="statementType"
+          :currentStepName="stepName"
+          :router="this.$router"
+          @draft-save-error="saveDraftError"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -59,7 +63,10 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import {
-  ActionBindingIF, ErrorIF, FeeSummaryIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  FeeSummaryIF, // eslint-disable-line no-unused-vars
+  LengthTrustIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 // local components
@@ -127,20 +134,44 @@ export default class LengthTrust extends Vue {
   private get registrationLengthMessage (): string {
     switch (this.registrationType) {
       case APIRegistrationTypes.REPAIRERS_LIEN:
-        return 'Enter the amount of the Lien and the date the vehicle was surrendered.' +
-                'Please note that this must be within the last 21 days. The length of the Lien is automatically set ' +
-                'to 180 days.'
+        return (
+          'Enter the amount of the Lien and the date the vehicle was surrendered.' +
+          'Please note that this must be within the last 21 days. The length of the Lien is automatically set ' +
+          'to 180 days.'
+        )
       case APIRegistrationTypes.MARRIAGE_MH:
+        return (
+          'The registration length for this registration is automatically set to infinite. ' +
+          'There is a $10.00 fee for this registration.'
+        )
       case APIRegistrationTypes.LAND_TAX_LIEN:
       case APIRegistrationTypes.MANUFACTURED_HOME_LIEN:
-        return 'The registration length for this registration is automatically set to infinite. ' +
-        'There is a $10.00 fee for this registration.'
+      case APIRegistrationTypes.INSURANCE_PREMIUM_TAX:
+      case APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX:
+      case APIRegistrationTypes.FOREST:
+      case APIRegistrationTypes.LOGGING_TAX:
+      case APIRegistrationTypes.CARBON_TAX:
+      case APIRegistrationTypes.RURAL_PROPERTY_TAX:
+      case APIRegistrationTypes.PROVINCIAL_SALES_TAX:
+      case APIRegistrationTypes.INCOME_TAX:
+      case APIRegistrationTypes.MOTOR_FUEL_TAX:
+      case APIRegistrationTypes.EXCISE_TAX:
+      case APIRegistrationTypes.LIEN_UNPAID_WAGES:
+      case APIRegistrationTypes.PROCEEDS_CRIME_NOTICE:
+      case APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE:
+      case APIRegistrationTypes.MANUFACTURED_HOME_NOTICE:
+      case APIRegistrationTypes.MAINTENANCE_LIEN:
       case APIRegistrationTypes.OTHER:
-        return 'The registration length for this registration is automatically set to infinite. ' +
-        'There is no fee for this registration.'
+        return (
+          'The registration length for this registration is automatically set to infinite. ' +
+          'There is no fee for this registration.'
+        )
       default:
-        return 'Enter the length of time you want the ' + this.getRegistrationType?.registrationTypeUI +
-                ' to be in effect. You can renew the registration in the future (for a fee).'
+        return (
+          'Enter the length of time you want the ' +
+          this.getRegistrationType?.registrationTypeUI +
+          ' to be in effect. You can renew the registration in the future (for a fee).'
+        )
     }
   }
 
@@ -176,7 +207,7 @@ export default class LengthTrust extends Vue {
 </script>
 
 <style lang="scss" module>
-@import "@/assets/styles/theme.scss";
+@import '@/assets/styles/theme.scss';
 .step-container {
   margin-top: 1rem;
   padding: 1.25rem;

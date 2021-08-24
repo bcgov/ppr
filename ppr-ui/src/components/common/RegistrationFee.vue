@@ -25,7 +25,7 @@
         <li
           :class="[$style['fee-container'], $style['fee-list__hint']]"
           :key="hintFee"
-          v-if="!isComplete && !hasNoCharge()"
+          v-if="!isComplete || hasNoCharge() || registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN"
         >
           <div class="fee-list__hint pl-3">{{ hintFee }}</div>
         </li>
@@ -99,16 +99,32 @@ export default defineComponent({
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
     const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
     const feeSummary: FeeSummaryIF = getFeeSummary.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationTypeAPI = getRegistrationType.value.registrationTypeAPI
 
     const hasNoCharge = (): boolean => {
       const hfArray = [
         APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN
-        // APIRegistrationTypes.MISCELLANEOUS_REGISTRATION,
-        // APIRegistrationTypes.MISCELLANEOUS_OTHER
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        APIRegistrationTypes.LAND_TAX_LIEN,
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+        APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+        APIRegistrationTypes.FOREST,
+        APIRegistrationTypes.LOGGING_TAX,
+        APIRegistrationTypes.CARBON_TAX,
+        APIRegistrationTypes.RURAL_PROPERTY_TAX,
+        APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+        APIRegistrationTypes.INCOME_TAX,
+        APIRegistrationTypes.MOTOR_FUEL_TAX,
+        APIRegistrationTypes.EXCISE_TAX,
+        APIRegistrationTypes.LIEN_UNPAID_WAGES,
+        APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+        APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+        APIRegistrationTypes.MAINTENANCE_LIEN,
+        APIRegistrationTypes.OTHER
       ]
-      return hfArray.includes(registrationType)
+      return hfArray.includes(registrationTypeAPI)
     }
 
     const localState = reactive({
@@ -119,6 +135,12 @@ export default defineComponent({
       quantity: feeSummary.quantity || 0,
       feeCode: feeSummary.feeCode || '',
       hintFee: computed((): string => {
+        if (hasNoCharge()) {
+          return 'Infinite Registration (default)'
+        }
+        if (registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+          return '180 Day Registration (default)'
+        }
         return getFinancingFee(false).hint
       }),
       isComplete: computed((): boolean => {
@@ -147,7 +169,7 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      switch (registrationType) {
+      switch (registrationTypeAPI) {
         case APIRegistrationTypes.REPAIRERS_LIEN:
           localState.feeAmount = 5
           localState.quantity = 1
@@ -161,6 +183,8 @@ export default defineComponent({
 
     return {
       hasNoCharge,
+      registrationTypeAPI,
+      APIRegistrationTypes,
       ...toRefs(localState)
     }
   }
@@ -192,6 +216,8 @@ header {
   color: $gray7;
   font-size: 14px;
   font-weight: normal;
+  padding-top: 0px;
+  margin-top: -5px;
 }
 
 .fee-list__item {
