@@ -89,7 +89,7 @@
       :headers="headers"
       :items="tableData"
       :search="search"
-      sort-by="number"
+      sort-by="registrationNumber"
       :sort-desc="[false, true]"
       disable-pagination
       disable-sort
@@ -99,28 +99,41 @@
     >
       <template slot="header" :headers="getDisplayedHeaders">
         <thead>
-        <tr>
-              <th v-for="(header, i) in getDisplayedHeaders"
-                  :class="header.class"
-                  :key="'find-header-'+i"
-                  class="text-left header-row-1 pa-0 pl-2">
-                <span>
-                  {{ header.text }}
-                  <v-icon v-if="header.value === selectedSort && submittedOrder === 'asc' && header.sortable"
-                          small
-                          style="color: black;"
-                          @click="selectAndSort(header.value, 'desc')">
-                    mdi-arrow-down
-                  </v-icon>
-                  <v-icon v-else-if="header.value === selectedSort && submittedOrder === 'desc' && header.sortable"
-                          small
-                          style="color: black;"
-                          @click="selectAndSort(header.value, 'asc')">
-                    mdi-arrow-up
-                  </v-icon>
-                </span>
-              </th>
-              </tr>
+          <tr>
+            <th
+              v-for="(header, i) in getDisplayedHeaders"
+              :class="header.class"
+              :key="'find-header-' + i"
+              class="text-left header-row-1 pa-0 pl-2"
+              @click="selectAndSort(header.value)"
+            >
+              <span>
+                {{ header.text }}
+                <v-icon
+                  v-if="
+                    header.value === selectedSort &&
+                      currentOrder === 'asc' &&
+                      header.sortable
+                  "
+                  small
+                  style="color: black;"
+                >
+                  mdi-arrow-down
+                </v-icon>
+                <v-icon
+                  v-else-if="
+                    header.value === selectedSort &&
+                      currentOrder === 'desc' &&
+                      header.sortable
+                  "
+                  small
+                  style="color: black;"
+                >
+                  mdi-arrow-up
+                </v-icon>
+              </span>
+            </th>
+          </tr>
         </thead>
       </template>
       <template v-slot:body.prepend>
@@ -255,9 +268,16 @@
           v-if="!row.item.hide"
           :class="draftClass(row.item.statusType)"
         >
-          <td class="font-weight-bold" v-if="selectedHeaderValues.includes('number')"
-          v-html="displayRegistrationNumber(row.item.baseRegistrationNumber, row.item.registrationNumber)">
-          </td>
+          <td
+            class="font-weight-bold"
+            v-if="selectedHeaderValues.includes('number')"
+            v-html="
+              displayRegistrationNumber(
+                row.item.baseRegistrationNumber,
+                row.item.registrationNumber
+              )
+            "
+          ></td>
           <td v-if="selectedHeaderValues.includes('type')">
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
@@ -267,7 +287,9 @@
           <td v-if="selectedHeaderValues.includes('status')">
             {{ getStatusDescription(row.item.statusType) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('rby')"></td>
+          <td v-if="selectedHeaderValues.includes('rby')">
+            {{ row.item.registeringName }}
+          </td>
           <td v-if="selectedHeaderValues.includes('rparty')">
             {{ row.item.registeringParty || '' }}
           </td>
@@ -365,7 +387,9 @@
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-clipboard-check-outline</v-icon>
-                        <span class="ml-1" @click="discharge(row.item)">Total Discharge</span>
+                        <span class="ml-1" @click="discharge(row.item)"
+                          >Total Discharge</span
+                        >
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
@@ -444,7 +468,7 @@ export default defineComponent({
       registrationDate: '',
       loadingPDF: '',
       loadingData: true,
-      submittedOrder: 'asc',
+      currentOrder: 'asc',
       selectedSort: 'number',
       search: '',
       selectedHeaderValues: [
@@ -486,13 +510,20 @@ export default defineComponent({
       return ''
     }
 
-    const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
+    const displayRegistrationNumber = (
+      baseReg: string,
+      actualReg: string
+    ): string => {
       if (baseReg) {
         if (baseReg === actualReg) {
           return baseReg
         }
-        return baseReg + '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
-          actualReg + '</span>'
+        return (
+          baseReg +
+          '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
+          actualReg +
+          '</span>'
+        )
       }
       return actualReg
     }
@@ -503,8 +534,28 @@ export default defineComponent({
       return `${year}/${month}/${day}`
     }
 
-    const selectAndSort = (col: string, direction: string) => {
+    const selectAndSort = (col: string) => {
+      if (!localState.headers.find(c => c.value === col).sortable) {
+        return
+      }
+      let direction = 'asc'
+      if (col === localState.selectedSort) {
+        if (localState.currentOrder === 'asc') {
+          direction = 'desc'
+        }
+      }
 
+      if (direction === 'desc') {
+        tableData.value.sort((a, b) =>
+          a[col] > b[col] ? 1 : b[col] > a[col] ? -1 : 0
+        )
+      } else {
+        tableData.value.sort((a, b) =>
+          a[col] < b[col] ? 1 : b[col] < a[col] ? -1 : 0
+        )
+      }
+      localState.currentOrder = direction
+      localState.selectedSort = col
     }
 
     const updateSubmittedRange = () => {

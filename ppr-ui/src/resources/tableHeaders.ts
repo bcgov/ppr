@@ -299,49 +299,49 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-md py-4',
     sortable: true,
     text: 'Registration Number',
-    value: 'number',
+    value: 'registrationNumber',
     display: true
   },
   {
     class: 'column-mdl py-4',
     sortable: true,
     text: 'Registration Type',
-    value: 'type',
+    value: 'registrationType',
     display: true
   },
   {
     class: 'column-md py-4',
     sortable: true,
     text: 'Registration Date',
-    value: 'rdate',
+    value: 'createDateTime',
     display: true
   },
   {
     class: 'column-mds py-4',
     sortable: true,
     text: 'Status',
-    value: 'status',
+    value: 'statusType',
     display: true
   },
   {
     class: 'column-md py-4',
     sortable: true,
     text: 'Registered By',
-    value: 'rby',
+    value: 'registeringName',
     display: true
   },
   {
     class: 'column-md py-4',
     sortable: true,
     text: 'Registering Party',
-    value: 'rparty',
+    value: 'registeringParty',
     display: true
   },
   {
     class: 'column-md py-4',
     sortable: true,
     text: 'Secured Parties',
-    value: 'sp',
+    value: 'securedParties',
     display: true
   },
 
@@ -349,14 +349,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-md py-4',
     sortable: true,
     text: 'Folio/Reference Number',
-    value: 'folio',
+    value: 'clientReferenceId',
     display: true
   },
   {
     class: 'column-sm py-4',
     sortable: true,
     text: 'Days to Expiry',
-    value: 'edays',
+    value: 'expireDays',
     display: true
   },
   {
