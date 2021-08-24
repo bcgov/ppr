@@ -30,7 +30,7 @@ from tests.unit.services.utils import create_header, create_header_account
 SAMPLE_JSON = copy.deepcopy(AMENDMENT_STATEMENT)
 STATEMENT_VALID = {
   'baseRegistrationNumber': 'TEST0001',
-  'baseDebtor': {
+  'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
   'registeringParty': {
@@ -61,7 +61,7 @@ STATEMENT_VALID = {
 }
 INVALID_REG_NUM = {
   'baseRegistrationNumber': 'TESTXXX1',
-  'baseDebtor': {
+  'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
   'registeringParty': {
@@ -120,8 +120,8 @@ MISSING_BASE_DEBTOR = {
 }
 INVALID_BASE_DEBTOR = {
   'baseRegistrationNumber': 'TEST0001',
-  'baseDebtor': {
-      'businessName': 'TEST BUS 3 DEBTOR'
+  'debtorName': {
+      'businessName': 'XXXX BUS 3 DEBTOR'
   },
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
@@ -151,7 +151,7 @@ INVALID_BASE_DEBTOR = {
 }
 INVALID_HISTORICAL = {
   'baseRegistrationNumber': 'TEST0003',
-  'baseDebtor': {
+  'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
   'registeringParty': {
@@ -182,7 +182,7 @@ INVALID_HISTORICAL = {
 }
 INVALID_CODE = {
   'baseRegistrationNumber': 'TEST0001',
-  'baseDebtor': {
+  'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
   'registeringParty': {
@@ -205,7 +205,7 @@ INVALID_CODE = {
 }
 INVALID_ADDRESS = {
   'baseRegistrationNumber': 'TEST0001',
-  'baseDebtor': {
+  'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
   'registeringParty': {
@@ -310,7 +310,7 @@ def test_amendment_court_order_success(session, client, jwt):
 
     json_data = copy.deepcopy(SAMPLE_JSON)
     json_data['baseRegistrationNumber'] = base_reg_num
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
+    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
     json_data['changeType'] = 'CO'
     del json_data['createDateTime']
     del json_data['amendmentRegistrationNumber']
@@ -349,7 +349,7 @@ def test_amendment_success(session, client, jwt):
 
     json_data = copy.deepcopy(SAMPLE_JSON)
     json_data['baseRegistrationNumber'] = base_reg_num
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
+    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
     json_data['changeType'] = 'AM'
     del json_data['courtOrderInformation']
     del json_data['createDateTime']

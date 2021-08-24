@@ -223,7 +223,7 @@ class AmendmentResource(Resource):
             statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+            if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
             # Verify delete party and collateral ID's
@@ -337,7 +337,7 @@ class ChangeResource(Resource):
             statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+            if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
             # Verify delete party and collateral ID's
@@ -448,7 +448,7 @@ class RenewalResource(Resource):
             statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+            if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
             # Set up the registration, pay, and save the data.
@@ -556,7 +556,7 @@ class DischargeResource(Resource):
             statement = FinancingStatement.find_by_registration_number(registration_num, False)
 
             # Verify base debtor (bypassed for staff)
-            if not statement.validate_base_debtor(request_json['baseDebtor'], is_staff(jwt)):
+            if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
             # No fee for a discharge.
@@ -619,6 +619,40 @@ class GetDischargeResource(Resource):
                 return get_pdf(statement.json, account_id, ReportTypes.DISCHARGE_STATEMENT_REPORT.value, token['name'])
 
             return statement.json, HTTPStatus.OK
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/<path:registration_num>/debtorNames', methods=['GET', 'OPTIONS'])
+class GetDebtorNamesResource(Resource):
+    """Resource to get debtor names for a financing statement identified by the registration number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(registration_num,):
+        """Get financing statement debtor names by registration number."""
+        try:
+            if registration_num is None:
+                return resource_utils.path_param_error_response('base registration number')
+
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if not is_staff(jwt) and account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch financing statement list for account ID
+            names_list = FinancingStatement.find_debtor_names_by_registration_number(registration_num)
+
+            return jsonify(names_list), HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)

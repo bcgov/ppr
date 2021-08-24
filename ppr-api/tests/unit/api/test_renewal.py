@@ -32,7 +32,7 @@ from tests.unit.services.utils import create_header, create_header_account
 STATEMENT_VALID = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
-    'baseDebtor': {
+    'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
     'registeringParty': {
@@ -75,8 +75,8 @@ MISSING_BASE_DEBTOR = {
 INVALID_BASE_DEBTOR = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
-    'baseDebtor': {
-        'businessName': 'TEST BUS 3 DEBTOR'
+    'debtorName': {
+        'businessName': 'XEST BUS 3 DEBTOR'
     },
     'registeringParty': {
         'businessName': 'ABC SEARCHING COMPANY',
@@ -98,7 +98,7 @@ INVALID_BASE_DEBTOR = {
 INVALID_REG_NUM = {
     'baseRegistrationNumber': 'TESTXXX1',
     'clientReferenceId': 'A-00000402',
-    'baseDebtor': {
+    'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
     'registeringParty': {
@@ -121,7 +121,7 @@ INVALID_REG_NUM = {
 INVALID_HISTORICAL = {
     'baseRegistrationNumber': 'TEST0003',
     'clientReferenceId': 'A-00000402',
-    'baseDebtor': {
+    'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
     'registeringParty': {
@@ -144,7 +144,7 @@ INVALID_HISTORICAL = {
 INVALID_CODE = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
-    'baseDebtor': {
+    'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
     'registeringParty': {
@@ -159,7 +159,7 @@ INVALID_CODE = {
 INVALID_ADDRESS = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
-    'baseDebtor': {
+    'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
     'registeringParty': {
@@ -251,7 +251,7 @@ def test_renewal_sa_success(session, client, jwt):
 
     json_data = copy.deepcopy(STATEMENT_VALID)
     json_data['baseRegistrationNumber'] = base_reg_num
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
+    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
     del json_data['payment']
 
     # test
@@ -273,7 +273,7 @@ def test_renewal_rl_success(session, client, jwt):
 
     json_data = copy.deepcopy(STATEMENT_VALID)
     json_data['baseRegistrationNumber'] = base_reg_num
-    json_data['baseDebtor']['businessName'] = 'TEST BUS 2 DEBTOR'
+    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
     del json_data['payment']
 
     # test

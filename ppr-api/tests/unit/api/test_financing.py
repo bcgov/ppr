@@ -304,6 +304,13 @@ TEST_CURRENT_STATE = [
     ('Original Financing Statement', 'TEST0001', False, ''),
     ('Invalid Financing Statement param', 'TEST0001', False, 'junk')
 ]
+# testdata pattern is ({description}, {roles}, {status}, {has_account}, {registration_number})
+TEST_DEBTOR_NAMES = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
+    ('Valid Request No Data', [PPR_ROLE], HTTPStatus.OK, True, 'TESTXXXX')
+]
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
@@ -441,3 +448,30 @@ def test_get_registration_current(session, client, jwt, desc, reg_number, curren
         assert 'courtOrderInformation' in json_data
     else:
         assert 'courtOrderInformation' not in json_data
+
+
+@pytest.mark.parametrize('desc,roles,status,has_account,reg_number', TEST_DEBTOR_NAMES)
+def test_get_debtor_names(session, client, jwt, desc, roles, status, has_account, reg_number):
+    """Assert that a request to get the debtor names for a base registration works as expected."""
+    # setup
+    headers = None
+    # setup
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    path = '/api/v1/financing-statements/' + reg_number + '/debtorNames'
+
+    response = client.get(path,
+                          headers=headers)
+
+    # check
+    assert response.status_code == status
+    if response.status_code == HTTPStatus.OK:
+        json_data = response.json
+        if reg_number == 'TEST0001':
+            assert json_data
+            assert len(json_data) > 0
+        # print(json_data)

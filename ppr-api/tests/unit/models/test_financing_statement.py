@@ -50,6 +50,12 @@ TEST_DEBTOR_NAME_DATA = [
     ('Valid Business', 'TEST0002', 'DB', 'Test Bus', True),
     ('Invalid Business', 'TEST0002', 'DB', 'Text Bus', False),
 ]
+# testdata pattern is ({registration number}, {results size})
+TEST_DEBTOR_NAMES_DATA = [
+    ('TEST0001', 4),
+    ('TEST0002', 1),
+    ('TESTXXXX', 0)
+]
 
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)
@@ -193,29 +199,44 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
 
 
 @pytest.mark.parametrize('desc,reg_number,type,debtor_name,valid', TEST_DEBTOR_NAME_DATA)
-def test_validate_base_debtor(session, desc, reg_number, type, debtor_name, valid):
+def test_validate_debtor_name(session, desc, reg_number, type, debtor_name, valid):
     """Assert that base debtor check on an existing registration works as expected."""
     json_data = copy.deepcopy(DISCHARGE_STATEMENT)
     if type == 'DB':
-        json_data['baseDebtor']['businessName'] = debtor_name
+        json_data['debtorName']['businessName'] = debtor_name
     else:
         person = {
             'last': debtor_name,
             'first': 'Test ind',
             'middle': '1'
         }
-        del json_data['baseDebtor']['businessName']
-        json_data['baseDebtor']['personName'] = person
+        del json_data['debtorName']['businessName']
+        json_data['debtorName']['personName'] = person
 
     statement = FinancingStatement.find_by_registration_number(reg_number, 'PS12345', False)
     assert statement
 
     # valid business name
-    valid_debtor = statement.validate_base_debtor(json_data['baseDebtor'], False)
+    valid_debtor = statement.validate_debtor_name(json_data['debtorName'], False)
     if valid:
         assert valid_debtor
     else:
         assert not valid_debtor
+
+
+@pytest.mark.parametrize('reg_num,results_size', TEST_DEBTOR_NAMES_DATA)
+def test_find_debtor_names(session, reg_num, results_size):
+    """Assert that finding debtor names by registration number works as expected."""
+    names_json = FinancingStatement.find_debtor_names_by_registration_number(reg_num)
+    if results_size == 0:
+        assert not names_json or len(names_json) == 0
+    else:
+        assert names_json and len(names_json) == results_size
+        if reg_num == 'TEST0001':
+            assert names_json[0]['personName']['last'] == 'DEBTOR'
+            assert names_json[1]['businessName'] == 'TEST BUS 2 DEBTOR'
+            assert names_json[2]['businessName'] == 'TEST 7 AMEND DEBTOR'
+            assert names_json[3]['businessName'] == 'TEST 8 TRANSFER DEBTOR'
 
 
 def test_current_json(session):

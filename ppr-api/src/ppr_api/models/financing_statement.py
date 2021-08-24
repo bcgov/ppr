@@ -252,37 +252,33 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
         return collateral_list
 
-    def validate_base_debtor(self, base_debtor_json, staff: bool = False):
-        """Verify supplied base debtor when registering non-financing statements. Bypass the check for staff.
-        Base debtor match rules:
-        The base debtor is the first debtor in the financing statement and may be historical/removed.
+    def validate_debtor_name(self, debtor_name_json, staff: bool = False):
+        """Verify supplied debtor name when registering non-financing statements. Bypass the check for staff.
+        Debtor name match rules:
+        The debtor name may be for any debtor in the financing statement and may be historical/removed.
         Match on first five characters, or all if less than 5, on the business name or the individual last name.
         """
         if staff:
             return True
 
-        if not base_debtor_json:
+        if not debtor_name_json:
             return False
 
         check_name = None
-        party_id = 0
-        db_name = None
-        if 'businessName' in base_debtor_json:
-            check_name = base_debtor_json['businessName'].upper()[:5]
-        elif 'personName' in base_debtor_json and 'last' in base_debtor_json['personName']:
-            check_name = base_debtor_json['personName']['last'].upper()[:5]
+        if 'businessName' in debtor_name_json:
+            check_name = debtor_name_json['businessName'].upper()[:5]
+        elif 'personName' in debtor_name_json and 'last' in debtor_name_json['personName']:
+            check_name = debtor_name_json['personName']['last'].upper()[:5]
         else:
             return False
 
         if self.parties:
             for party in self.parties:
-                if party.party_type == 'DB' and (party_id == 0 or party.id < party_id):
-                    party_id = party.id
-                    db_name = party.business_name.upper()[:5]
-                elif party.party_type == 'DI' and (party_id == 0 or party.id < party_id):
-                    party_id = party.id
-                    db_name = party.last_name.upper()[:5]
-        return db_name and check_name == db_name
+                if party.party_type == model_utils.PARTY_DEBTOR_BUS and check_name == party.business_name.upper()[:5]:
+                    return True
+                if party.party_type == model_utils.PARTY_DEBTOR_IND and check_name == party.last_name.upper()[:5]:
+                    return True
+        return False
 
     def save(self):
         """Save the object to the database immediately."""
@@ -379,6 +375,38 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                FinancingStatement.id == financing_id).one_or_none()
 
         return statement
+
+    @classmethod
+    def find_debtor_names_by_registration_number(cls, registration_num: str = None):
+        """Return a list of all debtor names fora base registration number."""
+        names_json = []
+        if not registration_num:
+            return names_json
+
+        statement = db.session.query(FinancingStatement).\
+                    filter(FinancingStatement.id == Registration.financing_id,
+                           Registration.registration_num == registration_num,
+                           Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
+                           one_or_none()
+        if statement and statement.parties:
+            for party in statement.parties:
+                if party.party_type == model_utils.PARTY_DEBTOR_BUS:
+                    name = {
+                        'businessName': party.business_name
+                    }
+                    names_json.append(name)
+                elif party.party_type == model_utils.PARTY_DEBTOR_IND:
+                    person_name = {
+                        'first': party.first_name,
+                        'last': party.last_name
+                    }
+                    if party.middle_initial and party.middle_initial != '' and party.middle_initial.upper() != 'NONE':
+                        person_name['middle'] = party.middle_initial
+                    name = {
+                        'personName': person_name
+                    }
+                    names_json.append(name)
+        return names_json
 
     @staticmethod
     def create_from_json(json_data, account_id: str, user_id: str = None):
