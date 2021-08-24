@@ -41,7 +41,7 @@
           </v-col>
         </v-row>
         <breadcrumb />
-        <tombstone />
+        <tombstone :setCurrentPath="currentPath" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters style="overflow: scroll;">
             <v-col cols="12">
@@ -66,6 +66,7 @@
 <script lang="ts">
 // External
 import { Component, Watch, Mixins } from 'vue-property-decorator'
+import { Route } from 'vue-router' // eslint-disable-line
 import { Action, Getter } from 'vuex-class'
 import { StatusCodes } from 'http-status-codes'
 
@@ -119,6 +120,7 @@ export default class App extends Mixins(AuthMixin) {
   @Action setUserInfo: ActionBindingIF
 
   // Local Properties
+  private currentPath: string = ''
   private errorDialog: boolean = false
   private dialogOptions: DialogOptionsIF = loginError
 
@@ -224,6 +226,11 @@ export default class App extends Mixins(AuthMixin) {
       // (since we won't get the event from Signin component)
       if (this.isAuthenticated) this.onProfileReady(true)
     }
+  }
+
+  @Watch('$route', { immediate: true, deep: true })
+  onUrlChange (newVal: Route) {
+    this.currentPath = newVal.path
   }
 
   /** Called when profile is ready -- we can now init app. */
