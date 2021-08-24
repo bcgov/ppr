@@ -64,7 +64,7 @@ export default defineComponent({
     const goToParties = (): void => {
       parties.showInvalid = true
       setAddSecuredPartiesAndDebtors(parties)
-      router.push({ path: '/add-securedparties-debtors' })
+      router.push({ path: '/new-registration/add-securedparties-debtors' })
     }
 
     return {

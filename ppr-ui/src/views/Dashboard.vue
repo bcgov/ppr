@@ -89,6 +89,7 @@ export default class Dashboard extends Vue {
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
 
+  @Action resetNewRegistration: ActionBindingIF
   @Action setDebtorName: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
@@ -142,6 +143,7 @@ export default class Dashboard extends Vue {
 
   /** Set registration type in the store and route to the first registration step */
   private startRegistration (selectedRegistration: RegistrationTypeIF): void {
+    this.resetNewRegistration(null) // Clear store data from the previous registration.
     this.setRegistrationType(selectedRegistration)
     this.$router.push({ name: RouteNames.LENGTH_TRUST })
   }
