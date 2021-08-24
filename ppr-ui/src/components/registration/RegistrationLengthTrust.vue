@@ -573,7 +573,7 @@ export default defineComponent({
   }
 }
 
-::v-deep .v-icon.v-icon {
+::v-deep .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)  {
   color: $primary-blue
 }
 ::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
