@@ -92,7 +92,7 @@
         <v-col cols="3" class="generic-label">
           Registration Length
         </v-col>
-        <v-col class="summary-text pl-2">
+        <v-col class="summary-text pl-4">
           {{ lengthSummary }}
         </v-col>
       </v-row>
@@ -142,6 +142,7 @@
                 readonly
                 v-bind="attrs"
                 v-on="on"
+                v-on:click:append="on.click"
               >
               </v-text-field>
             </template>
