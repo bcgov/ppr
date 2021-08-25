@@ -30,7 +30,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { convertDate } from '@/utils'
 
 export default defineComponent({
-  name: 'DefaultTombstone',
+  name: 'TombstoneDefault',
   setup (props, { root }) {
     const { getAccountLabel, getUserFirstName, getUserLastName } =
       useGetters<any>(['getAccountLabel', 'getUserFirstName', 'getUserLastName'])

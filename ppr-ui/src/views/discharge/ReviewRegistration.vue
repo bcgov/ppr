@@ -168,12 +168,8 @@ export default class ReviewRegistration extends Vue {
         quantity: 1,
         feeCode: ''
       } as FeeSummaryIF
-      console.log(financingStatement.createDateTime)
       this.setRegistrationCreationDate(financingStatement.createDateTime)
-      console.log(financingStatement.expiryDate)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      console.log(financingStatement.baseRegistrationNumber)
-      console.log(financingStatement)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddCollateral(collateral)

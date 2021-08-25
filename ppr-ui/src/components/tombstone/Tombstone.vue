@@ -1,8 +1,8 @@
 <template>
   <v-container class="view-container px-15 py-0" fluid style="background-color: white;">
     <div class="container pa-0 pt-6">
-      <default-tombstone v-if="displayDefault" />
-      <discharge-tombstone v-else-if="displayDischarge" />
+      <tombstone-default v-if="displayDefault" />
+      <tombstone-discharge v-else-if="displayDischarge" />
     </div>
   </v-container>
 </template>
@@ -10,21 +10,29 @@
 // external
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 // local
-import { DefaultTombstone, DischargeTombstone } from '@/components/tombstone'
+import { TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
 
 export default defineComponent({
   name: 'Tombstone',
   components: {
-    DefaultTombstone,
-    DischargeTombstone
+    TombstoneDefault,
+    TombstoneDischarge
+  },
+  props: {
+    setCurrentPath: {
+      default: ''
+    }
   },
   setup (props, { root }) {
     const localState = reactive({
+      currentPath: computed((): string => {
+        return props.setCurrentPath
+      }),
       displayDefault: computed((): boolean => {
-        return !root.$router.currentRoute.path.includes('discharge')
+        return !localState.currentPath.includes('discharge')
       }),
       displayDischarge: computed((): boolean => {
-        return root.$router.currentRoute.path.includes('discharge')
+        return localState.currentPath.includes('discharge')
       })
     })
 
