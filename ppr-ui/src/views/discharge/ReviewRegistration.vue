@@ -33,6 +33,7 @@
         </v-col>
         <v-col class="pl-6" cols="3">
           <registration-fee :registrationType="'Total Discharge'" />
+          <buttons-stacked class="pt-4" :setCancelBtn="'Cancel'" :setSubmitBtn="'Confirm and Complete'" />
         </v-col>
       </v-row>
     </div>
@@ -46,7 +47,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonsStacked, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
@@ -63,7 +64,7 @@ import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
-    ButtonFooter,
+    ButtonsStacked,
     RegistrationFee,
     RegistrationLengthTrust,
     Stepper,
