@@ -1,5 +1,6 @@
-export * from './mock-new-registration'
 export * from './mock-party-code-search-results'
+export * from './mock-registration-discharge'
+export * from './mock-registration-new'
 export * from './mock-registration-responses'
 export * from './mock-search-results'
 export * from './mock-search-responses'

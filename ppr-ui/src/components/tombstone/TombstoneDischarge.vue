@@ -4,11 +4,15 @@
       <v-col class="tombstone-header">
         {{ header }}
       </v-col>
-      <v-col class="float-right tombstone-info" style="padding-top: 0.375rem;">
-        <div class="float-right">
-          <span :class="$style['info-label']">Base Registration Date and Time: </span>
-          {{ creationDate }}
-        </div>
+      <v-col class="tombstone-info" style="padding-top: 0.375rem;">
+        <v-row justify="end" no-gutters>
+          <v-col :class="$style['info-label']" cols="6">
+            <span class="float-right">Base Registration Date and Time: </span>
+          </v-col>
+          <v-col class="pl-1" cols="6">
+            {{ creationDate }}
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <v-row class="tombstone-sub-header" no-gutters>
@@ -16,10 +20,14 @@
         {{ registrationType }}
       </v-col>
       <v-col class="tombstone-info" style="padding-top: 0.125rem;">
-        <div class="float-right">
-          <span :class="$style['info-label']">Current Expiry Date and Time: </span>
-          {{ expiryDate }}
-        </div>
+        <v-row justify="end" no-gutters>
+          <v-col :class="$style['info-label']" cols="6">
+            <span class="float-right">Current Expiry Date and Time: </span>
+          </v-col>
+          <v-col class="pl-1" cols="6">
+            {{ expiryDate }}
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </div>
@@ -33,7 +41,7 @@ import { convertDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 
 export default defineComponent({
-  name: 'DischargeTombstone',
+  name: 'TombstoneDischarge',
   setup () {
     const {
       getRegistrationCreationDate,
@@ -49,7 +57,6 @@ export default defineComponent({
     const localState = reactive({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {
-          console.log(getRegistrationCreationDate.value)
           const date = new Date(getRegistrationCreationDate.value)
           return convertDate(date, true, true)
         }
@@ -57,7 +64,6 @@ export default defineComponent({
       }),
       expiryDate: computed((): string => {
         if (getRegistrationExpiryDate.value) {
-          console.log(getRegistrationExpiryDate.value)
           const date = new Date(getRegistrationExpiryDate.value)
           return convertDate(date, true, true)
         }
