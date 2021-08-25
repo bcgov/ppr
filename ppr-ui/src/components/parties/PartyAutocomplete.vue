@@ -166,6 +166,7 @@ export default defineComponent({
   width: 150px;
   flex-direction: row;
   justify-content: flex-end;
+  font-size: 0.875rem;
 }
 .close-btn-row {
   height: 1rem;

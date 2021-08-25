@@ -11,7 +11,7 @@
         <v-col cols="11">
           <v-row no-gutters>
             <v-col class="text-md-center ml-8">
-              <v-icon :class="$style['iconRed']">mdi-information-outline</v-icon>
+              <v-icon :class="$style['iconRed']">mdi-alert-circle-outline</v-icon>
             </v-col>
           </v-row>
           <v-row no-gutters class="pt-5">
@@ -291,7 +291,7 @@ export default defineComponent({
 }
 
 .iconRed {
-  color: error !important;
+  color: #D3272C !important;
   font-size: 32px !important;
 }
 
