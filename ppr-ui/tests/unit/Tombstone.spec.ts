@@ -114,9 +114,9 @@ describe('Tombstone component', () => {
     const extraInfo = wrapper.findAll(tombstoneInfo)
     expect(extraInfo.length).toBe(2)
     expect(extraInfo.at(0).text()).toContain('Base Registration Date and Time: ')
-    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true))
+    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true)?.trim())
     expect(extraInfo.at(1).text()).toContain('Current Expiry Date and Time: ')
-    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true))
+    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true)?.trim())
   })
 
   it('renders Tombstone component properly for Dashboard', async () => {
