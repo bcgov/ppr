@@ -463,6 +463,10 @@ export default defineComponent({
   color: $gray7 !important;
 }
 
+::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td.list-item__title {
+  height: auto;
+}
+
 ::v-deep .v-list-item--active {
   padding-left: 30px;
   color: $primary-blue !important;
