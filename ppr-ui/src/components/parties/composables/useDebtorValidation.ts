@@ -57,7 +57,7 @@ export const useDebtorValidation = () => {
     resetError('month')
     resetError('day')
     if (year > 0 || month > 0 || day > 0) {
-      if (year < 1800 || year > new Date().getFullYear()) {
+      if ((!year) || year < 1800 || year > new Date().getFullYear()) {
         errors.value.year = {
           type: 'YEAR',
           succeeded: false,
@@ -73,7 +73,7 @@ export const useDebtorValidation = () => {
         }
       }
 
-      if (day < 1 || day > 31) {
+      if ((!day) || day < 1 || day > 31) {
         errors.value.day = {
           type: 'DAY',
           succeeded: false,
