@@ -294,6 +294,7 @@ export default defineComponent({
     const {
       hasVehicleCollateral,
       hasGeneralCollateral,
+      hasGeneralCollateralText,
       mustHaveManufacturedHomeCollateral
     } = useVehicle(props, context)
 
@@ -361,7 +362,7 @@ export default defineComponent({
         return 'At least one manufactured home as vehicle collateral'
       }
       if (hasGeneralCollateral()) {
-        return 'General collateral'
+        return 'General Collateral'
       }
       if (hasVehicleCollateral()) {
         return 'At least one vehicle as collateral'
@@ -434,9 +435,14 @@ export default defineComponent({
 
     onMounted(() => {
       if (hasGeneralCollateral() && !collateral.generalCollateral) {
-        if (registrationType === APIRegistrationTypes.OTHER) {
+        if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
           localState.generalCollateral =
             'All the Personal Property of the Debtor'
+        }
+        if (hasGeneralCollateralText()) {
+          localState.generalCollateral =
+            'All the debtor’s present and after acquired personal property, including ' +
+            'but not restricted to machinery, equipment, furniture, fixtures and receivables.'
         }
       }
     })

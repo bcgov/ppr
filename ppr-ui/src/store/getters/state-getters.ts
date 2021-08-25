@@ -83,6 +83,11 @@ export const getRegistrationType = (state: StateIF): RegistrationTypeIF => {
   return state.stateModel.registration.registrationType
 }
 
+/** The selected registration type object. */
+export const getRegistrationOther = (state: StateIF): string => {
+  return state.stateModel.registration.registrationTypeOtherDesc
+}
+
 /** The api response for ppr search. */
 export const getSearchResults = (state: StateIF): SearchResponseIF => {
   return state.stateModel.search.searchResults

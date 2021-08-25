@@ -23,10 +23,10 @@
           <v-icon color="green darken-2" class="agreement-valid-icon"
             >mdi-check</v-icon
           >
-          At least one Secured Party
+          {{ securedPartyText }}
         </div>
         <ul v-else>
-          <li>At least one Secured Party</li>
+          <li>{{ securedPartyText }}</li>
         </ul>
         <div v-if="debtors.length > 0">
           <v-icon color="green darken-2" class="agreement-valid-icon"
@@ -41,16 +41,23 @@
     </v-row>
     <v-row no-gutters class="pb-4 pt-10">
       <v-col>
-        <h3>Registering Party
-        <v-tooltip top content-class="top-tooltip pa-5" transition="fade-transition">
+        <h3>
+          Registering Party
+          <v-tooltip
+            top
+            content-class="top-tooltip pa-5"
+            transition="fade-transition"
+          >
             <template v-slot:activator="{ on }">
-              <v-icon class="pl-1 mt-n1" color="primary" v-on="on">mdi-information-outline</v-icon>
+              <v-icon class="pl-1 mt-n1" color="primary" v-on="on"
+                >mdi-information-outline</v-icon
+              >
             </template>
-            The Registering Party is based on your account information and cannot be
-            changed here. This information can be changed by updating your BC Registries
-            account information.
+            The Registering Party is based on your account information and
+            cannot be changed here. This information can be changed by updating
+            your BC Registries account information.
           </v-tooltip>
-          </h3>
+        </h3>
         <registering-party @setRegisteringParty="setRegisteringParty" />
       </v-col>
     </v-row>
@@ -73,15 +80,15 @@
 import {
   defineComponent,
   reactive,
-  toRefs
-  // watch,
-  // computed
+  toRefs,
+  computed
 } from '@vue/composition-api'
 // import { useGetters, useActions } from 'vuex-composition-helpers'
 import Debtors from './Debtors.vue'
 import SecuredParties from './SecuredParties.vue'
 import PartySummary from './PartySummary.vue'
 import RegisteringParty from './RegisteringParty.vue'
+import { useSecuredParty } from './composables/useSecuredParty'
 import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
@@ -97,19 +104,30 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup (props, context) {
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
     ])
+    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
     const localState = reactive({
       registeringParty: getAddSecuredPartiesAndDebtors.value.registeringParty,
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
-      debtors: getAddSecuredPartiesAndDebtors.value.debtors
+      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
+      securedPartyText: computed((): string => {
+        if (isSecuredPartyRestrictedList(registrationType)) {
+          return 'The Secured Party'
+        } else {
+          return 'At least one Secured Party'
+        }
+      })
     })
     const summaryView = toRefs(props).isSummary
 
     const setRegisteringParty = () => {
-      localState.registeringParty = getAddSecuredPartiesAndDebtors.value.registeringParty
+      localState.registeringParty =
+        getAddSecuredPartiesAndDebtors.value.registeringParty
     }
 
     return {
@@ -121,6 +139,4 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
-
-</style>
+<style lang="scss" module></style>

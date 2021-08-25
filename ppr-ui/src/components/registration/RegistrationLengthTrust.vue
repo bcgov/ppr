@@ -10,7 +10,10 @@
           >
             <strong>Registration Length and Trust Indenture</strong>
           </label>
-          <label class="pl-3" v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
+          <label
+            class="pl-3"
+            v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+          >
             <strong>Amount and Date of Surrender</strong>
           </label>
           <label class="pl-3" v-else>
@@ -333,7 +336,10 @@ export default defineComponent({
         return !lengthTrust.valid
       }),
       showErrorLienAmount: computed((): boolean => {
-        if (lengthTrust.lienAmount !== '' && localState.lienAmountMessage?.length > 0) {
+        if (
+          lengthTrust.lienAmount !== '' &&
+          localState.lienAmountMessage?.length > 0
+        ) {
           return true
         }
         return lengthTrust.showInvalid && lengthTrust.lienAmount === ''
@@ -366,7 +372,9 @@ export default defineComponent({
         return minDate.toISOString()
       }),
       computedDateFormatted: computed((): string => {
-        return localState.surrenderDate !== '' ? convertDate(new Date(localState.surrenderDate), false, false) : ''
+        return localState.surrenderDate !== ''
+          ? convertDate(new Date(localState.surrenderDate), false, false)
+          : ''
       }),
       lengthSummary: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
@@ -388,7 +396,9 @@ export default defineComponent({
       }),
       lienAmountSummary: computed((): string => {
         if (lengthTrust.lienAmount) {
-          var currency = lengthTrust.lienAmount?.replace('$', '')?.replaceAll(',', '')
+          var currency = lengthTrust.lienAmount
+            ?.replace('$', '')
+            ?.replaceAll(',', '')
           var lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
             return lengthTrust.lienAmount
@@ -421,8 +431,22 @@ export default defineComponent({
       const ipArray = [
         APIRegistrationTypes.MARRIAGE_MH,
         APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN
-        // APIRegistrationTypes.MISCELLANEOUS_REGISTRATION
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+        APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+        APIRegistrationTypes.FOREST,
+        APIRegistrationTypes.LOGGING_TAX,
+        APIRegistrationTypes.CARBON_TAX,
+        APIRegistrationTypes.RURAL_PROPERTY_TAX,
+        APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+        APIRegistrationTypes.INCOME_TAX,
+        APIRegistrationTypes.MOTOR_FUEL_TAX,
+        APIRegistrationTypes.EXCISE_TAX,
+        APIRegistrationTypes.LIEN_UNPAID_WAGES,
+        APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+        APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+        APIRegistrationTypes.MAINTENANCE_LIEN,
+        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE
       ]
       return ipArray.includes(registrationType)
     }
@@ -574,8 +598,9 @@ export default defineComponent({
   }
 }
 
-::v-deep .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline)  {
-  color: $primary-blue
+::v-deep
+  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+  color: $primary-blue;
 }
 ::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
   opacity: 1;
@@ -583,16 +608,17 @@ export default defineComponent({
 ::v-deep .v-date-picker-table__current {
   border-color: $primary-blue !important;
 }
-::v-deep .v-date-picker-table__current .v-btn__content{
+::v-deep .v-date-picker-table__current .v-btn__content {
   color: $primary-blue !important;
 }
 ::v-deep .theme--light.v-date-picker-table th {
-  color: $gray9
+  color: $gray9;
 }
 ::v-deep .v-date-picker-table .v-btn {
-  color: $gray7
+  color: $gray7;
 }
-::v-deep .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+::v-deep
+  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
   background-color: $primary-blue !important;
   border-color: $primary-blue !important;
   color: white !important;
@@ -609,5 +635,4 @@ export default defineComponent({
 ::v-deep .v-input--is-disabled {
   opacity: 0.4;
 }
-
 </style>

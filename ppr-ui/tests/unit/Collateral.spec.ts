@@ -7,7 +7,10 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedGeneralCollateral1,
   mockedVehicleCollateral1,
-  mockedSelectSecurityAgreement
+  mockedSelectSecurityAgreement,
+  mockedOtherCarbon,
+  mockedLienUnpaid,
+  generalCollateralText
 } from './test-data'
 
 // Components
@@ -68,6 +71,50 @@ describe('Collateral SA tests', () => {
   })
 })
 
+describe('Collateral Lien unpaid wages tests', () => {
+  let wrapper: Wrapper<any>
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedLienUnpaid())
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+  it('renders with default values', async () => {
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    // won't show vehicle collateral
+    expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
+    expect(wrapper.vm.generalCollateral).toContain('All the Personal Property of the Debtor')
+  })
+
+
+})
+
+describe('Collateral Carbon tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedOtherCarbon())
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: null,
+      vehicleCollateral: []
+    })
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with default values', async () => {
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    // won't show vehicle collateral
+    expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
+    expect(wrapper.vm.generalCollateral).toContain(generalCollateralText)
+  })
+
+
+})
+
 describe('Collateral store tests', () => {
   let wrapper: Wrapper<any>
 
@@ -76,6 +123,7 @@ describe('Collateral store tests', () => {
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: mockedVehicleCollateral1
     })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -108,3 +156,6 @@ describe('Collateral store tests', () => {
     expect(vehicleItem1.querySelectorAll('td')[4].textContent).toContain('KM8J3CA46JU622994')
   })
 })
+
+
+
