@@ -212,8 +212,8 @@ div.v-menu__content.theme--light.menuable__content__active {
 ::v-deep .v-list-item__title, .v-list-item__action {
   color: $gray7 !important;
   font-size: 0.875rem !important;
-  min-height: 48px;
-  padding: 22px;
+  min-height: 0;
+  padding: 11.5px 22px;
 }
 ::v-deep .v-list-item__title:hover{
   background-color: $gray1;
