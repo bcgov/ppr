@@ -253,11 +253,12 @@ tbody {
 // list items
 .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) .registration-list-item {
   font-size: 0.875rem;
-  padding-left: 8px;
+  padding-left: 16px;
 }
 
 .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
   color: $gray7 !important;
+  min-height: 0;
 }
 
 .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled):hover {
@@ -265,10 +266,15 @@ tbody {
   color: $primary-blue !important;
 }
 
+.theme--light.v-list-item--disabled {
+  min-height: 0;
+}
+
 .theme--light.v-list-item--disabled .registration-list-header {
   color: $gray9;
   font-size: 0.875rem;
   font-weight: bold;
+  text-align: center;
 }
 
 .theme--light.v-divider {

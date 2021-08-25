@@ -17,7 +17,7 @@
       :items="displayItems"
       item-text="text"
       label="Start a new Registration (Select a type)"
-      :menu-props="{ maxHeight: '325px' }"
+      :menu-props="{ maxHeight: '388px' }"
       offset="1000"
       return-object
       v-model="selected"
@@ -25,12 +25,12 @@
     >
       <template v-slot:item="{ parent, item }">
         <template v-if="item.class === 'registration-list-header'">
-          <v-list-item-content>
+          <v-list-item-content style="padding: 9px 0;">
             <v-row style="width: 45rem;">
-              <v-col cols="11">
+              <v-col class="py-0" align-self="center" cols="11">
                 <span class="registration-list-header">{{ item.text }}</span>
               </v-col>
-              <v-col cols="auto">
+              <v-col class="py-0" align-self="center" cols="auto">
                 <v-btn icon small @click="toggleGroup(item.group)" style="pointer-events: all;">
                   <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
                   <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
@@ -40,8 +40,8 @@
           </v-list-item-content>
         </template>
         <template v-else>
-          <v-list-item-content>
-            <span class='registration-list-item' v-html="`${parent.genFilteredText(item.text)}`"></span>
+          <v-list-item-content class="py-3">
+            <span class="registration-list-item" v-html="`${parent.genFilteredText(item.text)}`"></span>
           </v-list-item-content>
         </template>
       </template>
