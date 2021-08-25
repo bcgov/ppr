@@ -3,13 +3,13 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import { createLocalVue, mount, shallowMount } from '@vue/test-utils'
+import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
 import { ReviewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { RegistrationFee } from '@/components/common'
+import { ButtonsStacked, RegistrationFee } from '@/components/common'
 import {
   DebtorSummary,
   RegisteringPartySummary,
@@ -96,5 +96,6 @@ describe('ReviewConfirm new registration component', () => {
     expect(state.feeSummary.feeCode).toBe('')
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
+    expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
   })
 })
