@@ -1,7 +1,8 @@
 import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, APIVehicleTypes } from '@/enums'
 import {
   RegistrationTypesMiscellaneousCC,
-  RegistrationTypesStandard
+  RegistrationTypesStandard,
+  RegistrationTypesMiscellaneousOT
 } from '@/resources'
 import {
   AddPartiesIF,
@@ -49,6 +50,12 @@ export const mockedOtherCarbon = (): RegistrationTypeIF => {
   })
 }
 
+export const mockedLienUnpaid = (): RegistrationTypeIF => {
+  return RegistrationTypesMiscellaneousOT.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.LIEN_UNPAID_WAGES
+  })
+}
+
 export const mockedError: ErrorIF = {
   statusCode: 500,
   message: 'mock error'
@@ -90,6 +97,9 @@ export const mockedVehicleCollateral1: Array<VehicleCollateralIF> = [
     model: '1700 VISION'
   }
 ]
+
+export const generalCollateralText: string = 'All the debtor’s present and after acquired personal property, ' +
+'including but not restricted to machinery, equipment, furniture, fixtures and receivables.'
 
 export const mockedPayment1: PaymentIF = {
   invoiceId: '2198743',

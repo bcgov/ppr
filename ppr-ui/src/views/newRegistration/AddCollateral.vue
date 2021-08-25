@@ -19,7 +19,7 @@
             </v-row>
             <v-row no-gutters>
               <v-col class="pt-2 pb-6">
-                Add the collateral for this {{ registrationTypeUI }}.
+                Add the collateral for this {{ registrationTypeUI }} registration.
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -50,7 +50,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames, StatementTypes } from '@/enums'
+import { RouteNames, StatementTypes, APIRegistrationTypes } from '@/enums'
 import {
   ActionBindingIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
@@ -68,6 +68,7 @@ import { Collateral } from '@/components/collateral'
 })
 export default class AddCollateral extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getRegistrationOther: string
   @Getter getFeeSummary: FeeSummaryIF
 
   @Action resetNewRegistration: ActionBindingIF
@@ -92,6 +93,9 @@ export default class AddCollateral extends Vue {
   }
 
   private get registrationTypeUI (): string {
+    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+      return this.getRegistrationOther || ''
+    }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
 

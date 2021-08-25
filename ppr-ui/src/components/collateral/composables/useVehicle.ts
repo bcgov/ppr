@@ -39,11 +39,19 @@ export const useVehicle = (props, context) => {
   })
 
   const getVehicle = () => {
-    const vehicles: VehicleCollateralIF[] = getAddCollateral.value.vehicleCollateral
+    const vehicles: VehicleCollateralIF[] =
+      getAddCollateral.value.vehicleCollateral
     if (props.activeIndex >= 0) {
       localState.currentVehicle = vehicles[props.activeIndex]
     } else {
-      localState.currentVehicle = { id: -1, type: '', serialNumber: '', model: '', make: '', year: '' }
+      localState.currentVehicle = {
+        id: -1,
+        type: '',
+        serialNumber: '',
+        model: '',
+        make: '',
+        year: ''
+      }
     }
   }
 
@@ -125,10 +133,21 @@ export const useVehicle = (props, context) => {
   }
 
   const excludesManufacturedHomeCollateral = (): boolean => {
-    const mhArray = [
-      APIRegistrationTypes.REPAIRERS_LIEN
-    ]
+    const mhArray = [APIRegistrationTypes.REPAIRERS_LIEN]
     return mhArray.includes(registrationType)
+  }
+
+  const hasGeneralCollateralText = (): boolean => {
+    const gcList = [
+      APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+      APIRegistrationTypes.LOGGING_TAX,
+      APIRegistrationTypes.CARBON_TAX,
+      APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+      APIRegistrationTypes.INCOME_TAX,
+      APIRegistrationTypes.MOTOR_FUEL_TAX,
+      APIRegistrationTypes.EXCISE_TAX
+    ]
+    return gcList.includes(registrationType)
   }
 
   return {
@@ -138,6 +157,7 @@ export const useVehicle = (props, context) => {
     removeVehicle,
     hasVehicleCollateral,
     hasGeneralCollateral,
+    hasGeneralCollateralText,
     mustHaveManufacturedHomeCollateral,
     excludesManufacturedHomeCollateral,
     ...toRefs(localState)
