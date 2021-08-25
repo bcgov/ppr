@@ -85,7 +85,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames, StatementTypes } from '@/enums'
+import { RouteNames, StatementTypes, APIRegistrationTypes } from '@/enums'
 import {
   ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
@@ -152,7 +152,7 @@ export default class ReviewConfirm extends Vue {
   }
 
   private get registrationTypeUI (): string {
-    if (this.getRegistrationType?.registrationTypeAPI === 'OT') {
+    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
       return this.getRegistrationOther || ''
     }
     return this.getRegistrationType?.registrationTypeUI || ''

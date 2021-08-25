@@ -110,7 +110,7 @@ export default class LengthTrust extends Vue {
   }
 
   private get registrationTypeUI (): string {
-    if (this.getRegistrationType?.registrationTypeAPI === 'OT') {
+    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
       return this.getRegistrationOther || ''
     }
     return this.getRegistrationType?.registrationTypeUI || ''
