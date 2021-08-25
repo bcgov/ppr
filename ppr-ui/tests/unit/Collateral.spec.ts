@@ -95,7 +95,10 @@ describe('Collateral Carbon tests', () => {
 
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedOtherCarbon())
-
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: null,
+      vehicleCollateral: []
+    })
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -106,15 +109,11 @@ describe('Collateral Carbon tests', () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // won't show vehicle collateral
     expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
-
     expect(wrapper.vm.generalCollateral).toContain(generalCollateralText)
   })
 
 
 })
-
-
-
 
 describe('Collateral store tests', () => {
   let wrapper: Wrapper<any>
