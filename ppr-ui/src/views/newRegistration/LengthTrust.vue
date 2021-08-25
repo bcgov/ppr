@@ -84,6 +84,7 @@ import { APIRegistrationTypes, RouteNames, StatementTypes } from '@/enums' // es
 })
 export default class LengthTrust extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getRegistrationOther: string
   @Getter getLengthTrust: LengthTrustIF
   @Getter getFeeSummary: FeeSummaryIF
 
@@ -109,6 +110,9 @@ export default class LengthTrust extends Vue {
   }
 
   private get registrationTypeUI (): string {
+    if (this.getRegistrationType?.registrationTypeAPI === 'OT') {
+      return this.getRegistrationOther || ''
+    }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
 

@@ -19,7 +19,7 @@
             </v-row>
             <v-row no-gutters>
               <v-col class="pt-2 pb-6">
-                Add the collateral for this {{ registrationTypeUI }}.
+                Add the collateral for this {{ registrationTypeUI }} registration.
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -68,6 +68,7 @@ import { Collateral } from '@/components/collateral'
 })
 export default class AddCollateral extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getRegistrationOther: string
   @Getter getFeeSummary: FeeSummaryIF
 
   @Action resetNewRegistration: ActionBindingIF
@@ -92,6 +93,9 @@ export default class AddCollateral extends Vue {
   }
 
   private get registrationTypeUI (): string {
+    if (this.getRegistrationType?.registrationTypeAPI === 'OT') {
+      return this.getRegistrationOther || ''
+    }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
 

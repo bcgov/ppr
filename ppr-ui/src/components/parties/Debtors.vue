@@ -2,7 +2,7 @@
   <v-container fluid no-gutters class="pa-0">
     <v-row no-gutters>
       <v-col cols="auto"
-        >Include Debtors as either an Individual or a Business. If the debtor is
+        >Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
         operating a business and you want to register both the name of the
         business and the individual associated with the business, enter them as
         seperate debtors.<br /><br />

@@ -120,6 +120,7 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 })
 export default class ReviewConfirm extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getRegistrationOther: string
   @Getter getFeeSummary: FeeSummaryIF
   @Getter getAddCollateral: AddCollateralIF
   @Getter getLengthTrust: LengthTrustIF
@@ -151,6 +152,9 @@ export default class ReviewConfirm extends Vue {
   }
 
   private get registrationTypeUI (): string {
+    if (this.getRegistrationType?.registrationTypeAPI === 'OT') {
+      return this.getRegistrationOther || ''
+    }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
 

@@ -79,6 +79,7 @@ import { Parties } from '@/components/parties'
 export default class AddParties extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getFeeSummary: FeeSummaryIF
+  @Getter getRegistrationOther: string
 
   @Action resetNewRegistration: ActionBindingIF
 
@@ -100,6 +101,9 @@ export default class AddParties extends Vue {
   }
 
   private get registrationTypeUI (): string {
+    if (this.getRegistrationType?.registrationTypeAPI === 'OT') {
+      return this.getRegistrationOther || ''
+    }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
 
