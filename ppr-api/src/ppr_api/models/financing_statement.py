@@ -94,7 +94,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         statement = {
             'statusType': self.state_type
         }
-        if self.state_type == 'HDC':
+        if self.state_type == model_utils.STATE_DISCHARGED:
             index = len(self.registration) - 1
             statement['dischargedDateTime'] = model_utils.format_ts(self.registration[index].registration_ts)
 
@@ -106,6 +106,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if reg.registration_type:
                 statement['registrationDescription'] = reg.reg_type.registration_desc
                 statement['registrationAct'] = reg.reg_type.registration_act
+                if reg.registration_type == model_utils.REG_TYPE_OTHER and self.crown_charge_other:
+                    statement['otherTypeDescription'] = self.crown_charge_other
 
             statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
 
@@ -418,21 +420,16 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         statement.parties = Party.create_from_financing_json(json_data, None)
 
         reg_type = json_data['type']
+        statement.registration = [Registration.create_financing_from_json(json_data, account_id, user_id)]
+        statement.life = statement.registration[0].life
         if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
             statement.expire_date = model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
-            statement.life = model_utils.REPAIRER_LIEN_YEARS
-        elif 'lifeInfinite' in json_data and json_data['lifeInfinite']:
-            statement.life = model_utils.LIFE_INFINITE
-        else:
-            if 'lifeYears' in json_data:
-                statement.life = json_data['lifeYears']
-                if statement.life > 0:
-                    statement.expire_date = model_utils.expiry_dt_from_years(statement.life)
-            if 'expiryDate' in json_data and not statement.expire_date:
-                statement.expire_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
+        elif statement.life and statement.life != model_utils.LIFE_INFINITE:
+            statement.expire_date = model_utils.expiry_dt_from_years(statement.life)
 
-        statement.registration = [Registration.create_financing_from_json(json_data, account_id, user_id)]
-        # statement.registration_num = statement.registration[0].registration_num
+        if reg_type == model_utils.REG_TYPE_OTHER and 'otherTypeDescription' in json_data:
+            statement.crown_charge_other = json_data['otherTypeDescription']
+
         registration_id = statement.registration[0].id
         statement.trust_indenture = TrustIndenture.create_from_json(json_data, registration_id)
         if 'vehicleCollateral' in json_data:

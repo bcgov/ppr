@@ -35,6 +35,36 @@ PAY_DETAILS_SEARCH = {
     'label': 'Search by SERIAL_NUMBER',
     'value': '123456789'
 }
+# testdata pattern is ({pay_trans_type}, {quantity}, {filing_type})
+TEST_PAY_TYPE_FILING_TYPE = [
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, 5, 'FSREG'),
+    (TransactionTypes.SEARCH.value, 1, 'SERCH'),
+    (TransactionTypes.AMENDMENT.value, 1, 'FSCHG'),
+    (TransactionTypes.CHANGE.value, 1, 'FSCHG'),
+    (TransactionTypes.DISCHARGE.value, 1, 'FSDIS'),
+    (TransactionTypes.FINANCING_FR.value, 1, 'FLREG'),
+    (TransactionTypes.FINANCING_NO_FEE.value, 1, 'NCREG'),
+    (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG'),
+    (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN'),
+    (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN')
+]
+
+
+@pytest.mark.parametrize('pay_trans_type,quantity,filing_type', TEST_PAY_TYPE_FILING_TYPE)
+def test_payment_filing_type(client, jwt, pay_trans_type, quantity, filing_type):
+    """Assert that the payment-request body filing type is as expected for a pay transaction type."""
+    # setup
+
+    # test
+    data = SBCPaymentClient.create_payment_data(pay_trans_type, quantity, '200000000', 'UT-PAY-0001')
+    # check
+    assert data
+    assert data['filingInfo']['filingIdentifier'] == '200000000'
+    assert data['filingInfo']['folioNumber'] == 'UT-PAY-0001'
+    assert len(data['filingInfo']['filingTypes']) == 1
+    assert data['filingInfo']['filingTypes'][0]['quantity'] == quantity
+    assert data['filingInfo']['filingTypes'][0]['filingTypeCode'] == filing_type
+    assert data['businessInfo']['corpType'] == 'PPR'
 
 
 def test_payment_data_all(client, jwt):

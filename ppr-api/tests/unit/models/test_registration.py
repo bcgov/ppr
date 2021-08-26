@@ -26,11 +26,12 @@ from registry_schemas.example_data.ppr import (
     DISCHARGE_STATEMENT,
     DRAFT_AMENDMENT_STATEMENT,
     DRAFT_CHANGE_STATEMENT,
+    FINANCING_STATEMENT,
     RENEWAL_STATEMENT,
 )
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import Draft, FinancingStatement, Registration
+from ppr_api.models import Draft, FinancingStatement, Registration, utils as model_utils
 
 
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
@@ -50,6 +51,17 @@ TEST_REGISTRATION_NUMBER_DATA = [
 TEST_ACCOUNT_REGISTRATION_DATA = [
     ('Default registration format', 'PS12345', False),
     ('Collapsed parent/child registration format', 'PS12345', True)
+]
+# testdata pattern is ({reg_type}, {life}, {life_infinite}, {expected_life})
+TEST_LIFE_EXPIRY_DATA = [
+    ('SA', 5, False, 5),
+    ('SA', None, True, 99),
+    ('RL', 1, False, model_utils.REPAIRER_LIEN_YEARS),
+    ('MH', 1, False, model_utils.LIFE_INFINITE),
+    ('LT', None, True, model_utils.LIFE_INFINITE),
+    ('FR', 5, False, model_utils.LIFE_INFINITE),
+    ('OT', None, True, model_utils.LIFE_INFINITE),
+    ('ML', 1, False, model_utils.LIFE_INFINITE),
 ]
 
 
@@ -555,3 +567,17 @@ def test_save_change_from_draft(session):
     result = registration.json
     assert result
 #    assert 'documentId' in result
+
+
+@pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)
+def test_life_years(session, reg_type, life, life_infinite, expected_life):
+    """Assert that creating a registration with different registration types sets life as expected."""
+    json_data = copy.deepcopy(FINANCING_STATEMENT)
+    json_data['type'] = reg_type
+    if life is None:
+        del json_data['lifeYears']
+    else:
+        json_data['lifeYears'] = life
+    json_data['lifeInfinite'] = life_infinite
+    registration = Registration.create_financing_from_json(json_data, 'PS12345', 'TESTID')
+    assert registration.life == expected_life

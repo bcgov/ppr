@@ -301,8 +301,8 @@ def test_get_payment_details_registration(session, client, jwt):
 
     # check
     assert details
-    assert details['label'] == 'Register a Renewal Statement for Base Registration:'
-    assert details['value'] == 'TEST0001'
+    assert details['label'] == 'Renew Registration:'
+    assert details['value'].startswith('TEST0001 for ')
 
 
 def create_financing_test(session, client, jwt, type):

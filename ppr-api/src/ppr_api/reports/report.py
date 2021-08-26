@@ -576,7 +576,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 return timestamp.replace(' AM ', ' am ')
             return timestamp.replace(' PM ', ' pm ')
 
-        return local_datetime.strftime('%B %d, %Y')
+        return local_datetime.strftime('%B %-d, %Y')
 
 
 class ReportMeta:  # pylint: disable=too-few-public-methods

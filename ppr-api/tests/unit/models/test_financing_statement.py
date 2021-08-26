@@ -21,7 +21,7 @@ import copy
 
 import pytest
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT, DISCHARGE_STATEMENT, DRAFT_FINANCING_STATEMENT
-from ppr_api.models import FinancingStatement, Draft
+from ppr_api.models import FinancingStatement, Draft, utils as model_utils
 
 from ppr_api.exceptions import BusinessException
 
@@ -31,6 +31,7 @@ TEST_REGISTRATION_DATA = [
     ('SA', 'PS12345', False),
     ('SA', 'PS12345', True),
     ('RL', 'PS12345', False),
+    ('OT', 'PS12345', False),
     ('SA', None, False)
 ]
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff})
@@ -56,6 +57,17 @@ TEST_DEBTOR_NAMES_DATA = [
     ('TEST0002', 1),
     ('TESTXXXX', 0)
 ]
+# testdata pattern is ({reg_type}, {life}, {life_infinite}, {expected_life})
+TEST_LIFE_EXPIRY_DATA = [
+    ('SA', 5, False, 5),
+    ('SA', None, True, 99),
+    ('RL', 1, False, model_utils.REPAIRER_LIEN_YEARS),
+    ('MH', 1, False, model_utils.LIFE_INFINITE),
+    ('LT', None, True, model_utils.LIFE_INFINITE),
+    ('FR', 5, False, model_utils.LIFE_INFINITE),
+    ('OT', None, True, model_utils.LIFE_INFINITE),
+    ('ML', 1, False, model_utils.LIFE_INFINITE),
+]
 
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)
@@ -69,12 +81,14 @@ def test_save(session, reg_type, account_id, create_draft):
     del json_data['lifeInfinite']
     del json_data['expiryDate']
     del json_data['documentId']
-    if reg_type != 'RL':
+    if reg_type != model_utils.REG_TYPE_REPAIRER_LIEN:
         del json_data['lienAmount']
         del json_data['surrenderDate']
-    if reg_type != 'SA':
+    if reg_type != model_utils.REG_TYPE_SECURITY_AGREEMENT:
         del json_data['trustIndenture']
         del json_data['generalCollateral']
+    if reg_type == model_utils.REG_TYPE_OTHER:
+        json_data['otherTypeDescription'] = 'TEST OTHER DESC'
 
     if create_draft:
         draft_json = copy.deepcopy(DRAFT_FINANCING_STATEMENT)
@@ -98,9 +112,11 @@ def test_save(session, reg_type, account_id, create_draft):
     assert result['debtors'][0]
     assert result['securedParties'][0]
     assert result['vehicleCollateral'][0]
-    if reg_type == 'SA':
+    if reg_type == model_utils.REG_TYPE_SECURITY_AGREEMENT:
         assert result['generalCollateral'][0]
     assert 'documentId' not in result
+    if reg_type == model_utils.REG_TYPE_OTHER:
+        assert result['otherTypeDescription'] == 'TEST OTHER DESC'
 
 
 def test_find_all_by_account_id(session):
@@ -257,3 +273,33 @@ def test_current_json(session):
     assert json_data['securedParties'][1]['added']
     assert json_data['generalCollateral'][1]['added']
     assert json_data['vehicleCollateral'][1]['added']
+
+
+@pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)
+def test_life_expiry(session, reg_type, life, life_infinite, expected_life):
+    """Assert that creating a financing statment with different registration types sets life and expiry as expected."""
+    json_data = copy.deepcopy(FINANCING_STATEMENT)
+    json_data['type'] = reg_type
+    if life is None:
+        del json_data['lifeYears']
+    else:
+        json_data['lifeYears'] = life
+    json_data['lifeInfinite'] = life_infinite
+    if reg_type == model_utils.REG_TYPE_OTHER:
+        json_data['otherTypeDescription'] = 'TEST OTHER DESC'
+
+    statement = FinancingStatement.create_from_json(json_data, 'PS12345', 'TESTID')
+
+    assert statement.life == expected_life
+    if statement.life != model_utils.LIFE_INFINITE:
+        assert statement.expire_date
+        if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+            expire_date = model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+            assert model_utils.format_ts(statement.expire_date) == model_utils.format_ts(expire_date)
+        else:
+            expire_date = model_utils.expiry_dt_from_years(statement.life)
+            assert model_utils.format_ts(statement.expire_date) == model_utils.format_ts(expire_date)
+    else:
+        assert statement.expire_date is None
+    if reg_type == model_utils.REG_TYPE_OTHER:
+        assert statement.crown_charge_other == 'TEST OTHER DESC'
