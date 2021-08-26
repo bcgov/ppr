@@ -150,7 +150,14 @@
             ></v-text-field>
           </td>
           <td v-if="selectedHeaderValues.includes('registrationType')">
+            <registration-bar-type-ahead-list
+              v-if="hasRPPR"
+              :defaultLabel="labelText"
+              :defaultDense="true"
+              @selected="selectRegistration($event)"
+            />
             <v-select
+              v-else
               :items="registrationTypes"
               single-line
               item-text="registrationTypeUI"
@@ -423,11 +430,21 @@ import {
   computed,
   onMounted
 } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 
 import { registrationTableHeaders } from '@/resources'
 import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
-import { RegistrationSummaryIF, DraftResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import {
+  RegistrationSummaryIF, // eslint-disable-line no-unused-vars
+  AccountProductSubscriptionIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF // eslint-disable-line no-unused-vars
+} from '@/interfaces'
+import {
+  AccountProductCodes,
+  AccountProductRoles // eslint-disable-line no-unused-vars
+} from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 
 export default defineComponent({
   props: {
@@ -435,6 +452,9 @@ export default defineComponent({
       type: Boolean,
       default: false
     }
+  },
+  components: {
+    RegistrationBarTypeAheadList
   },
   setup (props, { emit, root }) {
     const {
@@ -457,6 +477,9 @@ export default defineComponent({
       filterResults,
       originalData
     } = useRegistration()
+    const { getAccountProductSubscriptions } = useGetters<any>([
+      'getAccountProductSubscriptions'
+    ])
 
     const localState = reactive({
       headers: registrationTableHeaders,
@@ -471,6 +494,7 @@ export default defineComponent({
       currentOrder: 'asc',
       selectedSort: 'number',
       search: '',
+      labelText: 'Registration Type',
       selectedHeaderValues: [
         'registrationNumber',
         'registrationType',
@@ -501,6 +525,15 @@ export default defineComponent({
         }
         return displayed
       })
+    })
+
+    const hasRPPR = computed(() => {
+      const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
+      return (
+        productSubscriptions?.[AccountProductCodes.RPPR].roles.includes(
+          AccountProductRoles.EDIT
+        ) || false
+      )
     })
 
     const rowClass = (item: RegistrationSummaryIF): string => {
@@ -589,6 +622,10 @@ export default defineComponent({
       // reset submittedInterval (will not trigger a search)
       // hide date picker
       localState.showSubmittedDatePicker = false
+    }
+
+    const selectRegistration = (val: RegistrationTypeIF) => {
+      registrationType.value = val.registrationTypeAPI
     }
 
     const downloadPDF = async (path: string): Promise<any> => {
@@ -687,6 +724,8 @@ export default defineComponent({
       displayRegistrationNumber,
       registrationType,
       registrationTypes,
+      hasRPPR,
+      selectRegistration,
       registeredBy,
       registeringParty,
       securedParties,

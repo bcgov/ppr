@@ -1,6 +1,6 @@
 import { RegistrationSummaryIF, DraftResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { reactive, toRefs, watch, ref } from '@vue/composition-api'
-import { RegistrationTypes, StatusTypes } from '@/resources'
+import { RegistrationTypesStandard, StatusTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
 
 export const useRegistration = () => {
@@ -17,7 +17,7 @@ export const useRegistration = () => {
     daysToExpiry: '',
     submittedStartDate: null,
     submittedEndDate: null,
-    registrationTypes: RegistrationTypes,
+    registrationTypes: RegistrationTypesStandard,
     statusTypes: StatusTypes
   })
 

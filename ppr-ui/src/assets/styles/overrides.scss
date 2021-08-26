@@ -253,7 +253,7 @@ tbody {
 }
 
 // list items
-.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) .registration-list-item {
+.theme--light.v-list-item .registration-list-item {
   font-size: 0.875rem;
   padding-left: 16px;
 }
@@ -452,7 +452,7 @@ tbody {
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper div.v-select__selection {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .column-selection .v-list-item--dense .v-list-item__title, 
@@ -462,4 +462,17 @@ tbody {
 
 .column-selection .v-list-item--dense, .column-selection .v-list--dense .v-list-item {
   min-height: 0px;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper div.registrationTypeAhead {
+  font-size: 0.875rem;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper div.container {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.v-list--dense .theme--light.v-list-item.v-list-item--active {
+  min-height: 0;
 }

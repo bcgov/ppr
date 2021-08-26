@@ -16,11 +16,12 @@
       hide-details
       :items="displayItems"
       item-text="text"
-      label="Start a new Registration (Select a type)"
+      :label="dropdownLabel"
       :menu-props="{ maxHeight: '388px' }"
       offset="1000"
       return-object
       v-model="selected"
+      :dense="isDense"
       @keypress="showAllGroups()"
     >
       <template v-slot:item="{ parent, item }">
@@ -60,6 +61,10 @@ export default defineComponent({
   components: {
     RegistrationOtherDialog
   },
+  props: {
+    defaultLabel: String,
+    defaultDense: Boolean
+  },
   name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
   setup (props, { emit }) {
@@ -72,7 +77,9 @@ export default defineComponent({
       displayItems: [...RegistrationTypes],
       origItems: [...RegistrationTypes],
       selected: null,
-      showDialog: false
+      showDialog: false,
+      dropdownLabel: props.defaultLabel,
+      isDense: props.defaultDense
     })
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) emit('selected', localState.selected)
