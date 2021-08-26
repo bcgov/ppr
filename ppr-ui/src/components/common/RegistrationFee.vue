@@ -25,7 +25,8 @@
         <li
           :class="[$style['fee-container'], $style['fee-list__hint']]"
           :key="hintFee"
-          v-if="!isComplete || hasNoCharge() || registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN"
+          v-if="!isComplete || hasNoCharge() || registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
+           || registrationTypeAPI === APIRegistrationTypes.MARRIAGE_MH"
         >
           <div class="fee-list__hint pl-3">{{ hintFee }}</div>
         </li>
@@ -135,7 +136,7 @@ export default defineComponent({
       quantity: feeSummary.quantity || 0,
       feeCode: feeSummary.feeCode || '',
       hintFee: computed((): string => {
-        if (hasNoCharge()) {
+        if (hasNoCharge() || (registrationTypeAPI === APIRegistrationTypes.MARRIAGE_MH)) {
           return 'Infinite Registration (default)'
         }
         if (registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
