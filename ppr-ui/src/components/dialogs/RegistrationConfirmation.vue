@@ -7,9 +7,10 @@
             <b>{{ options.title }}</b>
           </p>
           <p class="dialog-text pt-5 ma-0">
-            To ensure you are performing a Total Discharge on the correct registration
-            (Base Registration Number: ) please enter the <b>individual person's last name or
-              full business name</b> of any <b>Debtor</b> associated with this registration.
+            To ensure you are performing a Total Discharge on the correct
+            registration (Base Registration Number: ) please enter the
+            <b>individual person's last name or full business name</b> of any
+            <b>Debtor</b> associated with this registration.
           </p>
           <v-text-field
             id="dialog-text-field"
@@ -19,6 +20,19 @@
             :label="options.label"
             v-model="userInput"
           />
+
+          <v-autocomplete
+            auto-select-first
+            :items="debtors"
+            filled
+            clearable
+            label="Enter a Debtor (last name of individual person of full business name)"
+            id="debtor-drop"
+            v-model="userInput"
+            :error-messages="validationErrors"
+            persistent-hint
+            return-object
+          ></v-autocomplete>
         </v-col>
         <v-col cols="1">
           <v-row no-gutters justify="end">
@@ -58,39 +72,68 @@
 
 <script lang="ts">
 // external
-import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  watch,
+  computed,
+  onMounted
+} from '@vue/composition-api'
 
 // local
-import { ActionBindingIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import { debtorNames } from '@/utils'
 
-@Component({})
-export default class RegistrationConfirmation extends Vue {
-  @Action setRegistrationTypeOtherDesc: ActionBindingIF
+export default defineComponent({
+  props: {
+    attach: String,
+    display: Boolean,
+    options: {
+      type: Object as () => DialogOptionsIF
+    },
+    registrationNumber: String
+  },
+  emits: ['proceed'],
+  setup (props, context) {
+    const localState = reactive({
+      validationErrors: '',
+      userInput: '',
+      debtors: [],
+      options: props.options,
+      attach: props.attach,
+      display: props.display
+    })
 
-  @Prop() private attach: string
-  @Prop() private display: boolean
-  @Prop() private options: DialogOptionsIF
+    const submit = (): void => {
+      if (localState.userInput) {
+        context.emit('proceed')
+      } else {
+        localState.validationErrors = 'This field is required'
+      }
+    }
 
-  private validationErrors = ''
-  private userInput = ''
+    onMounted(async () => {
+      const names: Array<DebtorNameIF> = await debtorNames(
+        props.registrationNumber
+      )
+      for (let i = 0; i < names.length; i++) {
+        localState.debtors.push({ text: names[i].businessName, value: names[i].businessName })
+      }
+    })
 
-  private submit (): void {
-    if (this.userInput) {
-      this.setRegistrationTypeOtherDesc(this.userInput)
-      this.proceed(true)
-    } else {
-      this.validationErrors = 'This field is required'
+    watch(
+      () => localState.userInput,
+      (val: string) => {
+        if (!val) localState.validationErrors = 'This field is required'
+      }
+    )
+    return {
+      submit,
+      ...toRefs(localState)
     }
   }
-
-  @Watch('userInput')
-  private validateInput (val: string): void {
-    if (!val) this.validationErrors = 'This field is required'
-  }
-
-  @Emit() private proceed (val: boolean) {}
-}
+})
 </script>
 
 <style lang="scss" module>

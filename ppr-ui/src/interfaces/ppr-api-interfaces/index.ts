@@ -1,4 +1,5 @@
 export * from './address-interface'
+export * from './debtor-name-interface'
 export * from './error-interface'
 export * from './general-collateral-interface'
 export * from './individual-name-interface'
