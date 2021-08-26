@@ -28,6 +28,7 @@ from .draft import Draft
 from .party import Party
 from .court_order import CourtOrder
 from .general_collateral import GeneralCollateral
+from .type_tables import RegistrationType
 from .vehicle_collateral import VehicleCollateral
 # noqa: I003
 
@@ -261,6 +262,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.add(draft)
         db.session.commit()
 
+    def get_registration_type(self):
+        """Lookup registration type record if it has not already been fetched."""
+        if self.reg_type is None and self.registration_type:
+            self.reg_type = db.session.query(RegistrationType).\
+                            filter(RegistrationType.registration_type == self.registration_type).\
+                            one_or_none()
+
     @classmethod
     def find_by_id(cls, registration_id: int):
         """Return the registration matching the id."""
@@ -490,6 +498,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration.surrender_date = model_utils.ts_from_date_iso_format(json_data['surrenderDate'])
             registration.life = model_utils.REPAIRER_LIEN_YEARS
         elif 'lifeInfinite' in json_data and json_data['lifeInfinite']:
+            registration.life = model_utils.LIFE_INFINITE
+        elif registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
+            registration.life = model_utils.LIFE_INFINITE
+        elif reg_type in (model_utils.REG_TYPE_MARRIAGE_SEPARATION,
+                          model_utils.REG_TYPE_TAX_MH,
+                          model_utils.REG_TYPE_LAND_TAX_MH):
             registration.life = model_utils.LIFE_INFINITE
         elif 'lifeYears' in json_data:
             registration.life = json_data['lifeYears']

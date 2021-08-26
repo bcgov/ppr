@@ -711,20 +711,20 @@ def pay_and_save(request_json, registration_class, financing_statement, registra
     registration.user_id = token.get('username', None)
     invoice_id = None
     if account_id:
-        fee_code = TransactionTypes.CHANGE.value
+        pay_trans_type = TransactionTypes.CHANGE.value
         fee_quantity = registration.life
         if registration_class == model_utils.REG_CLASS_AMEND:
-            fee_code = TransactionTypes.AMENDMENT.value
+            pay_trans_type = TransactionTypes.AMENDMENT.value
         elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
             fee_quantity = 1
-            fee_code = TransactionTypes.RENEWAL_INFINITE.value
+            pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
         elif registration_class == model_utils.REG_CLASS_RENEWAL:
-            fee_code = TransactionTypes.RENEWAL_LIFE_YEAR.value
+            pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
 
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=account_id,
                           details=get_payment_details(registration))
-        pay_ref = payment.create_payment(fee_code, fee_quantity, None, registration.client_reference_id)
+        pay_ref = payment.create_payment(pay_trans_type, fee_quantity, None, registration.client_reference_id)
         invoice_id = pay_ref['invoiceId']
         registration.pay_invoice_id = int(invoice_id)
         registration.pay_path = pay_ref['receipt']
@@ -754,19 +754,17 @@ def pay_and_save_financing(request_json, account_id):
     statement = FinancingStatement.create_from_json(request_json, account_id, token.get('username', None))
     invoice_id = None
     if account_id:
-        fee_code = TransactionTypes.FINANCING_LIFE_YEAR.value
-        fee_quantity = statement.life
-        if statement.life == model_utils.LIFE_INFINITE:
-            fee_quantity = 1
-            fee_code = TransactionTypes.FINANCING_INFINITE.value
+        registration = statement.registration[0]
+        pay_trans_type, fee_quantity = get_payment_type_financing(registration)
+
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=account_id,
-                          details=get_payment_details_financing(statement))
-        pay_ref = payment.create_payment(fee_code, fee_quantity, None,
+                          details=get_payment_details_financing(registration))
+        pay_ref = payment.create_payment(pay_trans_type, fee_quantity, None,
                                          statement.registration[0].client_reference_id)
         invoice_id = pay_ref['invoiceId']
-        statement.registration[0].pay_invoice_id = int(invoice_id)
-        statement.registration[0].pay_path = pay_ref['receipt']
+        registration.pay_invoice_id = int(invoice_id)
+        registration.pay_path = pay_ref['receipt']
 
     # Try to save the financing statement: failure throws an exception.
     try:
@@ -785,20 +783,76 @@ def pay_and_save_financing(request_json, account_id):
     return statement
 
 
-def get_payment_details_financing(statement):
+def get_payment_details_financing(registration):
     """Extract the payment details value from the request financing statement."""
+    length = ' Length: '
+    if registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+        length += str(model_utils.REPAIRER_LIEN_DAYS) + ' days'
+    elif registration.life == model_utils.LIFE_INFINITE:
+        length += 'infinite'
+    elif registration.life == 1:
+        length += str(registration.life) + ' year'
+    else:
+        length += str(registration.life) + ' years'
+
+    if not registration.reg_type:
+        registration.get_registration_type()
+
     details = {
-        'label': 'Create Financing Statement Type:',
-        'value': statement.registration[0].registration_type
+        'label': 'Register Financing Statement Type:',
+        'value': registration.reg_type.registration_desc + length
     }
     return details
 
 
+def get_payment_type_financing(registration):
+    """Derive the payment transaction type and quantity from the financing statement registration type or class."""
+    pay_trans_type = TransactionTypes.FINANCING_LIFE_YEAR.value
+    fee_quantity = registration.life
+    if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
+        pay_trans_type = TransactionTypes.FINANCING_NO_FEE.value
+        fee_quantity = 1
+    elif registration.registration_type in (model_utils.REG_TYPE_LAND_TAX_MH, model_utils.REG_TYPE_TAX_MH):
+        pay_trans_type = TransactionTypes.FINANCING_NO_FEE.value
+        fee_quantity = 1
+    elif registration.registration_type == model_utils.REG_TYPE_MARRIAGE_SEPARATION:
+        pay_trans_type = TransactionTypes.FINANCING_FR.value
+        fee_quantity = 1
+    elif registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+        fee_quantity = 1
+    elif registration.life == model_utils.LIFE_INFINITE:
+        pay_trans_type = TransactionTypes.FINANCING_INFINITE.value
+        fee_quantity = 1
+    return pay_trans_type, fee_quantity
+
+
 def get_payment_details(registration):
     """Extract the payment details value from the registration request."""
+    label = ' Registration:'
+    value = registration.base_registration_num
+    if registration.registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
+        label = 'Discharge' + label
+    elif registration.registration_type_cl == model_utils.REG_CLASS_RENEWAL:
+        label = 'Renew' + label
+        value += ' for '
+        if registration.life == 0:
+            value += str(model_utils.REPAIRER_LIEN_DAYS) + ' days'
+        elif registration.life == model_utils.LIFE_INFINITE:
+            value += 'infinity'
+        elif registration.life == 1:
+            value += str(registration.life) + ' year'
+        else:
+            value += str(registration.life) + ' years'
+    elif registration.registration_type_cl == model_utils.REG_CLASS_AMEND:
+        label = 'Amendment of' + label
+    elif registration.registration_type_cl == model_utils.REG_CLASS_AMEND_COURT:
+        label = 'Court Order Amendment of' + label
+    elif registration.registration_type_cl == model_utils.REG_CLASS_CHANGE:
+        label = 'Change' + label
+
     details = {
-        'label': REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl] + ' for Base Registration:',
-        'value': registration.base_registration_num
+        'label': label,
+        'value': value
     }
     return details
 
@@ -806,7 +860,9 @@ def get_payment_details(registration):
 def validate_financing(json_data):
     """Perform non-schema extra validation on a financing statement."""
     error_msg = party_validator.validate_financing_parties(json_data)
-
+    if 'type' in json_data and json_data['type'] == model_utils.REG_TYPE_OTHER and \
+       'otherTypeDescription' not in json_data:
+        error_msg += ' When type is OT otherTypeDescription is required. '
     return error_msg
 
 

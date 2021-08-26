@@ -16,13 +16,16 @@
 
 Test-Suite to ensure that the /financing-statement endpoint is working as expected.
 """
+import copy
 from http import HTTPStatus
 
 import pytest
 
-from ppr_api.models import FinancingStatement
-from ppr_api.resources.financing_statements import get_payment_details_financing
+from ppr_api.models import FinancingStatement, Registration
+from ppr_api.resources.financing_statements import get_payment_details, get_payment_details_financing, \
+     get_payment_type_financing
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from ppr_api.services.payment.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -311,6 +314,57 @@ TEST_DEBTOR_NAMES = [
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
     ('Valid Request No Data', [PPR_ROLE], HTTPStatus.OK, True, 'TESTXXXX')
 ]
+# testdata pattern is ({reg_type}, {reg_class}, {registration_number}, {label}, {value}, {life})
+TEST_PAY_DETAILS_REGISTRATION = [
+    ('CO', 'COURTORDER', 'TEST0001', 'Court Order Amendment of Registration:', 'TEST0001', 1),
+    ('AM', 'AMENDMENT', 'TEST0001', 'Amendment of Registration:', 'TEST0001', 1),
+    ('DC', 'DISCHARGE', 'TEST0001', 'Discharge Registration:', 'TEST0001', 1),
+    ('AC', 'CHANGE', 'TEST0001', 'Change Registration:', 'TEST0001', 1),
+    ('RE', 'RENEWAL', 'TEST0001', 'Renew Registration:', 'TEST0001 for 1 year', 1),
+    ('RE', 'RENEWAL', 'TEST0001', 'Renew Registration:', 'TEST0001 for 2 years', 2),
+    ('RE', 'RENEWAL', 'TEST0001', 'Renew Registration:', 'TEST0001 for 180 days', 0),
+    ('RE', 'RENEWAL', 'TEST0001', 'Renew Registration:', 'TEST0001 for infinity', 99)
+]
+# testdata pattern is ({reg_type}, {registration_number}, {detail_desc})
+TEST_PAY_DETAILS_FINANCING = [
+    ('SA', 'TEST0001', 'PPSA SECURITY AGREEMENT Length: 2 years'),
+    ('RL', 'TEST0002', 'REPAIRERS LIEN Length: 180 days')
+]
+# testdata pattern is ({reg_type}, {life_years}, {quantity}, {pay_trans_type})
+TEST_PAY_TYPE_FINANCING = [
+    ('FA', 1, 1, TransactionTypes.FINANCING_LIFE_YEAR.value),
+    ('FL', 99, 1, TransactionTypes.FINANCING_INFINITE.value),
+    ('FR', 1, 1, TransactionTypes.FINANCING_FR.value),
+    ('FS', 2, 2, TransactionTypes.FINANCING_LIFE_YEAR.value),
+    ('LT', 1, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('MH', 1, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('RL', 0, 1, TransactionTypes.FINANCING_LIFE_YEAR.value),
+    ('SG', 3, 3, TransactionTypes.FINANCING_LIFE_YEAR.value),
+    ('SA', 5, 5, TransactionTypes.FINANCING_LIFE_YEAR.value),
+    ('SA', 99, 1, TransactionTypes.FINANCING_INFINITE.value),
+    ('HN', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('ML', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('PN', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('WL', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('CC', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('CT', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('DP', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('ET', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('FO', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('FT', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('HR', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('IP', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('IT', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('LO', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('MI', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('MR', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('OT', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('PG', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('PS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('RA', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('SS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('TL', 99, 1, TransactionTypes.FINANCING_NO_FEE.value)
+]
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
@@ -387,17 +441,58 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
     assert response.status_code == status
 
 
-def test_get_payment_details_financing(session, client, jwt):
+# testdata pattern is ({reg_type}, {registration_number}, {detail_desc})
+@pytest.mark.parametrize('reg_type,reg_num,detail_desc', TEST_PAY_DETAILS_FINANCING)
+def test_get_payment_details_financing(session, client, jwt, reg_type, reg_num, detail_desc):
     """Assert that a valid financing statement request payment details setup works as expected."""
     # setup
-    statement = FinancingStatement.create_from_json(FINANCING_VALID, 'PS12345')
+    statement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', False)
     # test
-    details = get_payment_details_financing(statement)
+    details = get_payment_details_financing(statement.registration[0])
+
+    # check
+    print(details)
+    assert details
+    assert details['label'] == 'Register Financing Statement Type:'
+    assert details['value'] == detail_desc
+
+
+@pytest.mark.parametrize('reg_type,reg_class,reg_num,label,value, life', TEST_PAY_DETAILS_REGISTRATION)
+def test_get_payment_details(session, client, jwt, reg_type, reg_class, reg_num, label, value, life):
+    """Assert that a valid registration statement request payment details setup works as expected."""
+    # setup
+    registration = Registration()
+    registration.base_registration_num = reg_num
+    registration.registration_type = reg_type
+    registration.registration_type_cl = reg_class
+    registration.life = life
+    # test
+    details = get_payment_details(registration)
 
     # check
     assert details
-    assert details['label'] == 'Create Financing Statement Type:'
-    assert details['value'] == 'SA'
+    assert details['label'] == label
+    assert details['value'] == value
+
+
+@pytest.mark.parametrize('reg_type,life_years,quantity,pay_trans_type', TEST_PAY_TYPE_FINANCING)
+def test_get_payment_type_financing(session, client, jwt, reg_type, life_years, quantity, pay_trans_type):
+    """Assert that a valid financing statement request payment transaction type setup works as expected."""
+    # setup
+    json = copy.deepcopy(FINANCING_VALID)
+    json['type'] = reg_type
+    if life_years == 99:
+        json['lifeYears'] = 1
+        json['lifeInfinite'] = True
+    else:
+        json['lifeYears'] = life_years
+    statement = FinancingStatement.create_from_json(json, 'PS12345')
+
+    pay_type, pay_quantity = get_payment_type_financing(statement.registration[0])
+    assert pay_type
+    assert pay_quantity
+    assert pay_type == pay_trans_type
+    assert pay_quantity == quantity
 
 
 def test_get_account_registrations_collapsed(session, client, jwt):
