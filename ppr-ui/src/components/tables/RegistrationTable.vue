@@ -138,7 +138,7 @@
       </template>
       <template v-slot:body.prepend>
         <tr class="filter-row">
-          <td v-if="selectedHeaderValues.includes('number')">
+          <td v-if="selectedHeaderValues.includes('registrationNumber')">
             <v-text-field
               filled
               single-line
@@ -149,7 +149,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('type')">
+          <td v-if="selectedHeaderValues.includes('registrationType')">
             <v-select
               :items="registrationTypes"
               single-line
@@ -169,7 +169,7 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('rdate')">
+          <td v-if="selectedHeaderValues.includes('createDateTime')">
             <v-text-field
               filled
               single-line
@@ -183,7 +183,7 @@
               hide-details="true"
             />
           </td>
-          <td v-if="selectedHeaderValues.includes('status')">
+          <td v-if="selectedHeaderValues.includes('statusType')">
             <v-select
               :items="statusTypes"
               single-line
@@ -202,7 +202,7 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('rby')">
+          <td v-if="selectedHeaderValues.includes('registeringName')">
             <v-text-field
               filled
               single-line
@@ -213,7 +213,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('rparty')">
+          <td v-if="selectedHeaderValues.includes('registeringParty')">
             <v-text-field
               filled
               single-line
@@ -224,7 +224,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('sp')">
+          <td v-if="selectedHeaderValues.includes('securedParties')">
             <v-text-field
               filled
               single-line
@@ -235,7 +235,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('folio')">
+          <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             <v-text-field
               filled
               single-line
@@ -246,7 +246,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('edays')">
+          <td v-if="selectedHeaderValues.includes('expireDays')">
             <v-text-field
               filled
               single-line
@@ -266,11 +266,10 @@
           :key="row.item.id"
           class="registration-row"
           v-if="!row.item.hide"
-          :class="draftClass(row.item.statusType)"
+          :class="rowClass(row.item)"
         >
           <td
-            class="font-weight-bold"
-            v-if="selectedHeaderValues.includes('number')"
+            v-if="selectedHeaderValues.includes('registrationNumber')"
             v-html="
               displayRegistrationNumber(
                 row.item.baseRegistrationNumber,
@@ -278,28 +277,28 @@
               )
             "
           ></td>
-          <td v-if="selectedHeaderValues.includes('type')">
+          <td v-if="selectedHeaderValues.includes('registrationType')">
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('rdate')">
+          <td v-if="selectedHeaderValues.includes('createDateTime')">
             {{ getFormattedDate(row.item.createDateTime) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('status')">
+          <td v-if="selectedHeaderValues.includes('statusType')">
             {{ getStatusDescription(row.item.statusType) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('rby')">
+          <td v-if="selectedHeaderValues.includes('registeringName')">
             {{ row.item.registeringName }}
           </td>
-          <td v-if="selectedHeaderValues.includes('rparty')">
+          <td v-if="selectedHeaderValues.includes('registeringParty')">
             {{ row.item.registeringParty || '' }}
           </td>
-          <td v-if="selectedHeaderValues.includes('sp')">
+          <td v-if="selectedHeaderValues.includes('securedParties')">
             {{ row.item.securedParties || '' }}
           </td>
-          <td v-if="selectedHeaderValues.includes('folio')">
+          <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             {{ row.item.clientReferenceId }}
           </td>
-          <td v-if="selectedHeaderValues.includes('edays')">
+          <td v-if="selectedHeaderValues.includes('expireDays')">
             {{ row.item.expireDays || '' }}
           </td>
           <td v-if="selectedHeaderValues.includes('vs')">
@@ -427,6 +426,7 @@ import {
 
 import { registrationTableHeaders } from '@/resources'
 import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
+import { RegistrationSummaryIF, DraftResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useRegistration } from '@/composables/useRegistration'
 
 export default defineComponent({
@@ -472,15 +472,15 @@ export default defineComponent({
       selectedSort: 'number',
       search: '',
       selectedHeaderValues: [
-        'number',
-        'type',
-        'rdate',
-        'status',
-        'rby',
-        'rparty',
-        'sp',
-        'folio',
-        'edays',
+        'registrationNumber',
+        'registrationType',
+        'createDateTime',
+        'statusType',
+        'registeringName',
+        'registeringParty',
+        'securedParties',
+        'clientReferenceId',
+        'expireDays',
         'vs'
       ],
       dropdownPropsXl: {
@@ -503,10 +503,15 @@ export default defineComponent({
       })
     })
 
-    const draftClass = (val: string): string => {
-      if (val === 'D') {
+    const rowClass = (item: RegistrationSummaryIF): string => {
+      if (item.statusType === 'D') {
         return 'font-italic'
+      } else {
+        if (item.baseRegistrationNumber === item.registrationNumber) {
+          return 'base-registration-row'
+        }
       }
+
       return ''
     }
 
@@ -516,10 +521,12 @@ export default defineComponent({
     ): string => {
       if (baseReg) {
         if (baseReg === actualReg) {
-          return baseReg
+          return '<b>' + baseReg + '</b>'
         }
         return (
+          '<b>' +
           baseReg +
+          '</b>' +
           '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
           actualReg +
           '</span>'
@@ -631,6 +638,7 @@ export default defineComponent({
           // assign a draft status to draft agreements
           for (let i = 0; i < tableData.value.length; i++) {
             tableData.value[i].statusType = 'D'
+            tableData.value[i].registrationNumber = 'Pending'
           }
         }
         if (registrations) {
@@ -674,7 +682,7 @@ export default defineComponent({
       getRegistrationType,
       getStatusDescription,
       discharge,
-      draftClass,
+      rowClass,
       registrationNumber,
       displayRegistrationNumber,
       registrationType,

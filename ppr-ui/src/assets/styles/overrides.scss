@@ -215,8 +215,10 @@ tbody {
   color: $gray9;
 }
 
-.theme--light.v-application .v-input--selection-controls__ripple {
-  color: $gray7;
+.theme--light.v-application .v-input--selection-controls__ripple,
+.theme--light.v-application .mdi-checkbox-blank-outline
+ {
+  color: $gray7 !important;
 }
 
 .v-application #remove-btn:disabled {
@@ -412,6 +414,8 @@ tbody {
 
 .column-selection .v-list-item__action:first-child {
   margin-right: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .column-selection .v-input__slot {
@@ -449,4 +453,13 @@ tbody {
 
 #registration-table.v-data-table > .v-data-table__wrapper div.v-select__selection {
   font-size: 14px;
+}
+
+.column-selection .v-list-item--dense .v-list-item__title, 
+.column-selection  .v-list--dense .v-list-item .v-list-item__title {
+  line-height: 1.2;
+}
+
+.column-selection .v-list-item--dense, .column-selection .v-list--dense .v-list-item {
+  min-height: 0px;
 }
