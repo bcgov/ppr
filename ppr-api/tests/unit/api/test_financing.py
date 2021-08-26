@@ -325,10 +325,10 @@ TEST_PAY_DETAILS_REGISTRATION = [
     ('RE', 'RENEWAL', 'TEST0001', 'Renew Registration:', 'TEST0001 for 180 days', 0),
     ('RE', 'RENEWAL', 'TEST0001', 'Renew Registration:', 'TEST0001 for infinity', 99)
 ]
-# testdata pattern is ({reg_type}, {registration_number}, {detail_desc})
+# testdata pattern is ({reg_type}, {registration_number}, {detail_desc}, {life})
 TEST_PAY_DETAILS_FINANCING = [
-    ('SA', 'TEST0001', 'PPSA SECURITY AGREEMENT Length: 2 years'),
-    ('RL', 'TEST0002', 'REPAIRERS LIEN Length: 180 days')
+    ('SA', 'TEST0001', 'PPSA SECURITY AGREEMENT Length: 2 years', 2),
+    ('RL', 'TEST0002', 'REPAIRERS LIEN Length: 180 days', 0)
 ]
 # testdata pattern is ({reg_type}, {life_years}, {quantity}, {pay_trans_type})
 TEST_PAY_TYPE_FINANCING = [
@@ -441,19 +441,23 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
     assert response.status_code == status
 
 
-# testdata pattern is ({reg_type}, {registration_number}, {detail_desc})
-@pytest.mark.parametrize('reg_type,reg_num,detail_desc', TEST_PAY_DETAILS_FINANCING)
-def test_get_payment_details_financing(session, client, jwt, reg_type, reg_num, detail_desc):
+# testdata pattern is ({reg_type}, {registration_number}, {detail_desc}, {life})
+@pytest.mark.parametrize('reg_type,reg_num,detail_desc,life', TEST_PAY_DETAILS_FINANCING)
+def test_get_payment_details_financing(session, client, jwt, reg_type, reg_num, detail_desc, life):
     """Assert that a valid financing statement request payment details setup works as expected."""
     # setup
-    statement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', False)
+    json_data = copy.deepcopy(FINANCING_VALID)
+    json_data['type'] = reg_type
+    json_data['lifeYears'] = life
+    statement = FinancingStatement.create_from_json(json_data, 'PS12345', 'TESTID')
+    statement.registration[0].registration_num = reg_num
     # test
     details = get_payment_details_financing(statement.registration[0])
 
     # check
-    print(details)
+    # print(details)
     assert details
-    assert details['label'] == 'Register Financing Statement Type:'
+    assert details['label'] == 'Register Financing Statement ' + reg_num + ' Type:'
     assert details['value'] == detail_desc
 
 

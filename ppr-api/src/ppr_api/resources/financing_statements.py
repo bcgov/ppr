@@ -799,7 +799,7 @@ def get_payment_details_financing(registration):
         registration.get_registration_type()
 
     details = {
-        'label': 'Register Financing Statement Type:',
+        'label': 'Register Financing Statement ' + registration.registration_num + ' Type:',
         'value': registration.reg_type.registration_desc + length
     }
     return details
