@@ -31,7 +31,7 @@ MSG_INVALID_HTTP_VERB = 'Invalid HTTP verb'
 TRANSACTION_TO_FILING_TYPE = {
     'AMENDMENT': 'FSCHG',
     'CHANGE': 'FSCHG',
-    'DISCHARGE': 'FSDCH',  # No charge fee.
+    'DISCHARGE': 'FSDIS',  # No charge fee.
     'FINANCING_FR': 'FLREG',  # Special flat rate fee for the FR registration type.
     'FINANCING_NO_FEE': 'NCREG',  # No Charge fee for LT, MH, MISCLIEN class, CROWNLIEN class.
     'FINANCING_LIFE_YEAR': 'FSREG',

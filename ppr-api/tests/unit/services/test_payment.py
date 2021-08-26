@@ -41,7 +41,7 @@ TEST_PAY_TYPE_FILING_TYPE = [
     (TransactionTypes.SEARCH.value, 1, 'SERCH'),
     (TransactionTypes.AMENDMENT.value, 1, 'FSCHG'),
     (TransactionTypes.CHANGE.value, 1, 'FSCHG'),
-    (TransactionTypes.DISCHARGE.value, 1, 'FSDCH'),
+    (TransactionTypes.DISCHARGE.value, 1, 'FSDIS'),
     (TransactionTypes.FINANCING_FR.value, 1, 'FLREG'),
     (TransactionTypes.FINANCING_NO_FEE.value, 1, 'NCREG'),
     (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG'),
