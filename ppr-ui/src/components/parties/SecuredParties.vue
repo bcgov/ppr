@@ -463,7 +463,7 @@ export default defineComponent({
   color: $gray7 !important;
 }
 
-::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td.list-item__title {
+::v-deep .v-data-table:not(.party-table) > .v-data-table__wrapper > table > tbody > tr > td.list-item__title {
   height: auto;
 }
 
