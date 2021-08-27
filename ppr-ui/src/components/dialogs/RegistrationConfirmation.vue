@@ -6,9 +6,9 @@
           <p class="dialog-title ma-0">
             <b>{{ optionsValue.title }}</b>
           </p>
-          <p class="dialog-text pt-5 ma-0">
+          <p class="dialog-text py-5 ma-0">
             To ensure you are performing a Total Discharge on the correct
-            registration (Base Registration Number: ) please enter the
+            registration (Base Registration Number: {{ regNumber }}) please enter the
             <b>individual person's last name or full business name</b> of any
             <b>Debtor</b> associated with this registration.
           </p>
@@ -17,10 +17,11 @@
             :items="debtors"
             filled
             clearable
+            no-data-text="Debtor not found."
             label="Enter a Debtor (last name of individual person of full business name)"
             id="debtor-drop"
             v-model="userInput"
-            :error-messages="validationErrors"
+            :error-messages="validationErrors ? validationErrors : ''"
             persistent-hint
             return-object
           ></v-autocomplete>
@@ -51,9 +52,9 @@
           </v-btn>
         </v-col>
         <v-col v-if="optionsValue.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" @click="submit()">{{
-            optionsValue.acceptText
-          }} <v-icon>mdi-chevron-right</v-icon> </v-btn>
+          <v-btn id="accept-btn" class="primary dialog-btn" @click="submit()"
+            >{{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
         </v-col>
       </v-row>
     </v-card>
@@ -62,14 +63,7 @@
 
 <script lang="ts">
 // external
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  watch,
-  onActivated, // eslint-disable-line
-  onMounted // eslint-disable-line
-} from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 
 // local
 import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
@@ -92,12 +86,17 @@ export default defineComponent({
       debtors: [],
       optionsValue: props.options,
       attachValue: props.attach,
-      displayValue: props.display
+      displayValue: props.display,
+      regNumber: props.registrationNumber
     })
 
     const submit = (): void => {
-      if (localState.userInput) {
-        context.emit('proceed')
+      if (localState.userInput.value) {
+        if (
+          localState.debtors.find(c => c.value === localState.userInput.value)
+        ) {
+          context.emit('proceed')
+        }
       } else {
         localState.validationErrors = 'This field is required'
       }
@@ -107,22 +106,34 @@ export default defineComponent({
       context.emit('confirmationClose')
     }
 
-    onActivated(async () => {
+    const getDebtors = async () => {
       const names: Array<DebtorNameIF> = await debtorNames(
         props.registrationNumber
       )
       for (let i = 0; i < names.length; i++) {
-        console.log(names[i])
         let dropdownValue = ''
         if (names[i].businessName) {
           dropdownValue = names[i].businessName
         }
         if (names[i].personName) {
-          dropdownValue = names[i].personName.first + ' ' + names[i].personName.last
+          dropdownValue = names[i].personName.last
         }
         localState.debtors.push({ text: dropdownValue, value: dropdownValue })
       }
-    })
+      localState.debtors.sort((a, b) =>
+        a.text < b.text ? 1 : b.text < a.text ? -1 : 0
+      )
+    }
+
+    watch(
+      () => props.registrationNumber,
+      (val: string) => {
+        if (val) {
+          localState.regNumber = props.registrationNumber
+          getDebtors()
+        }
+      }
+    )
 
     watch(
       () => localState.userInput,
@@ -130,6 +141,14 @@ export default defineComponent({
         if (!val) localState.validationErrors = 'This field is required'
       }
     )
+
+    watch(
+      () => props.display,
+      (val: boolean) => {
+        localState.displayValue = val
+      }
+    )
+
     return {
       submit,
       exit,

@@ -5,7 +5,7 @@
       :options="dischargeConfirmationDialog"
       :display="showDialog"
       :registrationNumber="currentRegistrationNumber"
-      @proceed="dialogSubmit($event)"
+      @proceed="dischargeSubmit()"
       @confirmationClose="closeConfirmation()"
     />
     <div :class="$style['col-selection']">
@@ -460,16 +460,14 @@ import RegistrationBarTypeAheadList from '@/components/registration/Registration
 
 export default defineComponent({
   components: {
-    RegistrationConfirmation
+    RegistrationConfirmation,
+    RegistrationBarTypeAheadList
   },
   props: {
     isSummary: {
       type: Boolean,
       default: false
     }
-  },
-  components: {
-    RegistrationBarTypeAheadList
   },
   setup (props, { emit, root }) {
     const {
@@ -683,6 +681,10 @@ export default defineComponent({
       // emit('discharge', registrationNumber)
     }
 
+    const dischargeSubmit = (): void => {
+      emit('discharge', localState.currentRegistrationNumber)
+    }
+
     const closeConfirmation = (): void => {
       localState.showDialog = false
     }
@@ -743,6 +745,7 @@ export default defineComponent({
       getRegistrationType,
       getStatusDescription,
       discharge,
+      dischargeSubmit,
       rowClass,
       registrationNumber,
       displayRegistrationNumber,
