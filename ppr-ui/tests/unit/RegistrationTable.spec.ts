@@ -8,6 +8,7 @@ import sinon from 'sinon'
 
 // Components
 import { RegistrationTable } from '@/components/tables'
+import { RegistrationBarTypeAheadList } from '@/components/registration'
 
 // Other
 import {
@@ -18,7 +19,7 @@ import {
 } from './test-data'
 import { DraftIF, RegistrationSummaryIF } from '@/interfaces'
 import { axios as pprAxios } from '@/utils/axios-ppr'
-import { UIRegistrationTypes } from '@/enums'
+import { AccountProductCodes, AccountProductMemberships, UIRegistrationTypes } from '@/enums'
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
@@ -57,6 +58,12 @@ describe('Test registration table with results', () => {
         })
       )
     )
+    await store.dispatch('setAccountProductSubscribtion', {
+      [AccountProductCodes.RPPR]: {
+        membership: AccountProductMemberships.MEMBER,
+        roles: ['edit']
+      }
+    })
     localVue = require('vue')
     localVue.use(Vuetify)
     wrapper = createComponent(localVue)
@@ -88,6 +95,18 @@ describe('Test registration table with results', () => {
     expect(rows.at(2).text()).toContain(mockedRegistration1.registeringParty)
     expect(rows.at(2).text()).toContain(mockedRegistration1.securedParties)
     expect(rows.at(2).text()).toContain(mockedRegistration1.registrationNumber)
+  })
+
+  it('renders and displays the typeahead dropdown', async () => {
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    // the api is going to be called twice, once for drafts and once for registrations
+    // the tests can't tell the difference, so the same one is called twice
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(true)
+    const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
+    expect(autocomplete.text()).toContain('Registration Type')
+
   })
 })
 
