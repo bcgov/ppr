@@ -256,18 +256,10 @@ tbody {
   padding-left: 16px;
 }
 
-.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
-  color: $gray7 !important;
-  min-height: 0;
-}
-
+// needed for registration bar type ahead list, but can be added to scoped styling if needed
 .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled):hover {
   background-color: $gray1;
   color: $primary-blue !important;
-}
-
-.theme--light.v-list-item--disabled {
-  min-height: 0;
 }
 
 .theme--light.v-list-item--disabled .registration-list-header {

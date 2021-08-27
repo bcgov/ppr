@@ -39,7 +39,7 @@
             </v-row>
           </v-list-item-content>
         </template>
-        <template v-else>
+        <template v-else class="registration-list">
           <v-list-item-content class="py-3">
             <span class="registration-list-item" v-html="`${parent.genFilteredText(item.text)}`"></span>
           </v-list-item-content>
@@ -155,6 +155,14 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
+::v-deep .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+  color: $gray7 !important;
+  min-height: 0;
+}
+
+::v-deep .theme--light.v-list-item--disabled {
+  min-height: 0;
+}
 </style>

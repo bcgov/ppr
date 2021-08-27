@@ -192,7 +192,6 @@ div.v-menu__content.theme--light.menuable__content__active {
   margin-left: 1px;
 }
 .actions__more-actions.more-actions {
-  max-height: 340px;
   overflow: auto;
 }
 .registration-bar-btn {
