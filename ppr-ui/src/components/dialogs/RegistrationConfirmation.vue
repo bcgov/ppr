@@ -77,7 +77,6 @@ import {
   reactive,
   toRefs,
   watch,
-  computed,
   onMounted
 } from '@vue/composition-api'
 

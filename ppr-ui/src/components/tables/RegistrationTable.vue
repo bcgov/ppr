@@ -1,5 +1,12 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
+    <registration-confirmation
+      attach="#app"
+      :options="dischargeConfirmationDialog"
+      :display="showDialog"
+      :registrationNumber="currentRegistrationNumber"
+      @proceed="dialogSubmit($event)"
+    />
     <div :class="$style['col-selection']">
       <v-text-field
         v-model="search"
@@ -432,7 +439,10 @@ import {
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
-import { registrationTableHeaders } from '@/resources'
+import {
+  registrationTableHeaders,
+  dischargeConfirmationDialog
+} from '@/resources'
 import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
 import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
@@ -444,9 +454,13 @@ import {
   AccountProductRoles // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import { RegistrationConfirmation } from '@/components/dialogs'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 
 export default defineComponent({
+  components: {
+    RegistrationConfirmation
+  },
   props: {
     isSummary: {
       type: Boolean,
@@ -484,6 +498,8 @@ export default defineComponent({
     const localState = reactive({
       headers: registrationTableHeaders,
       registrationDateFormatted: '',
+      showDialog: false,
+      currentRegistrationNumber: '',
       showSubmittedDatePicker: false,
       submittedStartDateTmp: null,
       submittedEndDateTmp: null,
@@ -661,8 +677,9 @@ export default defineComponent({
     }
 
     const discharge = (item): void => {
-      const registrationNumber = item.registrationNumber as string
-      emit('discharge', registrationNumber)
+      localState.currentRegistrationNumber = item.registrationNumber as string
+      localState.showDialog = true
+      // emit('discharge', registrationNumber)
     }
 
     /** Get the drafts and financing statements from the api. */
@@ -716,6 +733,7 @@ export default defineComponent({
 
     return {
       getFormattedDate,
+      dischargeConfirmationDialog,
       getRegistrationType,
       getStatusDescription,
       discharge,

@@ -453,7 +453,7 @@ export async function debtorNames (registrationNum: string): Promise<[DebtorName
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
-    .get('`financing-statements/${registrationNum}/debtorNames`,', config)
+    .get(`financing-statements/${registrationNum}/debtorNames`, config)
     .then(response => {
       const data = response?.data
       if (!data) {

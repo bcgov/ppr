@@ -58,7 +58,7 @@ export const registrationOtherDialog = {
     'enter the name of the statute below.'
 }
 
-//discharge confirmation
+// discharge confirmation
 export const dischargeConfirmationDialog: DialogOptionsIF = {
   acceptText: 'Continue',
   cancelText: 'Cancel',
