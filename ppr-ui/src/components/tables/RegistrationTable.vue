@@ -6,6 +6,7 @@
       :display="showDialog"
       :registrationNumber="currentRegistrationNumber"
       @proceed="dialogSubmit($event)"
+      @confirmationClose="closeConfirmation()"
     />
     <div :class="$style['col-selection']">
       <v-text-field
@@ -682,6 +683,10 @@ export default defineComponent({
       // emit('discharge', registrationNumber)
     }
 
+    const closeConfirmation = (): void => {
+      localState.showDialog = false
+    }
+
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
       try {
@@ -734,6 +739,7 @@ export default defineComponent({
     return {
       getFormattedDate,
       dischargeConfirmationDialog,
+      closeConfirmation,
       getRegistrationType,
       getStatusDescription,
       discharge,
