@@ -3,7 +3,11 @@
     <v-row no-gutters class="px-6">
       <v-col class="ml-n6" cols="4">
         <div class="actions">
-          <registration-bar-type-ahead-list v-if="hasRPPR" @selected="newRegistration($event)" />
+          <registration-bar-type-ahead-list v-if="hasRPPR"
+            :defaultLabel="labelText"
+            :defaultDense="false"
+            @selected="newRegistration($event)"
+            />
           <registration-bar-button-list v-else @selected="newRegistration($event)"/>
         </div>
       </v-col>
@@ -12,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'
@@ -32,6 +36,9 @@ export default defineComponent({
   setup (props, { emit }) {
     const { getAccountProductSubscriptions } = useGetters<any>(['getAccountProductSubscriptions'])
     const { setRegistrationTypeOtherDesc } = useActions<any>(['setRegistrationTypeOtherDesc'])
+    const localState = reactive({
+      labelText: 'Start a new Registration (Select a type)'
+    })
     const hasRPPR = computed(() => {
       const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
       return (
@@ -47,7 +54,8 @@ export default defineComponent({
 
     return {
       hasRPPR,
-      newRegistration
+      newRegistration,
+      ...toRefs(localState)
     }
   }
 })

@@ -1,6 +1,16 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
     <div :class="$style['col-selection']">
+      <v-text-field
+        v-model="search"
+        :class="[$style['text-input-style'], 'column-selection', 'mr-4']"
+        append-icon="mdi-magnify"
+        label="Find Registrations Containing"
+        dense
+        single-line
+        hide-details
+        style="width:250px"
+      ></v-text-field>
       <v-select
         id="column-selection"
         dense
@@ -76,17 +86,59 @@
       id="registration-table"
       class="registration-table pt-4"
       :class="$style['reg-table']"
-      :headers="getDisplayedHeaders"
+      :headers="headers"
       :items="tableData"
+      :search="search"
+      sort-by="registrationNumber"
+      :sort-desc="[false, true]"
       disable-pagination
+      disable-sort
       hide-default-footer
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
+      hide-default-header
       no-data-text="No registrations created yet."
     >
+      <template slot="header" :headers="getDisplayedHeaders">
+        <thead>
+          <tr>
+            <th
+              v-for="(header, i) in getDisplayedHeaders"
+              :class="header.class"
+              :key="'find-header-' + i"
+              class="text-left header-row-1 pa-0 pl-2"
+              @click="selectAndSort(header.value)"
+            >
+              <span>
+                {{ header.text }}
+                <v-icon
+                  v-if="
+                    header.value === selectedSort &&
+                      currentOrder === 'asc' &&
+                      header.sortable
+                  "
+                  small
+                  style="color: black;"
+                >
+                  mdi-arrow-down
+                </v-icon>
+                <v-icon
+                  v-else-if="
+                    header.value === selectedSort &&
+                      currentOrder === 'desc' &&
+                      header.sortable
+                  "
+                  small
+                  style="color: black;"
+                >
+                  mdi-arrow-up
+                </v-icon>
+              </span>
+            </th>
+          </tr>
+        </thead>
+      </template>
       <template v-slot:body.prepend>
         <tr class="filter-row">
-          <td v-if="selectedHeaderValues.includes('number')">
+          <td v-if="selectedHeaderValues.includes('registrationNumber')">
             <v-text-field
               filled
               single-line
@@ -97,8 +149,15 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('type')">
+          <td v-if="selectedHeaderValues.includes('registrationType')">
+            <registration-bar-type-ahead-list
+              v-if="hasRPPR"
+              :defaultLabel="labelText"
+              :defaultDense="true"
+              @selected="selectRegistration($event)"
+            />
             <v-select
+              v-else
               :items="registrationTypes"
               single-line
               item-text="registrationTypeUI"
@@ -117,7 +176,7 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('rdate')">
+          <td v-if="selectedHeaderValues.includes('createDateTime')">
             <v-text-field
               filled
               single-line
@@ -131,7 +190,7 @@
               hide-details="true"
             />
           </td>
-          <td v-if="selectedHeaderValues.includes('status')">
+          <td v-if="selectedHeaderValues.includes('statusType')">
             <v-select
               :items="statusTypes"
               single-line
@@ -150,7 +209,7 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('rby')">
+          <td v-if="selectedHeaderValues.includes('registeringName')">
             <v-text-field
               filled
               single-line
@@ -161,7 +220,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('rparty')">
+          <td v-if="selectedHeaderValues.includes('registeringParty')">
             <v-text-field
               filled
               single-line
@@ -172,7 +231,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('sp')">
+          <td v-if="selectedHeaderValues.includes('securedParties')">
             <v-text-field
               filled
               single-line
@@ -183,7 +242,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('folio')">
+          <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             <v-text-field
               filled
               single-line
@@ -194,7 +253,7 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('edays')">
+          <td v-if="selectedHeaderValues.includes('expireDays')">
             <v-text-field
               filled
               single-line
@@ -214,31 +273,39 @@
           :key="row.item.id"
           class="registration-row"
           v-if="!row.item.hide"
-          :class="draftClass(row.item.statusType)"
+          :class="rowClass(row.item)"
         >
-          <td class="font-weight-bold" v-if="selectedHeaderValues.includes('number')"
-          v-html="displayRegistrationNumber(row.item.baseRegistrationNumber, row.item.registrationNumber)">
-          </td>
-          <td v-if="selectedHeaderValues.includes('type')">
+          <td
+            v-if="selectedHeaderValues.includes('registrationNumber')"
+            v-html="
+              displayRegistrationNumber(
+                row.item.baseRegistrationNumber,
+                row.item.registrationNumber
+              )
+            "
+          ></td>
+          <td v-if="selectedHeaderValues.includes('registrationType')">
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('rdate')">
+          <td v-if="selectedHeaderValues.includes('createDateTime')">
             {{ getFormattedDate(row.item.createDateTime) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('status')">
+          <td v-if="selectedHeaderValues.includes('statusType')">
             {{ getStatusDescription(row.item.statusType) }}
           </td>
-          <td v-if="selectedHeaderValues.includes('rby')"></td>
-          <td v-if="selectedHeaderValues.includes('rparty')">
+          <td v-if="selectedHeaderValues.includes('registeringName')">
+            {{ row.item.registeringName }}
+          </td>
+          <td v-if="selectedHeaderValues.includes('registeringParty')">
             {{ row.item.registeringParty || '' }}
           </td>
-          <td v-if="selectedHeaderValues.includes('sp')">
+          <td v-if="selectedHeaderValues.includes('securedParties')">
             {{ row.item.securedParties || '' }}
           </td>
-          <td v-if="selectedHeaderValues.includes('folio')">
+          <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             {{ row.item.clientReferenceId }}
           </td>
-          <td v-if="selectedHeaderValues.includes('edays')">
+          <td v-if="selectedHeaderValues.includes('expireDays')">
             {{ row.item.expireDays || '' }}
           </td>
           <td v-if="selectedHeaderValues.includes('vs')">
@@ -326,7 +393,9 @@
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-clipboard-check-outline</v-icon>
-                        <span class="ml-1" @click="discharge(row.item)">Total Discharge</span>
+                        <span class="ml-1" @click="discharge(row.item)"
+                          >Total Discharge</span
+                        >
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item>
@@ -361,10 +430,21 @@ import {
   computed,
   onMounted
 } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 
 import { registrationTableHeaders } from '@/resources'
 import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
+import {
+  RegistrationSummaryIF, // eslint-disable-line no-unused-vars
+  AccountProductSubscriptionIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF // eslint-disable-line no-unused-vars
+} from '@/interfaces'
+import {
+  AccountProductCodes,
+  AccountProductRoles // eslint-disable-line no-unused-vars
+} from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 
 export default defineComponent({
   props: {
@@ -372,6 +452,9 @@ export default defineComponent({
       type: Boolean,
       default: false
     }
+  },
+  components: {
+    RegistrationBarTypeAheadList
   },
   setup (props, { emit, root }) {
     const {
@@ -394,6 +477,9 @@ export default defineComponent({
       filterResults,
       originalData
     } = useRegistration()
+    const { getAccountProductSubscriptions } = useGetters<any>([
+      'getAccountProductSubscriptions'
+    ])
 
     const localState = reactive({
       headers: registrationTableHeaders,
@@ -405,18 +491,20 @@ export default defineComponent({
       registrationDate: '',
       loadingPDF: '',
       loadingData: true,
-      sortBy: 'number',
-      sortDesc: false,
+      currentOrder: 'asc',
+      selectedSort: 'number',
+      search: '',
+      labelText: 'Registration Type',
       selectedHeaderValues: [
-        'number',
-        'type',
-        'rdate',
-        'status',
-        'rby',
-        'rparty',
-        'sp',
-        'folio',
-        'edays',
+        'registrationNumber',
+        'registrationType',
+        'createDateTime',
+        'statusType',
+        'registeringName',
+        'registeringParty',
+        'securedParties',
+        'clientReferenceId',
+        'expireDays',
         'vs'
       ],
       dropdownPropsXl: {
@@ -439,20 +527,43 @@ export default defineComponent({
       })
     })
 
-    const draftClass = (val: string): string => {
-      if (val === 'D') {
+    const hasRPPR = computed(() => {
+      const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
+      return (
+        productSubscriptions?.[AccountProductCodes.RPPR].roles.includes(
+          AccountProductRoles.EDIT
+        ) || false
+      )
+    })
+
+    const rowClass = (item: RegistrationSummaryIF): string => {
+      if (item.statusType === 'D') {
         return 'font-italic'
+      } else {
+        if (item.baseRegistrationNumber === item.registrationNumber) {
+          return 'base-registration-row'
+        }
       }
+
       return ''
     }
 
-    const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
+    const displayRegistrationNumber = (
+      baseReg: string,
+      actualReg: string
+    ): string => {
       if (baseReg) {
         if (baseReg === actualReg) {
-          return baseReg
+          return '<b>' + baseReg + '</b>'
         }
-        return baseReg + '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
-          actualReg + '</span>'
+        return (
+          '<b>' +
+          baseReg +
+          '</b>' +
+          '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
+          actualReg +
+          '</span>'
+        )
       }
       return actualReg
     }
@@ -461,6 +572,30 @@ export default defineComponent({
       if (!date) return ''
       const [year, month, day] = date.split('-')
       return `${year}/${month}/${day}`
+    }
+
+    const selectAndSort = (col: string) => {
+      if (!localState.headers.find(c => c.value === col).sortable) {
+        return
+      }
+      let direction = 'asc'
+      if (col === localState.selectedSort) {
+        if (localState.currentOrder === 'asc') {
+          direction = 'desc'
+        }
+      }
+
+      if (direction === 'desc') {
+        tableData.value.sort((a, b) =>
+          a[col] > b[col] ? 1 : b[col] > a[col] ? -1 : 0
+        )
+      } else {
+        tableData.value.sort((a, b) =>
+          a[col] < b[col] ? 1 : b[col] < a[col] ? -1 : 0
+        )
+      }
+      localState.currentOrder = direction
+      localState.selectedSort = col
     }
 
     const updateSubmittedRange = () => {
@@ -487,6 +622,10 @@ export default defineComponent({
       // reset submittedInterval (will not trigger a search)
       // hide date picker
       localState.showSubmittedDatePicker = false
+    }
+
+    const selectRegistration = (val: RegistrationTypeIF) => {
+      registrationType.value = val.registrationTypeAPI
     }
 
     const downloadPDF = async (path: string): Promise<any> => {
@@ -536,6 +675,7 @@ export default defineComponent({
           // assign a draft status to draft agreements
           for (let i = 0; i < tableData.value.length; i++) {
             tableData.value[i].statusType = 'D'
+            tableData.value[i].registrationNumber = 'Pending'
           }
         }
         if (registrations) {
@@ -579,11 +719,13 @@ export default defineComponent({
       getRegistrationType,
       getStatusDescription,
       discharge,
-      draftClass,
+      rowClass,
       registrationNumber,
       displayRegistrationNumber,
       registrationType,
       registrationTypes,
+      hasRPPR,
+      selectRegistration,
       registeredBy,
       registeringParty,
       securedParties,
@@ -596,6 +738,7 @@ export default defineComponent({
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
+      selectAndSort,
       ...toRefs(localState)
     }
   }
@@ -648,6 +791,7 @@ export default defineComponent({
   top: -100px;
   float: right;
   height: 0px;
+  display: inline-flex;
 }
 .text-input-style {
   background-color: white !important;
@@ -656,6 +800,13 @@ export default defineComponent({
   font-size: 13px;
   margin: 0;
   color: var(--text);
+  label {
+    font-size: 13px;
+    color: $gray7 !important;
+  }
+  span {
+    color: $gray7;
+  }
 }
 .pdf-btn {
   background-color: transparent !important;
