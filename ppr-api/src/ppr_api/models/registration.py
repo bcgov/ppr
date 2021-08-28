@@ -36,6 +36,53 @@ from .vehicle_collateral import VehicleCollateral
 FINANCING_PATH = '/ppr/api/v1/financing-statements/'
 
 
+class CrownChargeTypes(Enum):
+    """Render an Enum of the financing statement crown charge registration type class."""
+
+    CORP_TAX = 'CC'
+    CARBON_TAX = 'CT'
+    CONSUMPTION_TAX = 'DP'
+    EXCISE_TAX = 'ET'
+    FOREST_TAX = 'FO'
+    MOTOR_FUEL_TAX = 'FT'
+    HOTEL_TAX = 'HR'
+    INSURANCE_TAX = 'IP'
+    INCOME_TAX = 'IT'
+    LOGGING_TAX = 'LO'
+    MINING_TAX = 'MI'
+    MINERAL_TAX = 'MR'
+    OTHER = 'OT'
+    PETROLEUM_TAX = 'PG'
+    PROV_SALES_TAX = 'PS'
+    RURAL_TAX = 'RA'
+    SOCIAL_TAX = 'SS'
+    TAX_LIEN = 'TL'
+
+
+class MiscellaneousTypes(Enum):
+    """Render an Enum of the financing statement miscellaneous registration type class."""
+
+    HC_NOTICE = 'HN'
+    MAINTENANCE = 'ML'
+    MH_NOTICE = 'MN'
+    POC_NOTICE = 'PN'
+    WAGES_UNPAID = 'WL'
+
+
+class PPSATypes(Enum):
+    """Render an Enum of the financing statement PPSA lien registration type class."""
+
+    FORESTRY_CHARGE = 'FA'
+    FORESTRY_LIEN = 'FL'
+    MARRIAGE_SEPARATION = 'FR'
+    FORESTRY_SUB_CHARGE = 'FS'
+    LAND_TAX = 'LT'
+    MH_LIEN = 'MH'
+    REPAIRER_LIEN = 'RL'
+    SECURITY_AGREEMENT = 'SA'
+    SALE_GOODS = 'SG'
+
+
 class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all statement registration information."""
 
