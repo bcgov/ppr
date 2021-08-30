@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
-from ppr_api.models import FinancingStatement, Registration
+from ppr_api.models import FinancingStatement, Registration, utils as model_utils
 from ppr_api.resources.financing_statements import get_payment_details
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
@@ -321,7 +321,8 @@ def create_financing_test(session, client, jwt, type):
         del statement['surrenderDate']
     else:
         del statement['trustIndenture']
-        del statement['lifeYears']
+        statement['lifeYears'] = 1
+        statement['surrenderDate'] = model_utils.format_ts(model_utils.now_ts())
     return client.post('/api/v1/financing-statements',
                        json=statement,
                        headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),

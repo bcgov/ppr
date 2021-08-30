@@ -31,7 +31,7 @@ from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.utils.validators import party_validator, registration_validator
+from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -860,9 +860,7 @@ def get_payment_details(registration):
 def validate_financing(json_data):
     """Perform non-schema extra validation on a financing statement."""
     error_msg = party_validator.validate_financing_parties(json_data)
-    if 'type' in json_data and json_data['type'] == model_utils.REG_TYPE_OTHER and \
-       'otherTypeDescription' not in json_data:
-        error_msg += ' When type is OT otherTypeDescription is required. '
+    error_msg += financing_validator.validate(json_data)
     return error_msg
 
 
