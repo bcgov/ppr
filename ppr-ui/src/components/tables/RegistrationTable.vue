@@ -678,7 +678,6 @@ export default defineComponent({
     const discharge = (item): void => {
       localState.currentRegistrationNumber = item.registrationNumber as string
       localState.showDialog = true
-      // emit('discharge', registrationNumber)
     }
 
     const dischargeSubmit = (): void => {
