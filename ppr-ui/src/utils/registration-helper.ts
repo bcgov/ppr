@@ -35,6 +35,11 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   } else {
     statement.type = registrationType.registrationTypeAPI
   }
+
+  if (stateModel.registration.registrationTypeOtherDesc) {
+    statement.otherTypeDescription = stateModel.registration.registrationTypeOtherDesc
+  }
+
   // Step 1 setup
   const trustLength = stateModel.registration.lengthTrust
   statement.lifeInfinite = trustLength.lifeInfinite
@@ -99,6 +104,9 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
     vehicleCollateral: collateral.vehicleCollateral,
     generalCollateral: [],
     clientReferenceId: stateModel.folioOrReferenceNumber
+  }
+  if (stateModel.registration.registrationTypeOtherDesc) {
+    statement.otherTypeDescription = stateModel.registration.registrationTypeOtherDesc
   }
   if (draft !== null && draft.financingStatement !== null) {
     statement.documentId = draft.financingStatement.documentId

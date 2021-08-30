@@ -382,6 +382,7 @@ export default defineComponent({
       localState.loading = true
       if (parties.registeringParty) {
         // go to the service and see if there are similar secured parties
+        parties.registeringParty.businessName = 'Bank of Montreal'
         const response: [SearchPartyIF] = await partyCodeSearch(
           parties.registeringParty.businessName,
           true
@@ -436,6 +437,7 @@ export default defineComponent({
         localState.showDialog = true
       } else {
         parties.securedParties = [newParty]
+        parties.valid = isPartiesValid(parties)
         setAddSecuredPartiesAndDebtors(parties)
         localState.securedParties = [newParty]
       }
@@ -444,6 +446,7 @@ export default defineComponent({
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) {
         parties.securedParties = [localState.savedParty]
+        parties.valid = isPartiesValid(parties)
         setAddSecuredPartiesAndDebtors(parties)
         localState.securedParties = [localState.savedParty]
       } else {

@@ -29,6 +29,7 @@ export interface FinancingStatementIF {
   baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
+  otherTypeDescription?: string, //included if type is Other
   error?: ErrorIF
 }
 
