@@ -117,7 +117,11 @@ export const useVehicle = (props, context) => {
       APIRegistrationTypes.LIEN_UNPAID_WAGES,
       APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
       APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
-      APIRegistrationTypes.MAINTENANCE_LIEN
+      APIRegistrationTypes.MAINTENANCE_LIEN,
+      APIRegistrationTypes.OTHER,
+      APIRegistrationTypes.MINERAL_LAND_TAX,
+      APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+      APIRegistrationTypes.SCHOOL_ACT
     ]
     return ghArray.includes(registrationType)
   }
