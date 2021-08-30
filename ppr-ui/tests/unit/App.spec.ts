@@ -14,6 +14,7 @@ import App from '@/App.vue'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import { Tombstone } from '@/components/tombstone'
+import { Breadcrumb } from '@/components/common'
 
 // Other
 import mockRouter from './MockRouter'
@@ -81,6 +82,7 @@ describe('App component', () => {
     expect(wrapper.findComponent(SbcHeader).exists()).toBe(true)
     expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
+    expect(wrapper.findComponent(Breadcrumb).exists()).toBe(true)
   })
 
   it('gets auth and user info/settings properly', () => {

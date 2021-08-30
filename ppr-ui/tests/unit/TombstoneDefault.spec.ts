@@ -95,7 +95,7 @@ describe('TombstoneDefault component tests', () => {
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('My PPR Dashboard')
+    expect(header.at(0).text()).toContain('My Personal Property Registry')
     const subHeader = wrapper.findAll(tombstoneSubHeader)
     expect(subHeader.length).toBe(1)
     expect(subHeader.at(0).text()).toContain(userInfo.firstname)

@@ -10,10 +10,10 @@ export const tombstoneBreadcrumbDashboard: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'My PPR Dashboard'
+    text: 'My Personal Property Registry'
   }
 ]
-export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
+export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('REGISTRY_URL'),
@@ -22,12 +22,12 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
-    text: 'My PPR Dashboard'
+    text: 'My Personal Property Registry'
   },
   {
     disabled: true,
     href: '',
-    text: 'Search Results'
+    text: 'Total Discharge'
   }
 ]
 export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
@@ -39,11 +39,28 @@ export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
-    text: 'My PPR Dashboard'
+    text: 'My Personal Property Registry'
   },
   {
     disabled: true,
     href: '',
     text: 'New Registration'
+  }
+]
+export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    text: 'My Personal Property Registry'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: 'Search Results'
   }
 ]
