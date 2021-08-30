@@ -16,7 +16,8 @@
               amendments and any court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <registration-length-trust class="mt-10" :isSummary="true" :defaultRegistrationType="registrationType" />
+          <caution-box class="mt-10" :setMsg="cautionTxt"/>
+          <registration-length-trust class="mt-15" :isSummary="true" :defaultRegistrationType="registrationType" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -47,7 +48,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonsStacked, CautionBox, RegistrationFee, Stepper } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
@@ -65,6 +66,7 @@ import { StatusCodes } from 'http-status-codes'
 @Component({
   components: {
     ButtonsStacked,
+    CautionBox,
     RegistrationFee,
     RegistrationLengthTrust,
     Stepper,
@@ -94,7 +96,9 @@ export default class ReviewRegistration extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  private dataLoaded = false
+  private cautionTxt = 'Secured Parties in this registration ' +
+    'will receive a copy of the Total Discharge Verification Statement.'
+  private dataLoaded = false // eslint-disable-line lines-between-class-members
   private financingStatementDate: Date = null
 
   private get asOfDateTime (): string {

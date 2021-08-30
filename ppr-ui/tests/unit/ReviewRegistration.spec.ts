@@ -9,7 +9,7 @@ import sinon from 'sinon'
 import { ReviewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { ButtonsStacked, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
 import {
   DebtorSummary,
   RegisteringPartySummary,
@@ -70,6 +70,9 @@ describe('ReviewConfirm new registration component', () => {
 
   it('renders Review Registration View with child components', async () => {
     expect(wrapper.findComponent(ReviewRegistration).exists()).toBe(true)
+    expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
+    expect(wrapper.findComponent(CautionBox).vm.setMsg).toContain(
+      'will receive a copy of the Total Discharge Verification Statement.')
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
