@@ -382,7 +382,6 @@ export default defineComponent({
       localState.loading = true
       if (parties.registeringParty) {
         // go to the service and see if there are similar secured parties
-        parties.registeringParty.businessName = 'Bank of Montreal'
         const response: [SearchPartyIF] = await partyCodeSearch(
           parties.registeringParty.businessName,
           true
