@@ -58,7 +58,7 @@ export default defineComponent({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {
           const date = new Date(getRegistrationCreationDate.value)
-          return convertDate(date, true, true).replace('August', 'September')
+          return convertDate(date, true, true)
         }
         return ''
       }),
