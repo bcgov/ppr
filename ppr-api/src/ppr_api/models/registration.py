@@ -36,7 +36,7 @@ from .vehicle_collateral import VehicleCollateral
 FINANCING_PATH = '/ppr/api/v1/financing-statements/'
 
 
-class CrownChargeTypes(Enum):
+class CrownChargeTypes(str, Enum):
     """Render an Enum of the financing statement crown charge registration type class."""
 
     CORP_TAX = 'CC'
@@ -59,7 +59,7 @@ class CrownChargeTypes(Enum):
     TAX_LIEN = 'TL'
 
 
-class MiscellaneousTypes(Enum):
+class MiscellaneousTypes(str, Enum):
     """Render an Enum of the financing statement miscellaneous registration type class."""
 
     HC_NOTICE = 'HN'
@@ -69,7 +69,7 @@ class MiscellaneousTypes(Enum):
     WAGES_UNPAID = 'WL'
 
 
-class PPSATypes(Enum):
+class PPSATypes(str, Enum):
     """Render an Enum of the financing statement PPSA lien registration type class."""
 
     FORESTRY_CHARGE = 'FA'
@@ -86,7 +86,7 @@ class PPSATypes(Enum):
 class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all statement registration information."""
 
-    class RegistrationTypes(Enum):
+    class RegistrationTypes(str, Enum):
         """Render an Enum of the registration types."""
 
         REG_CLASS_AMEND = 'AMENDMENT'

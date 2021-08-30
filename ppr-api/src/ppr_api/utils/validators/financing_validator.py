@@ -101,8 +101,7 @@ def validate_life(json_data, reg_type: str, reg_class: str):
         error_msg += LI_NOT_ALLOWED
     elif 'lifeYears' not in json_data and 'lifeInfinite' not in json_data:
         error_msg += LIFE_MISSING
-    elif 'lifeYears' in json_data and 'lifeInfinite' in json_data and \
-         json_data['lifeInfinite'] and json_data['lifeYears'] > 0:
+    elif json_data.get('lifeYears', -1) > 0 and json_data.get('lifeInfinite'):
         error_msg += LIFE_INVALID
 
     return error_msg
@@ -189,8 +188,8 @@ def validate_rl(json_data, reg_type: str):
 def get_registration_class(reg_type: str):
     """Derive the registration class from the registration type."""
     try:
-        reg_class = model_utils.REG_TYPE_TO_REG_CLASS[reg_type]
-        if reg_class in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC, model_utils.REG_CLASS_PPSA):
+        if (reg_class := model_utils.REG_TYPE_TO_REG_CLASS[reg_type]) in \
+            (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC, model_utils.REG_CLASS_PPSA):
             return reg_class
 
         return ''
