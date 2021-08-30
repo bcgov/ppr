@@ -133,7 +133,7 @@ describe('Secured Party add business tests', () => {
     // for address
     wrapper.vm.$data.currentSecuredParty.address.street = 'street'
     wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'
-    wrapper.vm.$data.currentSecuredParty.address.region = 'BC'
+    .$data.currentSecuredParty.address.region = 'BC'
     wrapper.vm.$data.currentSecuredParty.address.country = 'CA'
     wrapper.vm.$data.currentSecuredParty.address.postalCode = 'v8r1w3'
     await Vue.nextTick()

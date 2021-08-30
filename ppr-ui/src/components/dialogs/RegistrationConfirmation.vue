@@ -63,7 +63,7 @@
 
 <script lang="ts">
 // external
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, ref } from '@vue/composition-api'
 
 // local
 import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
@@ -84,11 +84,12 @@ export default defineComponent({
       validationErrors: '',
       userInput: { value: 0, text: '' },
       debtors: [],
-      optionsValue: props.options,
       attachValue: props.attach,
       displayValue: props.display,
       regNumber: props.registrationNumber
     })
+
+    const optionsValue = ref(props.options)
 
     const submit = (): void => {
       if (localState.userInput.value) {
@@ -152,6 +153,7 @@ export default defineComponent({
     return {
       submit,
       exit,
+      optionsValue,
       ...toRefs(localState)
     }
   }
