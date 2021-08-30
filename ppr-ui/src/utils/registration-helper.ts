@@ -165,7 +165,7 @@ export function cleanupParty (party: PartyIF): PartyIF {
     delete party.businessName
     delete party.address
   } else {
-    if (party.birthDate !== null && party.birthDate === '') {
+    if (party.birthDate === null || party.birthDate === '') {
       delete party.birthDate
     }
     if (party.businessName !== null && party.businessName !== '') {
