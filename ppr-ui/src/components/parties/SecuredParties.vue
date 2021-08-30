@@ -1,11 +1,19 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
+    <change-secured-party-dialog
+      attach="#app"
+      :display="showDialog"
+      :securedPartyName="currentPartyName"
+      @proceed="dialogSubmit($event)"
+    />
     <v-row v-if="isSecuredPartyRestrictedList(registrationType)">
       <v-col cols="auto"
-        >Include Secured Party in your registration by adding their secured
+        >Include the Secured Party in your registration by adding their secured
         party code or their name (business or person). The account number of the
-        Secured Party must match the account number of the Registering Party.<br/>
-        <div class="font-weight-bold pt-2">Only one Secured Party is allowed.</div>
+        Secured Party must match the account number of the Registering Party.<br />
+        <div class="font-weight-bold pt-2">
+          Only one Secured Party is allowed.
+        </div>
       </v-col>
     </v-row>
     <v-row
@@ -33,7 +41,7 @@
           v-model="searchValue"
           class="mx-7 my-8"
         >
-           <template v-slot:selection="{ item }">
+          <template v-slot:selection="{ item }">
             <span v-text="item.code"></span>
             <span class="ml-4" v-text="item.businessName"></span>
           </template>
@@ -45,11 +53,11 @@
                   <v-col cols="9"
                     >{{ item.businessName }}<br />
                     <div class="pt-2">
-                    {{ item.address.street }},
-                    {{ item.address.city }}
-                    {{ item.address.region }}
-                    {{ getCountryName(item.address.country) }},
-                    {{ item.address.postalCode }}
+                      {{ item.address.street }},
+                      {{ item.address.city }}
+                      {{ item.address.region }}
+                      {{ getCountryName(item.address.country) }},
+                      {{ item.address.postalCode }}
                     </div>
                   </v-col>
                 </v-row>
@@ -136,7 +144,10 @@
               <td class="actions-cell  px-0 py-2">
                 <div
                   class="actions float-right"
-                  v-if="isRegisteringParty(row.item) || isSecuredPartyRestrictedList(registrationType)"
+                  v-if="
+                    isRegisteringParty(row.item) ||
+                      isSecuredPartyRestrictedList(registrationType)
+                  "
                 >
                   <v-list
                     class="actions__more-actions"
@@ -242,6 +253,7 @@ import PartyAutocomplete from './PartyAutocomplete.vue'
 import { useParty } from '@/composables/useParty'
 import { useSecuredParty } from './composables/useSecuredParty'
 import { BaseAddress } from '@/composables/address'
+import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 
 import { partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
@@ -253,7 +265,8 @@ export default defineComponent({
     EditParty,
     PartySearch,
     BaseAddress,
-    PartyAutocomplete
+    PartyAutocomplete,
+    ChangeSecuredPartyDialog
   },
   props: {
     isSummary: {
@@ -291,6 +304,9 @@ export default defineComponent({
       loading: false,
       securedParties: parties.securedParties,
       registeringPartyAdded: false,
+      currentPartyName: '',
+      showDialog: false,
+      savedParty: null,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       }),
@@ -365,6 +381,7 @@ export default defineComponent({
     const fetchOtherSecuredParties = async () => {
       localState.loading = true
       if (parties.registeringParty) {
+        parties.registeringParty.businessName = 'Bank of Montreal'
         // go to the service and see if there are similar secured parties
         const response: [SearchPartyIF] = await partyCodeSearch(
           parties.registeringParty.businessName,
@@ -413,9 +430,27 @@ export default defineComponent({
         address: party.address,
         personName: { first: '', middle: '', last: '' }
       }
-      parties.securedParties = [newParty]
-      setAddSecuredPartiesAndDebtors(parties)
-      localState.securedParties = [newParty]
+      // if secured party already shown
+      if (localState.securedParties.length === 1) {
+        localState.currentPartyName = party.businessName
+        localState.savedParty = newParty
+        localState.showDialog = true
+      } else {
+        parties.securedParties = [newParty]
+        setAddSecuredPartiesAndDebtors(parties)
+        localState.securedParties = [newParty]
+      }
+    }
+
+    const dialogSubmit = (proceed: boolean) => {
+      if (proceed) {
+        parties.securedParties = [localState.savedParty]
+        setAddSecuredPartiesAndDebtors(parties)
+        localState.securedParties = [localState.savedParty]
+      } else {
+        localState.searchValue = { code: localState.securedParties[0].code, businessName: localState.securedParties[0].businessName }
+      }
+      localState.showDialog = false
     }
 
     return {
@@ -434,6 +469,7 @@ export default defineComponent({
       registrationType,
       selectResult,
       filterList,
+      dialogSubmit,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }
@@ -463,12 +499,17 @@ export default defineComponent({
   color: $gray7 !important;
 }
 
-::v-deep .v-data-table:not(.party-table) > .v-data-table__wrapper > table > tbody > tr > td.list-item__title {
+::v-deep
+  .v-data-table:not(.party-table)
+  > .v-data-table__wrapper
+  > table
+  > tbody
+  > tr
+  > td.list-item__title {
   height: auto;
 }
 
 ::v-deep .v-list-item--active {
-  padding-left: 30px;
   color: $primary-blue !important;
   font-size: 0.875rem;
 }
