@@ -351,11 +351,8 @@ export default defineComponent({
         if (lengthTrust.showInvalid && lengthTrust.lienAmount === '') {
           return 'This field is required'
         }
-        if (lengthTrust.lienAmount?.length > 0) {
-          var amount = Number(lengthTrust.lienAmount.replace(',', ''))
-          if (isNaN(amount) || amount < 0.01) {
-            return 'Lien amount must be a number greater than 0.'
-          }
+        if (lengthTrust.lienAmount?.length > 0 && !validLienAmount(lengthTrust.lienAmount)) {
+          return 'Lien amount must be a number greater than 0.'
         }
         return ''
       }),
@@ -372,8 +369,8 @@ export default defineComponent({
         return minDate.toISOString()
       }),
       computedDateFormatted: computed((): string => {
-        return localState.surrenderDate !== ''
-          ? convertDate(new Date(localState.surrenderDate), false, false)
+        return lengthTrust.surrenderDate !== ''
+          ? convertDate(new Date((lengthTrust.surrenderDate + 'T09:00:00Z')), false, false)
           : ''
       }),
       lengthSummary: computed((): string => {
@@ -396,6 +393,7 @@ export default defineComponent({
       }),
       lienAmountSummary: computed((): string => {
         if (lengthTrust.lienAmount) {
+          // Format as CDN currency.
           var currency = lengthTrust.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
@@ -410,7 +408,7 @@ export default defineComponent({
       surrenderDateSummary: computed((): string => {
         if (lengthTrust.surrenderDate?.length >= 10) {
           return convertDate(
-            new Date(lengthTrust.surrenderDate.substring(0, 10)),
+            new Date((lengthTrust.surrenderDate + 'T09:00:00Z')),
             false,
             false
           )
@@ -446,11 +444,7 @@ export default defineComponent({
         APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
         APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
         APIRegistrationTypes.MAINTENANCE_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
-        APIRegistrationTypes.OTHER,
-        APIRegistrationTypes.MINERAL_LAND_TAX,
-        APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
-        APIRegistrationTypes.SCHOOL_ACT
+        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE
       ]
       return ipArray.includes(registrationType)
     }
@@ -486,6 +480,24 @@ export default defineComponent({
         setFeeSummary(feeSummary)
         context.emit('updated-fee-summary', feeSummary)
       }
+    }
+
+    const validLienAmount = (val: string): boolean => {
+      if (!val || val === '') {
+        return false
+      }
+      var lienAmount = val.trimRight().trimLeft()
+      if (lienAmount.length === 0) {
+        return false
+      }
+      if (lienAmount.startsWith('$')) {
+        lienAmount = lienAmount.substr(1)
+      }
+      var amount = Number(lienAmount.replace(/,/g, ''))
+      if (isNaN(amount) || amount < 0.01) {
+        return false
+      }
+      return true
     }
 
     watch(
@@ -544,18 +556,11 @@ export default defineComponent({
       () => localState.lienAmount,
       (val: string) => {
         lengthTrust.lienAmount = val.trimRight().trimLeft()
-        if (lengthTrust.lienAmount.length > 0) {
-          var amount = Number(lengthTrust.lienAmount.replace(',', ''))
-          if (isNaN(amount) || amount < 0.01) {
-            lengthTrust.valid = false
-          } else if (lengthTrust.surrenderDate !== '') {
-            lengthTrust.valid = true
-            lengthTrust.showInvalid = false
-          } else {
-            lengthTrust.valid = false
-          }
-        } else {
+        if (!validLienAmount(val)) {
           lengthTrust.valid = false
+        } else if (lengthTrust.surrenderDate !== '') {
+          lengthTrust.valid = true
+          lengthTrust.showInvalid = false
         }
         setLengthTrust(lengthTrust)
       }

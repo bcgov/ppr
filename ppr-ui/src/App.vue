@@ -18,13 +18,19 @@
       </div>
     </transition>
 
+    <!-- sbc-header
+        class="sbc-header"
+        :in-auth="false"
+        :redirect-on-login-success="baseUrl"
+        :redirect-url-login-fail="loginURL"
+        :redirect-on-logout="loginURL"
+        :show-actions="true"
+      / -->
+
     <sbc-header
         class="sbc-header"
-        :inAuth="false"
-        :redirectOnLoginSuccess="baseUrl"
-        :redirectUrlLoginFail="loginURL"
-        :redirectOnLogout="loginURL"
-        :showActions="true"
+        :in-auth="false"
+        :show-actions="true"
       />
 
     <div class="app-body">
