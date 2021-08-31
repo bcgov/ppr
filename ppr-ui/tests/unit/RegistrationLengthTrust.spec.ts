@@ -5,6 +5,9 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
+  LengthTrustIF
+} from '@/interfaces'
+import {
   mockedSelectSecurityAgreement,
   mockedRepairersLien,
   mockedSaleOfGoods
@@ -104,7 +107,6 @@ describe('RegistrationLengthTrust SA tests', () => {
 describe('RegistrationLengthTrust RL tests', () => {
   let wrapper: Wrapper<any>
   const defaultRegistrationType: String = String('RL')
-
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedRepairersLien())
     wrapper = createComponent(defaultRegistrationType)
@@ -129,11 +131,19 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.surrenderDateSummary).toBe('Not entered')
   })
   it('renders lienAmount', async () => {
-    wrapper.vm.$data.lienAmount = '20,000'
+    wrapper.vm.$data.lienAmount = '$1,000,000'
+    await Vue.nextTick()
+    expect(wrapper.vm.lienAmountMessage).toBe('')
+    expect(wrapper.vm.showErrorLienAmount).toBe(false)
+    wrapper.vm.$data.lienAmount = '$1'
     await Vue.nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('')
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
     wrapper.vm.$data.lienAmount = 'junk'
+    await Vue.nextTick()
+    expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
+    expect(wrapper.vm.showErrorLienAmount).toBe(true)
+    wrapper.vm.$data.lienAmount = '$1$'
     await Vue.nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
     expect(wrapper.vm.showErrorLienAmount).toBe(true)
