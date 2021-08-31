@@ -4,15 +4,20 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import sinon from 'sinon'
+import { axios } from '@/utils/axios-ppr'
+import { mockedPartyCodeSearchResults, mockedSecuredParties2 } from './test-data'
 import {
   mockedSecuredParties1,
-  mockedSecuredParties2,
+  mockedRegisteringParty1,
   mockedSelectSecurityAgreement,
   mockedOtherCarbon
 } from './test-data'
 
 // Components
 import { SecuredParties, EditParty, PartySearch } from '@/components/parties'
+import { ChangeSecuredPartyDialog } from '@/components/dialogs'
+import { SearchPartyIF } from '@/interfaces'
 
 Vue.use(Vuetify)
 
@@ -95,12 +100,29 @@ describe('Secured Party store tests', () => {
 
 describe('Secured Party Other registration type tests', () => {
   let wrapper: Wrapper<any>
+  const pprResp: Array<SearchPartyIF> = mockedPartyCodeSearchResults
+  sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
+  let sandbox
 
   beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    get.returns(
+      new Promise(resolve =>
+        resolve({
+          data: pprResp
+        })
+      )
+    )
     await store.dispatch('setRegistrationType', mockedOtherCarbon())
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: mockedRegisteringParty1,
+      securedParties: mockedSecuredParties2
+    })
     wrapper = createComponent()
   })
   afterEach(() => {
+    sandbox.restore()
     wrapper.destroy()
   })
 
@@ -112,5 +134,26 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.findComponent(PartySearch).exists()).toBeFalsy()
     // should have autocomplete instead
     expect(wrapper.find(partyAutoComplete).exists()).toBeTruthy()
+
+    // should have the dialog
+    expect(wrapper.find(ChangeSecuredPartyDialog).exists()).toBeTruthy()
+  })
+
+  it('shows the dialog with a secured party code change', async () => {
+    expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
+    
+    // should have the dialog
+    expect(wrapper.find(ChangeSecuredPartyDialog).exists()).toBeTruthy()
+
+    expect(wrapper.find('#secured-party-autocomplete').exists()).toBeTruthy()
+
+    const autocompleteControls = wrapper.findAll(".v-input__slot")
+    expect(autocompleteControls.length).toBe(1)
+    
+    // change the party code and then the dialog should show
+    wrapper.vm.selectResult({code: 123, businessName: 'Forrest Gump'})
+
+    expect(wrapper.find(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
+
   })
 })

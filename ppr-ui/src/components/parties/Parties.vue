@@ -63,7 +63,7 @@
     </v-row>
     <v-row no-gutters class="py-4">
       <v-col>
-        <h3>Secured Parties</h3>
+        <h3> {{ securedPartyTitle }} </h3>
         <secured-parties />
       </v-col>
     </v-row>
@@ -120,6 +120,13 @@ export default defineComponent({
           return 'The Secured Party'
         } else {
           return 'At least one Secured Party'
+        }
+      }),
+      securedPartyTitle: computed((): string => {
+        if (isSecuredPartyRestrictedList(registrationType)) {
+          return 'Secured Party'
+        } else {
+          return 'Secured Parties'
         }
       })
     })
