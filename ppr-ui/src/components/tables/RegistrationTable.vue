@@ -881,7 +881,7 @@ export default defineComponent({
   background-color: white !important;
   border: 1px solid var(--outline);
   height: 45px;
-  font-size: 13px;
+  font-size: 14px;
   margin: 0;
   color: var(--text);
   label {
