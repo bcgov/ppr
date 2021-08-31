@@ -370,7 +370,7 @@ export default defineComponent({
       }),
       computedDateFormatted: computed((): string => {
         return lengthTrust.surrenderDate !== ''
-          ? convertDate(new Date(lengthTrust.surrenderDate), false, false)
+          ? convertDate(new Date((lengthTrust.surrenderDate + 'T09:00:00Z')), false, false)
           : ''
       }),
       lengthSummary: computed((): string => {
@@ -408,7 +408,7 @@ export default defineComponent({
       surrenderDateSummary: computed((): string => {
         if (lengthTrust.surrenderDate?.length >= 10) {
           return convertDate(
-            new Date(lengthTrust.surrenderDate.substring(0, 10)),
+            new Date((lengthTrust.surrenderDate + 'T09:00:00Z')),
             false,
             false
           )
