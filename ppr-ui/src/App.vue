@@ -40,7 +40,7 @@
             This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
           </v-col>
         </v-row>
-        <breadcrumb />
+        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" />
         <tombstone :setCurrentPath="currentPath" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
@@ -120,8 +120,9 @@ export default class App extends Mixins(AuthMixin) {
   @Action setUserInfo: ActionBindingIF
 
   // Local Properties
-  private currentPath: string = ''
-  private errorDialog: boolean = false
+  private currentPath = ''
+  private currentPathName: RouteNames = null
+  private errorDialog = false
   private dialogOptions: DialogOptionsIF = loginError
 
   // FUTURE: change profileReady/appReady/haveData to a state machine?
@@ -231,6 +232,7 @@ export default class App extends Mixins(AuthMixin) {
   @Watch('$route', { immediate: true, deep: true })
   onUrlChange (newVal: Route) {
     this.currentPath = newVal.path
+    this.currentPathName = newVal.name as RouteNames
   }
 
   /** Called when profile is ready -- we can now init app. */

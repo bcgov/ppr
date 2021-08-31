@@ -1,13 +1,20 @@
 <template>
   <v-container fluid :class="$style['breadcrumb-row']" class="view-container px-15 py-0">
     <div class="container pa-0">
-      <v-row no-gutters class="container px-0 py-2">
-        <v-col cols="auto" class="pr-3" style="border-right: thin solid #ced4da">
-          <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact :href="backURL" icon small>
-            <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
+      <v-row no-gutters class="container" style="padding: 6px 0;">
+        <v-col cols="auto">
+          <v-row no-gutters>
+            <v-col cols="auto">
+              <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact icon small>
+                <v-icon>mdi-arrow-left</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col class="pl-3" cols="auto" style="padding-top: 2px;">
+              <div style="border-right: thin solid #ced4da; height: 28px;" />
+            </v-col>
+          </v-row>
         </v-col>
-        <v-col cols="auto" class="pl-3 pt-1">
+        <v-col cols="auto" class="pl-3" style="padding-top: 6px;">
           <v-breadcrumbs class="pa-0" :items="breadcrumbs">
             <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="item.href">
               <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
@@ -26,30 +33,52 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch, Ref } from '@vue/composition-api' // eslint-disable-line
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
-import { tombstoneBreadcrumbRegistration, tombstoneBreadcrumbDashboard } from '@/resources'
+import {
+  tombstoneBreadcrumbDashboard,
+  tombstoneBreadcrumbDischarge,
+  tombstoneBreadcrumbRegistration,
+  tombstoneBreadcrumbSearch
+} from '@/resources'
+import { RouteNames } from '@/enums'
 
 export default defineComponent({
   name: 'Breadcrumb',
   props: {
-    backURL: {
-      type: String,
-      default: ''
-    }
+    setCurrentPath: String,
+    setCurrentPathName: String
   },
-  setup (props, { root }) {
-    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+  setup (props) {
+    const {
+      getRegistrationNumber,
+      getRegistrationType
+    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType'])
+    const currentPath = toRefs(props).setCurrentPath
+    const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
+      backUrl: computed((): string => {
+        const length = localState.breadcrumbs?.length || 0
+        if (length > 0) {
+          return localState.breadcrumbs[length - 1].href || sessionStorage.getItem('BASE_URL')
+        }
+      }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
-        if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
-        (root.$route.name === 'search')) {
+        if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           return tombstoneBreadcrumbDashboard
+        } else if (routeName.value === RouteNames.SEARCH) {
+          return tombstoneBreadcrumbSearch
+        } else if (currentPath.value?.includes('discharge')) {
+          const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
+          dischargeBreadcrumb[2].text =
+            `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
+          return dischargeBreadcrumb
         } else {
-          const registrationBreadcrumb = tombstoneBreadcrumbRegistration
-          registrationBreadcrumb[2].text = getRegistrationType.value?.registrationTypeUI || 'New Registration'
+          const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
+          registrationBreadcrumb[2].text =
+            getRegistrationType.value?.registrationTypeUI || registrationBreadcrumb[2].text
           return registrationBreadcrumb
         }
       })
@@ -66,14 +95,16 @@ export default defineComponent({
 .back-btn {
   background-color: white;
   color: $primary-blue !important;
+  min-height: 32px !important;
+  min-width: 32px !important;
 }
 .breadcrumb-row {
-  background-color: $BCgovBlue4;
+  background-color: $BCgovBlue3-5;
   color: white;
 }
 .breadcrumb-text {
   color: white !important;
-  font-size: 0.75rem !important;
+  font-size: 0.8125rem !important;
 }
 .underlined {
   color: white !important;

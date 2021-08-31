@@ -39,14 +39,7 @@ export default defineComponent({
         return `${getUserFirstName.value} ${getUserLastName.value}`
       }),
       date: '',
-      header: computed((): string => {
-        if ((root.$route.name === 'dashboard') || (root.$route.name === 'signin') ||
-        (root.$route.name === 'search')) {
-          return 'My PPR Dashboard'
-        } else {
-          return 'My Personal Property Registry'
-        }
-      }),
+      header: 'My Personal Property Registry',
       accountName: computed((): string => {
         return getAccountLabel.value
       })
