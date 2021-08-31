@@ -1,6 +1,6 @@
 <template>
   <v-container class="view-container px-15 py-0" fluid style="background-color: white;">
-    <div class="container pa-0 pt-6">
+    <div class="container pa-0" style="padding: 29px 0 !important;">
       <tombstone-default v-if="displayDefault" />
       <tombstone-discharge v-else-if="displayDischarge" />
     </div>
