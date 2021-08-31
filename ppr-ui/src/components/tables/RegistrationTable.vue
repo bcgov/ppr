@@ -697,8 +697,12 @@ export default defineComponent({
           Array.prototype.push.apply(tableData.value, drafts)
           // assign a draft status to draft agreements
           for (let i = 0; i < tableData.value.length; i++) {
-            tableData.value[i].statusType = 'D'
-            tableData.value[i].registrationNumber = 'Pending'
+            if (!tableData.value[i].statusType) {
+              tableData.value[i].statusType = 'D'
+            }
+            if (!tableData.value[i].registrationNumber) {
+              tableData.value[i].registrationNumber = 'Pending'
+            }
           }
         }
         if (registrations) {

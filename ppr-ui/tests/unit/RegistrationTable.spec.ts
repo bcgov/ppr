@@ -9,6 +9,8 @@ import sinon from 'sinon'
 // Components
 import { RegistrationTable } from '@/components/tables'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
+import { RegistrationConfirmation } from '@/components/dialogs'
+
 
 // Other
 import {
@@ -20,6 +22,7 @@ import {
 import { DraftIF, RegistrationSummaryIF } from '@/interfaces'
 import { axios as pprAxios } from '@/utils/axios-ppr'
 import { AccountProductCodes, AccountProductMemberships, UIRegistrationTypes } from '@/enums'
+import flushPromises from 'flush-promises'
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
@@ -108,6 +111,35 @@ describe('Test registration table with results', () => {
     expect(autocomplete.text()).toContain('Registration Type')
 
   })
+
+  it('shows the discharge modal', async () => {
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    // the api is going to be called twice, once for drafts and once for registrations
+    // the tests can't tell the difference, so the same one is called twice
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    const buttons = wrapper.findAll('.actions__more-actions__btn')
+    expect(buttons.length).toBe(2)
+
+    buttons.at(1).trigger('click')
+    await Vue.nextTick()
+
+    //it renders the actions drop down
+    const menuItems = wrapper.findAll('.v-list-item__subtitle')
+    expect(menuItems.length).toBe(4)
+    expect(menuItems.at(1).text()).toContain('Total Discharge')
+
+    //click the discharge
+    menuItems.at(1).trigger('click')
+    await flushPromises()
+    const dialog = wrapper.findComponent(RegistrationConfirmation)
+    
+    expect(dialog.isVisible()).toBe(true)
+
+
+  })
+
 })
 
 describe('Test draft table with results', () => {
