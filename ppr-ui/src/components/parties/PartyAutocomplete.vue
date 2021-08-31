@@ -8,7 +8,7 @@
   >
     <v-row no-gutters justify="center" class="pl-2">
       <v-col no-gutters cols="12">
-        <v-list :class="$style['auto-complete-list']" class="pt-0">
+        <v-list v-if="autoCompleteResults.length > 0" :class="$style['auto-complete-list']" class="pt-0">
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item
               v-for="(result, i) in autoCompleteResults"
@@ -46,6 +46,22 @@
               </v-list-item-action>
             </v-list-item>
           </v-list-item-group>
+        </v-list>
+        <v-list v-else>
+           <v-list-item
+              :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]"
+            >
+              <v-list-item-content class="pt-2 pb-2">
+                <v-list-item-subtitle>
+                  <v-row :class="$style['auto-complete-row']">
+                    <v-col cols="12" :class="$style['title-size']">
+                      No matches found. Check your name or number, or add a Secured party
+                      that doesn't have a code.
+                    </v-col>
+                  </v-row>
+                </v-list-item-subtitle>
+              </v-list-item-content>
+           </v-list-item>
         </v-list>
       </v-col>
     </v-row>
@@ -98,7 +114,7 @@ export default defineComponent({
       () => props.autoCompleteItems,
       (items: Array<any>) => {
         localState.autoCompleteResults = items
-        if (items.length > 0) {
+        if (items) {
           localState.autoCompleteIsActive = true
         } else {
           localState.autoCompleteIsActive = false

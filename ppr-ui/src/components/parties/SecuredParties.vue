@@ -416,7 +416,7 @@ export default defineComponent({
       const textOne = item.businessName.toLowerCase()
       const searchText = queryText.toLowerCase()
       return (
-        textOne.indexOf(searchText) > -1 || item.code.indexOf(searchText) > -1
+        textOne.startsWith(searchText) || item.code.startsWith(searchText)
       )
     }
 
