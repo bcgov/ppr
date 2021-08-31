@@ -23,7 +23,7 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
 
   // add 'Pacific Time' to end if pacific timezone
   let timezone = ''
-  if ((date.toString()).includes('Pacific')) timezone = 'Pacific Time'
+  if ((date.toString()).includes('Pacific')) timezone = 'Pacific time'
 
   const datetime = format12HourTime(date)
 
