@@ -82,8 +82,6 @@ export default class AddCollateral extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private generalCollateral: string = ''
-
   private get feeSummary (): FeeSummaryIF {
     return this.getFeeSummary
   }

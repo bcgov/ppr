@@ -1,5 +1,13 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
+    <registration-confirmation
+      attach="#app"
+      :options="dischargeConfirmationDialog"
+      :display="showDialog"
+      :registrationNumber="currentRegistrationNumber"
+      @proceed="dischargeSubmit()"
+      @confirmationClose="closeConfirmation()"
+    />
     <div :class="$style['col-selection']">
       <v-text-field
         v-model="search"
@@ -432,7 +440,10 @@ import {
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
-import { registrationTableHeaders } from '@/resources'
+import {
+  registrationTableHeaders,
+  dischargeConfirmationDialog
+} from '@/resources'
 import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
 import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
@@ -444,17 +455,19 @@ import {
   AccountProductRoles // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import { RegistrationConfirmation } from '@/components/dialogs'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 
 export default defineComponent({
+  components: {
+    RegistrationConfirmation,
+    RegistrationBarTypeAheadList
+  },
   props: {
     isSummary: {
       type: Boolean,
       default: false
     }
-  },
-  components: {
-    RegistrationBarTypeAheadList
   },
   setup (props, { emit, root }) {
     const {
@@ -484,6 +497,8 @@ export default defineComponent({
     const localState = reactive({
       headers: registrationTableHeaders,
       registrationDateFormatted: '',
+      showDialog: false,
+      currentRegistrationNumber: '',
       showSubmittedDatePicker: false,
       submittedStartDateTmp: null,
       submittedEndDateTmp: null,
@@ -661,8 +676,16 @@ export default defineComponent({
     }
 
     const discharge = (item): void => {
-      const registrationNumber = item.registrationNumber as string
-      emit('discharge', registrationNumber)
+      localState.currentRegistrationNumber = item.registrationNumber as string
+      localState.showDialog = true
+    }
+
+    const dischargeSubmit = (): void => {
+      emit('discharge', localState.currentRegistrationNumber)
+    }
+
+    const closeConfirmation = (): void => {
+      localState.showDialog = false
     }
 
     /** Get the drafts and financing statements from the api. */
@@ -674,8 +697,12 @@ export default defineComponent({
           Array.prototype.push.apply(tableData.value, drafts)
           // assign a draft status to draft agreements
           for (let i = 0; i < tableData.value.length; i++) {
-            tableData.value[i].statusType = 'D'
-            tableData.value[i].registrationNumber = 'Pending'
+            if (!tableData.value[i].statusType) {
+              tableData.value[i].statusType = 'D'
+            }
+            if (!tableData.value[i].registrationNumber) {
+              tableData.value[i].registrationNumber = 'Pending'
+            }
           }
         }
         if (registrations) {
@@ -716,9 +743,12 @@ export default defineComponent({
 
     return {
       getFormattedDate,
+      dischargeConfirmationDialog,
+      closeConfirmation,
       getRegistrationType,
       getStatusDescription,
       discharge,
+      dischargeSubmit,
       rowClass,
       registrationNumber,
       displayRegistrationNumber,

@@ -12,6 +12,7 @@ import {
   SearchResultIF,
   UserSettingsIF,
   SearchPartyIF,
+  DebtorNameIF,
   RegistrationSummaryIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
@@ -442,6 +443,31 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
       return {
         error: {
           statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+        }
+      }
+    })
+}
+
+// Get debtor names for a registration
+export async function debtorNames (registrationNum: string): Promise<[DebtorNameIF]> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios
+    .get(`financing-statements/${registrationNum}/debtorNames`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        searches: null,
+        error: {
+          statusCode:
+            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message
         }
       }
     })

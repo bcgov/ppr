@@ -57,3 +57,12 @@ export const registrationOtherDialog = {
   text: 'If you need to register a Security Interest under a statute not listed, ' +
     'enter the name of the statute below.'
 }
+
+// discharge confirmation
+export const dischargeConfirmationDialog: DialogOptionsIF = {
+  acceptText: 'Continue',
+  cancelText: 'Cancel',
+  title: 'Confirm registration to be discharged',
+  label: 'Enter a Debtor (last name of individual person or full business name)',
+  text: ''
+}
