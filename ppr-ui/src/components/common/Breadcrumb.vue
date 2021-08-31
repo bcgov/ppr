@@ -5,7 +5,7 @@
         <v-col cols="auto">
           <v-row no-gutters>
             <v-col cols="auto">
-              <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact icon small>
+              <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact :href="backUrl" icon small>
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
             </v-col>
