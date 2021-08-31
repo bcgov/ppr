@@ -381,7 +381,6 @@ export default defineComponent({
     const fetchOtherSecuredParties = async () => {
       localState.loading = true
       if (parties.registeringParty) {
-        parties.registeringParty.businessName = 'Bank of Nova Scotia'
         // go to the service and see if there are similar secured parties
         const response: [SearchPartyIF] = await partyCodeSearch(
           parties.registeringParty.businessName,
