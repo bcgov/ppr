@@ -1,9 +1,13 @@
 export enum APIStatusTypes {
     DRAFT = 'D',
-    ACTIVE = 'ACT'
+    ACTIVE = 'ACT',
+    EXPIRED = 'HEX',
+    DISCHARGED = 'HDC'
 }
 
 export enum UIStatusTypes {
     DRAFT = 'Draft',
-    ACTIVE = 'Active'
+    ACTIVE = 'Active',
+    EXPIRED = 'Expired',
+    DISCHARGED = 'Discharged'
 }
