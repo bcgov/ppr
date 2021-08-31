@@ -449,7 +449,10 @@ export default defineComponent({
         setAddSecuredPartiesAndDebtors(parties)
         localState.securedParties = [localState.savedParty]
       } else {
-        localState.searchValue = { code: localState.securedParties[0].code, businessName: localState.securedParties[0].businessName }
+        localState.searchValue = {
+          code: localState.securedParties[0].code,
+          businessName: localState.securedParties[0].businessName
+        }
       }
       localState.showDialog = false
     }
