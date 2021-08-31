@@ -311,6 +311,10 @@ tbody {
   padding-bottom: 20px !important;
 }
 
+.registration-table.v-data-table tr.filter-row td {
+  padding-bottom: 0px !important;
+}
+
 .registration-table.v-data-table th {
   padding-bottom: 20px !important;
   vertical-align: bottom;
@@ -388,11 +392,15 @@ tbody {
 }
 
 .registration-table .v-data-table__wrapper {
-  overflow-x: scroll;
+  overflow-x: auto;
+}
+
+.registration-table tr:hover {
+  background-color: transparent !important;
 }
 
 .registration-table th {
-  font-size: 13px !important;
+  font-size: 0.875rem !important;
 }
 .column-selection .v-list {
   z-index: 9999;
@@ -422,6 +430,12 @@ tbody {
   height: 45px;
   padding-left: 10px;
   padding-top: 4px;
+}
+
+.column-selection .v-input__icon .v-icon {
+  padding-top: 8px;
+  padding-right: 8px;
+  color: $primary-blue;
 }
 
 .registration-date .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):not(.v-btn--rounded)
@@ -475,6 +489,12 @@ tbody {
 
 .v-list--dense .theme--light.v-list-item.v-list-item--active {
   min-height: 0;
+}
+
+#registration-table tr.filter-row td {
+  position: sticky;
+    top: 65px;
+    z-index: 20;
 }
 
 .registration-actions.theme--light .v-list-item--disabled .v-list-item__subtitle {

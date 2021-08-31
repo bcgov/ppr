@@ -38,17 +38,17 @@
       <v-row class="pt-15" no-gutters>
         <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
       </v-row>
-      <v-row no-gutters class="pt-7" style="margin-top: 2px">
+      <v-row no-gutters class="pt-7" style="margin-top: 2px; margin-bottom: 80px;">
         <v-col>
           <v-row no-gutters
                   id="registration-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
-              <b>My Registrations</b>
+              <b>My Registrations</b> ({{ registrationsLength }})
             </v-col>
           </v-row>
           <v-row no-gutters class="white" style="min-height:300px">
-            <v-col cols="12"><registration-table @discharge="startDischarge($event)"/></v-col>
+            <v-col cols="12"><registration-table @registrationTotal="showRegistrationTotal($event)" @discharge="startDischarge($event)"/></v-col>
           </v-row>
         </v-col>
       </v-row>
@@ -107,6 +107,8 @@ export default class Dashboard extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
+  private regLength: number = 0
+
   mounted () {
     // clear search data in the store
     this.setRegistrationType(null)
@@ -124,6 +126,10 @@ export default class Dashboard extends Vue {
     return this.getSearchHistory?.length || 0
   }
 
+  private get registrationsLength (): number {
+    return this.regLength
+  }
+
   private get breadcrumbs (): Array<BreadcrumbIF> {
     return tombstoneBreadcrumbDashboard
   }
@@ -134,6 +140,10 @@ export default class Dashboard extends Vue {
       query: { 'reg-num': regNum }
     })
     this.emitHaveData(false)
+  }
+
+  private showRegistrationTotal (total: number): void {
+    this.regLength = total
   }
 
   /** Redirects browser to Business Registry home page. */

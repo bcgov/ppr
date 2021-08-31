@@ -419,6 +419,7 @@ span.invalid-message {
 .v-data-table .filter-row {
   padding-top: 0px !important;
   padding-bottom: 0px !important;
+  background-color: #ffffff;
 
   td {
     padding-top: 10px !important;
@@ -488,6 +489,14 @@ span.invalid-message {
 }
 
 .base-registration-row {
-  background-color: #e0e0e054;
+  background: rgba(241, 243, 245, 0.5);
   font-weight: bold;
+}
+.registration-row {
+  z-index: 5;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > 
+table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+  background: rgba(241, 243, 245, 0.5) !important;
 }

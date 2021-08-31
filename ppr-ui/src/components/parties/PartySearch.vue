@@ -10,6 +10,7 @@
           persistent-hint
           hint="Enter at least the first 3 characters."
           :disabled="autoCompleteDisabled"
+          hint="Enter at least the first 4 characters"
         />
       </v-col>
       <v-col cols="6" :class="{ 'disabled-text': autoCompleteDisabled }">

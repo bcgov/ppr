@@ -92,7 +92,7 @@
     <v-data-table
       v-if="!loadingData"
       id="registration-table"
-      class="registration-table pt-4"
+      class="registration-table pt-4 pl-4"
       :class="$style['reg-table']"
       :headers="headers"
       :items="tableData"
@@ -103,6 +103,8 @@
       disable-sort
       hide-default-footer
       hide-default-header
+      fixed-header
+      height="600px"
       no-data-text="No registrations created yet."
     >
       <template slot="header" :headers="getDisplayedHeaders">
@@ -112,7 +114,7 @@
               v-for="(header, i) in getDisplayedHeaders"
               :class="header.class"
               :key="'find-header-' + i"
-              class="text-left header-row-1 pa-0 pl-2"
+              class="text-left header-row-1 pa-0 pl-2 py-2"
               @click="selectAndSort(header.value)"
             >
               <span>
@@ -758,6 +760,7 @@ export default defineComponent({
         }
         localState.loadingData = false
         originalData.value = tableData.value
+        emit('registrationTotal', originalData.value.length)
       } catch (error) {
         alert(error)
       }
@@ -830,8 +833,7 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .reg-table {
-  max-height: 550px;
-  overflow-y: scroll;
+  max-height: 620px;
 }
 .length-trust-label {
   font-size: 0.875rem;
