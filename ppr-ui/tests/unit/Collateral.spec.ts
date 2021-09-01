@@ -84,7 +84,7 @@ describe('Collateral Lien unpaid wages tests', () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // won't show vehicle collateral
     expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateral).toContain('All the Personal Property of the Debtor')
+    expect(wrapper.vm.generalCollateral).toContain('All the personal property of the debtor')
   })
 
 
