@@ -2,6 +2,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  DebtorNameIF,
   DraftIF,
   FeeSummaryIF,
   LengthTrustIF,
@@ -64,6 +65,10 @@ export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {
 
 export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
   commit('mutateLengthTrust', lengthTrust)
+}
+
+export const setRegistrationConfirmDebtorName: ActionIF = ({ commit }, debtorName: DebtorNameIF): void => {
+  commit('mutateRegistrationConfirmDebtorName', debtorName)
 }
 
 export const setRegistrationCreationDate: ActionIF = ({ commit }, date: string): void => {

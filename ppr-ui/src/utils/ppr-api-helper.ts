@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
 import {
+  DischargeRegistrationIF,
   DraftIF,
   DraftResultIF,
   FinancingStatementIF,
@@ -383,6 +384,32 @@ export async function createFinancingStatement (
           error?.response?.data?.rootCause
       }
       return statement
+    })
+}
+
+// Save a discharge registration.
+export async function createDischarge (discharge: DischargeRegistrationIF): Promise<DischargeRegistrationIF> {
+  return axios
+    .post<DischargeRegistrationIF>(
+      `financing-statements/${discharge.baseRegistrationNumber}/discharges`,
+      discharge,
+      getDefaultConfig())
+    .then(response => {
+      const data: DischargeRegistrationIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      discharge.error = {
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message:
+          error?.response?.data?.errorMessage +
+          ' ' +
+          error?.response?.data?.rootCause
+      }
+      return discharge
     })
 }
 

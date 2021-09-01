@@ -24,6 +24,7 @@ export const stateModel: StateModelIF = {
       vehicleCollateral: [],
       generalCollateral: ''
     },
+    confirmDebtorName: null,
     creationDate: '',
     currentStep: 1,
     debtorName: null,

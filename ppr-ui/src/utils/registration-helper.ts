@@ -3,15 +3,22 @@ import { APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
   AddPartiesIF,
   AddCollateralIF,
+  DischargeRegistrationIF,
   DraftIF,
   ErrorIF,
   FinancingStatementIF,
   GeneralCollateralIF,
   PartyIF,
   RegistrationTypeIF,
-  StateModelIF
+  StateModelIF,
+  DebtorNameIF
 } from '@/interfaces'
-import { createDraft, createFinancingStatement, updateDraft } from '@/utils'
+import {
+  createDischarge,
+  createDraft,
+  createFinancingStatement,
+  updateDraft
+} from '@/utils'
 
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
@@ -146,6 +153,29 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
 
   if (apiResponse !== undefined && apiResponse.error !== undefined) {
     console.error('saveFinancingStatement failed: ' + apiResponse.error.statusCode + ': ' +
+                  apiResponse.error.message)
+  }
+  return apiResponse
+}
+
+/** Save new discharge registration. Data to be saved is in the store state model. */
+export async function saveDischarge (stateModel:StateModelIF): Promise<DischargeRegistrationIF> {
+  var registration:DischargeRegistrationIF = {
+    baseRegistrationNumber: stateModel.registration.registrationNumber,
+    debtorName: stateModel.registration.confirmDebtorName,
+    registeringParty: stateModel.registration.parties.registeringParty,
+    clientReferenceId: stateModel.folioOrReferenceNumber
+  }
+  if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
+    delete registration.clientReferenceId
+  }
+  registration.registeringParty = cleanupParty(registration.registeringParty)
+  // Now save the registration.
+  console.log('saveDischarge calling api for base registration number ' + registration.baseRegistrationNumber + '.')
+  const apiResponse = await createDischarge(registration)
+
+  if (apiResponse !== undefined && apiResponse.error !== undefined) {
+    console.error('saveDischarge failed: ' + apiResponse.error.statusCode + ': ' +
                   apiResponse.error.message)
   }
   return apiResponse

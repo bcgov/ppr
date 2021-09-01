@@ -5,8 +5,8 @@ import CompositionApi from '@vue/composition-api'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
-import { cleanupParty, saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
-import { PartyIF, FinancingStatementIF, DraftIF, StateModelIF } from '@/interfaces'
+import { cleanupParty, saveDischarge, saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
+import { DischargeRegistrationIF, PartyIF, FinancingStatementIF, DraftIF, StateModelIF } from '@/interfaces'
 import { APIRegistrationTypes } from '@/enums'
 
 // Components
@@ -14,6 +14,7 @@ import { FolioNumberSummary } from '@/components/common'
 
 // Other
 import {
+  mockedDebtorNames,
   mockedDraftFinancingStatementAll,
   mockedSelectSecurityAgreement,
   mockedRegisteringParty1,
@@ -129,5 +130,74 @@ describe('Registration API Helper Tests', () => {
     expect(('personName' in party)).toBeFalsy()
     expect(('code' in party)).toBeFalsy()
     expect(('emailAddress' in party)).toBeFalsy()
+  })
+})
+
+describe('Registration API Helper Discharge Tests', () => {
+  // Use mock service directly - account id can be anything.
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
+
+  let wrapper: any
+
+  beforeEach(async () => {
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    document.body.setAttribute('data-app', 'true')
+    wrapper = mount(FolioNumberSummary, {
+      localVue,
+      propsData: {},
+      store,
+      vuetify
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationNumber', '023001B')
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: mockedRegisteringParty1
+    })
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('save business debtor with folio', async () => {
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+
+    var registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
+    // console.log(JSON.stringify(statement))
+    expect(registration.createDateTime).toBeDefined()
+    expect(registration.baseRegistrationNumber).toBeDefined()
+    expect(registration.dischargeRegistrationNumber).toBeDefined()
+    expect(registration.payment).toBeDefined()
+  })
+
+  it('save individual debtor with folio', async () => {
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[2])
+
+    var registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
+    // console.log(JSON.stringify(statement))
+    expect(registration.createDateTime).toBeDefined()
+    expect(registration.baseRegistrationNumber).toBeDefined()
+    expect(registration.dischargeRegistrationNumber).toBeDefined()
+    expect(registration.payment).toBeDefined()
+  })
+
+  it('save business debtor no folio', async () => {
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+
+    var registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
+    // console.log(JSON.stringify(statement))
+    expect(registration.createDateTime).toBeDefined()
+    expect(registration.baseRegistrationNumber).toBeDefined()
+    expect(registration.dischargeRegistrationNumber).toBeDefined()
+    expect(registration.payment).toBeDefined()
   })
 })
