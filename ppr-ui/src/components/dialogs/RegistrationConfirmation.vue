@@ -64,6 +64,7 @@
 <script lang="ts">
 // external
 import { defineComponent, reactive, toRefs, watch, ref } from '@vue/composition-api'
+import { useActions } from 'vuex-composition-helpers'
 
 // local
 import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
@@ -80,6 +81,7 @@ export default defineComponent({
   },
   emits: ['proceed', 'confirmationClose'],
   setup (props, context) {
+    const { setRegistrationConfirmDebtorName } = useActions<any>(['setRegistrationConfirmDebtorName'])
     const localState = reactive({
       validationErrors: '',
       userInput: { value: 0, text: '' },
@@ -93,9 +95,9 @@ export default defineComponent({
 
     const submit = (): void => {
       if (localState.userInput.value) {
-        if (
-          localState.debtors.find(c => c.value === localState.userInput.value)
-        ) {
+        const chosenDebtor = localState.debtors.find(c => c.value === localState.userInput.value)
+        if (chosenDebtor) {
+          setRegistrationConfirmDebtorName(chosenDebtor)
           context.emit('proceed')
         }
       } else {
