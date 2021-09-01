@@ -11,5 +11,6 @@ export enum RouteNames {
     ADD_SECUREDPARTIES_AND_DEBTORS = 'add-securedparties-debtors',
     ADD_COLLATERAL = 'add-collateral',
     REVIEW_CONFIRM = 'review-confirm',
-    REVIEW_DISCHARGE = 'review-discharge'
+    REVIEW_DISCHARGE = 'review-discharge',
+    CONFIRM_DISCHARGE = 'confirm-discharge'
 }
