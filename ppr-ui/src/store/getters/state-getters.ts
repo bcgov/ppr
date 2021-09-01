@@ -5,6 +5,7 @@ import {
   AddCollateralIF,
   AddPartiesIF,
   ButtonConfigIF,
+  DebtorNameIF,
   DraftIF,
   FeeSummaryIF,
   IndividualNameIF,
@@ -41,6 +42,11 @@ export const getAddCollateral = (state: StateIF): AddCollateralIF => {
 /** The registration parties object. */
 export const getAddSecuredPartiesAndDebtors = (state: StateIF): AddPartiesIF => {
   return state.stateModel.registration.parties
+}
+
+/** The change registration base or confirm debtor name. */
+export const getConfirmDebtorName = (state: StateIF): DebtorNameIF => {
+  return state.stateModel.registration.confirmDebtorName
 }
 
 /** The search value for ppr search when search type is individual debtor. */

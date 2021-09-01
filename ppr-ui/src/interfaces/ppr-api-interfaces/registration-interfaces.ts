@@ -1,5 +1,5 @@
 import { APIRegistrationTypes } from '@/enums'
-import { GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
+import { DebtorNameIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
 import { ErrorIF } from './error-interface'
 
 // Payment (pay-api) reference interface.
@@ -29,7 +29,7 @@ export interface FinancingStatementIF {
   baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
-  otherTypeDescription?: string, //included if type is Other
+  otherTypeDescription?: string, // Included if type is Other
   error?: ErrorIF
 }
 
@@ -73,4 +73,16 @@ export interface RegistrationSummaryIF {
   lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
   error?: ErrorIF,
   hide?: boolean
+}
+
+// Discharge Registration interface. Base registration number, debtor name, and registering party are required.
+export interface DischargeRegistrationIF {
+  baseRegistrationNumber: string, // The identifier of the financing statement being discharged.
+  debtorName: DebtorNameIF,
+  registeringParty: PartyIF,
+  clientReferenceId?: string, // AKA folio max length 20.
+  dischargeRegistrationNumber?: string, // Included on success, the identifier for the discharge registration.
+  createDateTime?: string, // Included in a successful response.
+  payment?: PaymentIF, // Included in a successful response.
+  error?: ErrorIF // Not null if the API call is unsuccessful.
 }

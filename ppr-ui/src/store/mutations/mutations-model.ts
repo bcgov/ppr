@@ -2,6 +2,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  DebtorNameIF,
   DraftIF,
   FeeSummaryIF,
   LengthTrustIF,
@@ -85,6 +86,11 @@ export const mutateNewRegistration = (state: StateIF) => {
     createDateTime: null,
     lastUpdateDateTime: null
   }
+  state.stateModel.registration.confirmDebtorName = null
+}
+
+export const mutateRegistrationConfirmDebtorName = (state: StateIF, debtorName: DebtorNameIF) => {
+  state.stateModel.registration.confirmDebtorName = debtorName
 }
 
 export const mutateRegistrationCreationDate = (state: StateIF, date: string) => {
