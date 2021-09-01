@@ -6,15 +6,9 @@ import { getVuexStore } from '@/store'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
-import { ReviewRegistration } from '@/views'
-import { Collateral } from '@/components/collateral'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { ConfirmDischarge } from '@/views'
 import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
-import {
-  DebtorSummary,
-  RegisteringPartySummary,
-  SecuredPartySummary
-} from '@/components/parties/summaries'
+import { RegisteringPartySummary } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
@@ -30,11 +24,14 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Input field selectors / buttons
+const back = '#btn-stacked-back'
+const cancel = '#btn-stacked-cancel'
+const submit = '#btn-stacked-submit'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 
-describe('ReviewConfirm new registration component', () => {
+describe('ConfirmDischarge registration view', () => {
   let wrapper: any
   let sandbox
   const { assign } = window.location
@@ -54,10 +51,10 @@ describe('ReviewConfirm new registration component', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({
-      name: RouteNames.REVIEW_DISCHARGE,
+      name: RouteNames.CONFIRM_DISCHARGE,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ReviewRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount(ConfirmDischarge, { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -68,49 +65,40 @@ describe('ReviewConfirm new registration component', () => {
     sandbox.restore()
   })
 
-  it('renders Review Registration View with child components', async () => {
-    expect(wrapper.findComponent(ReviewRegistration).exists()).toBe(true)
+  it('renders Confirm Registration View with child components', async () => {
+    expect(wrapper.findComponent(ConfirmDischarge).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).vm.setMsg).toContain(
       'will receive a copy of the Total Discharge Verification Statement.')
-    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    // check length trust summary
-    expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
-    expect(state.registration.lengthTrust.lifeYears).toBe(mockedFinancingStatementAll.lifeYears)
-    expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
-    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
-    // check secured parties
-    expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
-    expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
-    // check debtors
-    expect(state.registration.parties.debtors).toBe(mockedFinancingStatementAll.debtors)
-    expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
-    // check vehicle collateral
-    expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
-    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary (whether data for it is in store or by prop may change)
     expect(state.feeSummary.feeAmount).toBe(0)
     expect(state.feeSummary.feeCode).toBe('')
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
+    // buttons
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
+  })
+
+  it('processes back button action', async () => {
+    wrapper.find(ButtonsStacked).vm.$emit('back', true)
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
   })
 
   it('processes cancel button action', async () => {
     wrapper.find(ButtonsStacked).vm.$emit('cancel', true)
-    await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    // fill in with the rest of the flow once built
   })
 
   it('processes submit button action', async () => {
     wrapper.find(ButtonsStacked).vm.$emit('submit', true)
-    await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
+    // fill in with the rest of the flow once built
   })
 })

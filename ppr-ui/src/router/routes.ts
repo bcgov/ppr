@@ -2,6 +2,7 @@ import APP from '@/App.vue'
 import {
   AddCollateral,
   AddSecuredPartiesAndDebtors,
+  ConfirmDischarge,
   Dashboard,
   LengthTrust,
   ReviewConfirm,
@@ -37,6 +38,14 @@ export const routes = [
     path: '/dashboard',
     name: RouteNames.DASHBOARD,
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/discharge/confirm-discharge',
+    name: RouteNames.CONFIRM_DISCHARGE,
+    component: ConfirmDischarge,
     meta: {
       requiresAuth: true
     }

@@ -6,40 +6,39 @@
           <h1>Total Discharge</h1>
           <div style="padding-top: 30px; max-width: 875px;">
             <p class="ma-0">
-              Review the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br/>
-              If additional amendments including court orders are still required, ensure they are completed
-              prior to performing this Total Discharge.
-            </p>
-            <p class="ma-0 pt-5">
-              To view the full history of this registration including descriptions of any
-              amendments and any court orders, you will need to conduct a separate search.
+              Confirm and complete any additional information before submitting this Total Discharge.
             </p>
           </div>
           <caution-box class="mt-10" :setMsg="cautionTxt"/>
-          <registration-length-trust class="mt-15" :isSummary="true" :defaultRegistrationType="registrationType" />
-          <div class="summary-header mt-15 pa-4 rounded-top">
-            <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
-            <label class="pl-3">
-              <strong>Registering Party, Secured Parties, and Debtors</strong>
-            </label>
-          </div>
-          <h3 class="pt-6 px-1">Original Registering Party</h3>
+          <h2 class="pt-15">
+            Registering Party for this Discharge
+            <v-tooltip
+              class="pa-2"
+              content-class="top-tooltip"
+              top
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              </template>
+              <div class="pt-2 pb-2">
+                {{ tooltipTxt }}
+              </div>
+            </v-tooltip>
+          </h2>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6 px-1">Secured Parties</h3>
-          <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6 px-1">Debtors</h3>
-          <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-          <collateral class="mt-15" :isSummary="true" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <registration-fee :registrationType="'Total Discharge'" />
           <buttons-stacked
             class="pt-4"
+            :setBackBtn="'Back'"
             :setCancelBtn="'Cancel'"
-            :setSubmitBtn="'Confirm and Complete'"
-            @cancel="goToDashboard()"
-            @submit="confirmDischarge()"/>
+            :setSubmitBtn="'Submit Total Discharge'"
+            @back="goToReviewRegistration()"
+            @cancel="showDialog()"
+            @submit="submitDischarge()"
+          />
         </v-col>
       </v-row>
     </div>
@@ -54,14 +53,11 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
-import { RegistrationLengthTrust } from '@/components/registration'
-import { Collateral } from '@/components/collateral'
-import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
+import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
@@ -72,20 +68,14 @@ import { StatusCodes } from 'http-status-codes'
     ButtonsStacked,
     CautionBox,
     RegistrationFee,
-    RegistrationLengthTrust,
-    Collateral,
-    DebtorSummary,
-    RegisteringPartySummary,
-    SecuredPartySummary
+    RegisteringPartySummary
   }
 })
-export default class ReviewRegistration extends Vue {
+export default class ConfirmDischarge extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
 
-  @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
-  @Action setLengthTrust: ActionBindingIF
   @Action setRegistrationCreationDate: ActionBindingIF
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
@@ -102,6 +92,9 @@ export default class ReviewRegistration extends Vue {
     'will receive a copy of the Total Discharge Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private financingStatementDate: Date = null
+  private tooltipTxt = 'The Registering Party is based on your ' +
+    'account information and cannot be changed here. This information ' +
+    'can be changed by updating your BC Registries account information.'
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -148,21 +141,6 @@ export default class ReviewRegistration extends Vue {
             return true
           }
         })
-      // FUTURE: get general collateral from response
-      const generalCollateral = ''
-      const collateral = {
-        valid: true,
-        vehicleCollateral: financingStatement.vehicleCollateral,
-        generalCollateral: generalCollateral
-      } as AddCollateralIF
-      const lengthTrust = {
-        valid: true,
-        trustIndenture: financingStatement.trustIndenture || false,
-        lifeInfinite: financingStatement.lifeInfinite || false,
-        lifeYears: financingStatement.lifeYears || null,
-        surrenderDate: financingStatement.surrenderDate || null,
-        lienAmount: financingStatement.lienAmount || null
-      } as LengthTrustIF
       const parties = {
         valid: true,
         registeringParty: financingStatement.registeringParty,
@@ -179,8 +157,6 @@ export default class ReviewRegistration extends Vue {
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
-      this.setAddCollateral(collateral)
-      this.setLengthTrust(lengthTrust)
       this.setAddSecuredPartiesAndDebtors(parties)
       this.setFeeSummary(feeSummary)
     }
@@ -190,19 +166,22 @@ export default class ReviewRegistration extends Vue {
     this.onAppReady(this.appReady)
   }
 
-  private confirmDischarge (): void {
+  private goToReviewRegistration (): void {
     this.$router.push({
-      name: RouteNames.CONFIRM_DISCHARGE,
+      name: RouteNames.REVIEW_DISCHARGE,
       query: { 'reg-num': this.registrationNumber }
     })
     this.emitHaveData(false)
   }
 
-  private goToDashboard (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
+  private showDialog (): void {
+    // TBD
+    console.log('show dialog')
+  }
+
+  private submitDischarge (): void {
+    // TBD
+    console.log('submit')
   }
 
   /** Emits Have Data event. */

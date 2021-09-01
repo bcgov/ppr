@@ -5,7 +5,6 @@ import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
 
 // Components
 import { Breadcrumb } from '@/components/common'
@@ -80,6 +79,9 @@ const confirmNewRegRoute = routes.find(obj => {
 const reviewDischargeRoute = routes.find(obj => {
   return obj.name === RouteNames.REVIEW_DISCHARGE
 })
+const confirmDischargeRoute = routes.find(obj => {
+  return obj.name === RouteNames.CONFIRM_DISCHARGE
+})
 
 describe('Breadcrumb component tests', () => {
   let wrapper: any
@@ -119,6 +121,16 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on discharge: review discharge with breadcrumb', () => {
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE, reviewDischargeRoute.path, reviewDischargeRoute.name)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
+    for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDischarge[i].text)
+    }
+  })
+
+  it('renders on discharge: confirm discharge with breadcrumb', () => {
+    wrapper = createComponent(RouteNames.CONFIRM_DISCHARGE, confirmDischargeRoute.path, confirmDischargeRoute.name)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
