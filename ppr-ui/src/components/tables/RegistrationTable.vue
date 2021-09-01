@@ -314,7 +314,7 @@
             {{ row.item.clientReferenceId }}
           </td>
           <td v-if="selectedHeaderValues.includes('expireDays')">
-            {{ row.item.expireDays || '' }}
+            {{ showExpireDays(row.item.expireDays) }}
           </td>
           <td v-if="selectedHeaderValues.includes('vs')">
             <v-btn
@@ -380,10 +380,10 @@
 
               <span class="actions__more">
                 <v-menu offset-y left nudge-bottom="4">
-                  <template v-slot:activator="{ on }">
+                  <template v-slot:activator="{ on: onMenu }">
                     <v-btn
                       small
-                      v-on="on"
+                      v-on="onMenu"
                       color="primary"
                       class="actions__more-actions__btn"
                       :class="$style['down-btn']"
@@ -406,25 +406,27 @@
                         >
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item
-                      v-if="isAllowedRenewal(row.item)"
-                      :disabled="row.item.expireDays === -99"
+                    <v-tooltip
+                      left
+                      content-class="left-tooltip pa-2"
+                      transition="fade-transition"
+                      :disabled="row.item.expireDays !== -99"
                     >
-                      <v-tooltip
-                        left
-                        content-class="left-tooltip pa-2"
-                        transition="fade-transition"
-                        :disabled="row.item.expireDays !== -99"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-list-item-subtitle v-on="on">
+                      <template v-slot:activator="{ on: onTooltip }">
+                        <div v-on="onTooltip">
+                        <v-list-item
+                          v-if="isAllowedRenewal(row.item)"
+                          :disabled="row.item.expireDays === -99"
+                        >
+                          <v-list-item-subtitle>
                             <v-icon small>mdi-calendar-clock</v-icon>
                             <span class="ml-1">Renew</span>
                           </v-list-item-subtitle>
-                        </template>
-                        Infinite registrations cannot be renewed.
-                      </v-tooltip>
-                    </v-list-item>
+                        </v-list-item>
+                        </div>
+                      </template>
+                      Infinite registrations cannot be renewed.
+                    </v-tooltip>
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
@@ -601,6 +603,17 @@ export default defineComponent({
       if (!date) return ''
       const [year, month, day] = date.split('-')
       return `${year}/${month}/${day}`
+    }
+
+    const showExpireDays = (days: number): string => {
+      if (!days) {
+        return ''
+      }
+      if (days === -99) {
+        return 'Infinite'
+      } else {
+        return days.toString()
+      }
     }
 
     const selectAndSort = (col: string) => {
@@ -782,6 +795,7 @@ export default defineComponent({
       closeConfirmation,
       getRegistrationType,
       getStatusDescription,
+      showExpireDays,
       discharge,
       dischargeSubmit,
       rowClass,
