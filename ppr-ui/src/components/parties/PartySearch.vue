@@ -6,9 +6,9 @@
           filled
           label="Secured Party Code or Name"
           id="txt-code"
-          :hide-details="true"
           v-model="searchValue"
           persistent-hint
+          hint="Enter at least the first 3 characters."
           :disabled="autoCompleteDisabled"
         />
       </v-col>
@@ -85,7 +85,7 @@ export default defineComponent({
   setup (props, context) {
     const localState = reactive({
       searchValue: '',
-      autoCompleteResults: [],
+      autoCompleteResults: null,
       autoCompleteDisabled: computed((): boolean => {
         return props.isAutoCompleteDisabled
       }),
@@ -129,7 +129,7 @@ export default defineComponent({
     watch(
       () => localState.searchValue,
       (val: string) => {
-        if (localState.searchValue.length >= 4) {
+        if (localState.searchValue.length >= 3) {
           updateAutoCompleteResults(val)
         }
       }
