@@ -53,11 +53,10 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
-import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
@@ -74,12 +73,10 @@ import { StatusCodes } from 'http-status-codes'
     CautionBox,
     RegistrationFee,
     RegistrationLengthTrust,
-    Stepper,
     Collateral,
     DebtorSummary,
     RegisteringPartySummary,
-    SecuredPartySummary,
-    FolioNumberSummary
+    SecuredPartySummary
   }
 })
 export default class ReviewRegistration extends Vue {
