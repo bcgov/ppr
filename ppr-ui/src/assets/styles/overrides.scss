@@ -476,3 +476,12 @@ tbody {
 .v-list--dense .theme--light.v-list-item.v-list-item--active {
   min-height: 0;
 }
+
+.registration-actions.theme--light .v-list-item--disabled .v-list-item__subtitle {
+  opacity: 0.4;
+}
+
+.registration-actions .v-list-item {
+  min-height: 36px;
+}
+

@@ -391,7 +391,7 @@
                       <v-icon>mdi-menu-down</v-icon>
                     </v-btn>
                   </template>
-                  <v-list class="actions__more-actions">
+                  <v-list class="actions__more-actions registration-actions">
                     <v-list-item v-if="isAllowedAmendment(row.item)">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-pencil</v-icon>
@@ -400,17 +400,30 @@
                     </v-list-item>
                     <v-list-item v-if="isAllowedDischarge(row.item)">
                       <v-list-item-subtitle>
-                        <v-icon small>mdi-clipboard-check-outline</v-icon>
+                        <v-icon small>mdi-note-remove-outline</v-icon>
                         <span class="ml-1" @click="discharge(row.item)"
                           >Total Discharge</span
                         >
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item v-if="isAllowedRenewal(row.item)">
-                      <v-list-item-subtitle>
-                        <v-icon small>mdi-calendar-clock</v-icon>
-                        <span class="ml-1">Renew</span>
-                      </v-list-item-subtitle>
+                    <v-list-item
+                      v-if="isAllowedRenewal(row.item)"
+                      :disabled="row.item.expireDays === -99"
+                    >
+                      <v-tooltip
+                        left
+                        content-class="left-tooltip pa-2"
+                        transition="fade-transition"
+                        :disabled="row.item.expireDays !== -99"
+                      >
+                        <template v-slot:activator="{ on }">
+                          <v-list-item-subtitle v-on="on">
+                            <v-icon small>mdi-calendar-clock</v-icon>
+                            <span class="ml-1">Renew</span>
+                          </v-list-item-subtitle>
+                        </template>
+                        Infinite registrations cannot be renewed.
+                      </v-tooltip>
                     </v-list-item>
                     <v-list-item>
                       <v-list-item-subtitle>
@@ -690,7 +703,7 @@ export default defineComponent({
     }
 
     const isAllowedRenewal = (item): boolean => {
-      if ((item.statusType === APIStatusTypes.ACTIVE) && (item.expireDays !== -99)) {
+      if (item.statusType === APIStatusTypes.ACTIVE) {
         return true
       }
       return false
