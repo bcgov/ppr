@@ -8,7 +8,8 @@
           </p>
           <p class="dialog-text py-5 ma-0">
             To ensure you are performing a Total Discharge on the correct
-            registration (Base Registration Number: {{ regNumber }}) please enter the
+            registration (Base Registration Number: {{ regNumber }}) please
+            enter the
             <b>individual person's last name or full business name</b> of any
             <b>Debtor</b> associated with this registration.
           </p>
@@ -63,7 +64,14 @@
 
 <script lang="ts">
 // external
-import { defineComponent, reactive, toRefs, watch, ref } from '@vue/composition-api'
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  watch,
+  ref
+} from '@vue/composition-api'
+import { useActions } from 'vuex-composition-helpers'
 
 // local
 import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
@@ -80,13 +88,17 @@ export default defineComponent({
   },
   emits: ['proceed', 'confirmationClose'],
   setup (props, context) {
+    const { setRegistrationConfirmDebtorName } = useActions<any>([
+      'setRegistrationConfirmDebtorName'
+    ])
     const localState = reactive({
       validationErrors: '',
       userInput: { value: 0, text: '' },
       debtors: [],
       attachValue: props.attach,
       displayValue: props.display,
-      regNumber: props.registrationNumber
+      regNumber: props.registrationNumber,
+      fullDebtorInfo: null
     })
 
     const optionsValue = ref(props.options)
@@ -96,6 +108,12 @@ export default defineComponent({
         if (
           localState.debtors.find(c => c.value === localState.userInput.value)
         ) {
+          const chosenDebtor = localState.fullDebtorInfo.find(
+            c =>
+              c.businessName === localState.userInput.value ||
+              c.personName?.last === localState.userInput.value
+          )
+          setRegistrationConfirmDebtorName(chosenDebtor)
           context.emit('proceed')
         }
       } else {
@@ -124,6 +142,7 @@ export default defineComponent({
       localState.debtors.sort((a, b) =>
         a.text < b.text ? 1 : b.text < a.text ? -1 : 0
       )
+      localState.fullDebtorInfo = names
     }
 
     watch(

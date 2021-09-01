@@ -67,7 +67,7 @@ describe('Registration Confirmation Dialog', () => {
     wrapper.destroy()
   })
 
-  it('renders the component with all error options', async () => {
+  it('renders the component and allows debtor name selection', async () => {
     await Vue.nextTick()
     await Vue.nextTick()
 
@@ -81,7 +81,9 @@ describe('Registration Confirmation Dialog', () => {
     wrapper.vm.debtors = [ {text : 'Forrest Gump', value: 'Forrest Gump'},
                   { text: 'Other Company', value: 'Other Company' }]
 
-    // const autocomplete = wrapper.element;
+    wrapper.vm.fullDebtorInfo = mockedDebtorNames 
+    await flushPromises()           
+
     const autocompleteControls = wrapper.find(".v-input__slot")
     autocompleteControls.trigger("click")
 
@@ -91,10 +93,13 @@ describe('Registration Confirmation Dialog', () => {
 
     wrapper.find(accept).trigger('click')
     await flushPromises()
+ 
     expect(wrapper.emitted().proceed).toBeTruthy()
+
+    expect(store.getters.getConfirmDebtorName.businessName).toBe('Forrest Gump')
   })
 
-  it('renders the component with all error options', async () => {
+  it('the cancel button works', async () => {
     await Vue.nextTick()
 
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
