@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" width="40rem" persistent :attach="attach">
+  <v-dialog v-model="display" width="45rem" persistent :attach="attach">
     <v-card>
       <v-row no-gutters class="px-7 pt-7">
         <v-col cols="11">
@@ -23,12 +23,14 @@
         </v-col>
       </v-row>
       <v-row no-gutters justify="center" class="pt-5 pb-7">
-        <v-col v-if="options.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" @click="submit()">{{ options.acceptText }}</v-btn>
-        </v-col>
-        <v-col v-if="options.cancelText" cols="auto" class="pl-3">
+        <v-col v-if="options.cancelText" cols="auto" class="pr-3">
           <v-btn id="cancel-btn" class="outlined dialog-btn" outlined @click="proceed(false)">
             {{ options.cancelText }}
+          </v-btn>
+        </v-col>
+        <v-col v-if="options.acceptText" cols="auto">
+          <v-btn id="accept-btn" class="primary dialog-btn" @click="submit()">{{ options.acceptText }}
+            <v-icon color="white">mdi-chevron-right</v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -73,6 +75,9 @@ export default class RegistrationOtherDialog extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-btn.primary {
+  font-weight: normal;
+}
 </style>
