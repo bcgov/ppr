@@ -63,6 +63,7 @@ export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) =>
 }
 
 export const mutateNewRegistration = (state: StateIF) => {
+  state.stateModel.registration.showStepErrors = false
   state.stateModel.registration.lengthTrust.valid = false
   state.stateModel.registration.lengthTrust.showInvalid = false
   state.stateModel.registration.lengthTrust.lifeInfinite = false
