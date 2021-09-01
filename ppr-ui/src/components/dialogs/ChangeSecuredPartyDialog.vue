@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" width="40rem" persistent :attach="attach">
+  <v-dialog v-model="display" width="45rem" persistent :attach="attach">
     <v-card>
       <v-row no-gutters class="px-7 pt-7">
         <v-col cols="11">
@@ -64,6 +64,9 @@ export default class ConfirmationDialog extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-btn.primary {
+  font-weight: normal;
+}
 </style>

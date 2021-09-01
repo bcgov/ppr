@@ -444,7 +444,11 @@ export default defineComponent({
         APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
         APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
         APIRegistrationTypes.MAINTENANCE_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE
+        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+        APIRegistrationTypes.OTHER,
+        APIRegistrationTypes.MINERAL_LAND_TAX,
+        APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+        APIRegistrationTypes.SCHOOL_ACT
       ]
       return ipArray.includes(registrationType)
     }

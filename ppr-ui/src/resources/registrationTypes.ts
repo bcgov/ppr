@@ -70,6 +70,15 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 1,
+    registrationTypeUI: UIRegistrationTypes.MINERAL_LAND_TAX,
+    registrationTypeAPI: APIRegistrationTypes.MINERAL_LAND_TAX,
+    text: `${UIRegistrationTypes.MINERAL_LAND_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
     registrationTypeUI: UIRegistrationTypes.MOTOR_FUEL_TAX,
     registrationTypeAPI: APIRegistrationTypes.MOTOR_FUEL_TAX,
     text: `${UIRegistrationTypes.MOTOR_FUEL_TAX}`
@@ -88,6 +97,15 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 1,
+    registrationTypeUI: UIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+    registrationTypeAPI: APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+    text: `${UIRegistrationTypes.PROPERTY_TRANSFER_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
     registrationTypeUI: UIRegistrationTypes.PROVINCIAL_SALES_TAX,
     registrationTypeAPI: APIRegistrationTypes.PROVINCIAL_SALES_TAX,
     text: `${UIRegistrationTypes.PROVINCIAL_SALES_TAX}`
@@ -100,6 +118,15 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     registrationTypeUI: UIRegistrationTypes.RURAL_PROPERTY_TAX,
     registrationTypeAPI: APIRegistrationTypes.RURAL_PROPERTY_TAX,
     text: `${UIRegistrationTypes.RURAL_PROPERTY_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
+    registrationTypeUI: UIRegistrationTypes.SCHOOL_ACT,
+    registrationTypeAPI: APIRegistrationTypes.SCHOOL_ACT,
+    text: `${UIRegistrationTypes.SCHOOL_ACT}`
   },
   {
     class: 'registration-list-item',

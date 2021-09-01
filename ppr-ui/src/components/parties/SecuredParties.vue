@@ -431,7 +431,7 @@ export default defineComponent({
       }
       // if secured party already shown
       if (localState.securedParties.length === 1) {
-        localState.currentPartyName = party.businessName
+        localState.currentPartyName = party.code + ' ' + party.businessName
         localState.savedParty = newParty
         localState.showDialog = true
       } else {
