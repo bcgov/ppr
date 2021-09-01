@@ -392,13 +392,13 @@
                     </v-btn>
                   </template>
                   <v-list class="actions__more-actions">
-                    <v-list-item>
+                    <v-list-item v-if="isAllowedAmendment(row.item)">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-pencil</v-icon>
                         <span class="ml-1">Amend</span>
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item>
+                    <v-list-item v-if="isAllowedDischarge(row.item)">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-clipboard-check-outline</v-icon>
                         <span class="ml-1" @click="discharge(row.item)"
@@ -406,7 +406,7 @@
                         >
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item>
+                    <v-list-item v-if="isAllowedRenewal(row.item)">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-calendar-clock</v-icon>
                         <span class="ml-1">Renew</span>
@@ -452,7 +452,8 @@ import {
 } from '@/interfaces'
 import {
   AccountProductCodes,
-  AccountProductRoles // eslint-disable-line no-unused-vars
+  AccountProductRoles, // eslint-disable-line no-unused-vars
+  APIStatusTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { RegistrationConfirmation } from '@/components/dialogs'
@@ -688,6 +689,27 @@ export default defineComponent({
       localState.showDialog = false
     }
 
+    const isAllowedRenewal = (item): boolean => {
+      if ((item.statusType === APIStatusTypes.ACTIVE) && (item.expireDays !== -99)) {
+        return true
+      }
+      return false
+    }
+
+    const isAllowedDischarge = (item): boolean => {
+      if (item.statusType === APIStatusTypes.ACTIVE) {
+        return true
+      }
+      return false
+    }
+
+    const isAllowedAmendment = (item): boolean => {
+      if (item.statusType === APIStatusTypes.ACTIVE) {
+        return true
+      }
+      return false
+    }
+
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
       try {
@@ -765,6 +787,9 @@ export default defineComponent({
       statusTypes,
       tableData,
       filterResults,
+      isAllowedRenewal,
+      isAllowedDischarge,
+      isAllowedAmendment,
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,

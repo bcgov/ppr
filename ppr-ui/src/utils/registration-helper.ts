@@ -97,13 +97,15 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   var statement:FinancingStatementIF = {
     type: stateModel.registration.registrationType.registrationTypeAPI,
     lifeInfinite: trustLength.lifeInfinite,
-    lifeYears: trustLength.lifeYears,
     registeringParty: parties.registeringParty,
     securedParties: parties.securedParties,
     debtors: parties.debtors,
     vehicleCollateral: collateral.vehicleCollateral,
     generalCollateral: [],
     clientReferenceId: stateModel.folioOrReferenceNumber
+  }
+  if (!trustLength.lifeInfinite) {
+    statement.lifeYears = trustLength.lifeYears
   }
   if (stateModel.registration.registrationTypeOtherDesc) {
     statement.otherTypeDescription = stateModel.registration.registrationTypeOtherDesc
