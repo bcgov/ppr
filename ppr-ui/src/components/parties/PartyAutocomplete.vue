@@ -8,7 +8,8 @@
   >
     <v-row no-gutters justify="center" class="pl-2">
       <v-col no-gutters cols="12">
-        <v-list v-if="autoCompleteResults.length > 0" :class="$style['auto-complete-list']" class="pt-0">
+        <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0"
+          :class="$style['auto-complete-list']" class="pt-0">
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item
               v-for="(result, i) in autoCompleteResults"
