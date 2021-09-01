@@ -437,7 +437,7 @@ export default defineComponent({
       if (hasGeneralCollateral() && !collateral.generalCollateral) {
         if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
           localState.generalCollateral =
-            'All the Personal Property of the Debtor'
+            'All the personal property of the debtor'
         }
         if (hasGeneralCollateralText()) {
           localState.generalCollateral =
