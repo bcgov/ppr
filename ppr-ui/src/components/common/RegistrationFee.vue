@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-8">
+  <v-card>
     <header class="font-weight-bold px-3 py-3">
       <slot name="header">Fee Summary</slot>
     </header>

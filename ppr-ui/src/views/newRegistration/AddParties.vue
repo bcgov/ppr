@@ -31,7 +31,7 @@
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="pl-6" cols="3">
+          <v-col class="pl-6 pt-5" cols="3">
             <registration-fee :registrationType="registrationTypeUI" />
           </v-col>
         </v-row>

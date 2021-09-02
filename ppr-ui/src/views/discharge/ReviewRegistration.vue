@@ -1,10 +1,10 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-15" fluid style="min-width: 960px;">
+  <v-container v-if="dataLoaded" class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
-          <div style="padding-top: 30px; max-width: 875px;">
+          <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               Review the current information for this registration as of
               <b>{{ asOfDateTime }}.</b><br/>
@@ -16,7 +16,7 @@
               amendments and any court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <caution-box class="mt-10" :setMsg="cautionTxt"/>
+          <caution-box class="mt-9" :setMsg="cautionTxt"/>
           <registration-length-trust class="mt-15" :isSummary="true" :defaultRegistrationType="registrationType" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
