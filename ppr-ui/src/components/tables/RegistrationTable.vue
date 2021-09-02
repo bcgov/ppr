@@ -314,7 +314,7 @@
             {{ row.item.clientReferenceId }}
           </td>
           <td v-if="selectedHeaderValues.includes('expireDays')">
-            {{ row.item.expireDays || '' }}
+            {{ showExpireDays(row.item.expireDays) }}
           </td>
           <td v-if="selectedHeaderValues.includes('vs')">
             <v-btn
@@ -380,10 +380,10 @@
 
               <span class="actions__more">
                 <v-menu offset-y left nudge-bottom="4">
-                  <template v-slot:activator="{ on }">
+                  <template v-slot:activator="{ on: onMenu }">
                     <v-btn
                       small
-                      v-on="on"
+                      v-on="onMenu"
                       color="primary"
                       class="actions__more-actions__btn"
                       :class="$style['down-btn']"
@@ -391,27 +391,42 @@
                       <v-icon>mdi-menu-down</v-icon>
                     </v-btn>
                   </template>
-                  <v-list class="actions__more-actions">
-                    <v-list-item>
+                  <v-list class="actions__more-actions registration-actions">
+                    <v-list-item v-if="isAllowedAmendment(row.item)">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-pencil</v-icon>
                         <span class="ml-1">Amend</span>
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item>
+                    <v-list-item v-if="isAllowedDischarge(row.item)">
                       <v-list-item-subtitle>
-                        <v-icon small>mdi-clipboard-check-outline</v-icon>
+                        <v-icon small>mdi-note-remove-outline</v-icon>
                         <span class="ml-1" @click="discharge(row.item)"
                           >Total Discharge</span
                         >
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item>
-                      <v-list-item-subtitle>
-                        <v-icon small>mdi-calendar-clock</v-icon>
-                        <span class="ml-1">Renew</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
+                    <v-tooltip
+                      left
+                      content-class="left-tooltip pa-2"
+                      transition="fade-transition"
+                      :disabled="row.item.expireDays !== -99"
+                    >
+                      <template v-slot:activator="{ on: onTooltip }">
+                        <div v-on="onTooltip">
+                        <v-list-item
+                          v-if="isAllowedRenewal(row.item)"
+                          :disabled="row.item.expireDays === -99"
+                        >
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-calendar-clock</v-icon>
+                            <span class="ml-1">Renew</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                        </div>
+                      </template>
+                      Infinite registrations cannot be renewed.
+                    </v-tooltip>
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
@@ -452,7 +467,8 @@ import {
 } from '@/interfaces'
 import {
   AccountProductCodes,
-  AccountProductRoles // eslint-disable-line no-unused-vars
+  AccountProductRoles, // eslint-disable-line no-unused-vars
+  APIStatusTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { RegistrationConfirmation } from '@/components/dialogs'
@@ -589,6 +605,17 @@ export default defineComponent({
       return `${year}/${month}/${day}`
     }
 
+    const showExpireDays = (days: number): string => {
+      if (!days) {
+        return ''
+      }
+      if (days === -99) {
+        return 'Infinite'
+      } else {
+        return days.toString()
+      }
+    }
+
     const selectAndSort = (col: string) => {
       if (!localState.headers.find(c => c.value === col).sortable) {
         return
@@ -688,6 +715,27 @@ export default defineComponent({
       localState.showDialog = false
     }
 
+    const isAllowedRenewal = (item): boolean => {
+      if (item.statusType === APIStatusTypes.ACTIVE) {
+        return true
+      }
+      return false
+    }
+
+    const isAllowedDischarge = (item): boolean => {
+      if (item.statusType === APIStatusTypes.ACTIVE) {
+        return true
+      }
+      return false
+    }
+
+    const isAllowedAmendment = (item): boolean => {
+      if (item.statusType === APIStatusTypes.ACTIVE) {
+        return true
+      }
+      return false
+    }
+
     /** Get the drafts and financing statements from the api. */
     onMounted(async () => {
       try {
@@ -747,6 +795,7 @@ export default defineComponent({
       closeConfirmation,
       getRegistrationType,
       getStatusDescription,
+      showExpireDays,
       discharge,
       dischargeSubmit,
       rowClass,
@@ -765,6 +814,9 @@ export default defineComponent({
       statusTypes,
       tableData,
       filterResults,
+      isAllowedRenewal,
+      isAllowedDischarge,
+      isAllowedAmendment,
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
