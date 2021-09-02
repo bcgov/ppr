@@ -328,21 +328,21 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     sortable: true,
     text: 'Registered By',
     value: 'registeringName',
-    display: true
+    display: false
   },
   {
     class: 'column-md',
     sortable: true,
     text: 'Registering Party',
     value: 'registeringParty',
-    display: true
+    display: false
   },
   {
     class: 'column-md',
     sortable: true,
     text: 'Secured Parties',
     value: 'securedParties',
-    display: true
+    display: false
   },
 
   {
@@ -350,7 +350,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
-    display: true
+    display: false
   },
   {
     class: 'column-sm',

@@ -6,6 +6,7 @@
           <registration-bar-type-ahead-list v-if="hasRPPR"
             :defaultLabel="labelText"
             :defaultDense="false"
+            :defaultClearable="false"
             @selected="newRegistration($event)"
             />
           <registration-bar-button-list v-else @selected="newRegistration($event)"/>

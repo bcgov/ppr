@@ -1,6 +1,10 @@
 // Vuetify Overrides
 @import 'theme.scss';
 
+.v-list-item--link:before {
+  background-color: inherit;
+}
+
 // tables
 table {
   table-layout: fixed;
@@ -437,6 +441,9 @@ tbody {
   padding-right: 8px;
   color: $primary-blue;
 }
+.column-selection .v-input__icon .mdi-menu-down {
+  margin-top: -6px !important;
+}
 
 .registration-date .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):not(.v-btn--rounded)
 {
@@ -447,16 +454,25 @@ tbody {
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td, 
-#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
   padding: 0 5px;
 }
 
-#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action {
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action,
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.registration-action { 
   width:130px !important;
-  text-align: right !important;
-  padding-right: 45px !important;
+  padding-left: 15px !important;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.clear-filters {
+  color: $primary-blue !important;
+  padding-top: 35px !important;
+  cursor: pointer;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+    padding-top:20px !important;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
@@ -478,8 +494,22 @@ tbody {
   min-height: 0px;
 }
 
+.column-selection div.v-input__control {
+  background: white;
+}
+
+.column-selection .v-list--dense .v-list-item:hover,
+.column-selection .v-list-item__content:hover,
+.column-selection .v-list-item__action:hover
+ {
+  background-color: #f1f3f5;
+}
+
 #registration-table.v-data-table > .v-data-table__wrapper div.registrationTypeAhead {
   font-size: 0.875rem;
+  .v-input__slot {
+    background: rgba(0, 0, 0, 0.06);
+  }
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper div.container {
@@ -493,8 +523,28 @@ tbody {
 
 #registration-table tr.filter-row td {
   position: sticky;
-    top: 65px;
-    z-index: 20;
+    top: 70px;
+    background: white;
+}
+
+#registration-table tr.filter-row .v-label {
+  color: $gray7;
+}
+
+#registration-table .v-input__icon--clear, #registration-table {
+  .v-icon.mdi-close {
+    color: $primary-blue;
+    font-size: 18px;
+  }
+}
+
+.column-selection .v-list-item--link:before {
+  background-color: white;
+}
+
+.v-list--dense .list-item {
+  font-size: 14px;
+  padding: 0;
 }
 
 .registration-actions.theme--light .v-list-item--disabled .v-list-item__subtitle {

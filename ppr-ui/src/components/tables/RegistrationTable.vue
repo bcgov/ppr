@@ -11,18 +11,18 @@
     <div :class="$style['col-selection']">
       <v-text-field
         v-model="search"
-        :class="[$style['text-input-style'], 'column-selection', 'mr-4']"
+        :class="[$style['text-input-style-above'], 'column-selection', 'mr-4']"
         append-icon="mdi-magnify"
         label="Find Registrations Containing"
         dense
         single-line
         hide-details
-        style="width:250px"
+        style="width:270px"
       ></v-text-field>
       <v-select
         id="column-selection"
         dense
-        :class="[$style['text-input-style'], 'column-selection']"
+        :class="[$style['text-input-style-above'], 'column-selection']"
         attach
         autocomplete="off"
         :items="colheaders"
@@ -30,7 +30,7 @@
         multiple
         hide-details="true"
         placeholder="Columns to Show"
-        style="width: 200px;"
+        style="width: 240px;"
         v-model="selectedHeaderValues"
       >
         <template v-slot:selection="{ index }">
@@ -92,7 +92,7 @@
     <v-data-table
       v-if="!loadingData"
       id="registration-table"
-      class="registration-table pt-4 pl-4"
+      class="registration-table pl-4"
       :class="$style['reg-table']"
       :headers="headers"
       :items="tableData"
@@ -164,6 +164,7 @@
               v-if="hasRPPR"
               :defaultLabel="labelText"
               :defaultDense="true"
+              :defaultClearable="true"
               @selected="selectRegistration($event)"
             />
             <v-select
@@ -172,12 +173,14 @@
               single-line
               item-text="registrationTypeUI"
               item-value="registrationTypeAPI"
+              class="table-registration-types"
               filled
               dense
               clearable
               label="Registration Type"
               v-model="registrationType"
               id="txt-type"
+              :menu-props="{ bottom: true, offsetY: true }"
             >
               <template slot="item" slot-scope="data">
                 <span class="list-item">
@@ -197,6 +200,7 @@
               append-icon="mdi-calendar"
               @click="showSubmittedDatePicker = true"
               dense
+              clearable
               hide-details="true"
             />
           </td>
@@ -263,19 +267,11 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('expireDays')">
-            <v-text-field
-              filled
-              single-line
-              hide-details="true"
-              v-model="daysToExpiry"
-              type="text"
-              label="Days to Expiry"
-              dense
-            ></v-text-field>
+          <td v-if="selectedHeaderValues.includes('expireDays')"></td>
+          <td></td>
+          <td class="registration-action clear-filters" @click="clearFilters()">
+            Clear Filters <v-icon>mdi-close</v-icon>
           </td>
-          <td></td>
-          <td></td>
         </tr>
       </template>
       <template v-slot:item="row" class="registration-data-table">
@@ -506,6 +502,7 @@ export default defineComponent({
       statusTypes,
       tableData,
       filterResults,
+      clearFilters,
       originalData
     } = useRegistration()
     const { getAccountProductSubscriptions } = useGetters<any>([
@@ -533,15 +530,11 @@ export default defineComponent({
         'registrationType',
         'createDateTime',
         'statusType',
-        'registeringName',
-        'registeringParty',
-        'securedParties',
-        'clientReferenceId',
         'expireDays',
         'vs'
       ],
       dropdownPropsXl: {
-        minWidth: '200px',
+        minWidth: '240px',
         maxHeight: 'none'
       },
       colheaders: computed(function () {
@@ -823,6 +816,7 @@ export default defineComponent({
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
+      clearFilters,
       selectAndSort,
       ...toRefs(localState)
     }
@@ -852,6 +846,7 @@ export default defineComponent({
 }
 .date-selection {
   border-radius: 5px;
+  z-index: 10;
   left: 50%;
   margin-top: 140px;
   overflow: auto;
@@ -872,7 +867,7 @@ export default defineComponent({
 
 .col-selection {
   position: relative;
-  top: -100px;
+  top: -124px;
   float: right;
   height: 0px;
   display: inline-flex;
@@ -889,6 +884,21 @@ export default defineComponent({
     color: $gray7 !important;
   }
   span {
+    color: $gray7;
+  }
+}
+
+.text-input-style-above {
+  label {
+    font-size: 14px;
+    color: $gray7 !important;
+    padding-left: 6px;
+    margin-bottom: 10px;
+    margin-top: -2px;
+  }
+  span {
+    padding-left: 6px;
+    font-size: 14px;
     color: $gray7;
   }
 }
