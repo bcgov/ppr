@@ -114,7 +114,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-// .check-box-error ::v-deep .v-icon.notranslate.mdi.mdi-checkbox-blank-outline.theme--light,
 .check-box-error p {
   color: $error !important;
 }
