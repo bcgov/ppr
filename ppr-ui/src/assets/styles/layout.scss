@@ -1,3 +1,5 @@
+@import 'theme.scss';
+
 .app-container {
   display: flex;
   flex-flow: column nowrap;
@@ -38,6 +40,7 @@
 
 // Page Layout
 .view-container {
+  color: $gray7;
   display: flex;
   flex-flow: column nowrap;
   max-width: none;
@@ -96,6 +99,11 @@
 
 .column-xs {
   width: 4rem;
+}
+
+// borders
+.border-error-left {
+  border-left: 3px solid $error !important;
 }
 
 .soft-corners {

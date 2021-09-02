@@ -7,7 +7,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
 import { ConfirmDischarge } from '@/views'
-import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
@@ -36,6 +36,7 @@ describe('ConfirmDischarge registration view', () => {
   let sandbox
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  const regNum = '123456B'
 
   beforeEach(async () => {
     delete window.location
@@ -52,7 +53,7 @@ describe('ConfirmDischarge registration view', () => {
     const router = mockRouter.mock()
     await router.push({
       name: RouteNames.CONFIRM_DISCHARGE,
-      query: { 'reg-num': '123456B' }
+      query: { 'reg-num': regNum }
     })
     wrapper = shallowMount(ConfirmDischarge, { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
@@ -77,6 +78,12 @@ describe('ConfirmDischarge registration view', () => {
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
+    // check confirm discharge section
+    expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegNum).toContain(regNum)
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegType).toContain(state.registration.registrationType.registrationTypeUI)
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe('General Collateral and 2 Vehicles')
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(false)
     // check fee summary (whether data for it is in store or by prop may change)
     expect(state.feeSummary.feeAmount).toBe(0)
     expect(state.feeSummary.feeCode).toBe('')
@@ -87,18 +94,30 @@ describe('ConfirmDischarge registration view', () => {
   })
 
   it('processes back button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('back', true)
+    wrapper.findComponent(ButtonsStacked).vm.$emit('back', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
   })
 
   it('processes cancel button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('cancel', true)
+    await wrapper.findComponent(ButtonsStacked).vm.$emit('cancel', true)
     // fill in with the rest of the flow once built
   })
 
+  it('updates validity from checkboxes', async () => {
+    expect(wrapper.vm.$data.validConfirm).toBe(false)
+    await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
+    expect(wrapper.vm.$data.validConfirm).toBe(true)
+  })
+
+  it('shows validation errors when needed when submitting', async () => {
+    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
+  })
+
   it('processes submit button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('submit', true)
+    await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
+    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
     // fill in with the rest of the flow once built
   })
 })

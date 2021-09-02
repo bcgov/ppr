@@ -27,6 +27,18 @@
             </v-tooltip>
           </h2>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <h2 class="pt-15">X.Confirm</h2>
+          <p class="ma-0 pt-3">
+            You are about to submit a Total Discharge based on the following details:
+          </p>
+          <discharge-confirm-summary
+            class="mt-5"
+            :setRegNum="registrationNumber"
+            :setRegType="registrationTypeUI"
+            :setCollateralSummary="collateralSummary"
+            :setShowErrors="showErrors"
+            @valid="validConfirm = $event"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <registration-fee :registrationType="'Total Discharge'" />
@@ -52,7 +64,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -67,6 +79,7 @@ import { StatusCodes } from 'http-status-codes'
   components: {
     ButtonsStacked,
     CautionBox,
+    DischargeConfirmSummary,
     RegistrationFee,
     RegisteringPartySummary
   }
@@ -90,11 +103,15 @@ export default class ConfirmDischarge extends Vue {
 
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
-  private dataLoaded = false // eslint-disable-line lines-between-class-members
+  private collateralSummary = '' // eslint-disable-line lines-between-class-members
+  private dataLoaded = false
   private financingStatementDate: Date = null
+  private showErrors = false
   private tooltipTxt = 'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
     'can be changed by updating your BC Registries account information.'
+  private validConfirm = false // eslint-disable-line lines-between-class-members
+  private validFolio = true
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -134,6 +151,19 @@ export default class ConfirmDischarge extends Vue {
     if (financingStatement.error) {
       this.emitError(financingStatement.error)
     } else {
+      // set collateral summary
+      if (financingStatement.generalCollateral && !financingStatement.vehicleCollateral) {
+        this.collateralSummary = 'General Collateral and 0 Vehicles'
+      } else if (financingStatement.generalCollateral) {
+        this.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
+      } else if (financingStatement.vehicleCollateral) {
+        this.collateralSummary = `No General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
+      } else {
+        this.collateralSummary += 'No Collateral'
+      }
+      if (financingStatement.vehicleCollateral?.length === 1) {
+        this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
+      }
       // load data into the store
       const registrationType = RegistrationTypes.find(
         (reg, index) => {
@@ -180,6 +210,10 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private submitDischarge (): void {
+    if (!this.validConfirm || !this.validFolio) {
+      this.showErrors = true
+      return
+    }
     // TBD
     console.log('submit')
   }
