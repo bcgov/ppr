@@ -1,16 +1,16 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-15" fluid style="min-width: 960px;">
+  <v-container v-if="dataLoaded" class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
-          <div style="padding-top: 30px; max-width: 875px;">
+          <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               Confirm and complete any additional information before submitting this Total Discharge.
             </p>
           </div>
-          <caution-box class="mt-10" :setMsg="cautionTxt"/>
-          <h2 class="pt-15">
+          <caution-box class="mt-9" :setMsg="cautionTxt"/>
+          <h2 class="pt-14">
             Registering Party for this Discharge
             <v-tooltip
               class="pa-2"
