@@ -165,6 +165,9 @@ export default class LengthTrust extends Vue {
       case APIRegistrationTypes.MANUFACTURED_HOME_NOTICE:
       case APIRegistrationTypes.MAINTENANCE_LIEN:
       case APIRegistrationTypes.OTHER:
+      case APIRegistrationTypes.SCHOOL_ACT:
+      case APIRegistrationTypes.PROPERTY_TRANSFER_TAX:
+      case APIRegistrationTypes.MINERAL_LAND_TAX:
         return (
           'The registration length for this registration is automatically set to infinite. ' +
           'There is no fee for this registration.'
@@ -173,7 +176,7 @@ export default class LengthTrust extends Vue {
         return (
           'Enter the length of time you want the ' +
           this.getRegistrationType?.registrationTypeUI +
-          ' to be in effect. You can renew the registration in the future (for a fee).'
+          ' registration to be in effect. You can renew the registration in the future (for a fee).'
         )
     }
   }
