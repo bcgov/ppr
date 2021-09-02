@@ -7,7 +7,8 @@ import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
 import { ConfirmDischarge } from '@/views'
-import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee, 
+  FolioNumberSummary } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
@@ -91,6 +92,8 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
     // buttons
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
+    // folio
+    expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
 
   it('processes back button action', async () => {

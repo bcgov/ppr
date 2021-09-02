@@ -1,15 +1,21 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-15 pt-14"
+    fluid
+    style="min-width: 960px;"
+  >
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Confirm and complete any additional information before submitting this Total Discharge.
+              Confirm and complete any additional information before submitting
+              this Total Discharge.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt"/>
+          <caution-box class="mt-9" :setMsg="cautionTxt" />
           <h2 class="pt-14">
             Registering Party for this Discharge
             <v-tooltip
@@ -19,18 +25,24 @@
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on"
+                  >mdi-information-outline</v-icon
+                >
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <folio-number-summary class="pt-10" />
+          <registering-party-summary
+            class="pt-4"
+            :setEnableNoDataAction="false"
+          />
+          <folio-number-summary @folioValid="setFolioValid($event)" class="pt-10" />
           <h2 class="pt-15">X.Confirm</h2>
           <p class="ma-0 pt-3">
-            You are about to submit a Total Discharge based on the following details:
+            You are about to submit a Total Discharge based on the following
+            details:
           </p>
           <discharge-confirm-summary
             class="mt-5"
@@ -65,12 +77,22 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee, FolioNumberSummary } from '@/components/common'
+import {
+  ButtonsStacked,
+  CautionBox,
+  DischargeConfirmSummary,
+  RegistrationFee,
+  FolioNumberSummary
+} from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ActionBindingIF,
+  FeeSummaryIF,
+  ErrorIF,
+  AddPartiesIF,
+  RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
@@ -103,13 +125,15 @@ export default class ConfirmDischarge extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  private cautionTxt = 'Secured Parties in this registration ' +
+  private cautionTxt =
+    'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
   private financingStatementDate: Date = null
   private showErrors = false
-  private tooltipTxt = 'The Registering Party is based on your ' +
+  private tooltipTxt =
+    'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
     'can be changed by updating your BC Registries account information.'
   private validConfirm = false // eslint-disable-line lines-between-class-members
@@ -129,7 +153,7 @@ export default class ConfirmDischarge extends Vue {
 
   // the number of the registration being discharged
   private get registrationNumber (): string {
-    return this.$route.query['reg-num'] as string || ''
+    return (this.$route.query['reg-num'] as string) || ''
   }
 
   private get registrationTypeUI (): UIRegistrationTypes {
@@ -142,19 +166,27 @@ export default class ConfirmDischarge extends Vue {
 
   private async loadRegistration (): Promise<void> {
     if (!this.registrationNumber) {
-      console.error('No registration number given to discharge. Redirecting to dashboard...')
+      console.error(
+        'No registration number given to discharge. Redirecting to dashboard...'
+      )
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
       return
     }
     this.financingStatementDate = new Date()
-    const financingStatement = await getFinancingStatement(true, this.registrationNumber)
+    const financingStatement = await getFinancingStatement(
+      true,
+      this.registrationNumber
+    )
     if (financingStatement.error) {
       this.emitError(financingStatement.error)
     } else {
       // set collateral summary
-      if (financingStatement.generalCollateral && !financingStatement.vehicleCollateral) {
+      if (
+        financingStatement.generalCollateral &&
+        !financingStatement.vehicleCollateral
+      ) {
         this.collateralSummary = 'General Collateral and 0 Vehicles'
       } else if (financingStatement.generalCollateral) {
         this.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
@@ -164,15 +196,17 @@ export default class ConfirmDischarge extends Vue {
         this.collateralSummary += 'No Collateral'
       }
       if (financingStatement.vehicleCollateral?.length === 1) {
-        this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
+        this.collateralSummary = this.collateralSummary.replace(
+          'Vehicles',
+          'Vehicle'
+        )
       }
       // load data into the store
-      const registrationType = RegistrationTypes.find(
-        (reg, index) => {
-          if (reg.registrationTypeAPI === financingStatement.type) {
-            return true
-          }
-        })
+      const registrationType = RegistrationTypes.find((reg, index) => {
+        if (reg.registrationTypeAPI === financingStatement.type) {
+          return true
+        }
+      })
       const parties = {
         valid: true,
         registeringParty: financingStatement.registeringParty,
@@ -181,7 +215,7 @@ export default class ConfirmDischarge extends Vue {
       } as AddPartiesIF
       const feeSummary = {
         feeAmount: 0,
-        serviceFee: 1.50,
+        serviceFee: 1.5,
         quantity: 1,
         feeCode: ''
       } as FeeSummaryIF
@@ -205,6 +239,10 @@ export default class ConfirmDischarge extends Vue {
     })
     this.emitHaveData(false)
   }
+  
+  private setFolioValid (valid: boolean): void {
+    this.validFolio = valid
+  }
 
   private showDialog (): void {
     // TBD
@@ -222,14 +260,16 @@ export default class ConfirmDischarge extends Vue {
 
   /** Emits Have Data event. */
   @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
+  private emitHaveData (haveData: Boolean = true): void {}
 
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) alert('This registration does not exist.')
-    else if (error.statusCode === StatusCodes.BAD_REQUEST) alert('You do not have access to this registration.')
-    else alert('There was an internal error loading this registration. Please try again later.')
+    if (error.statusCode === StatusCodes.NOT_FOUND) { alert('This registration does not exist.') } else if (error.statusCode === StatusCodes.BAD_REQUEST) { alert('You do not have access to this registration.') } else {
+      alert(
+        'There was an internal error loading this registration. Please try again later.'
+      )
+    }
     this.emitHaveData(true)
     this.$router.push({
       name: RouteNames.DASHBOARD
@@ -242,7 +282,10 @@ export default class ConfirmDischarge extends Vue {
     // do not proceed if app is not ready
     if (!val) return
     // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+    if (
+      !this.isAuthenticated ||
+      (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))
+    ) {
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
