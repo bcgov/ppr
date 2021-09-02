@@ -118,6 +118,14 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
   })
 
+  it('shows errors when folio is invalid', async () => {
+    await wrapper.findComponent(FolioNumberSummary).vm.$emit('folioValid', false)
+    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    // turn show errors on when invalid
+    expect(wrapper.vm.$data.showErrors).toBe(true)
+    // fill in with the rest of the flow once built
+  })
+
   it('processes submit button action', async () => {
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)

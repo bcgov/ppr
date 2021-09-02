@@ -265,9 +265,7 @@ export default class ConfirmDischarge extends Vue {
     } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
       alert('You do not have access to this registration.')
     } else {
-      alert(
-        'There was an internal error loading this registration. Please try again later.'
-      )
+      alert('There was an internal error loading this registration. Please try again later.')
     }
     this.emitHaveData(true)
     this.$router.push({
@@ -281,10 +279,7 @@ export default class ConfirmDischarge extends Vue {
     // do not proceed if app is not ready
     if (!val) return
     // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (
-      !this.isAuthenticated ||
-      (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))
-    ) {
+    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
