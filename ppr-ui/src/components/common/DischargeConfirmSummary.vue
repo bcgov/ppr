@@ -15,6 +15,7 @@
           <p class="ma-0 pt-2"><b>Collateral:</b> {{ collateralSummary }}</p>
         </div>
         <v-checkbox
+          id="discharge-confirm-checkbox-1"
           class="ma-0 pt-4"
           :class="showErrors && !checkbox1 ? 'check-box-error': 'copy-normal'"
           hide-details
@@ -27,6 +28,7 @@
           </template>
         </v-checkbox>
         <v-checkbox
+          id="discharge-confirm-checkbox-2"
           class="ma-0 pt-4"
           :class="showErrors && !checkbox2 ? 'check-box-error': 'copy-normal'"
           hide-details
@@ -39,6 +41,7 @@
           </template>
         </v-checkbox>
         <v-checkbox
+          id="discharge-confirm-checkbox-3"
           class="ma-0 pt-4"
           :class="showErrors && !checkbox3 ? 'check-box-error': 'copy-normal'"
           hide-details
@@ -99,7 +102,6 @@ export default defineComponent({
       localState.showErrors = val
     })
     watch(() => localState.valid, (val) => {
-      console.log('emitting:', val)
       emit('valid', val)
     })
 
