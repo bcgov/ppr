@@ -1,7 +1,7 @@
 <template>
-  <v-dialog v-model="displayValue" width="40rem" persistent attach="#app">
+  <v-dialog v-model="displayValue" width="45rem" persistent attach="#app">
     <v-card>
-      <v-row no-gutters class="px-7 pt-7">
+      <v-row no-gutters class="pl-10 pt-7">
         <v-col cols="11">
           <p class="dialog-title ma-0">
             <b>{{ optionsValue.title }}</b>
@@ -28,7 +28,7 @@
           ></v-autocomplete>
         </v-col>
         <v-col cols="1">
-          <v-row no-gutters justify="end">
+          <v-row no-gutters>
             <v-btn
               id="close-btn"
               color="primary"
@@ -41,7 +41,7 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters justify="center" class="pt-5 pb-7">
+      <v-row no-gutters justify="center" class="pt-1 pb-7">
         <v-col v-if="options.cancelText" cols="auto" class="pr-3">
           <v-btn
             id="cancel-btn"
@@ -179,6 +179,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.v-btn.primary {
+  font-weight: normal;
+}
 </style>
