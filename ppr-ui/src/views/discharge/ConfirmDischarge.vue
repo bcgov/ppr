@@ -27,6 +27,7 @@
             </v-tooltip>
           </h2>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <folio-number-summary class="pt-10" />
           <h2 class="pt-15">X.Confirm</h2>
           <p class="ma-0 pt-3">
             You are about to submit a Total Discharge based on the following details:
@@ -64,7 +65,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee, FolioNumberSummary } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -81,6 +82,7 @@ import { StatusCodes } from 'http-status-codes'
     CautionBox,
     DischargeConfirmSummary,
     RegistrationFee,
+    FolioNumberSummary,
     RegisteringPartySummary
   }
 })
