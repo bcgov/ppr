@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="display" width="45rem" persistent :attach="attach">
     <v-card>
-      <v-row no-gutters class="px-7 pt-7">
+      <v-row no-gutters class="pl-10 pt-7">
         <v-col cols="11">
           <v-row no-gutters>
             <v-col align-self="start">
@@ -19,14 +19,14 @@
           </v-row>
         </v-col>
         <v-col cols="1">
-          <v-row no-gutters justify="end">
+          <v-row no-gutters>
             <v-btn color="primary" icon :ripple="false" @click="proceed(false)">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-row>
         </v-col>
       </v-row>
-      <v-row no-gutters justify="center" class="pt-5 pb-7">
+      <v-row no-gutters justify="center" class="pt-5 pb-10">
         <v-col cols="auto" class="pr-3">
           <v-btn
             id="cancel-btn"
