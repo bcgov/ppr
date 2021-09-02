@@ -14,7 +14,7 @@
       </v-row>
 
       <v-row class="px-1">
-        <v-col cols="12" class="pa-0">
+        <v-col cols="12" class="pa-0" :class="showErrors && !valid ? 'border-error-left': ''">
           <v-card flat>
             <v-row no-gutters>
               <v-col cols="3" class="generic-label pt-10 px-8"
@@ -49,6 +49,11 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
+  props: {
+    setShowErrors: {
+      default: false
+    }
+  },
   setup (props, { emit }) {
     const { setFolioOrReferenceNumber } = useActions<any>([
       'setFolioOrReferenceNumber'
@@ -60,12 +65,16 @@ export default defineComponent({
     const localState = reactive({
       isValid: true,
       folioNumber: '',
+      showErrors: props.setShowErrors,
       rules: [
         (v: string) => /^[0-9A-Za-z]*$/.test(v) || 'Invalid character', // numbers and letters only
         (v: string) => !v || v.length <= 15 || 'Maximum 15 characters reached' // maximum character count
       ]
     })
 
+    watch(() => props.setShowErrors, (val) => {
+      localState.showErrors = val
+    })
     watch(
       () => localState.folioNumber,
       (val: string) => {

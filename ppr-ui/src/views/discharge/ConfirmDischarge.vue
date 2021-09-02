@@ -25,9 +25,7 @@
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
-                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on"
-                  >mdi-information-outline</v-icon
-                >
+                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
               </template>
               <div class="pt-2 pb-2">
                 {{ tooltipTxt }}
@@ -40,6 +38,7 @@
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
+            :setShowErrors="showErrors"
             class="pt-10"
           />
           <h2 class="pt-15">X.Confirm</h2>
@@ -128,15 +127,13 @@ export default class ConfirmDischarge extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  private cautionTxt =
-    'Secured Parties in this registration ' +
+  private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
   private financingStatementDate: Date = null
   private showErrors = false
-  private tooltipTxt =
-    'The Registering Party is based on your ' +
+  private tooltipTxt = 'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
     'can be changed by updating your BC Registries account information.'
   private validConfirm = false // eslint-disable-line lines-between-class-members
@@ -169,9 +166,7 @@ export default class ConfirmDischarge extends Vue {
 
   private async loadRegistration (): Promise<void> {
     if (!this.registrationNumber) {
-      console.error(
-        'No registration number given to discharge. Redirecting to dashboard...'
-      )
+      console.error('No registration number given to discharge. Redirecting to dashboard...')
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
@@ -199,10 +194,7 @@ export default class ConfirmDischarge extends Vue {
         this.collateralSummary += 'No Collateral'
       }
       if (financingStatement.vehicleCollateral?.length === 1) {
-        this.collateralSummary = this.collateralSummary.replace(
-          'Vehicles',
-          'Vehicle'
-        )
+        this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
       }
       // load data into the store
       const registrationType = RegistrationTypes.find((reg, index) => {
