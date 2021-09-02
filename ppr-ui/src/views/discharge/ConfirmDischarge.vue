@@ -38,7 +38,10 @@
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <folio-number-summary @folioValid="setFolioValid($event)" class="pt-10" />
+          <folio-number-summary
+            @folioValid="setFolioValid($event)"
+            class="pt-10"
+          />
           <h2 class="pt-15">X.Confirm</h2>
           <p class="ma-0 pt-3">
             You are about to submit a Total Discharge based on the following
@@ -88,10 +91,10 @@ import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
-  ActionBindingIF,
-  FeeSummaryIF,
-  ErrorIF,
-  AddPartiesIF,
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  FeeSummaryIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
@@ -239,7 +242,7 @@ export default class ConfirmDischarge extends Vue {
     })
     this.emitHaveData(false)
   }
-  
+
   private setFolioValid (valid: boolean): void {
     this.validFolio = valid
   }
@@ -265,7 +268,11 @@ export default class ConfirmDischarge extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) { alert('This registration does not exist.') } else if (error.statusCode === StatusCodes.BAD_REQUEST) { alert('You do not have access to this registration.') } else {
+    if (error.statusCode === StatusCodes.NOT_FOUND) {
+      alert('This registration does not exist.')
+    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
+      alert('You do not have access to this registration.')
+    } else {
       alert(
         'There was an internal error loading this registration. Please try again later.'
       )
