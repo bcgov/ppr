@@ -6,7 +6,7 @@ import CompositionApi from '@vue/composition-api'
 import { mount, Wrapper, createLocalVue } from '@vue/test-utils'
 // local
 import { RegistrationConfirmation } from '@/components/dialogs'
-import { dischargeConfirmationDialog } from '@/resources'
+import { dischargeConfirmationDialog, amendConfirmationDialog, renewConfirmationDialog } from '@/resources'
 import { axios } from '@/utils/axios-ppr'
 import { mockedDebtorNames } from './test-data'
 import flushPromises from 'flush-promises'
@@ -25,6 +25,9 @@ const dropDown: string = '#debtor-drop'
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 
+const dischargeOptions = dischargeConfirmationDialog
+const amendOptions = amendConfirmationDialog
+const renewOptions = renewConfirmationDialog
 
 
 
@@ -32,7 +35,6 @@ describe('Registration Confirmation Dialog', () => {
   let wrapper: Wrapper<any>
   let sandbox
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
-  const confirmationOptions = dischargeConfirmationDialog
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -54,7 +56,7 @@ describe('Registration Confirmation Dialog', () => {
       propsData: {
         attach: '',
         display: true,
-        options: dischargeConfirmationDialog,
+        options: dischargeOptions,
         registrationNumber: 123
       },
       vuetify
@@ -73,7 +75,7 @@ describe('Registration Confirmation Dialog', () => {
 
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.isVisible()).toBe(true)
-    expect(wrapper.find(title).text()).toBe(confirmationOptions.title)
+    expect(wrapper.find(title).text()).toBe(dischargeOptions.title)
 
     expect(wrapper.find(dropDown).exists()).toBe(true)
     expect(wrapper.find(accept).exists()).toBe(true)
@@ -110,4 +112,28 @@ describe('Registration Confirmation Dialog', () => {
     await flushPromises()
     expect(wrapper.emitted().confirmationClose).toBeTruthy()
   })
+
+  it('renders the amendment dialog', async () => {
+    wrapper.setProps({ options: amendOptions })
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    expect(wrapper.isVisible()).toBe(true)
+    expect(wrapper.find(title).text()).toContain(amendOptions.title)
+  })
+
+   
+
+  it('renders the renewal dialog', async () => {
+    wrapper.setProps({ options: renewOptions })
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    expect(wrapper.isVisible()).toBe(true)
+    expect(wrapper.find(title).text()).toBe(renewOptions.title)
+  })
+
+
 })
