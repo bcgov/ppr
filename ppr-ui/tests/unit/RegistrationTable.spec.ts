@@ -140,7 +140,65 @@ describe('Test registration table with results', () => {
 
   })
 
+  it('shows the amendment modal', async () => {
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    // the api is going to be called twice, once for drafts and once for registrations
+    // the tests can't tell the difference, so the same one is called twice
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    const buttons = wrapper.findAll('.actions__more-actions__btn')
+    expect(buttons.length).toBe(2)
+
+    buttons.at(1).trigger('click')
+    await Vue.nextTick()
+
+    //it renders the actions drop down
+    const menuItems = wrapper.findAll('.v-list-item__subtitle')
+    expect(menuItems.length).toBe(4)
+    expect(menuItems.at(0).text()).toContain('Amend')
+
+    //click the amendment
+    menuItems.at(0).trigger('click')
+    await flushPromises()
+    const dialog = wrapper.findComponent(RegistrationConfirmation)
+    
+    expect(dialog.isVisible()).toBe(true)
+
+
+  })
+
+  it('shows the renewal modal', async () => {
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    // the api is going to be called twice, once for drafts and once for registrations
+    // the tests can't tell the difference, so the same one is called twice
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    const buttons = wrapper.findAll('.actions__more-actions__btn')
+    expect(buttons.length).toBe(2)
+
+    buttons.at(1).trigger('click')
+    await Vue.nextTick()
+
+    //it renders the actions drop down
+    const menuItems = wrapper.findAll('.v-list-item__subtitle')
+    expect(menuItems.length).toBe(4)
+    expect(menuItems.at(2).text()).toContain('Renew')
+
+    //click the renewal
+    menuItems.at(2).trigger('click')
+    await flushPromises()
+    const dialog = wrapper.findComponent(RegistrationConfirmation)
+    
+    expect(dialog.isVisible()).toBe(true)
+
+
+  })
+
+
 })
+
 
 describe('Test draft table with results', () => {
   let wrapper: Wrapper<any>
