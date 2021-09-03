@@ -11,18 +11,18 @@
     <div :class="$style['col-selection']">
       <v-text-field
         v-model="search"
-        :class="[$style['text-input-style'], 'column-selection', 'mr-4']"
+        :class="[$style['text-input-style-above'], 'column-selection', 'mr-4']"
         append-icon="mdi-magnify"
         label="Find Registrations Containing"
         dense
         single-line
         hide-details
-        style="width:250px"
+        style="width:270px"
       ></v-text-field>
       <v-select
         id="column-selection"
         dense
-        :class="[$style['text-input-style'], 'column-selection']"
+        :class="[$style['text-input-style-above'], 'column-selection']"
         attach
         autocomplete="off"
         :items="colheaders"
@@ -30,7 +30,7 @@
         multiple
         hide-details="true"
         placeholder="Columns to Show"
-        style="width: 200px;"
+        style="width: 240px;"
         v-model="selectedHeaderValues"
       >
         <template v-slot:selection="{ index }">
@@ -71,7 +71,7 @@
         <v-col cols="auto pr-4">
           <v-btn
             class="date-selection-btn bold"
-            flat
+            text
             ripple
             small
             @click="updateSubmittedRange"
@@ -79,7 +79,7 @@
           >
           <v-btn
             class="date-selection-btn ml-4"
-            flat
+            text
             ripple
             small
             @click="resetSubmittedRange"
@@ -92,7 +92,7 @@
     <v-data-table
       v-if="!loadingData"
       id="registration-table"
-      class="registration-table pt-4"
+      class="registration-table pl-4"
       :class="$style['reg-table']"
       :headers="headers"
       :items="tableData"
@@ -103,6 +103,8 @@
       disable-sort
       hide-default-footer
       hide-default-header
+      fixed-header
+      height="600px"
       no-data-text="No registrations created yet."
     >
       <template slot="header" :headers="getDisplayedHeaders">
@@ -112,7 +114,7 @@
               v-for="(header, i) in getDisplayedHeaders"
               :class="header.class"
               :key="'find-header-' + i"
-              class="text-left header-row-1 pa-0 pl-2"
+              class="text-left header-row-1 pa-0 pl-2 py-2"
               @click="selectAndSort(header.value)"
             >
               <span>
@@ -162,6 +164,8 @@
               v-if="hasRPPR"
               :defaultLabel="labelText"
               :defaultDense="true"
+              :defaultClearable="true"
+              :defaultClear="shouldClearType"
               @selected="selectRegistration($event)"
             />
             <v-select
@@ -170,12 +174,14 @@
               single-line
               item-text="registrationTypeUI"
               item-value="registrationTypeAPI"
+              class="table-registration-types"
               filled
               dense
               clearable
               label="Registration Type"
               v-model="registrationType"
               id="txt-type"
+              :menu-props="{ bottom: true, offsetY: true }"
             >
               <template slot="item" slot-scope="data">
                 <span class="list-item">
@@ -184,7 +190,7 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('createDateTime')">
+          <td v-if="selectedHeaderValues.includes('createDateTime')" @click="showSubmittedDatePicker = true">
             <v-text-field
               filled
               single-line
@@ -193,8 +199,8 @@
               v-model="registrationDateFormatted"
               hint="YYYY/MM/DD"
               append-icon="mdi-calendar"
-              @click="showSubmittedDatePicker = true"
               dense
+              clearable
               hide-details="true"
             />
           </td>
@@ -261,19 +267,11 @@
               dense
             ></v-text-field>
           </td>
-          <td v-if="selectedHeaderValues.includes('expireDays')">
-            <v-text-field
-              filled
-              single-line
-              hide-details="true"
-              v-model="daysToExpiry"
-              type="text"
-              label="Days to Expiry"
-              dense
-            ></v-text-field>
+          <td v-if="selectedHeaderValues.includes('expireDays')"></td>
+          <td></td>
+          <td class="registration-action clear-filters" @click="clearFilters()">
+            Clear Filters <v-icon>mdi-close</v-icon>
           </td>
-          <td></td>
-          <td></td>
         </tr>
       </template>
       <template v-slot:item="row" class="registration-data-table">
@@ -296,7 +294,12 @@
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
           <td v-if="selectedHeaderValues.includes('createDateTime')">
+            <span v-if="row.item.statusType !== 'D'">
             {{ getFormattedDate(row.item.createDateTime) }}
+            </span>
+            <span v-else>
+              Not Registered
+            </span>
           </td>
           <td v-if="selectedHeaderValues.includes('statusType')">
             {{ getStatusDescription(row.item.statusType) }}
@@ -313,12 +316,12 @@
           <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             {{ row.item.clientReferenceId }}
           </td>
-          <td v-if="selectedHeaderValues.includes('expireDays')">
-            {{ showExpireDays(row.item.expireDays) }}
+          <td v-if="selectedHeaderValues.includes('expireDays')" v-html="showExpireDays(row.item.expireDays)">
           </td>
           <td v-if="selectedHeaderValues.includes('vs')">
             <v-btn
               :id="`pdf-btn-${row.item.id}`"
+              v-if="row.item.statusType !== 'D'"
               :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
               depressed
               :loading="row.item.path === loadingPDF"
@@ -335,6 +338,7 @@
               <span class="edit-action">
                 <v-btn
                   color="primary"
+                  elevation="0"
                   :class="$style['edit-btn']"
                   :id="'class-' + row.index + '-change-added-btn'"
                 >
@@ -348,6 +352,7 @@
                     <v-btn
                       small
                       v-on="on"
+                      elevation="0"
                       color="primary"
                       class="actions__more-actions__btn"
                       :class="$style['down-btn']"
@@ -371,6 +376,7 @@
               <span class="edit-action">
                 <v-btn
                   color="primary"
+                  elevation="0"
                   :class="$style['edit-btn']"
                   :id="'class-' + row.index + '-change-added-btn'"
                 >
@@ -383,6 +389,7 @@
                   <template v-slot:activator="{ on: onMenu }">
                     <v-btn
                       small
+                      elevation="0"
                       v-on="onMenu"
                       color="primary"
                       class="actions__more-actions__btn"
@@ -497,15 +504,18 @@ export default defineComponent({
       registeringParty,
       securedParties,
       folioNumber,
+      shouldClearType,
       status,
       registrationType,
       registrationTypes,
       daysToExpiry,
       submittedStartDate,
       submittedEndDate,
+      registrationDateFormatted,
       statusTypes,
       tableData,
       filterResults,
+      clearFilters,
       originalData
     } = useRegistration()
     const { getAccountProductSubscriptions } = useGetters<any>([
@@ -535,15 +545,11 @@ export default defineComponent({
         'registrationType',
         'createDateTime',
         'statusType',
-        'registeringName',
-        'registeringParty',
-        'securedParties',
-        'clientReferenceId',
         'expireDays',
         'vs'
       ],
       dropdownPropsXl: {
-        minWidth: '200px',
+        minWidth: '240px',
         maxHeight: 'none'
       },
       colheaders: computed(function () {
@@ -611,12 +617,24 @@ export default defineComponent({
 
     const showExpireDays = (days: number): string => {
       if (!days) {
-        return ''
+        return 'N/A'
       }
       if (days === -99) {
         return 'Infinite'
       } else {
-        return days.toString()
+        if (days > 364) {
+          const years = days / 365
+          const daysRemaining = days % 365
+          let yearText = ' years '
+          if (years === 1) {
+            yearText = ' year '
+          }
+          return Math.floor(years).toString() + yearText + daysRemaining.toString() + ' days'
+        }
+        if (days < 30) {
+          return '<span class="invalid-color">' + days.toString() + ' days' + '</span>'
+        }
+        return days.toString() + ' days'
       }
     }
 
@@ -656,7 +674,7 @@ export default defineComponent({
       submittedStartDate.value = localState.submittedStartDateTmp
       submittedEndDate.value = localState.submittedEndDateTmp
       localState.showSubmittedDatePicker = false
-      localState.registrationDateFormatted = 'Custom'
+      registrationDateFormatted.value = 'Custom'
     }
 
     const resetSubmittedRange = () => {
@@ -671,6 +689,7 @@ export default defineComponent({
     }
 
     const selectRegistration = (val: RegistrationTypeIF) => {
+      shouldClearType.value = false
       registrationType.value = val.registrationTypeAPI
     }
 
@@ -781,6 +800,7 @@ export default defineComponent({
         }
         localState.loadingData = false
         originalData.value = tableData.value
+        emit('registrationTotal', originalData.value.length)
       } catch (error) {
         alert(error)
       }
@@ -789,7 +809,7 @@ export default defineComponent({
     watch(
       () => localState.registrationDate,
       (val: string) => {
-        localState.registrationDateFormatted = formatDate(val)
+        registrationDateFormatted.value = formatDate(val)
       }
     )
 
@@ -827,6 +847,8 @@ export default defineComponent({
       registrationNumber,
       displayRegistrationNumber,
       registrationType,
+      shouldClearType,
+      registrationDateFormatted,
       registrationTypes,
       hasRPPR,
       selectRegistration,
@@ -845,6 +867,7 @@ export default defineComponent({
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
+      clearFilters,
       selectAndSort,
       ...toRefs(localState)
     }
@@ -855,8 +878,7 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .reg-table {
-  max-height: 550px;
-  overflow-y: scroll;
+  max-height: 620px;
 }
 .length-trust-label {
   font-size: 0.875rem;
@@ -875,6 +897,7 @@ export default defineComponent({
 }
 .date-selection {
   border-radius: 5px;
+  z-index: 10;
   left: 50%;
   margin-top: 140px;
   overflow: auto;
@@ -895,7 +918,7 @@ export default defineComponent({
 
 .col-selection {
   position: relative;
-  top: -100px;
+  top: -124px;
   float: right;
   height: 0px;
   display: inline-flex;
@@ -904,7 +927,7 @@ export default defineComponent({
   background-color: white !important;
   border: 1px solid var(--outline);
   height: 45px;
-  font-size: 13px;
+  font-size: 14px;
   margin: 0;
   color: var(--text);
   label {
@@ -912,6 +935,21 @@ export default defineComponent({
     color: $gray7 !important;
   }
   span {
+    color: $gray7;
+  }
+}
+
+.text-input-style-above {
+  label {
+    font-size: 14px;
+    color: $gray7 !important;
+    padding-left: 6px;
+    margin-bottom: 10px;
+    margin-top: -2px;
+  }
+  span {
+    padding-left: 6px;
+    font-size: 14px;
     color: $gray7;
   }
 }
@@ -930,13 +968,15 @@ export default defineComponent({
 .edit-btn {
   font-weight: normal !important;
   height: 30px !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  margin-top: -16px;
 }
 .down-btn {
   height: 30px !important;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+  margin-top: -16px;
 }
 </style>

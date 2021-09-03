@@ -78,6 +78,7 @@ describe('Test registration table with results', () => {
     localVue = null
   })
 
+
   it('renders and displays correct registration elements', async () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // the api is going to be called twice, once for drafts and once for registrations
@@ -94,10 +95,8 @@ describe('Test registration table with results', () => {
 
     // the first row is row 2
     expect(rows.at(2).text()).toContain('PDF')
-    expect(rows.at(2).text()).toContain(mockedRegistration1.clientReferenceId)
-    expect(rows.at(2).text()).toContain(mockedRegistration1.registeringParty)
-    expect(rows.at(2).text()).toContain(mockedRegistration1.securedParties)
     expect(rows.at(2).text()).toContain(mockedRegistration1.registrationNumber)
+    expect(rows.at(2).text()).toContain(UIRegistrationTypes.SECURITY_AGREEMENT)
   })
 
   it('renders and displays the typeahead dropdown', async () => {
@@ -243,8 +242,8 @@ describe('Test draft table with results', () => {
     expect(rows.length).toBe(pprResp.length + 3)
 
     // the first row is row 2
-    expect(rows.at(2).text()).toContain('PDF')
-    expect(rows.at(2).text()).toContain(mockedDraft1.clientReferenceId)
+    expect(rows.at(2).text()).toContain('Draft') // draft status
+    expect(rows.at(2).text()).toContain('N/A') // N/A for expiry
     expect(rows.at(2).text()).toContain(UIRegistrationTypes.REPAIRERS_LIEN)
   })
 })

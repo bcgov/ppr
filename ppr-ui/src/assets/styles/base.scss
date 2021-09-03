@@ -322,12 +322,16 @@ ul.list {
 }
 
 .v-application div.invalid-message {
-  border-left: 3px solid #d3272c !important;
+  border-left: 3px solid $error !important;
 }
 
 span.invalid-message {
   font-size: 16px;
-  color: #d3272c !important;
+  color: $error !important;
+}
+
+span.invalid-color {
+  color: $error;
 }
 
 .invalid-link {
@@ -419,6 +423,7 @@ span.invalid-message {
 .v-data-table .filter-row {
   padding-top: 0px !important;
   padding-bottom: 0px !important;
+  background-color: #ffffff;
 
   td {
     padding-top: 10px !important;
@@ -453,19 +458,29 @@ span.invalid-message {
   color: $primary-blue !important;
 }
 
-.date-selection-btn {
-  color: $primary-blue;
+.registration-date .date-selection-btn {
+  color: $primary-blue !important;
   margin: 0;
   opacity: 1;
   padding: 0;
   min-width: 20px;
   box-shadow: none;
+  font-size: 14px;
 }
-.date-selection-btn:hover {
+.registration-date .date-selection-btn:hover {
   opacity: 0.7;
 }
-.date-selection-btn.bold {
+.registration-date .date-selection-btn.bold {
   font-weight: 800 !important;
+}
+
+.theme--light.v-btn--active.v-date-picker-table__current:hover::before, 
+.theme--light.v-btn--active.v-date-picker-table__current::before {
+  opacity: 0;
+}
+
+.v-btn:before {
+  color: inherit;
 }
 
 // tombstone styles
@@ -488,6 +503,14 @@ span.invalid-message {
 }
 
 .base-registration-row {
-  background-color: #e0e0e054;
+  background: rgba(241, 243, 245, 0.5);
   font-weight: bold;
+}
+.registration-row {
+  z-index: 5;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > 
+table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+  background: rgba(241, 243, 245, 0.5) !important;
 }

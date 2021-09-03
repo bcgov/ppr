@@ -1,5 +1,5 @@
 import { RegistrationSummaryIF, DraftResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { reactive, toRefs, watch, ref } from '@vue/composition-api'
+import { reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { RegistrationTypesStandard, StatusTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
 
@@ -13,11 +13,17 @@ export const useRegistration = () => {
     registeredBy: '',
     registeringParty: '',
     securedParties: '',
+    shouldClearType: false,
+    registrationDateFormatted: '',
     folioNumber: '',
     daysToExpiry: '',
     submittedStartDate: null,
     submittedEndDate: null,
-    registrationTypes: RegistrationTypesStandard,
+    registrationTypes: computed(function () {
+      const types = [...RegistrationTypesStandard]
+      types.shift()
+      return types
+    }),
     statusTypes: StatusTypes
   })
 
@@ -54,6 +60,21 @@ export const useRegistration = () => {
       return UIRegistrationTypes[keyValue]
     }
     return ''
+  }
+
+  const clearFilters = () => {
+    localState.registrationNumber = ''
+    localState.registrationType = ''
+    localState.status = ''
+    localState.registeredBy = ''
+    localState.registeringParty = ''
+    localState.securedParties = ''
+    localState.folioNumber = ''
+    localState.daysToExpiry = ''
+    localState.submittedStartDate = null
+    localState.submittedEndDate = null
+    localState.shouldClearType = true
+    localState.registrationDateFormatted = ''
   }
 
   const filterResults = (originalData: Array<any>): void => {
@@ -182,7 +203,10 @@ export const useRegistration = () => {
     if (localState.submittedStartDate) {
       for (let i = 0; i < originalData.length; i++) {
         if (originalData[i].createDateTime) {
-          const originalStartDate = originalData[i].createDateTime.substring(0, 10)
+          const originalStartDate = originalData[i].createDateTime.substring(
+            0,
+            10
+          )
           if (localState.submittedStartDate > originalStartDate) {
             newTableData[i].hide = true
           }
@@ -193,7 +217,10 @@ export const useRegistration = () => {
     if (localState.submittedEndDate) {
       for (let i = 0; i < originalData.length; i++) {
         if (originalData[i].createDateTime) {
-          const originalEndDate = originalData[i].createDateTime.substring(0, 10)
+          const originalEndDate = originalData[i].createDateTime.substring(
+            0,
+            10
+          )
           if (localState.submittedEndDate < originalEndDate) {
             newTableData[i].hide = true
           }
@@ -277,6 +304,7 @@ export const useRegistration = () => {
     getPdfLink,
     getRegistrationType,
     filterResults,
+    clearFilters,
     ...toRefs(localState)
   }
 }

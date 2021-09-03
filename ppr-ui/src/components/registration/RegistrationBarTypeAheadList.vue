@@ -17,11 +17,12 @@
       :items="displayItems"
       item-text="text"
       :label="dropdownLabel"
-      :menu-props="{ maxHeight: '388px' }"
+      :menu-props="{ maxHeight: '388px', bottom: true, offsetY: true }"
       offset="1000"
       return-object
       v-model="selected"
       :dense="isDense"
+      :clearable="isClearable"
       @keypress="showAllGroups()"
     >
       <template v-slot:item="{ parent, item }">
@@ -63,7 +64,12 @@ export default defineComponent({
   },
   props: {
     defaultLabel: String,
-    defaultDense: Boolean
+    defaultDense: Boolean,
+    defaultClearable: Boolean,
+    defaultClear: {
+      type: Boolean,
+      default: false
+    }
   },
   name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
@@ -79,7 +85,8 @@ export default defineComponent({
       selected: null,
       showDialog: false,
       dropdownLabel: props.defaultLabel,
-      isDense: props.defaultDense
+      isDense: props.defaultDense,
+      isClearable: props.defaultClearable
     })
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) emit('selected', localState.selected)
@@ -150,6 +157,12 @@ export default defineComponent({
       if (val) selectRegistration(val)
     })
 
+    watch(() => props.defaultClear, (val: boolean) => {
+      if (val) {
+        localState.selected = null
+      }
+    })
+
     return {
       dialogSubmit,
       filterList,
@@ -171,5 +184,15 @@ export default defineComponent({
 
 ::v-deep .theme--light.v-list-item--disabled {
   min-height: 0;
+}
+
+.registrationTypeAhead {
+  z-index: 30;
+}
+
+.v-input__icon--clear {
+  .v-icon {
+    font-size: 18px;
+  }
 }
 </style>
