@@ -47,4 +47,16 @@ describe('Folio number on the summarty page', () => {
     expect(wrapper.vm.$data.folioNumber).toEqual('ABC123')
     expect(wrapper.find('#txt-folio').element.value).toBe('ABC123')
   })
+
+  it('is valid and emits the valid event', async () => {
+    wrapper.find('#txt-folio').setValue('MY TEST')
+    expect(wrapper.emitted().folioValid).toBeTruthy()
+    expect(wrapper.vm.$data.isValid).toBeTruthy()
+  })
+
+  it('sets the validity to false for > 15 characters', async () => {
+    wrapper.find('#txt-folio').setValue('MY TEST THAT IS VERY LONG IN FACT TOO LONG')
+    expect(wrapper.emitted().folioValid).toBeTruthy()
+    expect(wrapper.vm.$data.isValid).toBeFalsy()
+  })
 })

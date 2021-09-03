@@ -108,6 +108,7 @@ import { StatusCodes } from 'http-status-codes'
     CautionBox,
     DischargeConfirmSummary,
     RegistrationFee,
+    FolioNumberSummary,
     RegisteringPartySummary
   }
 })
@@ -235,6 +236,10 @@ export default class ConfirmDischarge extends Vue {
       query: { 'reg-num': this.registrationNumber }
     })
     this.emitHaveData(false)
+  }
+
+  private setFolioValid (valid: boolean): void {
+    this.validFolio = valid
   }
 
   private showDialog (): void {
