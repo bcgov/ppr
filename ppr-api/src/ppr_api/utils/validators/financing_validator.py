@@ -188,8 +188,8 @@ def validate_rl(json_data, reg_type: str):
 def get_registration_class(reg_type: str):
     """Derive the registration class from the registration type."""
     try:
-        if (reg_class := model_utils.REG_TYPE_TO_REG_CLASS[reg_type]) in \
-            (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC, model_utils.REG_CLASS_PPSA):
+        if reg_class := model_utils.REG_TYPE_TO_REG_CLASS[reg_type] in \
+                (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC, model_utils.REG_CLASS_PPSA):
             return reg_class
 
         return ''
