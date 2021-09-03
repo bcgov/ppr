@@ -16,7 +16,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedFinancingStatementAll } from './test-data'
+import { mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
@@ -47,6 +47,10 @@ describe('ConfirmDischarge registration view', () => {
     const get = sandbox.stub(axios, 'get')
     get.returns(new Promise(resolve => resolve({
       data: { ...mockedFinancingStatementAll }
+    })))
+    const post = sandbox.stub(axios, 'post')
+    post.returns(new Promise(resolve => resolve({
+      data: { ...mockedDischargeResponse }
     })))
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -82,7 +86,9 @@ describe('ConfirmDischarge registration view', () => {
     // check confirm discharge section
     expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegNum).toContain(regNum)
+    // eslint-disable-next-line max-len
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegType).toContain(state.registration.registrationType.registrationTypeUI)
+    // eslint-disable-next-line max-len
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe('General Collateral and 2 Vehicles')
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(false)
     // check fee summary (whether data for it is in store or by prop may change)
@@ -127,8 +133,14 @@ describe('ConfirmDischarge registration view', () => {
   })
 
   it('processes submit button action', async () => {
+    // Set up for valid discharge request
+    await store.dispatch('setRegistrationNumber', '023001B')
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
-    // fill in with the rest of the flow once built
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 })

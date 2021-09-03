@@ -91,13 +91,15 @@ import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
+  DischargeRegistrationIF, // eslint-disable-line no-unused-vars
   FeeSummaryIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, // eslint-disable-line no-unused-vars
+  StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
-import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
+import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 
 @Component({
@@ -112,6 +114,7 @@ import { StatusCodes } from 'http-status-codes'
 })
 export default class ConfirmDischarge extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getStateModel: StateModelIF
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
@@ -244,13 +247,28 @@ export default class ConfirmDischarge extends Vue {
     console.log('show dialog')
   }
 
-  private submitDischarge (): void {
+  private async submitDischarge (): Promise<void> {
     if (!this.validConfirm || !this.validFolio) {
       this.showErrors = true
       return
     }
-    // TBD
-    console.log('submit')
+
+    const stateModel: StateModelIF = this.getStateModel
+    const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
+    if (apiResponse === undefined || apiResponse?.error !== undefined) {
+      console.error(apiResponse.error)
+      alert('There was an internal error attempting to save this Discharge registration. Please try again later.')
+    } else {
+      // On success return to dashboard
+      this.goToDashboard()
+    }
+  }
+
+  private goToDashboard (): void {
+    this.$router.push({
+      name: RouteNames.DASHBOARD
+    })
+    this.emitHaveData(false)
   }
 
   /** Emits Have Data event. */
