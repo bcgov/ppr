@@ -71,7 +71,7 @@
         <v-col cols="auto pr-4">
           <v-btn
             class="date-selection-btn bold"
-            flat
+            text
             ripple
             small
             @click="updateSubmittedRange"
@@ -79,7 +79,7 @@
           >
           <v-btn
             class="date-selection-btn ml-4"
-            flat
+            text
             ripple
             small
             @click="resetSubmittedRange"
@@ -165,6 +165,7 @@
               :defaultLabel="labelText"
               :defaultDense="true"
               :defaultClearable="true"
+              :defaultClear="shouldClearType"
               @selected="selectRegistration($event)"
             />
             <v-select
@@ -189,7 +190,7 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('createDateTime')">
+          <td v-if="selectedHeaderValues.includes('createDateTime')" @click="showSubmittedDatePicker = true">
             <v-text-field
               filled
               single-line
@@ -198,7 +199,6 @@
               v-model="registrationDateFormatted"
               hint="YYYY/MM/DD"
               append-icon="mdi-calendar"
-              @click="showSubmittedDatePicker = true"
               dense
               clearable
               hide-details="true"
@@ -493,12 +493,14 @@ export default defineComponent({
       registeringParty,
       securedParties,
       folioNumber,
+      shouldClearType,
       status,
       registrationType,
       registrationTypes,
       daysToExpiry,
       submittedStartDate,
       submittedEndDate,
+      registrationDateFormatted,
       statusTypes,
       tableData,
       filterResults,
@@ -511,7 +513,6 @@ export default defineComponent({
 
     const localState = reactive({
       headers: registrationTableHeaders,
-      registrationDateFormatted: '',
       showDialog: false,
       currentRegistrationNumber: '',
       showSubmittedDatePicker: false,
@@ -607,7 +608,16 @@ export default defineComponent({
       if (days === -99) {
         return 'Infinite'
       } else {
-        return days.toString()
+        if (days > 364) {
+          const years = days / 365
+          const daysRemaining = days % 365
+          let yearText = ' years '
+          if (years === 1) {
+            yearText = ' year '
+          }
+          return Math.floor(years).toString() + yearText + daysRemaining.toString() + ' days'
+        }
+        return days.toString() + ' days'
       }
     }
 
@@ -647,7 +657,7 @@ export default defineComponent({
       submittedStartDate.value = localState.submittedStartDateTmp
       submittedEndDate.value = localState.submittedEndDateTmp
       localState.showSubmittedDatePicker = false
-      localState.registrationDateFormatted = 'Custom'
+      registrationDateFormatted.value = 'Custom'
     }
 
     const resetSubmittedRange = () => {
@@ -662,6 +672,7 @@ export default defineComponent({
     }
 
     const selectRegistration = (val: RegistrationTypeIF) => {
+      shouldClearType.value = false
       registrationType.value = val.registrationTypeAPI
     }
 
@@ -762,7 +773,7 @@ export default defineComponent({
     watch(
       () => localState.registrationDate,
       (val: string) => {
-        localState.registrationDateFormatted = formatDate(val)
+        registrationDateFormatted.value = formatDate(val)
       }
     )
 
@@ -798,6 +809,8 @@ export default defineComponent({
       registrationNumber,
       displayRegistrationNumber,
       registrationType,
+      shouldClearType,
+      registrationDateFormatted,
       registrationTypes,
       hasRPPR,
       selectRegistration,

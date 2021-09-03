@@ -454,19 +454,29 @@ span.invalid-message {
   color: $primary-blue !important;
 }
 
-.date-selection-btn {
-  color: $primary-blue;
+.registration-date .date-selection-btn {
+  color: $primary-blue !important;
   margin: 0;
   opacity: 1;
   padding: 0;
   min-width: 20px;
   box-shadow: none;
+  font-size: 14px;
 }
-.date-selection-btn:hover {
+.registration-date .date-selection-btn:hover {
   opacity: 0.7;
 }
-.date-selection-btn.bold {
+.registration-date .date-selection-btn.bold {
   font-weight: 800 !important;
+}
+
+.theme--light.v-btn--active.v-date-picker-table__current:hover::before, 
+.theme--light.v-btn--active.v-date-picker-table__current::before {
+  opacity: 0;
+}
+
+.v-btn:before {
+  color: inherit;
 }
 
 // tombstone styles

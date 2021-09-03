@@ -532,9 +532,10 @@ tbody {
 }
 
 #registration-table .v-input__icon--clear, #registration-table {
-  .v-icon.mdi-close {
+  .v-icon.mdi-close, .v-icon.mdi-calendar {
     color: $primary-blue;
     font-size: 18px;
+    margin-bottom: 2px;
   }
 }
 

@@ -13,6 +13,8 @@ export const useRegistration = () => {
     registeredBy: '',
     registeringParty: '',
     securedParties: '',
+    shouldClearType: false,
+    registrationDateFormatted: '',
     folioNumber: '',
     daysToExpiry: '',
     submittedStartDate: null,
@@ -71,6 +73,8 @@ export const useRegistration = () => {
     localState.daysToExpiry = ''
     localState.submittedStartDate = null
     localState.submittedEndDate = null
+    localState.shouldClearType = true
+    localState.registrationDateFormatted = ''
   }
 
   const filterResults = (originalData: Array<any>): void => {

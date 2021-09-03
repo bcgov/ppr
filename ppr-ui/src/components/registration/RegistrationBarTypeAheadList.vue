@@ -65,7 +65,11 @@ export default defineComponent({
   props: {
     defaultLabel: String,
     defaultDense: Boolean,
-    defaultClearable: Boolean
+    defaultClearable: Boolean,
+    defaultClear: {
+      type: Boolean,
+      default: false
+    }
   },
   name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
@@ -151,6 +155,12 @@ export default defineComponent({
 
     watch(() => localState.selected, (val: RegistrationTypeIF) => {
       if (val) selectRegistration(val)
+    })
+
+    watch(() => props.defaultClear, (val: boolean) => {
+      if (val) {
+        localState.selected = null
+      }
     })
 
     return {
