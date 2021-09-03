@@ -7,7 +7,8 @@ import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
 import { ConfirmDischarge } from '@/views'
-import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee, 
+  FolioNumberSummary } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
@@ -91,6 +92,8 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
     // buttons
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
+    // folio
+    expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
 
   it('processes back button action', async () => {
@@ -113,6 +116,14 @@ describe('ConfirmDischarge registration view', () => {
   it('shows validation errors when needed when submitting', async () => {
     await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
+  })
+
+  it('shows errors when folio is invalid', async () => {
+    await wrapper.findComponent(FolioNumberSummary).vm.$emit('folioValid', false)
+    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    // turn show errors on when invalid
+    expect(wrapper.vm.$data.showErrors).toBe(true)
+    // fill in with the rest of the flow once built
   })
 
   it('processes submit button action', async () => {

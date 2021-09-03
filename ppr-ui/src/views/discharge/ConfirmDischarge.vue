@@ -1,15 +1,21 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-15 pt-14"
+    fluid
+    style="min-width: 960px;"
+  >
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Confirm and complete any additional information before submitting this Total Discharge.
+              Confirm and complete any additional information before submitting
+              this Total Discharge.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt"/>
+          <caution-box class="mt-9" :setMsg="cautionTxt" />
           <h2 class="pt-14">
             Registering Party for this Discharge
             <v-tooltip
@@ -26,10 +32,19 @@
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <registering-party-summary
+            class="pt-4"
+            :setEnableNoDataAction="false"
+          />
+          <folio-number-summary
+            @folioValid="setFolioValid($event)"
+            :setShowErrors="showErrors"
+            class="pt-10"
+          />
           <h2 class="pt-15">X.Confirm</h2>
           <p class="ma-0 pt-3">
-            You are about to submit a Total Discharge based on the following details:
+            You are about to submit a Total Discharge based on the following
+            details:
           </p>
           <discharge-confirm-summary
             class="mt-5"
@@ -64,12 +79,22 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee } from '@/components/common'
+import {
+  ButtonsStacked,
+  CautionBox,
+  DischargeConfirmSummary,
+  RegistrationFee,
+  FolioNumberSummary
+} from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  FeeSummaryIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  AddPartiesIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
@@ -81,6 +106,7 @@ import { StatusCodes } from 'http-status-codes'
     CautionBox,
     DischargeConfirmSummary,
     RegistrationFee,
+    FolioNumberSummary,
     RegisteringPartySummary
   }
 })
@@ -127,7 +153,7 @@ export default class ConfirmDischarge extends Vue {
 
   // the number of the registration being discharged
   private get registrationNumber (): string {
-    return this.$route.query['reg-num'] as string || ''
+    return (this.$route.query['reg-num'] as string) || ''
   }
 
   private get registrationTypeUI (): UIRegistrationTypes {
@@ -147,12 +173,18 @@ export default class ConfirmDischarge extends Vue {
       return
     }
     this.financingStatementDate = new Date()
-    const financingStatement = await getFinancingStatement(true, this.registrationNumber)
+    const financingStatement = await getFinancingStatement(
+      true,
+      this.registrationNumber
+    )
     if (financingStatement.error) {
       this.emitError(financingStatement.error)
     } else {
       // set collateral summary
-      if (financingStatement.generalCollateral && !financingStatement.vehicleCollateral) {
+      if (
+        financingStatement.generalCollateral &&
+        !financingStatement.vehicleCollateral
+      ) {
         this.collateralSummary = 'General Collateral and 0 Vehicles'
       } else if (financingStatement.generalCollateral) {
         this.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
@@ -165,12 +197,11 @@ export default class ConfirmDischarge extends Vue {
         this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
       }
       // load data into the store
-      const registrationType = RegistrationTypes.find(
-        (reg, index) => {
-          if (reg.registrationTypeAPI === financingStatement.type) {
-            return true
-          }
-        })
+      const registrationType = RegistrationTypes.find((reg, index) => {
+        if (reg.registrationTypeAPI === financingStatement.type) {
+          return true
+        }
+      })
       const parties = {
         valid: true,
         registeringParty: financingStatement.registeringParty,
@@ -179,7 +210,7 @@ export default class ConfirmDischarge extends Vue {
       } as AddPartiesIF
       const feeSummary = {
         feeAmount: 0,
-        serviceFee: 1.50,
+        serviceFee: 1.5,
         quantity: 1,
         feeCode: ''
       } as FeeSummaryIF
@@ -204,6 +235,10 @@ export default class ConfirmDischarge extends Vue {
     this.emitHaveData(false)
   }
 
+  private setFolioValid (valid: boolean): void {
+    this.validFolio = valid
+  }
+
   private showDialog (): void {
     // TBD
     console.log('show dialog')
@@ -220,14 +255,18 @@ export default class ConfirmDischarge extends Vue {
 
   /** Emits Have Data event. */
   @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
+  private emitHaveData (haveData: Boolean = true): void {}
 
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) alert('This registration does not exist.')
-    else if (error.statusCode === StatusCodes.BAD_REQUEST) alert('You do not have access to this registration.')
-    else alert('There was an internal error loading this registration. Please try again later.')
+    if (error.statusCode === StatusCodes.NOT_FOUND) {
+      alert('This registration does not exist.')
+    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
+      alert('You do not have access to this registration.')
+    } else {
+      alert('There was an internal error loading this registration. Please try again later.')
+    }
     this.emitHaveData(true)
     this.$router.push({
       name: RouteNames.DASHBOARD
