@@ -322,12 +322,16 @@ ul.list {
 }
 
 .v-application div.invalid-message {
-  border-left: 3px solid #d3272c !important;
+  border-left: 3px solid $error !important;
 }
 
 span.invalid-message {
   font-size: 16px;
-  color: #d3272c !important;
+  color: $error !important;
+}
+
+span.invalid-color {
+  color: $error;
 }
 
 .invalid-link {

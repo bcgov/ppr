@@ -294,7 +294,12 @@
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
           <td v-if="selectedHeaderValues.includes('createDateTime')">
+            <span v-if="row.item.statusType !== 'D'">
             {{ getFormattedDate(row.item.createDateTime) }}
+            </span>
+            <span v-else>
+              Not Registered
+            </span>
           </td>
           <td v-if="selectedHeaderValues.includes('statusType')">
             {{ getStatusDescription(row.item.statusType) }}
@@ -311,12 +316,12 @@
           <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             {{ row.item.clientReferenceId }}
           </td>
-          <td v-if="selectedHeaderValues.includes('expireDays')">
-            {{ showExpireDays(row.item.expireDays) }}
+          <td v-if="selectedHeaderValues.includes('expireDays')" v-html="showExpireDays(row.item.expireDays)">
           </td>
           <td v-if="selectedHeaderValues.includes('vs')">
             <v-btn
               :id="`pdf-btn-${row.item.id}`"
+              v-if="row.item.statusType !== 'D'"
               :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
               depressed
               :loading="row.item.path === loadingPDF"
@@ -333,6 +338,7 @@
               <span class="edit-action">
                 <v-btn
                   color="primary"
+                  elevation="0"
                   :class="$style['edit-btn']"
                   :id="'class-' + row.index + '-change-added-btn'"
                 >
@@ -346,6 +352,7 @@
                     <v-btn
                       small
                       v-on="on"
+                      elevation="0"
                       color="primary"
                       class="actions__more-actions__btn"
                       :class="$style['down-btn']"
@@ -369,6 +376,7 @@
               <span class="edit-action">
                 <v-btn
                   color="primary"
+                  elevation="0"
                   :class="$style['edit-btn']"
                   :id="'class-' + row.index + '-change-added-btn'"
                 >
@@ -381,6 +389,7 @@
                   <template v-slot:activator="{ on: onMenu }">
                     <v-btn
                       small
+                      elevation="0"
                       v-on="onMenu"
                       color="primary"
                       class="actions__more-actions__btn"
@@ -603,7 +612,7 @@ export default defineComponent({
 
     const showExpireDays = (days: number): string => {
       if (!days) {
-        return ''
+        return 'N/A'
       }
       if (days === -99) {
         return 'Infinite'
@@ -616,6 +625,9 @@ export default defineComponent({
             yearText = ' year '
           }
           return Math.floor(years).toString() + yearText + daysRemaining.toString() + ' days'
+        }
+        if (days < 30) {
+          return '<span class="invalid-color">' + days.toString() + ' days' + '</span>'
         }
         return days.toString() + ' days'
       }
@@ -930,13 +942,15 @@ export default defineComponent({
 .edit-btn {
   font-weight: normal !important;
   height: 30px !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  margin-top: -16px;
 }
 .down-btn {
   height: 30px !important;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+  margin-top: -16px;
 }
 </style>
