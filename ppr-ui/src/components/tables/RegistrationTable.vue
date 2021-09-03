@@ -2,10 +2,10 @@
   <v-container fluid no-gutters class="pa-0">
     <registration-confirmation
       attach="#app"
-      :options="dischargeConfirmationDialog"
+      :options="currentDialogOptions"
       :display="showDialog"
       :registrationNumber="currentRegistrationNumber"
-      @proceed="dischargeSubmit()"
+      @proceed="handleDialogSubmit()"
       @confirmationClose="closeConfirmation()"
     />
     <div :class="$style['col-selection']">
@@ -395,7 +395,7 @@
                     <v-list-item v-if="isAllowedAmendment(row.item)">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-pencil</v-icon>
-                        <span class="ml-1">Amend</span>
+                        <span class="ml-1" @click="amend(row.item)">Amend</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item v-if="isAllowedDischarge(row.item)">
@@ -420,7 +420,7 @@
                         >
                           <v-list-item-subtitle>
                             <v-icon small>mdi-calendar-clock</v-icon>
-                            <span class="ml-1">Renew</span>
+                            <span class="ml-1" @click="renew(row.item)">Renew</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                         </div>
@@ -457,7 +457,9 @@ import { useGetters } from 'vuex-composition-helpers'
 
 import {
   registrationTableHeaders,
-  dischargeConfirmationDialog
+  dischargeConfirmationDialog,
+  amendConfirmationDialog,
+  renewConfirmationDialog
 } from '@/resources'
 import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
 import {
@@ -513,6 +515,8 @@ export default defineComponent({
     const localState = reactive({
       headers: registrationTableHeaders,
       registrationDateFormatted: '',
+      currentDialogOptions: dischargeConfirmationDialog,
+      currentAction: '',
       showDialog: false,
       currentRegistrationNumber: '',
       showSubmittedDatePicker: false,
@@ -703,12 +707,31 @@ export default defineComponent({
     }
 
     const discharge = (item): void => {
+      localState.currentDialogOptions = dischargeConfirmationDialog
       localState.currentRegistrationNumber = item.registrationNumber as string
+      localState.currentAction = 'discharge'
       localState.showDialog = true
     }
 
-    const dischargeSubmit = (): void => {
-      emit('discharge', localState.currentRegistrationNumber)
+    const renew = (item): void => {
+      localState.currentDialogOptions = renewConfirmationDialog
+      localState.currentRegistrationNumber = item.registrationNumber as string
+      localState.currentAction = 'renew'
+      localState.showDialog = true
+    }
+
+    const amend = (item): void => {
+      localState.currentDialogOptions = amendConfirmationDialog
+      localState.currentRegistrationNumber = item.registrationNumber as string
+      localState.currentAction = 'amend'
+      localState.showDialog = true
+    }
+
+    const handleDialogSubmit = (): void => {
+      if (localState.currentAction === 'discharge') {
+        emit('discharge', localState.currentRegistrationNumber)
+      }
+      localState.showDialog = false
     }
 
     const closeConfirmation = (): void => {
@@ -797,7 +820,9 @@ export default defineComponent({
       getStatusDescription,
       showExpireDays,
       discharge,
-      dischargeSubmit,
+      handleDialogSubmit,
+      renew,
+      amend,
       rowClass,
       registrationNumber,
       displayRegistrationNumber,

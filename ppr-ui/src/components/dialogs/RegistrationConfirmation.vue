@@ -7,7 +7,7 @@
             <b>{{ optionsValue.title }}</b>
           </p>
           <p class="dialog-text py-5 ma-0">
-            To ensure you are performing a Total Discharge on the correct
+            To ensure you are performing {{ optionsValue.label }} on the correct
             registration (Base Registration Number: {{ regNumber }}) please
             enter the
             <b>individual person's last name or full business name</b> of any
@@ -68,8 +68,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch,
-  ref
+  watch
 } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 
@@ -95,13 +94,12 @@ export default defineComponent({
       validationErrors: '',
       userInput: { value: 0, text: '' },
       debtors: [],
+      optionsValue: props.options,
       attachValue: props.attach,
       displayValue: props.display,
       regNumber: props.registrationNumber,
       fullDebtorInfo: null
     })
-
-    const optionsValue = ref(props.options)
 
     const submit = (): void => {
       if (localState.userInput.value) {
@@ -169,10 +167,16 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => props.options,
+      (val: DialogOptionsIF) => {
+        localState.optionsValue = val
+      }
+    )
+
     return {
       submit,
       exit,
-      optionsValue,
       ...toRefs(localState)
     }
   }
