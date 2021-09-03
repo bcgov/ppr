@@ -123,7 +123,10 @@ export default defineComponent({
         APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
         APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
         APIRegistrationTypes.MAINTENANCE_LIEN,
-        APIRegistrationTypes.OTHER
+        APIRegistrationTypes.OTHER,
+        APIRegistrationTypes.MINERAL_LAND_TAX,
+        APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+        APIRegistrationTypes.SCHOOL_ACT
       ]
       return hfArray.includes(registrationTypeAPI)
     }
