@@ -15,7 +15,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
+import { mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
@@ -46,6 +46,10 @@ describe('ConfirmDischarge registration view', () => {
     const get = sandbox.stub(axios, 'get')
     get.returns(new Promise(resolve => resolve({
       data: { ...mockedFinancingStatementAll }
+    })))
+    const post = sandbox.stub(axios, 'post')
+    post.returns(new Promise(resolve => resolve({
+      data: { ...mockedDischargeResponse }
     })))
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -118,12 +122,6 @@ describe('ConfirmDischarge registration view', () => {
   })
 
   it('processes submit button action', async () => {
-    // Use mock service directly - account id can be anything.
-    const currentAccount = {
-      id: 'test_id'
-    }
-    sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-    sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
     // Set up for valid discharge request
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
@@ -132,6 +130,6 @@ describe('ConfirmDischarge registration view', () => {
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
     await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 })
