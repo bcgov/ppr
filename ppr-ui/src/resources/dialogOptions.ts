@@ -63,6 +63,22 @@ export const dischargeConfirmationDialog: DialogOptionsIF = {
   acceptText: 'Continue',
   cancelText: 'Cancel',
   title: 'Confirm registration to be discharged',
-  label: 'Enter a Debtor (last name of individual person or full business name)',
+  label: 'a Total Discharge',
+  text: ''
+}
+
+export const amendConfirmationDialog: DialogOptionsIF = {
+  acceptText: 'Continue',
+  cancelText: 'Cancel',
+  title: 'Confirm registration to be amended',
+  label: 'an Amendment',
+  text: ''
+}
+
+export const renewConfirmationDialog: DialogOptionsIF = {
+  acceptText: 'Continue',
+  cancelText: 'Cancel',
+  title: 'Confirm registration to be renewed',
+  label: 'a Renewal',
   text: ''
 }
