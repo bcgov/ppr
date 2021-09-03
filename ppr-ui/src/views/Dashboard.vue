@@ -48,7 +48,12 @@
             </v-col>
           </v-row>
           <v-row no-gutters class="white" style="min-height:300px">
-            <v-col cols="12"><registration-table @registrationTotal="showRegistrationTotal($event)" @discharge="startDischarge($event)"/></v-col>
+            <v-col cols="12">
+              <registration-table
+                @registrationTotal="showRegistrationTotal($event)"
+                @discharge="startDischarge($event)"
+              />
+            </v-col>
           </v-row>
         </v-col>
       </v-row>
