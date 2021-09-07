@@ -22,8 +22,8 @@
         </v-col>
       </v-row>
       <v-container
-        class="pt-4 px-4"
         :class="{ 'invalid-message': showErrorSummary }"
+        style="padding: 40px 30px;"
       >
         <v-row no-gutters v-if="showErrorSummary" class="pa-6">
           <v-col cols="auto">
@@ -40,7 +40,7 @@
             </span>
           </v-col>
         </v-row>
-        <v-row no-gutters class="ps-6 pt-6 pb-3">
+        <v-row no-gutters>
           <v-col cols="3" class="generic-label">
             Registration Length
           </v-col>
@@ -48,7 +48,7 @@
             {{ lengthSummary }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="ps-6 pb-6" v-if="registrationType === 'SA'">
+        <v-row no-gutters class="pt-3" v-if="registrationType === 'SA'">
           <v-col cols="3" class="generic-label">
             Trust Indenture
           </v-col>
@@ -58,7 +58,7 @@
         </v-row>
         <v-row
           no-gutters
-          class="ps-6 pb-3"
+          class="pt-6"
           v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         >
           <v-col cols="3" class="generic-label">
@@ -70,7 +70,7 @@
         </v-row>
         <v-row
           no-gutters
-          class="ps-6 pb-6"
+          class="pt-3"
           v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         >
           <v-col cols="3" class="generic-label">
@@ -602,13 +602,6 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .v-list-item {
   min-height: 0;
-  padding: 0 1rem 0 0.5rem;
-}
-.col {
-  padding: 0.25rem;
-  .col-roles {
-    padding: 0 !important;
-  }
 }
 
 ::v-deep
