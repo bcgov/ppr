@@ -16,6 +16,8 @@
 Validation includes rules captured in the PPR Registration Types spreadsheet:
 https://docs.google.com/spreadsheets/d/18eTumnf5H6TG2qWXwXJ_iAA-Gc7iNMpnm0ly7ctceTI/edit#gid=0
 """
+# pylint: disable=superfluous-parens
+
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
 
@@ -189,7 +191,7 @@ def get_registration_class(reg_type: str):
     """Derive the registration class from the registration type."""
     try:
         if (reg_class := model_utils.REG_TYPE_TO_REG_CLASS[reg_type]) in \
-            (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC, model_utils.REG_CLASS_PPSA):
+                (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC, model_utils.REG_CLASS_PPSA):
             return reg_class
 
         return ''

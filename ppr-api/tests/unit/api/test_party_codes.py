@@ -34,7 +34,7 @@ TEST_DATA_PARTY_CODE = [
 ]
 # testdata pattern is ({description}, {is staff}, {include account}, {response status}, {role}, {search_value})
 TEST_DATA_HEAD_OFFICE = [
-    ('Valid non-staff code exists', False, True, HTTPStatus.OK, PPR_ROLE, '9999'),
+    ('Valid non-staff code exists', False, True, HTTPStatus.OK, PPR_ROLE, '999'),
     ('Valid non-staff name exists', False, True, HTTPStatus.OK, PPR_ROLE, 'rbc royal bank'),
     ('Valid non-staff non-existent', False, True, HTTPStatus.OK, PPR_ROLE, '8999'),
     ('Non-staff missing account ID', False, False, HTTPStatus.BAD_REQUEST, PPR_ROLE, '9999'),

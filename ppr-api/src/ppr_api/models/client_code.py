@@ -83,7 +83,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         return party
 
     @classmethod
-    def find_by_head_office_code(cls, head_office_id: str = None):
+    def find_by_head_office_code(cls, head_office_id: str):
         """Return a list of client parties belonging to a head office searching by code."""
         party_codes = []
         if head_office_id and len(head_office_id) <= 4 and head_office_id.strip().isdigit():
@@ -92,6 +92,41 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 return party_codes
             for party in party_list:
                 party_codes.append(party.json)
+
+        return party_codes
+
+    @classmethod
+    def find_by_account_number(cls, account_number: int):
+        """Return a list of client parties searching by account number."""
+        party_codes = []
+        if account_number:
+            party_list = db.session.query(ClientCode).filter(ClientCode.bconline_account == account_number).all()
+            if not party_list:
+                return party_codes
+            for party in party_list:
+                party_codes.append(party.json)
+
+        return party_codes
+
+    @classmethod
+    def find_by_branch_start(cls, branch_code: str):
+        """Return a list of client parties matching on branch ids that start with a query number."""
+        party_codes = []
+        if not branch_code or not branch_code.strip().isdigit():
+            return party_codes
+        query_num = branch_code.strip()
+        if int(query_num) < 100:  # Exact match
+            party = cls.find_by_code(query_num)
+            if party:
+                party_codes.append(party)
+            return party_codes
+
+        query_num += '%'
+        party_list = db.session.query(ClientCode).filter(db.cast(ClientCode.id, db.String).like(query_num)).all()
+        if not party_list:
+            return party_codes
+        for party in party_list:
+            party_codes.append(party.json)
 
         return party_codes
 
@@ -121,7 +156,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         if is_fuzzy_search:
             return cls.find_by_head_office_name(name_or_id, is_fuzzy_search)
 
-        if name_or_id and len(name_or_id) <= 4 and name_or_id.strip().isdigit():
-            return cls.find_by_head_office_code(name_or_id)
+        if name_or_id and name_or_id.strip().isdigit():
+            return cls.find_by_branch_start(name_or_id)
 
         return cls.find_by_head_office_name(name_or_id)
