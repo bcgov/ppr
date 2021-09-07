@@ -3,18 +3,18 @@
     <v-form v-model="isValid">
       <v-row no-gutters>
         <v-col class="generic-label"
-          ><h3>1. Folio or Reference Number</h3></v-col
+          ><h2>1. Folio or Reference Number</h2></v-col
         >
       </v-row>
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
-          Add an optional number for this business for your own tracking
-          purposes. This information is not used by the BC Business Registry.
+          Add an optional number for this transaction for your own tracking purposes.
+          This information is not used by the Personal Property Registry.
         </v-col>
       </v-row>
 
-      <v-row class="px-1">
-        <v-col cols="12" class="pa-0" :class="showErrors && !valid ? 'border-error-left': ''">
+      <v-row class="no-gutters">
+        <v-col cols="12" class="pa-0" :class="showErrors && !isValid ? 'border-error-left': ''">
           <v-card flat>
             <v-row no-gutters>
               <v-col cols="3" class="generic-label pt-10 px-8"
