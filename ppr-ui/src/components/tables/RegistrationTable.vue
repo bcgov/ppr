@@ -364,7 +364,7 @@
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
-                        <span class="ml-1">Delete</span>
+                        <span class="ml-1">Delete Draft</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -415,7 +415,7 @@
                     </v-list-item>
                     <v-tooltip
                       left
-                      content-class="left-tooltip pa-2"
+                      content-class="left-tooltip pa-2 mr-2"
                       transition="fade-transition"
                       :disabled="row.item.expireDays !== -99"
                     >
@@ -437,7 +437,7 @@
                     <v-list-item>
                       <v-list-item-subtitle>
                         <v-icon small>mdi-delete</v-icon>
-                        <span class="ml-1">Remove from table</span>
+                        <span class="ml-1">Remove From Table</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>

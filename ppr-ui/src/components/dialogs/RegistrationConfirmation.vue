@@ -53,7 +53,7 @@
           </v-btn>
         </v-col>
         <v-col v-if="optionsValue.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" @click="submit()"
+          <v-btn id="accept-btn" class="primary dialog-btn" elevation="0" @click="submit()"
             >{{ optionsValue.acceptText }} <v-icon>mdi-chevron-right</v-icon>
           </v-btn>
         </v-col>
