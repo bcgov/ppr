@@ -164,7 +164,7 @@ import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
 
-import { debtorTableHeaders } from '@/resources'
+import { debtorTableHeaders, editTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
@@ -210,7 +210,7 @@ export default defineComponent({
       showErrorDebtors: computed((): boolean => {
         return parties.showInvalid && parties.debtors.length === 0
       }),
-      headers: debtorTableHeaders
+      headers: [...debtorTableHeaders, ...editTableHeaders]
     })
 
     const removeDebtor = (index: number): void => {

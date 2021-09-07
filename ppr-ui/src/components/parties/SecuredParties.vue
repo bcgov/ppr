@@ -255,7 +255,7 @@ import { useSecuredParty } from './composables/useSecuredParty'
 import { BaseAddress } from '@/composables/address'
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 
-import { partyTableHeaders } from '@/resources'
+import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeSearch } from '@/utils'
 import { useCountriesProvinces } from '@/composables/address/factories'
@@ -313,7 +313,7 @@ export default defineComponent({
       showErrorSecuredParties: computed((): boolean => {
         return parties.showInvalid && parties.securedParties.length === 0
       }),
-      headers: partyTableHeaders
+      headers: [...partyTableHeaders, ...editTableHeaders]
     })
 
     const removeParty = (index: number): void => {

@@ -224,13 +224,6 @@ export const debtorTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Birthdate',
     value: 'party.birthdate'
-  },
-
-  {
-    class: 'column-sm pa-0',
-    sortable: false,
-    text: '',
-    value: 'edit'
   }
 ]
 
@@ -258,12 +251,6 @@ export const partyTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Secured Party Code',
     value: 'code'
-  },
-  {
-    class: 'column-sm pa-0',
-    sortable: false,
-    text: '',
-    value: 'edit'
   }
 ]
 
@@ -291,6 +278,16 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'
+  }
+]
+
+// used for secured parties/debtors in edit mode
+export const editTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-sm pa-0',
+    sortable: false,
+    text: '',
+    value: 'edit'
   }
 ]
 
