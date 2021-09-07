@@ -16,6 +16,8 @@
                 <div class="pt-2">
                     {% if change.lifeInfinite is defined and change.lifeInfinite %}
                         Infinite
+                    {% elif change.lifeYears is not defined or change.lifeYears == 0 %}
+                        180 Days
                     {% elif change.lifeYears is defined %}
                         {{change.lifeYears}} {% if change.lifeYears > 1 %} Years {% else %} Year {% endif %}
                     {% endif %}

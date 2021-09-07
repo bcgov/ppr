@@ -17,10 +17,10 @@ from http import HTTPStatus
 from pathlib import Path
 
 import pycountry
-import pytz
 import requests
 from flask import current_app, jsonify
 
+from ppr_api.models import utils as model_utils
 from ppr_api.utils.auth import jwt
 
 
@@ -567,9 +567,7 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _to_report_datetime(date_time: str, include_time: bool = True):
         """Convert ISO formatted date time or date string to report format."""
-        utc_datetime = datetime.fromisoformat(date_time)
-        # local_datetime = datetime.fromtimestamp(utc_datetime.timestamp())
-        local_datetime = utc_datetime.astimezone(pytz.timezone('Canada/Pacific'))
+        local_datetime = model_utils.to_local_timestamp(datetime.fromisoformat(date_time))
         if include_time:
             timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
             if timestamp.find(' AM ') > 0:

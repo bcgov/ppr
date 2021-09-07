@@ -17,9 +17,16 @@ Common constants used across models and utilities for mapping type codes
 between the API and the database in both directions.
 """
 
-from datetime import date, datetime as _datetime, timezone, timedelta
 from datetime import time  # noqa: F401 pylint: disable=unused-import
+from datetime import date
+from datetime import datetime as _datetime
+from datetime import timedelta, timezone
 
+import pytz
+
+
+# Local timzone
+LOCAL_TZ = pytz.timezone('America/Los_Angeles')
 
 # API draft types
 DRAFT_TYPE_AMENDMENT = 'AMENDMENT_STATEMENT'
@@ -314,7 +321,7 @@ def today_ts_offset(offset_days: int = 1, add: bool = False):
     return today_ts - timedelta(days=offset_days)
 
 
-def expiry_dt_from_years(life_years: int):
+def remove_expiry_dt_from_years(life_years: int):
     """Create a date representing the current UTC date at 23:59:59.
 
     Adjusted by the life_years number of years in the future.
@@ -328,23 +335,69 @@ def expiry_dt_from_years(life_years: int):
     return _datetime.combine(future_date, expiry_time)
 
 
-def expiry_dt_from_renewal(registration_ts, life_years: int):
-    """Create a date representing the expiry date for a renewal registration.
+def expiry_dt_from_years(life_years: int, iso_date: str = None):
+    """Create a date representing the date at 23:59:59 local time as UTC.
+
+    Adjusted by the life_years number of years in the future. Current date if no iso_date
+    """
+    # Naive date
+    today = date.today() if not iso_date else date.fromisoformat(iso_date[:10])
+    # Add years
+    future_date = date((today.year + life_years), today.month, today.day)
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(_datetime.combine(future_date, expiry_time))
+    # Return as UTC
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+
+def expiry_dt_repairer_lien(expiry_ts: _datetime = None):
+    """Create a date representing the date at 23:59:59 local time as UTC.
+
+    Adjusted by the life_years number of years in the future. Current date if no iso_date
+    """
+    if not expiry_ts:
+        # Naive date
+        base_date = date.today()
+        # Naive time
+        expiry_time = time(23, 59, 59, tzinfo=None)
+        future_ts = _datetime.combine(base_date, expiry_time) + timedelta(days=REPAIRER_LIEN_DAYS)
+        # Explicitly set to local timezone which will adjust for daylight savings.
+        local_ts = LOCAL_TZ.localize(future_ts)
+        # Return as UTC
+        return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+    base_time = expiry_ts.timestamp()
+    offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
+    base_ts = expiry_ts + offset
+    base_date = date(base_ts.year, base_ts.month, base_ts.day)
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    future_ts = _datetime.combine(base_date, expiry_time) + timedelta(days=REPAIRER_LIEN_DAYS)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(future_ts)
+    # Return as UTC
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+
+def expiry_dt_from_registration(registration_ts, life_years: int):
+    """Create a date representing the expiry date for a registration.
 
     Adjust the registration timestamp by the life_years number of years in the future.
     """
-    if life_years == LIFE_INFINITE:
-        return 'Never'
-
-    expiry_date = None
-    if life_years > 0:
-        expiry_date = date((registration_ts.year + life_years), registration_ts.month, registration_ts.day)
-    else:
-        expiry_ts = registration_ts + timedelta(days=REPAIRER_LIEN_DAYS)
-        expiry_date = date(expiry_ts.year, expiry_ts.month, expiry_ts.day)
-    expiry_time = time(23, 59, 59, tzinfo=timezone.utc)
-    expiry = _datetime.combine(expiry_date, expiry_time)
-    return format_ts(expiry)
+    base_time = registration_ts.timestamp()
+    offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
+    base_ts = registration_ts + offset
+    base_date = date(base_ts.year, base_ts.month, base_ts.day)
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    future_ts = _datetime.combine(base_date, expiry_time)
+    future_ts = future_ts.replace(year=future_ts.year + life_years)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(future_ts)
+    # Return as UTC before formatting
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
 def expiry_dt_add_years(current_expiry, add_years: int):
@@ -376,6 +429,11 @@ def ts_from_date_iso_format(date_iso: str):
     Use the current UTC time.
     """
     return ts_from_iso_format(date_iso)
+
+
+def to_local_timestamp(utc_ts):
+    """Create a timestamp adjusted from UTC to the local timezone."""
+    return LOCAL_TZ.localize(_datetime.fromtimestamp(utc_ts.timestamp()))
 
 
 def is_historical(financing_statement):

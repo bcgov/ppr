@@ -63,6 +63,15 @@ TEST_LIFE_EXPIRY_DATA = [
     ('OT', None, True, model_utils.LIFE_INFINITE),
     ('ML', 1, False, model_utils.LIFE_INFINITE),
 ]
+# testdata pattern is ({reg_num}, {reg_type}, {expected_ts})
+TEST_EXPIRY_DATA = [
+    ('TEST0016', 'SA', '2041-09-04T06:59:59+00:00'),
+    ('TEST0016R1', 'RE', '2036-09-04T06:59:59+00:00'),
+    ('TEST0016R2', 'RE', '2041-09-04T06:59:59+00:00'),
+    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00'),
+    ('TEST0017R1', 'RE', '2022-08-27T06:59:59+00:00'),
+    ('TEST0017R2', 'RE', '2023-02-23T07:59:59+00:00')
+]
 
 
 def test_find_by_id(session):
@@ -581,3 +590,13 @@ def test_life_years(session, reg_type, life, life_infinite, expected_life):
     json_data['lifeInfinite'] = life_infinite
     registration = Registration.create_financing_from_json(json_data, 'PS12345', 'TESTID')
     assert registration.life == expected_life
+
+
+@pytest.mark.parametrize('reg_num, reg_type, expiry_ts', TEST_EXPIRY_DATA)
+def test_expiry(session, reg_num, reg_type, expiry_ts):
+    """Assert that creating a registration with renewals return the expected expiry date."""
+    registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
+    json_data = registration.json if reg_type == 'RE' else registration.financing_statement.json
+    assert 'expiryDate' in json_data
+    print(json_data['expiryDate'] + ' ' + expiry_ts)
+    assert json_data['expiryDate'] == expiry_ts
