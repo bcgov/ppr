@@ -65,14 +65,12 @@ describe('Registration Fee component tests', () => {
   var feeSummary: FeeSummaryIF = {
     feeAmount: 0,
     serviceFee: 1.50,
-    quantity: 0,
-    feeCode: ''
+    quantity: 0
   }
   const updatedFeeSummary: FeeSummaryIF = {
     feeAmount: 5.00,
     serviceFee: 1.50,
-    quantity: 3,
-    feeCode: ''
+    quantity: 3
   }
 
   beforeEach(async () => {

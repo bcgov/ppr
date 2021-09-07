@@ -86,14 +86,6 @@ export default defineComponent({
     },
     updatedFeeSummary: {
       type: Object as () => FeeSummaryIF
-    },
-    attach: {
-      type: String,
-      default: '#app'
-    },
-    display: {
-      type: Boolean,
-      default: true
     }
   },
   setup (props) {
@@ -132,8 +124,6 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      attachFee: props.attach,
-      displayFee: props.display,
       registrationTypeFee: props.registrationType,
       feeAmount: feeSummary.feeAmount || 0,
       quantity: feeSummary.quantity || 0,

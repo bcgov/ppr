@@ -15,8 +15,7 @@ export const stateModel: StateModelIF = {
   feeSummary: {
     feeAmount: 0,
     serviceFee: 1.5,
-    quantity: 0,
-    feeCode: ''
+    quantity: 0
   },
   registration: {
     collateral: {

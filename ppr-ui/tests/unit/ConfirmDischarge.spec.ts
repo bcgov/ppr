@@ -93,7 +93,6 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(false)
     // check fee summary (whether data for it is in store or by prop may change)
     expect(state.feeSummary.feeAmount).toBe(0)
-    expect(state.feeSummary.feeCode).toBe('')
     expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
     // buttons

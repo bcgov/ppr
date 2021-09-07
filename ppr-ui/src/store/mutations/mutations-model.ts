@@ -73,7 +73,6 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.lengthTrust.surrenderDate = ''
   state.stateModel.feeSummary.feeAmount = 0
   state.stateModel.feeSummary.quantity = 0
-  state.stateModel.feeSummary.feeCode = ''
   state.stateModel.registration.collateral.valid = false
   state.stateModel.registration.collateral.generalCollateral = ''
   state.stateModel.registration.collateral.vehicleCollateral = []
