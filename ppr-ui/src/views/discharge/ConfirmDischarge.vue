@@ -39,7 +39,7 @@
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
-            class="pt-10"
+            class="pt-15"
           />
           <h2 class="pt-15">X.Confirm</h2>
           <p class="ma-0 pt-3">
