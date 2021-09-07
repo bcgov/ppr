@@ -44,10 +44,8 @@
       elevation="6"
     >
       <v-row no-gutters>
-        <v-col cols="6" :class="$style['picker-title']"
-          >Select Start Date:</v-col
-        >
-        <v-col cols="6" :class="[$style['picker-title'], 'pl-4']"
+        <v-col cols="6" :class="pickerStartClass">Select Start Date:</v-col>
+        <v-col cols="6" class="pl-4" :class="pickerEndClass"
           >Select End Date:</v-col
         >
       </v-row>
@@ -190,7 +188,10 @@
               </template>
             </v-select>
           </td>
-          <td v-if="selectedHeaderValues.includes('createDateTime')" @click="showSubmittedDatePicker = true">
+          <td
+            v-if="selectedHeaderValues.includes('createDateTime')"
+            @click="showSubmittedDatePicker = true"
+          >
             <v-text-field
               filled
               single-line
@@ -295,7 +296,7 @@
           </td>
           <td v-if="selectedHeaderValues.includes('createDateTime')">
             <span v-if="row.item.statusType !== 'D'">
-            {{ getFormattedDate(row.item.createDateTime) }}
+              {{ getFormattedDate(row.item.createDateTime) }}
             </span>
             <span v-else>
               Not Registered
@@ -316,8 +317,10 @@
           <td v-if="selectedHeaderValues.includes('clientReferenceId')">
             {{ row.item.clientReferenceId }}
           </td>
-          <td v-if="selectedHeaderValues.includes('expireDays')" v-html="showExpireDays(row.item.expireDays)">
-          </td>
+          <td
+            v-if="selectedHeaderValues.includes('expireDays')"
+            v-html="showExpireDays(row.item.expireDays)"
+          ></td>
           <td v-if="selectedHeaderValues.includes('vs')">
             <v-btn
               :id="`pdf-btn-${row.item.id}`"
@@ -421,15 +424,17 @@
                     >
                       <template v-slot:activator="{ on: onTooltip }">
                         <div v-on="onTooltip">
-                        <v-list-item
-                          v-if="isAllowedRenewal(row.item)"
-                          :disabled="row.item.expireDays === -99"
-                        >
-                          <v-list-item-subtitle>
-                            <v-icon small>mdi-calendar-clock</v-icon>
-                            <span class="ml-1" @click="renew(row.item)">Renew</span>
-                          </v-list-item-subtitle>
-                        </v-list-item>
+                          <v-list-item
+                            v-if="isAllowedRenewal(row.item)"
+                            :disabled="row.item.expireDays === -99"
+                          >
+                            <v-list-item-subtitle>
+                              <v-icon small>mdi-calendar-clock</v-icon>
+                              <span class="ml-1" @click="renew(row.item)"
+                                >Renew</span
+                              >
+                            </v-list-item-subtitle>
+                          </v-list-item>
                         </div>
                       </template>
                       Infinite registrations cannot be renewed.
@@ -552,6 +557,14 @@ export default defineComponent({
         minWidth: '240px',
         maxHeight: 'none'
       },
+      pickerStartClass: computed(function () {
+        if (!localState.submittedStartDateTmp && localState.datePickerErr) { return 'picker-title picker-err' }
+        return 'picker-title'
+      }),
+      pickerEndClass: computed(function () {
+        if (!localState.submittedEndDateTmp && localState.datePickerErr) { return 'picker-title picker-err' }
+        return 'picker-title'
+      }),
       colheaders: computed(function () {
         const columns = [...localState.headers]
         columns.pop()
@@ -629,10 +642,20 @@ export default defineComponent({
           if (years === 1) {
             yearText = ' year '
           }
-          return Math.floor(years).toString() + yearText + daysRemaining.toString() + ' days'
+          return (
+            Math.floor(years).toString() +
+            yearText +
+            daysRemaining.toString() +
+            ' days'
+          )
         }
         if (days < 30) {
-          return '<span class="invalid-color">' + days.toString() + ' days' + '</span>'
+          return (
+            '<span class="invalid-color">' +
+            days.toString() +
+            ' days' +
+            '</span>'
+          )
         }
         return days.toString() + ' days'
       }
@@ -909,11 +932,6 @@ export default defineComponent({
   td {
     padding: 0;
   }
-}
-.picker-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: $gray9;
 }
 
 .col-selection {
