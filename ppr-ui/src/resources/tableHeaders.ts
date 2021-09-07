@@ -296,49 +296,49 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-md',
+    class: 'min-column-md med-table',
     sortable: true,
     text: 'Registration Number',
     value: 'registrationNumber',
     display: true
   },
   {
-    class: 'column-mdl',
+    class: 'min-column-mdl med-table',
     sortable: true,
     text: 'Registration Type',
     value: 'registrationType',
     display: true
   },
   {
-    class: 'column-md',
+    class: 'min-column-md med-table',
     sortable: true,
     text: 'Registration Date',
     value: 'createDateTime',
     display: true
   },
   {
-    class: 'column-mds',
+    class: 'min-column-mds med-table',
     sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
-    class: 'column-md',
+    class: 'min-column-mdl med-table',
     sortable: true,
     text: 'Registered By',
     value: 'registeringName',
     display: false
   },
   {
-    class: 'column-md',
+    class: 'min-column-mdl med-table',
     sortable: true,
     text: 'Registering Party',
     value: 'registeringParty',
     display: false
   },
   {
-    class: 'column-md',
+    class: 'min-column-mdl med-table',
     sortable: true,
     text: 'Secured Parties',
     value: 'securedParties',
@@ -346,21 +346,21 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
 
   {
-    class: 'column-md',
+    class: 'min-column-md med-table',
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
     display: false
   },
   {
-    class: 'column-sm',
+    class: 'min-column-sm sm-table',
     sortable: true,
     text: 'Days to Expiry',
     value: 'expireDays',
     display: true
   },
   {
-    class: 'column-sm',
+    class: 'min-column-sm sm-table',
     sortable: false,
     text: 'Verification Statement',
     value: 'vs',

@@ -514,3 +514,27 @@ span.invalid-color {
 table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
   background: rgba(241, 243, 245, 0.5) !important;
 }
+
+.min-column-md {
+  min-width: 10.5rem;
+}
+
+.min-column-mdl {
+  min-width: 13rem;
+}
+
+.min-column-mds {
+  min-width: 8rem;
+}
+
+.min-column-sm {
+  min-width: 6rem;
+}
+
+.med-table {
+  width: 20%;
+}
+
+.sm-table {
+  width: 10%;
+}

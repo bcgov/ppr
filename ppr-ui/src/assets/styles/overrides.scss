@@ -451,6 +451,11 @@ tbody {
   color: $primary-blue !important;
 }
 
+#registration-table.v-data-table > .v-data-table__wrapper > table {
+  width: auto;
+}
+
+
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td, 
@@ -525,6 +530,7 @@ tbody {
   position: sticky;
     top: 70px;
     background: white;
+    z-index: 2;
 }
 
 #registration-table tr.filter-row .v-label {
