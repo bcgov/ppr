@@ -8,7 +8,7 @@ import {
   ReviewConfirm,
   ReviewRegistration,
   RenewRegistration,
-  ConfirmRenewal,
+  // ConfirmRenewal,
   Search,
   Signin,
   Signout
@@ -71,7 +71,7 @@ export const routes = [
   {
     path: '/renew/confirm-renewal',
     name: RouteNames.CONFIRM_RENEWAL,
-    component: ConfirmRenewal,
+    component: RenewRegistration,
     meta: {
       requiresAuth: true
     }
