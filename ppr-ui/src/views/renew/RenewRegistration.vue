@@ -15,8 +15,8 @@
               amendments and any court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt"/>
-          <registration-length-trust class="mt-15" :isSummary="false" :defaultRegistrationType="registrationType" />
+          <registration-length-trust class="mt-15" :isRenewal="true"
+          :isSummary="false" :defaultRegistrationType="registrationType" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -32,13 +32,13 @@
           <collateral class="mt-15" :isSummary="true" />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <registration-fee :registrationType="'Total Discharge'" />
+          <registration-fee :registrationType="'Registration Renewal'" />
           <buttons-stacked
             class="pt-4"
             :setCancelBtn="'Cancel'"
             :setSubmitBtn="'Confirm and Complete'"
             @cancel="goToDashboard()"
-            @submit="confirmDischarge()"/>
+            @submit="confirmRenewal()"/>
         </v-col>
       </v-row>
     </div>
@@ -97,8 +97,6 @@ export default class ReviewRegistration extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  private cautionTxt = 'Secured Parties in this registration ' +
-    'will receive a copy of the Total Discharge Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private financingStatementDate: Date = null
 
@@ -114,7 +112,7 @@ export default class ReviewRegistration extends Vue {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  // the number of the registration being discharged
+  // the number of the registration being renewed
   private get registrationNumber (): string {
     return this.$route.query['reg-num'] as string || ''
   }
@@ -129,7 +127,7 @@ export default class ReviewRegistration extends Vue {
 
   private async loadRegistration (): Promise<void> {
     if (!this.registrationNumber) {
-      console.error('No registration number given to discharge. Redirecting to dashboard...')
+      console.error('No registration number given to renew. Redirecting to dashboard...')
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
@@ -189,9 +187,9 @@ export default class ReviewRegistration extends Vue {
     this.onAppReady(this.appReady)
   }
 
-  private confirmDischarge (): void {
+  private confirmRenewal (): void {
     this.$router.push({
-      name: RouteNames.CONFIRM_DISCHARGE,
+      name: RouteNames.CONFIRM_RENEWAL,
       query: { 'reg-num': this.registrationNumber }
     })
     this.emitHaveData(false)

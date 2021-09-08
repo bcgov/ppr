@@ -25,7 +25,7 @@
         </v-row>
       </v-container>
       <v-container v-else>
-        <v-row no-gutters class="ps-6 pb-3" v-if="vehicleCollateral.length > 0">
+        <v-row no-gutters class="ps-6 pb-3" v-if="vehicleCollateral && vehicleCollateral.length > 0">
           <v-col cols="3" class="pt-4 generic-label">
             Vehicle Collateral
           </v-col>
@@ -311,22 +311,23 @@ export default defineComponent({
       collateralValid: collateral.valid,
       showErrorComponent: collateral.showInvalid,
       getNumCols: computed((): number => {
-        if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
-          return 7
-        } else {
-          return 6
+        if (collateral.vehicleCollateral) {
+          if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
+            return 7
+          }
         }
+        return 6
       }),
       showErrorSummary: computed((): boolean => {
         return !collateral.valid
       }),
       getMH: computed(function () {
-        return collateral.vehicleCollateral.find(obj => obj.type === 'MH')
+        return collateral.vehicleCollateral && collateral.vehicleCollateral.find(obj => obj.type === 'MH')
       }),
       headers: computed(function () {
         const headersToShow = [...vehicleTableHeaders]
         const editRow = headersToShow.pop()
-        if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
+        if (collateral.vehicleCollateral && collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
           headersToShow.push({
             class: 'column-mds',
             sortable: false,
