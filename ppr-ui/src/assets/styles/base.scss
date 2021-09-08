@@ -538,3 +538,13 @@ table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table
 .sm-table {
   width: 10%;
 }
+
+.picker-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: $gray9;
+}
+
+.picker-err {
+  color: $error;
+}
