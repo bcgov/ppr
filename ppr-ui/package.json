@@ -12,7 +12,6 @@
   "dependencies": {
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-range-number-validator": "^1.1.0",
-    "@mdi/font": "^5.5.55",
     "@sentry/browser": "^6.0.4",
     "@sentry/integrations": "^6.0.4",
     "@vue/composition-api": "^1.0.0-rc.9",
@@ -37,6 +36,7 @@
     "vuex-composition-helpers": "^1.0.22"
   },
   "devDependencies": {
+    "@mdi/font": "^6.1.95",
     "@types/jest": "^25.1.4",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
