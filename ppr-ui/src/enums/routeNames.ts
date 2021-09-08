@@ -12,5 +12,7 @@ export enum RouteNames {
     ADD_COLLATERAL = 'add-collateral',
     REVIEW_CONFIRM = 'review-confirm',
     REVIEW_DISCHARGE = 'review-discharge',
-    CONFIRM_DISCHARGE = 'confirm-discharge'
+    CONFIRM_DISCHARGE = 'confirm-discharge',
+    RENEW_REGISTRATION = 'renew-registration',
+    CONFIRM_RENEWAL = 'confirm-renewal'
 }
