@@ -16,11 +16,11 @@
       <v-row class="no-gutters">
         <v-col cols="12" class="pa-0" :class="showErrors && !isValid ? 'border-error-left': ''">
           <v-card flat>
-            <v-row no-gutters>
-              <v-col cols="3" class="generic-label pt-10 px-8"
+            <v-row no-gutters style="padding: 0 30px;">
+              <v-col cols="3" class="generic-label pt-10"
                 >Folio Number</v-col
               >
-              <v-col cols="9" class="pt-8 pr-8">
+              <v-col cols="9" class="pt-8">
                 <v-text-field
                   filled
                   id="txt-folio"

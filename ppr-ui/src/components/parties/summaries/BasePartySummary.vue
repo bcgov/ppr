@@ -22,10 +22,10 @@
           <template v-slot:item="row" class="party-data-table">
             <tr :key="row.item.id" class="party-row">
               <td class="list-item__title">
-                <div class="icon-div" v-if="isBusiness(row.item)">
+                <div class="icon-div" style="padding-left: 14px;" v-if="isBusiness(row.item)">
                   <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
                 </div>
-                <div class="icon-div" v-else>
+                <div class="icon-div" style="padding-left: 14px;" v-else>
                   <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
                 </div>
                 {{ getName(row.item) }}

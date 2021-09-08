@@ -41,13 +41,13 @@
             :setShowErrors="showErrors"
             class="pt-15"
           />
-          <h2 class="pt-15">X.Confirm</h2>
-          <p class="ma-0 pt-3">
+          <h2 class="pt-15">2. Confirm</h2>
+          <p class="ma-0 pt-4">
             You are about to submit a Total Discharge based on the following
             details:
           </p>
           <discharge-confirm-summary
-            class="mt-5"
+            class="mt-6 soft-corners"
             :setRegNum="registrationNumber"
             :setRegType="registrationTypeUI"
             :setCollateralSummary="collateralSummary"

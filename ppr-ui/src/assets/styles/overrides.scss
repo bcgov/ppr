@@ -301,6 +301,10 @@ tbody {
   border-image: none;
 }
 
+.v-data-table .v-data-table__wrapper table thead tr th.extra-indent {
+  padding-left: 30px;
+}
+
 #search-history-table.v-data-table td,
 .registering-table.v-data-table td,
 .secured-party-table.v-data-table td,

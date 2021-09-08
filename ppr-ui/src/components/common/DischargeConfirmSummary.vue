@@ -4,11 +4,11 @@
     :class="showErrors && !valid ? 'border-error-left': ''"
     style="background-color: white;"
   >
-    <v-row class="px-4 py-10" no-gutters>
-      <v-col class="generic-label pt-5" cols="auto">
+    <v-row no-gutters style="padding: 40px 30px;">
+      <v-col class="generic-label pt-5" cols="3">
         Total Discharge
       </v-col>
-      <v-col class="pl-16">
+      <v-col cols="9">
         <div class="summary-info px-7 py-5">
           <p class="ma-0"><b>Base Registration Number:</b> {{ regNum }}</p>
           <p class="ma-0 pt-2"><b>Registration Type:</b> {{ regType }}</p>

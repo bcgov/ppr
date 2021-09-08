@@ -70,7 +70,7 @@ describe('Secured Party list tests', () => {
   it('renders secured party table and headers', async () => {
     expect(wrapper.find('.secured-party-summary .party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.secured-party-summary .party-summary-table .text-start').length).toBe(5)
+    expect(wrapper.findAll('.secured-party-summary .party-summary-table .text-start').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
@@ -104,7 +104,7 @@ describe('Debtor list tests', () => {
   it('renders debtor table and headers', async () => {
     expect(wrapper.find('.debtor-summary .party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.debtor-summary .party-summary-table .text-start').length).toBe(5)
+    expect(wrapper.findAll('.debtor-summary .party-summary-table .text-start').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
