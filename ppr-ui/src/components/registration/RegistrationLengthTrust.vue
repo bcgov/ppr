@@ -8,7 +8,7 @@
             class="pl-3"
             v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
           >
-            <strong>Registration Length and Trust Indenture</strong>
+            <strong>{{ regTitle }} Length and Trust Indenture</strong>
           </label>
           <label
             class="pl-3"
@@ -17,7 +17,7 @@
             <strong>Amount and Date of Surrender</strong>
           </label>
           <label class="pl-3" v-else>
-            <strong>Registration Length</strong>
+            <strong>{{ regTitle }} Length</strong>
           </label>
         </v-col>
       </v-row>
@@ -41,9 +41,7 @@
           </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-col cols="3" class="generic-label">
-            Registration Length
-          </v-col>
+          <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
           <v-col class="summary-text">
             {{ lengthSummary }}
           </v-col>
@@ -92,9 +90,7 @@
   >
     <div v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
       <v-row no-gutters class="ps-6 pt-6 pb-3">
-        <v-col cols="3" class="generic-label">
-          Registration Length
-        </v-col>
+        <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
         <v-col class="summary-text pl-4">
           {{ lengthSummary }}
         </v-col>
@@ -177,7 +173,7 @@
       <v-row no-gutters>
         <v-col cols="3" class="generic-label">
           <span :class="{ 'invalid-message': lengthTrust.showInvalid }"
-            >Registration Length</span
+            >{{ regTitle }} Length</span
           >
         </v-col>
         <v-col cols="auto">
@@ -224,11 +220,22 @@
         <v-col cols="3"></v-col>
         <v-col cols="9" v-if="!infinityPreselected()"><v-divider /></v-col>
       </v-row>
-      <v-row no-gutters class="pt-10" v-if="showTrustIndenture">
+      <v-row no-gutters class="py-6" v-if="renewalView">
+        <v-col cols="3" class="generic-label">New Expiry</v-col>
+        <v-col cols="9">{{ computedExpiryDateFormatted }}</v-col>
+      </v-row>
+      <v-row v-if="renewalView">
+        <v-col cols="3"></v-col>
+        <v-col cols="9"><v-divider /></v-col>
+      </v-row>
+      <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
         <v-col cols="3" class="generic-label">
           Trust Indenture
         </v-col>
-        <v-col cols="auto">
+        <v-col class="summary-text" v-if="renewalView">
+            {{ trustIndentureSummary }}
+        </v-col>
+        <v-col cols="auto" v-if="!renewalView">
           <v-checkbox
             class="trust-checkbox pa-0 ma-0"
             :hide-details="false"
@@ -239,7 +246,7 @@
           >
           </v-checkbox>
         </v-col>
-        <v-col cols="8">
+        <v-col cols="8" v-if="!renewalView">
           <v-tooltip
             top
             content-class="top-tooltip pa-5"
@@ -282,6 +289,10 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
+    },
+    isRenewal: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -289,7 +300,9 @@ export default defineComponent({
     const { setFeeSummary } = useActions<any>(['setFeeSummary'])
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
     const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
-    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+    const { getRegistrationType, getRegistrationExpiryDate } = useGetters<any>([
+      'getRegistrationType', 'getRegistrationExpiryDate'
+    ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const lengthTrust: LengthTrustIF = getLengthTrust.value
     const feeSummary: FeeSummaryIF = getFeeSummary.value
@@ -311,6 +324,7 @@ export default defineComponent({
 
     const localState = reactive({
       summaryView: props.isSummary,
+      renewalView: props.isRenewal,
       trustIndenture: lengthTrust.trustIndenture,
       lifeYearsDisabled: lengthTrust.lifeInfinite,
       lifeInfinite: lengthTrust.valid
@@ -362,6 +376,12 @@ export default defineComponent({
         }
         return ''
       }),
+      regTitle: computed((): string => {
+        if (props.isRenewal) {
+          return 'Renewal'
+        }
+        return 'Registration'
+      }),
       minSurrenderDate: computed((): string => {
         var dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
         var minDate = new Date()
@@ -370,8 +390,22 @@ export default defineComponent({
       }),
       computedDateFormatted: computed((): string => {
         return lengthTrust.surrenderDate !== ''
-          ? convertDate(new Date((lengthTrust.surrenderDate + 'T09:00:00Z')), false, false)
-          : ''
+          ? convertDate(new Date(lengthTrust.surrenderDate + 'T09:00:00Z'), false, false) : ''
+      }),
+      computedExpiryDateFormatted: computed((): string => {
+        if (props.isRenewal) {
+          if (lengthTrust.lifeInfinite) {
+            return 'Infinite'
+          }
+          if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
+            const expiryDate = getRegistrationExpiryDate.value
+            const numYears = parseInt(localState.lifeYearsEdit)
+            const newExpDate = new Date(expiryDate)
+            newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
+            return convertDate(newExpDate, true, true)
+          }
+          return ''
+        }
       }),
       lengthSummary: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
@@ -408,7 +442,7 @@ export default defineComponent({
       surrenderDateSummary: computed((): string => {
         if (lengthTrust.surrenderDate?.length >= 10) {
           return convertDate(
-            new Date((lengthTrust.surrenderDate + 'T09:00:00Z')),
+            new Date(lengthTrust.surrenderDate + 'T09:00:00Z'),
             false,
             false
           )

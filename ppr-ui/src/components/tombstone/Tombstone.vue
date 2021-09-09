@@ -1,8 +1,8 @@
 <template>
   <v-container class="view-container px-15 py-0" fluid style="background-color: white;">
     <div class="container pa-0" style="padding: 29px 0 !important;">
-      <tombstone-default v-if="displayDefault" />
-      <tombstone-discharge v-else-if="displayDischarge" />
+      <tombstone-discharge v-if="displayDischarge || displayRenewal" />
+      <tombstone-default v-else />
     </div>
   </v-container>
 </template>
@@ -28,11 +28,11 @@ export default defineComponent({
       currentPath: computed((): string => {
         return props.setCurrentPath
       }),
-      displayDefault: computed((): boolean => {
-        return !localState.currentPath.includes('discharge')
-      }),
       displayDischarge: computed((): boolean => {
         return localState.currentPath.includes('discharge')
+      }),
+      displayRenewal: computed((): boolean => {
+        return localState.currentPath.includes('renew')
       })
     })
 

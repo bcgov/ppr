@@ -7,6 +7,8 @@ import {
   LengthTrust,
   ReviewConfirm,
   ReviewRegistration,
+  RenewRegistration,
+  // ConfirmRenewal,
   Search,
   Signin,
   Signout
@@ -54,6 +56,22 @@ export const routes = [
     path: '/discharge/review-discharge',
     name: RouteNames.REVIEW_DISCHARGE,
     component: ReviewRegistration,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/renew/renew-registration',
+    name: RouteNames.RENEW_REGISTRATION,
+    component: RenewRegistration,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/renew/confirm-renewal',
+    name: RouteNames.CONFIRM_RENEWAL,
+    component: RenewRegistration,
     meta: {
       requiresAuth: true
     }

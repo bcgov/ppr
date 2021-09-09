@@ -8,7 +8,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 // Components
 import { Dashboard } from '@/views'
 import { SearchBar } from '@/components/search'
-import { SearchHistory } from '@/components/tables'
+import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 
 // Other
@@ -90,5 +90,17 @@ describe('Dashboard component', () => {
     wrapper.findComponent(RegistrationBar).vm.$emit(selectedType, mockedSelectSecurityAgreement)
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
+  })
+
+  it('routes to discharge after selecting registration type', async () => {
+    wrapper.findComponent(RegistrationTable).vm.$emit('discharge', '123456B')
+    await Vue.nextTick()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
+  })
+
+  it('routes to renew after selecting registration type', async () => {
+    wrapper.findComponent(RegistrationTable).vm.$emit('renew', '123456B')
+    await Vue.nextTick()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
   })
 })

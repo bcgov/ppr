@@ -773,6 +773,12 @@ export default defineComponent({
       if (localState.currentAction === 'discharge') {
         emit('discharge', localState.currentRegistrationNumber)
       }
+      if (localState.currentAction === 'renew') {
+        emit('renew', localState.currentRegistrationNumber)
+      }
+      if (localState.currentAction === 'amend') {
+        emit('amend', localState.currentRegistrationNumber)
+      }
       localState.showDialog = false
     }
 
