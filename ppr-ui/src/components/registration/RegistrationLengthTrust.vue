@@ -365,10 +365,7 @@ export default defineComponent({
         if (lengthTrust.showInvalid && lengthTrust.lienAmount === '') {
           return 'This field is required'
         }
-        if (
-          lengthTrust.lienAmount?.length > 0 &&
-          !validLienAmount(lengthTrust.lienAmount)
-        ) {
+        if (lengthTrust.lienAmount?.length > 0 && !validLienAmount(lengthTrust.lienAmount)) {
           return 'Lien amount must be a number greater than 0.'
         }
         return ''
@@ -393,12 +390,7 @@ export default defineComponent({
       }),
       computedDateFormatted: computed((): string => {
         return lengthTrust.surrenderDate !== ''
-          ? convertDate(
-            new Date(lengthTrust.surrenderDate + 'T09:00:00Z'),
-            false,
-            false
-          )
-          : ''
+          ? convertDate(new Date(lengthTrust.surrenderDate + 'T09:00:00Z'), false, false) : ''
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {

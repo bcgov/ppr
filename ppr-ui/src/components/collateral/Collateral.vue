@@ -311,10 +311,8 @@ export default defineComponent({
       collateralValid: collateral.valid,
       showErrorComponent: collateral.showInvalid,
       getNumCols: computed((): number => {
-        if (collateral.vehicleCollateral) {
-          if (collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
-            return 7
-          }
+        if (collateral.vehicleCollateral?.find(obj => obj.type === 'MH')) {
+          return 7
         }
         return 6
       }),
@@ -322,12 +320,12 @@ export default defineComponent({
         return !collateral.valid
       }),
       getMH: computed(function () {
-        return collateral.vehicleCollateral && collateral.vehicleCollateral.find(obj => obj.type === 'MH')
+        return collateral.vehicleCollateral?.find(obj => obj.type === 'MH')
       }),
       headers: computed(function () {
         const headersToShow = [...vehicleTableHeaders]
         const editRow = headersToShow.pop()
-        if (collateral.vehicleCollateral && collateral.vehicleCollateral.find(obj => obj.type === 'MH')) {
+        if (collateral.vehicleCollateral?.find(obj => obj.type === 'MH')) {
           headersToShow.push({
             class: 'column-mds',
             sortable: false,
