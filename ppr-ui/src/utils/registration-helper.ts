@@ -1,5 +1,5 @@
 // Libraries
-import { APIRegistrationTypes, DraftTypes } from '@/enums'
+import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes } from '@/enums'
 import {
   AddPartiesIF,
   AddCollateralIF,
@@ -17,8 +17,10 @@ import {
   createDischarge,
   createDraft,
   createFinancingStatement,
+  getDraft,
   updateDraft
 } from '@/utils'
+import { RegistrationTypes } from '@/resources'
 
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
@@ -181,6 +183,87 @@ export async function saveDischarge (stateModel:StateModelIF): Promise<Discharge
                   apiResponse.error.message)
   }
   return apiResponse
+}
+
+/** Setup a financing statement draft for editing. Get the previously saved draft and hydrate the state model. */
+export async function setupFinancingStatementDraft (stateModel:StateModelIF, documentId:string): Promise<StateModelIF> {
+  const draft:DraftIF = await getDraft(documentId)
+  stateModel.registration.draft = draft
+  if (draft === undefined) {
+    console.error('getDraft failed: response null.')
+    return stateModel
+  }
+  if (draft !== undefined && draft.error !== undefined) {
+    console.error('getDraft failed: ' + draft.error.statusCode + ': ' + draft.error.message)
+    return stateModel
+  }
+
+  var registrationType:RegistrationTypeIF = null
+  for (const regType of RegistrationTypes) {
+    if (regType.registrationTypeAPI !== null && regType.registrationTypeAPI === draft.financingStatement.type) {
+      // console.log(regType)
+      registrationType = regType
+      break
+    }
+  }
+  stateModel.registration.registrationType = registrationType
+  if (draft.financingStatement.registeringParty) {
+    stateModel.registration.parties.registeringParty = draft.financingStatement.registeringParty
+  }
+  // Step 1 setup
+  if (draft.financingStatement.lifeInfinite) {
+    stateModel.registration.lengthTrust.lifeInfinite = draft.financingStatement.lifeInfinite
+  }
+  if (draft.financingStatement.lifeYears) {
+    stateModel.registration.lengthTrust.lifeYears = draft.financingStatement.lifeYears
+  }
+  if (draft.financingStatement.trustIndenture) {
+    stateModel.registration.lengthTrust.trustIndenture = draft.financingStatement.trustIndenture
+  }
+  if (draft.financingStatement.type === APIRegistrationTypes.REPAIRERS_LIEN) {
+    if (draft.financingStatement.lienAmount) {
+      stateModel.registration.lengthTrust.lienAmount = draft.financingStatement.lienAmount
+    }
+    if (draft.financingStatement.surrenderDate) {
+      stateModel.registration.lengthTrust.surrenderDate = draft.financingStatement.surrenderDate
+    }
+    stateModel.registration.lengthTrust.valid = (stateModel.registration.lengthTrust.lienAmount !== '' &&
+                                                 stateModel.registration.lengthTrust.surrenderDate !== '')
+  } else {
+    stateModel.registration.lengthTrust.valid = (stateModel.registration.lengthTrust.lifeYears > 0 ||
+                                                 stateModel.registration.lengthTrust.lifeInfinite === true)
+  }
+
+  // Step 2 setup
+  if (draft.financingStatement.registeringParty) {
+    stateModel.registration.parties.registeringParty = draft.financingStatement.registeringParty
+  }
+  if (draft.financingStatement.securedParties) {
+    stateModel.registration.parties.securedParties = draft.financingStatement.securedParties
+  }
+  if (draft.financingStatement.debtors) {
+    stateModel.registration.parties.debtors = draft.financingStatement.debtors
+  }
+  stateModel.registration.parties.valid = (stateModel.registration.parties.registeringParty &&
+    stateModel.registration.parties.debtors && stateModel.registration.parties.debtors.length > 0 &&
+    stateModel.registration.parties.securedParties && stateModel.registration.parties.securedParties.length > 0)
+
+  // Step 3 setup
+  if (draft.financingStatement.vehicleCollateral) {
+    stateModel.registration.collateral.vehicleCollateral = draft.financingStatement.vehicleCollateral
+  }
+  if (draft.financingStatement.generalCollateral && draft.financingStatement.generalCollateral.length > 0) {
+    stateModel.registration.collateral.generalCollateral = draft.financingStatement.generalCollateral[0].description
+  }
+  stateModel.registration.collateral.valid = ((stateModel.registration.collateral.vehicleCollateral &&
+      stateModel.registration.collateral.vehicleCollateral.length > 0) ||
+      (stateModel.registration.collateral.generalCollateral &&
+       stateModel.registration.collateral.generalCollateral !== ''))
+
+  if (draft.financingStatement.clientReferenceId) {
+    stateModel.folioOrReferenceNumber = draft.financingStatement.clientReferenceId
+  }
+  return stateModel
 }
 
 export function cleanupParty (party: PartyIF): PartyIF {

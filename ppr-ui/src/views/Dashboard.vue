@@ -53,6 +53,7 @@
                 @registrationTotal="showRegistrationTotal($event)"
                 @discharge="startDischarge($event)"
                 @renew="startRenewal($event)"
+                @editFinancingDraft="startFinancingDraft($event)"
               />
             </v-col>
           </v-row>
@@ -71,10 +72,10 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
-import { ActionBindingIF, BreadcrumbIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
-         SearchResponseIF } from '@/interfaces' // eslint-disable-line
+import { ActionBindingIF, BreadcrumbIF, GetterIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
+         SearchResponseIF, StateModelIF } from '@/interfaces' // eslint-disable-line
 import { tombstoneBreadcrumbDashboard } from '@/resources'
-import { getFeatureFlag, searchHistory } from '@/utils'
+import { getFeatureFlag, searchHistory, setupFinancingStatementDraft } from '@/utils'
 // local components
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
@@ -94,6 +95,7 @@ export default class Dashboard extends Vue {
   @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getStateModel: StateModelIF
 
   @Action resetNewRegistration: ActionBindingIF
   @Action setDebtorName: ActionBindingIF
@@ -102,6 +104,10 @@ export default class Dashboard extends Vue {
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
+  @Action setStateModel: ActionBindingIF
+  @Action setLengthTrust: ActionBindingIF
+  @Action setAddCollateral: ActionBindingIF
+  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -154,6 +160,21 @@ export default class Dashboard extends Vue {
       query: { 'reg-num': regNum }
     })
     this.emitHaveData(false)
+  }
+
+  private async startFinancingDraft (documentId: string): Promise<void> {
+    this.resetNewRegistration(null) // Clear store data from the previous registration.
+    // Get draft details and setup store for editing the draft financing statement.
+    var stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
+    if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
+      alert('Attempt to get draft for editing failed.')
+    } else {
+      this.setLengthTrust(stateModel.registration.lengthTrust)
+      this.setAddCollateral(stateModel.registration.collateral)
+      this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+      // Go to the first step.
+      this.$router.push({ name: RouteNames.LENGTH_TRUST })
+    }
   }
 
   private showRegistrationTotal (total: number): void {
