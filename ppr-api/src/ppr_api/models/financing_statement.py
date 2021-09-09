@@ -423,7 +423,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         statement.registration = [Registration.create_financing_from_json(json_data, account_id, user_id)]
         statement.life = statement.registration[0].life
         if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-            statement.expire_date = model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+            statement.expire_date = model_utils.expiry_dt_repairer_lien()
         elif statement.life and statement.life != model_utils.LIFE_INFINITE:
             statement.expire_date = model_utils.expiry_dt_from_years(statement.life)
 

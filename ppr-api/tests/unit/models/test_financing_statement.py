@@ -68,6 +68,11 @@ TEST_LIFE_EXPIRY_DATA = [
     ('OT', None, True, model_utils.LIFE_INFINITE),
     ('ML', 1, False, model_utils.LIFE_INFINITE),
 ]
+# testdata pattern is ({reg_num}, {reg_type}, {expiry_ts}, {renewal2_ts}, {renewal1_ts})
+TEST_HISTORY_EXPIRY_DATA = [
+    ('TEST0016', 'SA', '2041-09-04T06:59:59+00:00', '2036-09-04T06:59:59+00:00', '2041-09-04T06:59:59+00:00'),
+    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00', '2022-08-27T06:59:59+00:00', '2023-02-23T07:59:59+00:00')
+]
 
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)
@@ -294,7 +299,7 @@ def test_life_expiry(session, reg_type, life, life_infinite, expected_life):
     if statement.life != model_utils.LIFE_INFINITE:
         assert statement.expire_date
         if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-            expire_date = model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+            expire_date = model_utils.expiry_dt_repairer_lien()
             assert model_utils.format_ts(statement.expire_date) == model_utils.format_ts(expire_date)
         else:
             expire_date = model_utils.expiry_dt_from_years(statement.life)
@@ -303,3 +308,18 @@ def test_life_expiry(session, reg_type, life, life_infinite, expected_life):
         assert statement.expire_date is None
     if reg_type == model_utils.REG_TYPE_OTHER:
         assert statement.crown_charge_other == 'TEST OTHER DESC'
+
+
+@pytest.mark.parametrize('reg_num, reg_type, expiry_ts, renewal2_ts, renewal1_ts', TEST_HISTORY_EXPIRY_DATA)
+def test_renewal_expiry(session, reg_num, reg_type, expiry_ts, renewal2_ts, renewal1_ts):
+    """Assert that a financing statement with renewal history returns the expected expiry dates."""
+    statement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', True)
+    statement.include_changes_json = True
+    json_data = statement.json
+    # print(json_data)
+    assert 'expiryDate' in json_data
+    assert json_data['expiryDate'] == expiry_ts
+    assert 'changes' in json_data
+    assert len(json_data['changes']) == 2
+    assert json_data['changes'][0]['expiryDate'] == renewal1_ts
+    assert json_data['changes'][1]['expiryDate'] == renewal2_ts

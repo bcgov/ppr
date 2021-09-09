@@ -177,8 +177,14 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     registration['registeringParty'] = party.json
 
         if self.registration_type == model_utils.REG_TYPE_RENEWAL and self.life is not None:
-            registration['lifeYears'] = self.life
-            registration['expiryDate'] = model_utils.expiry_dt_from_renewal(self.registration_ts, self.life)
+            if self.life != model_utils.LIFE_INFINITE:
+                registration['lifeYears'] = self.life
+            if self.life == model_utils.REPAIRER_LIEN_YEARS or \
+               self.financing_statement.registration[0].registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+                # Computed expiry date is cumulatative: original 180 days + sum of renewals up to this one.
+                registration['expiryDate'] = self.get_renewal_rl_expiry()
+            else:
+                registration['expiryDate'] = self.get_renewal_expiry()
 
         if self.court_order:
             registration['courtOrderInformation'] = self.court_order.json
@@ -486,22 +492,26 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
             if financing_reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
                 registration.life = model_utils.REPAIRER_LIEN_YEARS
+                # Adding 180 days to existing expiry.
                 registration.financing_statement.expire_date = \
-                    model_utils.now_ts_offset(model_utils.REPAIRER_LIEN_DAYS, True)
+                    model_utils.expiry_dt_repairer_lien(registration.financing_statement.expire_date)
             else:
                 if 'lifeInfinite' in json_data and json_data['lifeInfinite']:
                     registration.life = model_utils.LIFE_INFINITE
                     registration.financing_statement.expire_date = None
                 if 'lifeYears' in json_data:
                     registration.life = json_data['lifeYears']
-                    registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
+                    # registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
+                    # Replace above line with below: adding years to the existing expiry
+                    registration.financing_statement.expire_date = \
+                        model_utils.expiry_dt_add_years(registration.financing_statement.expire_date, registration.life)
                 elif 'expiryDate' in json_data:
                     new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data['expiryDate'])
                     registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
                     registration.financing_statement.expire_date = new_expiry_date
 
-            # Verify this is updated.
-            registration.financing_statement.life = registration.life
+                # Verify this is updated.
+                registration.financing_statement.life += registration.life
 
         # Repairer's lien renewal or amendment can have court order information.
         if (registration.registration_type == model_utils.REG_TYPE_AMEND_COURT or
@@ -706,3 +716,34 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     if party.middle_initial:
                         former_name += ' ' + party.middle_initial
         return former_name
+
+    def get_renewal_rl_expiry(self):
+        """Build a repairer's lien expiry date as the sum of previous registrations."""
+        expiry_ts = None
+        for registration in self.financing_statement.registration:
+            if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
+                                                     model_utils.REG_CLASS_PPSA):
+                expiry_ts = model_utils.expiry_dt_repairer_lien(registration.registration_ts)
+
+        for registration in self.financing_statement.registration:
+            if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
+                expiry_ts = model_utils.expiry_dt_repairer_lien(expiry_ts)
+
+        return model_utils.format_ts(expiry_ts)
+
+    def get_renewal_expiry(self):
+        """Build a non-repairer's lien expiry date as the sum of previous registrations."""
+        if self.life == model_utils.LIFE_INFINITE:
+            return 'Never'
+
+        expiry_ts = None
+        for registration in self.financing_statement.registration:
+            if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
+                                                     model_utils.REG_CLASS_PPSA):
+                expiry_ts = model_utils.expiry_dt_from_registration(registration.registration_ts,
+                                                                    registration.life)
+        for registration in self.financing_statement.registration:
+            if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
+                expiry_ts = model_utils.expiry_dt_add_years(expiry_ts, registration.life)
+
+        return model_utils.format_ts(expiry_ts)
