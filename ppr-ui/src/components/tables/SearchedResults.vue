@@ -70,7 +70,10 @@
             {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
           </template>
           <template v-slot:[`item.debtor.personName`]="{ item }">
-            {{ item.debtor.personName.first }} {{ item.debtor.personName.second }} {{ item.debtor.personName.last }}
+            {{ item.debtor.personName.first }}
+            {{ item.debtor.personName.second }}
+            {{ item.debtor.personName.middle }}
+            {{ item.debtor.personName.last }}
           </template>
           <template v-slot:[`item.debtor.birthDate`]="{ item }">
             {{ displayDate(item.debtor.birthDate) }}
