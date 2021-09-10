@@ -345,7 +345,7 @@
                   :class="$style['edit-btn']"
                   :id="'class-' + row.index + '-change-added-btn'"
                 >
-                  <span>Edit</span>
+                  <span @click="editDraft(row.item)">Edit</span>
                 </v-btn>
               </span>
 
@@ -482,7 +482,8 @@ import {
 import {
   AccountProductCodes,
   AccountProductRoles, // eslint-disable-line no-unused-vars
-  APIStatusTypes
+  APIStatusTypes,
+  DraftTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { RegistrationConfirmation } from '@/components/dialogs'
@@ -769,6 +770,17 @@ export default defineComponent({
       localState.showDialog = true
     }
 
+    const editDraft = (item): void => {
+      localState.currentRegistrationNumber = item.documentId as string
+      localState.currentAction = 'editDraft'
+      localState.showDialog = false
+      if (item.type === DraftTypes.FINANCING_STATEMENT) {
+        emit('editFinancingDraft', localState.currentRegistrationNumber)
+      } else if (item.type === DraftTypes.AMENDMENT_STATEMENT) {
+        alert('TODO: start amendment edit draft.')
+      }
+    }
+
     const handleDialogSubmit = (): void => {
       if (localState.currentAction === 'discharge') {
         emit('discharge', localState.currentRegistrationNumber)
@@ -872,6 +884,7 @@ export default defineComponent({
       handleDialogSubmit,
       renew,
       amend,
+      editDraft,
       rowClass,
       registrationNumber,
       displayRegistrationNumber,

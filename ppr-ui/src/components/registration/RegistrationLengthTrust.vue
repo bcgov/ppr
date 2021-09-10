@@ -187,7 +187,7 @@
               label=""
               value="false"
               id="length-in-years"
-              @click="setLifeInfinite('false')"
+              @click="setLifeInfinite(false)"
             >
             </v-radio>
             <v-radio
@@ -196,7 +196,7 @@
               label=""
               value="true"
               id="length-infinite"
-              @click="setLifeInfinite('true')"
+              @click="setLifeInfinite(true)"
             >
             </v-radio>
           </v-radio-group>
@@ -276,9 +276,10 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
-import { LengthTrustIF, FeeSummaryIF, FeeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, getFinancingFee } from '@/utils'
+import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { convertDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
+import { getFinancingFee } from '@/composables/fees/factories'
 
 export default defineComponent({
   props: {
@@ -297,17 +298,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { setFeeSummary } = useActions<any>(['setFeeSummary'])
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getFeeSummary } = useGetters<any>(['getFeeSummary'])
     const { getRegistrationType, getRegistrationExpiryDate } = useGetters<any>([
       'getRegistrationType', 'getRegistrationExpiryDate'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const lengthTrust: LengthTrustIF = getLengthTrust.value
-    const feeSummary: FeeSummaryIF = getFeeSummary.value
     const feeInfoYears = getFinancingFee(false)
-    const feeInfoInfinite = getFinancingFee(true)
     const router = context.root.$router
     const modal = false
 
@@ -317,9 +314,7 @@ export default defineComponent({
       !props.isSummary
     ) {
       lengthTrust.lifeYears = 1
-      feeSummary.quantity = 1
-      feeSummary.feeAmount = feeInfoYears.feeAmount
-      setFeeSummary(feeSummary)
+      setLengthTrust(lengthTrust)
     }
 
     const localState = reactive({
@@ -496,27 +491,19 @@ export default defineComponent({
       }
     })
 
-    const setLifeInfinite = (val: string): void => {
-      lengthTrust.lifeInfinite = String(val) === 'true'
+    const setLifeInfinite = (val: boolean): void => {
+      lengthTrust.lifeInfinite = val
       localState.lifeYearsDisabled = lengthTrust.lifeInfinite
       if (lengthTrust.lifeInfinite) {
         localState.lifeYearsEdit = ''
         lengthTrust.lifeYears = null
         lengthTrust.valid = true
         lengthTrust.showInvalid = false
-        feeSummary.quantity = feeInfoInfinite.quantityMin
-        feeSummary.feeAmount = feeInfoInfinite.feeAmount
         setLengthTrust(lengthTrust)
-        setFeeSummary(feeSummary)
-        context.emit('updated-fee-summary', feeSummary)
       } else {
         lengthTrust.valid = false
         lengthTrust.lifeYears = 0
-        feeSummary.feeAmount = 0
-        feeSummary.quantity = 0
         setLengthTrust(lengthTrust)
-        setFeeSummary(feeSummary)
-        context.emit('updated-fee-summary', feeSummary)
       }
     }
 
@@ -559,12 +546,6 @@ export default defineComponent({
             localState.lifeInfinite = 'false'
             lengthTrust.showInvalid = false
             setLengthTrust(lengthTrust)
-            feeSummary.quantity = life
-            feeSummary.feeAmount = feeInfoYears.feeAmount
-            setFeeSummary(feeSummary)
-            if (feeSummary.quantity > 0 && feeSummary.feeAmount > 0) {
-              context.emit('updated-fee-summary', feeSummary)
-            }
           }
         } else {
           if (!lengthTrust.lifeInfinite) {
@@ -576,10 +557,6 @@ export default defineComponent({
         if (!lengthTrust.valid && !lengthTrust.lifeInfinite) {
           lengthTrust.valid = false
           setLengthTrust(lengthTrust)
-          feeSummary.feeAmount = 0
-          feeSummary.quantity = 0
-          setFeeSummary(feeSummary)
-          context.emit('updated-fee-summary', feeSummary)
         }
       }
     )

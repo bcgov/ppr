@@ -1,5 +1,5 @@
 import {
-  AccountInformationIF, AuthorizationIF, FeeSummaryIF, RegistrationTypeIF, SearchResponseIF,
+  AccountInformationIF, AuthorizationIF, RegistrationTypeIF, SearchResponseIF,
   SearchTypeIF, UserInfoIF
 } from '@/interfaces'
 import { AccountProductSubscriptionIF } from '../account-interfaces'
@@ -11,7 +11,6 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
   authorization: AuthorizationIF
-  feeSummary: FeeSummaryIF
   folioOrReferenceNumber: string
   registration: {
     collateral: AddCollateralIF

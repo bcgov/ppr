@@ -61,7 +61,11 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <registration-fee :registrationType="registrationTypeUI"/>
+            <fee-summary
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+            />
           </v-col>
         </v-row>
       </div>
@@ -86,15 +90,13 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, StatementTypes, APIRegistrationTypes } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-// local components
-import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
-import { RegistrationLengthTrust } from '@/components/registration'
-import { Collateral } from '@/components/collateral'
-import { Parties } from '@/components/parties'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+// local store stuff
 import {
   getAddCollateral, // eslint-disable-line no-unused-vars
   getLengthTrust, // eslint-disable-line no-unused-vars
@@ -105,12 +107,18 @@ import {
   setLengthTrust, // eslint-disable-line no-unused-vars
   setAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
 } from '@/store/actions'
+// local components
+import { ButtonFooter, Stepper } from '@/components/common'
+import { RegistrationLengthTrust } from '@/components/registration'
+import { Collateral } from '@/components/collateral'
+import { Parties } from '@/components/parties'
+import { FeeSummary } from '@/composables/fees'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 
 @Component({
   components: {
     ButtonFooter,
-    RegistrationFee,
+    FeeSummary,
     RegistrationLengthTrust,
     Stepper,
     Collateral,
@@ -121,7 +129,6 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 export default class ReviewConfirm extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
-  @Getter getFeeSummary: FeeSummaryIF
   @Getter getAddCollateral: AddCollateralIF
   @Getter getLengthTrust: LengthTrustIF
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
@@ -141,14 +148,19 @@ export default class ReviewConfirm extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private showStepErrors: boolean = false
+  private feeType = FeeSummaryTypes.NEW
 
-  private get feeSummary (): FeeSummaryIF {
-    return this.getFeeSummary
-  }
+  private showStepErrors: boolean = false
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get registrationLength (): RegistrationLengthI {
+    return {
+      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
+      lifeYears: this.getLengthTrust?.lifeYears || 0
+    }
   }
 
   private get registrationTypeUI (): string {

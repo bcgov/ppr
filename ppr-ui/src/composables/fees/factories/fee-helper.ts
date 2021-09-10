@@ -1,9 +1,9 @@
-import { FeeCodes } from '@/enums'
-import { FeeIF } from '@/interfaces'
+import { FeeCodes } from '../enums'
+import { FeeI } from '../interfaces'
 
 const SERVICE_FEE: number = 1.50
 
-const SEARCH_FEE: FeeIF = {
+const SEARCH_FEE: FeeI = {
   feeCode: FeeCodes.SEARCH,
   description: 'Default search fee.',
   hint: '',
@@ -12,7 +12,7 @@ const SEARCH_FEE: FeeIF = {
   feeAmount: 8.00
 }
 
-const FINANCING_INFINITE_FEE: FeeIF = {
+const FINANCING_INFINITE_FEE: FeeI = {
   feeCode: FeeCodes.FINANCING_INFINITE,
   description: 'Default infinite life new registration fee.',
   hint: 'Select registration length',
@@ -21,7 +21,7 @@ const FINANCING_INFINITE_FEE: FeeIF = {
   feeAmount: 500.00
 }
 
-const FINANCING_YEAR_FEE: FeeIF = {
+const FINANCING_YEAR_FEE: FeeI = {
   feeCode: FeeCodes.FINANCING_INFINITE,
   description: 'Default new registration fee for 1 year.',
   hint: 'Select registration length',
@@ -30,7 +30,7 @@ const FINANCING_YEAR_FEE: FeeIF = {
   feeAmount: 5.00
 }
 
-export function getSearchFee (): FeeIF {
+export function getSearchFee (): FeeI {
   return SEARCH_FEE
 }
 
@@ -38,7 +38,7 @@ export function getSearchFeeAmount (includeServiceFee: boolean): number {
   return (SEARCH_FEE.feeAmount + (includeServiceFee ? SERVICE_FEE : 0.0))
 }
 
-export function getFinancingFee (infinite: boolean): FeeIF {
+export function getFinancingFee (infinite: boolean): FeeI {
   return infinite ? FINANCING_INFINITE_FEE : FINANCING_YEAR_FEE
 }
 

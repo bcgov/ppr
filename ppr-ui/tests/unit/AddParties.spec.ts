@@ -7,11 +7,11 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { AddSecuredPartiesAndDebtors } from '@/views'
-import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonFooter, Stepper } from '@/components/common'
+import { FeeSummary } from '@/composables/fees'
 
 // Other
 import mockRouter from './MockRouter'
-import { RouteNames } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -53,7 +53,7 @@ describe('AddParties new registration component', () => {
   it('renders Add Parties View with child components', () => {
     expect(wrapper.findComponent(AddSecuredPartiesAndDebtors).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
   })
 })

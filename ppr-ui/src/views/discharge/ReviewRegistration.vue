@@ -33,7 +33,10 @@
           <collateral class="mt-15" :isSummary="true" />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <registration-fee :registrationType="'Total Discharge'" />
+          <fee-summary
+            :setFeeType="feeType"
+            :setRegistrationType="registrationTypeUI"
+          />
           <buttons-stacked
             class="pt-4"
             :setCancelBtn="'Cancel'"
@@ -53,16 +56,19 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
+import { FeeSummary } from '@/composables/fees'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
@@ -71,7 +77,7 @@ import { StatusCodes } from 'http-status-codes'
   components: {
     ButtonsStacked,
     CautionBox,
-    RegistrationFee,
+    FeeSummary,
     RegistrationLengthTrust,
     Collateral,
     DebtorSummary,
@@ -84,7 +90,6 @@ export default class ReviewRegistration extends Vue {
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setFeeSummary: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setRegistrationCreationDate: ActionBindingIF
   @Action setRegistrationExpiryDate: ActionBindingIF
@@ -101,6 +106,7 @@ export default class ReviewRegistration extends Vue {
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
+  private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
 
   private get asOfDateTime (): string {
@@ -169,12 +175,6 @@ export default class ReviewRegistration extends Vue {
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
-      const feeSummary = {
-        feeAmount: 0,
-        serviceFee: 1.50,
-        quantity: 1,
-        feeCode: ''
-      } as FeeSummaryIF
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
@@ -182,7 +182,6 @@ export default class ReviewRegistration extends Vue {
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)
       this.setAddSecuredPartiesAndDebtors(parties)
-      this.setFeeSummary(feeSummary)
     }
   }
 
