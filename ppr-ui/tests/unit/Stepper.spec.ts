@@ -8,7 +8,6 @@ import { shallowMount } from '@vue/test-utils'
 
 // Components
 import { Stepper } from '@/components/common'
-// import { FeeSummaryIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 // Other
 import {

@@ -1,7 +1,8 @@
+import { FeeCodes } from '../enums'
 
 // Fee information interface.
-export interface FeeIF {
-  feeCode: string,
+export interface FeeI {
+  feeCode: FeeCodes,
   description?: string,
   hint?: string,
   quantityMin: number,

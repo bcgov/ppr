@@ -34,9 +34,10 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <registration-fee
-              :registrationType="registrationTypeUI"
-              :updatedFeeSummary="updatedFeeSummary"
+            <fee-summary
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
             />
           </v-col>
         </v-row>
@@ -62,22 +63,24 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
+import { APIRegistrationTypes, RouteNames, StatementTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
-  FeeSummaryIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 // local components
-import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonFooter, Stepper } from '@/components/common'
+import { FeeSummary } from '@/composables/fees'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { APIRegistrationTypes, RouteNames, StatementTypes } from '@/enums' // eslint-disable-line no-unused-vars
 
 @Component({
   components: {
     ButtonFooter,
-    RegistrationFee,
+    FeeSummary,
     RegistrationLengthTrust,
     Stepper
   }
@@ -86,7 +89,6 @@ export default class LengthTrust extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
   @Getter getLengthTrust: LengthTrustIF
-  @Getter getFeeSummary: FeeSummaryIF
 
   @Action setLengthTrust: ActionBindingIF
 
@@ -99,14 +101,17 @@ export default class LengthTrust extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private updatedFeeSummary: FeeSummaryIF = null
+  private feeType = FeeSummaryTypes.NEW
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  private get feeSummary (): FeeSummaryIF {
-    return this.getFeeSummary
+  private get registrationLength (): RegistrationLengthI {
+    return {
+      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
+      lifeYears: this.getLengthTrust?.lifeYears || 0
+    }
   }
 
   private get registrationTypeUI (): string {
@@ -196,13 +201,6 @@ export default class LengthTrust extends Vue {
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
-  }
-
-  @Watch('updatedFeeSummary')
-  private updateFeeSummary (val: FeeSummaryIF): void {
-    if (val) {
-      this.updatedFeeSummary = val
-    }
   }
 
   @Watch('draftSaveError')

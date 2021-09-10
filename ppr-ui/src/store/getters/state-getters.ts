@@ -7,7 +7,6 @@ import {
   ButtonConfigIF,
   DebtorNameIF,
   DraftIF,
-  FeeSummaryIF,
   IndividualNameIF,
   LengthTrustIF,
   RegistrationTypeIF,
@@ -57,11 +56,6 @@ export const getDebtorName = (state: StateIF): IndividualNameIF => {
 /** The current draft of a registration. */
 export const getDraft = (state: StateIF): DraftIF => {
   return state.stateModel.registration.draft
-}
-
-/** The registration fee summary object. */
-export const getFeeSummary = (state: StateIF): FeeSummaryIF => {
-  return state.stateModel.feeSummary
 }
 
 /** The registration life and trust indenture object. */

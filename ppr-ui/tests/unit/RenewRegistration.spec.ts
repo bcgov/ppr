@@ -9,7 +9,7 @@ import sinon from 'sinon'
 import { RenewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { ButtonsStacked, RegistrationFee } from '@/components/common'
+import { ButtonsStacked } from '@/components/common'
 import {
   DebtorSummary,
   RegisteringPartySummary,
@@ -92,10 +92,7 @@ describe('Renew registration component', () => {
     expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary (whether data for it is in store or by prop may change)
-    expect(state.feeSummary.feeAmount).toBe(0)
-    expect(state.feeSummary.feeCode).toBe('')
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Registration Renewal')
+    // FUTURE: add during renew fee summary ticket
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
   })
 

@@ -4,7 +4,6 @@ import {
   AddPartiesIF,
   DebtorNameIF,
   DraftIF,
-  FeeSummaryIF,
   LengthTrustIF,
   IndividualNameIF,
   RegistrationTypeIF,
@@ -53,10 +52,6 @@ export const setDebtorName: ActionIF = ({ commit }, debtorName: IndividualNameIF
 
 export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {
   commit('mutateDraft', draft)
-}
-
-export const setFeeSummary: ActionIF = ({ commit }, feeSummary: FeeSummaryIF): void => {
-  commit('mutateFeeSummary', feeSummary)
 }
 
 export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {

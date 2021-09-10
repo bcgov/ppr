@@ -7,16 +7,16 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { ReviewConfirm } from '@/views'
-import { ButtonFooter, RegistrationFee, Stepper, FolioNumberSummary, FolioNumber } from '@/components/common'
+import { ButtonFooter, Stepper, FolioNumberSummary } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
+import { FeeSummary } from '@/composables/fees'
 
 // Other
 import mockRouter from './MockRouter'
 import { mockedNewRegStep1, mockedSelectSecurityAgreement } from './test-data'
 import { RouteNames } from '@/enums'
-// Other
 import { DraftIF, LengthTrustIF } from '@/interfaces'
 
 Vue.use(Vuetify)
@@ -61,7 +61,7 @@ describe('ReviewConfirm new registration component', () => {
   it('renders Review Confirm View with child components', () => {
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
@@ -105,7 +105,7 @@ describe('ReviewConfirm step 1 tests', () => {
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Parties).exists()).toBe(true)
@@ -124,7 +124,7 @@ describe('ReviewConfirm step 1 tests', () => {
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Parties).exists()).toBe(true)

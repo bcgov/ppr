@@ -4,7 +4,6 @@ import {
   AddPartiesIF,
   DebtorNameIF,
   DraftIF,
-  FeeSummaryIF,
   LengthTrustIF,
   IndividualNameIF,
   RegistrationTypeIF,
@@ -50,10 +49,6 @@ export const mutateDraft = (state: StateIF, draft: DraftIF) => {
   state.stateModel.registration.draft = draft
 }
 
-export const mutateFeeSummary = (state: StateIF, feeSummary: FeeSummaryIF) => {
-  state.stateModel.feeSummary = feeSummary
-}
-
 export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>) => {
   state.stateModel.authorization.keycloakRoles = keyCloakRoles
 }
@@ -71,9 +66,6 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.lengthTrust.lifeYears = 0
   state.stateModel.registration.lengthTrust.lienAmount = ''
   state.stateModel.registration.lengthTrust.surrenderDate = ''
-  state.stateModel.feeSummary.feeAmount = 0
-  state.stateModel.feeSummary.quantity = 0
-  state.stateModel.feeSummary.feeCode = ''
   state.stateModel.registration.collateral.valid = false
   state.stateModel.registration.collateral.generalCollateral = ''
   state.stateModel.registration.collateral.vehicleCollateral = []

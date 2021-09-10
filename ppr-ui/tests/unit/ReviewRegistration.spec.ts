@@ -5,24 +5,26 @@ import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
+import flushPromises from 'flush-promises'
 // Components
 import { ReviewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { ButtonsStacked, CautionBox, RegistrationFee } from '@/components/common'
+import { ButtonsStacked, CautionBox } from '@/components/common'
 import {
   DebtorSummary,
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
+import { FeeSummary } from '@/composables/fees'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
 import { mockedFinancingStatementAll } from './test-data'
-import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -94,11 +96,9 @@ describe('ReviewConfirm new registration component', () => {
     // check vehicle collateral
     expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    // check fee summary (whether data for it is in store or by prop may change)
-    expect(state.feeSummary.feeAmount).toBe(0)
-    expect(state.feeSummary.feeCode).toBe('')
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
+    // check fee summary
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
   })
 
