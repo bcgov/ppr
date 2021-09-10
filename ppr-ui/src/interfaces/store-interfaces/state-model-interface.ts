@@ -20,6 +20,7 @@ export interface StateModelIF {
     debtorName: IndividualNameIF
     draft: DraftIF,
     expiryDate: string
+    surrenderDate: string
     lengthTrust: LengthTrustIF
     parties: AddPartiesIF
     registrationNumber: string

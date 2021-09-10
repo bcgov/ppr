@@ -73,6 +73,11 @@ export const getRegistrationExpiryDate = (state: StateIF): String => {
   return state.stateModel.registration.expiryDate
 }
 
+/** The expiry date of the selected registration. */
+export const getRegistrationSurrenderDate = (state: StateIF): String => {
+  return state.stateModel.registration.surrenderDate
+}
+
 /** The reg number for the selected registration. */
 export const getRegistrationNumber = (state: StateIF): String => {
   return state.stateModel.registration.registrationNumber

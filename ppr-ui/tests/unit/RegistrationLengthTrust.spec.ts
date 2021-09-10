@@ -10,7 +10,8 @@ import {
 import {
   mockedSelectSecurityAgreement,
   mockedRepairersLien,
-  mockedSaleOfGoods
+  mockedSaleOfGoods,
+  mockedMarriageMH
 } from './test-data'
 
 // Components
@@ -47,7 +48,9 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
 function createComponent (
-  defaultRegistrationType: String
+  defaultRegistrationType: String,
+  isSummary: Boolean,
+  isRenewal: Boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -55,7 +58,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(RegistrationLengthTrust, {
     localVue,
-    propsData: { defaultRegistrationType },
+    propsData: { defaultRegistrationType, isSummary, isRenewal },
     store,
     vuetify
   })
@@ -67,7 +70,7 @@ describe('RegistrationLengthTrust SA tests', () => {
 
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    wrapper = createComponent(defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType, false, false)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -109,7 +112,7 @@ describe('RegistrationLengthTrust RL tests', () => {
   const defaultRegistrationType: String = String('RL')
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedRepairersLien())
-    wrapper = createComponent(defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType, false, false)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -164,7 +167,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       lienAmount: ''
     })
     await store.dispatch('setRegistrationType', mockedSaleOfGoods())
-    wrapper = createComponent(defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType, false, false)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -194,7 +197,7 @@ describe('RegistrationLengthTrust life infinite tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    wrapper = createComponent(defaultRegistrationType)
+    wrapper = createComponent(defaultRegistrationType, false, false)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -207,4 +210,89 @@ describe('RegistrationLengthTrust life infinite tests', () => {
     expect(wrapper.vm.lifeYearsDisabled).toBe(true)
     expect(wrapper.vm.trustIndenture).toBe(false)
   })
+})
+
+
+describe('RegistrationLengthTrust Crown tests', () => {
+  let wrapper: Wrapper<any>
+  const defaultRegistrationType: String = String('MH')
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedMarriageMH())
+    wrapper = createComponent(defaultRegistrationType, false, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with default infinite values', async () => {
+    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.vm.showTrustIndenture).toBe(false)
+    expect(wrapper.find('#trust-indenture-checkbox').exists()).toBe(false)
+    expect(wrapper.find('#length-in-years').exists()).toBe(false)
+    
+    expect(wrapper.find('#lien-amount').exists()).toBe(false)
+    
+    expect(wrapper.vm.infinityPreselected()).toBe(true)
+   
+  })
+  
+})
+
+describe('RegistrationLengthTrust SA renewal test', () => {
+  let wrapper: Wrapper<any>
+  const defaultRegistrationType: String = String('SA')
+  beforeEach(async () => {
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 0,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationExpiryDate', '2021-03-31T07:00:00+00:00')
+    
+    wrapper = createComponent(defaultRegistrationType, false, true)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with default values', async () => {
+    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.find('#length-in-years').exists()).toBe(true)
+    // set renewal length to 1 year
+    wrapper.vm.$data.lifeYearsEdit = '1'
+    await Vue.nextTick()
+    expect(wrapper.find('#new-expiry').text()).toContain('March 31, 2022')
+  })
+  
+})
+
+describe('RegistrationLengthTrust RL renewal test', () => {
+  let wrapper: Wrapper<any>
+  const defaultRegistrationType: String = String('RL')
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedRepairersLien())
+    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
+    await store.dispatch('setRegistrationSurrenderDate', '2021-01-21T07:00:00+00:00')
+    
+    wrapper = createComponent(defaultRegistrationType, false, true)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with default values', async () => {
+    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.find('#length-in-years').exists()).toBe(false)
+    // new expiry date (180 days)
+    expect(wrapper.find('#new-expiry-rl').text()).toContain('January 24, 2022')
+    // surrender date
+    expect(wrapper.find('#surrender-date').text()).toContain('January 20, 2021')
+    
+  })
+  
 })

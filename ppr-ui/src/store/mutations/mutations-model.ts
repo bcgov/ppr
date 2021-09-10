@@ -94,6 +94,10 @@ export const mutateRegistrationExpiryDate = (state: StateIF, date: string) => {
   state.stateModel.registration.expiryDate = date
 }
 
+export const mutateRegistrationSurrenderDate = (state: StateIF, date: string) => {
+  state.stateModel.registration.surrenderDate = date
+}
+
 export const mutateRegistrationNumber = (state: StateIF, regNum: string) => {
   state.stateModel.registration.registrationNumber = regNum
 }

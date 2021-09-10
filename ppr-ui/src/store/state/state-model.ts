@@ -29,6 +29,7 @@ export const stateModel: StateModelIF = {
       lastUpdateDateTime: null
     },
     expiryDate: '',
+    surrenderDate: '',
     lengthTrust: {
       valid: false,
       lifeYears: 0,
