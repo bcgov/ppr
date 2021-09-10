@@ -5,19 +5,23 @@ import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
+import flushPromises from 'flush-promises'
 // Components
 import { ConfirmDischarge } from '@/views'
-import { ButtonsStacked, CautionBox, DischargeConfirmSummary, RegistrationFee, 
-  FolioNumberSummary } from '@/components/common'
+import {
+  ButtonsStacked, CautionBox, DischargeConfirmSummary,
+  FolioNumberSummary
+} from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
+import { FeeSummary } from '@/composables/fees'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
 import { mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll } from './test-data'
-import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -91,10 +95,9 @@ describe('ConfirmDischarge registration view', () => {
     // eslint-disable-next-line max-len
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe('General Collateral and 2 Vehicles')
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(false)
-    // check fee summary (whether data for it is in store or by prop may change)
-    expect(state.feeSummary.feeAmount).toBe(0)
-    expect(wrapper.findComponent(RegistrationFee).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationFee).vm.registrationType).toBe('Total Discharge')
+    // check fee summary
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
     // buttons
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     // folio

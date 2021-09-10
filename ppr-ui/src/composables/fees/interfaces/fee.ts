@@ -1,7 +1,7 @@
-import { FeeCodes } from "@/enums";
+import { FeeCodes } from '../enums'
 
 // Fee information interface.
-export interface FeeIF {
+export interface FeeI {
   feeCode: FeeCodes,
   description?: string,
   hint?: string,

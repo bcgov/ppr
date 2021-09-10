@@ -29,7 +29,11 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <registration-fee :registrationType="registrationTypeUI"/>
+            <fee-summary
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+            />
           </v-col>
         </v-row>
       </div>
@@ -51,25 +55,28 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames, StatementTypes, APIRegistrationTypes } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
-  ActionBindingIF, FeeSummaryIF, ErrorIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, ErrorIF, LengthTrustIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 // local components
-import { ButtonFooter, RegistrationFee, Stepper } from '@/components/common'
+import { ButtonFooter, Stepper } from '@/components/common'
+import { FeeSummary } from '@/composables/fees'
 import { Collateral } from '@/components/collateral'
 
 @Component({
   components: {
     ButtonFooter,
-    RegistrationFee,
+    FeeSummary,
     Stepper,
     Collateral
   }
 })
 export default class AddCollateral extends Vue {
+  @Getter getLengthTrust: LengthTrustIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
-  @Getter getFeeSummary: FeeSummaryIF
 
   @Action resetNewRegistration: ActionBindingIF
 
@@ -82,12 +89,17 @@ export default class AddCollateral extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private get feeSummary (): FeeSummaryIF {
-    return this.getFeeSummary
-  }
+  private feeType = FeeSummaryTypes.NEW
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get registrationLength (): RegistrationLengthI {
+    return {
+      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
+      lifeYears: this.getLengthTrust?.lifeYears || 0
+    }
   }
 
   private get registrationTypeUI (): string {

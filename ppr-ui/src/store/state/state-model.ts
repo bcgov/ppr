@@ -12,11 +12,6 @@ export const stateModel: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
-  feeSummary: {
-    feeAmount: 0,
-    serviceFee: 1.5,
-    quantity: 0
-  },
   registration: {
     collateral: {
       valid: false,

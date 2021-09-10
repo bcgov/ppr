@@ -56,7 +56,10 @@
           />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <registration-fee :registrationType="'Total Discharge'" />
+          <fee-summary
+            :setFeeType="feeType"
+            :setRegistrationType="registrationTypeUI"
+          />
           <buttons-stacked
             class="pt-4"
             :setBackBtn="'Back'"
@@ -83,21 +86,22 @@ import {
   ButtonsStacked,
   CautionBox,
   DischargeConfirmSummary,
-  RegistrationFee,
   FolioNumberSummary
 } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
+import { FeeSummary } from '@/composables/fees'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   DischargeRegistrationIF, // eslint-disable-line no-unused-vars
-  FeeSummaryIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
@@ -107,7 +111,7 @@ import { StatusCodes } from 'http-status-codes'
     ButtonsStacked,
     CautionBox,
     DischargeConfirmSummary,
-    RegistrationFee,
+    FeeSummary,
     FolioNumberSummary,
     RegisteringPartySummary
   }
@@ -117,7 +121,6 @@ export default class ConfirmDischarge extends Vue {
   @Getter getStateModel: StateModelIF
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setFeeSummary: ActionBindingIF
   @Action setRegistrationCreationDate: ActionBindingIF
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
@@ -134,6 +137,7 @@ export default class ConfirmDischarge extends Vue {
     'will receive a copy of the Total Discharge Verification Statement.'
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
+  private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
   private showErrors = false
   private tooltipTxt = 'The Registering Party is based on your ' +
@@ -211,18 +215,11 @@ export default class ConfirmDischarge extends Vue {
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
-      const feeSummary = {
-        feeAmount: 0,
-        serviceFee: 1.5,
-        quantity: 1,
-        feeCode: ''
-      } as FeeSummaryIF
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
-      this.setFeeSummary(feeSummary)
     }
   }
 

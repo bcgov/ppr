@@ -1,5 +1,5 @@
 // Fee summary state model
-export interface FeeSummaryIF {
+export interface FeeSummaryI {
   feeAmount: number
   serviceFee: number
   quantity: number
