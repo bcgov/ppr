@@ -627,25 +627,25 @@ def upgrade():
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'CC',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO CORPORATION CAPITAL TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO CORPORATION CAPITAL TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'CT',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO CARBON TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO CARBON TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'DP',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO CONSUMPTION, TRANSITION TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO CONSUMPTION, TRANSITION TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'ET',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO EXCISE TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO EXCISE TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
@@ -657,43 +657,43 @@ def upgrade():
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'FT',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MOTOR FUEL TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MOTOR FUEL TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'HR',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO HOTEL ROOM TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO HOTEL ROOM TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'IP',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO INSURANCE PREMIUM TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO INSURANCE PREMIUM TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'IT',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO INCOME TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO INCOME TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'LO',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO LOGGING TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO LOGGING TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'MI',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MINING TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MINING TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'MR',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MINERAL RESOURCE TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MINERAL RESOURCE TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
@@ -705,31 +705,49 @@ def upgrade():
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'PG',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO PETROLEUM and NATURAL GAS TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO PETROLEUM and NATURAL GAS TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'PS',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO PROVINCIAL SALES TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO PROVINCIAL SALES TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'RA',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO RURAL PROPERTY TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO TAXATION (RURAL AREA) ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'SS',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
-            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO SOCIAL SERVICE TAX'
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO SOCIAL SERVICE TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'TL',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
             'registration_desc': 'TAX LIEN UNDER SOCIAL SERVICE OR HOTEL ROOM TAX ACTS'
+        },
+        {
+            'registration_type_cl': 'CROWNLIEN',
+            'registration_type': 'MD',
+            'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO MINERAL LAND TAX ACT'
+        },
+        {
+            'registration_type_cl': 'CROWNLIEN',
+            'registration_type': 'PT',
+            'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO PROPERTY TRANSFER TAX ACT'
+        },
+        {
+            'registration_type_cl': 'CROWNLIEN',
+            'registration_type': 'SC',
+            'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO SCHOOL ACT'
         },
         {
             'registration_type_cl': 'DISCHARGE',
@@ -770,13 +788,13 @@ def upgrade():
         {
             'registration_type_cl': 'PPSALIEN',
             'registration_type': 'FA',
-            'registration_act': 'FORESTRY - CONTRACTOR CHARGE',
+            'registration_act': 'FORESTRY SERVICE PROVIDERS PROTECTION ACT',
             'registration_desc': 'FORESTRY - CONTRACTOR CHARGE'
         },
         {
             'registration_type_cl': 'PPSALIEN',
             'registration_type': 'FL',
-            'registration_act': 'FORESTRY - CONTRACTOR LIEN',
+            'registration_act': 'FORESTRY SERVICE PROVIDERS PROTECTION ACT',
             'registration_desc': 'FORESTRY - CONTRACTOR LIEN'
         },
         {
@@ -788,7 +806,7 @@ def upgrade():
         {
             'registration_type_cl': 'PPSALIEN',
             'registration_type': 'FS',
-            'registration_act': 'FORESTRY - SUB-CONTRACTOR CHARGE',
+            'registration_act': 'FORESTRY SERVICE PROVIDERS PROTECTION ACT',
             'registration_desc': 'FORESTRY - SUB-CONTRACTOR CHARGE'
         },
         {
@@ -812,7 +830,7 @@ def upgrade():
         {
             'registration_type_cl': 'PPSALIEN',
             'registration_type': 'SA',
-            'registration_act': 'PPSA SECURITY ACT',
+            'registration_act': 'PERSONAL PROPERTY SECURITY ACT',
             'registration_desc': 'PPSA SECURITY AGREEMENT'
         },
         {

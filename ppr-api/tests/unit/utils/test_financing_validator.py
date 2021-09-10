@@ -101,7 +101,7 @@ DESC_ALL_LIFE = 'Includes life years, life infinite'
 DESC_INCLUDES_LA = 'Includes lien amount'
 DESC_INCLUDES_SD = 'Includes surrender date'
 
-# testdata pattern is ({description}, {valid}, {lien_amount}, {surrender_date}, {message contents})
+# testdata pattern is ({description}, {valid}, {lien_amount}, {surrender_date}, {message content})
 TEST_RL_DATA = [
     (DESC_VALID, True, '1000', 'valid', None),
     ('Missing lien amount', False, None, 'valid', validator.RL_AMOUNT_REQUIRED),
@@ -114,7 +114,19 @@ TEST_RL_DATA = [
     (DESC_VC_MH, False, '1000', 'valid', validator.VC_MH_NOT_ALLOWED)
 ]
 
-# testdata pattern is ({description}, {valid}, {reg_type}, {message contents})
+
+# testdata pattern is ({description}, {valid}, {reg_type})
+TEST_EXCLUDED_TYPE_DATA = [
+    ('Type not allowed', False, 'SS'),
+    ('Type not allowed', False, 'MR'),
+    ('Type not allowed', False, 'CC'),
+    ('Type not allowed', False, 'DP'),
+    ('Type not allowed', False, 'HR'),
+    ('Type not allowed', False, 'MI')
+]
+
+
+# testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_FR_LT_MH_MN_DATA = [
     (DESC_VALID, True, 'FR', None),
     (DESC_VALID, True, 'LT', None),
@@ -144,7 +156,7 @@ TEST_FR_LT_MH_MN_DATA = [
     (DESC_EXCLUDES_LY, False, 'MH', validator.LY_NOT_ALLOWED)
 ]
 
-# testdata pattern is ({description}, {valid}, {message contents})
+# testdata pattern is ({description}, {valid}, {message content})
 TEST_PPSA_DATA = [
     (DESC_VALID, True, None),
     (DESC_INCLUDES_OT_DESC, False, validator.OT_NOT_ALLOWED),
@@ -154,7 +166,7 @@ TEST_PPSA_DATA = [
     (DESC_INCLUDES_SD, False, validator.SD_NOT_ALLOWED)
 ]
 
-# testdata pattern is ({description}, {valid}, {message contents})
+# testdata pattern is ({description}, {valid}, {message content})
 TEST_CROWN_DATA = [
     (DESC_VALID, True, None),
     (DESC_MISSING_GC, False, validator.GC_REQUIRED),
@@ -165,7 +177,20 @@ TEST_CROWN_DATA = [
     (DESC_MISSING_OT_DESC, False, validator.OT_MISSING_DESCRIPTION)
 ]
 
-# testdata pattern is ({description}, {valid}, {reg_type}, {message contents})
+# testdata pattern is ({description}, {valid}, {reg_type}, {message content})
+TEST_MD_PT_SC_DATA = [
+    (DESC_VALID, True, 'MD', None),
+    (DESC_VALID, True, 'PT', None),
+    (DESC_VALID, True, 'SC', None),
+    (DESC_MISSING_GC, False, 'MD', validator.GC_REQUIRED),
+    (DESC_INCLUDES_VC, False, 'MD', validator.VC_NOT_ALLOWED),
+    (DESC_MISSING_GC, False, 'PT', validator.GC_REQUIRED),
+    (DESC_INCLUDES_VC, False, 'PT', validator.VC_NOT_ALLOWED),
+    (DESC_MISSING_GC, False, 'SC', validator.GC_REQUIRED),
+    (DESC_INCLUDES_VC, False, 'SC', validator.VC_NOT_ALLOWED)
+]
+
+# testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_FL_FA_FS_HN_WL_DATA = [
     (DESC_VALID, True, 'FL', None),
     (DESC_VALID, True, 'FA', None),
@@ -184,7 +209,7 @@ TEST_FL_FA_FS_HN_WL_DATA = [
     (DESC_INCLUDES_VC, False, 'WL', validator.VC_NOT_ALLOWED)
 ]
 
-# testdata pattern is ({description}, {valid}, {reg_type}, {message contents})
+# testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_MISC_DATA = [
     (DESC_VALID, True, 'HN', None),
     (DESC_VALID, True, 'ML', None),
@@ -236,6 +261,21 @@ def test_validate_rl(session, desc, valid, lien_amount, surrender_date, message_
         # print(error_msg)
         assert error_msg != ''
         assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,reg_type', TEST_EXCLUDED_TYPE_DATA)
+def test_validate_excluded_type(session, desc, valid, reg_type):
+    """Assert that financing statement excluded registration type validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING)
+    json_data['type'] = reg_type
+    error_msg = validator.validate(json_data)
+    if valid:
+        assert error_msg == ''
+    else:
+        # print(error_msg)
+        assert error_msg != ''
+        assert error_msg.find(validator.TYPE_NOT_ALLOWED) != -1
 
 
 @pytest.mark.parametrize('desc,valid,reg_type,message_content', TEST_FR_LT_MH_MN_DATA)
@@ -312,11 +352,37 @@ def test_validate_ppsa(session, desc, valid, message_content):
                 assert error_msg.find(message_content) != -1
 
 
+@pytest.mark.parametrize('desc,valid,reg_type,message_content', TEST_MD_PT_SC_DATA)
+def test_validate_md_pt_sc(session, desc, valid, reg_type, message_content):
+    """Assert that new MD, PT, SC registration type validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING)
+    json_data['type'] = reg_type
+    del json_data['trustIndenture']
+    if desc == DESC_MISSING_GC:
+        del json_data['generalCollateral']
+    if desc != DESC_INCLUDES_VC:
+        del json_data['vehicleCollateral']
+    json_data['lifeInfinite'] = True
+    del json_data['lifeYears']
+
+    error_msg = validator.validate(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        print(error_msg)
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
+
+
 @pytest.mark.parametrize('desc,valid,message_content', TEST_CROWN_DATA)
 def test_validate_crown(session, desc, valid, message_content):
     """Assert that financing statement crown charge class registration type validation works as expected."""
     # setup
     for reg_type in CrownChargeTypes:
+        if validator.validate_allowed_type(reg_type.value) != '':
+            continue
+
         json_data = copy.deepcopy(FINANCING)
         json_data['type'] = reg_type.value
         del json_data['trustIndenture']
