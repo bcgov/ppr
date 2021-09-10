@@ -195,7 +195,7 @@ def validate_rl(json_data, reg_type: str):
 def validate_allowed_type(reg_type: str):
     """Check if the submitted type is allowed for new financing statements."""
     try:
-        test = model_utils.REG_TYPE_NEW_FINANCING_EXCLUDED[reg_type] 
+        test = model_utils.REG_TYPE_NEW_FINANCING_EXCLUDED[reg_type]
         if test:
             return TYPE_NOT_ALLOWED
         return ''

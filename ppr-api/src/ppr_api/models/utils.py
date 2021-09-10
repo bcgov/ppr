@@ -61,7 +61,6 @@ REG_TYPE_LAND_TAX_MH = 'LT'
 REG_TYPE_TAX_MH = 'MH'
 REG_TYPE_OTHER = 'OT'
 REG_TYPE_SECURITY_AGREEMENT = 'SA'
-REG_TYPE_NEW_EXCLUDED = ' SS, MR, CC, DP, HR, MI '
 
 SEARCH_MATCH_EXACT = 'EXACT'
 SEARCH_MATCH_SIMILAR = 'SIMILAR'
@@ -76,7 +75,7 @@ LIFE_INFINITE = 99
 REPAIRER_LIEN_DAYS = 180
 REPAIRER_LIEN_YEARS = 0
 
-# Mapping from API draft type to DB registration class
+# Legacy registration types not allowed with new financing statements.
 REG_TYPE_NEW_FINANCING_EXCLUDED = {
     'SS': 'SS',
     'MR': 'MR',

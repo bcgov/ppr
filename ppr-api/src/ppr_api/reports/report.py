@@ -11,7 +11,6 @@
 """Produces a PDF output based on templates and JSON messages."""
 import base64
 import json
-from datetime import datetime
 from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
@@ -567,7 +566,7 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _to_report_datetime(date_time: str, include_time: bool = True):
         """Convert ISO formatted date time or date string to report format."""
-        local_datetime = model_utils.to_local_timestamp(datetime.fromisoformat(date_time))
+        local_datetime = model_utils.to_local_timestamp(model_utils.ts_from_iso_format(date_time))
         if include_time:
             timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
             if timestamp.find(' AM ') > 0:
