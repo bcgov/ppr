@@ -167,7 +167,7 @@ export default class Dashboard extends Vue {
   private async startFinancingDraft (documentId: string): Promise<void> {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     // Get draft details and setup store for editing the draft financing statement.
-    var stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
+    const stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
     if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
       alert('Attempt to get draft for editing failed.')
     } else {
@@ -175,7 +175,7 @@ export default class Dashboard extends Vue {
       this.setAddCollateral(stateModel.registration.collateral)
       this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
       // setup fee
-      var feeSummary: FeeSummaryIF = this.getFeeSummary
+      const feeSummary: FeeSummaryIF = this.getFeeSummary
       if (stateModel.registration.lengthTrust.lifeInfinite) {
         const feeInfoInfinite = getFinancingFee(true)
         feeSummary.quantity = feeInfoInfinite.quantityMin
