@@ -74,10 +74,6 @@ export const setRegistrationExpiryDate: ActionIF = ({ commit }, date: string): v
   commit('mutateRegistrationExpiryDate', date)
 }
 
-export const setRegistrationSurrenderDate: ActionIF = ({ commit }, date: string): void => {
-  commit('mutateRegistrationSurrenderDate', date)
-}
-
 export const setRegistrationNumber: ActionIF = ({ commit }, regNum: string): void => {
   commit('mutateRegistrationNumber', regNum)
 }

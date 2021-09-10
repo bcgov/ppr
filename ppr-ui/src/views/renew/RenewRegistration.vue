@@ -87,8 +87,7 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
-  @Action setRegistrationSurrenderDate: ActionBindingIF
-
+  
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
@@ -167,7 +166,6 @@ export default class ReviewRegistration extends Vue {
       } as AddPartiesIF
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      this.setRegistrationSurrenderDate(financingStatement.surrenderDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddCollateral(collateral)

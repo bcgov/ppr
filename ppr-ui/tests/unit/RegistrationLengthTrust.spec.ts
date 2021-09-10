@@ -277,7 +277,15 @@ describe('RegistrationLengthTrust RL renewal test', () => {
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedRepairersLien())
     await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
-    await store.dispatch('setRegistrationSurrenderDate', '2021-01-21T07:00:00+00:00')
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 0,
+      showInvalid: false,
+      surrenderDate: '2021-01-21T07:00:00+00:00',
+      lienAmount: ''
+    })
     
     wrapper = createComponent(defaultRegistrationType, false, true)
   })
