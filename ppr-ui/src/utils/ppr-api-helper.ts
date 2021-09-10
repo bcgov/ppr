@@ -14,7 +14,8 @@ import {
   UserSettingsIF,
   SearchPartyIF,
   DebtorNameIF,
-  RegistrationSummaryIF
+  RegistrationSummaryIF,
+  RenewRegistrationIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
@@ -444,6 +445,33 @@ export async function createDischarge (discharge: DischargeRegistrationIF): Prom
       return discharge
     })
 }
+
+// Save a renewal registration.
+export async function createRenewal (renewal: RenewRegistrationIF): Promise<RenewRegistrationIF> {
+  return axios
+    .post<RenewRegistrationIF>(
+      `financing-statements/${renewal.baseRegistrationNumber}/discharges`,
+      renewal,
+      getDefaultConfig())
+    .then(response => {
+      const data: RenewRegistrationIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      renewal.error = {
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message:
+          error?.response?.data?.errorMessage +
+          ' ' +
+          error?.response?.data?.rootCause
+      }
+      return renewal
+    })
+}
+
 
 // Get an existing financing statement.
 export async function getFinancingStatement (
