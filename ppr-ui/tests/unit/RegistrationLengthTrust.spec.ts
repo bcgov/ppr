@@ -291,7 +291,7 @@ describe('RegistrationLengthTrust RL renewal test', () => {
     // new expiry date (180 days)
     expect(wrapper.find('#new-expiry-rl').text()).toContain('January 24, 2022')
     // surrender date
-    expect(wrapper.find('#surrender-date').text()).toContain('January 20, 2021')
+    expect(wrapper.find('#surrender-date').text()).toContain('January 21, 2021')
     
   })
   
