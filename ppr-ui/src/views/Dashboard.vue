@@ -72,10 +72,10 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
-import { ActionBindingIF, BreadcrumbIF, GetterIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
+import { ActionBindingIF, BreadcrumbIF, ErrorIF, FeeSummaryIF, RegistrationTypeIF, // eslint-disable-line
          SearchResponseIF, StateModelIF } from '@/interfaces' // eslint-disable-line
 import { tombstoneBreadcrumbDashboard } from '@/resources'
-import { getFeatureFlag, searchHistory, setupFinancingStatementDraft } from '@/utils'
+import { getFeatureFlag, getFinancingFee, searchHistory, setupFinancingStatementDraft } from '@/utils'
 // local components
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
@@ -96,6 +96,7 @@ export default class Dashboard extends Vue {
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter getFeeSummary: FeeSummaryIF
 
   @Action resetNewRegistration: ActionBindingIF
   @Action setDebtorName: ActionBindingIF
@@ -108,6 +109,7 @@ export default class Dashboard extends Vue {
   @Action setLengthTrust: ActionBindingIF
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setFeeSummary: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -172,6 +174,19 @@ export default class Dashboard extends Vue {
       this.setLengthTrust(stateModel.registration.lengthTrust)
       this.setAddCollateral(stateModel.registration.collateral)
       this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+      // setup fee
+      var feeSummary: FeeSummaryIF = this.getFeeSummary
+      if (stateModel.registration.lengthTrust.lifeInfinite) {
+        const feeInfoInfinite = getFinancingFee(true)
+        feeSummary.quantity = feeInfoInfinite.quantityMin
+        feeSummary.feeAmount = feeInfoInfinite.feeAmount
+        this.setFeeSummary(feeSummary)
+      } else if (stateModel.registration.lengthTrust.lifeYears > 0) {
+        const feeInfoYears = getFinancingFee(false)
+        feeSummary.quantity = stateModel.registration.lengthTrust.lifeYears
+        feeSummary.feeAmount = feeInfoYears.feeAmount
+        this.setFeeSummary(feeSummary)
+      }
       // Go to the first step.
       this.$router.push({ name: RouteNames.LENGTH_TRUST })
     }

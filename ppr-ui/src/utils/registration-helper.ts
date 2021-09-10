@@ -198,7 +198,10 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
     return stateModel
   }
 
-  var registrationType:RegistrationTypeIF = null
+  var registrationType:RegistrationTypeIF = RegistrationTypes.find(obj => {
+    return obj.registrationTypeAPI === draft.financingStatement.type
+  })
+  /*
   for (const regType of RegistrationTypes) {
     if (regType.registrationTypeAPI !== null && regType.registrationTypeAPI === draft.financingStatement.type) {
       // console.log(regType)
@@ -206,6 +209,8 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
       break
     }
   }
+  */
+
   stateModel.registration.registrationType = registrationType
   if (draft.financingStatement.registeringParty) {
     stateModel.registration.parties.registeringParty = draft.financingStatement.registeringParty
