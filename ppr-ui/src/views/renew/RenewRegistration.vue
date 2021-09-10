@@ -87,7 +87,7 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
-  
+
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
