@@ -266,19 +266,19 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
 /** Save new discharge registration. Data to be saved is in the store state model. */
 export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegistrationIF> {
   const trustLength = stateModel.registration.lengthTrust
-  
+
   var registration:RenewRegistrationIF = {
     baseRegistrationNumber: stateModel.registration.registrationNumber,
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,
     clientReferenceId: stateModel.folioOrReferenceNumber,
-    lifeInfinite: trustLength.lifeInfinite 
+    lifeInfinite: trustLength.lifeInfinite
   }
   if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
     delete registration.clientReferenceId
   }
   registration.registeringParty = cleanupParty(registration.registeringParty)
-  
+
   if (!trustLength.lifeInfinite) {
     registration.lifeYears = trustLength.lifeYears
   }
@@ -293,7 +293,6 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   }
   return apiResponse
 }
-
 
 export function cleanupParty (party: PartyIF): PartyIF {
   if (party.emailAddress !== null && party.emailAddress === '') {

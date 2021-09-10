@@ -472,7 +472,6 @@ export async function createRenewal (renewal: RenewRegistrationIF): Promise<Rene
     })
 }
 
-
 // Get an existing financing statement.
 export async function getFinancingStatement (
   current: boolean,

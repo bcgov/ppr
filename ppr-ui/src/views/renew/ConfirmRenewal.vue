@@ -79,19 +79,18 @@ import { RegistrationLengthTrust } from '@/components/registration'
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
-  DischargeRegistrationIF, // eslint-disable-line no-unused-vars
+  RenewRegistrationIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  RenewRegistrationIF
+  StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 import { FeeSummary } from '@/composables/fees'
-import { FeeSummaryI } from '@/composables/fees/interfaces'
+import { FeeSummaryI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
 @Component({
   components: {
