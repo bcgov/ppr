@@ -70,10 +70,15 @@ TEST_DATA_EXPIRY_RENEW_RL = [
     ('1 renewal', '2021-08-31T00:00:01-07:00', 1, '2022-08-27T06:59:59+00:00'),
     ('2 renewals', '2021-08-31T00:00:01-07:00', 2, '2023-02-23T07:59:59+00:00')
 ]
-# testdata pattern is ({desc}, {registration_ts}, {hour})
+# testdata pattern is ({desc}, {registration_ts}, {life_years}, {hour})
 TEST_DATA_EXPIRY_REGISTRATION = [
     ('Daylight savings', '2021-08-31T12:00:01-07:00', 5, 6),
     ('No daylight savings', '2021-01-31T13:00:01-07:00', 10, 7)
+]
+# testdata pattern is ({desc}, {utc_ts}, {local_ts})
+TEST_DATA_LOCAL_TIMEZONE = [
+    ('Daylight savings', '2021-09-01T06:59:59-00:00', '2021-08-31T23:59:59-07:00'),
+    ('No daylight savings', '2021-02-01T07:59:59-00:00', '2021-01-31T23:59:59-08:00')
 ]
 
 
@@ -241,3 +246,15 @@ def test_expiry_dt_from_registration(session, desc, registration_ts, life_years,
     assert expiry_ts.hour == hour
     assert expiry_ts.minute == 59
     assert expiry_ts.second == 59
+
+
+@pytest.mark.parametrize('desc,utc_ts,local_ts', TEST_DATA_LOCAL_TIMEZONE)
+def test_to_local_timezone(session, desc, utc_ts, local_ts):
+    """Assert that converting UTC time to local time is performing as expected."""
+    adjusted_ts = model_utils.to_local_timestamp(model_utils.ts_from_iso_format(utc_ts))
+    local_iso = adjusted_ts.isoformat()
+    print(utc_ts + ' ' + local_iso + ' ' + local_ts)
+    assert adjusted_ts.hour == 23
+    assert adjusted_ts.minute == 59
+    assert adjusted_ts.second == 59
+    assert local_iso == local_ts

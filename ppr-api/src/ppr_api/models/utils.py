@@ -61,6 +61,7 @@ REG_TYPE_LAND_TAX_MH = 'LT'
 REG_TYPE_TAX_MH = 'MH'
 REG_TYPE_OTHER = 'OT'
 REG_TYPE_SECURITY_AGREEMENT = 'SA'
+REG_TYPE_NEW_EXCLUDED = ' SS, MR, CC, DP, HR, MI '
 
 SEARCH_MATCH_EXACT = 'EXACT'
 SEARCH_MATCH_SIMILAR = 'SIMILAR'
@@ -74,6 +75,16 @@ STATE_EXPIRED = 'HEX'
 LIFE_INFINITE = 99
 REPAIRER_LIEN_DAYS = 180
 REPAIRER_LIEN_YEARS = 0
+
+# Mapping from API draft type to DB registration class
+REG_TYPE_NEW_FINANCING_EXCLUDED = {
+    'SS': 'SS',
+    'MR': 'MR',
+    'CC': 'CC',
+    'DP': 'DP',
+    'HR': 'HR',
+    'MI': 'MI',
+}
 
 # Mapping from API draft type to DB registration class
 DRAFT_TYPE_TO_REG_CLASS = {
@@ -132,12 +143,15 @@ REG_TYPE_TO_REG_CLASS = {
     'IP': 'CROWNLIEN',
     'IT': 'CROWNLIEN',
     'LO': 'CROWNLIEN',
+    'MD': 'CROWNLIEN',
     'MI': 'CROWNLIEN',
     'MR': 'CROWNLIEN',
     'OT': 'CROWNLIEN',
     'PG': 'CROWNLIEN',
     'PS': 'CROWNLIEN',
+    'PT': 'CROWNLIEN',
     'RA': 'CROWNLIEN',
+    'SC': 'CROWNLIEN',
     'SS': 'CROWNLIEN',
     'TL': 'CROWNLIEN',
     'DC': 'DISCHARGE',
@@ -433,7 +447,7 @@ def ts_from_date_iso_format(date_iso: str):
 
 def to_local_timestamp(utc_ts):
     """Create a timestamp adjusted from UTC to the local timezone."""
-    return LOCAL_TZ.localize(_datetime.fromtimestamp(utc_ts.timestamp()))
+    return utc_ts.astimezone(LOCAL_TZ)
 
 
 def is_historical(financing_statement):

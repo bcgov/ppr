@@ -23,6 +23,7 @@ from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
 
 
 # Error messages
+TYPE_NOT_ALLOWED = 'A new Financing Statement cannot be created with the submitted registration type.\n'
 GC_NOT_ALLOWED = 'General Collateral is not allowed with this registration type.\n'
 GC_REQUIRED = 'General Collateral is required with this registration type.\n'
 LA_NOT_ALLOWED = 'Lien Amount is not allowed with this registration type.\n'
@@ -76,6 +77,10 @@ def validate(json_data):
             return error_msg
 
         reg_type = json_data['type']
+        error_msg = validate_allowed_type(reg_type)
+        if error_msg != '':
+            return error_msg
+
         reg_class = get_registration_class(reg_type)
         if reg_class is None:
             return error_msg
@@ -95,7 +100,7 @@ def validate_life(json_data, reg_type: str, reg_class: str):
     """Validate lifeYears and lifeInfinite by registration type."""
     error_msg = ''
     if reg_type in LIFE_INFINITE_LIST or reg_class in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
-        if 'lifeYears' in json_data and (json_data['lifeYears'] != model_utils.LIFE_INFINITE):
+        if 'lifeYears' in json_data:
             error_msg = LY_NOT_ALLOWED
         if 'lifeInfinite' in json_data and not json_data['lifeInfinite']:
             error_msg += LI_INVALID
@@ -185,6 +190,17 @@ def validate_rl(json_data, reg_type: str):
             error_msg += RL_DATE_INVALID
 
     return error_msg
+
+
+def validate_allowed_type(reg_type: str):
+    """Check if the submitted type is allowed for new financing statements."""
+    try:
+        test = model_utils.REG_TYPE_NEW_FINANCING_EXCLUDED[reg_type] 
+        if test:
+            return TYPE_NOT_ALLOWED
+        return ''
+    except KeyError:
+        return ''
 
 
 def get_registration_class(reg_type: str):
