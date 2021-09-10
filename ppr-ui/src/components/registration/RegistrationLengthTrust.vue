@@ -108,7 +108,7 @@
         </v-row>
         <v-row no-gutters class="py-6">
            <v-col cols="3"></v-col>
-           <v-col cols="9"><v-divider class="ml-0" /></v-col>
+           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
         </v-row>
         <v-row no-gutters>
           <v-col cols="3" class="generic-label"> New Expiry </v-col>
@@ -118,7 +118,7 @@
         </v-row>
         <v-row no-gutters class="pt-6">
            <v-col cols="3"></v-col>
-           <v-col cols="9"><v-divider class="ml-0" /></v-col>
+           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
         </v-row>
         <v-row no-gutters class="pt-6">
           <v-col cols="3" class="generic-label">
@@ -276,15 +276,15 @@
       </v-row>
       <v-row>
         <v-col cols="3"></v-col>
-        <v-col cols="9" v-if="!infinityPreselected()"><v-divider /></v-col>
+        <v-col cols="9" class="pl-2" v-if="!infinityPreselected()"><v-divider class="ml-0" /></v-col>
       </v-row>
       <v-row no-gutters class="py-6" v-if="renewalView">
         <v-col cols="3" class="generic-label">New Expiry</v-col>
         <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
       </v-row>
-      <v-row v-if="renewalView">
+      <v-row v-if="renewalView && showTrustIndenture">
         <v-col cols="3"></v-col>
-        <v-col cols="9"><v-divider /></v-col>
+        <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
       </v-row>
       <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
         <v-col cols="3" class="generic-label">
