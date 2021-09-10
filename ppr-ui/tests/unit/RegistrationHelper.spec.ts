@@ -5,7 +5,13 @@ import CompositionApi from '@vue/composition-api'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
-import { cleanupParty, saveDischarge, saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
+import {
+  cleanupParty,
+  saveDischarge,
+  saveFinancingStatement,
+  saveFinancingStatementDraft,
+  setupFinancingStatementDraft
+} from '@/utils'
 import { DischargeRegistrationIF, PartyIF, FinancingStatementIF, DraftIF, StateModelIF } from '@/interfaces'
 import { APIRegistrationTypes } from '@/enums'
 
@@ -130,6 +136,53 @@ describe('Registration API Helper Tests', () => {
     expect(('personName' in party)).toBeFalsy()
     expect(('code' in party)).toBeFalsy()
     expect(('emailAddress' in party)).toBeFalsy()
+  })
+
+  it('setup financing statement draft for editing', async () => {
+    await store.dispatch('resetNewRegistration', null)
+    var stateModel:StateModelIF = await setupFinancingStatementDraft(wrapper.vm.$store.state.stateModel, 'D0034001')
+    // console.log(JSON.stringify(stateModel))
+    expect(stateModel.registration.draft).toBeDefined()
+    expect(stateModel.registration.draft.error).toBeUndefined()
+    expect(stateModel.registration.draft.financingStatement).toBeDefined()
+    expect(stateModel.registration.draft.financingStatement.documentId).toBe('D0034001')
+    expect(stateModel.folioOrReferenceNumber).toBeDefined()
+    expect(stateModel.registration.registrationType).toBeDefined()
+    expect(stateModel.registration.registrationType.registrationTypeUI).toBeDefined()
+    expect(stateModel.registration.parties.registeringParty).toBeDefined()
+    expect(stateModel.registration.lengthTrust).toBeDefined()
+    expect(stateModel.registration.lengthTrust.lifeYears).toBe(5)
+    expect(stateModel.registration.registrationType.registrationTypeAPI).toBe(APIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(stateModel.registration.parties.securedParties).toBeDefined()
+    expect(stateModel.registration.parties.securedParties.length).toBe(1)
+    expect(stateModel.registration.parties.debtors).toBeDefined()
+    expect(stateModel.registration.parties.debtors.length).toBe(1)
+    expect(stateModel.registration.collateral.vehicleCollateral).toBeDefined()
+    expect(stateModel.registration.collateral.vehicleCollateral.length).toBe(1)
+    // Update store and check it.
+    await store.dispatch('setDraft', stateModel.registration.draft)
+    await store.dispatch('setLengthTrust', stateModel.registration.lengthTrust)
+    await store.dispatch('setAddCollateral', stateModel.registration.collateral)
+    await store.dispatch('setAddSecuredPartiesAndDebtors', stateModel.registration.parties)
+    await store.dispatch('setFolioOrReferenceNumber', stateModel.folioOrReferenceNumber)
+    const storeModel:StateModelIF = wrapper.vm.$store.state.stateModel
+    expect(storeModel.registration.draft).toBeDefined()
+    expect(storeModel.registration.draft.error).toBeUndefined()
+    expect(storeModel.registration.draft.financingStatement).toBeDefined()
+    expect(storeModel.registration.draft.financingStatement.documentId).toBe('D0034001')
+    expect(storeModel.folioOrReferenceNumber).toBe(stateModel.folioOrReferenceNumber)
+    expect(storeModel.registration.registrationType).toBeDefined()
+    expect(storeModel.registration.registrationType.registrationTypeUI).toBeDefined()
+    expect(storeModel.registration.parties.registeringParty).toBeDefined()
+    expect(storeModel.registration.lengthTrust).toBeDefined()
+    expect(storeModel.registration.lengthTrust.lifeYears).toBe(5)
+    expect(storeModel.registration.registrationType.registrationTypeAPI).toBe(APIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(storeModel.registration.parties.securedParties).toBeDefined()
+    expect(storeModel.registration.parties.securedParties.length).toBe(1)
+    expect(storeModel.registration.parties.debtors).toBeDefined()
+    expect(storeModel.registration.parties.debtors.length).toBe(1)
+    expect(storeModel.registration.collateral.vehicleCollateral).toBeDefined()
+    expect(storeModel.registration.collateral.vehicleCollateral.length).toBe(1)
   })
 })
 

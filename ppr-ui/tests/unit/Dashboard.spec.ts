@@ -4,6 +4,8 @@ import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
+import sinon from 'sinon'
 
 // Components
 import { Dashboard } from '@/views'
@@ -13,8 +15,14 @@ import { RegistrationBar } from '@/components/registration'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedSearchResponse, mockedSearchHistory, mockedSelectSecurityAgreement } from './test-data'
+import {
+  mockedSearchResponse,
+  mockedSearchHistory,
+  mockedSelectSecurityAgreement,
+  mockedDraftFinancingStatementAll
+} from './test-data'
 import { RouteNames, UISearchTypes } from '@/enums'
+import { axios } from '@/utils/axios-ppr'
 
 Vue.use(Vuetify)
 
@@ -33,12 +41,19 @@ document.body.setAttribute('data-app', 'true')
 
 describe('Dashboard component', () => {
   let wrapper: any
+  let sandbox
   const { assign } = window.location
 
   beforeEach(async () => {
     // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // stub api call
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    get.returns(new Promise(resolve => resolve({
+      data: { ...mockedDraftFinancingStatementAll }
+    })))
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -46,11 +61,13 @@ describe('Dashboard component', () => {
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
     wrapper = shallowMount(Dashboard, { localVue, store, router, vuetify })
+    await flushPromises()
   })
 
   afterEach(() => {
     window.location.assign = assign
     wrapper.destroy()
+    sandbox.restore()
   })
 
   it('renders Dashboard View with child components', () => {
@@ -102,5 +119,12 @@ describe('Dashboard component', () => {
     wrapper.findComponent(RegistrationTable).vm.$emit('renew', '123456B')
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
+  })
+
+  it('routes to edit financing statement', async () => {
+    wrapper.findComponent(RegistrationTable).vm.$emit('editFinancingDraft', 'D0034001')
+    await flushPromises()
+    await Vue.nextTick()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
   })
 })
