@@ -234,7 +234,6 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(5)
         expect(wrapper.vm.$data.totalAmount).toBe(6.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
       } else {
         // standard selectable years / selectable infinite
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
@@ -243,7 +242,6 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(0)
         expect(wrapper.vm.$data.totalAmount).toBe(1.5)
         expect(wrapper.vm.$data.isComplete).toBe(false)
-        expect(wrapper.vm.$data.hintFee).toBe('Select registration length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
@@ -257,7 +255,6 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(500)
         expect(wrapper.vm.$data.totalAmount).toBe(501.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
         // select 1 year
         await wrapper.setProps({
           setRegistrationLength: {
@@ -271,7 +268,6 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(5)
         expect(wrapper.vm.$data.totalAmount).toBe(6.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $5.00/year')
         // select multiple years
         await wrapper.setProps({
           setRegistrationLength: {
@@ -285,7 +281,6 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(60)
         expect(wrapper.vm.$data.totalAmount).toBe(61.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('12 Years @ $5.00/year')
       }
     }
   })
