@@ -29,8 +29,6 @@ const dischargeOptions = dischargeConfirmationDialog
 const amendOptions = amendConfirmationDialog
 const renewOptions = renewConfirmationDialog
 
-
-
 describe('Registration Confirmation Dialog', () => {
   let wrapper: Wrapper<any>
   let sandbox
@@ -80,22 +78,22 @@ describe('Registration Confirmation Dialog', () => {
     expect(wrapper.find(dropDown).exists()).toBe(true)
     expect(wrapper.find(accept).exists()).toBe(true)
 
-    wrapper.vm.debtors = [ {text : 'Forrest Gump', value: 'Forrest Gump'},
-                  { text: 'Other Company', value: 'Other Company' }]
+    wrapper.vm.debtors = [{ text: 'Forrest Gump', value: 'Forrest Gump' },
+      { text: 'Other Company', value: 'Other Company' }]
 
-    wrapper.vm.fullDebtorInfo = mockedDebtorNames 
-    await flushPromises()           
+    wrapper.vm.fullDebtorInfo = mockedDebtorNames
+    await flushPromises()
 
-    const autocompleteControls = wrapper.find(".v-input__slot")
-    autocompleteControls.trigger("click")
+    const autocompleteControls = wrapper.find('.v-input__slot')
+    autocompleteControls.trigger('click')
 
     wrapper.vm.userInput = { value: 'Forrest Gump', text: 'Forrest Gump' }
-   
+
     await flushPromises()
 
     wrapper.find(accept).trigger('click')
     await flushPromises()
- 
+
     expect(wrapper.emitted().proceed).toBeTruthy()
 
     expect(store.getters.getConfirmDebtorName.businessName).toBe('Forrest Gump')
@@ -107,10 +105,15 @@ describe('Registration Confirmation Dialog', () => {
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.isVisible()).toBe(true)
 
+    wrapper.vm.userInput = { value: 'Forrest Gump', text: 'Forrest Gump' }
+    await flushPromises()
+
     expect(wrapper.find(cancel).exists()).toBe(true)
     wrapper.find(cancel).trigger('click')
     await flushPromises()
     expect(wrapper.emitted().confirmationClose).toBeTruthy()
+    expect(wrapper.vm.userInput.value).toBe(0)
+    expect(wrapper.vm.userInput.text).toBe('')
   })
 
   it('renders the amendment dialog', async () => {
@@ -123,8 +126,6 @@ describe('Registration Confirmation Dialog', () => {
     expect(wrapper.find(title).text()).toContain(amendOptions.title)
   })
 
-   
-
   it('renders the renewal dialog', async () => {
     wrapper.setProps({ options: renewOptions })
     await Vue.nextTick()
@@ -134,6 +135,4 @@ describe('Registration Confirmation Dialog', () => {
     expect(wrapper.isVisible()).toBe(true)
     expect(wrapper.find(title).text()).toBe(renewOptions.title)
   })
-
-
 })
