@@ -225,7 +225,7 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.RENEW)
       expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
       expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
-      expect(wrapper.vm.$data.feeLabel).toBe(newRegStandard[i])
+      expect(wrapper.vm.$data.feeLabel).toBe('Renewal')
 
       if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
