@@ -95,9 +95,8 @@ export interface RenewRegistrationIF {
   clientReferenceId?: string, // AKA folio max length 20.
   lifeInfinite?: boolean,
   lifeYears?: number, // 1..25 if not lifeInfinite, otherwise 0.
-  lienAmount?: string, // RL only
-  surrenderDate?: string, // RL only
   expiryDate?: string, // The date and time upon which the statement will expire. Empty if lifeInfinite true.
+  renewalRegistrationNumber?: string,
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
   error?: ErrorIF

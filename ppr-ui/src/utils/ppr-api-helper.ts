@@ -450,7 +450,7 @@ export async function createDischarge (discharge: DischargeRegistrationIF): Prom
 export async function createRenewal (renewal: RenewRegistrationIF): Promise<RenewRegistrationIF> {
   return axios
     .post<RenewRegistrationIF>(
-      `financing-statements/${renewal.baseRegistrationNumber}/discharges`,
+      `financing-statements/${renewal.baseRegistrationNumber}/renewals`,
       renewal,
       getDefaultConfig())
     .then(response => {

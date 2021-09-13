@@ -35,7 +35,8 @@
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <registration-length-trust class="mt-15" :isSummary="true" :defaultRegistrationType="registrationType" />
+          <registration-length-trust class="mt-15" :isRenewal="true"
+          :isSummary="true" :defaultRegistrationType="registrationType" />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -43,7 +44,11 @@
           />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <registration-fee :registrationType="'Registration Renewal'" />
+          <fee-summary
+              :setFeeType="feeType"
+              :setRegistrationLength="registrationLength"
+              :setRegistrationType="registrationTypeUI"
+            />
           <buttons-stacked
             class="pt-4"
             :setBackBtn="'Back'"
@@ -82,14 +87,16 @@ import {
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF // eslint-disable-line no-unused-vars
+  StateModelIF, // eslint-disable-line no-unused-vars
+  LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
 import { RegistrationTypes } from '@/resources'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 import { FeeSummary } from '@/composables/fees'
-import { FeeSummaryI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
 @Component({
   components: {
@@ -104,6 +111,7 @@ import { FeeSummaryI } from '@/composables/fees/interfaces' // eslint-disable-li
 export default class ConfirmDischarge extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter getLengthTrust: LengthTrustIF
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
@@ -126,8 +134,9 @@ export default class ConfirmDischarge extends Vue {
   private tooltipTxt = 'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
     'can be changed by updating your BC Registries account information.'
-  private validConfirm = false // eslint-disable-line lines-between-class-members
+
   private validFolio = true
+  private feeType = FeeSummaryTypes.RENEW
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -152,6 +161,13 @@ export default class ConfirmDischarge extends Vue {
 
   private get registrationType (): APIRegistrationTypes {
     return this.getRegistrationType?.registrationTypeAPI || null
+  }
+
+  private get registrationLength (): RegistrationLengthI {
+    return {
+      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
+      lifeYears: this.getLengthTrust?.lifeYears || 0
+    }
   }
 
   private async loadRegistration (): Promise<void> {
@@ -198,18 +214,11 @@ export default class ConfirmDischarge extends Vue {
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
-      const feeSummary = {
-        feeAmount: 0,
-        serviceFee: 1.5,
-        quantity: 1,
-        feeCode: ''
-      } as FeeSummaryI
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
-      this.setFeeSummary(feeSummary)
     }
   }
 
@@ -235,7 +244,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submitRenewal (): Promise<void> {
-    if (!this.validConfirm || !this.validFolio) {
+    if (!this.validFolio) {
       this.showErrors = true
       return
     }

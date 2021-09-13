@@ -16,6 +16,7 @@ import {
 } from '@/interfaces'
 import {
   createDischarge,
+  createRenewal,
   createDraft,
   createFinancingStatement,
   getDraft,
@@ -272,7 +273,7 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,
     clientReferenceId: stateModel.folioOrReferenceNumber,
-    lifeInfinite: trustLength.lifeInfinite
+    expiryDate: stateModel.registration.expiryDate
   }
   if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
     delete registration.clientReferenceId
@@ -285,7 +286,7 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
 
   // Now save the registration.
   console.log('save renewal calling api for base registration number ' + registration.baseRegistrationNumber + '.')
-  const apiResponse = await createDischarge(registration)
+  const apiResponse = await createRenewal(registration)
 
   if (apiResponse !== undefined && apiResponse.error !== undefined) {
     console.error('save renewal failed: ' + apiResponse.error.statusCode + ': ' +
