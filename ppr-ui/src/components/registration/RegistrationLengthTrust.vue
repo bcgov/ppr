@@ -46,7 +46,7 @@
             {{ lengthSummary }}
           </v-col>
         </v-row>
-        <v-row no-gutters class="pt-3" v-if="registrationType === 'SA'">
+        <v-row no-gutters class="pt-3" v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT">
           <v-col cols="3" class="generic-label">
             Trust Indenture
           </v-col>
@@ -75,6 +75,64 @@
             Surrender Date
           </v-col>
           <v-col class="summary-text">
+            {{ surrenderDateSummary }}
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card>
+  </v-container>
+
+  <v-container fluid no-gutters class="white pa-0"
+  v-else-if="renewalView && registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
+    <v-card flat id="length-trust-summary">
+      <v-row no-gutters class="summary-header pa-2">
+        <v-col cols="auto" class="pa-2">
+          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+          <label class="pl-3">
+            <strong>Renewal Length and Terms</strong>
+          </label>
+        </v-col>
+      </v-row>
+      <v-container style="padding: 40px 30px;">
+        <v-row no-gutters>
+          <v-col cols="12" class="pb-8">
+            The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
+            be added to any time remaining on your current registration.
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
+          <v-col class="summary-text">
+            {{ lengthSummary }}
+          </v-col>
+        </v-row>
+        <v-row no-gutters class="py-6">
+           <v-col cols="3"></v-col>
+           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col cols="3" class="generic-label"> New Expiry </v-col>
+          <v-col class="summary-text" id="new-expiry-rl">
+            {{ computedExpiryDateRLFormatted }}
+          </v-col>
+        </v-row>
+        <v-row no-gutters class="pt-6">
+           <v-col cols="3"></v-col>
+           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        </v-row>
+        <v-row no-gutters class="pt-6">
+          <v-col cols="3" class="generic-label">
+            Amount of Lien
+          </v-col>
+          <v-col class="summary-text">
+            {{ lienAmountSummary }}
+          </v-col>
+        </v-row>
+        <v-row no-gutters class="pt-6">
+          <v-col cols="3" class="generic-label">
+            Surrender Date
+          </v-col>
+          <v-col class="summary-text" id="surrender-date">
             {{ surrenderDateSummary }}
           </v-col>
         </v-row>
@@ -218,15 +276,15 @@
       </v-row>
       <v-row>
         <v-col cols="3"></v-col>
-        <v-col cols="9" v-if="!infinityPreselected()"><v-divider /></v-col>
+        <v-col cols="9" class="pl-2" v-if="!infinityPreselected()"><v-divider class="ml-0" /></v-col>
       </v-row>
       <v-row no-gutters class="py-6" v-if="renewalView">
         <v-col cols="3" class="generic-label">New Expiry</v-col>
-        <v-col cols="9">{{ computedExpiryDateFormatted }}</v-col>
+        <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
       </v-row>
-      <v-row v-if="renewalView">
+      <v-row v-if="renewalView && showTrustIndenture">
         <v-col cols="3"></v-col>
-        <v-col cols="9"><v-divider /></v-col>
+        <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
       </v-row>
       <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
         <v-col cols="3" class="generic-label">
@@ -299,8 +357,8 @@ export default defineComponent({
   setup (props, context) {
     const { setLengthTrust } = useActions<any>(['setLengthTrust'])
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getRegistrationType, getRegistrationExpiryDate } = useGetters<any>([
-      'getRegistrationType', 'getRegistrationExpiryDate'
+    const { getRegistrationType, getRegistrationExpiryDate, getRegistrationSurrenderDate } = useGetters<any>([
+      'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const lengthTrust: LengthTrustIF = getLengthTrust.value
@@ -402,6 +460,17 @@ export default defineComponent({
           return ''
         }
       }),
+      computedExpiryDateRLFormatted: computed((): string => {
+        if (props.isRenewal) {
+          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
+            const expiryDate = getRegistrationExpiryDate.value
+            const newExpDate = new Date(expiryDate)
+            newExpDate.setDate(newExpDate.getDate() + 180)
+            return convertDate(newExpDate, true, true)
+          }
+          return ''
+        }
+      }),
       lengthSummary: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
@@ -435,6 +504,14 @@ export default defineComponent({
         return 'Not entered'
       }),
       surrenderDateSummary: computed((): string => {
+        if (props.isRenewal) {
+          lengthTrust.surrenderDate = getRegistrationSurrenderDate.value
+          return convertDate(
+            new Date(lengthTrust.surrenderDate),
+            false,
+            false
+          )
+        }
         if (lengthTrust.surrenderDate?.length >= 10) {
           return convertDate(
             new Date(lengthTrust.surrenderDate + 'T09:00:00Z'),
