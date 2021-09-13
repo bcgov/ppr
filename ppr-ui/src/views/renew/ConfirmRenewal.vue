@@ -15,8 +15,7 @@
               this registration Renewal.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" />
-          <h2 class="pt-14">
+           <h2 class="pt-14">
             Registering Party for this Renewal
             <v-tooltip
               class="pa-2"
