@@ -32,7 +32,9 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <fee-summary
+            <sticky-container
+              :setRightOffset="true"
+              :setShowFeeSummary="true"
               :setFeeType="feeType"
               :setRegistrationLength="registrationLength"
               :setRegistrationType="registrationTypeUI"
@@ -66,16 +68,15 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ActionBindingIF, ErrorIF, LengthTrustIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 // local components
-import { ButtonFooter, Stepper } from '@/components/common'
-import { FeeSummary } from '@/composables/fees'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { Parties } from '@/components/parties'
 
 @Component({
   components: {
     ButtonFooter,
-    FeeSummary,
     Stepper,
-    Parties
+    Parties,
+    StickyContainer
   }
 })
 export default class AddParties extends Vue {

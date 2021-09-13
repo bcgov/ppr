@@ -9,11 +9,12 @@ import flushPromises from 'flush-promises'
 // Components
 import { ConfirmDischarge } from '@/views'
 import {
-  ButtonsStacked, CautionBox, DischargeConfirmSummary,
-  FolioNumberSummary
+  CautionBox,
+  DischargeConfirmSummary,
+  FolioNumberSummary,
+  StickyContainer
 } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
-import { FeeSummary } from '@/composables/fees'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -95,23 +96,26 @@ describe('ConfirmDischarge registration view', () => {
     // eslint-disable-next-line max-len
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe('General Collateral and 2 Vehicles')
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(false)
-    // check fee summary
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
-    // buttons
-    expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
+    // check fee summary + buttons
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Back')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Submit Total Discharge')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
     // folio
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
 
   it('processes back button action', async () => {
-    wrapper.findComponent(ButtonsStacked).vm.$emit('back', true)
+    wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
   })
 
   it('processes cancel button action', async () => {
-    await wrapper.findComponent(ButtonsStacked).vm.$emit('cancel', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
     // fill in with the rest of the flow once built
   })
 
@@ -122,13 +126,13 @@ describe('ConfirmDischarge registration view', () => {
   })
 
   it('shows validation errors when needed when submitting', async () => {
-    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
   })
 
   it('shows errors when folio is invalid', async () => {
     await wrapper.findComponent(FolioNumberSummary).vm.$emit('folioValid', false)
-    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     // turn show errors on when invalid
     expect(wrapper.vm.$data.showErrors).toBe(true)
     // fill in with the rest of the flow once built
@@ -141,7 +145,7 @@ describe('ConfirmDischarge registration view', () => {
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
-    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })

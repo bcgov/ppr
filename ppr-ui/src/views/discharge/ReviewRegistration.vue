@@ -33,16 +33,17 @@
           <collateral class="mt-15" :isSummary="true" />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <fee-summary
+          <sticky-container
+            :setRightOffset="true"
+            :setShowButtons="true"
+            :setShowFeeSummary="true"
             :setFeeType="feeType"
             :setRegistrationType="registrationTypeUI"
-          />
-          <buttons-stacked
-            class="pt-4"
             :setCancelBtn="'Cancel'"
             :setSubmitBtn="'Confirm and Complete'"
             @cancel="goToDashboard()"
-            @submit="confirmDischarge()"/>
+            @submit="confirmDischarge()"
+          />
         </v-col>
       </v-row>
     </div>
@@ -56,11 +57,10 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { ButtonsStacked, CautionBox } from '@/components/common'
+import { CautionBox, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
-import { FeeSummary } from '@/composables/fees'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -68,21 +68,19 @@ import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
-    ButtonsStacked,
     CautionBox,
-    FeeSummary,
     RegistrationLengthTrust,
     Collateral,
     DebtorSummary,
     RegisteringPartySummary,
-    SecuredPartySummary
+    SecuredPartySummary,
+    StickyContainer
   }
 })
 export default class ReviewRegistration extends Vue {

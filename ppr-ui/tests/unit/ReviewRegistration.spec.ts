@@ -10,13 +10,12 @@ import flushPromises from 'flush-promises'
 import { ReviewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { ButtonsStacked, CautionBox } from '@/components/common'
+import { CautionBox, StickyContainer } from '@/components/common'
 import {
   DebtorSummary,
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
-import { FeeSummary } from '@/composables/fees'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -96,20 +95,24 @@ describe('ReviewConfirm new registration component', () => {
     // check vehicle collateral
     expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    // check fee summary
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
-    expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
+    // check fee summary + buttons
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Confirm and Complete')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
   })
 
   it('processes cancel button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('cancel', true)
+    wrapper.find(StickyContainer).vm.$emit('cancel', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('processes submit button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('submit', true)
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
   })

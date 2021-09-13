@@ -61,7 +61,9 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <fee-summary
+            <sticky-container
+              :setRightOffset="true"
+              :setShowFeeSummary="true"
               :setFeeType="feeType"
               :setRegistrationLength="registrationLength"
               :setRegistrationType="registrationTypeUI"
@@ -108,22 +110,21 @@ import {
   setAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
 } from '@/store/actions'
 // local components
-import { ButtonFooter, Stepper } from '@/components/common'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
-import { FeeSummary } from '@/composables/fees'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 
 @Component({
   components: {
     ButtonFooter,
-    FeeSummary,
+    Collateral,
+    FolioNumberSummary,
+    Parties,
     RegistrationLengthTrust,
     Stepper,
-    Collateral,
-    Parties,
-    FolioNumberSummary
+    StickyContainer
   }
 })
 export default class ReviewConfirm extends Vue {

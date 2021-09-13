@@ -29,7 +29,9 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <fee-summary
+            <sticky-container
+              :setRightOffset="true"
+              :setShowFeeSummary="true"
               :setFeeType="feeType"
               :setRegistrationLength="registrationLength"
               :setRegistrationType="registrationTypeUI"
@@ -61,16 +63,15 @@ import {
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 // local components
-import { ButtonFooter, Stepper } from '@/components/common'
-import { FeeSummary } from '@/composables/fees'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { Collateral } from '@/components/collateral'
 
 @Component({
   components: {
     ButtonFooter,
-    FeeSummary,
+    Collateral,
     Stepper,
-    Collateral
+    StickyContainer
   }
 })
 export default class AddCollateral extends Vue {

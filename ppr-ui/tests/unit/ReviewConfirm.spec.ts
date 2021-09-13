@@ -7,11 +7,10 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { ReviewConfirm } from '@/views'
-import { ButtonFooter, Stepper, FolioNumberSummary } from '@/components/common'
+import { ButtonFooter, Stepper, FolioNumberSummary, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
-import { FeeSummary } from '@/composables/fees'
 
 // Other
 import mockRouter from './MockRouter'
@@ -49,7 +48,7 @@ describe('ReviewConfirm new registration component', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = mockRouter.mock()
-    await router.push({ name: 'review-confirm' })
+    await router.push({ name: RouteNames.REVIEW_CONFIRM })
     wrapper = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
   })
 
@@ -61,7 +60,9 @@ describe('ReviewConfirm new registration component', () => {
   it('renders Review Confirm View with child components', () => {
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
@@ -105,7 +106,9 @@ describe('ReviewConfirm step 1 tests', () => {
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Parties).exists()).toBe(true)
@@ -124,7 +127,9 @@ describe('ReviewConfirm step 1 tests', () => {
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Parties).exists()).toBe(true)
