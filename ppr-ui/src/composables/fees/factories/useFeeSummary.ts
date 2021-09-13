@@ -45,8 +45,20 @@ export function getFeeSummary (
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }
   if (feeType === FeeSummaryTypes.RENEW) {
-    // FUTURE: update this to the right one when doing renew work
-    return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
+    if (registrationType === UIRegistrationTypes.REPAIRERS_LIEN) {
+      return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_5] }
+    }
+    if (registrationType === UIRegistrationTypes.MARRIAGE_MH) {
+      return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_10] }
+    }
+    // selected infinite
+    if (registrationLength.lifeInfinite) {
+      return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_500] }
+    }
+    // selected years
+    const selectYearsFeeSummary = { ...defaultFeeSummaries[FeeSummaryDefaults.SELECT_5] }
+    selectYearsFeeSummary.quantity = registrationLength?.lifeYears || 0
+    return selectYearsFeeSummary
   }
   if (feeType === FeeSummaryTypes.NEW) {
     if (hasNoCharge(registrationType)) {
