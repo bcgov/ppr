@@ -213,4 +213,81 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.hintFee).toBe('')
     }
   })
+
+  it('renders with correct values for renewals', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    for (let i = 0; i < newRegStandard.length; i++) {
+      await wrapper.setProps({
+        setFeeType: FeeSummaryTypes.RENEW,
+        setRegistrationLength: { ...registrationLength },
+        setRegistrationType: newRegStandard[i]
+      })
+      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.RENEW)
+      expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
+      expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
+      expect(wrapper.vm.$data.feeLabel).toBe(newRegStandard[i])
+
+      if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(5)
+        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
+      } else {
+        // standard selectable years / selectable infinite
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(0)
+        expect(wrapper.vm.$data.totalAmount).toBe(1.5)
+        expect(wrapper.vm.$data.isComplete).toBe(false)
+        expect(wrapper.vm.$data.hintFee).toBe('Select registration length')
+        // select infinite
+        await wrapper.setProps({
+          setRegistrationLength: {
+            lifeInfinite: true,
+            lifeYears: 0
+          }
+        })
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(500)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(500)
+        expect(wrapper.vm.$data.totalAmount).toBe(501.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
+        // select 1 year
+        await wrapper.setProps({
+          setRegistrationLength: {
+            lifeInfinite: false,
+            lifeYears: 1
+          }
+        })
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(5)
+        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $5.00/year')
+        // select multiple years
+        await wrapper.setProps({
+          setRegistrationLength: {
+            lifeInfinite: false,
+            lifeYears: 12
+          }
+        })
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(12)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(60)
+        expect(wrapper.vm.$data.totalAmount).toBe(61.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('12 Years @ $5.00/year')
+      }
+    }
+  })
+
 })
