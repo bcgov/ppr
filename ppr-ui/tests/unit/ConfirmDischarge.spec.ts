@@ -14,6 +14,7 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
@@ -115,8 +116,20 @@ describe('ConfirmDischarge registration view', () => {
   })
 
   it('processes cancel button action', async () => {
+    // dialog doesn't start visible
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    // pressing cancel triggers dialog
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
-    // fill in with the rest of the flow once built
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(true)
+    // if dialog emits proceed false it closes + stays on page
+    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
+    // if dialog emits proceed true it goes to dashboard
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
+    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', true)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('updates validity from checkboxes', async () => {
