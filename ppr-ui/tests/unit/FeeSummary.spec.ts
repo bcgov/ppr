@@ -227,6 +227,12 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
       expect(wrapper.vm.$data.feeLabel).toBe('Renewal')
 
+      const noRenew = [UIRegistrationTypes.LAND_TAX_LIEN,
+        UIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        UIRegistrationTypes.MARRIAGE_MH
+      ]
+      
+
       if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
         expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
@@ -234,7 +240,8 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(5)
         expect(wrapper.vm.$data.totalAmount).toBe(6.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
-      } else {
+      // if it's not a kind of registration that doesn't renew
+      } else if (!noRenew.includes(newRegistrationTypes[i])){
         // standard selectable years / selectable infinite
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
         expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
