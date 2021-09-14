@@ -273,7 +273,6 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,
     clientReferenceId: stateModel.folioOrReferenceNumber,
-    expiryDate: stateModel.registration.expiryDate
   }
   if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
     delete registration.clientReferenceId
