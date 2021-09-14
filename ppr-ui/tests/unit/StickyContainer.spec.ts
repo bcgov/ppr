@@ -103,6 +103,19 @@ describe('Sticky Container component tests', () => {
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(registrationLength)
     expect(wrapper.vm.$data.registrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+
+    // updates fee summary with registration length chages
+    const newRegistrationLength: RegistrationLengthI = {
+      lifeInfinite: false,
+      lifeYears: 6
+    }
+    await wrapper.setProps({
+      setRegistrationLength: newRegistrationLength
+    })
+    
+    expect(wrapper.vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
+    expect(wrapper.vm.$data.registrationLength).toEqual(newRegistrationLength)
+    expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
   })
 
   it('renders component with given button stacked values', async () => {
