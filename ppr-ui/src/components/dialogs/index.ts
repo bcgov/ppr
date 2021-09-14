@@ -1,3 +1,4 @@
+export { default as BaseDialog } from './BaseDialog.vue'
 export { default as ChangeSecuredPartyDialog } from './ChangeSecuredPartyDialog.vue'
 export { default as ConfirmationDialog } from './ConfirmationDialog.vue'
 export { default as ErrorDialog } from './ErrorDialog.vue'

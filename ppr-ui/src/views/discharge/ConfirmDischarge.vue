@@ -5,6 +5,12 @@
     fluid
     style="min-width: 960px;"
   >
+    <base-dialog
+      attach="#app"
+      :options="options"
+      :display="showCancelDialog"
+      @proceed="cancel($event)"
+    />
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -88,6 +94,7 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -98,14 +105,16 @@ import {
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF // eslint-disable-line no-unused-vars
+  StateModelIF, // eslint-disable-line no-unused-vars
+  DialogOptionsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { RegistrationTypes } from '@/resources'
+import { RegistrationTypes, dischargeCancelDialog } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
+    BaseDialog,
     CautionBox,
     DischargeConfirmSummary,
     FolioNumberSummary,
@@ -136,6 +145,8 @@ export default class ConfirmDischarge extends Vue {
   private dataLoaded = false
   private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
+  private options: DialogOptionsIF = dischargeCancelDialog
+  private showCancelDialog = false
   private showErrors = false
   private tooltipTxt = 'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
@@ -224,6 +235,13 @@ export default class ConfirmDischarge extends Vue {
     this.onAppReady(this.appReady)
   }
 
+  private cancel (val: boolean): void {
+    this.showCancelDialog = false
+    if (val) {
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
+  }
+
   private goToReviewRegistration (): void {
     this.$router.push({
       name: RouteNames.REVIEW_DISCHARGE,
@@ -237,8 +255,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private showDialog (): void {
-    // TBD
-    console.log('show dialog')
+    this.showCancelDialog = true
   }
 
   private async submitDischarge (): Promise<void> {
