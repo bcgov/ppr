@@ -1,5 +1,4 @@
 import { UIRegistrationTypes } from '@/enums'
-import { RegistrationTypes } from '@/resources'
 import { FeeSummaryDefaults, FeeSummaryTypes } from '../enums'
 import { FeeSummaryI, RegistrationLengthI } from '../interfaces'
 import { defaultFeeSummaries } from '../resources'
