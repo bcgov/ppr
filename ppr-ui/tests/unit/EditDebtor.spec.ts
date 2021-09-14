@@ -94,6 +94,31 @@ describe('Debtor add individual tests', () => {
     // store should have 1 item now
     expect(store.getters.getAddSecuredPartiesAndDebtors.debtors.length).toBe(1)
   })
+
+  it('adds a debtor birthdate validation', async () => {
+    wrapper.find('#txt-first-debtor').setValue('JOE')
+    wrapper.find('#txt-last-debtor').setValue('SCHMOE')
+    await wrapper.find('#txt-month').setValue(6)
+    wrapper.vm.$data.month = { value: 6, text: 'June' }
+    await Vue.nextTick()
+    wrapper.find('#txt-day').setValue('ab')
+    wrapper.find('#txt-year').setValue('abcd')
+    // for address
+    wrapper.vm.$data.currentDebtor.address.street = 'street'
+    wrapper.vm.$data.currentDebtor.address.city = 'victoria'
+    wrapper.vm.$data.currentDebtor.address.region = 'BC'
+    wrapper.vm.$data.currentDebtor.address.country = 'CA'
+    wrapper.vm.$data.currentDebtor.address.postalCode = 'v8r1w3'
+    await Vue.nextTick()
+    wrapper.find(doneButtonSelector).trigger('click')
+    await flushPromises()
+
+    // Expect 2 validation messages
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(3)
+    expect(messages.at(0).text()).toBe('Please enter a valid day')
+    expect(messages.at(1).text()).toBe('Please enter a valid year')
+  })
 })
 
 describe('Debtor add business tests', () => {

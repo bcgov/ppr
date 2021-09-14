@@ -57,7 +57,7 @@ export const useDebtorValidation = () => {
     resetError('month')
     resetError('day')
     if (year > 0 || month > 0 || day > 0) {
-      if ((!year) || year < 1800 || year > new Date().getFullYear()) {
+      if ((!year) || !validBirthdateNumber('' + year) || year < 1800 || year > new Date().getFullYear()) {
         errors.value.year = {
           type: 'YEAR',
           succeeded: false,
@@ -73,7 +73,7 @@ export const useDebtorValidation = () => {
         }
       }
 
-      if ((!day) || day < 1 || day > 31) {
+      if ((!day) || !validBirthdateNumber('' + day) || day < 1 || day > 31) {
         errors.value.day = {
           type: 'DAY',
           succeeded: false,
@@ -147,6 +147,18 @@ export const useDebtorValidation = () => {
    */
   const updateValidity = (valid: boolean): void => {
     errors.value.address.succeeded = valid
+  }
+
+  /**
+   * A simple check that a birthdate year or day string is an integer.
+   * @param number Number as a string to verify.
+   * @returns True if number is an integer.
+   */
+  const validBirthdateNumber = (number: string): boolean => {
+    if (number.length !== 0 && number.trim().length === 0) {
+      return false
+    }
+    return /^\d+$/.test(number)
   }
 
   return {
