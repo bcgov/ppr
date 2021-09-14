@@ -73,7 +73,6 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
   ButtonsStacked,
-  CautionBox,
   FolioNumberSummary
 } from '@/components/common'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
@@ -101,7 +100,6 @@ import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces'
 @Component({
   components: {
     ButtonsStacked,
-    CautionBox,
     RegistrationLengthTrust,
     FeeSummary,
     FolioNumberSummary,

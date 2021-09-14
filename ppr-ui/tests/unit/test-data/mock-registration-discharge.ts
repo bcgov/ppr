@@ -1,5 +1,5 @@
 import { APIRegistrationTypes } from '@/enums'
-import { DischargeRegistrationIF, FinancingStatementIF } from '@/interfaces'
+import { DischargeRegistrationIF, FinancingStatementIF, RenewRegistrationIF } from '@/interfaces'
 import {
   mockedDebtors1,
   mockedGeneralCollateral2,
@@ -32,4 +32,13 @@ export const mockedDischargeResponse: DischargeRegistrationIF = {
   createDateTime: '2021-07-20T17:21:17+00:00',
   registeringParty: mockedRegisteringParty1,
   dischargeRegistrationNumber: '223456B'
+}
+
+export const mockedRenewalResponse: RenewRegistrationIF = {
+  debtorName: mockedDebtorNames[0],
+  baseRegistrationNumber: '123456B',
+  clientReferenceId: 'UT-100001',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  registeringParty: mockedRegisteringParty1,
+  expiryDate: '2025-08-01T17:21:17+00:00',
 }
