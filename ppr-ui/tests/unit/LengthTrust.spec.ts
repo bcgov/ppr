@@ -7,9 +7,8 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { LengthTrust } from '@/views'
-import { ButtonFooter, Stepper } from '@/components/common'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { FeeSummary } from '@/composables/fees'
 
 // Other
 import mockRouter from './MockRouter'
@@ -54,7 +53,9 @@ describe('Length and Trust Indenture new registration component', () => {
   it('renders Length Trust View with child components', () => {
     expect(wrapper.findComponent(LengthTrust).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
   })

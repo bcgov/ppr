@@ -87,6 +87,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .btn-stacked {
+  box-shadow: none;
   color: $primary-blue;
   width: 100%;
 }

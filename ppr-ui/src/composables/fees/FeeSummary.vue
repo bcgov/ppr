@@ -3,13 +3,13 @@
     <header class="font-weight-bold px-3 py-3">
       <slot name="header">Fee Summary</slot>
     </header>
-    <v-slide-y-transition group tag="ul" :class="$style['fee-list']">
+    <v-slide-y-transition group tag="ul" :class="[$style['fee-list']]">
       <template>
         <li
-          :class="[$style['fee-container'], $style['fee-list__item']]"
+          :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
           :key="feeLabel"
         >
-          <div :class="$style['fee-list__item-name']" class="pl-3">
+          <div :class="$style['fee-list__item-name']">
             {{ feeLabel }}
           </div>
           <div
@@ -27,16 +27,16 @@
         </li>
         <li
           v-if="hintFee"
-          :class="[$style['fee-container'], $style['fee-list__hint']]"
+          :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'pr-4', 'pt-3']"
           :key="hintFee"
         >
-          <div class="fee-list__hint pl-3">{{ hintFee }}</div>
+          <div class="fee-list__hint">{{ hintFee }}</div>
         </li>
         <li
-          :class="[$style['fee-container'], $style['fee-list__item']]"
+          :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
           :key="feeSummary.serviceFee"
         >
-          <div :class="$style['fee-list__item-name']" class="pl-3">
+          <div :class="$style['fee-list__item-name']">
             Service Fee
           </div>
           <div
@@ -51,7 +51,7 @@
         </li>
       </template>
     </v-slide-y-transition>
-    <div :class="[$style['fee-container'], $style['fee-total']]">
+    <div :class="[$style['fee-container'], $style['fee-total'], 'pa-4']">
       <div :class="$style['fee-total__name']">Total Fees</div>
       <div :class="$style['fee-total__currency']">CAD</div>
       <div :class="$style['fee-total__value']">
@@ -169,12 +169,10 @@ header {
   flex-flow: row nowrap;
   line-height: 1.2rem;
   font-size: 0.875rem;
-  padding: 1em;
 }
 
 .fee-list {
-  border-bottom: 1px solid $gray3;
-  padding-left: 0px;
+  padding-left: 30px !important;
 }
 
 .fee-list__hint {
@@ -202,7 +200,9 @@ header {
   }
 }
 
-.fee-list__item + .fee-list__item {
+.fee-total,
+.fee-list__item + .fee-list__item,
+.fee-list__hint + .fee-list__item {
   border-top: 1px solid $gray3;
 }
 

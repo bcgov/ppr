@@ -7,9 +7,8 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
 import { AddCollateral } from '@/views'
-import { ButtonFooter, Stepper } from '@/components/common'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { Collateral } from '@/components/collateral'
-import { FeeSummary } from '@/composables/fees'
 
 // Other
 import mockRouter from './MockRouter'
@@ -55,7 +54,9 @@ describe('AddCollateral new registration component', () => {
     expect(wrapper.findComponent(AddCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
   })
 })
