@@ -46,6 +46,18 @@
             {{ lengthSummary }}
           </v-col>
         </v-row>
+        <v-row class="pt-4" v-if="renewalView">
+          <v-col cols="3"></v-col>
+          <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        </v-row>
+        <v-row no-gutters class="pt-4" v-if="renewalView">
+          <v-col cols="3" class="generic-label">New Expiry</v-col>
+          <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
+        </v-row>
+        <v-row v-if="renewalView && showTrustIndenture">
+          <v-col cols="3"></v-col>
+          <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        </v-row>
         <v-row no-gutters class="pt-3" v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT">
           <v-col cols="3" class="generic-label">
             Trust Indenture

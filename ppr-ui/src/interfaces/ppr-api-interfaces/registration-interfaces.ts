@@ -86,3 +86,18 @@ export interface DischargeRegistrationIF {
   payment?: PaymentIF, // Included in a successful response.
   error?: ErrorIF // Not null if the API call is unsuccessful.
 }
+
+// Renew registration interface. Slightly guessing on the fields here
+export interface RenewRegistrationIF {
+  baseRegistrationNumber: string, // The identifier of the financing statement being discharged.
+  debtorName: DebtorNameIF,
+  registeringParty: PartyIF,
+  clientReferenceId?: string, // AKA folio max length 20.
+  lifeInfinite?: boolean,
+  lifeYears?: number, // 1..25 if not lifeInfinite, otherwise 0.
+  expiryDate?: string, // The date and time upon which the statement will expire. Empty if lifeInfinite true.
+  renewalRegistrationNumber?: string,
+  createDateTime?: string, // Included in a successful response.
+  payment?: PaymentIF, // Included in a successful response.
+  error?: ErrorIF
+}

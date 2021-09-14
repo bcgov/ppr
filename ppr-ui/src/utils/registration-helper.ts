@@ -11,10 +11,12 @@ import {
   PartyIF,
   RegistrationTypeIF,
   StateModelIF,
-  DebtorNameIF
+  DebtorNameIF,
+  RenewRegistrationIF
 } from '@/interfaces'
 import {
   createDischarge,
+  createRenewal,
   createDraft,
   createFinancingStatement,
   getDraft,
@@ -260,6 +262,36 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
     stateModel.folioOrReferenceNumber = draft.financingStatement.clientReferenceId
   }
   return stateModel
+}
+
+/** Save new discharge registration. Data to be saved is in the store state model. */
+export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegistrationIF> {
+  const trustLength = stateModel.registration.lengthTrust
+
+  var registration:RenewRegistrationIF = {
+    baseRegistrationNumber: stateModel.registration.registrationNumber,
+    debtorName: stateModel.registration.confirmDebtorName,
+    registeringParty: stateModel.registration.parties.registeringParty,
+    clientReferenceId: stateModel.folioOrReferenceNumber
+  }
+  if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
+    delete registration.clientReferenceId
+  }
+  registration.registeringParty = cleanupParty(registration.registeringParty)
+
+  if (!trustLength.lifeInfinite) {
+    registration.lifeYears = trustLength.lifeYears
+  }
+
+  // Now save the registration.
+  console.log('save renewal calling api for base registration number ' + registration.baseRegistrationNumber + '.')
+  const apiResponse = await createRenewal(registration)
+
+  if (apiResponse !== undefined && apiResponse.error !== undefined) {
+    console.error('save renewal failed: ' + apiResponse.error.statusCode + ': ' +
+                  apiResponse.error.message)
+  }
+  return apiResponse
 }
 
 export function cleanupParty (party: PartyIF): PartyIF {
