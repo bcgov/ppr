@@ -99,7 +99,8 @@ describe('Renew registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.RENEW)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: mockedFinancingStatementAll.lifeInfinite,
-      lifeYears: mockedFinancingStatementAll.lifeYears
+      // set life years to 0 so user has to choose
+      lifeYears: 0
     })
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
