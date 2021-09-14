@@ -5,6 +5,12 @@
     fluid
     style="min-width: 960px;"
   >
+    <base-dialog
+      attach="#app"
+      :options="options"
+      :display="showCancelDialog"
+      @proceed="cancel($event)"
+    />
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -44,13 +50,14 @@
           />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <fee-summary
-              :setFeeType="feeType"
-              :setRegistrationLength="registrationLength"
-              :setRegistrationType="registrationTypeUI"
-            />
-          <buttons-stacked
-            class="pt-4"
+          <sticky-container
+            :setErrMsg="stickyComponentErrMsg"
+            :setRightOffset="true"
+            :setShowButtons="true"
+            :setShowFeeSummary="true"
+            :setFeeType="feeType"
+            :setRegistrationLength="registrationLength"
+            :setRegistrationType="registrationTypeUI"
             :setBackBtn="'Back'"
             :setCancelBtn="'Cancel'"
             :setSubmitBtn="'Submit Renewal'"
@@ -72,9 +79,10 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
-  ButtonsStacked,
-  FolioNumberSummary
+  FolioNumberSummary,
+  StickyContainer
 } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { RegistrationLengthTrust } from '@/components/registration'
 
@@ -87,23 +95,23 @@ import {
   AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
-  LengthTrustIF // eslint-disable-line no-unused-vars
+  LengthTrustIF, // eslint-disable-line no-unused-vars
+  DialogOptionsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
-import { RegistrationTypes } from '@/resources'
+import { RegistrationTypes, renewCancelDialog } from '@/resources'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
-import { FeeSummary } from '@/composables/fees'
-import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
 @Component({
   components: {
-    ButtonsStacked,
-    RegistrationLengthTrust,
-    FeeSummary,
+    BaseDialog,
     FolioNumberSummary,
-    RegisteringPartySummary
+    RegisteringPartySummary,
+    RegistrationLengthTrust,
+    StickyContainer
   }
 })
 export default class ConfirmDischarge extends Vue {
@@ -128,6 +136,8 @@ export default class ConfirmDischarge extends Vue {
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
   private financingStatementDate: Date = null
+  private options: DialogOptionsIF = renewCancelDialog
+  private showCancelDialog = false
   private showErrors = false
   private tooltipTxt = 'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
@@ -165,6 +175,20 @@ export default class ConfirmDischarge extends Vue {
     return {
       lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
       lifeYears: this.getLengthTrust?.lifeYears || 0
+    }
+  }
+
+  private get stickyComponentErrMsg (): string {
+    if (!this.validFolio && this.showErrors) {
+      return '< Please complete required information'
+    }
+    return ''
+  }
+
+  private cancel (val: boolean): void {
+    this.showCancelDialog = false
+    if (val) {
+      this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
 
@@ -237,8 +261,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private showDialog (): void {
-    // TBD
-    console.log('show dialog')
+    this.showCancelDialog = true
   }
 
   private async submitRenewal (): Promise<void> {

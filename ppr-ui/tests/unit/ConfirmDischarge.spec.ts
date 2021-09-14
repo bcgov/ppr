@@ -30,11 +30,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Input field selectors / buttons
-const back = '#btn-stacked-back'
-const cancel = '#btn-stacked-cancel'
-const submit = '#btn-stacked-submit'
-
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 
@@ -108,11 +103,12 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // folio
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    // dialog
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
   })
 
   it('processes back button action', async () => {
-    wrapper.findComponent(StickyContainer).vm.$emit('back', true)
-    await flushPromises()
+    await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
   })
 

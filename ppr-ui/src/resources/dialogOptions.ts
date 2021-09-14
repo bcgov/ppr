@@ -58,9 +58,19 @@ export const registrationOtherDialog = {
     'enter the name of the statute below.'
 }
 
-// discharge cancel
+// cancel dialogs
 export const dischargeCancelDialog: DialogOptionsIF = {
   acceptText: 'Cancel Total Discharge',
+  cancelText: 'Close',
+  title: 'Cancel',
+  label: '',
+  text: 'This will discard all changes made and return you to My Personal Property ' +
+    'Registry dashboard.'
+}
+
+// discharge cancel
+export const renewCancelDialog: DialogOptionsIF = {
+  acceptText: 'Cancel Renewal',
   cancelText: 'Close',
   title: 'Cancel',
   label: '',
