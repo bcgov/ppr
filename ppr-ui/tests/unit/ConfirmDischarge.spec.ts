@@ -135,7 +135,6 @@ describe('ConfirmDischarge registration view', () => {
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     // turn show errors on when invalid
     expect(wrapper.vm.$data.showErrors).toBe(true)
-    // fill in with the rest of the flow once built
   })
 
   it('processes submit button action', async () => {

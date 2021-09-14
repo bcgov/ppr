@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" width="40rem" persistent :attach="attach">
+  <v-dialog v-model="display" width="45rem" persistent :attach="attach">
     <v-card>
       <v-row no-gutters class="px-7 pt-7">
         <v-col cols="11">
@@ -14,15 +14,15 @@
           </v-btn>
         </v-col>
       </v-row>
-      <v-row no-gutters justify="center" class="pt-5 pb-7">
+      <v-row no-gutters justify="center" class="py-7">
         <v-col v-if="options.acceptText" cols="auto">
-          <v-btn id="accept-btn" class="primary dialog-btn" @click="proceed(true)">
-            {{ options.acceptText }}
+          <v-btn id="cancel-btn" class="outlined dialog-btn" outlined @click="proceed(false)">
+            {{ options.cancelText }}
           </v-btn>
         </v-col>
         <v-col v-if="options.cancelText" cols="auto" class="pl-3">
-          <v-btn id="cancel-btn" class="outlined dialog-btn" outlined @click="proceed(false)">
-            {{ options.cancelText }}
+          <v-btn id="accept-btn" class="primary dialog-btn" @click="proceed(true)">
+            {{ options.acceptText }}
           </v-btn>
         </v-col>
       </v-row>
@@ -47,6 +47,9 @@ export default class ConfirmationDialog extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+#accept-btn {
+  font-weight: normal;
+}
 </style>
