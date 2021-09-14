@@ -213,4 +213,83 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.hintFee).toBe('')
     }
   })
+
+  it('renders with correct values for renewals', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    for (let i = 0; i < newRegStandard.length; i++) {
+      await wrapper.setProps({
+        setFeeType: FeeSummaryTypes.RENEW,
+        setRegistrationLength: { ...registrationLength },
+        setRegistrationType: newRegStandard[i]
+      })
+      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.RENEW)
+      expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
+      expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
+      expect(wrapper.vm.$data.feeLabel).toBe('Renewal')
+
+      const noRenew = [UIRegistrationTypes.LAND_TAX_LIEN,
+        UIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        UIRegistrationTypes.MARRIAGE_MH
+      ]
+      
+
+      if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(5)
+        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+      // if it's not a kind of registration that doesn't renew
+      } else if (!noRenew.includes(newRegistrationTypes[i])){
+        // standard selectable years / selectable infinite
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(0)
+        expect(wrapper.vm.$data.totalAmount).toBe(1.5)
+        expect(wrapper.vm.$data.isComplete).toBe(false)
+        // select infinite
+        await wrapper.setProps({
+          setRegistrationLength: {
+            lifeInfinite: true,
+            lifeYears: 0
+          }
+        })
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(500)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(500)
+        expect(wrapper.vm.$data.totalAmount).toBe(501.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+        // select 1 year
+        await wrapper.setProps({
+          setRegistrationLength: {
+            lifeInfinite: false,
+            lifeYears: 1
+          }
+        })
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(5)
+        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+        // select multiple years
+        await wrapper.setProps({
+          setRegistrationLength: {
+            lifeInfinite: false,
+            lifeYears: 12
+          }
+        })
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(12)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(60)
+        expect(wrapper.vm.$data.totalAmount).toBe(61.5)
+        expect(wrapper.vm.$data.isComplete).toBe(true)
+      }
+    }
+  })
+
 })

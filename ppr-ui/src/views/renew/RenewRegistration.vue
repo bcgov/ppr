@@ -32,6 +32,11 @@
           <collateral class="mt-15" :isSummary="true" />
         </v-col>
         <v-col class="pl-6" cols="3">
+          <fee-summary
+            :setFeeType="feeType"
+            :setRegistrationLength="registrationLength"
+            :setRegistrationType="registrationTypeUI"
+          />
           <buttons-stacked
             class="pt-4"
             :setCancelBtn="'Cancel'"
@@ -55,13 +60,16 @@ import { ButtonsStacked, CautionBox } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
+import { FeeSummary } from '@/composables/fees'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationTypes } from '@/resources'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 
@@ -72,12 +80,14 @@ import { StatusCodes } from 'http-status-codes'
     RegistrationLengthTrust,
     Collateral,
     DebtorSummary,
+    FeeSummary,
     RegisteringPartySummary,
     SecuredPartySummary
   }
 })
 export default class ReviewRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getLengthTrust: LengthTrustIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -97,6 +107,7 @@ export default class ReviewRegistration extends Vue {
 
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private financingStatementDate: Date = null
+  private feeType = FeeSummaryTypes.RENEW
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -121,6 +132,13 @@ export default class ReviewRegistration extends Vue {
 
   private get registrationType (): APIRegistrationTypes {
     return this.getRegistrationType?.registrationTypeAPI || null
+  }
+
+  private get registrationLength (): RegistrationLengthI {
+    return {
+      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
+      lifeYears: this.getLengthTrust?.lifeYears || 0
+    }
   }
 
   private async loadRegistration (): Promise<void> {

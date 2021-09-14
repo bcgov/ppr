@@ -44,11 +44,7 @@ export function getFeeSummary (
     // FUTURE: update this to the right one when doing amend work
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }
-  if (feeType === FeeSummaryTypes.RENEW) {
-    // FUTURE: update this to the right one when doing renew work
-    return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
-  }
-  if (feeType === FeeSummaryTypes.NEW) {
+  if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {
     if (hasNoCharge(registrationType)) {
       return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     }
