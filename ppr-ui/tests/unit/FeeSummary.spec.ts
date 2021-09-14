@@ -54,6 +54,14 @@ const newRegistrationTypes = [
   ...newRegStandard,
   ...newRegMisc
 ]
+const renewRegistrationTypes = [
+  UIRegistrationTypes.SECURITY_AGREEMENT,
+  UIRegistrationTypes.REPAIRERS_LIEN,
+  UIRegistrationTypes.SALE_OF_GOODS,
+  UIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
+  UIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
+  UIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN
+]
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -216,23 +224,17 @@ describe('FeeSummary component tests', () => {
 
   it('renders with correct values for renewals', async () => {
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    for (let i = 0; i < newRegStandard.length; i++) {
+    for (let i = 0; i < renewRegistrationTypes.length; i++) {
       await wrapper.setProps({
         setFeeType: FeeSummaryTypes.RENEW,
         setRegistrationLength: { ...registrationLength },
-        setRegistrationType: newRegStandard[i]
+        setRegistrationType: renewRegistrationTypes[i]
       })
       expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.RENEW)
       expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
+      expect(wrapper.vm.$data.registrationType).toBe(renewRegistrationTypes[i])
       expect(wrapper.vm.$data.feeLabel).toBe('Renewal')
-
-      const noRenew = [UIRegistrationTypes.LAND_TAX_LIEN,
-        UIRegistrationTypes.MANUFACTURED_HOME_LIEN,
-        UIRegistrationTypes.MARRIAGE_MH
-      ]
       
-
       if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
         expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
@@ -240,8 +242,8 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(5)
         expect(wrapper.vm.$data.totalAmount).toBe(6.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
-      // if it's not a kind of registration that doesn't renew
-      } else if (!noRenew.includes(newRegistrationTypes[i])){
+        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
+      } else {
         // standard selectable years / selectable infinite
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
         expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
@@ -249,6 +251,7 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(0)
         expect(wrapper.vm.$data.totalAmount).toBe(1.5)
         expect(wrapper.vm.$data.isComplete).toBe(false)
+        expect(wrapper.vm.$data.hintFee).toBe('Select registration length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
@@ -262,6 +265,7 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(500)
         expect(wrapper.vm.$data.totalAmount).toBe(501.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
         // select 1 year
         await wrapper.setProps({
           setRegistrationLength: {
@@ -275,6 +279,7 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(5)
         expect(wrapper.vm.$data.totalAmount).toBe(6.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $5.00/year')
         // select multiple years
         await wrapper.setProps({
           setRegistrationLength: {
@@ -288,6 +293,7 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(60)
         expect(wrapper.vm.$data.totalAmount).toBe(61.5)
         expect(wrapper.vm.$data.isComplete).toBe(true)
+        expect(wrapper.vm.$data.hintFee).toBe('12 Years @ $5.00/year')
       }
     }
   })

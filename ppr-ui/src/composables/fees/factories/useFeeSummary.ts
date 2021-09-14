@@ -73,7 +73,7 @@ export function getFeeHint (
   registrationType: UIRegistrationTypes,
   registrationLength: RegistrationLengthI
 ): string {
-  if (feeType === FeeSummaryTypes.NEW) {
+  if ([FeeSummaryTypes.NEW, FeeSummaryTypes.RENEW].includes(feeType)) {
     if (hasNoCharge(registrationType) || registrationType === UIRegistrationTypes.MARRIAGE_MH) {
       return 'Infinite Registration (default)'
     }

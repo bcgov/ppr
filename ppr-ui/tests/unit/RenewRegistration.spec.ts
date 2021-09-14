@@ -9,7 +9,7 @@ import sinon from 'sinon'
 import { RenewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { ButtonsStacked } from '@/components/common'
+import { StickyContainer } from '@/components/common'
 import {
   DebtorSummary,
   RegisteringPartySummary,
@@ -23,6 +23,7 @@ import { axios } from '@/utils/axios-ppr'
 import mockRouter from './MockRouter'
 import { mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 
 Vue.use(Vuetify)
 
@@ -91,19 +92,28 @@ describe('Renew registration component', () => {
     // check vehicle collateral
     expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    // check fee summary (whether data for it is in store or by prop may change)
-    // FUTURE: add during renew fee summary ticket
-    expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
+    // check fee summary + buttons
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.RENEW)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+      lifeInfinite: mockedFinancingStatementAll.lifeInfinite,
+      lifeYears: mockedFinancingStatementAll.lifeYears
+    })
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Confirm and Complete')
   })
 
   it('processes cancel button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('cancel', true)
+    wrapper.find(StickyContainer).vm.$emit('cancel', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('processes submit button action', async () => {
-    wrapper.find(ButtonsStacked).vm.$emit('submit', true)
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
   })

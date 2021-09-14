@@ -17,6 +17,7 @@ import mockRouter from './MockRouter'
 import { mockedNewRegStep1, mockedSelectSecurityAgreement } from './test-data'
 import { RouteNames } from '@/enums'
 import { DraftIF, LengthTrustIF } from '@/interfaces'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 
 Vue.use(Vuetify)
 
