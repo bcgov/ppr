@@ -1,4 +1,5 @@
 import { UIRegistrationTypes } from '@/enums'
+import { RegistrationTypes } from '@/resources'
 import { FeeSummaryDefaults, FeeSummaryTypes } from '../enums'
 import { FeeSummaryI, RegistrationLengthI } from '../interfaces'
 import { defaultFeeSummaries } from '../resources'
@@ -29,7 +30,8 @@ export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
     UIRegistrationTypes.PROPERTY_TRANSFER_TAX,
     UIRegistrationTypes.SCHOOL_ACT
   ]
-  return hfArray.includes(val)
+  // it will not be in the UIRegistrationTypes enum list if 'Other' was selected
+  return hfArray.includes(val) || !Object.values(UIRegistrationTypes).includes(val)
 }
 
 export function getFeeSummary (
