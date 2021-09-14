@@ -39,10 +39,10 @@ describe('Base Dialog tests', () => {
           attach: '',
           display: false,
           options: {
-            acceptText: '',
-            cancelText: '',
-            text: '',
-            title: ''
+            acceptText: 'default accept',
+            cancelText: 'default cancel',
+            text: 'default text',
+            title: 'default title'
           }
         }
       })
@@ -53,16 +53,21 @@ describe('Base Dialog tests', () => {
   })
 
   it('renders the component', async () => {
-    expect(wrapper.findComponent(BaseDialog).exists()).toBe(false)
-    expect(wrapper.isVisible()).toBe(false)
-    wrapper.setProps({
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    expect(wrapper.vm.$props.display).toBe(false)
+    expect(wrapper.findAll(title).length).toBe(0)
+    expect(wrapper.findAll(text).length).toBe(0)
+    expect(wrapper.findAll(accept).length).toBe(0)
+    expect(wrapper.findAll(cancel).length).toBe(0)
+    await wrapper.setProps({
       attach: '',
       display: true,
       options: options
     })
-    await flushPromises()
-    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
-    expect(wrapper.isVisible()).toBe(true)
+    expect(wrapper.findAll(title).length).toBe(1)
+    expect(wrapper.findAll(text).length).toBe(1)
+    expect(wrapper.findAll(accept).length).toBe(1)
+    expect(wrapper.findAll(cancel).length).toBe(1)
     expect(wrapper.find(title).text()).toBe(options.title)
     expect(wrapper.find(text).text()).toContain(options.text)
     if (options.acceptText) {

@@ -105,6 +105,7 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Submit Total Discharge')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // folio
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
   })
@@ -141,6 +142,10 @@ describe('ConfirmDischarge registration view', () => {
   it('shows validation errors when needed when submitting', async () => {
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('< Please complete required information')
+    // msgs go away when validation changes
+    await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
   })
 
   it('shows errors when folio is invalid', async () => {

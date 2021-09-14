@@ -63,6 +63,7 @@
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
+            :setErrMsg="stickyComponentErrMsg"
             :setRightOffset="true"
             :setShowButtons="true"
             :setShowFeeSummary="true"
@@ -177,6 +178,13 @@ export default class ConfirmDischarge extends Vue {
 
   private get registrationType (): APIRegistrationTypes {
     return this.getRegistrationType?.registrationTypeAPI || null
+  }
+
+  private get stickyComponentErrMsg (): string {
+    if ((!this.validConfirm || !this.validFolio) && this.showErrors) {
+      return '< Please complete required information'
+    }
+    return ''
   }
 
   private async loadRegistration (): Promise<void> {
