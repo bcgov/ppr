@@ -77,7 +77,8 @@ describe('Renew registration component', () => {
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
-    expect(state.registration.lengthTrust.lifeYears).toBe(mockedFinancingStatementAll.lifeYears)
+    //should start off null
+    expect(state.registration.lengthTrust.lifeYears).toBe(null)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // check registering party
@@ -98,7 +99,8 @@ describe('Renew registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.RENEW)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: mockedFinancingStatementAll.lifeInfinite,
-      lifeYears: mockedFinancingStatementAll.lifeYears
+      // set life years to 0 so user has to choose
+      lifeYears: 0
     })
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')

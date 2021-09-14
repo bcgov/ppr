@@ -168,10 +168,10 @@ export default class ReviewRegistration extends Vue {
         generalCollateral: generalCollateral
       } as AddCollateralIF
       const lengthTrust = {
-        valid: true,
+        valid: false,
         trustIndenture: financingStatement.trustIndenture || false,
-        lifeInfinite: financingStatement.lifeInfinite || false,
-        lifeYears: financingStatement.lifeYears || null,
+        lifeInfinite: false,
+        lifeYears: null,
         surrenderDate: financingStatement.surrenderDate || null,
         lienAmount: financingStatement.lienAmount || null
       } as LengthTrustIF
