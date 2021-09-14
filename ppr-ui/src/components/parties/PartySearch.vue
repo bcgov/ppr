@@ -29,6 +29,7 @@
         <party-autocomplete
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
+          :setAutoCompleteActive="setAutoCompleteActive"
         />
       </v-col>
     </v-row>
@@ -89,14 +90,18 @@ export default defineComponent({
       autoCompleteDisabled: computed((): boolean => {
         return props.isAutoCompleteDisabled
       }),
+      setAutoCompleteActive: false,
       registeringPartySelected: false,
       resultAdded: [],
       partyCode: 0
     })
 
     const goToAddSecuredParty = () => {
-      localState.searchValue = ''
-      closeAutoComplete()
+      if (localState.searchValue) {
+        localState.searchValue = ''
+        localState.setAutoCompleteActive = false
+        closeAutoComplete()
+      }
       context.emit('showSecuredPartyAdd')
     }
 
@@ -109,6 +114,7 @@ export default defineComponent({
     }
 
     const closeAutoComplete = () => {
+      localState.setAutoCompleteActive = false
       localState.autoCompleteResults = []
     }
 
@@ -124,6 +130,7 @@ export default defineComponent({
       } else {
         localState.autoCompleteResults = []
       }
+      localState.setAutoCompleteActive = true
     }
 
     watch(
