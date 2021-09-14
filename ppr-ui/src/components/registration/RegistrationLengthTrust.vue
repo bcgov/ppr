@@ -154,10 +154,34 @@
   <v-container
     fluid
     no-gutters
-    class="white pt-10 pa-6 pr-10 rounded"
+    class="white pb-6 pr-10 pl-8 rounded"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
     v-else
   >
+  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8">
+        <v-col cols="auto" class="pa-2">
+          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+          <label class="pl-3">
+            <strong>Renewal Length <span v-if="showTrustIndenture">and Trust Indenture</span>
+            <span v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN">and Terms</span></strong>
+          </label>
+        </v-col>
+      </v-row>
+
+        <v-row v-if="renewalView && registrationType === APIRegistrationTypes.REPAIRERS_LIEN" no-gutters>
+          <v-col cols="12" class="pb-8">
+            The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
+            be added to any time remaining on your current registration.
+          </v-col>
+        </v-row>
+
+      <v-row v-if="renewalView && registrationType !== APIRegistrationTypes.REPAIRERS_LIEN" no-gutters>
+          <v-col cols="12" class="pb-2">
+            The registration length entered below will be added to any time remaining on your
+            current registration.
+          </v-col>
+        </v-row>
+
     <div v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
       <v-row no-gutters class="ps-6 pt-6 pb-3">
         <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
@@ -240,7 +264,7 @@
       </v-row>
     </div>
     <div v-else>
-      <v-row no-gutters>
+      <v-row class="pt-6" no-gutters>
         <v-col cols="3" class="generic-label">
           <span :class="{ 'invalid-message': lengthTrust.showInvalid }"
             >{{ regTitle }} Length</span
@@ -409,6 +433,9 @@ export default defineComponent({
         feeInfoYears.feeAmount.toFixed(2) +
         ' per year)',
       showTrustIndenture: computed((): boolean => {
+        if (localState.renewalView) {
+          return lengthTrust.trustIndenture
+        }
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
@@ -469,7 +496,7 @@ export default defineComponent({
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
             return convertDate(newExpDate, true, true)
           }
-          return ''
+          return '-'
         }
       }),
       computedExpiryDateRLFormatted: computed((): string => {
