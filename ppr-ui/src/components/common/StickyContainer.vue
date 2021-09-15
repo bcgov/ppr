@@ -1,5 +1,5 @@
 <template :class="{ 'pl-15': leftOffset, 'pr-15': rightOffset }">
-  <div :class="`sticky-container-${size}`">
+  <div :class="[`sticky-container-${size}`, { 'position-bottom': attachToBottom } ]">
     <fee-summary
       v-if="showFeeSummary"
       :setFeeType="feeType"
@@ -25,6 +25,7 @@
 <script lang="ts">
 import {
   defineComponent,
+  onMounted,
   reactive,
   toRefs,
   watch
@@ -86,6 +87,7 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const localState = reactive({
+      attachToBottom: false,
       backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
       errMsg: props.setErrMsg,
@@ -98,6 +100,13 @@ export default defineComponent({
       showFeeSummary: props.setShowFeeSummary,
       size: props.setSize,
       submitBtn: props.setSubmitBtn
+    })
+    onMounted(() => {
+      if (window.innerHeight < 700) {
+        localState.attachToBottom = true
+      } else {
+        localState.attachToBottom = false
+      }
     })
     const back = () => {
       emit('back', true)
@@ -133,6 +142,9 @@ export default defineComponent({
   color: $error;
   font-size: 0.75rem;
   text-align: center;
+}
+.position-bottom {
+  bottom: 0px;
 }
 // matches cols=3
 .sticky-container-3 {
