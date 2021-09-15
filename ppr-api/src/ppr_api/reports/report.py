@@ -11,6 +11,7 @@
 """Produces a PDF output based on templates and JSON messages."""
 import base64
 import json
+from datetime import timedelta
 from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
@@ -439,7 +440,7 @@ class Report:  # pylint: disable=too-few-public-methods
         """Replace financing statement API ISO UTC strings with local report format strings."""
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'expiryDate' in statement:
-            statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'])
+            statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
         if 'surrenderDate' in statement:
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'dischargedDateTime' in statement:
@@ -467,7 +468,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'changeType' in statement:
             statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']]
         if 'expiryDate' in statement:
-            statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'])
+            statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
         if 'surrenderDate' in statement:
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'deleteDebtors' in statement:
@@ -564,9 +565,12 @@ class Report:  # pylint: disable=too-few-public-methods
         return ''
 
     @staticmethod
-    def _to_report_datetime(date_time: str, include_time: bool = True):
+    def _to_report_datetime(date_time: str, include_time: bool = True, expiry: bool = False):
         """Convert ISO formatted date time or date string to report format."""
         local_datetime = model_utils.to_local_timestamp(model_utils.ts_from_iso_format(date_time))
+        if expiry and local_datetime.hour != 23:  # Expiry dates 15+ years in the future are not ajdusting for DST.
+            offset = 23 - local_datetime.hour
+            local_datetime = local_datetime + timedelta(hours=offset)
         if include_time:
             timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
             if timestamp.find(' AM ') > 0:

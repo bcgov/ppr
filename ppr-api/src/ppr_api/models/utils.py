@@ -17,7 +17,7 @@ Common constants used across models and utilities for mapping type codes
 between the API and the database in both directions.
 """
 
-from datetime import time  # noqa: F401 pylint: disable=unused-import
+from datetime import time, tzinfo  # noqa: F401 pylint: disable=unused-import
 from datetime import date
 from datetime import datetime as _datetime
 from datetime import timedelta, timezone
@@ -334,27 +334,17 @@ def today_ts_offset(offset_days: int = 1, add: bool = False):
     return today_ts - timedelta(days=offset_days)
 
 
-def remove_expiry_dt_from_years(life_years: int):
-    """Create a date representing the current UTC date at 23:59:59.
-
-    Adjusted by the life_years number of years in the future.
-    """
-    today = now_ts()
-    year = today.year + life_years
-    month = today.month
-    day = today.day
-    future_date = date(year, month, day)
-    expiry_time = time(23, 59, 59, tzinfo=timezone.utc)
-    return _datetime.combine(future_date, expiry_time)
-
-
 def expiry_dt_from_years(life_years: int, iso_date: str = None):
     """Create a date representing the date at 23:59:59 local time as UTC.
 
     Adjusted by the life_years number of years in the future. Current date if no iso_date
     """
     # Naive date
-    today = date.today() if not iso_date else date.fromisoformat(iso_date[:10])
+    today = None
+    if iso_date:
+        today = date.fromisoformat(iso_date[:10])
+    else:
+        today = now_ts().astimezone(LOCAL_TZ)
     # Add years
     future_date = date((today.year + life_years), today.month, today.day)
     # Naive time
@@ -372,7 +362,9 @@ def expiry_dt_repairer_lien(expiry_ts: _datetime = None):
     """
     if not expiry_ts:
         # Naive date
-        base_date = date.today()
+        today = now_ts().astimezone(LOCAL_TZ)
+        # base_date = date.today()
+        base_date = date(today.year, today.month, today.day)
         # Naive time
         expiry_time = time(23, 59, 59, tzinfo=None)
         future_ts = _datetime.combine(base_date, expiry_time) + timedelta(days=REPAIRER_LIEN_DAYS)
