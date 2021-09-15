@@ -1,7 +1,12 @@
 <template>
   <v-container fluid no-gutters class="white pa-0" v-if="summaryView">
     <v-card flat id="length-trust-summary">
-      <v-row no-gutters class="summary-header pa-2">
+      <v-row class="py-2" v-if="isRenewal" style="background-color: #f1f3f5">
+        <v-col cols="auto">
+          <h2>Renewal Length and Terms</h2>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="summary-header pa-2" v-else>
         <v-col cols="auto" class="pa-2">
           <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
           <label
@@ -46,11 +51,11 @@
             {{ lengthSummary }}
           </v-col>
         </v-row>
-        <v-row class="pt-4" v-if="renewalView">
+        <v-row class="pt-4" v-if="renewalView && registrationType !== APIRegistrationTypes.REPAIRERS_LIEN">
           <v-col cols="3"></v-col>
           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
         </v-row>
-        <v-row no-gutters class="pt-4" v-if="renewalView">
+        <v-row no-gutters class="pt-6" v-if="renewalView">
           <v-col cols="3" class="generic-label">New Expiry</v-col>
           <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
         </v-row>
@@ -58,7 +63,7 @@
           <v-col cols="3"></v-col>
           <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
         </v-row>
-        <v-row no-gutters class="pt-3" v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT">
+        <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
           <v-col cols="3" class="generic-label">
             Trust Indenture
           </v-col>
@@ -80,7 +85,7 @@
         </v-row>
         <v-row
           no-gutters
-          class="pt-3"
+          class="pt-6"
           v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         >
           <v-col cols="3" class="generic-label">
@@ -108,7 +113,8 @@
       <v-container style="padding: 40px 30px;">
         <v-row no-gutters>
           <v-col cols="12" class="pb-8">
-            The length of a Repairers Lien is automatically set to 180 days. The registration renewal length will
+            The length of a Repairers Lien renewal is automatically set to 180 days.
+            The registration renewal length will
             be added to any time remaining on your current registration.
           </v-col>
         </v-row>
@@ -125,7 +131,7 @@
         <v-row no-gutters>
           <v-col cols="3" class="generic-label"> New Expiry </v-col>
           <v-col class="summary-text" id="new-expiry-rl">
-            {{ computedExpiryDateRLFormatted }}
+            {{ computedExpiryDateFormatted }}
           </v-col>
         </v-row>
         <v-row no-gutters class="pt-6">
@@ -372,7 +378,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
-import { APIRegistrationTypes } from '@/enums'
+import { APIRegistrationTypes, RouteNames } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
 export default defineComponent({
@@ -400,6 +406,7 @@ export default defineComponent({
     const lengthTrust: LengthTrustIF = getLengthTrust.value
     const feeInfoYears = getFinancingFee(false)
     const router = context.root.$router
+    const route = context.root.$route
     const modal = false
 
     if (
@@ -407,6 +414,7 @@ export default defineComponent({
       lengthTrust.lifeYears !== 1 &&
       !props.isSummary
     ) {
+      lengthTrust.valid = true
       lengthTrust.lifeYears = 1
       setLengthTrust(lengthTrust)
     }
@@ -487,7 +495,13 @@ export default defineComponent({
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
           if (lengthTrust.lifeInfinite) {
-            return 'Infinite'
+            return 'No Expiry'
+          }
+          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
+            const expiryDate = getRegistrationExpiryDate.value
+            const newExpDate = new Date(expiryDate)
+            newExpDate.setDate(newExpDate.getDate() + 180)
+            return convertDate(newExpDate, true, true)
           }
           if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
@@ -497,17 +511,6 @@ export default defineComponent({
             return convertDate(newExpDate, true, true)
           }
           return '-'
-        }
-      }),
-      computedExpiryDateRLFormatted: computed((): string => {
-        if (props.isRenewal) {
-          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
-            const expiryDate = getRegistrationExpiryDate.value
-            const newExpDate = new Date(expiryDate)
-            newExpDate.setDate(newExpDate.getDate() + 180)
-            return convertDate(newExpDate, true, true)
-          }
-          return ''
         }
       }),
       lengthSummary: computed((): string => {
@@ -565,9 +568,17 @@ export default defineComponent({
       })
     })
     const goToLengthTrust = (): void => {
-      lengthTrust.showInvalid = true
-      setLengthTrust(lengthTrust)
-      router.push({ path: '/new-registration/length-trust' })
+      if (!props.isRenewal) {
+        lengthTrust.showInvalid = true
+        setLengthTrust(lengthTrust)
+        router.push({ path: '/new-registration/length-trust' })
+      } else {
+        const registrationNumber = route.query['reg-num'] as string || ''
+        router.push({
+          name: RouteNames.RENEW_REGISTRATION,
+          query: { 'reg-num': registrationNumber }
+        })
+      }
     }
 
     const infinityPreselected = (): boolean => {

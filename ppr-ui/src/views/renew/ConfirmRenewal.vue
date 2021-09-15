@@ -35,7 +35,7 @@
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <registration-length-trust class="mt-15" :isRenewal="true"
+          <registration-length-trust class="mt-10" :isRenewal="true"
           :isSummary="true" :defaultRegistrationType="registrationType" />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -217,6 +217,7 @@ export default class ConfirmDischarge extends Vue {
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
+      const lt = this.getLengthTrust // eslint-disable-line
     }
   }
 

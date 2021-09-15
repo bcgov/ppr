@@ -18,8 +18,9 @@
             :items="debtors"
             filled
             clearable
+            class="debtor-drop"
             no-data-text="Debtor not found."
-            label="Enter a Debtor (last name of individual person of full business name)"
+            label="Enter a Debtor (last name of individual person or full business name)"
             id="debtor-drop"
             v-model="userInput"
             :error-messages="validationErrors ? validationErrors : ''"
