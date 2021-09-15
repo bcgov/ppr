@@ -123,13 +123,15 @@
               class="party-row"
             >
               <td class="list-item__title title-text">
-                <div class="icon-div" v-if="isBusiness(row.item)">
-                  <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
-                </div>
-                <div class="icon-div" v-else>
-                  <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
-                </div>
-                {{ getName(row.item) }}
+                <v-row no-gutters>
+                  <v-col cols="12" style="padding-left: 14px;">
+                    <div class="icon-div mt-n1 pr-4">
+                      <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
+                      <v-icon v-else>mdi-account</v-icon>
+                    </div>
+                    <div>{{ getName(row.item) }}</div>
+                  </v-col>
+                </v-row>
               </td>
               <td>
                 <base-address
@@ -503,8 +505,7 @@ export default defineComponent({
   color: $gray7 !important;
 }
 
-::v-deep
-  .v-data-table:not(.party-table)
+::v-deep .v-data-table:not(.party-table)
   > .v-data-table__wrapper
   > table
   > tbody
