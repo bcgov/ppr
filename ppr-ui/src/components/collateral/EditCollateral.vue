@@ -60,7 +60,7 @@
                   @change="changeVehicleType"
                 >
                   <template slot="item" slot-scope="data">
-                    <span class="list-item">
+                    <span :id="`txt-type-drop-${data.item.text}`" class="list-item">
                       {{ data.item.text }}
                     </span>
                   </template>
