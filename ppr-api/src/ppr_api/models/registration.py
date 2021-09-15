@@ -28,6 +28,7 @@ from .draft import Draft
 from .party import Party
 from .court_order import CourtOrder
 from .general_collateral import GeneralCollateral
+from .general_collateral_legacy import GeneralCollateralLegacy
 from .type_tables import RegistrationType
 from .vehicle_collateral import VehicleCollateral
 # noqa: I003
@@ -132,6 +133,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                                back_populates='registration', cascade='all, delete', uselist=False)
     parties = db.relationship('Party', back_populates='registration')
     general_collateral = db.relationship('GeneralCollateral', back_populates='registration')
+    general_collateral_legacy = db.relationship('GeneralCollateralLegacy', back_populates='registration')
     vehicle_collateral = db.relationship('VehicleCollateral', back_populates='registration')
     draft = db.relationship('Draft', foreign_keys=[draft_id], uselist=False)
     trust_indenture = db.relationship('TrustIndenture', back_populates='registration', uselist=False)
@@ -161,9 +163,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 #               self.registration_type != model_utils.REG_TYPE_RENEWAL:
 #            registration['documentId'] = self.draft.document_number
 
-        if self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                         model_utils.REG_CLASS_AMEND_COURT,
-                                         model_utils.REG_CLASS_CHANGE):
+        if self.is_change():
             registration['changeType'] = self.registration_type
 
         if self.client_reference_id:
@@ -190,10 +190,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration['courtOrderInformation'] = self.court_order.json
 
         # add debtors, secured parties
-        if self.parties and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                               model_utils.REG_CLASS_AMEND_COURT,
-                                               model_utils.REG_CLASS_CHANGE)):
+        if self.parties and self.is_change():
             secured = []
             debtors = []
             for party in self.parties:
@@ -215,10 +212,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration['addSecuredParties'] = secured
 
         # delete debtors, secured parties
-        if self.financing_statement.parties and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                               model_utils.REG_CLASS_AMEND_COURT,
-                                               model_utils.REG_CLASS_CHANGE)):
+        if self.financing_statement.parties and self.is_change():
             secured = []
             debtors = []
             for party in self.financing_statement.parties:
@@ -237,39 +231,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if secured:
                 registration['deleteSecuredParties'] = secured
 
-        # add general collateral
-        if self.general_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                               model_utils.REG_CLASS_AMEND_COURT,
-                                               model_utils.REG_CLASS_CHANGE)):
-            collateral = []
-            for gen_c in self.general_collateral:
-                if gen_c.registration_id == registration_id:
-                    collateral_json = gen_c.json
-                    collateral_json['reg_id'] = registration_id
-                    collateral.append(collateral_json)
-            if collateral:
-                registration['addGeneralCollateral'] = collateral
-
-        # delete general collateral
-        if self.financing_statement.general_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                               model_utils.REG_CLASS_AMEND_COURT,
-                                               model_utils.REG_CLASS_CHANGE)):
-            collateral = []
-            for gen_c in self.financing_statement.general_collateral:
-                if gen_c.registration_id_end == registration_id:
-                    collateral_json = gen_c.json
-                    collateral_json['reg_id'] = registration_id
-                    collateral.append(collateral_json)
-            if collateral:
-                registration['deleteGeneralCollateral'] = collateral
+        # general collateral including legacy
+        if self.is_change():
+            self.__add_general_collateral_json(registration, registration_id)
+            self.__delete_general_collateral_json(registration, registration_id)
 
         # add vehicle collateral
-        if self.vehicle_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                               model_utils.REG_CLASS_AMEND_COURT,
-                                               model_utils.REG_CLASS_CHANGE)):
+        if self.vehicle_collateral and self.is_change():
             collateral = []
             for vehicle_c in self.vehicle_collateral:
                 if vehicle_c.registration_id == registration_id:
@@ -280,10 +248,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration['addVehicleCollateral'] = collateral
 
         # delete vehicle collateral
-        if self.financing_statement.general_collateral and \
-                (self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                               model_utils.REG_CLASS_AMEND_COURT,
-                                               model_utils.REG_CLASS_CHANGE)):
+        if self.financing_statement.general_collateral and self.is_change():
             collateral = []
             for vehicle_c in self.financing_statement.vehicle_collateral:
                 if vehicle_c.registration_id_end == registration_id:
@@ -293,9 +258,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if collateral:
                 registration['deleteVehicleCollateral'] = collateral
 
-        return self.set_payment_json(registration)
+        return self.__set_payment_json(registration)
 
-    def set_payment_json(self, registration):
+    def __set_payment_json(self, registration):
         """Add registration payment info json if payment exists."""
         if self.pay_invoice_id and self.pay_path:
             payment = {
@@ -304,6 +269,41 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             registration['payment'] = payment
         return registration
+
+    def __add_general_collateral_json(self, json_data, registration_id):
+        """Build general collateral added as part of the registration."""
+        collateral = []
+        if self.general_collateral_legacy:
+            for gen_c in self.general_collateral_legacy:
+                if gen_c.registration_id == registration_id and \
+                   gen_c.status == GeneralCollateralLegacy.StatusTypes.ADDED:
+                    collateral.append(gen_c.json)
+        if self.general_collateral:
+            for gen_c in self.general_collateral:
+                if gen_c.registration_id == registration_id:
+                    # collateral_json = gen_c.json
+                    # collateral_json['reg_id'] = registration_id  # Need this for report edit badge
+                    collateral.append(gen_c.json)
+        if collateral:
+            json_data['addGeneralCollateral'] = collateral
+
+    def __delete_general_collateral_json(self, json_data, registration_id):
+        """Build general collateral deleted as part of the registration."""
+        collateral = []
+        if self.financing_statement.general_collateral_legacy:
+            for gen_c in self.financing_statement.general_collateral_legacy:
+                if registration_id == gen_c.registration_id_end or \
+                        (registration_id == gen_c.registration_id and
+                         gen_c.status == GeneralCollateralLegacy.StatusTypes.DELETED):
+                    collateral.append(gen_c.json)
+        if self.financing_statement.general_collateral:
+            for gen_c in self.financing_statement.general_collateral:
+                if gen_c.registration_id_end == registration_id:
+                    # collateral_json = gen_c.json
+                    # collateral_json['reg_id'] = registration_id  # Need this for report edit badge
+                    collateral.append(gen_c.json)
+        if collateral:
+            json_data['deleteGeneralCollateral'] = collateral
 
     def save(self):
         """Render a registration to the local cache."""
@@ -321,6 +321,20 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             self.reg_type = db.session.query(RegistrationType).\
                             filter(RegistrationType.registration_type == self.registration_type).\
                             one_or_none()
+
+    def is_financing(self):
+        """Check if the registration is a financing registration for some conditions."""
+        return self.registration_type_cl and \
+            self.registration_type_cl in (model_utils.REG_CLASS_CROWN,
+                                          model_utils.REG_CLASS_MISC,
+                                          model_utils.REG_CLASS_PPSA)
+
+    def is_change(self):
+        """Check if the registration is a change or amendment for some conditions."""
+        return self.registration_type_cl and \
+            self.registration_type_cl in (model_utils.REG_CLASS_AMEND,
+                                          model_utils.REG_CLASS_AMEND_COURT,
+                                          model_utils.REG_CLASS_CHANGE)
 
     @classmethod
     def find_by_id(cls, registration_id: int):

@@ -14,6 +14,8 @@
 """This module holds data for general collateral."""
 from __future__ import annotations
 
+from ppr_api.models import utils as model_utils
+
 from .db import db
 
 
@@ -46,9 +48,23 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     @property
     def json(self) -> dict:
         """Return the genreal collateral as a json object."""
+        if not self.registration:
+            return {
+                'collateralId': self.id,
+                'description': self.description,
+                'addedDateTime': '',
+                'added': False,
+                'removed': False,
+                'legacy': False
+            }
+
         return {
             'collateralId': self.id,
-            'description': self.description
+            'description': self.description,
+            'addedDateTime': model_utils.format_ts(self.registration.registration_ts),
+            'added': not self.registration.is_financing(),
+            'removed': False,
+            'legacy': False
         }
 
     @classmethod
