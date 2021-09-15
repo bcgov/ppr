@@ -48,7 +48,7 @@
             </v-list-item>
           </v-list-item-group>
         </v-list>
-        <v-list v-else>
+        <v-list v-else-if="autoCompleteIsActive">
            <v-list-item
               :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]"
             >
@@ -80,6 +80,10 @@ export default defineComponent({
     autoCompleteItems: {
       type: Array,
       default: []
+    },
+    setAutoCompleteActive: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -87,7 +91,7 @@ export default defineComponent({
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
       searchValue: '',
-      autoCompleteIsActive: false,
+      autoCompleteIsActive: props.setAutoCompleteActive,
       autoCompleteSelected: -1,
       autoCompleteResults: [],
       resultAdded: []
@@ -122,6 +126,13 @@ export default defineComponent({
         }
       },
       { immediate: true, deep: true }
+    )
+
+    watch(
+      () => props.setAutoCompleteActive,
+      (val: boolean) => {
+        localState.autoCompleteIsActive = props.setAutoCompleteActive
+      }
     )
 
     return {
