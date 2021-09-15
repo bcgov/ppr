@@ -23,7 +23,8 @@
 import {
   defineComponent,
   reactive,
-  toRefs
+  toRefs,
+  watch
 } from '@vue/composition-api'
 // local components
 import { ButtonsStacked } from '@/components/common'
@@ -100,6 +101,10 @@ export default defineComponent({
     const submit = () => {
       emit('submit', true)
     }
+
+    watch(() => props.setRegistrationLength, (val: RegistrationLengthI) => {
+      localState.registrationLength = val
+    }, { deep: true, immediate: true })
 
     return {
       back,
