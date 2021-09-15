@@ -72,14 +72,12 @@
             >
               <td class="list-item__title title-text">
                 <v-row no-gutters>
-                  <v-col cols="auto" style="padding-left: 14px;">
+                  <v-col cols="12" style="padding-left: 14px;">
                     <div class="icon-div mt-n1 pr-4">
                       <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
                       <v-icon v-else>mdi-account</v-icon>
                     </div>
-                  </v-col>
-                  <v-col cols="auto">
-                    {{ getName(row.item) }}
+                    <div>{{ getName(row.item) }}</div>
                   </v-col>
                 </v-row>
               </td>
