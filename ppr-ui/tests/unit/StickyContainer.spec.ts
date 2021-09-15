@@ -20,6 +20,9 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
+// selectors
+const errMsg = '.err-msg'
+
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -80,6 +83,7 @@ describe('Sticky Container component tests', () => {
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(false)
+    expect(wrapper.findAll(errMsg).length).toBe(0)
   })
 
   it('renders component with given fee summary values', async () => {
@@ -181,5 +185,14 @@ describe('Sticky Container component tests', () => {
     expect(getLastEvent(wrapper, 'cancel')).toBe(true)
     await wrapper.findComponent(ButtonsStacked).vm.$emit('submit')
     expect(getLastEvent(wrapper, 'submit')).toBe(true)
+  })
+
+  it('displays err message when given', async () => {
+    wrapper = createComponent(false, false, null, null, null, '', '', '')
+    expect(wrapper.findAll(errMsg).length).toBe(0)
+    const msg = 'test error msg'
+    await wrapper.setProps({ setErrMsg: msg })
+    expect(wrapper.findAll(errMsg).length).toBe(1)
+    expect(wrapper.findAll(errMsg).at(0).text()).toBe(msg)
   })
 })

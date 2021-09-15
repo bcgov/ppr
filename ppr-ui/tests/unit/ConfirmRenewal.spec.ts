@@ -10,27 +10,22 @@ import { mockedFinancingStatementAll, mockedDebtorNames, mockedRenewalResponse }
 
 // Components
 import { ConfirmRenewal } from '@/views'
-import { ButtonsStacked, FolioNumberSummary } from '@/components/common'
+import { FolioNumberSummary, StickyContainer } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrust } from '@/components/registration'
-import { FeeSummary } from '@/composables/fees'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedNewRegStep1, mockedSelectSecurityAgreement } from './test-data'
 import { RouteNames } from '@/enums'
-import { DraftIF, LengthTrustIF, StateModelIF } from '@/interfaces'
+import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
-// Input field selectors / buttons
-const cancelBtn: string = '#reg-cancel-btn'
-const saveBtn: string = '#reg-save-btn'
-const expiryDate: string = '#new-expiry'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -83,22 +78,46 @@ describe('Confirm Renewal new registration component', () => {
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
-    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
-    
-
+    // check fee summary + buttons
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Back')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Submit Renewal')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.RENEW)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
+    // dialog
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
   })
 
-  it('allows cancel to previous page', () => {
+  it('allows back to previous page', async () => {
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
-      wrapper.find(ButtonsStacked).vm.$emit('back', true)
-      expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
-   })
+    await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
+  })
+
+  it('processes cancel button action', async () => {
+    // dialog doesn't start visible
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    // pressing cancel triggers dialog
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(true)
+    // if dialog emits proceed false it closes + stays on page
+    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
+    // if dialog emits proceed true it goes to dashboard
+    await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
+    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', true)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
 
   it('allows submit of renewal', async () => {
     // Set up for valid discharge request
@@ -106,10 +125,10 @@ describe('Confirm Renewal new registration component', () => {
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
-    await wrapper.findComponent(ButtonsStacked).vm.$emit('submit', true)
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-   })
+  })
 
 })
 

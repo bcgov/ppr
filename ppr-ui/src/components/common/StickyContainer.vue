@@ -16,6 +16,9 @@
       @cancel="cancel()"
       @submit="submit()"
     />
+    <div v-if="errMsg" class="err-msg pt-3">
+      {{ errMsg }}
+    </div>
   </div>
 </template>
 
@@ -42,6 +45,9 @@ export default defineComponent({
   },
   props: {
     // component options
+    setErrMsg: {
+      default: ''
+    },
     setLeftOffset: {
       default: false
     },
@@ -82,6 +88,7 @@ export default defineComponent({
     const localState = reactive({
       backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
+      errMsg: props.setErrMsg,
       feeType: props.setFeeType,
       leftOffset: props.setLeftOffset,
       registrationType: props.setRegistrationType,
@@ -102,6 +109,10 @@ export default defineComponent({
       emit('submit', true)
     }
 
+    watch(() => props.setErrMsg, (val: string) => {
+      localState.errMsg = val
+    })
+
     watch(() => props.setRegistrationLength, (val: RegistrationLengthI) => {
       localState.registrationLength = val
     }, { deep: true, immediate: true })
@@ -118,6 +129,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.err-msg {
+  color: $error;
+  font-size: 0.75rem;
+  text-align: center;
+}
 // matches cols=3
 .sticky-container-3 {
   max-width: 316px;
