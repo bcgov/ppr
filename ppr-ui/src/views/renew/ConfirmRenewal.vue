@@ -217,7 +217,6 @@ export default class ConfirmDischarge extends Vue {
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
-      const lt = this.getLengthTrust // eslint-disable-line
     }
   }
 

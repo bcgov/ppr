@@ -1,7 +1,7 @@
 <template>
   <v-container fluid no-gutters class="white pa-0" v-if="summaryView">
     <v-card flat id="length-trust-summary">
-      <v-row class="py-2" v-if="isRenewal" style="background-color: #f1f3f5">
+      <v-row class="py-2 renewal-title" v-if="isRenewal">
         <v-col cols="auto">
           <h2>Renewal Length and Terms</h2>
         </v-col>
@@ -740,6 +740,10 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .v-list-item {
   min-height: 0;
+}
+
+.renewal-title {
+   background-color: #f1f3f5;
 }
 
 ::v-deep
