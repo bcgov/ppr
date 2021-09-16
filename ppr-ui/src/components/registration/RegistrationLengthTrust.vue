@@ -1,11 +1,9 @@
 <template>
   <v-container fluid no-gutters class="white pa-0" v-if="summaryView">
     <v-card flat id="length-trust-summary">
-      <v-row class="py-2 renewal-title" v-if="isRenewal">
-        <v-col cols="auto">
-          <h2>Renewal Length and Terms</h2>
-        </v-col>
-      </v-row>
+      <h2 class="pt-2 pb-5 renewal-title" v-if="isRenewal">
+          Renewal Length and Terms
+       </h2>
       <v-row no-gutters class="summary-header pa-2" v-else>
         <v-col cols="auto" class="pa-2">
           <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
