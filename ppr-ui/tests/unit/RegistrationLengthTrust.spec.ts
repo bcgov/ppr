@@ -121,7 +121,7 @@ describe('RegistrationLengthTrust RL tests', () => {
   it('renders with RL values', async () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(false)
-    expect(wrapper.vm.lifeInfinite).toBe('')
+    expect(wrapper.vm.lifeInfinite).toBe('false')
     expect(wrapper.vm.surrenderDate).toBe('')
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
     expect(wrapper.vm.showErrorSurrenderDate).toBe(false)
