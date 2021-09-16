@@ -30,6 +30,7 @@ from .registration import Registration  # noqa: F401 pylint: disable=unused-impo
 from .trust_indenture import TrustIndenture  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .party import Party  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
+from .general_collateral_legacy import GeneralCollateralLegacy  # noqa: F401 pylint: disable=unused-import; see above
 from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
 
@@ -75,6 +76,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     general_collateral = db.relationship('GeneralCollateral',
                                          order_by='asc(GeneralCollateral.id)',
                                          back_populates='financing_statement')
+    general_collateral_legacy = db.relationship('GeneralCollateralLegacy',
+                                                order_by='asc(GeneralCollateralLegacy.id)',
+                                                back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
     previous_statement = db.relationship('PreviousFinancingStatement', back_populates='financing_statement')
     # Relationships - StateType
@@ -216,22 +220,29 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
 
     def general_collateral_json(self, registration_id):
         """Build general collateral JSON: current_view_json determines if current or original data is included."""
-        if not self.general_collateral:
+        if not self.general_collateral and not self.general_collateral_legacy:
             return None
 
         collateral_list = []
-        for collateral in self.general_collateral:
+        for collateral in reversed(self.general_collateral):
             collateral_json = None
             if not self.current_view_json and collateral.registration_id == registration_id:
                 collateral_json = collateral.json
             elif self.current_view_json and not collateral.registration_id_end:
                 collateral_json = collateral.json
-                if self.mark_update_json and collateral.registration_id != registration_id:
-                    collateral_json['added'] = True
 
             if collateral_json:
                 collateral_list.append(collateral_json)
 
+        for collateral in reversed(self.general_collateral_legacy):
+            collateral_json = None
+            if not self.current_view_json and collateral.registration_id == registration_id:
+                collateral_json = collateral.json
+            elif self.current_view_json and not collateral.registration_id_end and \
+                (collateral.status is None or collateral.status != GeneralCollateralLegacy.StatusTypes.DELETED):
+                collateral_json = collateral.json
+            if collateral_json:
+                collateral_list.append(collateral_json)
         return collateral_list
 
     def vehicle_collateral_json(self, registration_id):

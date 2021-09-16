@@ -31,7 +31,7 @@ from registry_schemas.example_data.ppr import (
 )
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import Draft, FinancingStatement, Registration, utils as model_utils
+from ppr_api.models import Draft, GeneralCollateralLegacy, FinancingStatement, Registration, utils as model_utils
 
 
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
@@ -271,6 +271,49 @@ def test_find_by_registration_num_ds(session):
     assert json_data['dischargeRegistrationNumber']
     assert json_data['createDateTime']
     assert json_data['registeringParty']
+
+
+def test_find_by_registration_num_legacy_gc(session):
+    """Assert that find an amendment statement with legacy general collateral contains all expected elements."""
+    registration = Registration.find_by_registration_number('TEST0018A1', 'PS12345', True)
+    assert registration
+    assert registration.registration_num == 'TEST0018A1'
+    assert registration.registration_type == 'AM'
+    assert registration.registration_ts
+    assert registration.account_id
+    assert registration.client_reference_id
+    assert registration.parties
+    assert len(registration.parties) == 1
+    assert registration.financing_statement
+    assert registration.general_collateral_legacy
+    collateral = registration.general_collateral_legacy
+    assert len(collateral) == 1
+    assert collateral[0].status == GeneralCollateralLegacy.StatusTypes.ADDED
+    registration = Registration.find_by_registration_number('TEST0018A2', 'PS12345', True)
+    assert registration
+    assert registration.registration_num == 'TEST0018A2'
+    assert registration.general_collateral_legacy
+    collateral = registration.general_collateral_legacy
+    assert len(collateral) == 1
+    assert collateral[0].status == GeneralCollateralLegacy.StatusTypes.DELETED
+
+
+def test_find_by_registration_num_gc(session):
+    """Assert that find an amendment with general collateral changes contains all expected elements."""
+    registration = Registration.find_by_registration_number('TEST0018A3', 'PS12345', True)
+    assert registration
+    assert registration.registration_num == 'TEST0018A3'
+    assert registration.registration_type == 'AM'
+    assert registration.general_collateral
+    collateral = registration.general_collateral
+    assert len(collateral) == 1
+    json_data = registration.json
+    assert len(json_data['addGeneralCollateral']) == 1
+    assert json_data['addGeneralCollateral'][0]['collateralId'] == 200000009
+    assert 'addedDateTime' in json_data['addGeneralCollateral'][0]
+    assert len(json_data['deleteGeneralCollateral']) == 1
+    assert json_data['deleteGeneralCollateral'][0]['collateralId'] == 200000005
+    assert 'addedDateTime' in json_data['deleteGeneralCollateral'][0]
 
 
 def test_find_by_id_invalid(session):

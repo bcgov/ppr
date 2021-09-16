@@ -276,8 +276,54 @@ def test_current_json(session):
     assert 'added' in json_data['vehicleCollateral'][1]
     assert json_data['debtors'][1]['added']
     assert json_data['securedParties'][1]['added']
-    assert json_data['generalCollateral'][1]['added']
+    assert json_data['generalCollateral'][0]['added']
     assert json_data['vehicleCollateral'][1]['added']
+
+
+def test_gc_legacy_json(session):
+    """Assert that the financing statement JSON contains expected general collateral."""
+    result = FinancingStatement.find_by_id(200000012)
+    result.mark_update_json = False
+    result.current_view_json = False
+    json_data = result.json
+    # print(json_data)
+    assert len(json_data['generalCollateral']) == 3
+    for collateral in json_data['generalCollateral']:
+        assert 'added' in collateral
+        assert 'removed' in collateral
+        assert 'collateralId' in collateral
+        assert 'addedDateTime' in collateral
+        assert 'legacy' in collateral
+        assert 'description' in collateral
+        assert collateral['legacy']
+        assert not collateral['added']
+        assert not collateral['removed']
+
+
+def test_gc_legacy_current_json(session):
+    """Assert that the financing statement JSON contains expected general collateral."""
+    result = FinancingStatement.find_by_id(200000012)
+    result.mark_update_json = False
+    result.current_view_json = True
+    json_data = result.json
+    # print(json_data)
+    assert len(json_data['generalCollateral']) >= 4
+    for collateral in json_data['generalCollateral']:
+        assert 'added' in collateral
+        assert 'removed' in collateral
+        assert 'collateralId' in collateral
+        assert 'addedDateTime' in collateral
+        assert 'legacy' in collateral
+        assert 'description' in collateral
+        if collateral['collateralId'] == 200000009:
+            assert not collateral['legacy']
+        else:
+            assert collateral['legacy']
+        if collateral['collateralId'] in (200000007, 200000009):
+            assert collateral['added']
+        else:
+            assert not collateral['added']
+        assert not collateral['removed']
 
 
 @pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)
