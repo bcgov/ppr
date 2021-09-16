@@ -44,7 +44,8 @@ export const useDebtor = (props, context) => {
   const getDebtor = () => {
     const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.value.debtors
     if (props.activeIndex >= 0) {
-      localState.currentDebtor = debtors[props.activeIndex]
+      // deep copy so original object doesn't get modified
+      localState.currentDebtor = JSON.parse(JSON.stringify(debtors[props.activeIndex]))
       localState.currentIsBusiness = false
       if (localState.currentDebtor.businessName) {
         localState.currentIsBusiness = true

@@ -36,7 +36,8 @@ export const useSecuredParty = (props, context) => {
     const securedParties: PartyIF[] =
       getAddSecuredPartiesAndDebtors.value.securedParties
     if (props.activeIndex >= 0) {
-      localState.currentSecuredParty = securedParties[props.activeIndex]
+      // deep copy so original object doesn't get modified
+      localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[props.activeIndex]))
       localState.currentIsBusiness = false
       if (localState.currentSecuredParty.businessName) {
         localState.currentIsBusiness = true
