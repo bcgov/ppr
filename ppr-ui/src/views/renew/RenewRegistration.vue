@@ -7,12 +7,13 @@
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current registration information as of
-              <b>{{ asOfDateTime }}.</b> Review this infromation to ensure it is correct and select the length
-              of time you would like to renew this registration for.<br/>
+              <b>{{ asOfDateTime }}.</b> Review this information to ensure it is correct
+              <span v-if="registrationType !== registrationTypeRL"> and select the length
+              of time you would like to renew this registration for</span>.<br/>
             </p>
             <p class="ma-0 pt-5">
               To view the full history of this registration including descriptions of any
-              amendments and any court orders, you will need to conduct a separate search.
+              previous amendments or court orders, you will need to conduct a separate search.
             </p>
           </div>
           <registration-length-trust class="mt-15" :isRenewal="true"
@@ -140,6 +141,10 @@ export default class ReviewRegistration extends Vue {
     }
   }
 
+  private get registrationTypeRL (): string {
+    return APIRegistrationTypes.REPAIRERS_LIEN
+  }
+
   private async loadRegistration (): Promise<void> {
     if (!this.registrationNumber) {
       console.error('No registration number given to renew. Redirecting to dashboard...')
@@ -169,12 +174,17 @@ export default class ReviewRegistration extends Vue {
       } as AddCollateralIF
       const lengthTrust = {
         valid: false,
+        showInvalid: false,
         trustIndenture: financingStatement.trustIndenture || false,
         lifeInfinite: false,
         lifeYears: null,
         surrenderDate: financingStatement.surrenderDate || null,
         lienAmount: financingStatement.lienAmount || null
       } as LengthTrustIF
+      if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+        lengthTrust.lifeYears = 1
+        lengthTrust.valid = true
+      }
       const parties = {
         valid: true,
         registeringParty: financingStatement.registeringParty,
