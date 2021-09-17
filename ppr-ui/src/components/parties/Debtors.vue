@@ -70,14 +70,23 @@
               :key="row.item.id"
               class="debtor-row"
             >
-              <td class="list-item__title title-text">
+              <td class="list-item__title title-text pl-7">
+                <v-row no-gutters>
+                  <v-col cols="3">
                 <div class="icon-div" v-if="isBusiness(row.item)">
                   <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
                 </div>
+                
                 <div class="icon-div" v-else>
                   <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
                 </div>
-                {{ getName(row.item) }}
+                  </v-col>
+                  <v-col cols="9">
+                <div>
+                  {{ getName(row.item) }}
+                </div>
+                  </v-col>
+                </v-row>
               </td>
               <td>
                 <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
