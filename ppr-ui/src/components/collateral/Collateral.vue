@@ -352,10 +352,7 @@ export default defineComponent({
       (val: string) => {
         collateral.generalCollateral = [
           {
-            added: false,
-            addedDateTime: (new Date()).toString(),
-            description: val,
-            legacy: false
+            description: val
           }
         ]
         setAddCollateral(collateral)

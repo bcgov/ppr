@@ -73,19 +73,15 @@ export const mockedAddress1: AddressIF = {
 
 export const mockedGeneralCollateral1: GeneralCollateralIF[] = [
   {
-    added: false,
     addedDateTime: '2021-09-16T05:56:20Z',
-    description: 'TEST1 GENERAL COLLATERAL',
-    legacy: false
+    description: 'TEST1 GENERAL COLLATERAL'
   }
 ]
 
 export const mockedGeneralCollateral2: GeneralCollateralIF[] = [
   {
-    added: false,
     addedDateTime: '2021-09-16T23:56:20Z',
     description: 'TEST2 GENERAL COLLATERAL',
-    legacy: false
   }
 ]
 
@@ -178,10 +174,7 @@ export const mockedNewRegStep3: AddCollateralIF = {
   vehicleCollateral: mockedVehicleCollateral1,
   generalCollateral: [
     {
-      added: false,
-      addedDateTime: '2021-09-17T15:56:20Z',
-      description: 'TEST GENERAL COLLATERAL',
-      legacy: false
+      description: 'TEST GENERAL COLLATERAL'
     }
   ]
 }
