@@ -272,11 +272,10 @@ def test_current_json(session):
     assert len(json_data['vehicleCollateral']) >= 2
     assert 'added' in json_data['debtors'][1]
     assert 'added' in json_data['securedParties'][1]
-    assert 'added' in json_data['generalCollateral'][1]
+    assert 'added' not in json_data['generalCollateral'][1]
     assert 'added' in json_data['vehicleCollateral'][1]
     assert json_data['debtors'][1]['added']
     assert json_data['securedParties'][1]['added']
-    assert json_data['generalCollateral'][0]['added']
     assert json_data['vehicleCollateral'][1]['added']
 
 
@@ -292,8 +291,8 @@ def test_gc_legacy_json(session):
         assert 'collateralId' in collateral
         assert 'addedDateTime' in collateral
         assert 'description' in collateral
-        assert 'legacy' not in collateral
-        assert 'added' not in collateral
+        assert 'descriptionAdd' not in collateral
+        assert 'descriptionDelete' not in collateral
 
 
 def test_gc_legacy_current_json(session):
@@ -307,17 +306,14 @@ def test_gc_legacy_current_json(session):
     for collateral in json_data['generalCollateral']:
         assert 'collateralId' in collateral
         assert 'addedDateTime' in collateral
-        assert 'description' in collateral
-        assert 'added' in collateral
-        assert 'legacy' in collateral
+        # print(collateral)
+        if collateral['collateralId'] in (200000004, 200000005, 200000006, 200000007, 200000008):
+            assert collateral['description']
+            assert 'descriptionAdd' not in collateral
+            assert 'descriptionDelete' not in collateral
         if collateral['collateralId'] == 200000009:
-            assert not collateral['legacy']
-        else:
-            assert collateral['legacy']
-        if collateral['collateralId'] in (200000007, 200000009):
-            assert collateral['added']
-        else:
-            assert not collateral['added']
+            assert collateral['descriptionAdd']
+            assert collateral['descriptionDelete']
 
 
 @pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)

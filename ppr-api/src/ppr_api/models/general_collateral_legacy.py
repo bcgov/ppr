@@ -59,23 +59,24 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
 
     @property
     def current_json(self) -> dict:
-        """For the current or consolidated view include status flags in the genreal collateral as json/a dict."""
+        """Generate a Financing Statement current view of the general collateral as json/dict."""
         collateral = {
             'collateralId': self.id,
-            'description': self.description,
-            'addedDateTime': '',
-            'added': False,
-            'legacy': True
+            'addedDateTime': ''
         }
         if self.status and self.status == STATUS_ADDED:
-            collateral['added'] = True
+            collateral['descriptionAdd'] = self.description
+        elif self.status and self.status == STATUS_DELETED:
+            collateral['descriptionDelete'] = self.description
+        else:
+            collateral['description'] = self.description
         if self.registration:
             collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
         return collateral
 
     @property
     def json(self) -> dict:
-        """By default the status and legacy flags are not needed in the genreal collateral as json/a dict."""
+        """Generate the default view of the general collateral as json/a dict."""
         collateral = {
             'collateralId': self.id,
             'description': self.description,
