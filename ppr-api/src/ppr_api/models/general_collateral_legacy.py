@@ -38,7 +38,7 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
 
     id = db.Column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
     description = db.Column('description', db.Text, nullable=False)
-    # A - added, R - removed, or null if neither
+    # A - added, D - removed/deleted, or null if neither
     status = db.Column('status', db.String(1), nullable=True)
 
     # parent keys
@@ -58,20 +58,29 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
                                           cascade='all, delete', uselist=False)
 
     @property
-    def json(self) -> dict:
-        """Return the genreal collateral as json/dict."""
+    def current_json(self) -> dict:
+        """For the current or consolidated view include status flags in the genreal collateral as json/a dict."""
         collateral = {
             'collateralId': self.id,
             'description': self.description,
             'addedDateTime': '',
             'added': False,
-            'removed': False,
             'legacy': True
         }
         if self.status and self.status == STATUS_ADDED:
             collateral['added'] = True
-        elif self.status and self.status == STATUS_DELETED:
-            collateral['removed'] = True
+        if self.registration:
+            collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+        return collateral
+
+    @property
+    def json(self) -> dict:
+        """By default the status and legacy flags are not needed in the genreal collateral as json/a dict."""
+        collateral = {
+            'collateralId': self.id,
+            'description': self.description,
+            'addedDateTime': ''
+        }
         if self.registration:
             collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
         return collateral

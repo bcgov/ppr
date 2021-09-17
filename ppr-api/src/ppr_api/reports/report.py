@@ -452,6 +452,10 @@ class Report:  # pylint: disable=too-few-public-methods
         for debtor in statement['debtors']:
             if 'birthDate' in debtor:
                 debtor['birthDate'] = Report._to_report_datetime(debtor['birthDate'], False)
+        if 'generalCollateral' in statement:
+            for collateral in statement['generalCollateral']:
+                if 'addedDateTime' in collateral:
+                    collateral['addedDateTime'] = Report._to_report_datetime(collateral['addedDateTime'], True)
 
         if statement['type'] == 'RL' and 'lienAmount' in statement:
             lien_amount = str(statement['lienAmount'])
@@ -459,7 +463,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 statement['lienAmount'] = '$' + '{:0,.2f}'.format(float(lien_amount))
 
     @staticmethod
-    def _set_change_date_time(statement):
+    def _set_change_date_time(statement):   # pylint: disable=too-many-branches
         """Replace non-financing statement API ISO UTC strings with local report format strings."""
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
@@ -479,6 +483,14 @@ class Report:  # pylint: disable=too-few-public-methods
             for add_debtor in statement['addDebtors']:
                 if 'birthDate' in add_debtor:
                     add_debtor['birthDate'] = Report._to_report_datetime(add_debtor['birthDate'], False)
+        if 'deleteGeneralCollateral' in statement:
+            for delete_gc in statement['deleteGeneralCollateral']:
+                if 'addedDateTime' in delete_gc:
+                    delete_gc['addedDateTime'] = Report._to_report_datetime(delete_gc['addedDateTime'], True)
+        if 'addGeneralCollateral' in statement:
+            for add_gc in statement['addGeneralCollateral']:
+                if 'addedDateTime' in add_gc:
+                    add_gc['addedDateTime'] = Report._to_report_datetime(add_gc['addedDateTime'], True)
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""

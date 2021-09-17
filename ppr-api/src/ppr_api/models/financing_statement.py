@@ -229,8 +229,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if not self.current_view_json and collateral.registration_id == registration_id:
                 collateral_json = collateral.json
             elif self.current_view_json and not collateral.registration_id_end:
-                collateral_json = collateral.json
-
+                collateral_json = collateral.current_json
             if collateral_json:
                 collateral_list.append(collateral_json)
 
@@ -240,7 +239,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 collateral_json = collateral.json
             elif self.current_view_json and not collateral.registration_id_end and \
                 (collateral.status is None or collateral.status != GeneralCollateralLegacy.StatusTypes.DELETED):
-                collateral_json = collateral.json
+                collateral_json = collateral.current_json
             if collateral_json:
                 collateral_list.append(collateral_json)
         return collateral_list

@@ -85,8 +85,8 @@ def test_find_by_reg_id_invalid(session):
     assert not collateral
 
 
-def test_general_collateral_json(session):
-    """Assert that the general collateral model renders to a json format correctly."""
+def test_general_collateral_current_json(session):
+    """Assert that the general collateral model renders to a current json format correctly."""
     collateral = GeneralCollateral(
         id=1000,
         description='TEST',
@@ -97,8 +97,22 @@ def test_general_collateral_json(session):
         'description': collateral.description,
         'addedDateTime': '',
         'added': False,
-        'removed': False,
         'legacy': False
+    }
+    assert collateral.current_json == collateral_json
+
+
+def test_general_collateral_json(session):
+    """Assert that the general collateral model renders to a json format correctly."""
+    collateral = GeneralCollateral(
+        id=1000,
+        description='TEST',
+    )
+
+    collateral_json = {
+        'collateralId': collateral.id,
+        'description': collateral.description,
+        'addedDateTime': ''
     }
     assert collateral.json == collateral_json
 

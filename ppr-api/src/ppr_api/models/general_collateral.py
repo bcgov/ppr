@@ -46,15 +46,14 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                                           back_populates='general_collateral', cascade='all, delete', uselist=False)
 
     @property
-    def json(self) -> dict:
-        """Return the genreal collateral as a json object."""
+    def current_json(self) -> dict:
+        """For the current or consolidated view include status flags in the genreal collateral as json/dict."""
         if not self.registration:
             return {
                 'collateralId': self.id,
                 'description': self.description,
                 'addedDateTime': '',
                 'added': False,
-                'removed': False,
                 'legacy': False
             }
 
@@ -63,9 +62,20 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             'description': self.description,
             'addedDateTime': model_utils.format_ts(self.registration.registration_ts),
             'added': not self.registration.is_financing(),
-            'removed': False,
             'legacy': False
         }
+
+    @property
+    def json(self) -> dict:
+        """By default the status and legacy flags are not needed in the genreal collateral as json/a dict."""
+        collateral = {
+            'collateralId': self.id,
+            'description': self.description,
+            'addedDateTime': ''
+        }
+        if self.registration:
+            collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+        return collateral
 
     @classmethod
     def find_by_id(cls, collateral_id: int = None):
