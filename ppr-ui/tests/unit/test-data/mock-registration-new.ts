@@ -71,15 +71,25 @@ export const mockedAddress1: AddressIF = {
   deliveryInstructions: ''
 }
 
-export const mockedGeneralCollateral1: string = 'TEST1 GENERAL COLLATERAL'
-
-export const mockedGeneralCollateral2: Array<GeneralCollateralIF> = [
+export const mockedGeneralCollateral1: GeneralCollateralIF[] = [
   {
-    description: 'TEST1 GENERAL COLLATERAL'
+    added: false,
+    addedDateTime: '2021-09-16T05:56:20Z',
+    description: 'TEST1 GENERAL COLLATERAL',
+    legacy: false
   }
 ]
 
-export const mockedVehicleCollateral1: Array<VehicleCollateralIF> = [
+export const mockedGeneralCollateral2: GeneralCollateralIF[] = [
+  {
+    added: false,
+    addedDateTime: '2021-09-16T23:56:20Z',
+    description: 'TEST2 GENERAL COLLATERAL',
+    legacy: false
+  }
+]
+
+export const mockedVehicleCollateral1: VehicleCollateralIF[] = [
   {
     id: 1,
     type: APIVehicleTypes.MOTOR_VEHICLE,
@@ -111,7 +121,7 @@ export const mockedRegisteringParty1: PartyIF = {
   address: mockedAddress1
 }
 
-export const mockedSecuredParties1: Array<PartyIF> = [
+export const mockedSecuredParties1: PartyIF[] = [
   {
     businessName: 'SECURED PARTY COMPANY LTD.',
     emailAddress: 'test@company.com',
@@ -119,7 +129,7 @@ export const mockedSecuredParties1: Array<PartyIF> = [
   }
 ]
 
-export const mockedSecuredParties2: Array<PartyIF> = [
+export const mockedSecuredParties2: PartyIF[] = [
   {
     personName: {
       last: 'INDIVIDUAL PARTY',
@@ -130,7 +140,7 @@ export const mockedSecuredParties2: Array<PartyIF> = [
   }
 ]
 
-export const mockedDebtors1: Array<PartyIF> = [
+export const mockedDebtors1: PartyIF[] = [
   {
     personName: {
       last: 'INDIVIDUAL DEBTOR',
@@ -142,7 +152,7 @@ export const mockedDebtors1: Array<PartyIF> = [
   }
 ]
 
-export const mockedDebtors2: Array<PartyIF> = [
+export const mockedDebtors2: PartyIF[] = [
   {
     businessName: 'SOMEBODYS BUSINESS',
     address: mockedAddress1
@@ -166,7 +176,14 @@ export const mockedNewRegStep2: AddPartiesIF = {
 export const mockedNewRegStep3: AddCollateralIF = {
   valid: false,
   vehicleCollateral: mockedVehicleCollateral1,
-  generalCollateral: 'TEST GENERAL COLLATERAL'
+  generalCollateral: [
+    {
+      added: false,
+      addedDateTime: '2021-09-17T15:56:20Z',
+      description: 'TEST GENERAL COLLATERAL',
+      legacy: false
+    }
+  ]
 }
 
 export const mockedFinancingStatementAll: FinancingStatementIF = {
@@ -237,7 +254,7 @@ export const mockedDraftFinancingStatementStep3: DraftIF = {
   financingStatement: mockedFinancingStatementStep3
 }
 
-export const mockedPartyCodeSearchResponse: Array<SearchPartyIF> = [{
+export const mockedPartyCodeSearchResponse: SearchPartyIF[] = [{
   businessName: 'SOMEBODYS BUSINESS',
   code: '123',
   address: mockedAddress1
