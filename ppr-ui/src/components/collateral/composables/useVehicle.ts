@@ -42,7 +42,8 @@ export const useVehicle = (props, context) => {
     const vehicles: VehicleCollateralIF[] =
       getAddCollateral.value.vehicleCollateral
     if (props.activeIndex >= 0) {
-      localState.currentVehicle = vehicles[props.activeIndex]
+      // deep copy so original object doesn't get modified
+      localState.currentVehicle = JSON.parse(JSON.stringify(vehicles[props.activeIndex]))
     } else {
       localState.currentVehicle = {
         id: -1,
