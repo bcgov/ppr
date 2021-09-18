@@ -112,6 +112,7 @@ export const useSecuredParty = (props, context) => {
       APIRegistrationTypes.MOTOR_FUEL_TAX,
       APIRegistrationTypes.EXCISE_TAX,
       APIRegistrationTypes.MAINTENANCE_LIEN,
+      APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
       APIRegistrationTypes.OTHER,
       APIRegistrationTypes.MINERAL_LAND_TAX,
       APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
