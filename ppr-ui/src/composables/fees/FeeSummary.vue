@@ -103,8 +103,7 @@ export default defineComponent({
         if (localState.feeType === FeeSummaryTypes.DISCHARGE) {
           return 'Total Discharge'
         } else if (localState.feeType === FeeSummaryTypes.RENEW) {
-          // FUTURE: update this when doing renewal
-          return 'Renewal'
+          return 'Registration Renewal'
         } else {
           return localState.registrationType
         }
