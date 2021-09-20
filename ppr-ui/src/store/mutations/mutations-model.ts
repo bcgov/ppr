@@ -80,6 +80,7 @@ export const mutateNewRegistration = (state: StateIF) => {
     createDateTime: null,
     lastUpdateDateTime: null
   }
+  state.stateModel.registration.registrationFlowType = RegistrationFlowType.NEW
   state.stateModel.registration.confirmDebtorName = null
 }
 
