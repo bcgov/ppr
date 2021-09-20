@@ -1,3 +1,4 @@
+import { RegistrationFlowType } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
@@ -39,6 +40,7 @@ export const stateModel: StateModelIF = {
     },
     registrationNumber: '',
     registrationType: null,
+    registrationFlowType: RegistrationFlowType.NEW,
     registrationTypeOtherDesc: null,
     showStepErrors: false,
     parties: {

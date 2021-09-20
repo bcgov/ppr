@@ -62,7 +62,7 @@ import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
-import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes, RouteNames, UIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
@@ -93,6 +93,7 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
+  @Action setRegistrationFlowType: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -178,6 +179,7 @@ export default class ReviewRegistration extends Vue {
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)
       this.setAddSecuredPartiesAndDebtors(parties)
+      this.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
     }
   }
 

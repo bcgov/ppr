@@ -1,3 +1,4 @@
+import { RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -80,6 +81,10 @@ export const setRegistrationNumber: ActionIF = ({ commit }, regNum: string): voi
 
 export const setRegistrationType: ActionIF = ({ commit }, registrationType: RegistrationTypeIF): void => {
   commit('mutateRegistrationType', registrationType)
+}
+
+export const setRegistrationFlowType: ActionIF = ({ commit }, registrationFlowType: RegistrationFlowType): void => {
+  commit('mutateRegistrationType', registrationFlowType)
 }
 
 export const setRegistrationTypeOtherDesc: ActionIF = ({ commit }, description: string): void => {

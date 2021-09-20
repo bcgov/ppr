@@ -188,11 +188,12 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const registrationFlowType = getRegistrationFlowType.value
     const addressSchema = PartyAddressSchema
     const {
       getName,
@@ -220,11 +221,11 @@ export default defineComponent({
     })
 
     const removeDebtor = (index: number): void => {
-      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      localState.debtors.splice(index, 1)
-      currentParties.debtors = localState.debtors
-      currentParties.valid = isPartiesValid(currentParties)
-      setAddSecuredPartiesAndDebtors(currentParties)
+        let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+        localState.debtors.splice(index, 1)
+        currentParties.debtors = localState.debtors
+        currentParties.valid = isPartiesValid(currentParties)
+        setAddSecuredPartiesAndDebtors(currentParties)
       // setValid()
     }
 
@@ -259,6 +260,7 @@ export default defineComponent({
       resetData,
       isBusiness,
       addressSchema,
+      registrationFlowType,
       ...toRefs(localState)
     }
   }

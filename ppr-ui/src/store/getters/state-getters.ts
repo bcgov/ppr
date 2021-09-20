@@ -88,6 +88,11 @@ export const getRegistrationType = (state: StateIF): RegistrationTypeIF => {
   return state.stateModel.registration.registrationType
 }
 
+/** The selected registration flow type object. */
+export const getRegistrationFlowType = (state: StateIF): string => {
+  return state.stateModel.registration.registrationFlowType
+}
+
 /** The selected registration type object. */
 export const getRegistrationOther = (state: StateIF): string => {
   return state.stateModel.registration.registrationTypeOtherDesc
