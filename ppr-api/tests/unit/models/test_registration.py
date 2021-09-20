@@ -289,6 +289,13 @@ def test_find_by_registration_num_legacy_gc(session):
     collateral = registration.general_collateral_legacy
     assert len(collateral) == 1
     assert collateral[0].status == GeneralCollateralLegacy.StatusTypes.ADDED
+    json_data = registration.json
+    assert len(json_data['addGeneralCollateral']) == 1
+    assert json_data['addGeneralCollateral'][0]['collateralId'] == 200000007
+    assert 'addedDateTime' in json_data['addGeneralCollateral'][0]
+    assert 'added' not in json_data['addGeneralCollateral'][0]
+    assert 'legacy' not in json_data['addGeneralCollateral'][0]
+
     registration = Registration.find_by_registration_number('TEST0018A2', 'PS12345', True)
     assert registration
     assert registration.registration_num == 'TEST0018A2'
@@ -296,6 +303,12 @@ def test_find_by_registration_num_legacy_gc(session):
     collateral = registration.general_collateral_legacy
     assert len(collateral) == 1
     assert collateral[0].status == GeneralCollateralLegacy.StatusTypes.DELETED
+    json_data = registration.json
+    assert len(json_data['deleteGeneralCollateral']) == 1
+    assert json_data['deleteGeneralCollateral'][0]['collateralId'] == 200000008
+    assert 'addedDateTime' in json_data['deleteGeneralCollateral'][0]
+    assert 'added' not in json_data['deleteGeneralCollateral'][0]
+    assert 'legacy' not in json_data['deleteGeneralCollateral'][0]
 
 
 def test_find_by_registration_num_gc(session):
@@ -306,14 +319,20 @@ def test_find_by_registration_num_gc(session):
     assert registration.registration_type == 'AM'
     assert registration.general_collateral
     collateral = registration.general_collateral
-    assert len(collateral) == 1
+    assert len(collateral) == 2
     json_data = registration.json
     assert len(json_data['addGeneralCollateral']) == 1
     assert json_data['addGeneralCollateral'][0]['collateralId'] == 200000009
     assert 'addedDateTime' in json_data['addGeneralCollateral'][0]
+    assert 'description' in json_data['addGeneralCollateral'][0]
+    assert 'descriptionAdd' not in json_data['addGeneralCollateral'][0]
+    assert 'descriptionDelete' not in json_data['addGeneralCollateral'][0]
     assert len(json_data['deleteGeneralCollateral']) == 1
-    assert json_data['deleteGeneralCollateral'][0]['collateralId'] == 200000005
+    assert json_data['deleteGeneralCollateral'][0]['collateralId'] == 200000010
     assert 'addedDateTime' in json_data['deleteGeneralCollateral'][0]
+    assert 'description' in json_data['deleteGeneralCollateral'][0]
+    assert 'descriptionAdd' not in json_data['deleteGeneralCollateral'][0]
+    assert 'descriptionDelete' not in json_data['deleteGeneralCollateral'][0]
 
 
 def test_find_by_id_invalid(session):

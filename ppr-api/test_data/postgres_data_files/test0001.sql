@@ -44,11 +44,11 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
     VALUES(200000004, 'SP', 200000000, 200000000, null, 200000000, null, null, null, null,
            null, 200000002)
 ;
-INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description)
-  VALUES(200000000, 200000000, 200000000, null, 'TEST0001 GC 1')
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200000000, 200000000, 200000000, null, 'TEST0001 GC 1', 'A')
 ;
-INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description)
-  VALUES(200000001, 200000000, 200000000, null, 'TEST0001 GC 2')
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200000001, 200000000, 200000000, null, 'TEST0001 GC 2', 'A')
 ;
 INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, registration_id_end,
                               year, make, model, serial_number, mhr_number, srch_vin)

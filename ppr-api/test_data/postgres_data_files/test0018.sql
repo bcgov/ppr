@@ -94,7 +94,7 @@ INSERT INTO general_collateral_legacy(id, registration_id, financing_id, registr
   VALUES(200000008, 200000026, 200000012, null, '*** DELETED *** TEST0018 GC 1 *** DELETED *** ', 'D')
 ;
 
--- New amendment remove legacy gc 2, add gc 5
+-- New amendment remove legacy gc 2 by description , add gc 5
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
   VALUES(200000030, 'D-T-0018A3', 'PS12345', timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 
@@ -115,10 +115,9 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
            null, 200000029)
 ;
 INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
-  VALUES(200000009, 200000027, 200000012, null, 'TEST0018 GC 5', null)
+  VALUES(200000009, 200000027, 200000012, null, 'ADDING TEST0018 GC 5', 'A')
 ;
-UPDATE general_collateral_legacy
-   SET registration_id_end = 200000027
- WHERE id = 200000005
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200000010, 200000027, 200000012, null, 'DELETING TEST0018 GC 2', 'D')
 ;
 -- TEST0018 end

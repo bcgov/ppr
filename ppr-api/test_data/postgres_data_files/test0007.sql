@@ -31,8 +31,11 @@ INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, re
   VALUES(200000006, 'MV', 200000008, 200000000, null, 2018, 'FORD', 'FIESTA', 'T346JU622994', null,
          searchkey_vehicle('T346JU622994'))
 ;
-INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description)
-  VALUES(200000002, 200000008, 200000000, null, 'TEST GENERAL COLLATERAL AMEND ADD.')
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200000002, 200000008, 200000000, null, 'TEST GENERAL COLLATERAL AMEND ADD.', 'A')
+;
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200010002, 200000008, 200000000, null, 'TEST GENERAL COLLATERAL AMEND DELETE.', 'D')
 ;
 INSERT INTO court_orders(id, registration_id, order_date, court_name, court_registry, file_number, effect_of_order)
   VALUES(200000001, 200000008, CURRENT_TIMESTAMP + interval '200 days', 'Supreme Court of British Columbia', 'Victoria', 'BC123495',
@@ -41,10 +44,6 @@ INSERT INTO court_orders(id, registration_id, order_date, court_name, court_regi
 UPDATE parties
    SET registration_id_end = 200000008
  WHERE id IN (200000001, 200000003)
-;
-UPDATE general_collateral
-  SET registration_id_end = 200000008
-WHERE id = 200000001
 ;
 UPDATE serial_collateral
   SET registration_id_end = 200000008

@@ -7,6 +7,8 @@ DELETE FROM serial_collateral
   WHERE financing_id >= 200000000;
 DELETE FROM general_collateral
   WHERE financing_id >= 200000000;
+DELETE FROM general_collateral_legacy
+  WHERE financing_id >= 200000000;
 DELETE FROM parties
   WHERE financing_id >= 200000000;
 DELETE FROM trust_indentures

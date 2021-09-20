@@ -75,6 +75,38 @@ def test_find_by_reg_id_invalid(session):
     assert not collateral
 
 
+def test_general_collateral_add_json(session):
+    """Assert that the general collateral model renders add collateral json format correctly."""
+    collateral = GeneralCollateralLegacy(
+        id=1000,
+        description='TEST ADD',
+        status='A'
+    )
+
+    collateral_json = {
+        'collateralId': collateral.id,
+        'descriptionAdd': collateral.description,
+        'addedDateTime': ''
+    }
+    assert collateral.current_json == collateral_json
+
+
+def test_general_collateral_delete_json(session):
+    """Assert that the general collateral model renders delete collateral json format correctly."""
+    collateral = GeneralCollateralLegacy(
+        id=1000,
+        description='TEST DELETE',
+        status='D'
+    )
+
+    collateral_json = {
+        'collateralId': collateral.id,
+        'descriptionDelete': collateral.description,
+        'addedDateTime': ''
+    }
+    assert collateral.current_json == collateral_json
+
+
 def test_general_collateral_json(session):
     """Assert that the general collateral model renders to a json format correctly."""
     collateral = GeneralCollateralLegacy(
@@ -85,17 +117,8 @@ def test_general_collateral_json(session):
     collateral_json = {
         'collateralId': collateral.id,
         'description': collateral.description,
-        'addedDateTime': '',
-        'added': False,
-        'removed': False,
-        'legacy': True
+        'addedDateTime': ''
     }
     # print(collateral.json)
     assert collateral.json == collateral_json
-    collateral.status = 'D'
-    collateral_json['removed'] = True
-    assert collateral.json == collateral_json
-    collateral.status = 'A'
-    collateral_json['removed'] = False
-    collateral_json['added'] = True
-    assert collateral.json == collateral_json
+    assert collateral.current_json == collateral_json

@@ -280,7 +280,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     collateral.append(gen_c.json)
         if self.general_collateral:
             for gen_c in self.general_collateral:
-                if gen_c.registration_id == registration_id:
+                if gen_c.registration_id == registration_id and \
+                   gen_c.status == GeneralCollateralLegacy.StatusTypes.ADDED:
                     # collateral_json = gen_c.json
                     # collateral_json['reg_id'] = registration_id  # Need this for report edit badge
                     collateral.append(gen_c.json)
@@ -298,7 +299,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     collateral.append(gen_c.json)
         if self.financing_statement.general_collateral:
             for gen_c in self.financing_statement.general_collateral:
-                if gen_c.registration_id_end == registration_id:
+                if registration_id == gen_c.registration_id_end or \
+                        (registration_id == gen_c.registration_id and
+                         gen_c.status == GeneralCollateralLegacy.StatusTypes.DELETED):
                     # collateral_json = gen_c.json
                     # collateral_json['reg_id'] = registration_id  # Need this for report edit badge
                     collateral.append(gen_c.json)
@@ -613,12 +616,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if existing:
                     existing.registration_id_end = registration.id
 
-        if 'deleteGeneralCollateral' in json_data and json_data['deleteGeneralCollateral']:
-            for gen_c in json_data['deleteGeneralCollateral']:
-                collateral = Registration.find_general_collateral_by_id(gen_c['collateralId'],
-                                                                        financing_statement.general_collateral)
-                if collateral:
-                    collateral.registration_id_end = registration.id
+        # In "add only" general collateral solution gc records are never logically deleted.
+        # if 'deleteGeneralCollateral' in json_data and json_data['deleteGeneralCollateral']:
+        #    for gen_c in json_data['deleteGeneralCollateral']:
+        #        collateral = Registration.find_general_collateral_by_id(gen_c['collateralId'],
+        #                                                                financing_statement.general_collateral)
+        #        if collateral:
+        #            collateral.registration_id_end = registration.id
 
         if 'deleteVehicleCollateral' in json_data and json_data['deleteVehicleCollateral']:
             for vehicle_c in json_data['deleteVehicleCollateral']:

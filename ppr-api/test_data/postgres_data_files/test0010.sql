@@ -26,12 +26,11 @@ INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, re
   VALUES(200000008, 'MH', 200000011, 200000000, null, 2012, 'HOMCO IND. LTD DIPLOMAT', null, '999999', searchkey_mhr('220000'),
          searchkey_vehicle('xadfsf039220000'))
 ;
-INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description)
-  VALUES(200000003, 200000011, 200000000, null, 'TEST GENERAL COLLATERAL CHANGE ADD.')
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200000003, 200000011, 200000000, null, 'TEST GENERAL COLLATERAL CHANGE ADD.', 'A')
 ;
-UPDATE general_collateral
-  SET registration_id_end = 200000011
-WHERE id = 200000002
+INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
+  VALUES(200010003, 200000011, 200000000, null, 'TEST GENERAL COLLATERAL CHANGE DELETE.', 'D')
 ;
 UPDATE serial_collateral
   SET registration_id_end = 200000011

@@ -17,6 +17,7 @@ from __future__ import annotations
 from ppr_api.models import utils as model_utils
 
 from .db import db
+from .general_collateral_legacy import GeneralCollateralLegacy
 
 
 class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -46,26 +47,33 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
                                           back_populates='general_collateral', cascade='all, delete', uselist=False)
 
     @property
-    def json(self) -> dict:
-        """Return the genreal collateral as a json object."""
-        if not self.registration:
-            return {
-                'collateralId': self.id,
-                'description': self.description,
-                'addedDateTime': '',
-                'added': False,
-                'removed': False,
-                'legacy': False
-            }
+    def current_json(self) -> dict:
+        """Generate the current Financing Statement view of the general collateral as json/dict."""
+        collateral = {
+            'collateralId': self.id,
+            'addedDateTime': ''
+        }
+        if self.status and self.status == GeneralCollateralLegacy.StatusTypes.ADDED:
+            collateral['descriptionAdd'] = self.description
+        elif self.status and self.status == GeneralCollateralLegacy.StatusTypes.DELETED:
+            collateral['descriptionDelete'] = self.description
+        else:
+            collateral['description'] = self.description
+        if self.registration:
+            collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+        return collateral
 
-        return {
+    @property
+    def json(self) -> dict:
+        """Generate the default financing statement view of the general collateral as json/a dict."""
+        collateral = {
             'collateralId': self.id,
             'description': self.description,
-            'addedDateTime': model_utils.format_ts(self.registration.registration_ts),
-            'added': not self.registration.is_financing(),
-            'removed': False,
-            'legacy': False
+            'addedDateTime': ''
         }
+        if self.registration:
+            collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+        return collateral
 
     @classmethod
     def find_by_id(cls, collateral_id: int = None):
@@ -122,11 +130,19 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         Map json schema object to db.
         """
         collateral_list = []
-        if json_data and registration_id and financing_id and \
-                'addGeneralCollateral' in json_data and json_data['addGeneralCollateral']:
-            for collateral in json_data['addGeneralCollateral']:
-                gen_collateral = GeneralCollateral.create_from_json(collateral, registration_id)
-                gen_collateral.financing_id = financing_id
-                collateral_list.append(gen_collateral)
+        if json_data and registration_id and financing_id:
+            if 'addGeneralCollateral' in json_data and json_data['addGeneralCollateral']:
+                for collateral in json_data['addGeneralCollateral']:
+                    gen_collateral = GeneralCollateral.create_from_json(collateral, registration_id)
+                    gen_collateral.status = GeneralCollateralLegacy.StatusTypes.ADDED
+                    gen_collateral.financing_id = financing_id
+                    collateral_list.append(gen_collateral)
+            # "Add only" solution delete is not a logical delete for general collateral
+            if 'deleteGeneralCollateral' in json_data and json_data['deleteGeneralCollateral']:
+                for collateral in json_data['deleteGeneralCollateral']:
+                    gen_collateral = GeneralCollateral.create_from_json(collateral, registration_id)
+                    gen_collateral.status = GeneralCollateralLegacy.StatusTypes.DELETED
+                    gen_collateral.financing_id = financing_id
+                    collateral_list.append(gen_collateral)
 
         return collateral_list

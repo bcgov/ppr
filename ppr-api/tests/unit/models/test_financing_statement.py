@@ -272,11 +272,10 @@ def test_current_json(session):
     assert len(json_data['vehicleCollateral']) >= 2
     assert 'added' in json_data['debtors'][1]
     assert 'added' in json_data['securedParties'][1]
-    assert 'added' in json_data['generalCollateral'][1]
+    assert 'added' not in json_data['generalCollateral'][1]
     assert 'added' in json_data['vehicleCollateral'][1]
     assert json_data['debtors'][1]['added']
     assert json_data['securedParties'][1]['added']
-    assert json_data['generalCollateral'][0]['added']
     assert json_data['vehicleCollateral'][1]['added']
 
 
@@ -289,15 +288,11 @@ def test_gc_legacy_json(session):
     # print(json_data)
     assert len(json_data['generalCollateral']) == 3
     for collateral in json_data['generalCollateral']:
-        assert 'added' in collateral
-        assert 'removed' in collateral
         assert 'collateralId' in collateral
         assert 'addedDateTime' in collateral
-        assert 'legacy' in collateral
         assert 'description' in collateral
-        assert collateral['legacy']
-        assert not collateral['added']
-        assert not collateral['removed']
+        assert 'descriptionAdd' not in collateral
+        assert 'descriptionDelete' not in collateral
 
 
 def test_gc_legacy_current_json(session):
@@ -309,21 +304,25 @@ def test_gc_legacy_current_json(session):
     # print(json_data)
     assert len(json_data['generalCollateral']) >= 4
     for collateral in json_data['generalCollateral']:
-        assert 'added' in collateral
-        assert 'removed' in collateral
         assert 'collateralId' in collateral
         assert 'addedDateTime' in collateral
-        assert 'legacy' in collateral
-        assert 'description' in collateral
+        # print(collateral)
+        if collateral['collateralId'] in (200000004, 200000005, 200000006):
+            assert collateral['description']
+            assert 'descriptionAdd' not in collateral
+            assert 'descriptionDelete' not in collateral
+        if collateral['collateralId'] == 200000007:
+            assert collateral['descriptionAdd']
+            assert 'descriptionDelete' not in collateral
+            assert 'description' not in collateral
+        if collateral['collateralId'] == 200000008:
+            assert collateral['descriptionDelete']
+            assert 'descriptionAdd' not in collateral
+            assert 'description' not in collateral
         if collateral['collateralId'] == 200000009:
-            assert not collateral['legacy']
-        else:
-            assert collateral['legacy']
-        if collateral['collateralId'] in (200000007, 200000009):
-            assert collateral['added']
-        else:
-            assert not collateral['added']
-        assert not collateral['removed']
+            assert collateral['descriptionAdd']
+            assert collateral['descriptionDelete']
+            assert 'description' not in collateral
 
 
 @pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)
