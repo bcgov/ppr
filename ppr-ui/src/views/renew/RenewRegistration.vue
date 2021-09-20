@@ -165,12 +165,10 @@ export default class ReviewRegistration extends Vue {
             return true
           }
         })
-      // FUTURE: get general collateral from response
-      const generalCollateral = ''
       const collateral = {
         valid: true,
         vehicleCollateral: financingStatement.vehicleCollateral,
-        generalCollateral: generalCollateral
+        generalCollateral: financingStatement.generalCollateral
       } as AddCollateralIF
       const lengthTrust = {
         valid: false,

@@ -1,5 +1,5 @@
 // Libraries
-import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes } from '@/enums'
+import { APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
   AddPartiesIF,
   AddCollateralIF,
@@ -7,11 +7,9 @@ import {
   DraftIF,
   ErrorIF,
   FinancingStatementIF,
-  GeneralCollateralIF,
   PartyIF,
   RegistrationTypeIF,
   StateModelIF,
-  DebtorNameIF,
   RenewRegistrationIF
 } from '@/interfaces'
 import {
@@ -27,13 +25,9 @@ import { RegistrationTypes } from '@/resources'
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
   const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
-  // console.log('registrationType: ' + JSON.stringify(registrationType))
-  var error:ErrorIF = null
-  var draft:DraftIF = stateModel.registration.draft
-  // console.log('draft: ' + JSON.stringify(draft))
+  const draft:DraftIF = stateModel.registration.draft
   draft.type = DraftTypes.FINANCING_STATEMENT
-  var statement:FinancingStatementIF = draft.financingStatement
-  // console.log('statement: ' + JSON.stringify(statement))
+  let statement:FinancingStatementIF = draft.financingStatement
   if (statement === undefined || statement === null) {
     statement = {
       type: registrationType.registrationTypeAPI,
@@ -68,12 +62,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   // Step 3 setup
   const collateral:AddCollateralIF = stateModel.registration.collateral
   statement.vehicleCollateral = collateral.vehicleCollateral
-  if (collateral.generalCollateral !== null && collateral.generalCollateral !== '') {
-    var generalCollateral: GeneralCollateralIF = { description: collateral.generalCollateral }
-    statement.generalCollateral = [generalCollateral]
-  } else {
-    statement.generalCollateral = []
-  }
+  statement.generalCollateral = collateral.generalCollateral
   statement.clientReferenceId = stateModel.folioOrReferenceNumber
   // Now save the draft.
   draft.financingStatement = statement
@@ -112,7 +101,7 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
     securedParties: parties.securedParties,
     debtors: parties.debtors,
     vehicleCollateral: collateral.vehicleCollateral,
-    generalCollateral: [],
+    generalCollateral: collateral.generalCollateral,
     clientReferenceId: stateModel.folioOrReferenceNumber
   }
   if (!trustLength.lifeInfinite) {
@@ -129,10 +118,6 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   } else if (statement.type === APIRegistrationTypes.REPAIRERS_LIEN) {
     statement.lienAmount = trustLength.lienAmount
     statement.surrenderDate = trustLength.surrenderDate + 'T08:00:00+00:00'
-  }
-  if (collateral.generalCollateral !== null && collateral.generalCollateral !== '') {
-    var generalCollateral: GeneralCollateralIF = { description: collateral.generalCollateral }
-    statement.generalCollateral = [generalCollateral]
   }
   // Now tidy up, deleting objects that are empty strings to pass validation.
   // For example, party.birthDate = '' will fail validation.
@@ -250,13 +235,12 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
   if (draft.financingStatement.vehicleCollateral) {
     stateModel.registration.collateral.vehicleCollateral = draft.financingStatement.vehicleCollateral
   }
-  if (draft.financingStatement.generalCollateral && draft.financingStatement.generalCollateral.length > 0) {
-    stateModel.registration.collateral.generalCollateral = draft.financingStatement.generalCollateral[0].description
+  if (draft.financingStatement.generalCollateral) {
+    stateModel.registration.collateral.generalCollateral = draft.financingStatement.generalCollateral
   }
-  stateModel.registration.collateral.valid = ((stateModel.registration.collateral.vehicleCollateral &&
-      stateModel.registration.collateral.vehicleCollateral.length > 0) ||
-      (stateModel.registration.collateral.generalCollateral &&
-       stateModel.registration.collateral.generalCollateral !== ''))
+  const vcValid = stateModel.registration.collateral.vehicleCollateral?.length !== 0
+  const gcValid = stateModel.registration.collateral.generalCollateral?.length !== 0
+  stateModel.registration.collateral.valid = vcValid && gcValid
 
   if (draft.financingStatement.clientReferenceId) {
     stateModel.folioOrReferenceNumber = draft.financingStatement.clientReferenceId

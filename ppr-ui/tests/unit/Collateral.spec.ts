@@ -59,7 +59,7 @@ describe('Collateral SA tests', () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // won't show edit collateral component until click
     expect(wrapper.findComponent(EditCollateral).exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateral).toBe('')
+    expect(wrapper.vm.generalCollateralDesc).toBe('')
   })
 
   it('add collateral button shows the add vehicle form', async () => {
@@ -84,7 +84,7 @@ describe('Collateral Lien unpaid wages tests', () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // won't show vehicle collateral
     expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateral).toContain('All the personal property of the debtor')
+    expect(wrapper.vm.generalCollateralDesc).toContain('All the personal property of the debtor')
   })
 
 
@@ -109,7 +109,7 @@ describe('Collateral Carbon tests', () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // won't show vehicle collateral
     expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateral).toContain(generalCollateralText)
+    expect(wrapper.vm.generalCollateralDesc).toContain(generalCollateralText)
   })
 
 
@@ -132,7 +132,7 @@ describe('Collateral store tests', () => {
 
   it('renders general collateral when set', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper.vm.generalCollateral).toEqual('TEST1 GENERAL COLLATERAL')
+    expect(wrapper.vm.generalCollateralDesc).toEqual('TEST1 GENERAL COLLATERAL')
   })
   it('renders vehicle collateral table and headers', async () => {
     expect(wrapper.find('.collateral-table').exists()).toBeTruthy()

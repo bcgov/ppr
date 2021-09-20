@@ -62,15 +62,15 @@
         <v-row
           no-gutters
           class="ps-6 pt-4 pb-3"
-          v-if="generalCollateral.length > 0"
+          v-if="generalCollateralDesc.length > 0"
         >
           <v-col cols="3" class="generic-label">
             General Collateral
           </v-col>
         </v-row>
-        <v-row class="px-6" no-gutters v-if="generalCollateral.length > 0">
+        <v-row class="px-6" no-gutters v-if="generalCollateralDesc.length > 0">
           <v-col :class="[$style['summary-text'], 'py-6']">
-            {{ generalCollateral }}
+            {{ generalCollateralDesc }}
           </v-col>
         </v-row>
       </v-container>
@@ -235,7 +235,7 @@
               </v-col>
               <v-col cols="9" class="pr-4">
                 <v-textarea
-                  v-model="generalCollateral"
+                  v-model="generalCollateralDesc"
                   id="generalCollateral"
                   auto-grow
                   counter="4000"
@@ -265,7 +265,7 @@ import {
   computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { AddCollateralIF, VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditCollateral from './EditCollateral.vue'
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './composables/useVehicle'
@@ -287,6 +287,9 @@ export default defineComponent({
     const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
 
     const collateral: AddCollateralIF = getAddCollateral.value
+    const setGeneralCollateralDesc = (collateral.generalCollateral?.length || 0) > 0
+      ? collateral.generalCollateral[0].description : ''
+
     const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const router = context.root.$router
@@ -307,7 +310,7 @@ export default defineComponent({
       showEditVehicle: [false],
       generalCollateralError: '',
       vehicleCollateral: collateral.vehicleCollateral,
-      generalCollateral: collateral.generalCollateral,
+      generalCollateralDesc: setGeneralCollateralDesc,
       collateralValid: collateral.valid,
       showErrorComponent: collateral.showInvalid,
       getNumCols: computed((): number => {
@@ -345,9 +348,13 @@ export default defineComponent({
     })
 
     watch(
-      () => localState.generalCollateral,
+      () => localState.generalCollateralDesc,
       (val: string) => {
-        collateral.generalCollateral = val
+        collateral.generalCollateral = [
+          {
+            description: val
+          }
+        ]
         setAddCollateral(collateral)
         setValid()
       }
@@ -433,13 +440,13 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      if (hasGeneralCollateral() && !collateral.generalCollateral) {
+      if (hasGeneralCollateral() && !localState.generalCollateralDesc) {
         if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
-          localState.generalCollateral =
+          localState.generalCollateralDesc =
             'All the personal property of the debtor'
         }
         if (hasGeneralCollateralText()) {
-          localState.generalCollateral =
+          localState.generalCollateralDesc =
             'All the debtor’s present and after acquired personal property, including ' +
             'but not restricted to machinery, equipment, furniture, fixtures and receivables.'
         }
