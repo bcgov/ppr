@@ -233,7 +233,7 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.RENEW)
       expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
       expect(wrapper.vm.$data.registrationType).toBe(renewRegistrationTypes[i])
-      expect(wrapper.vm.$data.feeLabel).toBe('Renewal')
+      expect(wrapper.vm.$data.feeLabel).toBe('Registration Renewal')
       
       if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
@@ -251,7 +251,7 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.$data.totalFees).toBe(0)
         expect(wrapper.vm.$data.totalAmount).toBe(1.5)
         expect(wrapper.vm.$data.isComplete).toBe(false)
-        expect(wrapper.vm.$data.hintFee).toBe('Select registration length')
+        expect(wrapper.vm.$data.hintFee).toBe('Select registration renewal length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
