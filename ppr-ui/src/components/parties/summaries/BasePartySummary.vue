@@ -21,14 +21,22 @@
         >
           <template v-slot:item="row" class="party-data-table">
             <tr :key="row.item.id" class="party-row">
-              <td class="list-item__title">
-                <div class="icon-div" style="padding-left: 14px;" v-if="isBusiness(row.item)">
-                  <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
-                </div>
-                <div class="icon-div" style="padding-left: 14px;" v-else>
-                  <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
-                </div>
-                {{ getName(row.item) }}
+              <td class="list-item__title title-text" style="padding-left:30px">
+                <v-row no-gutters>
+                  <v-col cols="3">
+                    <div class="icon-div" v-if="isBusiness(row.item)">
+                      <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
+                    </div>
+                    <div class="icon-div" v-else>
+                      <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
+                    </div>
+                  </v-col>
+                  <v-col cols="9">
+                    <div>
+                      {{ getName(row.item) }}
+                    </div>
+                  </v-col>
+                </v-row>
               </td>
               <td>
                 <base-address
