@@ -14,14 +14,18 @@
           >
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
-                <td class="list-item__title title-text">
+                <td class="list-item__title title-text" style="padding-left:30px">
                   <v-row no-gutters>
-                    <v-col cols="12" style="padding-left: 14px;">
+                    <v-col cols="3">
                       <div class="icon-div mt-n1 pr-4">
                         <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
                         <v-icon v-else>mdi-account</v-icon>
                       </div>
-                      <div>{{ getName(row.item) }}</div>
+                    </v-col>
+                    <v-col cols="9">
+                      <div>
+                        {{ getName(row.item) }}
+                      </div>
                     </v-col>
                   </v-row>
                 </td>
