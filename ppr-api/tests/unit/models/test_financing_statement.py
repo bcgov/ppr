@@ -307,13 +307,22 @@ def test_gc_legacy_current_json(session):
         assert 'collateralId' in collateral
         assert 'addedDateTime' in collateral
         # print(collateral)
-        if collateral['collateralId'] in (200000004, 200000005, 200000006, 200000007, 200000008):
+        if collateral['collateralId'] in (200000004, 200000005, 200000006):
             assert collateral['description']
             assert 'descriptionAdd' not in collateral
             assert 'descriptionDelete' not in collateral
+        if collateral['collateralId'] == 200000007:
+            assert collateral['descriptionAdd']
+            assert 'descriptionDelete' not in collateral
+            assert 'description' not in collateral
+        if collateral['collateralId'] == 200000008:
+            assert collateral['descriptionDelete']
+            assert 'descriptionAdd' not in collateral
+            assert 'description' not in collateral
         if collateral['collateralId'] == 200000009:
             assert collateral['descriptionAdd']
             assert collateral['descriptionDelete']
+            assert 'description' not in collateral
 
 
 @pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)
