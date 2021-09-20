@@ -221,11 +221,11 @@ export default defineComponent({
     })
 
     const removeDebtor = (index: number): void => {
-        let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-        localState.debtors.splice(index, 1)
-        currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties)
-        setAddSecuredPartiesAndDebtors(currentParties)
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      localState.debtors.splice(index, 1)
+      currentParties.debtors = localState.debtors
+      currentParties.valid = isPartiesValid(currentParties)
+      setAddSecuredPartiesAndDebtors(currentParties)
       // setValid()
     }
 
