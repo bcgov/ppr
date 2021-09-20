@@ -90,6 +90,9 @@ export function getFeeHint (
     if (registrationLength.lifeYears > 1) {
       return `${registrationLength.lifeYears} Years @ $5.00/year`
     }
+    if (feeType === FeeSummaryTypes.RENEW) {
+      return 'Select registration renewal length'
+    }
     // selected years is 0
     return 'Select registration length'
   }

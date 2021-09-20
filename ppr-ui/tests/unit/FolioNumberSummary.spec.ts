@@ -56,7 +56,11 @@ describe('Folio number on the summarty page', () => {
 
   it('sets the validity to false for > 15 characters', async () => {
     wrapper.find('#txt-folio').setValue('MY TEST THAT IS VERY LONG IN FACT TOO LONG')
-    expect(wrapper.emitted().folioValid).toBeTruthy()
+    await Vue.nextTick()
+    await Vue.nextTick()
+    await Vue.nextTick()
     expect(wrapper.vm.$data.isValid).toBeFalsy()
+    expect(wrapper.emitted().folioValid).toBeTruthy()
+    
   })
 })

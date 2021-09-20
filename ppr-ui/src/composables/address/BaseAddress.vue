@@ -5,7 +5,9 @@
       <div v-if="!editing" class="address-block">
         <div class="address-block__info pre-wrap">
           <div class="address-block__info-row">{{ addressLocal.street }}</div>
-          <div class="address-block__info-row">{{ addressLocal.streetAdditional }}</div>
+          <div v-if="addressLocal.streetAdditional" class="address-block__info-row">
+            {{ addressLocal.streetAdditional }}
+          </div>
           <div class="address-block__info-row">
             <span>{{ addressLocal.city }}</span>
             <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}</span>

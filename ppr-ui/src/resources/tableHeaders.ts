@@ -202,7 +202,7 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
 
 export const debtorTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds extra-indent py-4',
+    class: 'column-md extra-indent py-4',
     sortable: false,
     text: 'Name',
     value: 'party.name'
@@ -229,7 +229,7 @@ export const debtorTableHeaders: Array<BaseHeaderIF> = [
 
 export const partyTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds extra-indent py-4',
+    class: 'column-md extra-indent py-4',
     sortable: false,
     text: 'Name',
     value: 'name'
@@ -256,7 +256,7 @@ export const partyTableHeaders: Array<BaseHeaderIF> = [
 
 export const registeringTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-mds extra-indent py-4',
+    class: 'column-md extra-indent py-4',
     sortable: false,
     text: 'Name',
     value: 'name'

@@ -38,16 +38,23 @@
     </v-row>
     <v-row no-gutters class="pt-1">
       <v-col class="ml-n6 pl-6" cols="4">
-        <v-select :id="$style['search-type-select']"
-                  class="search-bar-type-select"
-                  :error-messages="categoryMessage ? categoryMessage : ''"
-                  filled
-                  :items="searchTypes"
-                  item-disabled="selectDisabled"
-                  item-text="searchTypeUI"
-                  :label="selectedSearchType ? '' : searchTypeLabel"
-                  return-object
-                  v-model="selectedSearchType">
+        <v-select
+          id="search-select"
+          class="search-bar-type-select"
+          :error-messages="categoryMessage ? categoryMessage : ''"
+          filled
+          :items="searchTypes"
+          item-disabled="selectDisabled"
+          item-text="searchTypeUI"
+          :label="selectedSearchType ? '' : searchTypeLabel"
+          return-object
+          v-model="selectedSearchType"
+        >
+          <template slot="item" slot-scope="data">
+            <span :id="`search-bar-${data.item.searchTypeUI}`">
+              {{ data.item.searchTypeUI }}
+            </span>
+          </template>
         </v-select>
       </v-col>
       <v-col v-if="!isIndividualDebtor" cols="7" class="pl-3">
@@ -58,17 +65,18 @@
                    transition="fade-transition"
                    :value="showSearchPopUp && searchPopUp">
           <template v-slot:activator="scope" & v-on="scope.on">
-            <v-text-field autocomplete="off"
-                          class="search-bar-text-field"
-                          :disabled="!selectedSearchType"
-                          :error-messages="searchMessage ? searchMessage : ''"
-                          filled
-                          id="search-bar-field"
-                          :hint="searchHint"
-                          :hide-details="hideDetails"
-                          persistent-hint
-                          :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
-                          v-model="searchValue"/>
+            <v-text-field
+              id="search-bar-field"
+              class="search-bar-text-field"
+              autocomplete="off"
+              :disabled="!selectedSearchType"
+              :error-messages="searchMessage ? searchMessage : ''"
+              filled
+              :hint="searchHint"
+              :hide-details="hideDetails"
+              persistent-hint
+              :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
+              v-model="searchValue"/>
           </template>
           <v-row v-for="(line, index) in searchPopUp" :key="index" class="pt-2 pl-3">
             {{ line }}

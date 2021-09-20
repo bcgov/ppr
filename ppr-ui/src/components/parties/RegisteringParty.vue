@@ -17,11 +17,9 @@
                 <td class="list-item__title title-text" style="padding-left:30px">
                   <v-row no-gutters>
                     <v-col cols="3">
-                      <div class="icon-div" v-if="isBusiness(row.item)">
-                        <v-icon class="mt-n2 pr-4">mdi-domain</v-icon>
-                      </div>
-                      <div class="icon-div" v-else>
-                        <v-icon class="mt-n2 pr-4">mdi-account</v-icon>
+                      <div class="icon-div mt-n1 pr-4">
+                        <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
+                        <v-icon v-else>mdi-account</v-icon>
                       </div>
                     </v-col>
                     <v-col cols="9">

@@ -22,6 +22,7 @@ from .court_order import CourtOrder
 from .draft import Draft
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
+from .general_collateral_legacy import GeneralCollateralLegacy
 from .party import Party
 from .previous_financing_statement import PreviousFinancingStatement
 from .registration import Registration
@@ -45,6 +46,6 @@ from .vehicle_collateral import VehicleCollateral
 
 __all__ = ('db',
            'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft', 'FinancingStatement',
-           'GeneralCollateral', 'Party', 'PartyType', 'PreviousFinancingStatement', 'ProvinceType', 'Registration',
-           'RegistrationType', 'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType',
-           'SerialType', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')
+           'GeneralCollateral', 'GeneralCollateralLegacy', 'Party', 'PartyType', 'PreviousFinancingStatement',
+           'ProvinceType', 'Registration', 'RegistrationType', 'RegistrationTypeClass', 'SearchRequest', 'SearchResult',
+           'SearchType', 'StateType', 'SerialType', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')

@@ -89,14 +89,17 @@ def test_general_collateral_json(session):
     """Assert that the general collateral model renders to a json format correctly."""
     collateral = GeneralCollateral(
         id=1000,
-        description='TEST'
+        description='TEST',
     )
 
     collateral_json = {
         'collateralId': collateral.id,
-        'description': collateral.description
+        'description': collateral.description,
+        'addedDateTime': '',
+        'added': False,
+        'removed': False,
+        'legacy': False
     }
-
     assert collateral.json == collateral_json
 
 
