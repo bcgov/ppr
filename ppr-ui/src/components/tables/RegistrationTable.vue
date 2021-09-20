@@ -795,6 +795,7 @@ export default defineComponent({
     }
 
     const closeConfirmation = (): void => {
+      localState.currentRegistrationNumber = null
       localState.showDialog = false
     }
 

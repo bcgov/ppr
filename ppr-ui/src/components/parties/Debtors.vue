@@ -5,7 +5,7 @@
         >Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
         operating a business and you want to register both the name of the
         business and the individual associated with the business, enter them as
-        seperate debtors.<br /><br />
+        separate debtors.<br /><br />
         Note: If a Debtor name is entered incorrectly, it could invalidate the
         entire registration.
       </v-col>
