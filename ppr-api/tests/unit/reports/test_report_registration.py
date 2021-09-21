@@ -44,7 +44,7 @@ TEST_REPORT_DATA = [
     (ReportTypes.AMENDMENT_STATEMENT_REPORT.value, AMENDMENT_CO_DATAFILE),
     (ReportTypes.CHANGE_STATEMENT_REPORT.value, CHANGE_AC_DATAFILE),
     (ReportTypes.CHANGE_STATEMENT_REPORT.value, CHANGE_DT_DATAFILE),
-    (ReportTypes.DISCHARGE_STATEMENT_REPORT.value, DISCHARGE_DATAFILE)
+    (ReportTypes.FINANCING_STATEMENT_REPORT.value, DISCHARGE_DATAFILE)
 ]
 
 
@@ -72,5 +72,5 @@ def test_registration_config(client, jwt, type, json_data_file):
     assert report_data['meta_title']
     assert report_data['meta_account_id']
     assert report_data['environment']
-    assert report_data['createDateTime'].endswith('Pacific Time')
+    assert report_data['createDateTime'].endswith('Pacific time')
     assert report_data['registeringParty']['address']['country'] == 'Canada'
