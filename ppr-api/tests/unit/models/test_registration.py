@@ -72,6 +72,14 @@ TEST_EXPIRY_DATA = [
     ('TEST0017R1', 'RE', '2022-08-27T06:59:59+00:00'),
     ('TEST0017R2', 'RE', '2023-02-23T07:59:59+00:00')
 ]
+# testdata pattern is ({base_reg_num}, {reg_num}, {reg_num_name})
+TEST_VERIFICATION_DATA = [
+    ('TEST0004', 'TEST00D4', 'dischargeRegistrationNumber'),
+    ('TEST0005', 'TEST00R5', 'renewalRegistrationNumber'),
+    ('TEST0018', 'TEST0018A3', 'amendmentRegistrationNumber'),
+    ('TEST0018', 'TEST0018A2', 'amendmentRegistrationNumber'),
+    ('TEST0001', 'TEST0009', 'changeRegistrationNumber')
+]
 
 
 def test_find_by_id(session):
@@ -662,3 +670,14 @@ def test_expiry(session, reg_num, reg_type, expiry_ts):
     assert 'expiryDate' in json_data
     print(json_data['expiryDate'] + ' ' + expiry_ts)
     assert json_data['expiryDate'] == expiry_ts
+
+
+@pytest.mark.parametrize('base_reg_num,reg_num,reg_num_name', TEST_VERIFICATION_DATA)
+def test_verification_json(session, base_reg_num, reg_num, reg_num_name):
+    """Assert that generating verification statement json works as expected."""
+    registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
+    json_data = registration.verification_json(reg_num_name)
+    assert json_data[reg_num_name] == reg_num
+    assert json_data['baseRegistrationNumber'] == base_reg_num
+    assert len(json_data['changes']) >= 1
+    assert json_data['changes'][0][reg_num_name] == reg_num

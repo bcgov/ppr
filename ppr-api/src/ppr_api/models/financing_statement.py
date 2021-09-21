@@ -89,8 +89,10 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     mark_update_json = False
     # Use to specify if generated json content is current state or original financing statement.
     current_view_json = True
-    # Use to include/exclude all change statement data in the financing statement json.
+    # Use to include/exclude all change statement data in the financing statement json for search results.
     include_changes_json = False
+    # Use to include/exclude registration history at the time of the registration for verfication statements.
+    verification_reg_id = 0
 
     @property
     def json(self) -> dict:
@@ -173,7 +175,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         if self.include_changes_json and self.registration and len(self.registration) > 1:
             changes = []
             for reg in reversed(self.registration):
-                if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
+                if reg.registration_type_cl not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN') and \
+                   (self.verification_reg_id < 1 or reg.id <= self.verification_reg_id):
                     statement_json = reg.json
                     statement_json['statementType'] = \
                         model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]

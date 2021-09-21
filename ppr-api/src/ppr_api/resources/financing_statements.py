@@ -236,15 +236,16 @@ class AmendmentResource(Resource):
                                         registration_num,
                                         account_id)
 
+            response_json = registration.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(registration.json,
+                return get_pdf(response_json,
                                account_id,
-                               ReportTypes.AMENDMENT_STATEMENT_REPORT.value,
+                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                token['name'])
 
-            return registration.json, HTTPStatus.CREATED
+            return response_json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -283,12 +284,13 @@ class GetAmendmentResource(Resource):
                                                                  is_staff(jwt),
                                                                  registration_num)
 
+            response_json = statement.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.AMENDMENT_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
 
-            return statement.json, HTTPStatus.OK
+            return response_json, HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -350,12 +352,13 @@ class ChangeResource(Resource):
                                         registration_num,
                                         account_id)
 
+            response_json = registration.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(registration.json, account_id, ReportTypes.CHANGE_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
 
-            return registration.json, HTTPStatus.CREATED
+            return response_json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -394,12 +397,13 @@ class GetChangeResource(Resource):
                                                                  is_staff(jwt),
                                                                  registration_num)
 
+            response_json = statement.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.CHANGE_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
 
-            return statement.json, HTTPStatus.OK
+            return response_json, HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -458,12 +462,13 @@ class RenewalResource(Resource):
                                         registration_num,
                                         account_id)
 
+            response_json = registration.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(registration.json, account_id, ReportTypes.RENEWAL_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
 
-            return registration.json, HTTPStatus.CREATED
+            return response_json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
             return resource_utils.pay_exception_response(pay_exception)
@@ -502,12 +507,13 @@ class GetRenewalResource(Resource):
                                                                  is_staff(jwt),
                                                                  registration_num)
 
+            response_json = statement.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.RENEWAL_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
 
-            return statement.json, HTTPStatus.OK
+            return response_json, HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -559,25 +565,33 @@ class DischargeResource(Resource):
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()
 
-            # No fee for a discharge.
+            # No fee for a discharge but create a payment transaction record.
+            # Set up the registration, pay, and save the data.
+            registration = pay_and_save(request_json,
+                                        model_utils.REG_CLASS_DISCHARGE,
+                                        statement,
+                                        registration_num,
+                                        account_id)
             # Try to save the discharge statement: failure throws a business exception.
-            registration = Registration.create_from_json(request_json,
-                                                         model_utils.REG_CLASS_DISCHARGE,
-                                                         statement,
-                                                         registration_num,
-                                                         account_id)
-            registration.save()
-
+            # registration = Registration.create_from_json(request_json,
+            #                                            model_utils.REG_CLASS_DISCHARGE,
+            #                                             statement,
+            #                                             registration_num,
+            #                                             account_id)
+            # registration.save()
+            response_json = registration.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(registration.json,
+                return get_pdf(response_json,
                                account_id,
-                               ReportTypes.DISCHARGE_STATEMENT_REPORT.value,
+                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                token['name'])
 
-            return registration.json, HTTPStatus.CREATED
+            return response_json, HTTPStatus.CREATED
 
+        except SBCPaymentException as pay_exception:
+            return resource_utils.pay_exception_response(pay_exception)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -613,12 +627,19 @@ class GetDischargeResource(Resource):
                                                                  is_staff(jwt),
                                                                  registration_num)
 
+            response_json = statement.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.DISCHARGE_STATEMENT_REPORT.value, token['name'])
+                # return get_pdf(statement.json, account_id, ReportTypes.DISCHARGE_STATEMENT_REPORT.value,
+                #               token['name'])
+                return get_pdf(response_json,
+                               account_id,
+                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               token['name'])
 
-            return statement.json, HTTPStatus.OK
+            return response_json, HTTPStatus.OK
+            # return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -712,14 +733,16 @@ def pay_and_save(request_json, registration_class, financing_statement, registra
     invoice_id = None
     if account_id:
         pay_trans_type = TransactionTypes.CHANGE.value
-        fee_quantity = registration.life
+        fee_quantity = 1
         if registration_class == model_utils.REG_CLASS_AMEND:
             pay_trans_type = TransactionTypes.AMENDMENT.value
         elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
-            fee_quantity = 1
             pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
         elif registration_class == model_utils.REG_CLASS_RENEWAL:
+            fee_quantity = registration.life
             pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
+        elif registration_class == model_utils.REG_CLASS_DISCHARGE:
+            pay_trans_type = TransactionTypes.DISCHARGE.value
 
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=account_id,

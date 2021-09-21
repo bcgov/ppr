@@ -204,6 +204,15 @@ def test_get_discharge(session, client, jwt, desc, roles, status, has_account, r
 
     # check
     assert response.status_code == status
+    # basic verification statement data check
+    if status == HTTPStatus.OK:
+        json_data = response.json
+        assert json_data['dischargeRegistrationNumber'] == reg_num
+        assert len(json_data['changes']) >= 1
+        assert json_data['changes'][0]['dischargeRegistrationNumber'] == reg_num
+        if desc != 'Mismatch registrations staff':
+            assert json_data['baseRegistrationNumber'] == base_reg_num
+            assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
 
 
 def test_discharge_success(session, client, jwt):
@@ -240,3 +249,10 @@ def test_discharge_success(session, client, jwt):
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
+    # basic verification statement data check
+    json_data = rv.json
+    assert 'dischargeRegistrationNumber' in json_data
+    assert len(json_data['changes']) >= 1
+    assert 'dischargeRegistrationNumber' in json_data['changes'][0]
+    assert json_data['baseRegistrationNumber'] == base_reg_num
+    assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
