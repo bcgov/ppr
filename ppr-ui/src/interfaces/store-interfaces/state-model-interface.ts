@@ -1,3 +1,4 @@
+import { RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF, AuthorizationIF, RegistrationTypeIF, SearchResponseIF,
   SearchTypeIF, UserInfoIF
@@ -20,6 +21,7 @@ export interface StateModelIF {
     debtorName: IndividualNameIF
     draft: DraftIF,
     expiryDate: string
+    registrationFlowType: RegistrationFlowType
     lengthTrust: LengthTrustIF
     parties: AddPartiesIF
     registrationNumber: string

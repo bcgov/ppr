@@ -188,11 +188,12 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const registrationFlowType = getRegistrationFlowType.value
     const addressSchema = PartyAddressSchema
     const {
       getName,
@@ -259,6 +260,7 @@ export default defineComponent({
       resetData,
       isBusiness,
       addressSchema,
+      registrationFlowType,
       ...toRefs(localState)
     }
   }

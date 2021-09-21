@@ -1,3 +1,4 @@
+import { RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -79,6 +80,7 @@ export const mutateNewRegistration = (state: StateIF) => {
     createDateTime: null,
     lastUpdateDateTime: null
   }
+  state.stateModel.registration.registrationFlowType = RegistrationFlowType.NEW
   state.stateModel.registration.confirmDebtorName = null
 }
 
@@ -100,6 +102,10 @@ export const mutateRegistrationNumber = (state: StateIF, regNum: string) => {
 
 export const mutateRegistrationType = (state: StateIF, registrationType: RegistrationTypeIF) => {
   state.stateModel.registration.registrationType = registrationType
+}
+
+export const mutateRegistrationFlowType = (state: StateIF, registrationFlowType: RegistrationFlowType) => {
+  state.stateModel.registration.registrationFlowType = registrationFlowType
 }
 
 export const mutateRegistrationTypeOtherDesc = (state: StateIF, description: string) => {

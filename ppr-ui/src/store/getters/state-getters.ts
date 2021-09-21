@@ -1,5 +1,5 @@
 // Enums and Interfaces
-import { AccountTypes, APIRegistrationTypes, RouteNames } from '@/enums'
+import { AccountTypes, APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import {
   AccountProductSubscriptionIF,
   AddCollateralIF,
@@ -86,6 +86,11 @@ export const getRegistrationNumber = (state: StateIF): String => {
 /** The selected registration type object. */
 export const getRegistrationType = (state: StateIF): RegistrationTypeIF => {
   return state.stateModel.registration.registrationType
+}
+
+/** The selected registration flow type object. */
+export const getRegistrationFlowType = (state: StateIF): RegistrationFlowType => {
+  return state.stateModel.registration.registrationFlowType
 }
 
 /** The selected registration type object. */
