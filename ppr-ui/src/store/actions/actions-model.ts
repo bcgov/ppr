@@ -84,7 +84,7 @@ export const setRegistrationType: ActionIF = ({ commit }, registrationType: Regi
 }
 
 export const setRegistrationFlowType: ActionIF = ({ commit }, registrationFlowType: RegistrationFlowType): void => {
-  commit('mutateRegistrationType', registrationFlowType)
+  commit('mutateRegistrationFlowType', registrationFlowType)
 }
 
 export const setRegistrationTypeOtherDesc: ActionIF = ({ commit }, description: string): void => {
