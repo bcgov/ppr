@@ -572,13 +572,6 @@ class DischargeResource(Resource):
                                         statement,
                                         registration_num,
                                         account_id)
-            # Try to save the discharge statement: failure throws a business exception.
-            # registration = Registration.create_from_json(request_json,
-            #                                            model_utils.REG_CLASS_DISCHARGE,
-            #                                             statement,
-            #                                             registration_num,
-            #                                             account_id)
-            # registration.save()
             response_json = registration.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
@@ -631,15 +624,12 @@ class GetDischargeResource(Resource):
             if resource_utils.is_pdf(request):
                 token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                # return get_pdf(statement.json, account_id, ReportTypes.DISCHARGE_STATEMENT_REPORT.value,
-                #               token['name'])
                 return get_pdf(response_json,
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                token['name'])
 
             return response_json, HTTPStatus.OK
-            # return statement.json, HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
