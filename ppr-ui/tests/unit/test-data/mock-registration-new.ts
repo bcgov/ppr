@@ -1,4 +1,4 @@
-import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, APIVehicleTypes } from '@/enums'
+import { APIRegistrationTypes, DraftTypes, UIRegistrationTypes, APIVehicleTypes, ActionTypes } from '@/enums'
 import {
   RegistrationTypesMiscellaneousCC,
   RegistrationTypesStandard,
@@ -152,6 +152,37 @@ export const mockedDebtors2: PartyIF[] = [
   {
     businessName: 'SOMEBODYS BUSINESS',
     address: mockedAddress1
+  }
+]
+
+export const mockedDebtorsAmendment: PartyIF[] = [
+  {
+    personName: {
+      last: 'INDIVIDUAL DEBTOR',
+      first: 'TEST',
+      middle: '1'
+    },
+    birthDate: '1990-06-15T16:42:00-08:00',
+    address: mockedAddress1,
+    action: ActionTypes.EDITED
+  },
+  {
+    personName: {
+      last: 'SECOND DEBTOR',
+      first: 'PERSON'
+    },
+    birthDate: '1990-06-15T16:42:00-08:00',
+    address: mockedAddress1,
+    action: ActionTypes.REMOVED
+  },
+  {
+    personName: {
+      last: 'THIRD DEBTOR',
+      first: 'WOMAN'
+    },
+    birthDate: '1990-06-15T16:42:00-08:00',
+    address: mockedAddress1,
+    action: ActionTypes.ADDED
   }
 ]
 
