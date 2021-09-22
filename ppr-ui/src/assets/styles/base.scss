@@ -391,6 +391,13 @@ span.invalid-color {
   opacity: 0.4;
 }
 
+tr.disabled-text-not-action td {
+  opacity: 0.4;
+}
+tr.disabled-text-not-action td:last-child {
+  opacity: 1;
+}
+
 .auto-complete-added,
 .v-list .v-list-item--active .v-icon.mdi-check,
 .v-list-item__action .v-icon.mdi-check

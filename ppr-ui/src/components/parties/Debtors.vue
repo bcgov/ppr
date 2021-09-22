@@ -69,7 +69,7 @@
               v-if="!showEditDebtor[row.index]"
               :key="row.item.id"
               class="debtor-row"
-              :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}"
+              :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}"
             >
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>
@@ -98,12 +98,25 @@
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
               <td class="actions-cell px-0 py-2">
-                <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                  && row.item.action === ActionTypes.REMOVED"
-                  class="actions float-right">
-                </div>
-                <div v-else class="actions float-right">
-                  <span class="edit-action">
+                <div class="actions float-right">
+                  <span
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
+                    class="edit-action"
+                  >
+                    <v-btn
+                      text
+                      color="primary"
+                      :class="[$style['smaller-button'], 'edit-btn']"
+                      :id="'class-' + row.index + '-undo-btn'"
+                      @click="undo(row.index)"
+                      :disabled="addEditInProgress"
+                    >
+                      <v-icon small>mdi-undo</v-icon>
+                      <span>Undo</span>
+                    </v-btn>
+                  </span>
+                  <span v-else class="edit-action">
                     <v-btn
                       text
                       color="primary"
@@ -113,12 +126,20 @@
                       :disabled="addEditInProgress"
                     >
                       <v-icon small>mdi-pencil</v-icon>
-                      <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT">Amend</span>
+                      <span
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && row.item.action !== ActionTypes.ADDED"
+                      >
+                        Amend
+                      </span>
                       <span v-else>Edit</span>
                     </v-btn>
                   </span>
 
-                  <span class="actions__more">
+                  <span class="actions__more"
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action !== ActionTypes.REMOVED"
+                  >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
                         <v-btn
@@ -200,8 +221,14 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
+    const {
+      getAddSecuredPartiesAndDebtors,
+      getRegistrationFlowType,
+      getOriginalAddSecuredPartiesAndDebtors
+    } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors',
+      'getRegistrationFlowType',
+      'getOriginalAddSecuredPartiesAndDebtors'
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
@@ -270,6 +297,11 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors(currentParties)
     }
 
+    const undo = (index: number): void => {
+      const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+      localState.debtors.splice(index, 1, originalParties.debtors[index])
+    }
+
     return {
       removeDebtor,
       getName,
@@ -277,6 +309,7 @@ export default defineComponent({
       initEdit,
       initAdd,
       resetData,
+      undo,
       isBusiness,
       addressSchema,
       registrationFlowType,

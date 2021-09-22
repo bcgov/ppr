@@ -50,6 +50,28 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
+  // used for amendments only
+  originalRegistration: {
+    collateral: {
+      valid: true,
+      vehicleCollateral: [],
+      generalCollateral: []
+    },
+    lengthTrust: {
+      valid: true,
+      lifeYears: 0,
+      lifeInfinite: false,
+      trustIndenture: false,
+      lienAmount: '',
+      surrenderDate: ''
+    },
+    parties: {
+      valid: true,
+      registeringParty: null,
+      securedParties: [],
+      debtors: []
+    }
+  },
   search: {
     searchHistory: null,
     searchResults: null,

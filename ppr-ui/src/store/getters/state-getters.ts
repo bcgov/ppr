@@ -38,9 +38,20 @@ export const getAddCollateral = (state: StateIF): AddCollateralIF => {
   return state.stateModel.registration.collateral
 }
 
+/** The registration collateral object of the original registration
+ * (for amendments) */
+export const getOriginalAddCollateral = (state: StateIF): AddCollateralIF => {
+  return state.stateModel.originalRegistration.collateral
+}
+
 /** The registration parties object. */
 export const getAddSecuredPartiesAndDebtors = (state: StateIF): AddPartiesIF => {
   return state.stateModel.registration.parties
+}
+
+/** The registration parties object of the original registration (for amendments). */
+export const getOriginalAddSecuredPartiesAndDebtors = (state: StateIF): AddPartiesIF => {
+  return state.stateModel.originalRegistration.parties
 }
 
 /** The change registration base or confirm debtor name. */
@@ -61,6 +72,12 @@ export const getDraft = (state: StateIF): DraftIF => {
 /** The registration life and trust indenture object. */
 export const getLengthTrust = (state: StateIF): LengthTrustIF => {
   return state.stateModel.registration.lengthTrust
+}
+
+/** The registration life and trust indenture object of the original registration
+ * (for amendments) */
+export const getOriginalLengthTrust = (state: StateIF): LengthTrustIF => {
+  return state.stateModel.originalRegistration.lengthTrust
 }
 
 /** The creation date of the selected registration. */
