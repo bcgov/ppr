@@ -7,6 +7,7 @@ import {
   ButtonConfigIF,
   DebtorNameIF,
   DraftIF,
+  GeneralCollateralIF,
   IndividualNameIF,
   LengthTrustIF,
   RegistrationTypeIF,
@@ -14,7 +15,8 @@ import {
   SearchTypeIF,
   StateIF,
   StateModelIF,
-  UserSettingsIF
+  UserSettingsIF,
+  VehicleCollateralIF
 } from '@/interfaces'
 
 /** The current account id. */
@@ -59,14 +61,14 @@ export const getConfirmDebtorName = (state: StateIF): DebtorNameIF => {
   return state.stateModel.registration.confirmDebtorName
 }
 
-/** The search value for ppr search when search type is individual debtor. */
-export const getDebtorName = (state: StateIF): IndividualNameIF => {
-  return state.stateModel.registration.debtorName
-}
-
 /** The current draft of a registration. */
 export const getDraft = (state: StateIF): DraftIF => {
   return state.stateModel.registration.draft
+}
+
+/** The list of registration general collateral */
+export const getGeneralCollateral = (state: StateIF): GeneralCollateralIF[] => {
+  return state.stateModel.registration.collateral.generalCollateral
 }
 
 /** The registration life and trust indenture object. */
@@ -113,6 +115,11 @@ export const getRegistrationFlowType = (state: StateIF): RegistrationFlowType =>
 /** The selected registration type object. */
 export const getRegistrationOther = (state: StateIF): string => {
   return state.stateModel.registration.registrationTypeOtherDesc
+}
+
+/** The search value for ppr search when search type is individual debtor. */
+export const getSearchDebtorName = (state: StateIF): IndividualNameIF => {
+  return state.stateModel.search.searchDebtorName
 }
 
 /** The api response for ppr search. */
@@ -169,6 +176,11 @@ export const getUserSettings = (state: StateIF): UserSettingsIF => {
 /** The current user's username. */
 export const getUserUsername = (state: StateIF): string => {
   return state.stateModel.userInfo?.username || ''
+}
+
+/** The list of registration vehicle collateral */
+export const getVehicleCollateral = (state: StateIF): VehicleCollateralIF[] => {
+  return state.stateModel.registration.collateral.vehicleCollateral
 }
 
 /** Whether the user is authorized to edit. */

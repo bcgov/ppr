@@ -13,7 +13,9 @@ import {
   StateIF,
   UserInfoIF,
   UserSettingsIF,
-  AccountProductSubscriptionIF
+  AccountProductSubscriptionIF,
+  GeneralCollateralIF,
+  VehicleCollateralIF
 } from '@/interfaces'
 
 export const mutateAccountProductSubscribtion = (
@@ -46,16 +48,21 @@ export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
   state.stateModel.authorization.authRoles = authRoles
 }
 
-export const mutateCurrentStep = (state: any, currentStep: boolean) => {
-  state.stateModel.registration.currentStep = currentStep
+export const mutateCollateralShowInvalid = (state: StateIF, value: boolean) => {
+  state.stateModel.registration.collateral.showInvalid = value
 }
 
-export const mutateDebtorName = (state: StateIF, debtorName: IndividualNameIF) => {
-  state.stateModel.registration.debtorName = debtorName
+export const mutateCollateralValid = (state: StateIF, value: boolean) => {
+  console.log('mutating valid', value)
+  state.stateModel.registration.collateral.valid = value
 }
 
 export const mutateDraft = (state: StateIF, draft: DraftIF) => {
   state.stateModel.registration.draft = draft
+}
+
+export const mutateGeneralCollateral = (state: StateIF, generalCollateral: GeneralCollateralIF[]) => {
+  state.stateModel.registration.collateral.generalCollateral = generalCollateral
 }
 
 export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>) => {
@@ -124,6 +131,10 @@ export const mutateRegistrationTypeOtherDesc = (state: StateIF, description: str
   state.stateModel.registration.registrationTypeOtherDesc = description
 }
 
+export const mutateSearchDebtorName = (state: StateIF, debtorName: IndividualNameIF) => {
+  state.stateModel.search.searchDebtorName = debtorName
+}
+
 export const mutateSearchedType = (state: StateIF, searchedType: SearchTypeIF) => {
   state.stateModel.search.searchedType = searchedType
 }
@@ -152,6 +163,10 @@ export const mutateUserSettings = (state: StateIF, settings: UserSettingsIF) => 
   state.stateModel.userInfo.settings = settings
 }
 
+export const mutateVehicleCollateral = (state: StateIF, vCollateral: VehicleCollateralIF[]) => {
+  state.stateModel.registration.collateral.vehicleCollateral = vCollateral
+}
+
 export const mutateAddSecuredPartiesAndDebtorStepValidity = (state: any, validity: boolean) => {
   state.stateModel.registration.parties.valid = validity
 }
@@ -168,6 +183,6 @@ export const mutateFolioOrReferenceNumber = (state: StateIF, refNumber: string) 
   state.stateModel.folioOrReferenceNumber = refNumber
 }
 
-export const mutateShowStepErrors = (state: any, show: boolean) => {
+export const mutateShowStepErrors = (state: StateIF, show: boolean) => {
   state.stateModel.registration.showStepErrors = show
 }

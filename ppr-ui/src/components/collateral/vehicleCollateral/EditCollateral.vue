@@ -193,8 +193,7 @@
 <script lang="ts">
 import { defineComponent, onMounted } from '@vue/composition-api'
 
-import { useCollateralValidation } from './composables/useCollateralValidation'
-import { useVehicle } from './composables/useVehicle'
+import { useCollateralValidation, useVehicle } from './factories'
 import { APIVehicleTypes } from '@/enums'
 
 export default defineComponent({
@@ -208,7 +207,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['addEditVehicle', 'resetEvent'],
+  emits: ['resetEvent'],
   setup (props, context) {
     const {
       // @ts-ignore - returned by toRef

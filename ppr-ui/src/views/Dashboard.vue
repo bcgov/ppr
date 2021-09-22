@@ -13,7 +13,7 @@
           <v-row no-gutters>
             <search-bar class="soft-corners-bottom"
                         :searchTitle="''"
-                        @debtor-name="setDebtorName"
+                        @debtor-name="setSearchDebtorName"
                         @searched-type="setSearchedType"
                         @searched-value="setSearchedValue"
                         @search-data="setSearchResults"
@@ -98,7 +98,7 @@ export default class Dashboard extends Vue {
   @Getter getStateModel: StateModelIF
 
   @Action resetNewRegistration: ActionBindingIF
-  @Action setDebtorName: ActionBindingIF
+  @Action setSearchDebtorName: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
