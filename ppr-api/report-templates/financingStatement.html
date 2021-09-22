@@ -30,11 +30,18 @@
       <table class="registration-header-table" role="presentation">
         <tr>
           <td>Base Registration Number: {{ baseRegistrationNumber }}</td>
+          <td>
+            {% if statusType == 'HDC' %} 
+              <span class="badge-gold">DISCHARGED</span>
+            {% elif statusType == 'HEX' %} 
+              <span class="badge-gold">EXPIRED</span>
+            {% endif %}
+          </td>
         </tr>
       </table>
     </div>
     <div class="footer-reg-num">
-      {% if environment != '' %}TEST DATA |  {% endif %}Base Registration #{{ baseRegistrationNumber }}:
+      {% if environment != '' %}TEST DATA |  {% endif %}Base Registration #{{ baseRegistrationNumber }} | Page
     </div>
   
     <div class="registration-details-container">
@@ -97,14 +104,11 @@
       [[registration/debtors.html]]
       [[registration/vehicleCollateral.html]]
       [[registration/generalCollateral.html]]
-      {% if courtOrderInformation is defined %}
-        [[registration/courtOrderInformation.html]]
-      {% endif %}
       [[registration/registeringParty.html]]
     </div>
 
     {% if changes is defined %}
-      <p style="page-break-before: always" ></p>
+      {# <p style="page-break-before: always" ></p> #}
       <div class="separator-header mt-4"></div>
       <div class="section-title-centre mt-4">HISTORY</div>
       <div class="section-statement">(Showing most recent first)</div>

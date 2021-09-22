@@ -182,9 +182,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.life == model_utils.REPAIRER_LIEN_YEARS or \
                self.financing_statement.registration[0].registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
                 # Computed expiry date is cumulatative: original 180 days + sum of renewals up to this one.
-                registration['expiryDate'] = self.get_renewal_rl_expiry()
+                registration['expiryDate'] = self.__get_renewal_rl_expiry()
             else:
-                registration['expiryDate'] = self.get_renewal_expiry()
+                registration['expiryDate'] = self.__get_renewal_expiry()
 
         if self.court_order:
             registration['courtOrderInformation'] = self.court_order.json
@@ -451,6 +451,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if changes:
                 statement['changes'] = changes
         return financing_json
+
+    def verification_json(self, reg_num_name: str):
+        """Generate verification statement json for API response and verification reports."""
+        self.financing_statement.current_view_json = False
+        self.financing_statement.mark_update_json = True
+        self.financing_statement.include_changes_json = True
+        self.financing_statement.verification_reg_id = self.id
+        verification_json = self.financing_statement.json
+        verification_json[reg_num_name] = self.registration_num
+        return verification_json
 
     @staticmethod
     def create_from_json(json_data,
@@ -735,7 +745,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         former_name += ' ' + party.middle_initial
         return former_name
 
-    def get_renewal_rl_expiry(self):
+    def __get_renewal_rl_expiry(self):
         """Build a repairer's lien expiry date as the sum of previous registrations."""
         expiry_ts = None
         for registration in self.financing_statement.registration:
@@ -749,7 +759,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return model_utils.format_ts(expiry_ts)
 
-    def get_renewal_expiry(self):
+    def __get_renewal_expiry(self):
         """Build a non-repairer's lien expiry date as the sum of previous registrations."""
         if self.life == model_utils.LIFE_INFINITE:
             return 'Never'

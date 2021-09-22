@@ -1,21 +1,96 @@
 {
   "baseRegistrationNumber": "TEST0004", 
-  "clientReferenceId": "TEST-DIS-0004", 
-  "createDateTime": "2021-07-16T15:41:58+00:00", 
+  "changes": [
+    {
+      "baseRegistrationNumber": "TEST0004", 
+      "clientReferenceId": "TEST-DIS-0004", 
+      "createDateTime": "2021-09-18T20:34:01+00:00", 
+      "dischargeRegistrationNumber": "TEST00D4", 
+      "registeringParty": {
+        "address": {
+          "city": "city", 
+          "country": "CA", 
+          "postalCode": "V8R3A5", 
+          "region": "BC", 
+          "street": "TEST-00D4", 
+          "streetAdditional": "line 2"
+        }, 
+        "personName": {
+          "first": "TEST-DISCHARGE", 
+          "last": "REGISTERING", 
+          "middle": "4"
+        }
+      }, 
+      "statementType": "DISCHARGE_STATEMENT"
+    }
+  ], 
+  "clientReferenceId": "TEST-SA-0004", 
+  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "debtors": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0004", 
+        "streetAdditional": "line 2"
+      }, 
+      "birthDate": "2005-04-02T14:00:00+00:00", 
+      "partyId": 200000012, 
+      "personName": {
+        "first": "TEST IND", 
+        "last": "DEBTOR", 
+        "middle": "4"
+      }
+    }
+  ], 
   "dischargeRegistrationNumber": "TEST00D4", 
+  "dischargedDateTime": "2021-09-18T20:34:01+00:00", 
+  "expiryDate": "2023-09-17T20:34:01+00:00", 
+  "lifeYears": 2, 
   "registeringParty": {
     "address": {
       "city": "city", 
       "country": "CA", 
       "postalCode": "V8R3A5", 
       "region": "BC", 
-      "street": "TEST-00D4", 
+      "street": "TEST-0004", 
       "streetAdditional": "line 2"
     }, 
     "personName": {
-      "first": "TEST-DISCHARGE", 
+      "first": "TEST", 
       "last": "REGISTERING", 
       "middle": "4"
     }
-  }
+  }, 
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+  "registrationDescription": "PPSA SECURITY AGREEMENT", 
+  "securedParties": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0004", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST 4 SECURED PARTY", 
+      "partyId": 200000013
+    }
+  ], 
+  "statusType": "HDC", 
+  "trustIndenture": true, 
+  "type": "SA", 
+  "vehicleCollateral": [
+    {
+      "make": "HONDA", 
+      "model": "CIVIC", 
+      "serialNumber": "JU622994", 
+      "type": "MV", 
+      "vehicleId": 200000004, 
+      "year": 2018
+    }
+  ]
 }

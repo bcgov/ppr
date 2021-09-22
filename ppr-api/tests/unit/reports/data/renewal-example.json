@@ -1,8 +1,52 @@
 {
   "baseRegistrationNumber": "TEST0005", 
-  "clientReferenceId": "TEST-REN-0005", 
-  "createDateTime": "2021-07-15T15:46:58+00:00", 
-  "expiryDate": "2023-07-15T15:41:58+00:00", 
+  "changes": [
+    {
+      "baseRegistrationNumber": "TEST0005", 
+      "clientReferenceId": "TEST-REN-0005", 
+      "createDateTime": "2021-09-17T20:39:01+00:00", 
+      "expiryDate": "2024-09-18T06:59:59+00:00", 
+      "lifeYears": 2, 
+      "registeringParty": {
+        "address": {
+          "city": "city", 
+          "country": "CA", 
+          "postalCode": "V8R3A5", 
+          "region": "BC", 
+          "street": "TEST-00R5", 
+          "streetAdditional": "line 2"
+        }, 
+        "personName": {
+          "first": "TEST-RENEWAL", 
+          "last": "REGISTERING", 
+          "middle": "5"
+        }
+      }, 
+      "renewalRegistrationNumber": "TEST00R5", 
+      "statementType": "RENEWAL_STATEMENT"
+    }
+  ], 
+  "clientReferenceId": "TEST-SA-0005", 
+  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "debtors": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0005", 
+        "streetAdditional": "line 2"
+      }, 
+      "partyId": 200000016, 
+      "personName": {
+        "first": "TEST IND", 
+        "last": "DEBTOR", 
+        "middle": "5"
+      }
+    }
+  ], 
+  "expiryDate": "2023-09-17T20:34:01+00:00", 
   "lifeYears": 2, 
   "registeringParty": {
     "address": {
@@ -10,14 +54,43 @@
       "country": "CA", 
       "postalCode": "V8R3A5", 
       "region": "BC", 
-      "street": "TEST-00R5", 
+      "street": "TEST-0005", 
       "streetAdditional": "line 2"
     }, 
     "personName": {
-      "first": "TEST-RENEWAL", 
+      "first": "TEST", 
       "last": "REGISTERING", 
       "middle": "5"
     }
   }, 
-  "renewalRegistrationNumber": "TEST00R5"
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+  "registrationDescription": "PPSA SECURITY AGREEMENT", 
+  "renewalRegistrationNumber": "TEST00R5", 
+  "securedParties": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0005", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST 5 SECURED PARTY", 
+      "partyId": 200000017
+    }
+  ], 
+  "statusType": "ACT", 
+  "trustIndenture": false, 
+  "type": "SA", 
+  "vehicleCollateral": [
+    {
+      "make": "TESLA", 
+      "model": "MODEL 3", 
+      "serialNumber": "YJ46JU622994", 
+      "type": "MV", 
+      "vehicleId": 200000005, 
+      "year": 2018
+    }
+  ]
 }

@@ -1,30 +1,102 @@
 {
   "baseRegistrationNumber": "TEST0002", 
-  "clientReferenceId": "TEST-REN-0006", 
-  "courtOrderInformation": {
-    "courtName": "Supreme Court of British Columbia", 
-    "courtRegistry": "Victoria", 
-    "effectOfOrder": "Court Order to renew Repairer's Lien.", 
-    "fileNumber": "BC123495", 
-    "orderDate": "2022-01-31T15:41:58+00:00"
-  }, 
-  "createDateTime": "2021-07-15T15:46:58+00:00", 
-  "expiryDate": "2021-10-13T15:41:58+00:00", 
-  "lifeYears": 0, 
+  "changes": [
+    {
+      "baseRegistrationNumber": "TEST0002", 
+      "clientReferenceId": "TEST-REN-0006", 
+      "courtOrderInformation": {
+        "courtName": "Supreme Court of British Columbia", 
+        "courtRegistry": "Victoria", 
+        "effectOfOrder": "Court Order to renew Repairer's Lien.", 
+        "fileNumber": "BC123495", 
+        "orderDate": "2022-04-05T20:34:01+00:00"
+      }, 
+      "createDateTime": "2021-09-17T20:39:01+00:00", 
+      "expiryDate": "2022-09-13T06:59:59+00:00", 
+      "lifeYears": 0, 
+      "registeringParty": {
+        "address": {
+          "city": "city", 
+          "country": "CA", 
+          "postalCode": "V8R3A5", 
+          "region": "BC", 
+          "street": "TEST-00R6", 
+          "streetAdditional": "line 2"
+        }, 
+        "personName": {
+          "first": "TEST-RENEWAL-RL", 
+          "last": "REGISTERING", 
+          "middle": "6"
+        }
+      }, 
+      "renewalRegistrationNumber": "TEST00R6", 
+      "statementType": "RENEWAL_STATEMENT"
+    }
+  ], 
+  "clientReferenceId": "TEST-RL-0001", 
+  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "debtors": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0002", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST BUS 2 DEBTOR", 
+      "partyId": 200000006
+    }
+  ], 
+  "expiryDate": "2021-12-16T20:34:01+00:00", 
+  "lienAmount": "2000.00", 
   "registeringParty": {
     "address": {
       "city": "city", 
       "country": "CA", 
       "postalCode": "V8R3A5", 
       "region": "BC", 
-      "street": "TEST-00R6", 
+      "street": "TEST-0002", 
       "streetAdditional": "line 2"
     }, 
     "personName": {
-      "first": "TEST-RENEWAL-RL", 
+      "first": "TEST", 
       "last": "REGISTERING", 
-      "middle": "6"
+      "middle": "2"
     }
   }, 
-  "renewalRegistrationNumber": "TEST00R6"
+  "registrationAct": "REPAIRERS LIEN ACT", 
+  "registrationDescription": "REPAIRERS LIEN", 
+  "renewalRegistrationNumber": "TEST00R6", 
+  "securedParties": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST 200000000", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST PARTY CODE 1", 
+      "code": "200000000", 
+      "emailAddress": "test-sp-client@gmail.com", 
+      "partyId": 200000007
+    }
+  ], 
+  "statusType": "ACT", 
+  "surrenderDate": "2021-12-16T20:34:01+00:00", 
+  "trustIndenture": false, 
+  "type": "RL", 
+  "vehicleCollateral": [
+    {
+      "make": "HYUNDAI", 
+      "model": "TUSCON", 
+      "serialNumber": "KX8J3CA46JU622994", 
+      "type": "MV", 
+      "vehicleId": 200000002, 
+      "year": 2014
+    }
+  ]
 }

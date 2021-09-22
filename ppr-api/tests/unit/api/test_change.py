@@ -225,13 +225,13 @@ TEST_CREATE_DATA = [
 
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num}, {base_reg_num})
 TEST_GET_STATEMENT = [
-    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0010', 'TEST0001'),
-    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0010', 'TEST0001'),
-    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0010', 'TEST0001'),
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0009', 'TEST0001'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0009', 'TEST0001'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0009', 'TEST0001'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0001'),
-    ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0010', 'TEST0002'),
-    ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0010', 'TEST0002'),
-    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0010', 'TEST0001')
+    ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0009', 'TEST0002'),
+    ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0009', 'TEST0002'),
+    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0009', 'TEST0001')
 ]
 
 
@@ -273,6 +273,15 @@ def test_get_change(session, client, jwt, desc, roles, status, has_account, reg_
 
     # check
     assert response.status_code == status
+    # basic verification statement data check
+    if status == HTTPStatus.OK:
+        json_data = response.json
+        assert json_data['changeRegistrationNumber'] == reg_num
+        assert len(json_data['changes']) >= 1
+        assert json_data['changes'][0]['changeRegistrationNumber'] == reg_num
+        if desc != 'Mismatch registrations staff':
+            assert json_data['baseRegistrationNumber'] == base_reg_num
+            assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
 
 
 def test_change_substitute_collateral_success(session, client, jwt):
@@ -308,6 +317,12 @@ def test_change_substitute_collateral_success(session, client, jwt):
 
     # check
     assert rv.status_code == HTTPStatus.CREATED
+    json_data = rv.json
+    assert 'changeRegistrationNumber' in json_data
+    assert len(json_data['changes']) >= 1
+    assert 'changeRegistrationNumber' in json_data['changes'][0]
+    assert json_data['baseRegistrationNumber'] == base_reg_num
+    assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
 
 
 def test_change_debtor_transfer_success(session, client, jwt):
@@ -343,6 +358,12 @@ def test_change_debtor_transfer_success(session, client, jwt):
 
     # check
     assert rv.status_code == HTTPStatus.CREATED
+    json_data = rv.json
+    assert 'changeRegistrationNumber' in json_data
+    assert len(json_data['changes']) >= 1
+    assert 'changeRegistrationNumber' in json_data['changes'][0]
+    assert json_data['baseRegistrationNumber'] == base_reg_num
+    assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
 
 
 def create_financing_test(session, client, jwt):

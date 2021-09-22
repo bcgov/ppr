@@ -1,43 +1,253 @@
 {
-  "addDebtors": [
+  "amendmentRegistrationNumber": "TEST0007", 
+  "baseRegistrationNumber": "TEST0001", 
+  "changes": [
     {
-      "address": {
-        "city": "VICTORIA", 
-        "country": "CA", 
-        "postalCode": "V8S 2V4", 
-        "region": "BC", 
-        "street": "620 JOHNSON ST"
+      "addDebtors": [
+        {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-00A7", 
+            "streetAdditional": "line 2"
+          }, 
+          "businessName": "TEST 7 AMEND DEBTOR", 
+          "former_name": "", 
+          "partyId": 200000021, 
+          "reg_id": 200000008
+        }
+      ], 
+      "addGeneralCollateral": [
+        {
+          "addedDateTime": "2021-09-17T20:39:01+00:00", 
+          "collateralId": 200000002, 
+          "description": "TEST GENERAL COLLATERAL AMEND ADD."
+        }
+      ], 
+      "addSecuredParties": [
+        {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-00A7", 
+            "streetAdditional": "line 2"
+          }, 
+          "businessName": "TEST 7 AMEND SECURED PARTY", 
+          "former_name": "TEST 1 SECURED PARTY", 
+          "partyId": 200000022, 
+          "reg_id": 200000008
+        }
+      ], 
+      "addVehicleCollateral": [
+        {
+          "make": "FORD", 
+          "model": "FIESTA", 
+          "reg_id": 200000008, 
+          "serialNumber": "T346JU622994", 
+          "type": "MV", 
+          "vehicleId": 200000006, 
+          "year": 2018
+        }
+      ], 
+      "amendmentRegistrationNumber": "TEST0007", 
+      "baseRegistrationNumber": "TEST0001", 
+      "changeType": "CO", 
+      "clientReferenceId": "TEST-AM-0007", 
+      "courtOrderInformation": {
+        "courtName": "Supreme Court of British Columbia", 
+        "courtRegistry": "Victoria", 
+        "effectOfOrder": "Court Order to change something.", 
+        "fileNumber": "BC123495", 
+        "orderDate": "2022-04-05T20:34:01+00:00"
       }, 
-      "former_name": "", 
-      "partyId": 382, 
-      "personName": {
-        "first": "JAMES", 
-        "last": "FOX"
+      "createDateTime": "2021-09-17T20:39:01+00:00", 
+      "deleteDebtors": [
+        {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0001", 
+            "streetAdditional": "line 2"
+          }, 
+          "birthDate": "2005-04-02T14:00:00+00:00", 
+          "partyId": 200000001, 
+          "personName": {
+            "first": "TEST IND", 
+            "last": "DEBTOR", 
+            "middle": "1"
+          }, 
+          "reg_id": 200000008
+        }
+      ], 
+      "deleteGeneralCollateral": [
+        {
+          "addedDateTime": "2021-09-17T20:39:01+00:00", 
+          "collateralId": 200010002, 
+          "description": "TEST GENERAL COLLATERAL AMEND DELETE."
+        }
+      ], 
+      "deleteSecuredParties": [
+        {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0001", 
+            "streetAdditional": "line 2"
+          }, 
+          "businessName": "TEST 1 SECURED PARTY", 
+          "partyId": 200000003, 
+          "reg_id": 200000008
+        }
+      ], 
+      "deleteVehicleCollateral": [
+        {
+          "make": "HOMCO IND. LTD DIPLOMAT", 
+          "manufacturedHomeRegistrationNumber": "021324", 
+          "reg_id": 200000008, 
+          "serialNumber": "9407", 
+          "type": "MH", 
+          "vehicleId": 200000001, 
+          "year": 2001
+        }
+      ], 
+      "description": "Description of court order.", 
+      "registeringParty": {
+        "address": {
+          "city": "city", 
+          "country": "CA", 
+          "postalCode": "V8R3A5", 
+          "region": "BC", 
+          "street": "TEST-00A7", 
+          "streetAdditional": "line 2"
+        }, 
+        "personName": {
+          "first": "TEST-AMEND-CO", 
+          "last": "REGISTERING", 
+          "middle": "7"
+        }
       }, 
-      "reg_id": 210
+      "statementType": "AMENDMENT_STATEMENT"
     }
   ], 
-  "amendmentRegistrationNumber": "100209B", 
-  "baseRegistrationNumber": "100208B", 
-  "changeType": "CO", 
-  "clientReferenceId": "T-AM-CO-0001", 
-  "courtOrderInformation": {
-    "courtName": "Supreme Court of British Columbia.", 
-    "courtRegistry": "KAMLOOPS", 
-    "effectOfOrder": "Court Order to add James Smith as a debtor.", 
-    "fileNumber": "BC123445", 
-    "orderDate": "2020-02-02T07:00:00+00:00"
-  }, 
-  "createDateTime": "2021-06-11T23:14:26+00:00", 
-  "description": "Court Order debtor addition.", 
+  "clientReferenceId": "TEST-SA-0001", 
+  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "debtors": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0001", 
+        "streetAdditional": "line 2"
+      }, 
+      "birthDate": "2005-04-02T14:00:00+00:00", 
+      "partyId": 200000001, 
+      "personName": {
+        "first": "TEST IND", 
+        "last": "DEBTOR", 
+        "middle": "1"
+      }
+    }, 
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0001", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST BUS 2 DEBTOR", 
+      "partyId": 200000002
+    }
+  ], 
+  "expiryDate": "2023-09-17T20:34:01+00:00", 
+  "generalCollateral": [
+    {
+      "addedDateTime": "2021-09-17T20:34:01+00:00", 
+      "collateralId": 200000001, 
+      "description": "TEST0001 GC 2"
+    }, 
+    {
+      "addedDateTime": "2021-09-17T20:34:01+00:00", 
+      "collateralId": 200000000, 
+      "description": "TEST0001 GC 1"
+    }
+  ], 
+  "lifeYears": 2, 
   "registeringParty": {
     "address": {
-      "city": "VICTORIA", 
+      "city": "city", 
       "country": "CA", 
-      "postalCode": "V8W 2V8", 
+      "postalCode": "V8R3A5", 
       "region": "BC", 
-      "street": "222 SUMMER STREET"
+      "street": "TEST-0001", 
+      "streetAdditional": "line 2"
     }, 
-    "businessName": "ABC SEARCHING COMPANY"
-  }
+    "personName": {
+      "first": "TEST", 
+      "last": "REGISTERING", 
+      "middle": "1"
+    }
+  }, 
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+  "registrationDescription": "PPSA SECURITY AGREEMENT", 
+  "securedParties": [
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-0001", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST 1 SECURED PARTY", 
+      "partyId": 200000003
+    }, 
+    {
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST 200000000", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST PARTY CODE 1", 
+      "code": "200000000", 
+      "emailAddress": "test-sp-client@gmail.com", 
+      "partyId": 200000004
+    }
+  ], 
+  "statusType": "ACT", 
+  "trustIndenture": true, 
+  "type": "SA", 
+  "vehicleCollateral": [
+    {
+      "make": "HYUNDAI", 
+      "model": "TUSCON", 
+      "serialNumber": "KM8J3CA46JU622994", 
+      "type": "MV", 
+      "vehicleId": 200000000, 
+      "year": 2018
+    }, 
+    {
+      "make": "HOMCO IND. LTD DIPLOMAT", 
+      "manufacturedHomeRegistrationNumber": "021324", 
+      "serialNumber": "9407", 
+      "type": "MH", 
+      "vehicleId": 200000001, 
+      "year": 2001
+    }
+  ]
 }
