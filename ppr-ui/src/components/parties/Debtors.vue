@@ -69,6 +69,7 @@
               v-if="!showEditDebtor[row.index]"
               :key="row.item.id"
               class="debtor-row"
+              :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}"
             >
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>
@@ -82,6 +83,11 @@
                     <div>
                       {{ getName(row.item) }}
                     </div>
+                    <div v-if="row.item.action">
+                      <v-chip x-small label color="#1669BB" text-color="white">
+                        {{ row.item.action }}
+                      </v-chip>
+                    </div>
                   </v-col>
                 </v-row>
               </td>
@@ -93,21 +99,47 @@
               <!-- Action Btns -->
               <td class="actions-cell px-0 py-2">
                 <div class="actions float-right">
-                  <span class="edit-action">
+                  <span
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
+                    class="edit-action"
+                  >
                     <v-btn
                       text
                       color="primary"
-                      class="edit-btn"
+                      :class="[$style['smaller-button'], 'edit-btn']"
+                      :id="'class-' + row.index + '-undo-btn'"
+                      @click="undo(row.index)"
+                      :disabled="addEditInProgress"
+                    >
+                      <v-icon small>mdi-undo</v-icon>
+                      <span>Undo</span>
+                    </v-btn>
+                  </span>
+                  <span v-else class="edit-action">
+                    <v-btn
+                      text
+                      color="primary"
+                      :class="[$style['smaller-button'], 'edit-btn']"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
                     >
                       <v-icon small>mdi-pencil</v-icon>
-                      <span>Edit</span>
+                      <span
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && row.item.action !== ActionTypes.ADDED"
+                      >
+                        Amend
+                      </span>
+                      <span v-else>Edit</span>
                     </v-btn>
                   </span>
 
-                  <span class="actions__more">
+                  <span class="actions__more"
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action !== ActionTypes.REMOVED"
+                  >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
                         <v-btn
@@ -115,7 +147,7 @@
                           small
                           v-on="on"
                           color="primary"
-                          class="actions__more-actions__btn"
+                          :class="[$style['smaller-actions'], 'actions__more-actions__btn']"
                           :disabled="addEditInProgress"
                         >
                           <v-icon>mdi-menu-down</v-icon>
@@ -172,6 +204,7 @@ import { BaseAddress } from '@/composables/address'
 
 import { debtorTableHeaders, editTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
+import { ActionTypes, RegistrationFlowType } from '@/enums'
 
 export default defineComponent({
   components: {
@@ -188,8 +221,14 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
+    const {
+      getAddSecuredPartiesAndDebtors,
+      getRegistrationFlowType,
+      getOriginalAddSecuredPartiesAndDebtors
+    } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors',
+      'getRegistrationFlowType',
+      'getOriginalAddSecuredPartiesAndDebtors'
     ])
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
@@ -222,10 +261,17 @@ export default defineComponent({
 
     const removeDebtor = (index: number): void => {
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      localState.debtors.splice(index, 1)
-      currentParties.debtors = localState.debtors
-      currentParties.valid = isPartiesValid(currentParties)
-      setAddSecuredPartiesAndDebtors(currentParties)
+      const currentDebtor = currentParties.debtors[index]
+      if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentDebtor.action !== ActionTypes.ADDED)) {
+        currentDebtor.action = ActionTypes.REMOVED
+        localState.debtors.splice(index, 1, currentDebtor)
+        setAddSecuredPartiesAndDebtors(currentParties)
+      } else {
+        localState.debtors.splice(index, 1)
+        currentParties.debtors = localState.debtors
+        currentParties.valid = isPartiesValid(currentParties)
+        setAddSecuredPartiesAndDebtors(currentParties)
+      }
       // setValid()
     }
 
@@ -251,6 +297,11 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors(currentParties)
     }
 
+    const undo = (index: number): void => {
+      const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+      localState.debtors.splice(index, 1, originalParties.debtors[index])
+    }
+
     return {
       removeDebtor,
       getName,
@@ -258,9 +309,12 @@ export default defineComponent({
       initEdit,
       initAdd,
       resetData,
+      undo,
       isBusiness,
       addressSchema,
       registrationFlowType,
+      RegistrationFlowType,
+      ActionTypes,
       ...toRefs(localState)
     }
   }
@@ -281,5 +335,14 @@ export default defineComponent({
   overflow: visible;
   text-overflow: inherit;
   white-space: inherit;
+}
+
+.smaller-actions {
+  min-width: 34px !important;
+  padding: 0 8px !important;
+}
+
+.smaller-button {
+  padding: 0 12px !important;
 }
 </style>

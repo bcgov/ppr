@@ -30,8 +30,16 @@ export const mutateAddCollateral = (state: StateIF, addCollateral: AddCollateral
   state.stateModel.registration.collateral = addCollateral
 }
 
+export const mutateOriginalAddCollateral = (state: StateIF, addCollateral: AddCollateralIF) => {
+  state.stateModel.originalRegistration.collateral = addCollateral
+}
+
 export const mutateAddSecuredPartiesAndDebtors = (state: StateIF, addParties: AddPartiesIF) => {
   state.stateModel.registration.parties = addParties
+}
+
+export const mutateOriginalAddSecuredPartiesAndDebtors = (state: StateIF, addParties: AddPartiesIF) => {
+  state.stateModel.originalRegistration.parties = addParties
 }
 
 export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
@@ -56,6 +64,10 @@ export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>
 
 export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) => {
   state.stateModel.registration.lengthTrust = lengthTrust
+}
+
+export const mutateOriginalLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) => {
+  state.stateModel.originalRegistration.lengthTrust = lengthTrust
 }
 
 export const mutateNewRegistration = (state: StateIF) => {

@@ -4,6 +4,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
 import { useParty } from '@/composables/useParty'
+import { ActionTypes, RegistrationFlowType } from '@/enums'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -21,8 +22,8 @@ export const useDebtor = (props, context) => {
   const { setAddSecuredPartiesAndDebtors } = useActions<any>([
     'setAddSecuredPartiesAndDebtors'
   ])
-  const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors'
+  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
+    'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
   ])
   const localState = reactive({
     addressSchema: { ...PartyAddressSchema },
@@ -31,7 +32,8 @@ export const useDebtor = (props, context) => {
       personName: initPerson,
       birthDate: '',
       emailAddress: '',
-      address: initAddress
+      address: initAddress,
+      action: null
     } as PartyIF,
     year: '',
     day: '',
@@ -101,10 +103,11 @@ export const useDebtor = (props, context) => {
     let newList: PartyIF[] = parties.debtors // eslint-disable-line
     // New debtor
     if (props.activeIndex === -1) {
-      // localState.currentDebtor.id = newList.length + 1
+      localState.currentDebtor.action = ActionTypes.ADDED
       newList.push(localState.currentDebtor)
     } else {
-      // Edit vehicle
+      // Edit debtor
+      localState.currentDebtor.action = ActionTypes.EDITED
       newList.splice(props.activeIndex, 1, localState.currentDebtor)
     }
     parties.debtors = newList

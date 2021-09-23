@@ -29,6 +29,12 @@ export interface StateModelIF {
     registrationTypeOtherDesc: string
     showStepErrors: boolean
   }
+  // for amendments only
+  originalRegistration: {
+    collateral: AddCollateralIF
+    lengthTrust: LengthTrustIF
+    parties: AddPartiesIF
+  }
   search: {
     searchHistory: Array<SearchResponseIF>
     searchResults: SearchResponseIF

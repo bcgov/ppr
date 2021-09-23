@@ -35,8 +35,16 @@ export const setAddCollateral: ActionIF = ({ commit }, addCollateral: AddCollate
   commit('mutateAddCollateral', addCollateral)
 }
 
+export const setOriginalAddCollateral: ActionIF = ({ commit }, addCollateral: AddCollateralIF): void => {
+  commit('mutateOriginalAddCollateral', addCollateral)
+}
+
 export const setAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, addParties: AddPartiesIF): void => {
   commit('mutateAddSecuredPartiesAndDebtors', addParties)
+}
+
+export const setOriginalAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, addParties: AddPartiesIF): void => {
+  commit('mutateOriginalAddSecuredPartiesAndDebtors', addParties)
 }
 
 export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): void => {
@@ -61,6 +69,10 @@ export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {
 
 export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
   commit('mutateLengthTrust', lengthTrust)
+}
+
+export const setOriginalLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
+  commit('mutateOriginalLengthTrust', lengthTrust)
 }
 
 export const setRegistrationConfirmDebtorName: ActionIF = ({ commit }, debtorName: DebtorNameIF): void => {

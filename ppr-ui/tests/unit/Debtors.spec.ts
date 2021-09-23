@@ -6,11 +6,12 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedDebtors1,
-  mockedDebtors2
+  mockedDebtorsAmendment
 } from './test-data'
 
 // Components
 import { Debtors, EditDebtor } from '@/components/parties'
+import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -66,7 +67,7 @@ describe('Debtor SA tests', () => {
   })
 })
 
-describe('Collateral store tests', () => {
+describe('Debtor store tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -98,4 +99,48 @@ describe('Collateral store tests', () => {
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
     expect(item1.querySelectorAll('td')[3].textContent).toContain('June 16, 1990')
   })
+})
+
+
+describe('Debtor amendment tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      debtors: mockedDebtorsAmendment
+    })
+    await store.dispatch('setOriginalAddSecuredPartiesAndDebtors', {
+      debtors: mockedDebtorsAmendment
+    })
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct rows when data is present', () => {
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    // three debtors, three rows
+    expect(rowCount).toEqual(3)
+  })
+
+  it('displays the correct chips in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[2]
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('edited')
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('removed')
+    expect(item3.querySelectorAll('td')[0].textContent).toContain('added')
+  })
+
+  it('displays the correct actions in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[2]
+    expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
+    expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
+    expect(item3.querySelectorAll('td')[4].textContent).toContain('Edit')
+  })
+
 })
