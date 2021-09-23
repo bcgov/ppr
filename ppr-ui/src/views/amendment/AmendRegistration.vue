@@ -8,12 +8,6 @@
             <p class="ma-0">
               Review the current information for this registration as of
               <b>{{ asOfDateTime }}.</b><br/>
-              If additional amendments including court orders are still required, ensure they are completed
-              prior to performing this Total Discharge.
-            </p>
-            <p class="ma-0 pt-5">
-              To view the full history of this registration including descriptions of any
-              amendments and any court orders, you will need to conduct a separate search.
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt"/>
@@ -24,13 +18,18 @@
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
+          <div style="padding-top: 25px; max-width: 875px;">
+            <p class="ma-0">
+              The Registering Party has been added based on your account information and cannot be changed here.
+            </p>
+          </div>
           <h3 class="pt-6 px-1">Original Registering Party</h3>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6 px-1">Secured Parties</h3>
-          <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <secured-parties class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtors />
-          <collateral class="mt-15" :isSummary="true" />
+          <collateral class="mt-15" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -40,9 +39,9 @@
             :setFeeType="feeType"
             :setRegistrationType="registrationTypeUI"
             :setCancelBtn="'Cancel'"
-            :setSubmitBtn="'Confirm and Complete'"
+            :setSubmitBtn="'Review and Complete'"
             @cancel="goToDashboard()"
-            @submit="confirmDischarge()"
+            @submit="confirmAmendment()"
           />
         </v-col>
       </v-row>
@@ -58,10 +57,10 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer } from '@/components/common'
-import { Debtors } from '@/components/parties'
+import { Debtors, SecuredParties } from '@/components/parties'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
-import { RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
+import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -81,7 +80,7 @@ import { StatusCodes } from 'http-status-codes'
     Collateral,
     Debtors,
     RegisteringPartySummary,
-    SecuredPartySummary,
+    SecuredParties,
     StickyContainer
   }
 })
@@ -108,9 +107,9 @@ export default class AmendRegistration extends Vue {
   private isJestRunning: boolean
 
   private cautionTxt = 'Secured Parties in this registration ' +
-    'will receive a copy of the Total Discharge Verification Statement.'
+    'will receive a copy of the Amendment Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
-  private feeType = FeeSummaryTypes.DISCHARGE
+  private feeType = FeeSummaryTypes.AMMEND
   private financingStatementDate: Date = null
 
   private get asOfDateTime (): string {
@@ -125,7 +124,7 @@ export default class AmendRegistration extends Vue {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  // the number of the registration being discharged
+  // the number of the registration being amended
   private get registrationNumber (): string {
     return this.$route.query['reg-num'] as string || ''
   }
@@ -140,7 +139,7 @@ export default class AmendRegistration extends Vue {
 
   private async loadRegistration (): Promise<void> {
     if (!this.registrationNumber) {
-      console.error('No registration number given to discharge. Redirecting to dashboard...')
+      console.error('No registration number given to amend. Redirecting to dashboard...')
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
@@ -195,7 +194,7 @@ export default class AmendRegistration extends Vue {
     this.onAppReady(this.appReady)
   }
 
-  private confirmDischarge (): void {
+  private confirmAmendment (): void {
     this.$router.push({
       name: RouteNames.CONFIRM_DISCHARGE,
       query: { 'reg-num': this.registrationNumber }
