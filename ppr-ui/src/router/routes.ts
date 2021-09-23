@@ -11,7 +11,8 @@ import {
   ConfirmRenewal,
   Search,
   Signin,
-  Signout
+  Signout,
+  AmendRegistration
 } from '@/views'
 import { RouteNames } from '@/enums'
 
@@ -72,6 +73,14 @@ export const routes = [
     path: '/renew/confirm-renewal',
     name: RouteNames.CONFIRM_RENEWAL,
     component: ConfirmRenewal,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/amendment/amend-registration',
+    name: RouteNames.AMEND_REGISTRATION,
+    component: AmendRegistration,
     meta: {
       requiresAuth: true
     }

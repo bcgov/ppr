@@ -53,6 +53,7 @@
                 @registrationTotal="showRegistrationTotal($event)"
                 @discharge="startDischarge($event)"
                 @renew="startRenewal($event)"
+                @amend="startAmendment($event)"
                 @editFinancingDraft="startFinancingDraft($event)"
               />
             </v-col>
@@ -157,6 +158,14 @@ export default class Dashboard extends Vue {
   private startRenewal (regNum: string): void {
     this.$router.push({
       name: RouteNames.RENEW_REGISTRATION,
+      query: { 'reg-num': regNum }
+    })
+    this.emitHaveData(false)
+  }
+
+  private startAmendment (regNum: string): void {
+    this.$router.push({
+      name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': regNum }
     })
     this.emitHaveData(false)
