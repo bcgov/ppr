@@ -113,7 +113,6 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
 import { APIRegistrationTypes, RouteNames } from '@/enums'
-import { getFinancingFee } from '@/composables/fees/factories'
 
 export default defineComponent({
   props: {
@@ -130,7 +129,6 @@ export default defineComponent({
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const lengthTrust: LengthTrustIF = getLengthTrust.value
-    const feeInfoYears = getFinancingFee(false)
     const router = context.root.$router
     const route = context.root.$route
     const modal = false
