@@ -45,7 +45,7 @@
               <v-container fluid class="ps-1 pt-8">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
-                    <collateral :isSummary="true"/>
+                    <collateral :isSummary="true" :setRegistrationType="registrationType" />
                   </v-col>
                 </v-row>
               </v-container>

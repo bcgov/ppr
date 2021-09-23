@@ -24,7 +24,7 @@
             </v-row>
             <v-row no-gutters>
               <v-col cols="12">
-                <collateral />
+                <collateral :isSummary="false" :setRegistrationType="registrationType" />
               </v-col>
             </v-row>
           </v-col>
@@ -110,13 +110,8 @@ export default class AddCollateral extends Vue {
     return this.getRegistrationType?.registrationTypeUI || ''
   }
 
-  private get registrationType (): string {
-    return this.getRegistrationType?.registrationTypeAPI || ''
-  }
-
-  /** Redirects browser to Business Registry home page. */
-  private redirectRegistryHome (): void {
-    window.location.assign(this.registryUrl)
+  private get registrationType (): APIRegistrationTypes {
+    return this.getRegistrationType?.registrationTypeAPI || null
   }
 
   private get statementType (): string {

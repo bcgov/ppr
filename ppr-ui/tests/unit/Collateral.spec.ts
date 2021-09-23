@@ -9,12 +9,12 @@ import {
   mockedVehicleCollateral1,
   mockedSelectSecurityAgreement,
   mockedOtherCarbon,
-  mockedLienUnpaid,
-  generalCollateralText
+  mockedLienUnpaid
 } from './test-data'
 
 // Components
-import { Collateral, EditCollateral } from '@/components/collateral'
+import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -22,14 +22,19 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Input field selectors / buttons
-const addButtonSelector: string = '#btn-add-collateral'
+const collateralEdit = '#collateral-edit'
+const collateralSummary = '#collateral-summary'
+const goToCollateralBtn = '#router-link-collateral'
+const validCollateralIcon = '.agreement-valid-icon'
 
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchBar> object with the given parameters.
+ * @returns a Wrapper<any> object with the given parameters.
  */
 function createComponent (
+  isSummary: boolean,
+  registrationTypeAPI: APIRegistrationTypes
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -37,125 +42,316 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(Collateral, {
     localVue,
-    propsData: {},
+    propsData: {
+      isSummary: isSummary,
+      setRegistrationType: registrationTypeAPI
+    },
     store,
     vuetify
   })
 }
 
-describe('Collateral SA tests', () => {
+describe('Collateral SA tests (covers workflow for most registration types)', () => {
   let wrapper: Wrapper<any>
+  const registrationType = mockedSelectSecurityAgreement()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
 
-    wrapper = createComponent()
+    wrapper = createComponent(true, registrationType.registrationTypeAPI)
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
-  it('renders with default values', async () => {
+  it('renders summary properly in error view when no collateral exists', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    // won't show edit collateral component until click
-    expect(wrapper.findComponent(EditCollateral).exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateralDesc).toBe('')
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
+    expect(wrapper.vm.valid).toBe(false)
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+    expect(wrapper.findAll('.invalid-message').length).toBe(2)
+    expect(wrapper.findAll('.invalid-message').at(1).text()).toContain('This step is unfinished.')
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(true)
   })
 
-  it('add collateral button shows the add vehicle form', async () => {
-    expect(wrapper.find(addButtonSelector).exists()).toBe(true)
-    wrapper.find(addButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.findComponent(EditCollateral).exists()).toBeTruthy()
-    expect(wrapper.findComponent(EditCollateral).isVisible()).toBe(true)
+  it('renders summary view properly when vehicle collateral exists', async () => {
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: mockedVehicleCollateral1,
+      valid: true,
+      showInvalid: false
+    })
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+    expect(wrapper.findAll('.invalid-message').length).toBe(0)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
+  })
+
+  it('renders summary view properly when general collateral exists', async () => {
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: mockedGeneralCollateral1,
+      vehicleCollateral: [],
+      valid: true,
+      showInvalid: false
+    })
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+    expect(wrapper.findAll('.invalid-message').length).toBe(0)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
+  })
+
+  it('renders summary view properly when vehicle + general collateral exists', async () => {
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: mockedGeneralCollateral1,
+      vehicleCollateral: mockedVehicleCollateral1,
+      valid: true,
+      showInvalid: false
+    })
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+    expect(wrapper.findAll('.invalid-message').length).toBe(0)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
+  })
+
+  it('renders edit view properly when no collateral exists', async () => {
+    await wrapper.setProps({ isSummary: false })
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(false)
+    expect(wrapper.findAll(collateralSummary).length).toBe(0)
+    expect(wrapper.findAll(collateralEdit).length).toBe(1)
+    // description
+    expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('At least one form of collateral (vehicle or general)')
+    expect(wrapper.findAll(validCollateralIcon).length).toBe(0)
+    // vehicle collateral
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(false)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
+    // general collateral
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(false)
+  })
+
+  it('updates description in edit view when vehicle collateral is added', async () => {
+    await wrapper.setProps({ isSummary: false })
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: mockedVehicleCollateral1,
+      valid: true,
+      showInvalid: false
+    })
+    expect(wrapper.vm.valid).toBe(true)
+    // description
+    expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('At least one form of collateral (vehicle or general)')
+    expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
+    expect(wrapper.vm.$data.vehicleCollateralLength).toBe(2)
+  })
+
+  it('updates description in edit view when general collateral is added', async () => {
+    await wrapper.setProps({ isSummary: false })
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: mockedGeneralCollateral1,
+      vehicleCollateral: [],
+      valid: true,
+      showInvalid: false
+    })
+    expect(wrapper.vm.valid).toBe(true)
+    // description
+    expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('At least one form of collateral (vehicle or general)')
+    expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.vm.$data.vehicleCollateralLength).toBe(0)
   })
 })
 
 describe('Collateral Lien unpaid wages tests', () => {
   let wrapper: Wrapper<any>
-  beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedLienUnpaid())
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    wrapper.destroy()
-  })
-  it('renders with default values', async () => {
-    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    // won't show vehicle collateral
-    expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateralDesc).toContain('All the personal property of the debtor')
-  })
-
-
-})
-
-describe('Collateral Carbon tests', () => {
-  let wrapper: Wrapper<any>
+  const registrationType = mockedLienUnpaid()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedOtherCarbon())
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     await store.dispatch('setAddCollateral', {
-      generalCollateral: null,
-      vehicleCollateral: []
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
     })
-    wrapper = createComponent()
+
+    wrapper = createComponent(true, registrationType.registrationTypeAPI)
   })
   afterEach(() => {
     wrapper.destroy()
   })
-
-  it('renders with default values', async () => {
+  it('renders summary view with general collateral when none is given', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    // won't show vehicle collateral
-    expect(wrapper.find('.collateral-table').exists()).toBeFalsy()
-    expect(wrapper.vm.generalCollateralDesc).toContain(generalCollateralText)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+    expect(wrapper.findAll('.invalid-message').length).toBe(0)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
   })
 
+  it('renders edit view with general collateral when none is given', async () => {
+    await wrapper.setProps({ isSummary: false })
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(0)
+    expect(wrapper.findAll(collateralEdit).length).toBe(1)
+    // description
+    expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('General Collateral')
+    expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
+    // vehicle collateral
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(false)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
+    // general collateral
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(false)
+  })
 
+  it('renders summary view without general collateral when none is given and it is in the discharge flow', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.DISCHARGE)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
+    wrapper2.destroy()
+  })
+
+  it('renders summary view without general collateral when none is given and it is in the renew flow', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.RENEWAL)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
+    wrapper2.destroy()
+  })
 })
 
-describe('Collateral store tests', () => {
+
+describe('Collateral Carbon Tax tests', () => {
   let wrapper: Wrapper<any>
+  const registrationType = mockedOtherCarbon()
 
   beforeEach(async () => {
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     await store.dispatch('setAddCollateral', {
-      generalCollateral: mockedGeneralCollateral1,
-      vehicleCollateral: mockedVehicleCollateral1
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
     })
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    wrapper = createComponent()
+
+    wrapper = createComponent(true, registrationType.registrationTypeAPI)
   })
   afterEach(() => {
     wrapper.destroy()
   })
-
-  it('renders general collateral when set', async () => {
+  it('renders summary view with general collateral when none is given', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper.vm.generalCollateralDesc).toEqual('TEST1 GENERAL COLLATERAL')
-  })
-  it('renders vehicle collateral table and headers', async () => {
-    expect(wrapper.find('.collateral-table').exists()).toBeTruthy()
-    // column header class is text-start
-    expect(wrapper.findAll('.text-start').length).toBe(6)
-  })
-
-  it('displays the correct vehicle rows when data is present', () => {
-    const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row').length
-
-    expect(vehicleRowCount).toEqual(2)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+    expect(wrapper.findAll('.invalid-message').length).toBe(0)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
   })
 
-  it('displays the correct data in the vehicle table rows', () => {
-    const vehicleItem1 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[0]
+  it('renders edit view with general collateral when none is given', async () => {
+    await wrapper.setProps({ isSummary: false })
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findAll(collateralSummary).length).toBe(0)
+    expect(wrapper.findAll(collateralEdit).length).toBe(1)
+    // description
+    expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('General Collateral')
+    expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
+    // vehicle collateral
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(false)
+    expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
+    // general collateral
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(false)
+  })
 
-    expect(vehicleItem1.querySelectorAll('td')[0].textContent).toContain('MV')
-    expect(vehicleItem1.querySelectorAll('td')[1].textContent).toContain('2018')
-    expect(vehicleItem1.querySelectorAll('td')[2].textContent).toContain('HYUNDAI')
-    expect(vehicleItem1.querySelectorAll('td')[3].textContent).toContain('TUSCON')
-    expect(vehicleItem1.querySelectorAll('td')[4].textContent).toContain('KM8J3CA46JU622994')
+  it('renders summary view without general collateral when none is given and it is in the discharge flow', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.DISCHARGE)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
+    wrapper2.destroy()
+  })
+
+  it('renders summary view without general collateral when none is given and it is in the renew flow', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.RENEWAL)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
+    wrapper2.destroy()
   })
 })
-
-
-

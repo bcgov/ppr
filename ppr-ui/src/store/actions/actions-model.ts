@@ -150,7 +150,6 @@ export const setUserSettings: ActionIF = ({ commit }, settings: UserSettingsIF):
 }
 
 export const setVehicleCollateral: ActionIF = ({ commit }, vCollateral: VehicleCollateralIF[]): void => {
-  console.log('action')
   commit('mutateVehicleCollateral', vCollateral)
 }
 

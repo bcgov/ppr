@@ -24,19 +24,24 @@
           </v-col>
         </v-row>
       </v-container>
-      <div v-else>
-        <vehicle-collateral :isSummary="true" :showInvalid="showInvalid" />
-        <general-collateral :isSummary="true" />
-      </div>
+      <vehicle-collateral
+        v-if="vehicleCollateralLength > 0"
+        :isSummary="true"
+        :showInvalid="showInvalid"
+      />
+      <general-collateral
+        v-if="generalCollateralLength > 0"
+        :isSummary="true"
+      />
     </v-card>
   </v-container>
-  <v-container v-else class="pa-0" fluid no-gutters>
+  <v-container v-else id="collateral-edit" class="pa-0" fluid no-gutters>
     <v-row no-gutters>
       <v-col cols="auto" class="generic-label"
         >Your registration must include the following:</v-col
       >
     </v-row>
-    <v-row no-gutters class="pt-6">
+    <v-row id="collateral-edit-description" class="pt-6" no-gutters>
       <v-col cols="auto">
         <ul v-if="!valid">
           <li>{{ getCollateralDescription() }}</li>
@@ -51,10 +56,9 @@
     </v-row>
     <vehicle-collateral :isSummary="false" :showInvalid="showInvalid && !valid" />
     <general-collateral
-      v-if="hasGeneralCollateral()"
+      v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
       :isSummary="false"
-      :showInvalid="showInvalid && !valid"
       @valid="generalCollateralValid = $event"
     />
   </v-container>
@@ -64,6 +68,7 @@
 import {
   computed,
   defineComponent,
+  onMounted,
   reactive,
   toRefs,
   watch
@@ -73,11 +78,13 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { GeneralCollateral } from './generalCollateral'
 import { VehicleCollateral } from './vehicleCollateral'
 // local types/resources/etc.
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   AddCollateralIF, // eslint-disable-line no-unused-vars
   GeneralCollateralIF, // eslint-disable-line no-unused-vars
   VehicleCollateralIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { useGeneralCollateral } from './generalCollateral/factories'
 import { useVehicle } from './vehicleCollateral/factories'
 
 export default defineComponent({
@@ -90,28 +97,41 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
-    }
+    },
+    setRegistrationType: String as () => APIRegistrationTypes
   },
   setup (props, context) {
-    const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
+    const {
+      getAddCollateral,
+      getRegistrationFlowType
+    } = useGetters<any>(['getAddCollateral', 'getRegistrationFlowType'])
+
     const {
       setCollateralShowInvalid,
-      setCollateralValid
-    } = useActions<any>(['setCollateralShowInvalid', 'setCollateralValid'])
+      setCollateralValid,
+      setGeneralCollateral
+    } = useActions<any>(['setCollateralShowInvalid', 'setCollateralValid', 'setGeneralCollateral'])
 
     const router = context.root.$router
 
     const {
       hasVehicleCollateral,
-      hasGeneralCollateral,
       mustHaveManufacturedHomeCollateral
     } = useVehicle(props, context)
+    const {
+      hasGeneralCollateral,
+      hasGeneralCollateralText
+    } = useGeneralCollateral()
 
     const localState = reactive({
       generalCollateralValid: true,
+      registrationType: props.setRegistrationType,
       summaryView: props.isSummary,
       collateral: computed((): AddCollateralIF => {
         return getAddCollateral.value as AddCollateralIF
+      }),
+      generalCollateralLength: computed((): number => {
+        return localState.collateral.generalCollateral?.length || 0
       }),
       showInvalid: computed((): boolean => {
         return localState.collateral.showInvalid
@@ -124,14 +144,33 @@ export default defineComponent({
       })
     })
 
+    onMounted(() => {
+      if (
+        getRegistrationFlowType.value === RegistrationFlowType.NEW &&
+        localState.collateral?.generalCollateral?.length === 0
+      ) {
+        if (hasGeneralCollateral(localState.registrationType)) {
+          if (localState.registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
+            setGeneralCollateral([{ description: 'All the personal property of the debtor' }])
+          }
+          if (hasGeneralCollateralText(localState.registrationType)) {
+            setGeneralCollateral([{
+              description: 'All the debtor’s present and after acquired personal property, including ' +
+                'but not restricted to machinery, equipment, furniture, fixtures and receivables.'
+            }])
+          }
+        }
+      }
+    })
+
     const getCollateralDescription = (): string => {
-      if (hasVehicleCollateral() && hasGeneralCollateral()) {
+      if (hasVehicleCollateral() && hasGeneralCollateral(localState.registrationType)) {
         return 'At least one form of collateral (vehicle or general)'
       }
       if (mustHaveManufacturedHomeCollateral()) {
         return 'At least one manufactured home as vehicle collateral'
       }
-      if (hasGeneralCollateral()) {
+      if (hasGeneralCollateral(localState.registrationType)) {
         return 'General Collateral'
       }
       if (hasVehicleCollateral()) {
@@ -144,8 +183,11 @@ export default defineComponent({
       router.push({ path: '/new-registration/add-collateral' })
     }
 
+    watch(() => props.isSummary, (val: boolean) => {
+      localState.summaryView = val
+    })
+
     watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
-      console.log('here1', val)
       if (
         val?.length > 0 ||
         (localState.collateral?.generalCollateral?.length > 0 &&
@@ -159,7 +201,6 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     watch(() => localState.collateral.generalCollateral, (val: GeneralCollateralIF[]) => {
-      console.log('here2', val)
       if (
         (val?.length > 0 && localState.generalCollateralValid) ||
         localState.collateral?.vehicleCollateral?.length > 0

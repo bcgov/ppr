@@ -53,7 +53,6 @@ export const mutateCollateralShowInvalid = (state: StateIF, value: boolean) => {
 }
 
 export const mutateCollateralValid = (state: StateIF, value: boolean) => {
-  console.log('mutating valid', value)
   state.stateModel.registration.collateral.valid = value
 }
 
