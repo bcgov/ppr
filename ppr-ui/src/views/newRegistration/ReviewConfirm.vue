@@ -27,7 +27,7 @@
               <v-container fluid class="pa-1">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
-                    <registration-length-trust :isSummary="true" :defaultRegistrationType="registrationType" />
+                    <registration-length-trust-summary />
                   </v-col>
                 </v-row>
               </v-container>
@@ -111,7 +111,7 @@ import {
 } from '@/store/actions'
 // local components
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
@@ -122,7 +122,7 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
     Collateral,
     FolioNumberSummary,
     Parties,
-    RegistrationLengthTrust,
+    RegistrationLengthTrustSummary,
     Stepper,
     StickyContainer
   }

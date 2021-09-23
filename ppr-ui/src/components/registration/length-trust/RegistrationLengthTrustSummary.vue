@@ -1,0 +1,358 @@
+<template>
+  <v-container fluid no-gutters class="white pa-0">
+    <v-card flat id="length-trust-summary">
+      <h2 class="pt-2 pb-5 renewal-title" v-if="isRenewal">
+          Renewal Length and Terms
+       </h2>
+      <v-row no-gutters class="summary-header pa-2" v-else>
+        <v-col cols="auto" class="pa-2">
+          <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
+          <label
+            class="pl-3"
+            v-if="registrationType === APIRegistrationTypes.SECURITY_AGREEMENT"
+          >
+            <strong>{{ regTitle }} Length and Trust Indenture</strong>
+          </label>
+          <label
+            class="pl-3"
+            v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+          >
+            <strong>Amount and Date of Surrender</strong>
+          </label>
+          <label class="pl-3" v-else>
+            <strong>{{ regTitle }} Length</strong>
+          </label>
+        </v-col>
+      </v-row>
+      <v-container
+        :class="{ 'invalid-message': showErrorSummary }"
+        style="padding: 40px 30px;"
+      >
+        <v-row no-gutters v-if="showErrorSummary" class="pa-6">
+          <v-col cols="auto">
+            <span :class="{ 'invalid-message': showErrorSummary }">
+              <v-icon color="error">mdi-information-outline</v-icon>
+              This step is unfinished.
+            </span>
+            <span
+              id="router-link-length-trust"
+              class="invalid-link"
+              @click="goToLengthTrust()"
+            >
+              Return to this step to complete it.
+            </span>
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
+          <v-col class="summary-text">
+            {{ lengthSummary }}
+          </v-col>
+        </v-row>
+        <v-row class="pt-4" v-if="renewalView && registrationType !== APIRegistrationTypes.REPAIRERS_LIEN">
+          <v-col cols="3"></v-col>
+          <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        </v-row>
+        <v-row no-gutters class="pt-6" v-if="renewalView">
+          <v-col cols="3" class="generic-label">New Expiry</v-col>
+          <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
+        </v-row>
+        <v-row v-if="renewalView && showTrustIndenture">
+          <v-col cols="3"></v-col>
+          <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
+        </v-row>
+        <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
+          <v-col cols="3" class="generic-label">
+            Trust Indenture
+          </v-col>
+          <v-col class="summary-text">
+            {{ trustIndentureSummary }}
+          </v-col>
+        </v-row>
+        <v-row
+          no-gutters
+          class="pt-6"
+          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        >
+          <v-col cols="3" class="generic-label">
+            Amount of Lien
+          </v-col>
+          <v-col class="summary-text">
+            {{ lienAmountSummary }}
+          </v-col>
+        </v-row>
+        <v-row
+          no-gutters
+          class="pt-6"
+          v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        >
+          <v-col cols="3" class="generic-label">
+            Surrender Date
+          </v-col>
+          <v-col class="summary-text">
+            {{ surrenderDateSummary }}
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card>
+  </v-container>
+
+</template>
+
+<script lang="ts">
+// external
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs
+} from '@vue/composition-api'
+import { useGetters, useActions } from 'vuex-composition-helpers'
+
+// local
+import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { convertDate } from '@/utils'
+import { APIRegistrationTypes, RouteNames } from '@/enums'
+import { getFinancingFee } from '@/composables/fees/factories'
+
+export default defineComponent({
+  props: {
+    isRenewal: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
+    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
+    const { getRegistrationType, getRegistrationExpiryDate, getRegistrationSurrenderDate } = useGetters<any>([
+      'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
+    ])
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
+    const lengthTrust: LengthTrustIF = getLengthTrust.value
+    const feeInfoYears = getFinancingFee(false)
+    const router = context.root.$router
+    const route = context.root.$route
+    const modal = false
+
+    const localState = reactive({
+      renewalView: props.isRenewal,
+      trustIndenture: lengthTrust.trustIndenture,
+      lifeYearsDisabled: lengthTrust.lifeInfinite,
+      lifeInfinite: lengthTrust.valid
+        ? lengthTrust.lifeInfinite.toString()
+        : '',
+      maxYears: feeInfoYears.quantityMax.toString(),
+      lifeYearsEdit:
+        lengthTrust.lifeYears > 0 ? lengthTrust.lifeYears.toString() : '',
+      lifeYearsMessage: '',
+      trustIndentureHint: '',
+      surrenderDate: lengthTrust.surrenderDate,
+      lienAmount: lengthTrust.lienAmount,
+      lifeYearsHint:
+        'Minimum 1 year, Maximum ' +
+        feeInfoYears.quantityMax.toString() +
+        ' years ($' +
+        feeInfoYears.feeAmount.toFixed(2) +
+        ' per year)',
+      showTrustIndenture: computed((): boolean => {
+        if (localState.renewalView) {
+          return lengthTrust.trustIndenture
+        }
+        return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
+      }),
+      showErrorSummary: computed((): boolean => {
+        return !lengthTrust.valid
+      }),
+      showErrorSurrenderDate: computed((): boolean => {
+        return lengthTrust.showInvalid && lengthTrust.surrenderDate === ''
+      }),
+      regTitle: computed((): string => {
+        if (props.isRenewal) {
+          return 'Renewal'
+        }
+        return 'Registration'
+      }),
+      computedDateFormatted: computed((): string => {
+        return lengthTrust.surrenderDate !== ''
+          ? convertDate(new Date(lengthTrust.surrenderDate + 'T09:00:00Z'), false, false) : ''
+      }),
+      computedExpiryDateFormatted: computed((): string => {
+        if (props.isRenewal) {
+          if (lengthTrust.lifeInfinite) {
+            return 'No Expiry'
+          }
+          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
+            const expiryDate = getRegistrationExpiryDate.value
+            const newExpDate = new Date(expiryDate)
+            newExpDate.setDate(newExpDate.getDate() + 180)
+            return convertDate(newExpDate, true, true)
+          }
+          if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
+            const expiryDate = getRegistrationExpiryDate.value
+            const numYears = parseInt(localState.lifeYearsEdit)
+            const newExpDate = new Date(expiryDate)
+            newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
+            return convertDate(newExpDate, true, true)
+          }
+          return '-'
+        }
+      }),
+      lengthSummary: computed((): string => {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
+          return '180 Days'
+        }
+        if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
+          return 'Not entered'
+        }
+        if (lengthTrust.lifeInfinite) {
+          return 'Infinite'
+        }
+        if (lengthTrust.lifeYears === 1) {
+          return lengthTrust.lifeYears.toString() + ' Year'
+        }
+        return lengthTrust.lifeYears.toString() + ' Years'
+      }),
+      trustIndentureSummary: computed((): string => {
+        return lengthTrust.trustIndenture ? 'Yes' : 'No'
+      }),
+      lienAmountSummary: computed((): string => {
+        if (lengthTrust.lienAmount) {
+          // Format as CDN currency.
+          var currency = lengthTrust.lienAmount
+            ?.replace('$', '')
+            ?.replaceAll(',', '')
+          var lienFloat = parseFloat(currency)
+          if (isNaN(lienFloat)) {
+            return lengthTrust.lienAmount
+          }
+          return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+        }
+        return 'Not entered'
+      }),
+      surrenderDateSummary: computed((): string => {
+        if (props.isRenewal) {
+          lengthTrust.surrenderDate = getRegistrationSurrenderDate.value
+          return convertDate(
+            new Date(lengthTrust.surrenderDate),
+            false,
+            false
+          )
+        }
+        if (lengthTrust.surrenderDate?.length >= 10) {
+          return convertDate(
+            new Date(lengthTrust.surrenderDate + 'T09:00:00Z'),
+            false,
+            false
+          )
+        }
+        if (lengthTrust.surrenderDate === '') {
+          return 'Not entered'
+        }
+        return lengthTrust.surrenderDate
+      })
+    })
+    const goToLengthTrust = (): void => {
+      if (!props.isRenewal) {
+        lengthTrust.showInvalid = true
+        setLengthTrust(lengthTrust)
+        router.push({ path: '/new-registration/length-trust' })
+      } else {
+        const registrationNumber = route.query['reg-num'] as string || ''
+        router.push({
+          name: RouteNames.RENEW_REGISTRATION,
+          query: { 'reg-num': registrationNumber }
+        })
+      }
+    }
+
+    const infinityPreselected = (): boolean => {
+      const ipArray = [
+        APIRegistrationTypes.MARRIAGE_MH,
+        APIRegistrationTypes.LAND_TAX_LIEN,
+        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
+        APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+        APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+        APIRegistrationTypes.FOREST,
+        APIRegistrationTypes.LOGGING_TAX,
+        APIRegistrationTypes.CARBON_TAX,
+        APIRegistrationTypes.RURAL_PROPERTY_TAX,
+        APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+        APIRegistrationTypes.INCOME_TAX,
+        APIRegistrationTypes.MOTOR_FUEL_TAX,
+        APIRegistrationTypes.EXCISE_TAX,
+        APIRegistrationTypes.LIEN_UNPAID_WAGES,
+        APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+        APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+        APIRegistrationTypes.MAINTENANCE_LIEN,
+        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+        APIRegistrationTypes.OTHER,
+        APIRegistrationTypes.MINERAL_LAND_TAX,
+        APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+        APIRegistrationTypes.SCHOOL_ACT
+      ]
+      return ipArray.includes(registrationType)
+    }
+
+    return {
+      goToLengthTrust,
+      lengthTrust,
+      infinityPreselected,
+      APIRegistrationTypes,
+      registrationType,
+      modal,
+      ...toRefs(localState)
+    }
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+/* Need scoped for date picker v-deep style overrides to work */
+@import '@/assets/styles/theme.scss';
+.v-list-item {
+  min-height: 0;
+}
+
+.renewal-title {
+   background-color: #f1f3f5;
+}
+
+::v-deep
+  .v-icon.v-icon:not(.mdi-radiobox-marked):not(.mdi-radiobox-blank):not(.mdi-checkbox-blank-outline) {
+  color: $primary-blue;
+}
+::v-deep .v-picker__title__btn:not(.v-picker__title__btn--active) {
+  opacity: 1;
+}
+::v-deep .v-date-picker-table__current {
+  border-color: $primary-blue !important;
+}
+::v-deep .v-date-picker-table__current .v-btn__content {
+  color: $primary-blue !important;
+}
+::v-deep .theme--light.v-date-picker-table th {
+  color: $gray9;
+}
+::v-deep .v-date-picker-table .v-btn {
+  color: $gray7;
+}
+::v-deep
+  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: $primary-blue !important;
+  border-color: $primary-blue !important;
+  color: white !important;
+}
+::v-deep .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+  opacity: 0;
+}
+::v-deep .v-icon.v-icon.v-icon--link {
+  cursor: text;
+}
+::v-deep .theme--light.v-icon.v-icon.v-icon--disabled {
+  color: $primary-blue !important;
+}
+::v-deep .v-input--is-disabled {
+  opacity: 0.4;
+}
+</style>

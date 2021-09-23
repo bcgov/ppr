@@ -41,8 +41,8 @@
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <registration-length-trust class="mt-10" :isRenewal="true"
-          :isSummary="true" :defaultRegistrationType="registrationType" />
+          <registration-length-trust-summary class="mt-10" :isRenewal="true"
+          />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -84,7 +84,7 @@ import {
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustSummary } from '@/components/registration'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -110,7 +110,7 @@ import { StatusCodes } from 'http-status-codes'
     BaseDialog,
     FolioNumberSummary,
     RegisteringPartySummary,
-    RegistrationLengthTrust,
+    RegistrationLengthTrustSummary,
     StickyContainer
   }
 })
