@@ -200,18 +200,6 @@ export default defineComponent({
           return '-'
         }
       }),
-      lengthSummary: computed((): string => {
-        if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
-          return 'Not entered'
-        }
-        if (lengthTrust.lifeInfinite) {
-          return 'Infinite'
-        }
-        if (lengthTrust.lifeYears === 1) {
-          return lengthTrust.lifeYears.toString() + ' Year'
-        }
-        return lengthTrust.lifeYears.toString() + ' Years'
-      }),
       trustIndentureSummary: computed((): string => {
         return lengthTrust.trustIndenture ? 'Yes' : 'No'
       })

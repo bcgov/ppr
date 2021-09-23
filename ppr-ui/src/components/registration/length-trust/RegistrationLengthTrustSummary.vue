@@ -138,23 +138,13 @@ export default defineComponent({
     const localState = reactive({
       renewalView: props.isRenewal,
       trustIndenture: lengthTrust.trustIndenture,
-      lifeYearsDisabled: lengthTrust.lifeInfinite,
       lifeInfinite: lengthTrust.valid
         ? lengthTrust.lifeInfinite.toString()
         : '',
-      maxYears: feeInfoYears.quantityMax.toString(),
       lifeYearsEdit:
         lengthTrust.lifeYears > 0 ? lengthTrust.lifeYears.toString() : '',
-      lifeYearsMessage: '',
-      trustIndentureHint: '',
       surrenderDate: lengthTrust.surrenderDate,
       lienAmount: lengthTrust.lienAmount,
-      lifeYearsHint:
-        'Minimum 1 year, Maximum ' +
-        feeInfoYears.quantityMax.toString() +
-        ' years ($' +
-        feeInfoYears.feeAmount.toFixed(2) +
-        ' per year)',
       showTrustIndenture: computed((): boolean => {
         if (localState.renewalView) {
           return lengthTrust.trustIndenture
@@ -163,9 +153,6 @@ export default defineComponent({
       }),
       showErrorSummary: computed((): boolean => {
         return !lengthTrust.valid
-      }),
-      showErrorSurrenderDate: computed((): boolean => {
-        return lengthTrust.showInvalid && lengthTrust.surrenderDate === ''
       }),
       regTitle: computed((): string => {
         if (props.isRenewal) {
@@ -266,38 +253,9 @@ export default defineComponent({
       }
     }
 
-    const infinityPreselected = (): boolean => {
-      const ipArray = [
-        APIRegistrationTypes.MARRIAGE_MH,
-        APIRegistrationTypes.LAND_TAX_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_LIEN,
-        APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
-        APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
-        APIRegistrationTypes.FOREST,
-        APIRegistrationTypes.LOGGING_TAX,
-        APIRegistrationTypes.CARBON_TAX,
-        APIRegistrationTypes.RURAL_PROPERTY_TAX,
-        APIRegistrationTypes.PROVINCIAL_SALES_TAX,
-        APIRegistrationTypes.INCOME_TAX,
-        APIRegistrationTypes.MOTOR_FUEL_TAX,
-        APIRegistrationTypes.EXCISE_TAX,
-        APIRegistrationTypes.LIEN_UNPAID_WAGES,
-        APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
-        APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
-        APIRegistrationTypes.MAINTENANCE_LIEN,
-        APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
-        APIRegistrationTypes.OTHER,
-        APIRegistrationTypes.MINERAL_LAND_TAX,
-        APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
-        APIRegistrationTypes.SCHOOL_ACT
-      ]
-      return ipArray.includes(registrationType)
-    }
-
     return {
       goToLengthTrust,
       lengthTrust,
-      infinityPreselected,
       APIRegistrationTypes,
       registrationType,
       modal,
