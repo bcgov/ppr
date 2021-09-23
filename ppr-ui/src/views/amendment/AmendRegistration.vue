@@ -29,7 +29,7 @@
           <secured-parties class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtors />
-          <collateral class="mt-15" />
+          <collateral :setRegistrationType="registrationType" class="mt-15" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
