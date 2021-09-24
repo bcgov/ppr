@@ -28,7 +28,7 @@ import {
   mockedDebtors1,
   mockedVehicleCollateral1,
   mockedGeneralCollateral1,
-  mockedNewRegStep1
+  mockedLengthTrust1
 } from './test-data'
 
 Vue.use(Vuetify)
@@ -59,7 +59,7 @@ describe('Registration API Helper Tests', () => {
       vuetify
     })
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
-    await store.dispatch('setLengthTrust', mockedNewRegStep1)
+    await store.dispatch('setLengthTrust', mockedLengthTrust1)
     await store.dispatch('setFolioOrReferenceNumber', 'ABC123')
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
       securedParties: mockedSecuredParties1,

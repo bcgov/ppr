@@ -12,7 +12,7 @@ import { mockedFinancingStatementAll, mockedDebtorNames, mockedRenewalResponse }
 import { ConfirmRenewal } from '@/views'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustSummary } from '@/components/registration'
 
 // Other
 import mockRouter from './MockRouter'
@@ -82,7 +82,7 @@ describe('Confirm Renewal new registration component', () => {
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)

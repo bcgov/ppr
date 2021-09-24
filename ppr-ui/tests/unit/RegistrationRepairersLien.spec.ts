@@ -8,10 +8,7 @@ import {
   LengthTrustIF
 } from '@/interfaces'
 import {
-  mockedSelectSecurityAgreement,
-  mockedRepairersLien,
-  mockedSaleOfGoods,
-  mockedMarriageMH
+  mockedRepairersLien
 } from './test-data'
 
 // Components
@@ -21,9 +18,6 @@ Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
-
-// Input field selectors / buttons
-const selectDropDown: string = '.registration-bar-type-select'
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
@@ -65,7 +59,6 @@ function createComponent (
 
 describe('RegistrationLengthTrust RL tests', () => {
   let wrapper: Wrapper<any>
-  const defaultRegistrationType: String = String('RL')
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedRepairersLien())
     wrapper = createComponent(false)
@@ -76,16 +69,12 @@ describe('RegistrationLengthTrust RL tests', () => {
 
   it('renders with RL values', async () => {
     expect(wrapper.findComponent(RegistrationRepairersLien).exists()).toBe(true)
-    expect(wrapper.vm.showTrustIndenture).toBe(false)
-    expect(wrapper.vm.lifeInfinite).toBe('false')
     expect(wrapper.vm.surrenderDate).toBe('')
+    expect(wrapper.vm.lengthTrust.showInvalid).toBe(false)
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
     expect(wrapper.vm.showErrorSurrenderDate).toBe(false)
     expect(wrapper.vm.minSurrenderDate).toBeDefined()
     expect(wrapper.vm.lienAmount).toBe('')
-    expect(wrapper.vm.lengthSummary).toBe('180 Days')
-    expect(wrapper.vm.lifeYearsEdit).toBe('1')
-    expect(wrapper.vm.lifeYearsDisabled).toBe(false)
     expect(wrapper.vm.lienAmountSummary).toBe('Not entered')
     expect(wrapper.vm.surrenderDateSummary).toBe('Not entered')
   })
@@ -112,7 +101,6 @@ describe('RegistrationLengthTrust RL tests', () => {
 
 describe('RegistrationLengthTrust RL renewal test', () => {
   let wrapper: Wrapper<any>
-  const defaultRegistrationType: String = String('RL')
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedRepairersLien())
     await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')

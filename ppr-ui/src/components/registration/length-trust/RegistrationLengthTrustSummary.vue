@@ -45,7 +45,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
-          <v-col class="summary-text">
+          <v-col class="summary-text" id="registration-length">
             {{ lengthSummary }}
           </v-col>
         </v-row>
@@ -65,7 +65,7 @@
           <v-col cols="3" class="generic-label">
             Trust Indenture
           </v-col>
-          <v-col class="summary-text">
+          <v-col class="summary-text" id="trust-indenture-summary">
             {{ trustIndentureSummary }}
           </v-col>
         </v-row>
@@ -131,7 +131,6 @@ export default defineComponent({
     const lengthTrust: LengthTrustIF = getLengthTrust.value
     const router = context.root.$router
     const route = context.root.$route
-    const modal = false
 
     const localState = reactive({
       renewalView: props.isRenewal,
@@ -139,8 +138,6 @@ export default defineComponent({
       lifeInfinite: lengthTrust.valid
         ? lengthTrust.lifeInfinite.toString()
         : '',
-      lifeYearsEdit:
-        lengthTrust.lifeYears > 0 ? lengthTrust.lifeYears.toString() : '',
       surrenderDate: lengthTrust.surrenderDate,
       lienAmount: lengthTrust.lienAmount,
       showTrustIndenture: computed((): boolean => {
@@ -173,9 +170,9 @@ export default defineComponent({
             newExpDate.setDate(newExpDate.getDate() + 180)
             return convertDate(newExpDate, true, true)
           }
-          if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
+          if ((getRegistrationExpiryDate.value) && (lengthTrust.lifeYears > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
-            const numYears = parseInt(localState.lifeYearsEdit)
+            const numYears = lengthTrust.lifeYears
             const newExpDate = new Date(expiryDate)
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
             return convertDate(newExpDate, true, true)
@@ -256,7 +253,6 @@ export default defineComponent({
       lengthTrust,
       APIRegistrationTypes,
       registrationType,
-      modal,
       ...toRefs(localState)
     }
   }

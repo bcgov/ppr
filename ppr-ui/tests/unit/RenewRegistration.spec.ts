@@ -115,8 +115,16 @@ describe('Renew registration component', () => {
   })
 
   it('processes submit button action', async () => {
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 1,
+      showInvalid: false
+    })
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
   })
 })

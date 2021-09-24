@@ -30,6 +30,7 @@ export const stateModel: StateModelIF = {
     expiryDate: '',
     lengthTrust: {
       valid: false,
+      showInvalid: false,
       lifeYears: 0,
       lifeInfinite: false,
       trustIndenture: false,

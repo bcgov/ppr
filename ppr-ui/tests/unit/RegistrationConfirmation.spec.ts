@@ -55,7 +55,7 @@ describe('Registration Confirmation Dialog', () => {
         attach: '',
         display: true,
         options: dischargeOptions,
-        registrationNumber: 123
+        registrationNumber: '123'
       },
       vuetify
     })

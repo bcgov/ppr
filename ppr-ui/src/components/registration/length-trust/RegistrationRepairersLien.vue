@@ -197,10 +197,7 @@ export default defineComponent({
     const route = context.root.$route
     const modal = false
 
-    if (
-      registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
-      lengthTrust.lifeYears !== 1
-    ) {
+    if (props.isRenewal && (lengthTrust.lifeYears !== 1)) {
       lengthTrust.valid = true
       lengthTrust.lifeYears = 1
       setLengthTrust(lengthTrust)
