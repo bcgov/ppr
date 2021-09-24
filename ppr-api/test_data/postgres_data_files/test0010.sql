@@ -5,7 +5,7 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
-    VALUES(200000011, 200000000, 'TEST0010', 'TEST0001', 'SU', 'CHANGE', CURRENT_TIMESTAMP, 200000014, null,
+    VALUES(200000011, 200000000, 'TEST0010', 'TEST0001', 'SU', 'CHANGE', CURRENT_TIMESTAMP + interval '20 minutes', 200000014, null,
            null, null, 'PS12345', 'TEST-CH-0010', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)

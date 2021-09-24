@@ -216,7 +216,10 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.account_id = :query_account
+   AND (r.account_id = :query_account OR r.id IN (SELECT r2.id
+                                                    FROM user_extra_registrations uer, registrations r2
+                                                   WHERE uer.registration_number = r2.registration_number
+                                                     AND uer.account_id = :query_account))
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
@@ -256,7 +259,14 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
-   AND r.account_id = :query_account
+   AND fs.id IN (SELECT fs2.id
+                   FROM financing_statements fs2, registrations r2
+                  WHERE fs2.id = r2.financing_id
+                    AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+                    AND (r2.account_id = :query_account OR
+                         r2.registration_number IN (SELECT uer.registration_number
+                                                      FROM user_extra_registrations uer
+                                                     WHERE uer.account_id = :query_account)))
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
@@ -265,6 +275,54 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
 ORDER BY r.registration_ts DESC
 FETCH FIRST :max_results_size ROWS ONLY
+"""
+
+QUERY_ACCOUNT_ADD_REGISTRATION = """
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       CASE WHEN fs.life = 99 THEN -99
+            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
+       (SELECT MAX(r2.registration_ts)
+          FROM registrations r2
+         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    ELSE p.first_name || ' ' || p.last_name END
+          FROM parties p
+         WHERE p.registration_id = r.id
+           AND p.party_type = 'RG') AS registering_party,
+       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                ELSE p.first_name || ' ' || p.last_name END), ', ')
+          FROM parties p
+         WHERE p.financing_id = fs.id
+           AND p.registration_id_end IS NULL
+           AND p.party_type = 'SP') AS secured_party,
+       r.client_reference_id,
+       (SELECT CASE WHEN r.user_id IS NULL THEN ''
+                    ELSE (SELECT u.firstname || ' ' || u.lastname
+                            FROM users u
+                           WHERE u.username = r.user_id) END) AS registering_name,
+       r.account_id,
+       (SELECT COUNT(uer.id)
+          FROM user_extra_registrations uer
+         WHERE uer.account_id = :query_account
+           AND (uer.registration_number = :query_reg_num OR
+                uer.registration_number = r.registration_number)) AS exists_count
+  FROM registrations r, registration_types rt, financing_statements fs
+ WHERE r.registration_type = rt.registration_type
+   AND fs.id = r.financing_id
+   AND fs.id IN (SELECT fs2.id
+                   FROM financing_statements fs2, registrations r2
+                  WHERE fs2.id = r2.financing_id
+                    AND r2.registration_number = :query_reg_num)
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+ORDER BY r.registration_ts DESC
 """
 
 QUERY_ACCOUNT_DRAFTS = """
@@ -457,3 +515,13 @@ def is_historical(financing_statement):
         return True
 
     return False
+
+
+def is_financing(registration_class):
+    """Check if the registration is a financing registration for some conditions."""
+    return registration_class and registration_class in (REG_CLASS_CROWN, REG_CLASS_MISC, REG_CLASS_PPSA)
+
+
+def is_change(registration_class):
+    """Check if the registration is a change or amendment for some conditions."""
+    return registration_class and registration_class in (REG_CLASS_AMEND, REG_CLASS_AMEND_COURT, REG_CLASS_CHANGE)

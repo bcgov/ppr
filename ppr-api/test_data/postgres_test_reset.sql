@@ -35,4 +35,6 @@ DELETE FROM addresses
   WHERE id BETWEEN 99990001 AND 99990004;
 DELETE FROM users
   WHERE id >= 200000000;
+DELETE FROM user_extra_registrations
+  WHERE id >= 200000000;
 -- Delete test data end

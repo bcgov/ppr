@@ -289,6 +289,24 @@ TEST_GET_LIST = [
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True),
     ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False)
 ]
+# testdata pattern is ({description}, {roles}, {status}, {account_id}, {reg_num})
+TEST_USER_LIST = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019A'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019A'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0019A'),
+    ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
+    ('Already exists user', [PPR_ROLE], HTTPStatus.CONFLICT, 'PS12345', 'TEST0001'),
+    ('Already exists extra', [PPR_ROLE], HTTPStatus.CONFLICT, 'PS12345', 'TEST0019'),
+    ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019A')
+]
+# testdata pattern is ({description}, {roles}, {status}, {account_id}, {reg_num})
+TEST_USER_LIST_DELETE = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.NO_CONTENT, 'PS12345', 'TEST0019'),
+    ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
+    ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019')
+]
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num})
 TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
@@ -418,6 +436,43 @@ def test_get_account_registrations_list(session, client, jwt, desc, roles, statu
     # test
     response = client.get('/api/v1/financing-statements/registrations',
                           headers=headers)
+
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST)
+def test_account_add_registration(session, client, jwt, desc, roles, status, account_id, reg_num):
+    """Assert that a request to add a registration to the user list works as expected."""
+    headers = None
+    # setup
+    if account_id:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.post('/api/v1/financing-statements/registrations/' + reg_num,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST_DELETE)
+def test_account_delete_registration(session, client, jwt, desc, roles, status, account_id, reg_num):
+    """Assert that a request to delete a registration from the user list works as expected."""
+    headers = None
+    # setup
+    if account_id:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.delete('/api/v1/financing-statements/registrations/' + reg_num,
+                             headers=headers)
 
     # check
     assert response.status_code == status

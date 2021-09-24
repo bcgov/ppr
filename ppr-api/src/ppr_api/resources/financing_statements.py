@@ -22,7 +22,7 @@ from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import FinancingStatement, Registration
+from ppr_api.models import FinancingStatement, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.resources import utils as resource_utils
@@ -44,6 +44,7 @@ VAL_ERROR_DISCHARGE = 'Discharge Statement request data validation errors.'  # D
 SAVE_ERROR_MESSAGE = 'Account {0} create {1} statement db save failed: {2}'
 PAY_REFUND_MESSAGE = 'Account {0} create {1} statement refunding payment for invoice {2}.'
 PAY_REFUND_ERROR = 'Account {0} create {1} statement payment refund failed for invoice {2}: {3}.'
+DUPLICATE_REGISTRATION_ERROR = 'Registration {0} is already available to the account.'
 # Payment detail/transaction description by registration.
 REG_CLASS_TO_STATEMENT_TYPE = {
     'AMENDMENT': 'Register an Amendment Statement',
@@ -707,6 +708,85 @@ class GetRegistrationResource(Resource):
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('DELETE,POST,OPTIONS')
+@API.route('/registrations/<path:registration_num>', methods=['DELETE', 'POST', 'OPTIONS'])
+class AccountRegistrationResource(Resource):
+    """Resource to maintain user account additional Financing Statements by registration number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def post(registration_num):
+        """Add a financing statement by registration number to the user registrations list."""
+        try:
+            if registration_num is None:
+                return resource_utils.path_param_error_response('registration number')
+
+            # Quick check: must provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch summary registration by registration number
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num)
+            if registration is None:
+                return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
+            # Check if duplicate.
+            if registration['accountId'] == account_id or registration['existsCount'] > 0:
+                return resource_utils.duplicate_error_response(DUPLICATE_REGISTRATION_ERROR.format(registration_num))
+
+            # Future: check if restricted access for crown charges.
+            if registration['registrationClass'] == model_utils.REG_CLASS_CROWN:
+                current_app.logger.info('Check restricted access when available.')
+
+            # Save the base registration: request may be a change registration number.
+            base_reg_num = registration['baseRegistrationNumber']
+            del registration['accountId']
+            del registration['existsCount']
+            extra_registration = UserExtraRegistration(account_id=account_id, registration_number=base_reg_num)
+            extra_registration.save()
+
+            return registration, HTTPStatus.CREATED
+
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def delete(registration_num):
+        """Delete a financing statement by registration number from the user registrations list."""
+        try:
+            if registration_num is None:
+                return resource_utils.path_param_error_response('registration number')
+
+            # Quick check: must provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try and get existing record
+            extra_registration = UserExtraRegistration.find_by_registration_number(registration_num, account_id)
+            if extra_registration is None:
+                return resource_utils.not_found_error_response('user account registration', registration_num)
+
+            # Delete.
+            UserExtraRegistration.delete(registration_num, account_id)
+
+            return '', HTTPStatus.NO_CONTENT
+
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
