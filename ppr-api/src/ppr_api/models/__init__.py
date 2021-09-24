@@ -40,6 +40,7 @@ from .type_tables import (
     StateType,
 )
 from .user import User
+from .user_extra_registration import UserExtraRegistration
 from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
 
@@ -48,4 +49,5 @@ __all__ = ('db',
            'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft', 'FinancingStatement',
            'GeneralCollateral', 'GeneralCollateralLegacy', 'Party', 'PartyType', 'PreviousFinancingStatement',
            'ProvinceType', 'Registration', 'RegistrationType', 'RegistrationTypeClass', 'SearchRequest', 'SearchResult',
-           'SearchType', 'StateType', 'SerialType', 'TrustIndenture', 'User', 'UserProfile', 'VehicleCollateral')
+           'SearchType', 'StateType', 'SerialType', 'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile',
+           'VehicleCollateral')

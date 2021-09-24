@@ -84,6 +84,12 @@ def not_found_error_response(item, key):
     return jsonify({'message': message}), HTTPStatus.NOT_FOUND
 
 
+def duplicate_error_response(message):
+    """Build a duplicate request error response."""
+    current_app.logger.info(str(HTTPStatus.CONFLICT.value) + ': ' + message)
+    return jsonify({'message': message}), HTTPStatus.CONFLICT
+
+
 def unauthorized_error_response(account_id):
     """Build an unauthorized error response."""
     message = f'Authorization failure submitting a request for {account_id}.'

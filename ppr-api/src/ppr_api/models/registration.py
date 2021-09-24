@@ -106,7 +106,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                                  default=db.func.get_registration_num())
     base_registration_num = db.Column('base_reg_number', db.String(10), nullable=True, index=True)
     account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
+    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
     life = db.Column('life', db.Integer, nullable=True)
     lien_value = db.Column('lien_value', db.String(15), nullable=True)
     surrender_date = db.Column('surrender_date', db.DateTime, nullable=True)
@@ -419,19 +419,19 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         'registeringName': registering_name
                     }
                     reg_class = result['registrationClass']
-                    if reg_class in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
+                    if model_utils.is_financing(reg_class):
                         result['baseRegistrationNumber'] = reg_num
                         result['path'] = FINANCING_PATH + reg_num
-                    elif reg_class == 'DISCHARGE':
+                    elif reg_class == model_utils.REG_CLASS_DISCHARGE:
                         result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
-                    elif reg_class == 'RENEWAL':
+                    elif reg_class == model_utils.REG_CLASS_RENEWAL:
                         result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
-                    elif reg_class == 'CHANGE':
+                    elif reg_class == model_utils.REG_CLASS_CHANGE:
                         result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
-                    else:
+                    elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                         result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
-                    if collapse and reg_class not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN'):
+                    if collapse and not model_utils.is_financing(reg_class):
                         registrations_json.append(result)
                     else:
                         results_json.append(result)
@@ -439,6 +439,61 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     return Registration.build_account_collapsed_json(results_json, registrations_json)
 
         return results_json
+
+    @classmethod
+    def find_summary_by_reg_num(cls, account_id: str, registration_num: str):
+        """Return a single registration summary by registration_number."""
+        result = None
+        changes = []
+        if account_id is None or registration_num is None:
+            return result
+
+        results = db.session.execute(model_utils.QUERY_ACCOUNT_ADD_REGISTRATION,
+                                     {'query_account': account_id, 'query_reg_num': registration_num})
+        rows = results.fetchall()
+        if rows is not None:
+            for row in rows:
+                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                reg_num = str(mapping['registration_number'])
+                base_reg_num = str(mapping['base_reg_number'])
+                registering_name = str(mapping['registering_name'])
+                if not registering_name:
+                    registering_name = ''
+                reg_class = str(mapping['registration_type_cl'])
+                result = {
+                    'registrationNumber': reg_num,
+                    'baseRegistrationNumber': base_reg_num,
+                    'createDateTime': model_utils.format_ts(mapping['registration_ts']),
+                    'registrationType': str(mapping['registration_type']),
+                    'registrationDescription': str(mapping['registration_desc']),
+                    'registrationClass': reg_class,
+                    'registeringParty': str(mapping['registering_party']),
+                    'securedParties': str(mapping['secured_party']),
+                    'clientReferenceId': str(mapping['client_reference_id']),
+                    'registeringName': registering_name
+                }
+                if model_utils.is_financing(reg_class):
+                    result['baseRegistrationNumber'] = reg_num
+                    result['path'] = FINANCING_PATH + reg_num
+                    result['statusType'] = str(mapping['state'])
+                    result['expireDays'] = int(mapping['expire_days'])
+                    result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
+                    result['existsCount'] = int(mapping['exists_count'])
+                    result['accountId'] = str(mapping['account_id'])
+                elif reg_class == model_utils.REG_CLASS_DISCHARGE:
+                    result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
+                elif reg_class == model_utils.REG_CLASS_RENEWAL:
+                    result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
+                elif reg_class == model_utils.REG_CLASS_CHANGE:
+                    result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
+                elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+                    result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
+
+                if not model_utils.is_financing(reg_class):
+                    changes.append(result)
+        if result and changes:
+            result['changes'] = changes
+        return result
 
     @staticmethod
     def build_account_collapsed_json(financing_json, registrations_json):

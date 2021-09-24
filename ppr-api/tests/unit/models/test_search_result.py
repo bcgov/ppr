@@ -197,7 +197,7 @@ def test_search_history_sort(session, client, jwt):
     # print(details_json)
     history = result[0]['financingStatement']['changes']
     assert len(history) == 4
-    assert history[0]['changeRegistrationNumber'] == 'TEST0009'
-    assert history[1]['changeRegistrationNumber'] == 'TEST0008'
-    assert history[2]['amendmentRegistrationNumber'] == 'TEST0007'
-    assert history[3]['changeRegistrationNumber'] == 'TEST0010'
+    assert history[0]['changeRegistrationNumber'] == 'TEST0010'
+    assert history[1]['changeRegistrationNumber'] == 'TEST0009'
+    assert history[2]['changeRegistrationNumber'] == 'TEST0008'
+    assert history[3]['amendmentRegistrationNumber'] == 'TEST0007'

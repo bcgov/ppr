@@ -53,7 +53,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     search_criteria = db.Column('api_criteria', db.JSON, nullable=False)
     search_response = db.Column('search_response', db.JSON, nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
-    client_reference_id = db.Column('client_reference_id', db.String(20), nullable=True)
+    client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
     total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
     returned_results_size = db.Column('returned_results_size', db.Integer, nullable=True)
     user_id = db.Column('user_id', db.String(1000), nullable=True)

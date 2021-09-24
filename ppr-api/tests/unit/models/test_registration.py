@@ -47,10 +47,16 @@ TEST_REGISTRATION_NUMBER_DATA = [
     ('Mismatch registration numbers staff', 'TEST00R5', 'PS12345', HTTPStatus.OK, True, 'TEST0001'),
     ('Discharged staff', 'TEST0D14', 'PS12345', HTTPStatus.OK, True, 'TEST0014')
 ]
-# testdata pattern is ({description}, {account ID}, {collapse results})
+# testdata pattern is ({description}, {account ID}, {collapse results}, {user_added_reg_num})
 TEST_ACCOUNT_REGISTRATION_DATA = [
-    ('Default registration format', 'PS12345', False),
-    ('Collapsed parent/child registration format', 'PS12345', True)
+    ('Default registration format', 'PS12345', False, 'TEST0019'),
+    ('Collapsed parent/child registration format', 'PS12345', True, 'TEST0019')
+]
+# testdata pattern is ({reg_num}, {account ID}, {result_count}, {exist_count}, {change_count})
+TEST_ACCOUNT_ADD_REGISTRATION_DATA = [
+    ('TEST0018', 'PS12345', 1, 0, 3),
+    ('TEST0019', 'PS12345', 1, 1, 0),
+    ('TESXXXXX', 'PS12345', 0, 1, 0)
 ]
 # testdata pattern is ({reg_type}, {life}, {life_infinite}, {expected_life})
 TEST_LIFE_EXPIRY_DATA = [
@@ -193,13 +199,16 @@ def test_find_by_id_cs_su(session):
     assert 'deleteSecuredParties' not in json_data
 
 
-@pytest.mark.parametrize('desc,account_id,collapse', TEST_ACCOUNT_REGISTRATION_DATA)
-def test_find_all_by_account_id(session, desc, account_id, collapse):
+@pytest.mark.parametrize('desc,account_id,collapse,user_added_reg_num', TEST_ACCOUNT_REGISTRATION_DATA)
+def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_reg_num):
     """Assert that the financing statement summary list by account id first item contains all expected elements."""
     statement_list = Registration.find_all_by_account_id(account_id, collapse)
+    found_added: bool = False
 
     assert statement_list
     for statement in statement_list:
+        if statement['registrationNumber'] == user_added_reg_num:
+            found_added = True
         assert statement['registrationNumber']
         assert statement['registrationType']
         assert statement['registrationClass']
@@ -217,6 +226,7 @@ def test_find_all_by_account_id(session, desc, account_id, collapse):
             assert statement['securedParties']
         if not collapse:
             assert 'changes' not in statement
+    assert found_added
 
 
 def test_find_all_by_account_id_no_result(session):
@@ -224,6 +234,37 @@ def test_find_all_by_account_id_no_result(session):
     statement_list = Registration.find_all_by_account_id('XXXXX45')
 
     assert len(statement_list) == 0
+
+
+@pytest.mark.parametrize('reg_num,account_id,result_count,exist_count,change_count', TEST_ACCOUNT_ADD_REGISTRATION_DATA)
+def test_find_summary_by_reg_num(session, reg_num, account_id, result_count, exist_count, change_count):
+    """Assert that the add to account registration list item contains all expected elements."""
+    registration = Registration.find_summary_by_reg_num(account_id, reg_num)
+    if result_count < 1:
+        assert not registration
+    else:
+        assert registration
+        assert registration['registrationNumber'] == reg_num
+        assert registration['registrationType'] == 'SA'
+        assert registration['registrationClass'] == 'PPSALIEN'
+        assert registration['registrationDescription']
+        assert registration['statusType'] == 'ACT'
+        assert registration['createDateTime']
+        assert registration['lastUpdateDateTime']
+        assert registration['registeringName']
+        assert registration['path']
+        assert registration['expireDays']
+        assert registration['registeringParty']
+        assert registration['securedParties']
+        assert registration['baseRegistrationNumber'] == reg_num
+        assert registration['accountId']
+        assert registration['existsCount'] == exist_count
+        if change_count == 0:
+            assert 'changes' not in registration
+        else:
+            assert len(registration['changes']) == change_count
+            for change in registration['changes']:
+                assert change['baseRegistrationNumber'] == reg_num
 
 
 @pytest.mark.parametrize('desc,reg_number,account_id,status,staff,base_reg_number', TEST_REGISTRATION_NUMBER_DATA)
