@@ -234,7 +234,7 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
       expect(wrapper.vm.$data.registrationType).toBe(renewRegistrationTypes[i])
       expect(wrapper.vm.$data.feeLabel).toBe('Registration Renewal')
-      
+
       if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
         expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
@@ -298,4 +298,24 @@ describe('FeeSummary component tests', () => {
     }
   })
 
+  it('renders with correct values for amendments', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    for (let i = 0; i < newRegistrationTypes.length; i++) {
+      await wrapper.setProps({
+        setFeeType: FeeSummaryTypes.AMEND,
+        setRegistrationLength: null,
+        setRegistrationType: newRegistrationTypes[i]
+      })
+      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.AMEND)
+      expect(wrapper.vm.$data.registrationType).toBe(newRegistrationTypes[i])
+      expect(wrapper.vm.$data.feeLabel).toBe('Registration Amendment')
+      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+      expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+      expect(wrapper.vm.$data.totalFees).toBe(10)
+      expect(wrapper.vm.$data.totalAmount).toBe(11.5)
+      expect(wrapper.vm.$data.isComplete).toBe(true)
+      expect(wrapper.vm.$data.hintFee).toBe('')
+    }
+  })
 })

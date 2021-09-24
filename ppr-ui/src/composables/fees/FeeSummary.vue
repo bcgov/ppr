@@ -104,6 +104,8 @@ export default defineComponent({
           return 'Total Discharge'
         } else if (localState.feeType === FeeSummaryTypes.RENEW) {
           return 'Registration Renewal'
+        } else if (localState.feeType === FeeSummaryTypes.AMEND) {
+          return 'Registration Amendment'
         } else {
           return localState.registrationType
         }
