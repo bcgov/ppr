@@ -1,7 +1,7 @@
 <template>
   <v-container class="view-container px-15 py-0" fluid style="background-color: white;">
     <div class="container pa-0" style="padding: 29px 0 !important;">
-      <tombstone-discharge v-if="displayDischarge || displayRenewal" />
+      <tombstone-discharge v-if="displayDischarge || displayRenewal || displayAmendment" />
       <tombstone-default v-else />
     </div>
   </v-container>
@@ -33,6 +33,9 @@ export default defineComponent({
       }),
       displayRenewal: computed((): boolean => {
         return localState.currentPath.includes('renew')
+      }),
+      displayAmendment: computed((): boolean => {
+        return localState.currentPath.includes('amend')
       })
     })
 
