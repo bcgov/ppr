@@ -199,11 +199,28 @@ export const mockedDebtorsAmendment: PartyIF[] = [
   }
 ]
 
-export const mockedNewRegStep1: LengthTrustIF = {
+export const mockedLengthTrust1: LengthTrustIF = {
   valid: false,
   lifeYears: 5,
   lifeInfinite: false,
   trustIndenture: true
+}
+
+export const mockedLengthTrust2: LengthTrustIF = {
+  valid: true,
+  lifeYears: null,
+  lifeInfinite: true,
+  trustIndenture: false
+}
+
+export const mockedLengthTrust3: LengthTrustIF = {
+  valid: true,
+  trustIndenture: false,
+  lifeInfinite: false,
+  lifeYears: 0,
+  showInvalid: false,
+  surrenderDate: '2021-01-21',
+  lienAmount: '1000.00'
 }
 
 export const mockedNewRegStep2: AddPartiesIF = {

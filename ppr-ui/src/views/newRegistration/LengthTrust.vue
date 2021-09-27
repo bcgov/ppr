@@ -26,9 +26,8 @@
             </v-row>
             <v-row no-gutters>
               <v-col>
-                <registration-length-trust
-                  :defaultRegistrationType="registrationType"
-                />
+                <registration-length-trust v-if="registrationType !== registrationTypeRL" />
+                <registration-repairers-lien v-else />
               </v-col>
             </v-row>
           </v-col>
@@ -75,12 +74,13 @@ import {
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 // local components
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 
 @Component({
   components: {
     ButtonFooter,
     RegistrationLengthTrust,
+    RegistrationRepairersLien,
     Stepper,
     StickyContainer
   }
