@@ -65,10 +65,16 @@ import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
-import { APIRegistrationTypes, RouteNames, UIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import {
+  APIRegistrationTypes, // eslint-disable-line no-unused-vars
+  RouteNames, // eslint-disable-line no-unused-vars
+  RegistrationFlowType, // eslint-disable-line no-unused-vars
+  UIRegistrationTypes // eslint-disable-line no-unused-vars
+} from '@/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, AddCollateralIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationTypes } from '@/resources'
@@ -89,6 +95,7 @@ import { StatusCodes } from 'http-status-codes'
   }
 })
 export default class ReviewRegistration extends Vue {
+  @Getter getConfirmDebtorName: DebtorNameIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getLengthTrust: LengthTrustIF
 
@@ -150,8 +157,12 @@ export default class ReviewRegistration extends Vue {
   }
 
   private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber) {
-      console.error('No registration number given to renew. Redirecting to dashboard...')
+    if (!this.registrationNumber || !this.getConfirmDebtorName) {
+      if (!this.registrationNumber) {
+        console.error('No registration number given to discharge. Redirecting to dashboard...')
+      } else {
+        console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+      }
       this.$router.push({
         name: RouteNames.DASHBOARD
       })

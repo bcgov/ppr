@@ -18,15 +18,6 @@
       </div>
     </transition>
 
-    <!-- sbc-header
-        class="sbc-header"
-        :in-auth="false"
-        :redirect-on-login-success="baseUrl"
-        :redirect-url-login-fail="loginURL"
-        :redirect-on-logout="loginURL"
-        :show-actions="true"
-      / -->
-
     <sbc-header
         class="sbc-header"
         :in-auth="false"
@@ -148,34 +139,12 @@ export default class App extends Mixins(AuthMixin) {
   /** Whether the token refresh service is initialized. */
   private tokenService: boolean = false
 
-  /** The base URL that auth will redirect to. */
-  private get baseUrl (): string {
-    return sessionStorage.getItem('BASE_URL')
-  }
-
-  private get dashboardURL (): string {
-    return window.location.origin + '/dashboard'
-  }
-
-  /** The login URL. */
-  private get loginURL (): string {
-    // if AUTH_URL does not exist this will return 'undefined'. Needs to be null or str
-    const url = sessionStorage.getItem('AUTH_WEB_URL')
-    if (url) return url
-    return null
-  }
-
   /** The registry URL. */
   private get registryUrl (): string {
     // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
     const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')
     if (configRegistryUrl) return configRegistryUrl
     return null
-  }
-
-  /** The URL of the Pay API. */
-  private get payApiUrl (): string {
-    return sessionStorage.getItem('PAY_API_URL')
   }
 
   /** True if an error dialog is displayed. */
