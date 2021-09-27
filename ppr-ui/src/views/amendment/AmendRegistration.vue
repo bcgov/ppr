@@ -109,7 +109,7 @@ export default class AmendRegistration extends Vue {
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Amendment Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
-  private feeType = FeeSummaryTypes.AMMEND
+  private feeType = FeeSummaryTypes.AMEND
   private financingStatementDate: Date = null
 
   private get asOfDateTime (): string {

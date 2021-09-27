@@ -2,6 +2,11 @@ import { FeeSummaryDefaults } from '../enums'
 import { FeeSummaryI } from '../interfaces'
 
 export const defaultFeeSummaries = {
+  [FeeSummaryDefaults.AMEND]: {
+    feeAmount: 10,
+    quantity: 1,
+    serviceFee: 1.5
+  } as FeeSummaryI,
   [FeeSummaryDefaults.NO_FEE]: {
     feeAmount: 0,
     quantity: 1,

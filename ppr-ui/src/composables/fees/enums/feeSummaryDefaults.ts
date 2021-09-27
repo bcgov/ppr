@@ -1,4 +1,5 @@
 export enum FeeSummaryDefaults {
+  AMEND = 'feeDefaultAmend',
   NO_FEE = 'feeDefaultNoFee',
   DEFAULT_5 = 'feeDefault5',
   DEFAULT_10 = 'feeDefault10',

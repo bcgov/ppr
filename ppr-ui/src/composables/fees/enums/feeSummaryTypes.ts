@@ -1,5 +1,5 @@
 export enum FeeSummaryTypes {
-  AMMEND = 'ammend',
+  AMEND = 'amend',
   DISCHARGE = 'discharge',
   NEW = 'new',
   RENEW = 'renew'
