@@ -141,7 +141,7 @@ export default class ReviewConfirm extends Vue {
   private feeType = FeeSummaryTypes.NEW
   private showStepErrors: boolean = false
   private statementType = StatementTypes.FINANCING_STATEMENT
-  private stepName = RouteNames.ADD_COLLATERAL
+  private stepName = RouteNames.REVIEW_CONFIRM
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
