@@ -11,7 +11,11 @@
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt"/>
-          <registration-length-trust class="mt-15" :isSummary="true" :defaultRegistrationType="registrationType" />
+          <registration-length-trust
+            class="mt-15"
+            :isSummary="true"
+            @setRegistrationLengthTrustValid="registrationLengthTrustValid = $event"
+          />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -26,10 +30,10 @@
           <h3 class="pt-6 px-1">Original Registering Party</h3>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6 px-1">Secured Parties</h3>
-          <secured-parties class="pt-4" />
+          <secured-parties @setSecuredPartiesValid="securedPartiesValid = $event" class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
-          <debtors />
-          <collateral :setRegistrationType="registrationType" class="mt-15" />
+          <debtors @setDebtorValid="debtorValid = $event" />
+          <collateral :setRegistrationType="registrationType" @setCollateralValid="collateralValid = $event" class="mt-15" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -111,6 +115,10 @@ export default class AmendRegistration extends Vue {
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private feeType = FeeSummaryTypes.AMMEND
   private financingStatementDate: Date = null
+  private debtorValid = true
+  private securedPartiesValid = true
+  private registrationLengthTrustValid = true
+  private collateralValid = true
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -195,11 +203,14 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
-    this.$router.push({
-      name: RouteNames.CONFIRM_DISCHARGE,
-      query: { 'reg-num': this.registrationNumber }
-    })
-    this.emitHaveData(false)
+    if (this.debtorValid && this.securedPartiesValid && this.registrationLengthTrustValid && this.collateralValid) {
+      // TODO: change route name
+      this.$router.push({
+        name: RouteNames.CONFIRM_DISCHARGE,
+        query: { 'reg-num': this.registrationNumber }
+      })
+      this.emitHaveData(false)
+      }
   }
 
   private goToDashboard (): void {
