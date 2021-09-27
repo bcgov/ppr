@@ -116,7 +116,7 @@ describe('Sticky Container component tests', () => {
     await wrapper.setProps({
       setRegistrationLength: newRegistrationLength
     })
-    
+
     expect(wrapper.vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
     expect(wrapper.vm.$data.registrationLength).toEqual(newRegistrationLength)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
@@ -177,7 +177,6 @@ describe('Sticky Container component tests', () => {
       'submit' // submit btn
     )
     await flushPromises()
-
 
     await wrapper.findComponent(ButtonsStacked).vm.$emit('back')
     expect(getLastEvent(wrapper, 'back')).toBe(true)

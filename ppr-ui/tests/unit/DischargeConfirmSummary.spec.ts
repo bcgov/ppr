@@ -50,7 +50,7 @@ function createComponent (
       setRegNum: setRegNum,
       setRegType: setRegType,
       setCollateralSummary: setCollateralSummary,
-      setShowErrors: setShowErrors,
+      setShowErrors: setShowErrors
     },
     store,
     vuetify
@@ -152,6 +152,8 @@ describe('Discharge confirm summary component tests', () => {
     await flushPromises()
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(2)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(1)
-    expect(wrapper.findAll(checkboxTxtError).at(0).text()).toContain('all collateral on this registration will be released.')
+    expect(wrapper.findAll(checkboxTxtError).at(0).text()).toContain(
+      'all collateral on this registration will be released.'
+    )
   })
 })

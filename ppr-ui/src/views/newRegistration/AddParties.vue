@@ -95,7 +95,7 @@ export default class AddParties extends Vue {
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
   private statementType = StatementTypes.FINANCING_STATEMENT
-  private stepName = RouteNames.LENGTH_TRUST
+  private stepName = RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))

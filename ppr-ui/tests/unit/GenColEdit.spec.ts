@@ -21,7 +21,6 @@ const newDescriptionTxt = '#general-collateral-new-desc'
 const errorMsg = '.v-messages__message'
 const showError = '.invalid-message'
 
-
 /**
  * Creates and mounts a component, so that it can be tested.
  *

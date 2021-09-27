@@ -79,7 +79,7 @@ describe('Renew registration component', () => {
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
-    //should start off null
+    // should start off null
     expect(state.registration.lengthTrust.lifeYears).toBe(null)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)

@@ -25,7 +25,7 @@ import { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 // unit test helpers/data
 import mockRouter from './MockRouter'
-import { mockedLengthTrust1, mockedSelectSecurityAgreement } from './test-data'
+import { mockedSelectSecurityAgreement } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -99,7 +99,9 @@ describe('Review Confirm new registration component', () => {
       lifeInfinite: false,
       lifeYears: 0
     })
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      UIRegistrationTypes.SECURITY_AGREEMENT
+    )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
@@ -152,20 +154,27 @@ describe('Review Confirm new registration component', () => {
     jest.setTimeout(30000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
-      if (!RegistrationTypes[i].registrationTypeUI || RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER) {
+      if (
+        !RegistrationTypes[i].registrationTypeUI ||
+        RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
+      ) {
         continue
       }
       await store.dispatch('setRegistrationType', RegistrationTypes[i])
       await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
-      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(RegistrationTypes[i].registrationTypeUI)
+      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+        RegistrationTypes[i].registrationTypeUI
+      )
       // header
       expect(wrapper.find(header).text()).toContain(RegistrationTypes[i].registrationTypeUI)
       // title
       expect(wrapper.find(title).text()).toContain('Review and Confirm')
       // message
-      expect(wrapper.find(titleInfo).text()).toContain('Review the information in your registration. If you need to change')
+      expect(wrapper.find(titleInfo).text()).toContain(
+        'Review the information in your registration. If you need to change'
+      )
       wrapper.destroy()
     }
   })

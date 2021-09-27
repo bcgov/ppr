@@ -73,7 +73,7 @@ describe('Length and Trust Indenture new registration component', () => {
   })
 
   afterEach(() => {
-    wrapper?.destroy()
+    wrapper?.destroy() // eslint-disable-line no-unused-expressions
   })
 
   it('redirects to dashboard when store is not set', () => {
@@ -98,7 +98,9 @@ describe('Length and Trust Indenture new registration component', () => {
       lifeInfinite: false,
       lifeYears: 0
     })
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      UIRegistrationTypes.SECURITY_AGREEMENT
+    )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
@@ -146,14 +148,19 @@ describe('Length and Trust Indenture new registration component', () => {
     jest.setTimeout(30000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
-      if (!RegistrationTypes[i].registrationTypeUI || RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER) {
+      if (
+        !RegistrationTypes[i].registrationTypeUI ||
+        RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
+      ) {
         continue
       }
       await store.dispatch('setRegistrationType', RegistrationTypes[i])
       await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
-      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(RegistrationTypes[i].registrationTypeUI)
+      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+        RegistrationTypes[i].registrationTypeUI
+      )
       // header
       expect(wrapper.find(header).text()).toContain(RegistrationTypes[i].registrationTypeUI)
       // title
@@ -195,7 +202,9 @@ describe('Length and Trust Indenture new registration component', () => {
       } else if (infiniteDefaultFree.includes(RegistrationTypes[i].registrationTypeAPI)) {
         expect(wrapper.find(titleInfo).text()).toContain('infinite. There is no fee for this registration.')
       } else {
-        expect(wrapper.find(titleInfo).text()).toContain('Enter the length of time you want the ' + RegistrationTypes[i].registrationTypeUI)
+        expect(wrapper.find(titleInfo).text()).toContain(
+          'Enter the length of time you want the ' + RegistrationTypes[i].registrationTypeUI
+        )
       }
 
       wrapper.destroy()

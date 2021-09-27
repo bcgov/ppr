@@ -97,11 +97,15 @@ describe('Add Parties new registration component', () => {
       lifeInfinite: false,
       lifeYears: 0
     })
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      UIRegistrationTypes.SECURITY_AGREEMENT
+    )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
-    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(
+      RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
+    )
     expect(wrapper.findComponent(Parties).exists()).toBe(true)
     expect(wrapper.find(header).exists()).toBe(true)
     expect(wrapper.find(title).exists()).toBe(true)
@@ -145,20 +149,27 @@ describe('Add Parties new registration component', () => {
     jest.setTimeout(30000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
-      if (!RegistrationTypes[i].registrationTypeUI || RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER) {
+      if (
+        !RegistrationTypes[i].registrationTypeUI ||
+        RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
+      ) {
         continue
       }
       await store.dispatch('setRegistrationType', RegistrationTypes[i])
       await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
-      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(RegistrationTypes[i].registrationTypeUI)
+      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+        RegistrationTypes[i].registrationTypeUI
+      )
       // header
       expect(wrapper.find(header).text()).toContain(RegistrationTypes[i].registrationTypeUI)
       // title
       expect(wrapper.find(title).text()).toContain('Add Secured Parties and Debtors')
       // message
-      expect(wrapper.find(titleInfo).text()).toContain('Add the people and businesses who have an interest in this registration.')
+      expect(wrapper.find(titleInfo).text()).toContain(
+        'Add the people and businesses who have an interest in this registration.'
+      )
       wrapper.destroy()
     }
   })

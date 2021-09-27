@@ -91,7 +91,7 @@ export default class AddCollateral extends Vue {
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
   private statementType = StatementTypes.FINANCING_STATEMENT
-  private stepName = RouteNames.LENGTH_TRUST
+  private stepName = RouteNames.ADD_COLLATERAL
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
