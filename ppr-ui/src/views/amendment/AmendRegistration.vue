@@ -32,7 +32,7 @@
           <h3 class="pt-6 px-1">Secured Parties</h3>
           <secured-parties @setSecuredPartiesValid="securedPartiesValid = $event" class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
-          <debtors @setDebtorValid="debtorValid = $event" />
+          <debtors @setDebtorValid="debtorValid = $event" :setShowInvalid="showDebtorInvalid" />
           <collateral
             :setRegistrationType="registrationType"
             @setCollateralValid="collateralValid = $event"
@@ -99,6 +99,7 @@ import { StatusCodes } from 'http-status-codes'
 })
 export default class AmendRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -125,6 +126,7 @@ export default class AmendRegistration extends Vue {
   private feeType = FeeSummaryTypes.AMMEND
   private financingStatementDate: Date = null
   private debtorValid = true
+  private showDebtorInvalid = false
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
@@ -219,6 +221,8 @@ export default class AmendRegistration extends Vue {
         query: { 'reg-num': this.registrationNumber }
       })
       this.emitHaveData(false)
+    } else {
+      this.showDebtorInvalid = true
     }
   }
 
