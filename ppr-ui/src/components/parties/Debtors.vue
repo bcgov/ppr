@@ -272,7 +272,7 @@ export default defineComponent({
         currentParties.valid = isPartiesValid(currentParties)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
-      // setValid()
+      emitDebtorValidity()
     }
 
     const initEdit = (index: number) => {
@@ -295,11 +295,29 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
+      emitDebtorValidity()
     }
 
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
       localState.debtors.splice(index, 1, originalParties.debtors[index])
+      emitDebtorValidity()
+    }
+
+    const emitDebtorValidity = (): void => {
+      if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+        for (let i = 0; i < localState.debtors.length; i++) {
+          // is valid if there is at least one debtor
+          if (localState.debtors[i].action !== ActionTypes.REMOVED) {
+            emit('setDebtorValid', true)
+          }
+        }
+      } else {
+        if (localState.debtors.length > 0) {
+          emit('setDebtorValid', true)
+        }
+      }
+      emit('setDebtorValid', false)
     }
 
     return {

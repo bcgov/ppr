@@ -33,7 +33,11 @@
           <secured-parties @setSecuredPartiesValid="securedPartiesValid = $event" class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtors @setDebtorValid="debtorValid = $event" />
-          <collateral :setRegistrationType="registrationType" @setCollateralValid="collateralValid = $event" class="mt-15" />
+          <collateral
+            :setRegistrationType="registrationType"
+            @setCollateralValid="collateralValid = $event"
+            class="mt-15"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -66,7 +70,12 @@ import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
-import { APIRegistrationTypes, RouteNames, UIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import {
+  APIRegistrationTypes, // eslint-disable-line no-unused-vars
+  RouteNames, // eslint-disable-line no-unused-vars
+  UIRegistrationTypes, // eslint-disable-line no-unused-vars
+  RegistrationFlowType // eslint-disable-line no-unused-vars
+} from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
@@ -210,7 +219,7 @@ export default class AmendRegistration extends Vue {
         query: { 'reg-num': this.registrationNumber }
       })
       this.emitHaveData(false)
-      }
+    }
   }
 
   private goToDashboard (): void {
