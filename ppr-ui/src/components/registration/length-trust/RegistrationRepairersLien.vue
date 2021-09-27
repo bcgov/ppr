@@ -20,7 +20,7 @@
         <v-row no-gutters>
           <v-col cols="3" class="generic-label"> {{ regTitle }} Length </v-col>
           <v-col class="summary-text">
-            {{ lengthSummary }}
+            180 Days
           </v-col>
         </v-row>
         <v-row no-gutters class="py-6">
@@ -169,14 +169,15 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
-import { APIRegistrationTypes, RouteNames } from '@/enums'
+import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -192,48 +193,39 @@ export default defineComponent({
       'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
-    const lengthTrust: LengthTrustIF = getLengthTrust.value
-    const router = context.root.$router
-    const route = context.root.$route
     const modal = false
-
-    if (props.isRenewal && (lengthTrust.lifeYears !== 1)) {
-      lengthTrust.valid = true
-      lengthTrust.lifeYears = 1
-      setLengthTrust(lengthTrust)
-    }
 
     const localState = reactive({
       renewalView: props.isRenewal,
       trustIndentureHint: '',
-      surrenderDate: lengthTrust.surrenderDate,
-      lienAmount: lengthTrust.lienAmount,
+      surrenderDate: getLengthTrust.value.surrenderDate,
+      lienAmount: getLengthTrust.value.lienAmount,
       showErrorSummary: computed((): boolean => {
-        return !lengthTrust.valid
+        return !getLengthTrust.value.valid
       }),
       showErrorLienAmount: computed((): boolean => {
         if (
-          lengthTrust.lienAmount !== '' &&
+          getLengthTrust.value.lienAmount !== '' &&
           localState.lienAmountMessage?.length > 0
         ) {
           return true
         }
-        return lengthTrust.showInvalid && lengthTrust.lienAmount === ''
+        return getLengthTrust.value.showInvalid && getLengthTrust.value.lienAmount === ''
       }),
       showErrorSurrenderDate: computed((): boolean => {
-        return lengthTrust.showInvalid && lengthTrust.surrenderDate === ''
+        return getLengthTrust.value.showInvalid && getLengthTrust.value.surrenderDate === ''
       }),
       lienAmountMessage: computed((): string => {
-        if (lengthTrust.showInvalid && lengthTrust.lienAmount === '') {
+        if (getLengthTrust.value.showInvalid && getLengthTrust.value.lienAmount === '') {
           return 'This field is required'
         }
-        if (lengthTrust.lienAmount?.length > 0 && !validLienAmount(lengthTrust.lienAmount)) {
+        if (getLengthTrust.value.lienAmount?.length > 0 && !validLienAmount(getLengthTrust.value.lienAmount)) {
           return 'Lien amount must be a number greater than 0.'
         }
         return ''
       }),
       surrenderDateMessage: computed((): string => {
-        if (lengthTrust.showInvalid && lengthTrust.surrenderDate === '') {
+        if (getLengthTrust.value.showInvalid && getLengthTrust.value.surrenderDate === '') {
           return 'This field is required'
         }
         return ''
@@ -251,8 +243,8 @@ export default defineComponent({
         return minDate.toISOString()
       }),
       computedDateFormatted: computed((): string => {
-        return lengthTrust.surrenderDate !== ''
-          ? convertDate(new Date(lengthTrust.surrenderDate + 'T09:00:00Z'), false, false) : ''
+        return getLengthTrust.value.surrenderDate !== ''
+          ? convertDate(new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'), false, false) : ''
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
@@ -262,15 +254,18 @@ export default defineComponent({
           return convertDate(newExpDate, true, true)
         }
       }),
+      lengthTrust: computed((): LengthTrustIF => {
+        return getLengthTrust.value as LengthTrustIF || null
+      }),
       lienAmountSummary: computed((): string => {
-        if (lengthTrust.lienAmount) {
+        if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = lengthTrust.lienAmount
+          var currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
           var lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
-            return lengthTrust.lienAmount
+            return getLengthTrust.value.lienAmount
           }
           return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
         }
@@ -278,39 +273,26 @@ export default defineComponent({
       }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
-          lengthTrust.surrenderDate = getRegistrationSurrenderDate.value
+          getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
-            new Date(lengthTrust.surrenderDate),
+            new Date(getLengthTrust.value.surrenderDate),
             false,
             false
           )
         }
-        if (lengthTrust.surrenderDate?.length >= 10) {
+        if (getLengthTrust.value.surrenderDate?.length >= 10) {
           return convertDate(
-            new Date(lengthTrust.surrenderDate + 'T09:00:00Z'),
+            new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'),
             false,
             false
           )
         }
-        if (lengthTrust.surrenderDate === '') {
+        if (getLengthTrust.value.surrenderDate === '') {
           return 'Not entered'
         }
-        return lengthTrust.surrenderDate
+        return getLengthTrust.value.surrenderDate
       })
     })
-    const goToLengthTrust = (): void => {
-      if (!props.isRenewal) {
-        lengthTrust.showInvalid = true
-        setLengthTrust(lengthTrust)
-        router.push({ path: '/new-registration/length-trust' })
-      } else {
-        const registrationNumber = route.query['reg-num'] as string || ''
-        router.push({
-          name: RouteNames.RENEW_REGISTRATION,
-          query: { 'reg-num': registrationNumber }
-        })
-      }
-    }
 
     const validLienAmount = (val: string): boolean => {
       if (!val || val === '') {
@@ -333,33 +315,42 @@ export default defineComponent({
     watch(
       () => localState.lienAmount,
       (val: string) => {
-        lengthTrust.lienAmount = val.trimRight().trimLeft()
+        const lt = localState.lengthTrust
+        lt.lienAmount = val.trimRight().trimLeft()
         if (!validLienAmount(val)) {
-          lengthTrust.valid = false
-        } else if (lengthTrust.surrenderDate !== '') {
-          lengthTrust.valid = true
-          lengthTrust.showInvalid = false
+          lt.valid = false
+        } else if (lt.surrenderDate !== '') {
+          lt.valid = true
+          lt.showInvalid = false
         }
-        setLengthTrust(lengthTrust)
+        setLengthTrust(lt)
       }
     )
     watch(
       () => localState.surrenderDate,
       (val: string) => {
-        lengthTrust.surrenderDate = val
-        if (lengthTrust.lienAmount !== '' && lengthTrust.surrenderDate !== '') {
-          lengthTrust.valid = true
-          lengthTrust.showInvalid = false
+        const lt = localState.lengthTrust
+        lt.surrenderDate = val
+        if (lt.lienAmount !== '' && lt.surrenderDate !== '') {
+          lt.valid = true
+          lt.showInvalid = false
         } else {
-          lengthTrust.valid = false
+          lt.valid = false
         }
-        setLengthTrust(lengthTrust)
+        setLengthTrust(lt)
       }
     )
 
+    onMounted(() => {
+      if (props.isRenewal && (getLengthTrust.value.lifeYears !== 1)) {
+        const lt = localState.lengthTrust
+        lt.valid = true
+        lt.lifeYears = 1
+        setLengthTrust(lt)
+      }
+    })
+
     return {
-      goToLengthTrust,
-      lengthTrust,
       APIRegistrationTypes,
       registrationType,
       modal,

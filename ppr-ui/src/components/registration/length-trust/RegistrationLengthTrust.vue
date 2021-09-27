@@ -5,7 +5,7 @@
     class="white pb-6 pr-10 pl-8 rounded"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
   >
-  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8">
+  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 mr-n2">
         <v-col cols="auto" class="pa-2">
           <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
           <label class="pl-3">
@@ -129,7 +129,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
-import { APIRegistrationTypes, RouteNames } from '@/enums'
+import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
 export default defineComponent({
@@ -146,22 +146,16 @@ export default defineComponent({
       'getRegistrationType', 'getRegistrationExpiryDate'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
-    const lengthTrust: LengthTrustIF = getLengthTrust.value
     const feeInfoYears = getFinancingFee(false)
-    const router = context.root.$router
-    const route = context.root.$route
     const modal = false
 
     const localState = reactive({
       renewalView: props.isRenewal,
-      trustIndenture: lengthTrust.trustIndenture,
-      lifeYearsDisabled: lengthTrust.lifeInfinite,
-      lifeInfinite: lengthTrust.valid
-        ? lengthTrust.lifeInfinite.toString()
-        : '',
+      trustIndenture: getLengthTrust.value.trustIndenture,
+      lifeYearsDisabled: computed((): string => { return getLengthTrust.value.lifeInfinite }),
+      lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
       maxYears: feeInfoYears.quantityMax.toString(),
-      lifeYearsEdit:
-        lengthTrust.lifeYears > 0 ? lengthTrust.lifeYears.toString() : '',
+      lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
       lifeYearsHint:
@@ -172,12 +166,12 @@ export default defineComponent({
         ' per year)',
       showTrustIndenture: computed((): boolean => {
         if (localState.renewalView) {
-          return lengthTrust.trustIndenture
+          return getLengthTrust.value.trustIndenture
         }
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
-        return !lengthTrust.valid
+        return !getLengthTrust.value.valid
       }),
       regTitle: computed((): string => {
         if (props.isRenewal) {
@@ -187,7 +181,7 @@ export default defineComponent({
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
-          if (lengthTrust.lifeInfinite) {
+          if (getLengthTrust.value.lifeInfinite) {
             return 'No Expiry'
           }
           if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
@@ -200,23 +194,13 @@ export default defineComponent({
           return '-'
         }
       }),
+      lengthTrust: computed((): LengthTrustIF => {
+        return getLengthTrust.value as LengthTrustIF || null
+      }),
       trustIndentureSummary: computed((): string => {
-        return lengthTrust.trustIndenture ? 'Yes' : 'No'
+        return getLengthTrust.value.trustIndenture ? 'Yes' : 'No'
       })
     })
-    const goToLengthTrust = (): void => {
-      if (!props.isRenewal) {
-        lengthTrust.showInvalid = true
-        setLengthTrust(lengthTrust)
-        router.push({ path: '/new-registration/length-trust' })
-      } else {
-        const registrationNumber = route.query['reg-num'] as string || ''
-        router.push({
-          name: RouteNames.RENEW_REGISTRATION,
-          query: { 'reg-num': registrationNumber }
-        })
-      }
-    }
 
     const infinityPreselected = (): boolean => {
       const ipArray = [
@@ -248,26 +232,27 @@ export default defineComponent({
 
     onMounted(() => {
       if (infinityPreselected()) {
-        lengthTrust.valid = true
-        lengthTrust.lifeInfinite = true
-        lengthTrust.lifeYears = null
-        setLengthTrust(lengthTrust)
+        const lt = localState.lengthTrust
+        lt.valid = true
+        lt.lifeInfinite = true
+        lt.lifeYears = null
+        setLengthTrust(lt)
       }
     })
 
     const setLifeInfinite = (val: boolean): void => {
-      lengthTrust.lifeInfinite = val
-      localState.lifeYearsDisabled = lengthTrust.lifeInfinite
-      if (lengthTrust.lifeInfinite) {
+      const lt = localState.lengthTrust
+      lt.lifeInfinite = val
+      if (lt.lifeInfinite) {
         localState.lifeYearsEdit = ''
-        lengthTrust.lifeYears = null
-        lengthTrust.valid = true
-        lengthTrust.showInvalid = false
-        setLengthTrust(lengthTrust)
+        lt.lifeYears = null
+        lt.valid = true
+        lt.showInvalid = false
+        setLengthTrust(lt)
       } else {
-        lengthTrust.valid = false
-        lengthTrust.lifeYears = 0
-        setLengthTrust(lengthTrust)
+        lt.valid = false
+        lt.lifeYears = 0
+        setLengthTrust(lt)
       }
     }
 
@@ -275,49 +260,49 @@ export default defineComponent({
       () => localState.lifeYearsEdit,
       (val: string) => {
         localState.lifeYearsMessage = ''
+        const lt = localState.lengthTrust
         if (val?.length > 0) {
           var life = parseInt(val)
           if (isNaN(life)) {
             localState.lifeYearsMessage =
               'Registration length must be a number between 1 and ' +
               localState.maxYears
-            lengthTrust.valid = false
+            lt.valid = false
           } else if (life < 1 || life > feeInfoYears.quantityMax) {
             localState.lifeYearsMessage =
               'Registration length must be between 1 and ' + localState.maxYears
-            lengthTrust.valid = false
+            lt.valid = false
           } else {
-            lengthTrust.lifeYears = life
-            lengthTrust.valid = true
+            lt.lifeYears = life
+            lt.valid = true
             localState.lifeInfinite = 'false'
-            lengthTrust.showInvalid = false
-            setLengthTrust(lengthTrust)
+            lt.showInvalid = false
+            setLengthTrust(lt)
           }
         } else {
-          if (!lengthTrust.lifeInfinite) {
-            lengthTrust.lifeYears = 0
-            setLengthTrust(lengthTrust)
-            lengthTrust.valid = false
+          if (!lt.lifeInfinite) {
+            lt.lifeYears = 0
+            setLengthTrust(lt)
+            lt.valid = false
           }
         }
-        if (!lengthTrust.valid && !lengthTrust.lifeInfinite) {
-          lengthTrust.valid = false
-          setLengthTrust(lengthTrust)
+        if (!lt.valid && !lt.lifeInfinite) {
+          lt.valid = false
+          setLengthTrust(lt)
         }
       }
     )
     watch(
       () => localState.trustIndenture,
       (val: boolean) => {
-        lengthTrust.trustIndenture = val
-        setLengthTrust(lengthTrust)
+        const lt = localState.lengthTrust
+        lt.trustIndenture = val
+        setLengthTrust(lt)
       }
     )
 
     return {
-      goToLengthTrust,
       setLifeInfinite,
-      lengthTrust,
       infinityPreselected,
       APIRegistrationTypes,
       registrationType,

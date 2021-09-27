@@ -128,26 +128,25 @@ export default defineComponent({
       'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
-    const lengthTrust: LengthTrustIF = getLengthTrust.value
     const router = context.root.$router
     const route = context.root.$route
 
     const localState = reactive({
       renewalView: props.isRenewal,
-      trustIndenture: lengthTrust.trustIndenture,
-      lifeInfinite: lengthTrust.valid
-        ? lengthTrust.lifeInfinite.toString()
+      trustIndenture: getLengthTrust.value.trustIndenture,
+      lifeInfinite: getLengthTrust.value.valid
+        ? getLengthTrust.value.lifeInfinite.toString()
         : '',
-      surrenderDate: lengthTrust.surrenderDate,
-      lienAmount: lengthTrust.lienAmount,
+      surrenderDate: getLengthTrust.value.surrenderDate,
+      lienAmount: getLengthTrust.value.lienAmount,
       showTrustIndenture: computed((): boolean => {
         if (localState.renewalView) {
-          return lengthTrust.trustIndenture
+          return getLengthTrust.value.trustIndenture
         }
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
-        return !lengthTrust.valid
+        return !getLengthTrust.value.valid
       }),
       regTitle: computed((): string => {
         if (props.isRenewal) {
@@ -156,12 +155,12 @@ export default defineComponent({
         return 'Registration'
       }),
       computedDateFormatted: computed((): string => {
-        return lengthTrust.surrenderDate !== ''
-          ? convertDate(new Date(lengthTrust.surrenderDate + 'T09:00:00Z'), false, false) : ''
+        return getLengthTrust.value.surrenderDate !== ''
+          ? convertDate(new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'), false, false) : ''
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
-          if (lengthTrust.lifeInfinite) {
+          if (getLengthTrust.value.lifeInfinite) {
             return 'No Expiry'
           }
           if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
@@ -170,9 +169,9 @@ export default defineComponent({
             newExpDate.setDate(newExpDate.getDate() + 180)
             return convertDate(newExpDate, true, true)
           }
-          if ((getRegistrationExpiryDate.value) && (lengthTrust.lifeYears > 0)) {
+          if ((getRegistrationExpiryDate.value) && (getLengthTrust.value.lifeYears > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
-            const numYears = lengthTrust.lifeYears
+            const numYears = getLengthTrust.value.lifeYears
             const newExpDate = new Date(expiryDate)
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
             return convertDate(newExpDate, true, true)
@@ -184,61 +183,65 @@ export default defineComponent({
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
-        if (!lengthTrust.lifeInfinite && lengthTrust.lifeYears < 1) {
+        if (!getLengthTrust.value.lifeInfinite && getLengthTrust.value.lifeYears < 1) {
           return 'Not entered'
         }
-        if (lengthTrust.lifeInfinite) {
+        if (getLengthTrust.value.lifeInfinite) {
           return 'Infinite'
         }
-        if (lengthTrust.lifeYears === 1) {
-          return lengthTrust.lifeYears.toString() + ' Year'
+        if (getLengthTrust.value.lifeYears === 1) {
+          return getLengthTrust.value.lifeYears.toString() + ' Year'
         }
-        return lengthTrust.lifeYears.toString() + ' Years'
+        return getLengthTrust.value.lifeYears.toString() + ' Years'
       }),
       trustIndentureSummary: computed((): string => {
-        return lengthTrust.trustIndenture ? 'Yes' : 'No'
+        return getLengthTrust.value.trustIndenture ? 'Yes' : 'No'
       }),
       lienAmountSummary: computed((): string => {
-        if (lengthTrust.lienAmount) {
+        if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = lengthTrust.lienAmount
+          var currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
           var lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
-            return lengthTrust.lienAmount
+            return getLengthTrust.value.lienAmount
           }
           return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
         }
         return 'Not entered'
       }),
+      lengthTrust: computed((): LengthTrustIF => {
+        return getLengthTrust.value as LengthTrustIF || null
+      }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
-          lengthTrust.surrenderDate = getRegistrationSurrenderDate.value
+          getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
-            new Date(lengthTrust.surrenderDate),
+            new Date(getLengthTrust.value.surrenderDate),
             false,
             false
           )
         }
-        if (lengthTrust.surrenderDate?.length >= 10) {
+        if (getLengthTrust.value.surrenderDate?.length >= 10) {
           return convertDate(
-            new Date(lengthTrust.surrenderDate + 'T09:00:00Z'),
+            new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'),
             false,
             false
           )
         }
-        if (lengthTrust.surrenderDate === '') {
+        if (getLengthTrust.value.surrenderDate === '') {
           return 'Not entered'
         }
-        return lengthTrust.surrenderDate
+        return getLengthTrust.value.surrenderDate
       })
     })
     const goToLengthTrust = (): void => {
       if (!props.isRenewal) {
-        lengthTrust.showInvalid = true
-        setLengthTrust(lengthTrust)
-        router.push({ path: '/new-registration/length-trust' })
+        const lt = localState.lengthTrust
+        lt.showInvalid = true
+        setLengthTrust(lt)
+        router.push(RouteNames.LENGTH_TRUST)
       } else {
         const registrationNumber = route.query['reg-num'] as string || ''
         router.push({
@@ -250,7 +253,6 @@ export default defineComponent({
 
     return {
       goToLengthTrust,
-      lengthTrust,
       APIRegistrationTypes,
       registrationType,
       ...toRefs(localState)

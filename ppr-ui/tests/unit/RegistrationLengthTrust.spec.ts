@@ -5,7 +5,7 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
-  LengthTrustIF
+  LengthTrustIF, StateModelIF
 } from '@/interfaces'
 import {
   mockedSelectSecurityAgreement,
@@ -91,12 +91,16 @@ describe('RegistrationLengthTrust SA tests', () => {
     wrapper.vm.$data.lifeYearsEdit = 'XX'
     await Vue.nextTick()
     expect(wrapper.vm.lifeYearsMessage).toBe('Registration length must be a number between 1 and 25')
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    expect(state.registration.lengthTrust.valid).toBe(false)
   })
+
   it('renders lifeInfinite', async () => {
-    wrapper.vm.$data.lifeInfinite = 'true'
+    wrapper.find('#length-infinite').trigger('click')
     await Vue.nextTick()
     wrapper.vm.$data.lifeYearsEdit = ''
     expect(wrapper.vm.lifeInfinite).toBe('true')
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
   })
 })
 
@@ -104,7 +108,7 @@ describe('RegistrationLengthTrust SG tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
     await store.dispatch('setLengthTrust', {
-      valid: false,
+      valid: true,
       trustIndenture: false,
       lifeInfinite: false,
       lifeYears: 3,
@@ -123,10 +127,14 @@ describe('RegistrationLengthTrust SG tests', () => {
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // show trust indenture will be true for security agreement only
     expect(wrapper.vm.showTrustIndenture).toBe(false)
-    expect(wrapper.vm.lifeInfinite).toBe('')
+    expect(wrapper.vm.lifeInfinite).toBe('false')
     expect(wrapper.vm.lifeYearsEdit).toBe('3')
     expect(wrapper.vm.lifeYearsDisabled).toBe(false)
     expect(wrapper.vm.trustIndenture).toBe(false)
+    await Vue.nextTick()
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(3)
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeInfinite).toBe(false)
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
   })
 })
 
@@ -154,6 +162,7 @@ describe('RegistrationLengthTrust life infinite tests', () => {
     expect(wrapper.vm.lifeYearsEdit).toBe('')
     expect(wrapper.vm.lifeYearsDisabled).toBe(true)
     expect(wrapper.vm.trustIndenture).toBe(false)
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
   })
 })
 
@@ -177,6 +186,7 @@ describe('RegistrationLengthTrust Crown tests', () => {
     expect(wrapper.find('#lien-amount').exists()).toBe(false)
     
     expect(wrapper.vm.infinityPreselected()).toBe(true)
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
    
   })
   
@@ -210,6 +220,8 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     wrapper.vm.$data.lifeYearsEdit = '1'
     await Vue.nextTick()
     expect(wrapper.find('#new-expiry').text()).toContain('March 31, 2022')
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(1)
+    expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
   })
   
 })
