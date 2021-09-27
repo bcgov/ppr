@@ -18,7 +18,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
+              <v-col class="pt-2 pb-6 sub-header-info">
                 Add the collateral for this {{ registrationTypeUI }} registration.
               </v-col>
             </v-row>

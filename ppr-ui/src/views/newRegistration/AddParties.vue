@@ -20,9 +20,8 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
-                Add the people and businesses who have an interest in this
-                registration.
+              <v-col class="pt-2 pb-6 sub-header-info">
+                Add the people and businesses who have an interest in this registration.
               </v-col>
             </v-row>
             <v-row no-gutters>

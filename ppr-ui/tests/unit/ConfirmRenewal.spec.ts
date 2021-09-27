@@ -40,6 +40,8 @@ describe('Confirm Renewal new registration component', () => {
     // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // store setup
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')

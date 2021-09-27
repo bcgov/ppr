@@ -18,7 +18,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
+              <v-col class="pt-2 pb-6 sub-header-info">
                 Review the information in your registration. If you need to change anything,
                 return to the step to make the necessary change.
               </v-col>

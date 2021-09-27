@@ -20,7 +20,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
+              <v-col class="pt-2 pb-6 sub-header-info">
                 {{ registrationLengthMessage }}
               </v-col>
             </v-row>
@@ -105,6 +105,8 @@ export default class LengthTrust extends Vue {
 
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
+  private statementType = StatementTypes.FINANCING_STATEMENT
+  private stepName = RouteNames.LENGTH_TRUST
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -187,14 +189,6 @@ export default class LengthTrust extends Vue {
           ' registration to be in effect. You can renew the registration in the future (for a fee).'
         )
     }
-  }
-
-  private get statementType (): string {
-    return StatementTypes.FINANCING_STATEMENT
-  }
-
-  private get stepName (): string {
-    return RouteNames.LENGTH_TRUST
   }
 
   mounted () {
