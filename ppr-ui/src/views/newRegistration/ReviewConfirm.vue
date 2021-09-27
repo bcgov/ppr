@@ -140,6 +140,8 @@ export default class ReviewConfirm extends Vue {
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
   private showStepErrors: boolean = false
+  private statementType = StatementTypes.FINANCING_STATEMENT
+  private stepName = RouteNames.LENGTH_TRUST
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -161,14 +163,6 @@ export default class ReviewConfirm extends Vue {
 
   private get registrationType (): string {
     return this.getRegistrationType?.registrationTypeAPI || ''
-  }
-
-  private get statementType (): string {
-    return StatementTypes.FINANCING_STATEMENT
-  }
-
-  private get stepName (): string {
-    return RouteNames.REVIEW_CONFIRM
   }
 
   mounted () {

@@ -90,6 +90,8 @@ export default class AddCollateral extends Vue {
 
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
+  private statementType = StatementTypes.FINANCING_STATEMENT
+  private stepName = RouteNames.LENGTH_TRUST
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -111,14 +113,6 @@ export default class AddCollateral extends Vue {
 
   private get registrationType (): APIRegistrationTypes {
     return this.getRegistrationType?.registrationTypeAPI || null
-  }
-
-  private get statementType (): string {
-    return StatementTypes.FINANCING_STATEMENT
-  }
-
-  private get stepName (): string {
-    return RouteNames.ADD_COLLATERAL
   }
 
   mounted () {

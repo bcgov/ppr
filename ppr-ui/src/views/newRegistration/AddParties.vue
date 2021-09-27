@@ -94,6 +94,8 @@ export default class AddParties extends Vue {
 
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
+  private statementType = StatementTypes.FINANCING_STATEMENT
+  private stepName = RouteNames.LENGTH_TRUST
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -111,14 +113,6 @@ export default class AddParties extends Vue {
       return this.getRegistrationOther || ''
     }
     return this.getRegistrationType?.registrationTypeUI || ''
-  }
-
-  private get statementType (): string {
-    return StatementTypes.FINANCING_STATEMENT
-  }
-
-  private get stepName (): string {
-    return RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
   }
 
   mounted () {
