@@ -13,18 +13,18 @@
           <!-- v-if reason: setting the props to null will cause the select to display 'null' -->
           <search-bar v-if="getSearchedType"
                       class="soft-corners"
-                      :defaultDebtor="getDebtorName"
+                      :defaultDebtor="getSearchDebtorName"
                       :defaultFolioNumber="folioNumber"
                       :defaultSearchValue="getSearchedValue"
                       :defaultSelectedSearchType="getSearchedType"
-                      @debtor-name="setDebtorName"
+                      @debtor-name="setSearchDebtorName"
                       @searched-type="setSearchedType"
                       @searched-value="setSearchedValue"
                       @search-error="emitError"
                       @search-data="setSearchResults"/>
           <search-bar v-else
                       class="soft-corners"
-                      @debtor-name="setDebtorName"
+                      @debtor-name="setSearchDebtorName"
                       @searched-type="setSearchedType"
                       @searched-value="setSearchedValue"
                       @search-error="emitError"
@@ -116,13 +116,13 @@ import { SearchBar } from '@/components/search'
   }
 })
 export default class Search extends Vue {
-  @Getter getDebtorName: IndividualNameIF
+  @Getter getSearchDebtorName: IndividualNameIF
   @Getter getSearchResults: SearchResponseIF
   @Getter getSearchedValue: string
   @Getter getSearchedType: SearchTypeIF
   @Getter getUserSettings: UserSettingsIF
 
-  @Action setDebtorName: ActionBindingIF
+  @Action setSearchDebtorName: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF

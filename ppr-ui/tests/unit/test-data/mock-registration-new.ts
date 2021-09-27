@@ -80,8 +80,21 @@ export const mockedGeneralCollateral1: GeneralCollateralIF[] = [
 
 export const mockedGeneralCollateral2: GeneralCollateralIF[] = [
   {
-    addedDateTime: '2021-09-16T23:56:20Z',
-    description: 'TEST2 GENERAL COLLATERAL',
+    addedDateTime: '2021-09-20T18:56:20Z',
+    descriptionDelete: 'test delete 2'
+  },
+  {
+    addedDateTime: '2021-09-19T18:56:20Z',
+    descriptionAdd: 'test add 2',
+    descriptionDelete: 'test delete 1'
+  },
+  {
+    addedDateTime: '2021-09-18T18:56:20Z',
+    descriptionAdd: 'test add 1'
+  },
+  {
+    addedDateTime: '2021-09-17T18:56:20Z',
+    description: 'test base reg description'
   }
 ]
 

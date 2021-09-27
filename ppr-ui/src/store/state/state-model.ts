@@ -21,8 +21,6 @@ export const stateModel: StateModelIF = {
     },
     confirmDebtorName: null,
     creationDate: '',
-    currentStep: 1,
-    debtorName: null,
     draft: {
       type: '',
       financingStatement: null,
@@ -73,6 +71,7 @@ export const stateModel: StateModelIF = {
     }
   },
   search: {
+    searchDebtorName: null,
     searchHistory: null,
     searchResults: null,
     searchedType: null,

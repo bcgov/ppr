@@ -555,3 +555,8 @@ table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table
 .picker-err {
   color: $error;
 }
+
+// custom padding shortcut classes
+.pt-30px {
+  padding-top: 30px;
+}
