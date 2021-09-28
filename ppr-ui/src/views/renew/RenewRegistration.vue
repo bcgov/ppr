@@ -16,8 +16,10 @@
               previous amendments or court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <registration-length-trust class="mt-15" :isRenewal="true"
-          :isSummary="false" :defaultRegistrationType="registrationType" />
+          <registration-length-trust v-if="registrationType !== registrationTypeRL"
+          class="mt-15" :isRenewal="true" />
+          <registration-repairers-lien v-else
+          class="mt-15" :isRenewal="true" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -30,7 +32,7 @@
           <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-          <collateral class="mt-15" :isSummary="true" />
+          <collateral class="mt-15" :isSummary="true" :setRegistrationType="registrationType" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -59,7 +61,7 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer } from '@/components/common'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
@@ -78,6 +80,7 @@ import { StatusCodes } from 'http-status-codes'
   components: {
     CautionBox,
     RegistrationLengthTrust,
+    RegistrationRepairersLien,
     Collateral,
     DebtorSummary,
     RegisteringPartySummary,
@@ -206,10 +209,13 @@ export default class ReviewRegistration extends Vue {
   }
 
   private confirmRenewal (): void {
-    this.$router.push({
-      name: RouteNames.CONFIRM_RENEWAL,
-      query: { 'reg-num': this.registrationNumber }
-    })
+    if (this.getLengthTrust.valid) {
+      this.$router.push({
+        name: RouteNames.CONFIRM_RENEWAL,
+        query: { 'reg-num': this.registrationNumber }
+      })
+    } else {
+    }
     this.emitHaveData(false)
   }
 

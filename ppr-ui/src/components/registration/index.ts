@@ -1,4 +1,6 @@
 export { default as RegistrationBar } from './RegistrationBar.vue'
 export { default as RegistrationBarButtonList } from './RegistrationBarButtonList.vue'
 export { default as RegistrationBarTypeAheadList } from './RegistrationBarTypeAheadList.vue'
-export { default as RegistrationLengthTrust } from './RegistrationLengthTrust.vue'
+export { default as RegistrationLengthTrust } from './length-trust/RegistrationLengthTrust.vue'
+export { default as RegistrationRepairersLien } from './length-trust/RegistrationRepairersLien.vue'
+export { default as RegistrationLengthTrustSummary } from './length-trust/RegistrationLengthTrustSummary.vue'

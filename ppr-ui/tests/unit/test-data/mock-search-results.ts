@@ -1,4 +1,4 @@
-import { MatchTypes, UISearchTypes } from '@/enums'
+import { APIVehicleTypes, MatchTypes, UISearchTypes } from '@/enums'
 import { SearchResultIF } from '@/interfaces'
 
 type mockSearchResults = {
@@ -20,7 +20,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 1,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU622994',
         year: 2018,
         make: 'HYUNDAI',
@@ -35,7 +35,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 2,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU622995',
         year: 2017,
         make: 'TESTmake1',
@@ -50,7 +50,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 3,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU622996',
         year: 2017,
         make: 'TESTmake2',
@@ -65,7 +65,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 4,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU622997',
         year: 2017,
         make: 'TESTmake3',
@@ -80,7 +80,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 5,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU622998',
         year: 2017,
         make: 'TESTmake4',
@@ -95,7 +95,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 6,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU622999',
         year: 2017,
         make: 'TESTmake5',
@@ -110,7 +110,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 7,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU623000',
         year: 2017,
         make: 'TESTmake6',
@@ -125,7 +125,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 8,
-        type: 'MV',
+        type: APIVehicleTypes.MOTOR_VEHICLE,
         serialNumber: 'KM8J3CA46JU623001',
         year: 2017,
         make: 'TESTmake7',
@@ -242,7 +242,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 1,
-        type: 'MH',
+        type: APIVehicleTypes.MANUFACTURED_HOME,
         serialNumber: 'KM8J3CA46JU622914',
         year: 2018,
         make: 'HYUNDAI',
@@ -258,7 +258,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 2,
-        type: 'MH',
+        type: APIVehicleTypes.MANUFACTURED_HOME,
         serialNumber: 'KM8J3CA46JU622925',
         year: 2017,
         make: 'TESTmake1',
@@ -274,7 +274,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 3,
-        type: 'MH',
+        type: APIVehicleTypes.MANUFACTURED_HOME,
         serialNumber: 'KM8J3CA46JU622936',
         year: 2017,
         make: 'TESTmake2',
@@ -290,7 +290,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 4,
-        type: 'MH',
+        type: APIVehicleTypes.MANUFACTURED_HOME,
         serialNumber: 'KM8J3CA46JU622947',
         year: 2017,
         make: 'TESTmake3',
@@ -308,7 +308,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 1,
-        type: 'AC',
+        type: APIVehicleTypes.AIRCRAFT,
         serialNumber: 'KM8J3CA46JU622194',
         year: 1998,
         make: 'CESSNA',
@@ -323,7 +323,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 2,
-        type: 'AC',
+        type: APIVehicleTypes.AIRCRAFT,
         serialNumber: 'KM8J3CA46JU622295',
         year: 2017,
         make: 'TESTmake1',
@@ -338,7 +338,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 3,
-        type: 'AC',
+        type: APIVehicleTypes.AIRCRAFT,
         serialNumber: 'KM8J3CA46JU622396',
         year: 2017,
         make: 'TESTmake2',
@@ -353,7 +353,7 @@ export const mockedSearchResults: mockSearchResults = {
       registrationType: 'SA',
       vehicleCollateral: {
         id: 4,
-        type: 'AC',
+        type: APIVehicleTypes.AIRCRAFT,
         serialNumber: 'KM8J3CA46JU622497',
         year: 2017,
         make: 'TESTmake3',

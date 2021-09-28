@@ -12,6 +12,7 @@ import { PartyAutocomplete } from '@/components/parties'
 // Other
 import { SearchPartyIF } from '@/interfaces'
 import { mockedPartyCodeSearchResults } from './test-data'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -19,6 +20,9 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 const partyCodeAutoComplete = '#party-search-auto-complete'
+
+// event
+const selectItem: string = 'selectItem'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -60,6 +64,7 @@ describe('Secured Party search autocomplete tests', () => {
 
   it('adds the party aafter a name in the list is clicked', async () => {
     const partySearchAddLinks = wrapper.findAll('.v-list-item__action')
+    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(0)
     expect(partySearchAddLinks.length).toBe(3)
     const icon = partySearchAddLinks.at(0).find('.v-icon')
     icon.trigger('click')
@@ -68,5 +73,7 @@ describe('Secured Party search autocomplete tests', () => {
     expect(
       store.getters.getAddSecuredPartiesAndDebtors.securedParties[0].businessName
     ).toBe('TONY SCOTT REVENUE ADMINISTRATION BRANCH')
+    // the autocomplete is then closed & event emitted
+    expect(wrapper.emitted().selectItem).toBeTruthy()
   })
 })

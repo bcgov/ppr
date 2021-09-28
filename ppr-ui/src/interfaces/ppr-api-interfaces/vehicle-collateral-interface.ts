@@ -3,7 +3,7 @@ import { ActionTypes, APIVehicleTypes } from '@/enums'
 // Vehicle collateral interface.
 export interface VehicleCollateralIF {
   id: number,
-  type: string, // One of VehicleTypes
+  type: APIVehicleTypes, // One of VehicleTypes
   serialNumber: string,
   year?: number | '', // Optional
   make?: string, // Optional

@@ -15,10 +15,8 @@ export interface StateModelIF {
   folioOrReferenceNumber: string
   registration: {
     collateral: AddCollateralIF
-    confirmDebtorName: DebtorNameIF // Required for registrations.
+    confirmDebtorName: DebtorNameIF // Required for actions on existing registrations.
     creationDate: string
-    currentStep: number,
-    debtorName: IndividualNameIF
     draft: DraftIF,
     expiryDate: string
     registrationFlowType: RegistrationFlowType
@@ -36,6 +34,7 @@ export interface StateModelIF {
     parties: AddPartiesIF
   }
   search: {
+    searchDebtorName: IndividualNameIF
     searchHistory: Array<SearchResponseIF>
     searchResults: SearchResponseIF
     searchedType: SearchTypeIF

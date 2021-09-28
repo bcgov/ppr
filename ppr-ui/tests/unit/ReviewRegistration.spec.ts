@@ -9,7 +9,7 @@ import flushPromises from 'flush-promises'
 // Components
 import { ReviewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { CautionBox, StickyContainer } from '@/components/common'
 import {
   DebtorSummary,
@@ -82,7 +82,7 @@ describe('ReviewConfirm new registration component', () => {
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(mockedFinancingStatementAll.lifeYears)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
-    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)

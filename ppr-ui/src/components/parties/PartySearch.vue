@@ -30,6 +30,7 @@
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
           :setAutoCompleteActive="setAutoCompleteActive"
+          @selectItem="searchValue = ''"
         />
       </v-col>
     </v-row>

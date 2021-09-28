@@ -12,7 +12,9 @@ import {
   SearchTypeIF,
   UserInfoIF,
   UserSettingsIF,
-  AccountProductSubscriptionIF
+  AccountProductSubscriptionIF,
+  GeneralCollateralIF,
+  VehicleCollateralIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 
@@ -51,16 +53,20 @@ export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): vo
   commit('mutateAuthRoles', authRoles)
 }
 
-export const setCurrentStep: ActionIF = ({ commit }, currentStep): void => {
-  commit('mutateCurrentStep', currentStep)
+export const setCollateralShowInvalid = ({ commit }, show: boolean): void => {
+  commit('mutateCollateralShowInvalid', show)
 }
 
-export const setDebtorName: ActionIF = ({ commit }, debtorName: IndividualNameIF): void => {
-  commit('mutateDebtorName', debtorName)
+export const setCollateralValid = ({ commit }, valid: boolean): void => {
+  commit('mutateCollateralValid', valid)
 }
 
 export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {
   commit('mutateDraft', draft)
+}
+
+export const setGeneralCollateral: ActionIF = ({ commit }, generalCollateral: GeneralCollateralIF[]): void => {
+  commit('mutateGeneralCollateral', generalCollateral)
 }
 
 export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {
@@ -103,6 +109,10 @@ export const setRegistrationTypeOtherDesc: ActionIF = ({ commit }, description: 
   commit('mutateRegistrationTypeOtherDesc', description)
 }
 
+export const setSearchDebtorName: ActionIF = ({ commit }, debtorName: IndividualNameIF): void => {
+  commit('mutateSearchDebtorName', debtorName)
+}
+
 export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<SearchResponseIF>): void => {
   commit('mutateSearchHistory', searchHistory)
 }
@@ -137,6 +147,10 @@ export const setUserInfo: ActionIF = ({ commit }, userInfo: UserInfoIF): void =>
 
 export const setUserSettings: ActionIF = ({ commit }, settings: UserSettingsIF): void => {
   commit('mutateUserSettings', settings)
+}
+
+export const setVehicleCollateral: ActionIF = ({ commit }, vCollateral: VehicleCollateralIF[]): void => {
+  commit('mutateVehicleCollateral', vCollateral)
 }
 
 export const setAddSecuredPartiesAndDebtorsStepValidity = ({ commit }, validity) => {

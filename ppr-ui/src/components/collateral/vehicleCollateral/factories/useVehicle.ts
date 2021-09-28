@@ -5,10 +5,13 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { APIRegistrationTypes } from '@/enums'
 
 export const useVehicle = (props, context) => {
-  const { setAddCollateral } = useActions<any>(['setAddCollateral'])
-  const { getAddCollateral } = useGetters<any>(['getAddCollateral'])
   const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+  const { getVehicleCollateral } = useGetters<any>(['getVehicleCollateral'])
+  const { setCollateralValid } = useActions<any>(['setCollateralValid'])
+  const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
+
   const registrationType = getRegistrationType.value.registrationTypeAPI
+
   const localState = reactive({
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
@@ -39,8 +42,7 @@ export const useVehicle = (props, context) => {
   })
 
   const getVehicle = () => {
-    const vehicles: VehicleCollateralIF[] =
-      getAddCollateral.value.vehicleCollateral
+    const vehicles = getVehicleCollateral.value as VehicleCollateralIF[]
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentVehicle = JSON.parse(JSON.stringify(vehicles[props.activeIndex]))
@@ -67,8 +69,7 @@ export const useVehicle = (props, context) => {
   }
 
   const addVehicle = () => {
-    let collateral = getAddCollateral.value // eslint-disable-line
-    let newList: VehicleCollateralIF[] = collateral.vehicleCollateral // eslint-disable-line
+    let newList = [...getVehicleCollateral.value] as VehicleCollateralIF[] // eslint-disable-line
     // New vehicle
     if (props.activeIndex === -1) {
       localState.currentVehicle.id = newList.length + 1
@@ -77,9 +78,8 @@ export const useVehicle = (props, context) => {
       // Edit vehicle
       newList.splice(props.activeIndex, 1, localState.currentVehicle)
     }
-    collateral.vehicleCollateral = newList
-    collateral.valid = true
-    setAddCollateral(collateral)
+    setVehicleCollateral(newList)
+    setCollateralValid(true)
     context.emit('resetEvent')
   }
 
@@ -98,35 +98,6 @@ export const useVehicle = (props, context) => {
     return vhArray.includes(registrationType)
   }
 
-  const hasGeneralCollateral = (): boolean => {
-    const ghArray = [
-      APIRegistrationTypes.SECURITY_AGREEMENT,
-      APIRegistrationTypes.SALE_OF_GOODS,
-      APIRegistrationTypes.FORESTRY_CONTRACTOR_LIEN,
-      APIRegistrationTypes.FORESTRY_CONTRACTOR_CHARGE,
-      APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN,
-      APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
-      APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
-      APIRegistrationTypes.FOREST,
-      APIRegistrationTypes.LOGGING_TAX,
-      APIRegistrationTypes.CARBON_TAX,
-      APIRegistrationTypes.RURAL_PROPERTY_TAX,
-      APIRegistrationTypes.PROVINCIAL_SALES_TAX,
-      APIRegistrationTypes.INCOME_TAX,
-      APIRegistrationTypes.MOTOR_FUEL_TAX,
-      APIRegistrationTypes.EXCISE_TAX,
-      APIRegistrationTypes.LIEN_UNPAID_WAGES,
-      APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
-      APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
-      APIRegistrationTypes.MAINTENANCE_LIEN,
-      APIRegistrationTypes.OTHER,
-      APIRegistrationTypes.MINERAL_LAND_TAX,
-      APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
-      APIRegistrationTypes.SCHOOL_ACT
-    ]
-    return ghArray.includes(registrationType)
-  }
-
   const mustHaveManufacturedHomeCollateral = (): boolean => {
     const mhArray = [
       APIRegistrationTypes.MARRIAGE_MH,
@@ -142,27 +113,12 @@ export const useVehicle = (props, context) => {
     return mhArray.includes(registrationType)
   }
 
-  const hasGeneralCollateralText = (): boolean => {
-    const gcList = [
-      APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
-      APIRegistrationTypes.LOGGING_TAX,
-      APIRegistrationTypes.CARBON_TAX,
-      APIRegistrationTypes.PROVINCIAL_SALES_TAX,
-      APIRegistrationTypes.INCOME_TAX,
-      APIRegistrationTypes.MOTOR_FUEL_TAX,
-      APIRegistrationTypes.EXCISE_TAX
-    ]
-    return gcList.includes(registrationType)
-  }
-
   return {
     getVehicle,
     addVehicle,
     resetFormAndData,
     removeVehicle,
     hasVehicleCollateral,
-    hasGeneralCollateral,
-    hasGeneralCollateralText,
     mustHaveManufacturedHomeCollateral,
     excludesManufacturedHomeCollateral,
     ...toRefs(localState)

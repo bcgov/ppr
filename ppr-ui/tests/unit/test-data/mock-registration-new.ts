@@ -80,8 +80,21 @@ export const mockedGeneralCollateral1: GeneralCollateralIF[] = [
 
 export const mockedGeneralCollateral2: GeneralCollateralIF[] = [
   {
-    addedDateTime: '2021-09-16T23:56:20Z',
-    description: 'TEST2 GENERAL COLLATERAL',
+    addedDateTime: '2021-09-20T18:56:20Z',
+    descriptionDelete: 'test delete 2'
+  },
+  {
+    addedDateTime: '2021-09-19T18:56:20Z',
+    descriptionAdd: 'test add 2',
+    descriptionDelete: 'test delete 1'
+  },
+  {
+    addedDateTime: '2021-09-18T18:56:20Z',
+    descriptionAdd: 'test add 1'
+  },
+  {
+    addedDateTime: '2021-09-17T18:56:20Z',
+    description: 'test base reg description'
   }
 ]
 
@@ -198,11 +211,29 @@ export const mockedDebtorsDeleted: PartyIF[] = [
   }
 ]
 
-export const mockedNewRegStep1: LengthTrustIF = {
+
+export const mockedLengthTrust1: LengthTrustIF = {
   valid: false,
   lifeYears: 5,
   lifeInfinite: false,
   trustIndenture: true
+}
+
+export const mockedLengthTrust2: LengthTrustIF = {
+  valid: true,
+  lifeYears: null,
+  lifeInfinite: true,
+  trustIndenture: false
+}
+
+export const mockedLengthTrust3: LengthTrustIF = {
+  valid: true,
+  trustIndenture: false,
+  lifeInfinite: false,
+  lifeYears: 0,
+  showInvalid: false,
+  surrenderDate: '2021-01-21',
+  lienAmount: '1000.00'
 }
 
 export const mockedNewRegStep2: AddPartiesIF = {

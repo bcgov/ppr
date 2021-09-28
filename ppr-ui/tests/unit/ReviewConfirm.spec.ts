@@ -8,16 +8,15 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 // Components
 import { ReviewConfirm } from '@/views'
 import { ButtonFooter, Stepper, FolioNumberSummary, StickyContainer } from '@/components/common'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 
 // Other
 import mockRouter from './MockRouter'
-import { mockedNewRegStep1, mockedSelectSecurityAgreement } from './test-data'
+import { mockedLengthTrust1, mockedSelectSecurityAgreement } from './test-data'
 import { RouteNames } from '@/enums'
 import { DraftIF, LengthTrustIF } from '@/interfaces'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
 
 Vue.use(Vuetify)
 
@@ -103,14 +102,14 @@ describe('ReviewConfirm step 1 tests', () => {
   })
 
   it('Review Confirm View with invalid step 1', async () => {
-    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedNewRegStep1))
+    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedLengthTrust1))
     await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
-    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Parties).exists()).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
@@ -120,7 +119,7 @@ describe('ReviewConfirm step 1 tests', () => {
   })
 
   it('Review Confirm View with valid step 1', async () => {
-    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedNewRegStep1))
+    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedLengthTrust1))
     lengthTrust.valid = true
     lengthTrust.lifeInfinite = false
     lengthTrust.lifeYears = 3
@@ -131,7 +130,7 @@ describe('ReviewConfirm step 1 tests', () => {
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
-    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Parties).exists()).toBe(true)
     // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)

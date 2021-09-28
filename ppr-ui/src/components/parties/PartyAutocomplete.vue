@@ -108,6 +108,8 @@ export default defineComponent({
         personName: { first: '', middle: '', last: '' }
       }
       addSecuredParty(newParty)
+      context.emit('selectItem')
+      closeAutoComplete()
     }
 
     const closeAutoComplete = () => {
