@@ -95,11 +95,14 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.draft = {
     type: '',
     financingStatement: null,
+    amendmentStatement: null,
     createDateTime: null,
     lastUpdateDateTime: null
   }
   state.stateModel.registration.registrationFlowType = RegistrationFlowType.NEW
   state.stateModel.registration.confirmDebtorName = null
+  state.stateModel.registration.courtOrderInformation = null
+  state.stateModel.registration.amendmentDescription = ''
 }
 
 export const mutateRegistrationConfirmDebtorName = (state: StateIF, debtorName: DebtorNameIF) => {

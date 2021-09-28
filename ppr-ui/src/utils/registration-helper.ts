@@ -1,11 +1,13 @@
 // Libraries
-import { APIRegistrationTypes, DraftTypes } from '@/enums'
+import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
   AddPartiesIF,
   AddCollateralIF,
+  AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,
   ErrorIF,
+  GeneralCollateralIF,
   FinancingStatementIF,
   PartyIF,
   RegistrationTypeIF,
@@ -21,6 +23,147 @@ import {
   updateDraft
 } from '@/utils'
 import { RegistrationTypes } from '@/resources'
+
+/** Setup the amendment registration for the API call. All data to be saved is in the store state model. */
+function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF {
+  const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
+  let statement:AmendmentStatementIF = stateModel.registration.draft.amendmentStatement
+  if (statement === undefined || statement === null) {
+    statement = {
+      changeType: APIAmendmentTypes.AMENDMENT,
+      baseRegistrationNumber: stateModel.registration.registrationNumber,
+      description: stateModel.registration.amendmentDescription,
+      registeringParty: stateModel.registration.parties.registeringParty
+    }
+  } else {
+    statement.description = stateModel.registration.amendmentDescription
+  }
+  const courtOrder = stateModel.registration.courtOrderInformation
+  if (courtOrder && courtOrder.courtName !== '' && courtOrder.courtRegistry !== '' &&
+      courtOrder.fileNumber !== '' && courtOrder.effectOfOrder !== '' && courtOrder.orderDate !== '') {
+    statement.changeType = APIAmendmentTypes.COURT_ORDER
+    statement.courtOrderInformation = stateModel.registration.courtOrderInformation
+  } else {
+    statement.changeType = APIAmendmentTypes.AMENDMENT
+    delete statement.courtOrderInformation
+  }
+  // Set these every time.
+  statement.addSecuredParties = []
+  statement.deleteSecuredParties = []
+  statement.addDebtors = []
+  statement.deleteDebtors = []
+  statement.addVehicleCollateral = []
+  statement.deleteVehicleCollateral = []
+  statement.addGeneralCollateral = []
+  statement.deleteGeneralCollateral = []
+  if (stateModel.folioOrReferenceNumber && stateModel.folioOrReferenceNumber !== '') {
+    statement.clientReferenceId = stateModel.folioOrReferenceNumber
+  } else {
+    statement.clientReferenceId = ''
+  }
+
+  // trust indenture setup
+  if (stateModel.registration.lengthTrust.action &&
+      stateModel.registration.lengthTrust.action === ActionTypes.EDITED &&
+      registrationType.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
+    statement.trustIndenture = stateModel.registration.lengthTrust.trustIndenture
+  } else {
+    statement.trustIndenture = false
+  }
+  const parties:AddPartiesIF = stateModel.registration.parties
+  // Conditionally set draft debtors.
+  for (let i = 0; i < parties.debtors.length; i++) {
+    if (parties.debtors[i].action) {
+      if (parties.debtors[i].action === ActionTypes.ADDED || parties.debtors[i].action === ActionTypes.EDITED) {
+        statement.addDebtors.push(JSON.parse(JSON.stringify(parties.debtors[i])))
+      }
+      if (parties.debtors[i].action === ActionTypes.REMOVED || parties.debtors[i].action === ActionTypes.EDITED) {
+        statement.deleteDebtors.push(JSON.parse(JSON.stringify(parties.debtors[i])))
+      }
+    }
+  }
+  // Conditionally set draft secured parties.
+  for (let i = 0; i < parties.securedParties.length; i++) {
+    if (parties.securedParties[i].action) {
+      if (parties.securedParties[i].action === ActionTypes.ADDED ||
+          parties.securedParties[i].action === ActionTypes.EDITED) {
+        statement.addSecuredParties.push(JSON.parse(JSON.stringify(parties.securedParties[i])))
+      }
+      if (parties.securedParties[i].action === ActionTypes.REMOVED ||
+          parties.securedParties[i].action === ActionTypes.EDITED) {
+        statement.deleteSecuredParties.push(JSON.parse(JSON.stringify(parties.securedParties[i])))
+      }
+    }
+  }
+
+  const collateral:AddCollateralIF = stateModel.registration.collateral
+  // Conditionally set draft vehicle collateral
+  if (collateral.vehicleCollateral && collateral.vehicleCollateral.length > 0) {
+    for (let i = 0; i < collateral.vehicleCollateral.length; i++) {
+      if (collateral.vehicleCollateral[i].action) {
+        if (collateral.vehicleCollateral[i].action === ActionTypes.ADDED ||
+            collateral.vehicleCollateral[i].action === ActionTypes.EDITED) {
+          statement.addVehicleCollateral.push(JSON.parse(JSON.stringify(collateral.vehicleCollateral[i])))
+        }
+        if (collateral.vehicleCollateral[i].action === ActionTypes.REMOVED ||
+            collateral.vehicleCollateral[i].action === ActionTypes.EDITED) {
+          statement.deleteVehicleCollateral.push(JSON.parse(JSON.stringify(collateral.vehicleCollateral[i])))
+        }
+      }
+    }
+  }
+  // Conditionally set draft general collateral
+  if (collateral.generalCollateral && collateral.generalCollateral.length > 0) {
+    for (let i = 0; i < collateral.generalCollateral.length; i++) {
+      if (collateral.generalCollateral[i].descriptionAdd &&
+          collateral.generalCollateral[i].descriptionAdd.trim().length > 0) {
+        const gc:GeneralCollateralIF = {
+          description: collateral.generalCollateral[i].descriptionAdd
+        }
+        statement.addGeneralCollateral.push(gc)
+      }
+      if (collateral.generalCollateral[i].descriptionDelete &&
+          collateral.generalCollateral[i].descriptionDelete.trim().length > 0) {
+        const gc:GeneralCollateralIF = {
+          collateralId: collateral.generalCollateral[i].collateralId,
+          description: collateral.generalCollateral[i].descriptionDelete
+        }
+        statement.deleteGeneralCollateral.push(gc)
+      }
+    }
+  }
+  return statement
+}
+
+/** Setup the draft data for the current amendment. All data to be saved is in the store state model. */
+export function setupAmendmentStatementDraft (stateModel:StateModelIF): DraftIF {
+  const draft:DraftIF = stateModel.registration.draft
+  draft.type = DraftTypes.AMENDMENT_STATEMENT
+  draft.amendmentStatement = setupAmendmentStatement(stateModel)
+  return draft
+}
+
+/** Save or update a draft of the current amendment. */
+export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
+  const draft:DraftIF = setupAmendmentStatementDraft(stateModel)
+  let draftResponse:DraftIF = null
+  let apiCall:String = ''
+  if (draft.amendmentStatement.documentId !== undefined && draft.amendmentStatement.documentId !== '') {
+    apiCall = 'update'
+    draftResponse = await updateDraft(draft)
+  } else {
+    apiCall = 'create'
+    draftResponse = await createDraft(draft)
+  }
+  if (draftResponse !== undefined && draftResponse.error === undefined) {
+    console.log('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
+                draftResponse.amendmentStatement.documentId)
+  } else if (draftResponse !== undefined) {
+    console.error('saveAmendmentStatementDraft failed: ' + draftResponse.error.statusCode + ': ' +
+                  draftResponse.error.message)
+  }
+  return draftResponse
+}
 
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {

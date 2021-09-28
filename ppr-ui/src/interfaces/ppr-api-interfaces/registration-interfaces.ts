@@ -1,5 +1,5 @@
-import { APIRegistrationTypes } from '@/enums'
-import { DebtorNameIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
+import { APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
+import { CourtOrderIF, DebtorNameIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
 import { ErrorIF } from './error-interface'
 
 // Payment (pay-api) reference interface.
@@ -33,10 +33,11 @@ export interface FinancingStatementIF {
   error?: ErrorIF
 }
 
-// Draft interface. TODO: add change, amendment statement draft definitions when available.
+// Draft interface. Change statement draft is out of scope.
 export interface DraftIF {
     type: string, // One of enum DraftTypes.
     financingStatement?: FinancingStatementIF, // Include if draft is for a financing statement.
+    amendmentStatement?: AmendmentStatementIF, // Include if draft is for an amendment statement.
     createDateTime?: string, // Included in a successful response. Generated on first draft save.
     lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
     error?: ErrorIF
@@ -98,6 +99,30 @@ export interface RenewRegistrationIF {
   expiryDate?: string, // The date and time upon which the statement will expire. Empty if lifeInfinite true.
   renewalRegistrationNumber?: string,
   createDateTime?: string, // Included in a successful response.
+  payment?: PaymentIF, // Included in a successful response.
+  error?: ErrorIF
+}
+
+// Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
+export interface AmendmentStatementIF {
+  changeType?: APIAmendmentTypes, // If empty the API will figure this value out.
+  clientReferenceId?: string, // AKA folio max length 20.
+  documentId?: string, // Optional draft ID if draft created.
+  description: string, // Mandatory description of amendment.
+  baseRegistrationNumber: string, // The identifier of the registration being amended.
+  registeringParty: PartyIF,
+  courtOrderInformation?: CourtOrderIF, // Only populated if all court order elements present.
+  addSecuredParties?: PartyIF[], // Only populated if adding.
+  deleteSecuredParties?: PartyIF[], // Only populated if deleting.
+  addDebtors?: PartyIF[], // Only populated if adding.
+  deleteDebtors?: PartyIF[], // Only populated if deleting.
+  addVehicleCollateral?: VehicleCollateralIF[], // Only populated if adding.
+  deleteVehicleCollateral?: VehicleCollateralIF[], // Only populated if deleting.
+  addGeneralCollateral?: GeneralCollateralIF[], // Only populated if adding.
+  deleteGeneralCollateral?: GeneralCollateralIF[], // Only populated if deleting.
+  trustIndenture?: boolean, // Include if changing.
+  createDateTime?: string, // Included in a successful response.
+  amendmentRegistrationNumber?: string, // Included in a successful response. The unique identifier of the registration.
   payment?: PaymentIF, // Included in a successful response.
   error?: ErrorIF
 }

@@ -14,16 +14,19 @@ export const stateModel: StateModelIF = {
     authRoles: []
   },
   registration: {
+    amendmentDescription: '',
     collateral: {
       valid: false,
       vehicleCollateral: [],
       generalCollateral: []
     },
     confirmDebtorName: null,
+    courtOrderInformation: null,
     creationDate: '',
     draft: {
       type: '',
       financingStatement: null,
+      amendmentStatement: null,
       createDateTime: null,
       lastUpdateDateTime: null
     },

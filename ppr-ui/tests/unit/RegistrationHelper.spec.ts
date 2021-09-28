@@ -7,19 +7,32 @@ import { mount, createLocalVue } from '@vue/test-utils'
 
 import {
   cleanupParty,
+  saveAmendmentStatementDraft,
   saveDischarge,
   saveFinancingStatement,
   saveFinancingStatementDraft,
+  setupAmendmentStatementDraft,
   setupFinancingStatementDraft
 } from '@/utils'
-import { DischargeRegistrationIF, PartyIF, FinancingStatementIF, DraftIF, StateModelIF } from '@/interfaces'
-import { APIRegistrationTypes } from '@/enums'
+import {
+  AmendmentStatementIF,
+  DischargeRegistrationIF,
+  DraftIF,
+  FinancingStatementIF,
+  PartyIF,
+  StateModelIF
+} from '@/interfaces'
+import { APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
 
 // Components
 import { FolioNumberSummary } from '@/components/common'
 
 // Other
 import {
+  mockedModelAmendmdmentAdd,
+  mockedModelAmendmdmentCourtOrder,
+  mockedModelAmendmdmentDelete,
+  mockedModelAmendmdmentEdit,
   mockedDebtorNames,
   mockedDraftFinancingStatementAll,
   mockedSelectSecurityAgreement,
@@ -77,7 +90,7 @@ describe('Registration API Helper Tests', () => {
   })
 
   it('save new security agreement', async () => {
-    var statement:FinancingStatementIF = await saveFinancingStatement(wrapper.vm.$store.state.stateModel)
+    const statement:FinancingStatementIF = await saveFinancingStatement(wrapper.vm.$store.state.stateModel)
     // console.log(JSON.stringify(statement))
     expect(statement.createDateTime).toBeDefined()
     expect(statement.baseRegistrationNumber).toBeDefined()
@@ -90,7 +103,7 @@ describe('Registration API Helper Tests', () => {
     model.registration.lengthTrust.surrenderDate = '2021-07-28T07:00:00+00:00'
     model.registration.lengthTrust.trustIndenture = false
     model.registration.lengthTrust.lifeYears = 1
-    var statement:FinancingStatementIF = await saveFinancingStatement(model)
+    const statement:FinancingStatementIF = await saveFinancingStatement(model)
     // console.log(JSON.stringify(statement))
     expect(statement.createDateTime).toBeDefined()
     expect(statement.baseRegistrationNumber).toBeDefined()
@@ -99,7 +112,7 @@ describe('Registration API Helper Tests', () => {
 
   it('save new financing statement draft', async () => {
     await store.dispatch('setDraft', mockedDraftFinancingStatementAll)
-    var draft:DraftIF = await saveFinancingStatementDraft(wrapper.vm.$store.state.stateModel)
+    const draft:DraftIF = await saveFinancingStatementDraft(wrapper.vm.$store.state.stateModel)
     // console.log(JSON.stringify(statement))
     expect(draft.createDateTime).toBeDefined()
     expect(draft.financingStatement.documentId).toBeDefined()
@@ -119,7 +132,7 @@ describe('Registration API Helper Tests', () => {
   })
 
   it('verify cleanupParty works as expected', async () => {
-    var party:PartyIF = mockedRegisteringParty1
+    let party:PartyIF = mockedRegisteringParty1
     party.address.streetAdditional = ''
     party = cleanupParty(party)
     // console.log(JSON.stringify(party))
@@ -140,7 +153,7 @@ describe('Registration API Helper Tests', () => {
 
   it('setup financing statement draft for editing', async () => {
     await store.dispatch('resetNewRegistration', null)
-    var stateModel:StateModelIF = await setupFinancingStatementDraft(wrapper.vm.$store.state.stateModel, 'D0034001')
+    const stateModel:StateModelIF = await setupFinancingStatementDraft(wrapper.vm.$store.state.stateModel, 'D0034001')
     // console.log(JSON.stringify(stateModel))
     expect(stateModel.registration.draft).toBeDefined()
     expect(stateModel.registration.draft.error).toBeUndefined()
@@ -252,5 +265,109 @@ describe('Registration API Helper Discharge Tests', () => {
     expect(registration.baseRegistrationNumber).toBeDefined()
     expect(registration.dischargeRegistrationNumber).toBeDefined()
     expect(registration.payment).toBeDefined()
+  })
+})
+
+describe('Registration API Helper Draft Amendment setup tests', () => {
+  let wrapper: any
+
+  beforeEach(async () => {
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    document.body.setAttribute('data-app', 'true')
+    wrapper = mount(FolioNumberSummary, {
+      localVue,
+      propsData: {},
+      store,
+      vuetify
+    })
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('amendment draft add stuff setup', async () => {
+    const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentAdd)
+    // console.log(JSON.stringify(draft))
+    expect(draft.amendmentStatement).toBeDefined()
+    const amendDraft:AmendmentStatementIF = draft.amendmentStatement
+    expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
+    expect(amendDraft.changeType).toBe(APIAmendmentTypes.AMENDMENT)
+    expect(amendDraft.description).toBe('Adding')
+    expect(amendDraft.registeringParty).toBeDefined()
+    expect(amendDraft.clientReferenceId).toBe('UT-AM-001-ADD')
+    expect(amendDraft.addDebtors.length).toBe(1)
+    expect(amendDraft.deleteDebtors.length).toBe(0)
+    expect(amendDraft.addSecuredParties.length).toBe(1)
+    expect(amendDraft.deleteSecuredParties.length).toBe(0)
+    expect(amendDraft.addGeneralCollateral.length).toBe(1)
+    expect(amendDraft.deleteGeneralCollateral.length).toBe(0)
+    expect(amendDraft.addVehicleCollateral.length).toBe(1)
+    expect(amendDraft.deleteVehicleCollateral.length).toBe(0)
+  })
+
+  it('amendment draft delete stuff setup', async () => {
+    const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentDelete)
+    // console.log(JSON.stringify(draft))
+    expect(draft.amendmentStatement).toBeDefined()
+    const amendDraft:AmendmentStatementIF = draft.amendmentStatement
+    expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
+    expect(amendDraft.changeType).toBe(APIAmendmentTypes.AMENDMENT)
+    expect(amendDraft.description).toBe('Deleting')
+    expect(amendDraft.registeringParty).toBeDefined()
+    expect(amendDraft.clientReferenceId).toBe('UT-AM-002-DELETE')
+    expect(amendDraft.addDebtors.length).toBe(0)
+    expect(amendDraft.deleteDebtors.length).toBe(1)
+    expect(amendDraft.addSecuredParties.length).toBe(0)
+    expect(amendDraft.deleteSecuredParties.length).toBe(1)
+    expect(amendDraft.addGeneralCollateral.length).toBe(0)
+    expect(amendDraft.deleteGeneralCollateral.length).toBe(1)
+    expect(amendDraft.addVehicleCollateral.length).toBe(0)
+    expect(amendDraft.deleteVehicleCollateral.length).toBe(1)
+  })
+
+  it('amendment draft edit stuff setup', async () => {
+    const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentEdit)
+    // console.log(JSON.stringify(draft))
+    expect(draft.amendmentStatement).toBeDefined()
+    const amendDraft:AmendmentStatementIF = draft.amendmentStatement
+    expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
+    expect(amendDraft.changeType).toBe(APIAmendmentTypes.AMENDMENT)
+    expect(amendDraft.description).toBe('Editing')
+    expect(amendDraft.registeringParty).toBeDefined()
+    expect(amendDraft.clientReferenceId).toBe('UT-AM-003-EDIT')
+    expect(amendDraft.addDebtors.length).toBe(1)
+    expect(amendDraft.deleteDebtors.length).toBe(1)
+    expect(amendDraft.addSecuredParties.length).toBe(1)
+    expect(amendDraft.deleteSecuredParties.length).toBe(1)
+    expect(amendDraft.addGeneralCollateral.length).toBe(1)
+    expect(amendDraft.deleteGeneralCollateral.length).toBe(1)
+    expect(amendDraft.addVehicleCollateral.length).toBe(1)
+    expect(amendDraft.deleteVehicleCollateral.length).toBe(1)
+  })
+
+  it('amendment draft court order setup', async () => {
+    const draft:DraftIF = setupAmendmentStatementDraft(mockedModelAmendmdmentCourtOrder)
+    // console.log(JSON.stringify(draft))
+    expect(draft.amendmentStatement).toBeDefined()
+    const amendDraft:AmendmentStatementIF = draft.amendmentStatement
+    expect(amendDraft.baseRegistrationNumber).toBe('0023001B')
+    expect(amendDraft.changeType).toBe(APIAmendmentTypes.COURT_ORDER)
+    expect(amendDraft.description).toBe('Court Order')
+    expect(amendDraft.registeringParty).toBeDefined()
+    expect(amendDraft.courtOrderInformation).toBeDefined()
+    expect(amendDraft.courtOrderInformation.orderDate).toBe('2021-09-03T18:00:00+00:00')
+    expect(amendDraft.clientReferenceId).toBe('UT-AM-004-COURT-ORDER')
+    expect(amendDraft.addDebtors.length).toBe(0)
+    expect(amendDraft.deleteDebtors.length).toBe(0)
+    expect(amendDraft.addSecuredParties.length).toBe(0)
+    expect(amendDraft.deleteSecuredParties.length).toBe(0)
+    expect(amendDraft.addGeneralCollateral.length).toBe(0)
+    expect(amendDraft.deleteGeneralCollateral.length).toBe(0)
+    expect(amendDraft.addVehicleCollateral.length).toBe(0)
+    expect(amendDraft.deleteVehicleCollateral.length).toBe(0)
   })
 })
