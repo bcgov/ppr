@@ -47,9 +47,11 @@
             :setFeeType="feeType"
             :setRegistrationType="registrationTypeUI"
             :setCancelBtn="'Cancel'"
+            :setBackBtn="'Save and Resume Later'"
             :setSubmitBtn="'Review and Complete'"
             @cancel="goToDashboard()"
             @submit="confirmAmendment()"
+            @back="saveDraft()"
           />
         </v-col>
       </v-row>
@@ -223,6 +225,10 @@ export default class AmendRegistration extends Vue {
     } else {
       this.showInvalid = true
     }
+  }
+
+  private saveDraft (): void {
+    this.goToDashboard()
   }
 
   private goToDashboard (): void {
