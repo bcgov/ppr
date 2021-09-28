@@ -32,7 +32,7 @@
           <h3 class="pt-6 px-1">Secured Parties</h3>
           <secured-parties @setSecuredPartiesValid="securedPartiesValid = $event" class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
-          <debtors @setDebtorValid="debtorValid = $event" :setShowInvalid="showDebtorInvalid" />
+          <debtors @setDebtorValid="debtorValid = $event" :setShowInvalid="showInvalid" />
           <collateral
             :setRegistrationType="registrationType"
             @setCollateralValid="collateralValid = $event"
@@ -126,7 +126,7 @@ export default class AmendRegistration extends Vue {
   private feeType = FeeSummaryTypes.AMMEND
   private financingStatementDate: Date = null
   private debtorValid = true
-  private showDebtorInvalid = false
+  private showInvalid = false
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
@@ -215,14 +215,13 @@ export default class AmendRegistration extends Vue {
 
   private confirmAmendment (): void {
     if (this.debtorValid && this.securedPartiesValid && this.registrationLengthTrustValid && this.collateralValid) {
-      // TODO: change route name
       this.$router.push({
-        name: RouteNames.CONFIRM_DISCHARGE,
+        name: RouteNames.CONFIRM_AMENDMENT,
         query: { 'reg-num': this.registrationNumber }
       })
       this.emitHaveData(false)
     } else {
-      this.showDebtorInvalid = true
+      this.showInvalid = true
     }
   }
 

@@ -178,4 +178,20 @@ describe('Debtor validation tests', () => {
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
 
+
+  it('goes from valid to invalid', async () => {
+    wrapper.vm.$data.debtors = mockedDebtors1
+    await Vue.nextTick()
+    expect(wrapper.vm.getDebtorValidity()).toBe(true)
+    // remove said debtor
+    // click the drop down arrow
+    wrapper.find('.v-data-table .debtor-row .actions__more-actions__btn').trigger('click')
+    await Vue.nextTick()
+    //click remove
+    wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.getDebtorValidity()).toBe(false)
+
+  })
+
 })
