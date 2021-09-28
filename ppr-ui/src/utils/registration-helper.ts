@@ -24,11 +24,25 @@ import {
 } from '@/utils'
 import { RegistrationTypes } from '@/resources'
 
+/** Set the amendment add/delete lists depending on the registration list actions */
+function setAmendmentList (baseList:Array<any>, addList:Array<any>, deleteList:Array<any>) {
+  for (let i = 0; i < baseList.length; i++) {
+    if (baseList[i].action) {
+      if (baseList[i].action === ActionTypes.ADDED || baseList[i].action === ActionTypes.EDITED) {
+        addList.push(JSON.parse(JSON.stringify(baseList[i])))
+      }
+      if (baseList[i].action === ActionTypes.REMOVED || baseList[i].action === ActionTypes.EDITED) {
+        deleteList.push(JSON.parse(JSON.stringify(baseList[i])))
+      }
+    }
+  }
+}
+
 /** Setup the amendment registration for the API call. All data to be saved is in the store state model. */
 function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF {
   const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
   let statement:AmendmentStatementIF = stateModel.registration.draft.amendmentStatement
-  if (statement === undefined || statement === null) {
+  if (!statement) {
     statement = {
       changeType: APIAmendmentTypes.AMENDMENT,
       baseRegistrationNumber: stateModel.registration.registrationNumber,
@@ -72,46 +86,14 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
   }
   const parties:AddPartiesIF = stateModel.registration.parties
   // Conditionally set draft debtors.
-  for (let i = 0; i < parties.debtors.length; i++) {
-    if (parties.debtors[i].action) {
-      if (parties.debtors[i].action === ActionTypes.ADDED || parties.debtors[i].action === ActionTypes.EDITED) {
-        statement.addDebtors.push(JSON.parse(JSON.stringify(parties.debtors[i])))
-      }
-      if (parties.debtors[i].action === ActionTypes.REMOVED || parties.debtors[i].action === ActionTypes.EDITED) {
-        statement.deleteDebtors.push(JSON.parse(JSON.stringify(parties.debtors[i])))
-      }
-    }
-  }
+  setAmendmentList(parties.debtors, statement.addDebtors, statement.deleteDebtors)
+
   // Conditionally set draft secured parties.
-  for (let i = 0; i < parties.securedParties.length; i++) {
-    if (parties.securedParties[i].action) {
-      if (parties.securedParties[i].action === ActionTypes.ADDED ||
-          parties.securedParties[i].action === ActionTypes.EDITED) {
-        statement.addSecuredParties.push(JSON.parse(JSON.stringify(parties.securedParties[i])))
-      }
-      if (parties.securedParties[i].action === ActionTypes.REMOVED ||
-          parties.securedParties[i].action === ActionTypes.EDITED) {
-        statement.deleteSecuredParties.push(JSON.parse(JSON.stringify(parties.securedParties[i])))
-      }
-    }
-  }
+  setAmendmentList(parties.securedParties, statement.addSecuredParties, statement.deleteSecuredParties)
 
   const collateral:AddCollateralIF = stateModel.registration.collateral
   // Conditionally set draft vehicle collateral
-  if (collateral.vehicleCollateral && collateral.vehicleCollateral.length > 0) {
-    for (let i = 0; i < collateral.vehicleCollateral.length; i++) {
-      if (collateral.vehicleCollateral[i].action) {
-        if (collateral.vehicleCollateral[i].action === ActionTypes.ADDED ||
-            collateral.vehicleCollateral[i].action === ActionTypes.EDITED) {
-          statement.addVehicleCollateral.push(JSON.parse(JSON.stringify(collateral.vehicleCollateral[i])))
-        }
-        if (collateral.vehicleCollateral[i].action === ActionTypes.REMOVED ||
-            collateral.vehicleCollateral[i].action === ActionTypes.EDITED) {
-          statement.deleteVehicleCollateral.push(JSON.parse(JSON.stringify(collateral.vehicleCollateral[i])))
-        }
-      }
-    }
-  }
+  setAmendmentList(collateral.vehicleCollateral, statement.addVehicleCollateral, statement.deleteVehicleCollateral)
   // Conditionally set draft general collateral
   if (collateral.generalCollateral && collateral.generalCollateral.length > 0) {
     for (let i = 0; i < collateral.generalCollateral.length; i++) {
@@ -137,9 +119,10 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
 
 /** Setup the draft data for the current amendment. All data to be saved is in the store state model. */
 export function setupAmendmentStatementDraft (stateModel:StateModelIF): DraftIF {
-  const draft:DraftIF = stateModel.registration.draft
-  draft.type = DraftTypes.AMENDMENT_STATEMENT
-  draft.amendmentStatement = setupAmendmentStatement(stateModel)
+  const draft:DraftIF = {
+    type: DraftTypes.AMENDMENT_STATEMENT,
+    amendmentStatement: setupAmendmentStatement(stateModel)
+  }
   return draft
 }
 
@@ -155,12 +138,15 @@ export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Pro
     apiCall = 'create'
     draftResponse = await createDraft(draft)
   }
-  if (draftResponse !== undefined && draftResponse.error === undefined) {
+
+  if (draftResponse && !draftResponse.error) {
     console.log('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
                 draftResponse.amendmentStatement.documentId)
-  } else if (draftResponse !== undefined) {
+  } else if (draftResponse) {
     console.error('saveAmendmentStatementDraft failed: ' + draftResponse.error.statusCode + ': ' +
                   draftResponse.error.message)
+  } else {
+    console.error('saveAmendmentStatementDraft failed: no API response.')
   }
   return draftResponse
 }
@@ -218,13 +204,15 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
     apiCall = 'create'
     draftResponse = await createDraft(draft)
   }
-  // await store.dispatch('setDraft', apiResponse)
-  if (draftResponse !== undefined && draftResponse.error === undefined) {
+
+  if (draftResponse && !draftResponse.error) {
     console.log('saveFinancingStatementDraft ' + apiCall + ' draft successful for documentId ' +
                 draftResponse.financingStatement.documentId)
-  } else if (draftResponse !== undefined) {
+  } else if (draftResponse) {
     console.error('saveFinancingStatementDraft failed: ' + draftResponse.error.statusCode + ': ' +
                   draftResponse.error.message)
+  } else {
+    console.error('saveFinancingStatementDraft failed: no API response.')
   }
   return draftResponse
 }

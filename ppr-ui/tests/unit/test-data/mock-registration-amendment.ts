@@ -1,10 +1,12 @@
-import { RegistrationFlowType, APIVehicleTypes, ActionTypes } from '@/enums'
+import { ActionTypes, APIAmendmentTypes, APIVehicleTypes, DraftTypes, RegistrationFlowType } from '@/enums'
 import {
   CourtOrderIF,
+  DraftIF,
   GeneralCollateralIF,
   PartyIF,
   VehicleCollateralIF,
-  StateModelIF
+  StateModelIF,
+  AmendmentStatementIF
 } from '@/interfaces'
 import {
   mockedAddress1,
@@ -244,6 +246,18 @@ export const mockedDebtorsEdit: PartyIF[] = [
     address: mockedAddress1
   }
 ]
+
+export const mockedAmendmentStatement1: AmendmentStatementIF = {
+  documentId: 'D0034002',
+  baseRegistrationNumber: '023003B',
+  description: 'Test',
+  registeringParty: mockedRegisteringParty1,
+  changeType: APIAmendmentTypes.AMENDMENT
+}
+export const mockedDraftAmendmentStatement: DraftIF = {
+  type: DraftTypes.AMENDMENT_STATEMENT,
+  amendmentStatement: mockedAmendmentStatement1
+}
 
 export const mockedModelAmendmdmentAdd: StateModelIF = {
   accountInformation: {

@@ -251,8 +251,13 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
 
 // Update an existing draft.
 export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
-  var documentId = draft.financingStatement?.documentId
-  if (documentId === undefined || documentId === '') {
+  let documentId = ''
+  if (draft.financingStatement) {
+    documentId = draft.financingStatement?.documentId
+  } else if (draft.amendmentStatement) {
+    documentId = draft.amendmentStatement?.documentId
+  }
+  if (!documentId || documentId === '') {
     draft.error = {
       statusCode: StatusCodes.BAD_REQUEST,
       message:
