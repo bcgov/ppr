@@ -204,7 +204,7 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on discharge: confirm discharge with breadcrumb', () => {
+  it('renders on renew: confirm renewal with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_RENEWAL, confirmRenewRoute.path, confirmRenewRoute.name)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
@@ -214,7 +214,7 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on renew: review renewal with breadcrumb', () => {
+  it('renders on amendment: review amendment with breadcrumb', () => {
     wrapper = createComponent(RouteNames.AMEND_REGISTRATION, reviewAmendRoute.path, reviewAmendRoute.name)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
@@ -224,7 +224,7 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on discharge: confirm discharge with breadcrumb', () => {
+  it('renders on amendment: confirm amendment with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_AMENDMENT, confirmAmendRoute.path, confirmAmendRoute.name)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
