@@ -29,8 +29,8 @@
                 {{ item.descriptionAdd }}
               </p>
             </div>
-            <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description">
-              <b v-if="registrationFlowType !== RegistrationFlowType.NEW" class="pt-30px">
+            <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description pt-30px">
+              <b v-if="registrationFlowType !== RegistrationFlowType.NEW">
                 Base Registration Collateral:
               </b>
               <p v-if="item.description" class="pt-30px ma-0">
