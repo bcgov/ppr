@@ -83,7 +83,7 @@
                     <div>
                       {{ getName(row.item) }}
                     </div>
-                    <div v-if="row.item.action">
+                    <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                       <v-chip x-small label color="#1669BB" text-color="white">
                         {{ row.item.action }}
                       </v-chip>
@@ -137,8 +137,9 @@
                   </span>
 
                   <span class="actions__more"
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && row.item.action !== ActionTypes.REMOVED"
+                    v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action !== ActionTypes.REMOVED) ||
+                    registrationFlowType !== RegistrationFlowType.AMENDMENT"
                   >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">

@@ -5,11 +5,13 @@
     class="white pb-6 pr-10 pl-8 rounded"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
   >
-  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 mr-n2">
+  <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
         <v-col cols="auto" class="pa-2">
           <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
           <label class="pl-3">
-            <strong>Renewal Length <span v-if="showTrustIndenture">and Trust Indenture</span></strong>
+            <strong>Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+            <span v-else>Terms</span>
+            </strong>
           </label>
         </v-col>
       </v-row>
