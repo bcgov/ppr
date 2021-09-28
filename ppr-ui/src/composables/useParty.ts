@@ -1,3 +1,4 @@
+import { ActionTypes } from '@/enums'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
@@ -59,13 +60,23 @@ export const useParty = () => {
   }
 
   const isPartiesValid = (parties: AddPartiesIF): boolean => {
-    if (parties.debtors.length === 0) {
-      return false
+    let debtorValid = false
+    let securedPartyValid = false
+    for (let i = 0; i < parties.debtors.length; i++) {
+      // is valid if there is at least one debtor
+      if (parties.debtors[i].action !== ActionTypes.REMOVED) {
+        debtorValid = true
+      }
     }
-    if (parties.securedParties.length === 0) {
-      return false
+
+    for (let i = 0; i < parties.securedParties.length; i++) {
+      // is valid if there is at least one secured party
+      if (parties.securedParties[i].action !== ActionTypes.REMOVED) {
+        securedPartyValid = true
+      }
     }
-    return true
+
+    return debtorValid && securedPartyValid
   }
 
   return {

@@ -104,4 +104,19 @@ describe('Amendment registration component', () => {
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
+
+  it('doesnt proceed if validation errors', async () => {
+    wrapper.vm.debtorValid = false
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.vm.showInvalid).toBe(true)
+  })
+
+  it('goes to the confirmation page', async () => {
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
+    
+  })
+
 })

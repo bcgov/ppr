@@ -6,7 +6,8 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedDebtors1,
-  mockedDebtorsAmendment
+  mockedDebtorsAmendment,
+  mockedDebtorsDeleted
 } from './test-data'
 
 // Components
@@ -141,6 +142,56 @@ describe('Debtor amendment tests', () => {
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
     expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
     expect(item3.querySelectorAll('td')[4].textContent).toContain('Edit')
+  })
+
+})
+
+
+describe('Debtor validation tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      debtors: mockedDebtorsDeleted
+    })
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct rows', () => {
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row').length
+    // one greyed out row
+    expect(rowCount).toEqual(1)
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('removed')
+  })
+
+  
+  it('displays the error', async () => {
+    wrapper.vm.$props.setShowInvalid = true
+    expect(wrapper.vm.getDebtorValidity()).toBe(false)
+    wrapper.vm.$data.showErrorDebtors = true
+    await Vue.nextTick()
+    expect(wrapper.findAll('.invalid-message').length).toBe(1)
+  })
+
+
+  it('goes from valid to invalid', async () => {
+    wrapper.vm.$data.debtors = mockedDebtors1
+    await Vue.nextTick()
+    expect(wrapper.vm.getDebtorValidity()).toBe(true)
+    // remove said debtor
+    // click the drop down arrow
+    wrapper.find('.v-data-table .debtor-row .actions__more-actions__btn').trigger('click')
+    await Vue.nextTick()
+    //click remove
+    wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.getDebtorValidity()).toBe(false)
+
   })
 
 })

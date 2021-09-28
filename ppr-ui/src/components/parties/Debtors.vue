@@ -56,7 +56,7 @@
       <v-col>
         <v-data-table
           class="debtor-table"
-          :class="{ 'invalid-message': showErrorDebtors }"
+          :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
           :headers="headers"
           :items="debtors"
           disable-pagination
@@ -194,7 +194,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  computed
+  computed,
+  watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -205,6 +206,7 @@ import { BaseAddress } from '@/composables/address'
 import { debtorTableHeaders, editTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -213,6 +215,10 @@ export default defineComponent({
   },
   props: {
     isSummary: {
+      type: Boolean,
+      default: false
+    },
+    setShowInvalid: {
       type: Boolean,
       default: false
     }
@@ -231,7 +237,6 @@ export default defineComponent({
       'getOriginalAddSecuredPartiesAndDebtors'
     ])
 
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const registrationFlowType = getRegistrationFlowType.value
     const addressSchema = PartyAddressSchema
     const {
@@ -249,12 +254,13 @@ export default defineComponent({
       invalidSection: false,
       activeIndex: -1,
       showEditDebtor: [false],
-      debtors: parties.debtors,
+      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       showErrorSummary: computed((): boolean => {
-        return !parties.valid
+        return !getAddSecuredPartiesAndDebtors.value.valid
       }),
-      showErrorDebtors: computed((): boolean => {
-        return parties.showInvalid && parties.debtors.length === 0
+      showErrorDebtors: getAddSecuredPartiesAndDebtors.value.showInvalid,
+      parties: computed((): AddPartiesIF => {
+        return getAddSecuredPartiesAndDebtors.value
       }),
       headers: [...debtorTableHeaders, ...editTableHeaders]
     })
@@ -272,7 +278,7 @@ export default defineComponent({
         currentParties.valid = isPartiesValid(currentParties)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
-      // setValid()
+      getDebtorValidity()
     }
 
     const initEdit = (index: number) => {
@@ -295,15 +301,40 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
+      getDebtorValidity()
     }
 
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
-      localState.debtors.splice(index, 1, originalParties.debtors[index])
+      localState.debtors.splice(index, 1, cloneDeep(originalParties.debtors[index]))
+      getDebtorValidity()
     }
+
+    const getDebtorValidity = (): boolean => {
+      let validity = false
+      if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+        for (let i = 0; i < localState.debtors.length; i++) {
+          // is valid if there is at least one debtor
+          if (localState.debtors[i].action !== ActionTypes.REMOVED) {
+            validity = true
+          }
+        }
+      } else {
+        if (localState.debtors.length > 0) {
+          validity = true
+        }
+      }
+      emit('setDebtorValid', validity)
+      return validity
+    }
+
+    watch(() => props.setShowInvalid, (val) => {
+      localState.showErrorDebtors = val
+    })
 
     return {
       removeDebtor,
+      getDebtorValidity,
       getName,
       getFormattedBirthdate,
       initEdit,

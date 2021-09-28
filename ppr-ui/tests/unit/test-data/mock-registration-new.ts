@@ -199,6 +199,19 @@ export const mockedDebtorsAmendment: PartyIF[] = [
   }
 ]
 
+export const mockedDebtorsDeleted: PartyIF[] = [
+  {
+    personName: {
+      last: 'SECOND DEBTOR',
+      first: 'PERSON'
+    },
+    birthDate: '1990-06-15T16:42:00-08:00',
+    address: mockedAddress1,
+    action: ActionTypes.REMOVED
+  }
+]
+
+
 export const mockedLengthTrust1: LengthTrustIF = {
   valid: false,
   lifeYears: 5,

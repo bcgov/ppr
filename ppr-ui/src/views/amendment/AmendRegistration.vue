@@ -11,7 +11,11 @@
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt"/>
-          <registration-length-trust class="mt-15" :isSummary="true" :defaultRegistrationType="registrationType" />
+          <registration-length-trust
+            class="mt-15"
+            :isSummary="true"
+            @setRegistrationLengthTrustValid="registrationLengthTrustValid = $event"
+          />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -26,10 +30,14 @@
           <h3 class="pt-6 px-1">Original Registering Party</h3>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6 px-1">Secured Parties</h3>
-          <secured-parties class="pt-4" />
+          <secured-parties @setSecuredPartiesValid="securedPartiesValid = $event" class="pt-4" />
           <h3 class="pt-6 px-1">Debtors</h3>
-          <debtors />
-          <collateral :setRegistrationType="registrationType" class="mt-15" />
+          <debtors @setDebtorValid="debtorValid = $event" :setShowInvalid="showInvalid" />
+          <collateral
+            :setRegistrationType="registrationType"
+            @setCollateralValid="collateralValid = $event"
+            class="mt-15"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -62,7 +70,12 @@ import { RegistrationLengthTrust } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
-import { APIRegistrationTypes, RouteNames, UIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import {
+  APIRegistrationTypes, // eslint-disable-line no-unused-vars
+  RouteNames, // eslint-disable-line no-unused-vars
+  UIRegistrationTypes, // eslint-disable-line no-unused-vars
+  RegistrationFlowType // eslint-disable-line no-unused-vars
+} from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
@@ -86,6 +99,7 @@ import { StatusCodes } from 'http-status-codes'
 })
 export default class AmendRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -111,6 +125,11 @@ export default class AmendRegistration extends Vue {
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private feeType = FeeSummaryTypes.AMEND
   private financingStatementDate: Date = null
+  private debtorValid = true
+  private showInvalid = false
+  private securedPartiesValid = true
+  private registrationLengthTrustValid = true
+  private collateralValid = true
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -195,11 +214,15 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
-    this.$router.push({
-      name: RouteNames.CONFIRM_DISCHARGE,
-      query: { 'reg-num': this.registrationNumber }
-    })
-    this.emitHaveData(false)
+    if (this.debtorValid && this.securedPartiesValid && this.registrationLengthTrustValid && this.collateralValid) {
+      this.$router.push({
+        name: RouteNames.CONFIRM_AMENDMENT,
+        query: { 'reg-num': this.registrationNumber }
+      })
+      this.emitHaveData(false)
+    } else {
+      this.showInvalid = true
+    }
   }
 
   private goToDashboard (): void {
