@@ -1,5 +1,10 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-15 pt-14"
+    fluid
+    style="min-width: 960px;"
+  >
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -7,14 +12,16 @@
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               Review the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br/>
+              <b>{{ asOfDateTime }}.</b><br />
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt"/>
+          <caution-box class="mt-9" :setMsg="cautionTxt" />
           <registration-length-trust
             class="mt-15"
             :isSummary="true"
-            @setRegistrationLengthTrustValid="registrationLengthTrustValid = $event"
+            @setRegistrationLengthTrustValid="
+              registrationLengthTrustValid = $event
+            "
           />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
@@ -24,15 +31,25 @@
           </div>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              The Registering Party has been added based on your account information and cannot be changed here.
+              The Registering Party has been added based on your account
+              information and cannot be changed here.
             </p>
           </div>
           <h3 class="pt-6 px-1">Original Registering Party</h3>
-          <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <registering-party-summary
+            class="pt-4"
+            :setEnableNoDataAction="false"
+          />
           <h3 class="pt-6 px-1">Secured Parties</h3>
-          <secured-parties @setSecuredPartiesValid="securedPartiesValid = $event" class="pt-4" />
+          <secured-parties
+            @setSecuredPartiesValid="securedPartiesValid = $event"
+            class="pt-4"
+          />
           <h3 class="pt-6 px-1">Debtors</h3>
-          <debtors @setDebtorValid="debtorValid = $event" :setShowInvalid="showInvalid" />
+          <debtors
+            @setDebtorValid="debtorValid = $event"
+            :setShowInvalid="showInvalid"
+          />
           <collateral
             :setRegistrationType="registrationType"
             @setCollateralValid="collateralValid = $event"
@@ -47,9 +64,11 @@
             :setFeeType="feeType"
             :setRegistrationType="registrationTypeUI"
             :setCancelBtn="'Cancel'"
+            :setBackBtn="'Save and Resume Later'"
             :setSubmitBtn="'Review and Complete'"
             @cancel="goToDashboard()"
             @submit="confirmAmendment()"
+            @back="saveDraft()"
           />
         </v-col>
       </v-row>
@@ -78,11 +97,23 @@ import {
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
-  ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  AddPartiesIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, // eslint-disable-line no-unused-vars
+  AddCollateralIF, // eslint-disable-line no-unused-vars
+  LengthTrustIF, // eslint-disable-line no-unused-vars
+  StateModelIF, // eslint-disable-line no-unused-vars
+  DraftIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
-import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
+import {
+  convertDate,
+  getFeatureFlag,
+  getFinancingStatement,
+  saveAmendmentStatementDraft,
+  setupAmendmentStatementFromDraft
+} from '@/utils'
 import { cloneDeep } from 'lodash'
 import { StatusCodes } from 'http-status-codes'
 
@@ -100,9 +131,12 @@ import { StatusCodes } from 'http-status-codes'
 export default class AmendRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
+  @Getter getStateModel: StateModelIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setAmendmentDescription: ActionBindingIF
+  @Action setCourtOrderInformation: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setOriginalAddCollateral: ActionBindingIF
   @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -120,7 +154,8 @@ export default class AmendRegistration extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  private cautionTxt = 'Secured Parties in this registration ' +
+  private cautionTxt =
+    'Secured Parties in this registration ' +
     'will receive a copy of the Amendment Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private feeType = FeeSummaryTypes.AMEND
@@ -145,7 +180,12 @@ export default class AmendRegistration extends Vue {
 
   // the number of the registration being amended
   private get registrationNumber (): string {
-    return this.$route.query['reg-num'] as string || ''
+    return (this.$route.query['reg-num'] as string) || ''
+  }
+
+  // the draft document id if loading data after the base registration.
+  private get documentId (): string {
+    return (this.$route.query['document-id'] as string) || ''
   }
 
   private get registrationTypeUI (): UIRegistrationTypes {
@@ -170,12 +210,11 @@ export default class AmendRegistration extends Vue {
       this.emitError(financingStatement.error)
     } else {
       // load data into the store
-      const registrationType = RegistrationTypes.find(
-        (reg, index) => {
-          if (reg.registrationTypeAPI === financingStatement.type) {
-            return true
-          }
-        })
+      const registrationType = RegistrationTypes.find((reg, index) => {
+        if (reg.registrationTypeAPI === financingStatement.type) {
+          return true
+        }
+      })
       const collateral = {
         valid: true,
         vehicleCollateral: financingStatement.vehicleCollateral,
@@ -206,6 +245,26 @@ export default class AmendRegistration extends Vue {
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
       this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+
+      if (this.documentId) {
+        const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
+        if (stateModel.registration.draft.error) {
+          console.error('loadRegistration setupAmendmentStatementFromDraft error: status: ' +
+                        stateModel.registration.draft.error.statusCode + ' message: ' +
+                        stateModel.registration.draft.error.message)
+          this.emitError(stateModel.registration.draft.error)
+        } else {
+          this.setAddCollateral(stateModel.registration.collateral)
+          this.setLengthTrust(stateModel.registration.lengthTrust)
+          this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+          if (stateModel.registration.amendmentDescription) {
+            this.setAmendmentDescription(stateModel.registration.amendmentDescription)
+          }
+          if (stateModel.registration.courtOrderInformation) {
+            this.setCourtOrderInformation(stateModel.registration.courtOrderInformation)
+          }
+        }
+      }
     }
   }
 
@@ -214,7 +273,12 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
-    if (this.debtorValid && this.securedPartiesValid && this.registrationLengthTrustValid && this.collateralValid) {
+    if (
+      this.debtorValid &&
+      this.securedPartiesValid &&
+      this.registrationLengthTrustValid &&
+      this.collateralValid
+    ) {
       this.$router.push({
         name: RouteNames.CONFIRM_AMENDMENT,
         query: { 'reg-num': this.registrationNumber }
@@ -223,6 +287,20 @@ export default class AmendRegistration extends Vue {
     } else {
       this.showInvalid = true
     }
+  }
+
+  private async saveDraft (): Promise<void> {
+    const stateModel: StateModelIF = this.getStateModel
+    const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
+    if (draft.error !== undefined) {
+      console.log(
+        'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
+      )
+    }
+    this.$router.push({
+      name: RouteNames.DASHBOARD
+    })
+    this.emitHaveData(false)
   }
 
   private goToDashboard (): void {
@@ -234,14 +312,18 @@ export default class AmendRegistration extends Vue {
 
   /** Emits Have Data event. */
   @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
+  private emitHaveData (haveData: Boolean = true): void {}
 
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) alert('This registration does not exist.')
-    else if (error.statusCode === StatusCodes.BAD_REQUEST) alert('You do not have access to this registration.')
-    else alert('There was an internal error loading this registration. Please try again later.')
+    if (error.statusCode === StatusCodes.NOT_FOUND) {
+      alert('This registration does not exist.')
+    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
+      alert('You do not have access to this registration.')
+    } else {
+      alert('There was an internal error loading this registration. Please try again later.')
+    }
     this.emitHaveData(true)
     this.$router.push({
       name: RouteNames.DASHBOARD

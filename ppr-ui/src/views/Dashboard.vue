@@ -55,6 +55,7 @@
                 @renew="startRenewal($event)"
                 @amend="startAmendment($event)"
                 @editFinancingDraft="startFinancingDraft($event)"
+                @editAmendmentDraft="startAmendmentDraft"
               />
             </v-col>
           </v-row>
@@ -184,6 +185,16 @@ export default class Dashboard extends Vue {
       // Go to the first step.
       this.$router.push({ name: RouteNames.LENGTH_TRUST })
     }
+  }
+
+  private async startAmendmentDraft ({ regNum, docId }): Promise<void> {
+    this.resetNewRegistration(null) // Clear store data from the previous registration.
+    // Go to the Amendment first step which loads the base registration and draft data.
+    this.$router.push({
+      name: RouteNames.AMEND_REGISTRATION,
+      query: { 'reg-num': regNum, 'document-id': docId }
+    })
+    this.emitHaveData(false)
   }
 
   private showRegistrationTotal (total: number): void {
