@@ -114,6 +114,7 @@ export default class AmendRegistration extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
+  @Action setDraft: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -228,6 +229,21 @@ export default class AmendRegistration extends Vue {
   }
 
   private saveDraft (): void {
+    const stateModel: StateModelIF = getStateModel.value
+      const draft: DraftIF = await saveFinancingStatementDraft(stateModel)
+      setDraft(draft)
+      if (draft.error !== undefined) {
+        console.log(
+          'saveDraft error status: ' +
+            draft.error.statusCode +
+            ' message: ' +
+            draft.error.message
+        )
+        // Emit error message.
+        emit('save-draft-error', draft.error)
+        return false
+      }
+      return true
     this.goToDashboard()
   }
 
