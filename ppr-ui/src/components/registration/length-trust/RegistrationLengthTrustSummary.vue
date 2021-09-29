@@ -2,7 +2,8 @@
   <v-container fluid no-gutters class="white pa-0">
     <v-card flat id="length-trust-summary">
       <h2 class="pt-2 pb-5 renewal-title" v-if="isRenewal">
-          Renewal Length and Terms
+          Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+          <span v-else>Terms</span>
        </h2>
       <v-row no-gutters class="summary-header pa-2" v-else>
         <v-col cols="auto" class="pa-2">
@@ -49,17 +50,9 @@
             {{ lengthSummary }}
           </v-col>
         </v-row>
-        <v-row class="pt-4" v-if="renewalView && registrationType !== APIRegistrationTypes.REPAIRERS_LIEN">
-          <v-col cols="3"></v-col>
-          <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
-        </v-row>
-        <v-row no-gutters class="pt-6" v-if="renewalView">
+        <v-row no-gutters class="pt-8" v-if="renewalView">
           <v-col cols="3" class="generic-label">New Expiry</v-col>
           <v-col cols="9" id="new-expiry">{{ computedExpiryDateFormatted }}</v-col>
-        </v-row>
-        <v-row v-if="renewalView && showTrustIndenture">
-          <v-col cols="3"></v-col>
-          <v-col cols="9" class="pl-2"><v-divider class="ml-0" /></v-col>
         </v-row>
         <v-row no-gutters class="pt-6" v-if="showTrustIndenture">
           <v-col cols="3" class="generic-label">
