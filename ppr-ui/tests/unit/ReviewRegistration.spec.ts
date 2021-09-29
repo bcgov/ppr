@@ -23,7 +23,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedFinancingStatementAll } from './test-data'
+import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -44,6 +44,8 @@ describe('ReviewConfirm new registration component', () => {
   beforeEach(async () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // setup store values
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')

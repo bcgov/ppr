@@ -43,6 +43,8 @@ describe('ConfirmDischarge registration view', () => {
   beforeEach(async () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // store setup
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -155,7 +157,6 @@ describe('ConfirmDischarge registration view', () => {
     // Set up for valid discharge request
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)

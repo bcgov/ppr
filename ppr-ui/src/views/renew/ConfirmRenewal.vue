@@ -96,7 +96,8 @@ import {
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF // eslint-disable-line no-unused-vars
+  DialogOptionsIF, // eslint-disable-line no-unused-vars
+  DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
@@ -115,6 +116,7 @@ import { StatusCodes } from 'http-status-codes'
   }
 })
 export default class ConfirmDischarge extends Vue {
+  @Getter getConfirmDebtorName: DebtorNameIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
   @Getter getLengthTrust: LengthTrustIF
@@ -193,8 +195,12 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber) {
-      console.error('No registration number given to discharge. Redirecting to dashboard...')
+    if (!this.registrationNumber || !this.getConfirmDebtorName) {
+      if (!this.registrationNumber) {
+        console.error('No registration number given to discharge. Redirecting to dashboard...')
+      } else {
+        console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+      }
       this.$router.push({
         name: RouteNames.DASHBOARD
       })

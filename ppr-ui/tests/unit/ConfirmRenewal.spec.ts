@@ -40,6 +40,8 @@ describe('Confirm Renewal new registration component', () => {
     // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // store setup
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -51,7 +53,7 @@ describe('Confirm Renewal new registration component', () => {
     post.returns(new Promise(resolve => resolve({
       data: { ...mockedRenewalResponse }
     })))
-    
+
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
     localVue.use(VueRouter)
@@ -76,7 +78,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    
+
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     // check registering party
@@ -129,6 +131,4 @@ describe('Confirm Renewal new registration component', () => {
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
-
 })
-

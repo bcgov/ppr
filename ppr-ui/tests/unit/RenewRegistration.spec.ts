@@ -21,7 +21,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedFinancingStatementAll } from './test-data'
+import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 
@@ -44,6 +44,8 @@ describe('Renew registration component', () => {
   beforeEach(async () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // setup store values
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -77,7 +79,7 @@ describe('Renew registration component', () => {
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
-    //should start off null
+    // should start off null
     expect(state.registration.lengthTrust.lifeYears).toBe(null)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)

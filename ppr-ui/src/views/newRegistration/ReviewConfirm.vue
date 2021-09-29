@@ -1,5 +1,5 @@
 <template>
-  <v-container class="view-container pa-0" fluid>
+  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -18,7 +18,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
+              <v-col class="pt-2 pb-6 sub-header-info">
                 Review the information in your registration. If you need to change anything,
                 return to the step to make the necessary change.
               </v-col>
@@ -91,24 +91,14 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames, StatementTypes, APIRegistrationTypes } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
-// local store stuff
-import {
-  getAddCollateral, // eslint-disable-line no-unused-vars
-  getLengthTrust, // eslint-disable-line no-unused-vars
-  getAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
-} from '@/store/getters'
-import {
-  setAddCollateral, // eslint-disable-line no-unused-vars
-  setLengthTrust, // eslint-disable-line no-unused-vars
-  setAddSecuredPartiesAndDebtors // eslint-disable-line no-unused-vars
-} from '@/store/actions'
+import { getFeatureFlag } from '@/utils'
 // local components
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
@@ -128,30 +118,30 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
   }
 })
 export default class ReviewConfirm extends Vue {
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getRegistrationOther: string
   @Getter getAddCollateral: AddCollateralIF
-  @Getter getLengthTrust: LengthTrustIF
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
+  @Getter getLengthTrust: LengthTrustIF
+  @Getter getRegistrationFlowType: RegistrationFlowType
+  @Getter getRegistrationOther: string
+  @Getter getRegistrationType: RegistrationTypeIF
 
-  @Action resetNewRegistration: ActionBindingIF
   @Action setAddCollateral: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setShowStepErrors: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
 
-  @Prop({ default: '#app' })
-  private attachDialog: string
+  /** Whether App is ready. */
+  @Prop({ default: false })
+  private appReady: boolean
 
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  @Prop({ default: 'https://bcregistry.ca' })
-  private registryUrl: string
-
+  private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
-
   private showStepErrors: boolean = false
+  private statementType = StatementTypes.FINANCING_STATEMENT
+  private stepName = RouteNames.REVIEW_CONFIRM
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -175,20 +165,41 @@ export default class ReviewConfirm extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
 
-  /** Redirects browser to Business Registry home page. */
-  private redirectRegistryHome (): void {
-    window.location.assign(this.registryUrl)
-  }
-
-  private get statementType (): string {
-    return StatementTypes.FINANCING_STATEMENT
-  }
-
-  private get stepName (): string {
-    return RouteNames.REVIEW_CONFIRM
-  }
-
   mounted () {
+    this.onAppReady(this.appReady)
+  }
+
+  @Emit('error')
+  private emitError (error: ErrorIF): void {
+    console.error(error)
+    alert('Error saving registration. Replace when design complete.')
+  }
+
+  /** Emits Have Data event. */
+  @Emit('haveData')
+  private emitHaveData (haveData: Boolean = true): void { }
+
+  /** Called when App is ready and this component can load its data. */
+  @Watch('appReady')
+  private async onAppReady (val: boolean): Promise<void> {
+    // do not proceed if app is not ready
+    if (!val) return
+    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      this.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      return
+    }
+
+    // redirect if store doesn't contain all needed data (happens on page reload, etc.)
+    if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
+      this.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      return
+    }
+
     const collateral = this.getAddCollateral
     if (!collateral.valid) {
       collateral.showInvalid = true
@@ -204,12 +215,10 @@ export default class ReviewConfirm extends Vue {
       parties.showInvalid = true
       this.setAddSecuredPartiesAndDebtors(parties)
     }
-  }
 
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-    alert('Error saving registration. Replace when design complete.')
+    // page is ready to view
+    this.emitHaveData(true)
+    this.dataLoaded = true
   }
 
   @Watch('saveDraftError')

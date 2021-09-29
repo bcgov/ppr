@@ -28,7 +28,6 @@ const description = '.gc-description'
 const descriptionAdd = '.gc-description-add'
 const descriptionDelete = '.gc-description-delete'
 
-
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -95,7 +94,7 @@ describe('GenColSummary tests', () => {
     const descriptionDeleteAll = wrapper.findAll(descriptionDelete)
     let addCount = 0
     let deleteCount = 0
-    for (let i=0; i < mockedGeneralCollateral2.length; i++) {
+    for (let i = 0; i < mockedGeneralCollateral2.length; i++) {
       expect(addCount < descriptionAddAll.length)
       expect(deleteCount < descriptionDeleteAll.length)
       if (mockedGeneralCollateral2[i].addedDateTime) {

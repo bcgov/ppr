@@ -4,17 +4,16 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  LengthTrustIF, StateModelIF
-} from '@/interfaces'
+// local components
+import { RegistrationLengthTrust } from '@/components/registration'
+// local types/helpers/etc.
+import { StateModelIF } from '@/interfaces'
+// unit test helpers/data
 import {
   mockedSelectSecurityAgreement,
   mockedSaleOfGoods,
   mockedMarriageMH
 } from './test-data'
-
-// Components
-import { RegistrationLengthTrust } from '@/components/registration'
 
 Vue.use(Vuetify)
 
@@ -22,26 +21,9 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 /**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
-
-/**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchBar> object with the given parameters.
+ * @returns a Wrapper<any> object with the given parameters.
  */
 function createComponent (
   isRenewal: Boolean

@@ -3,20 +3,29 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import CompositionApi from '@vue/composition-api'
+import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 
-// Components
-import { ReviewConfirm } from '@/views'
-import { ButtonFooter, Stepper, FolioNumberSummary, StickyContainer } from '@/components/common'
-import { RegistrationLengthTrustSummary } from '@/components/registration'
+// Local Components
+import { ButtonFooter, FolioNumberSummary, Stepper, StickyContainer } from '@/components/common'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
-
-// Other
+import { RegistrationLengthTrustSummary } from '@/components/registration'
+import { ReviewConfirm } from '@/views'
+// Local types/helpers
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import {
+  RegistrationFlowType,
+  RouteNames,
+  StatementTypes,
+  UIRegistrationTypes
+} from '@/enums'
+import { LengthTrustIF } from '@/interfaces'
+import { RegistrationTypes } from '@/resources'
+// unit test helpers/data
 import mockRouter from './MockRouter'
-import { mockedLengthTrust1, mockedSelectSecurityAgreement } from './test-data'
-import { RouteNames } from '@/enums'
-import { DraftIF, LengthTrustIF } from '@/interfaces'
+import { mockedSelectSecurityAgreement } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -24,118 +33,149 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Input field selectors / buttons
-const cancelBtn: string = '#reg-cancel-btn'
-const saveBtn: string = '#reg-save-btn'
-const saveResumeBtn: string = '#reg-save-resume-btn'
-const backBtn: string = '#reg-back-btn'
-const nextBtn: string = '#reg-next-btn'
-const registrationLengthTrust: string = '#registration-length-trust'
-const errorLinkLengthTrust: string = '#router-link-length-trust'
+const header = '#registration-header'
+const title: string = '.sub-header'
+const titleInfo: string = '.sub-header-info'
 
-// Prevent the warning "[Vuetify] Unable to locate target [data-app]"
-document.body.setAttribute('data-app', 'true')
+/**
+ * Creates and mounts a component, so that it can be tested.
+ *
+ * @returns a Wrapper<any> object with the given parameters.
+ */
+function createComponent (): Wrapper<any> {
+  const localVue = createLocalVue()
+  localVue.use(CompositionApi)
+  localVue.use(Vuetify)
+  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
+  document.body.setAttribute('data-app', 'true')
+  localVue.use(VueRouter)
+  const router = mockRouter.mock()
+  router.push({ name: RouteNames.REVIEW_CONFIRM })
 
-describe('ReviewConfirm new registration component', () => {
+  return mount(ReviewConfirm, {
+    localVue,
+    propsData: {
+      appReady: true,
+      isJestRunning: true
+    },
+    router,
+    store,
+    vuetify
+  })
+}
+
+describe('Review Confirm new registration component', () => {
   let wrapper: any
-  const { assign } = window.location
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: RouteNames.REVIEW_CONFIRM })
-    wrapper = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
+    await store.dispatch('setRegistrationType', null)
+    await store.dispatch('setRegistrationFlowType', null)
   })
 
   afterEach(() => {
-    window.location.assign = assign
     wrapper.destroy()
   })
 
-  it('renders Review Confirm View with child components', () => {
+  it('redirects to dashboard when store is not set', () => {
+    wrapper = createComponent()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
+
+  it('renders Add Parties View with child components when store is set', async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent()
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.vm.appReady).toBe(true)
+    expect(wrapper.vm.dataLoaded).toBe(true)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+      lifeInfinite: false,
+      lifeYears: 0
+    })
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      UIRegistrationTypes.SECURITY_AGREEMENT
+    )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(Parties).exists()).toBe(true)
+    expect(wrapper.findComponent(Parties).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(Collateral).vm.$props.isSummary).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    expect(wrapper.find(header).exists()).toBe(true)
+    expect(wrapper.find(title).exists()).toBe(true)
+    expect(wrapper.find(titleInfo).exists()).toBe(true)
   })
-})
 
-describe('ReviewConfirm step 1 tests', () => {
-  let wrapper: any
-  const { assign } = window.location
-
-  beforeEach(async () => {
-    // reset the store data
-    await store.dispatch('resetNewRegistration')
-    const resetDraft:DraftIF = {
-      type: '',
-      financingStatement: null,
-      createDateTime: null,
-      lastUpdateDateTime: null
+  it('updates fee summary with registration length changes', async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent()
+    await flushPromises()
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+      lifeInfinite: false,
+      lifeYears: 0
+    })
+    const newLengthTrust1: LengthTrustIF = {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: true,
+      lifeYears: 0
     }
-    await store.dispatch('setDraft', resetDraft)
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
-
-    // mock the window.location.assign function
-    delete window.location
-    window.location = { assign: jest.fn() } as any
-
-    // create a Local Vue and install router on it
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const router = mockRouter.mock()
-    await router.push({ name: 'review-confirm' })
-    wrapper = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
+    await store.dispatch('setLengthTrust', newLengthTrust1)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+      lifeInfinite: newLengthTrust1.lifeInfinite,
+      lifeYears: newLengthTrust1.lifeYears
+    })
+    const newLengthTrust2: LengthTrustIF = {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: true,
+      lifeYears: 0
+    }
+    await store.dispatch('setLengthTrust', newLengthTrust2)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+      lifeInfinite: newLengthTrust2.lifeInfinite,
+      lifeYears: newLengthTrust2.lifeYears
+    })
   })
 
-  afterEach(() => {
-    window.location.assign = assign
-    wrapper.destroy()
-  })
-
-  it('Review Confirm View with invalid step 1', async () => {
-    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedLengthTrust1))
-    await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
-    expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
-    expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
-    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
-    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper.findComponent(Parties).exists()).toBe(true)
-    // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
-    // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(true)
-    // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('Not entered')
-    // expect(wrapper.findComponent(RegistrationLengthTrust).trustIndentureSummary).toBe('No')
-  })
-
-  it('Review Confirm View with valid step 1', async () => {
-    const lengthTrust:LengthTrustIF = JSON.parse(JSON.stringify(mockedLengthTrust1))
-    lengthTrust.valid = true
-    lengthTrust.lifeInfinite = false
-    lengthTrust.lifeYears = 3
-    lengthTrust.trustIndenture = true
-    await wrapper.vm.$store.dispatch('setLengthTrust', lengthTrust)
-    expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
-    expect(wrapper.findComponent(Stepper).exists()).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
-    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
-    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
-    expect(wrapper.findComponent(Parties).exists()).toBe(true)
-    // expect(wrapper.findComponent(RegistrationLengthTrust).isSummary).toBe(true)
-    // expect(wrapper.findComponent(RegistrationLengthTrust).showErrorSummary).toBe(false)
-    // expect(wrapper.findComponent(RegistrationLengthTrust).lengthSummary).toBe('3')
-    // expect(wrapper.findComponent(RegistrationLengthTrust).trustIndentureSummary).toBe('Yes')
+  it('displays correct info based on registration type', async () => {
+    jest.setTimeout(30000)
+    for (let i = 0; i < RegistrationTypes.length; i++) {
+      // skip dividers + other
+      if (
+        !RegistrationTypes[i].registrationTypeUI ||
+        RegistrationTypes[i].registrationTypeUI === UIRegistrationTypes.OTHER
+      ) {
+        continue
+      }
+      await store.dispatch('setRegistrationType', RegistrationTypes[i])
+      await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+      wrapper = createComponent()
+      await flushPromises()
+      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+        RegistrationTypes[i].registrationTypeUI
+      )
+      // header
+      expect(wrapper.find(header).text()).toContain(RegistrationTypes[i].registrationTypeUI)
+      // title
+      expect(wrapper.find(title).text()).toContain('Review and Confirm')
+      // message
+      expect(wrapper.find(titleInfo).text()).toContain(
+        'Review the information in your registration. If you need to change'
+      )
+      wrapper.destroy()
+    }
   })
 })

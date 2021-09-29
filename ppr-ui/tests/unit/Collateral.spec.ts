@@ -150,7 +150,9 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
     expect(wrapper.findAll(collateralEdit).length).toBe(1)
     // description
     expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
-    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('At least one form of collateral (vehicle or general)')
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain(
+      'At least one form of collateral (vehicle or general)'
+    )
     expect(wrapper.findAll(validCollateralIcon).length).toBe(0)
     // vehicle collateral
     expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(false)
@@ -170,7 +172,9 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
     expect(wrapper.vm.valid).toBe(true)
     // description
     expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
-    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('At least one form of collateral (vehicle or general)')
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain(
+      'At least one form of collateral (vehicle or general)'
+    )
     expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
     expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
     expect(wrapper.vm.$data.vehicleCollateralLength).toBe(2)
@@ -187,7 +191,9 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
     expect(wrapper.vm.valid).toBe(true)
     // description
     expect(wrapper.findAll('#collateral-edit-description').length).toBe(1)
-    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain('At least one form of collateral (vehicle or general)')
+    expect(wrapper.findAll('#collateral-edit-description').at(0).text()).toContain(
+      'At least one form of collateral (vehicle or general)'
+    )
     expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
     expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
     expect(wrapper.vm.$data.vehicleCollateralLength).toBe(0)
@@ -274,7 +280,6 @@ describe('Collateral Lien unpaid wages tests', () => {
     wrapper2.destroy()
   })
 })
-
 
 describe('Collateral Carbon Tax tests', () => {
   let wrapper: Wrapper<any>

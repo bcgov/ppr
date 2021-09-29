@@ -1,5 +1,5 @@
 <template>
-  <v-container class="view-container pa-0" fluid>
+  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -18,7 +18,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col class="pt-2 pb-6">
+              <v-col class="pt-2 pb-6 sub-header-info">
                 Add the collateral for this {{ registrationTypeUI }} registration.
               </v-col>
             </v-row>
@@ -52,16 +52,17 @@
 <script lang="ts">
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
+import { Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames, StatementTypes, APIRegistrationTypes } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
-  ActionBindingIF, ErrorIF, LengthTrustIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
+  ErrorIF, LengthTrustIF, RegistrationTypeIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { getFeatureFlag } from '@/utils'
 // local components
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { Collateral } from '@/components/collateral'
@@ -76,21 +77,21 @@ import { Collateral } from '@/components/collateral'
 })
 export default class AddCollateral extends Vue {
   @Getter getLengthTrust: LengthTrustIF
+  @Getter getRegistrationFlowType: RegistrationFlowType
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
 
-  @Action resetNewRegistration: ActionBindingIF
-
-  @Prop({ default: '#app' })
-  private attachDialog: string
+  /** Whether App is ready. */
+  @Prop({ default: false })
+  private appReady: boolean
 
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  @Prop({ default: 'https://bcregistry.ca' })
-  private registryUrl: string
-
+  private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
+  private statementType = StatementTypes.FINANCING_STATEMENT
+  private stepName = RouteNames.ADD_COLLATERAL
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -114,17 +115,38 @@ export default class AddCollateral extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || null
   }
 
-  private get statementType (): string {
-    return StatementTypes.FINANCING_STATEMENT
+  mounted () {
+    this.onAppReady(this.appReady)
   }
 
-  private get stepName (): string {
-    return RouteNames.ADD_COLLATERAL
-  }
+  /** Emits Have Data event. */
+  @Emit('haveData')
+  private emitHaveData (haveData: Boolean = true): void { }
 
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
+  /** Called when App is ready and this component can load its data. */
+  @Watch('appReady')
+  private async onAppReady (val: boolean): Promise<void> {
+    // do not proceed if app is not ready
+    if (!val) return
+    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      this.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      return
+    }
+
+    // redirect if store doesn't contain all needed data (happens on page reload, etc.)
+    if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
+      this.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      return
+    }
+
+    // page is ready to view
+    this.emitHaveData(true)
+    this.dataLoaded = true
   }
 
   @Watch('draftSaveError')
