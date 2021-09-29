@@ -3,26 +3,24 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { mount, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
+import flushPromises from 'flush-promises'
 
-// Components
+// local components
 import { RegistrationTable } from '@/components/tables'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 import { RegistrationConfirmation } from '@/components/dialogs'
-
-
-// Other
+// local types/helpers/etc.
+import { AccountProductCodes, AccountProductMemberships, UIRegistrationTypes } from '@/enums'
+import { DraftIF, RegistrationSummaryIF } from '@/interfaces'
+import { registrationTableHeaders } from '@/resources'
+import { axios as pprAxios } from '@/utils/axios-ppr'
+// unit test data/helpers
 import {
   mockedRegistration1,
-  mockedRegistration2,
-  mockedDraft1,
-  mockedDraft2
+  mockedDraft1
 } from './test-data'
-import { DraftIF, RegistrationSummaryIF } from '@/interfaces'
-import { axios as pprAxios } from '@/utils/axios-ppr'
-import { AccountProductCodes, AccountProductMemberships, UIRegistrationTypes } from '@/enums'
-import flushPromises from 'flush-promises'
 
 const vuetify = new Vuetify({})
 const store = getVuexStore()
@@ -32,7 +30,7 @@ const regTable: string = '#registration-table'
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchedResult> object with the given parameters.
+ * @returns a Wrapper<any> object with the given parameters.
  */
 function createComponent (localVue): Wrapper<any> {
   localVue.use(CompositionApi)
@@ -40,6 +38,12 @@ function createComponent (localVue): Wrapper<any> {
   return mount(RegistrationTable, {
     localVue,
     store,
+    // FUTURE: set props dynamically and add tests for updating these props
+    propsData: {
+      setHeaders: [...registrationTableHeaders],
+      setSearch: '',
+      toggleSnackbar: false
+    },
     vuetify
   })
 }
@@ -83,28 +87,25 @@ describe('Test registration table with results', () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // the api is going to be called twice, once for drafts and once for registrations
     // the tests can't tell the difference, so the same one is called twice
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await flushPromises()
     expect(wrapper.vm.tableData.length).toBe(2)
 
     const registrationTableDisplay = wrapper.findAll(regTable)
     expect(registrationTableDisplay.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header, include the filter row, include registrations called twice
-    expect(rows.length).toBe(pprResp.length + 3)
-
-    // the first row is row 2
-    expect(rows.at(2).text()).toContain('PDF')
-    expect(rows.at(2).text()).toContain(mockedRegistration1.registrationNumber)
-    expect(rows.at(2).text()).toContain(UIRegistrationTypes.SECURITY_AGREEMENT)
+    // get stub called twice so duplicate registrations in the table
+    // FUTURE: update stub so that there is a separate one for each call
+    expect(rows.length).toBe(pprResp.length * 2)
+    expect(rows.at(0).text()).toContain('PDF')
+    expect(rows.at(0).text()).toContain(mockedRegistration1.registrationNumber)
+    expect(rows.at(0).text()).toContain(UIRegistrationTypes.SECURITY_AGREEMENT)
   })
 
   it('renders and displays the typeahead dropdown', async () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // the api is going to be called twice, once for drafts and once for registrations
     // the tests can't tell the difference, so the same one is called twice
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await flushPromises()
     expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(true)
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Registration Type')
@@ -163,8 +164,6 @@ describe('Test registration table with results', () => {
     const dialog = wrapper.findComponent(RegistrationConfirmation)
     
     expect(dialog.isVisible()).toBe(true)
-
-
   })
 
   it('shows the renewal modal', async () => {
@@ -191,11 +190,29 @@ describe('Test registration table with results', () => {
     const dialog = wrapper.findComponent(RegistrationConfirmation)
     
     expect(dialog.isVisible()).toBe(true)
-
-
   })
 
-
+  it('shows the snackbar when toggled', async () => {
+    // toggle show snackbar
+    await wrapper.setProps({ toggleSnackBar: true })
+    expect(wrapper.find('.v-snack__wrapper').exists()).toBe(true)
+    expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(true)
+    expect(wrapper.find('.v-snack__wrapper').text()).toContain(
+      'Registration was successfully added to your table'
+    )
+    // close snackbar
+    expect(wrapper.find('.snackbar-btn-close').exists()).toBe(true)
+    await wrapper.find('.snackbar-btn-close').trigger('click')
+    expect(wrapper.vm.$data.showSnackbar).toBe(false)
+    expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(false)
+    // verify toggle works again after the first time
+    await wrapper.setProps({ toggleSnackBar: false })
+    expect(wrapper.vm.$data.showSnackbar).toBe(true)
+    expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(true)
+    expect(wrapper.find('.v-snack__wrapper').text()).toContain(
+      'Registration was successfully added to your table'
+    )
+  })
 })
 
 
@@ -238,12 +255,11 @@ describe('Test draft table with results', () => {
     const registrationTableDisplay = wrapper.findAll(regTable)
     expect(registrationTableDisplay.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header, include the filter row, include registrations called twice
-    expect(rows.length).toBe(pprResp.length + 3)
-
-    // the first row is row 2
-    expect(rows.at(2).text()).toContain('Draft') // draft status
-    expect(rows.at(2).text()).toContain('N/A') // N/A for expiry
-    expect(rows.at(2).text()).toContain(UIRegistrationTypes.REPAIRERS_LIEN)
+    // get stub called twice so duplicate registrations in the table
+    // FUTURE: update stub so that there is a separate one for each call
+    expect(rows.length).toBe(pprResp.length * 2)
+    expect(rows.at(0).text()).toContain('Draft') // draft status
+    expect(rows.at(0).text()).toContain('N/A') // N/A for expiry
+    expect(rows.at(0).text()).toContain(UIRegistrationTypes.REPAIRERS_LIEN)
   })
 })
