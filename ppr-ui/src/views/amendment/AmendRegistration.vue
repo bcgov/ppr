@@ -143,7 +143,6 @@ export default class AmendRegistration extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
-  @Action setDraft: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -265,13 +264,15 @@ export default class AmendRegistration extends Vue {
   private async saveDraft (): Promise<void> {
     const stateModel: StateModelIF = this.getStateModel
     const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
-    this.setDraft(draft)
     if (draft.error !== undefined) {
       console.log(
         'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
       )
     }
-    this.goToDashboard()
+    this.$router.push({
+      name: RouteNames.DASHBOARD
+    })
+    this.emitHaveData(false)
   }
 
   private goToDashboard (): void {
