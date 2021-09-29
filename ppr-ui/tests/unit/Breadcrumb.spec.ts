@@ -15,7 +15,9 @@ import {
   tombstoneBreadcrumbDashboard,
   tombstoneBreadcrumbDischarge,
   tombstoneBreadcrumbRegistration,
-  tombstoneBreadcrumbSearch
+  tombstoneBreadcrumbSearch,
+  tombstoneBreadcrumbAmendment,
+  tombstoneBreadcrumbRenewal
 } from '@/resources'
 import { routes } from '@/router'
 
@@ -81,6 +83,18 @@ const reviewDischargeRoute = routes.find(obj => {
 })
 const confirmDischargeRoute = routes.find(obj => {
   return obj.name === RouteNames.CONFIRM_DISCHARGE
+})
+const reviewRenewRoute = routes.find(obj => {
+  return obj.name === RouteNames.RENEW_REGISTRATION
+})
+const confirmRenewRoute = routes.find(obj => {
+  return obj.name === RouteNames.CONFIRM_RENEWAL
+})
+const reviewAmendRoute = routes.find(obj => {
+  return obj.name === RouteNames.AMEND_REGISTRATION
+})
+const confirmAmendRoute = routes.find(obj => {
+  return obj.name === RouteNames.CONFIRM_AMENDMENT
 })
 
 describe('Breadcrumb component tests', () => {
@@ -176,6 +190,47 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
+    }
+  })
+
+
+  it('renders on renew: review renewal with breadcrumb', () => {
+    wrapper = createComponent(RouteNames.RENEW_REGISTRATION, reviewRenewRoute.path, reviewRenewRoute.name)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
+    for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRenewal[i].text)
+    }
+  })
+
+  it('renders on renew: confirm renewal with breadcrumb', () => {
+    wrapper = createComponent(RouteNames.CONFIRM_RENEWAL, confirmRenewRoute.path, confirmRenewRoute.name)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
+    for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRenewal[i].text)
+    }
+  })
+
+  it('renders on amendment: review amendment with breadcrumb', () => {
+    wrapper = createComponent(RouteNames.AMEND_REGISTRATION, reviewAmendRoute.path, reviewAmendRoute.name)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
+    for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
+    }
+  })
+
+  it('renders on amendment: confirm amendment with breadcrumb', () => {
+    wrapper = createComponent(RouteNames.CONFIRM_AMENDMENT, confirmAmendRoute.path, confirmAmendRoute.name)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
+    for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
     }
   })
 })

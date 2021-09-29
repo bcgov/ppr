@@ -40,6 +40,8 @@ import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
 import {
   tombstoneBreadcrumbDashboard,
   tombstoneBreadcrumbDischarge,
+  tombstoneBreadcrumbRenewal,
+  tombstoneBreadcrumbAmendment,
   tombstoneBreadcrumbRegistration,
   tombstoneBreadcrumbSearch
 } from '@/resources'
@@ -75,6 +77,16 @@ export default defineComponent({
           dischargeBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
           return dischargeBreadcrumb
+        } else if (currentPath.value?.includes('renew')) {
+          const renewBreadcrumb = [...tombstoneBreadcrumbRenewal]
+          renewBreadcrumb[2].text =
+            `Base Registration ${getRegistrationNumber.value} - Renewal` || renewBreadcrumb[2].text
+          return renewBreadcrumb
+        } else if (currentPath.value?.includes('amend')) {
+          const amnendBreadcrumb = [...tombstoneBreadcrumbAmendment]
+          amnendBreadcrumb[2].text =
+            `Base Registration ${getRegistrationNumber.value} - Amendment` || amnendBreadcrumb[2].text
+          return amnendBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[2].text =

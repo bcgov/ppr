@@ -86,6 +86,14 @@ export const routes = [
     }
   },
   {
+    path: '/amendment/confirm-admendment',
+    name: RouteNames.CONFIRM_AMENDMENT,
+    component: AmendRegistration,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/new-registration/length-trust',
     name: RouteNames.LENGTH_TRUST,
     component: LengthTrust,

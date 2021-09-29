@@ -31,14 +31,14 @@ const tombstoneInfo: string = '.tombstone-info'
  *
  * @returns a Wrapper<SearchedResult> object with the given parameters.
  */
-function createComponent (): Wrapper<any> {
+function createComponent (mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
   const router = mockRouter.mock()
-  router.push({ name: RouteNames.REVIEW_DISCHARGE })
+  router.push({ name: mockRoute })
 
   return mount(TombstoneDischarge, {
     localVue,
@@ -76,7 +76,41 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Total Discharge', async () => {
-    wrapper = createComponent()
+    wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
+    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    const header = wrapper.findAll(tombstoneHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
+    const subHeader = wrapper.findAll(tombstoneSubHeader)
+    expect(subHeader.length).toBe(1)
+    expect(subHeader.at(0).text()).toContain(registrationType.registrationTypeUI)
+    const extraInfo = wrapper.findAll(tombstoneInfo)
+    expect(extraInfo.length).toBe(2)
+    expect(extraInfo.at(0).text()).toContain('Base Registration Date and Time: ')
+    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true)?.trim())
+    expect(extraInfo.at(1).text()).toContain('Current Expiry Date and Time: ')
+    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true)?.trim())
+  })
+
+  it('renders Tombstone component properly for Renewal', async () => {
+    wrapper = createComponent(RouteNames.RENEW_REGISTRATION)
+    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    const header = wrapper.findAll(tombstoneHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
+    const subHeader = wrapper.findAll(tombstoneSubHeader)
+    expect(subHeader.length).toBe(1)
+    expect(subHeader.at(0).text()).toContain(registrationType.registrationTypeUI)
+    const extraInfo = wrapper.findAll(tombstoneInfo)
+    expect(extraInfo.length).toBe(2)
+    expect(extraInfo.at(0).text()).toContain('Base Registration Date and Time: ')
+    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true)?.trim())
+    expect(extraInfo.at(1).text()).toContain('Current Expiry Date and Time: ')
+    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true)?.trim())
+  })
+
+  it('renders Tombstone component properly for Amendment', async () => {
+    wrapper = createComponent(RouteNames.AMEND_REGISTRATION)
     expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)

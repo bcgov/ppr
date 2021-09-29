@@ -30,6 +30,40 @@ export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
     text: 'Total Discharge'
   }
 ]
+export const tombstoneBreadcrumbRenewal: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    text: 'My Personal Property Registry'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: 'Renewal'
+  }
+]
+export const tombstoneBreadcrumbAmendment: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    text: 'My Personal Property Registry'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: 'Amendment'
+  }
+]
 export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
   {
     disabled: false,
