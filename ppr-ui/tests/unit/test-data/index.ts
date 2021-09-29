@@ -1,4 +1,5 @@
 export * from './mock-party-code-search-results'
+export * from './mock-registration-amendment'
 export * from './mock-registration-discharge'
 export * from './mock-registration-new'
 export * from './mock-registration-responses'

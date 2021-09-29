@@ -4,7 +4,7 @@ import {
   SearchTypeIF, UserInfoIF
 } from '@/interfaces'
 import { AccountProductSubscriptionIF } from '../account-interfaces'
-import { DebtorNameIF, DraftIF, IndividualNameIF } from '../ppr-api-interfaces'
+import { CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF } from '../ppr-api-interfaces'
 import { AddPartiesIF, AddCollateralIF, LengthTrustIF } from '../registration-interfaces'
 
 // State model example
@@ -14,8 +14,10 @@ export interface StateModelIF {
   authorization: AuthorizationIF
   folioOrReferenceNumber: string
   registration: {
+    amendmentDescription: string // amendments only
     collateral: AddCollateralIF
     confirmDebtorName: DebtorNameIF // Required for actions on existing registrations.
+    courtOrderInformation: CourtOrderIF
     creationDate: string
     draft: DraftIF,
     expiryDate: string

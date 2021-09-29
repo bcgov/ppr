@@ -3,6 +3,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  CourtOrderIF,
   DebtorNameIF,
   DraftIF,
   LengthTrustIF,
@@ -49,6 +50,10 @@ export const setOriginalAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, add
   commit('mutateOriginalAddSecuredPartiesAndDebtors', addParties)
 }
 
+export const setAmendmentDescription: ActionIF = ({ commit }, description: string): void => {
+  commit('mutateAmendmentDescription', description)
+}
+
 export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): void => {
   commit('mutateAuthRoles', authRoles)
 }
@@ -59,6 +64,10 @@ export const setCollateralShowInvalid = ({ commit }, show: boolean): void => {
 
 export const setCollateralValid = ({ commit }, valid: boolean): void => {
   commit('mutateCollateralValid', valid)
+}
+
+export const setCourtOrderInformation: ActionIF = ({ commit }, courtOrderInformation: CourtOrderIF): void => {
+  commit('mutateCourtOrderInformation', courtOrderInformation)
 }
 
 export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {

@@ -85,3 +85,14 @@ export enum StatementTypes {
     FINANCING_STATEMENT = 'FINANCING',
     RENEWAL_STATEMENT = 'RENEWAL',
 }
+
+export enum APIAmendmentTypes {
+    AMENDMENT = 'AM', // Default, use if multiple changes or only description.
+    COURT_ORDER = 'CO', // Use if including court order information.
+    COLLATERAL_ADDITION = 'AA', // Only adding collateral.
+    COLLATERAL_SUBSTITUTION = 'AU', // Only adding and removing collateral.
+    DEBTOR_TRANSFER = 'AD', // Only adding and removing a debtor.
+    DEBTOR_RELEASE = 'AR', // Only removing a debtor.
+    PARTIAL_DISCHARGE = 'AP', // Only removing collateral.
+    SECURED_PARTY_TRANSFER = 'AS' // Only adding and removing a secured party.
+}

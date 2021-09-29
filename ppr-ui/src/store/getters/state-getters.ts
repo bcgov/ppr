@@ -5,6 +5,7 @@ import {
   AddCollateralIF,
   AddPartiesIF,
   ButtonConfigIF,
+  CourtOrderIF,
   DebtorNameIF,
   DraftIF,
   GeneralCollateralIF,
@@ -40,6 +41,11 @@ export const getAddCollateral = (state: StateIF): AddCollateralIF => {
   return state.stateModel.registration.collateral
 }
 
+/** The amendment registration description. */
+export const getAmendmentDescription = (state: StateIF): string => {
+  return state.stateModel.registration.amendmentDescription
+}
+
 /** The registration collateral object of the original registration
  * (for amendments) */
 export const getOriginalAddCollateral = (state: StateIF): AddCollateralIF => {
@@ -59,6 +65,11 @@ export const getOriginalAddSecuredPartiesAndDebtors = (state: StateIF): AddParti
 /** The change registration base or confirm debtor name. */
 export const getConfirmDebtorName = (state: StateIF): DebtorNameIF => {
   return state.stateModel.registration.confirmDebtorName
+}
+
+/** The registration court order information object. */
+export const getCourtOrderInformation = (state: StateIF): CourtOrderIF => {
+  return state.stateModel.registration.courtOrderInformation
 }
 
 /** The current draft of a registration. */
