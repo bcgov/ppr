@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
 import {
+  AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,
   DraftResultIF,
@@ -416,6 +417,33 @@ export async function createFinancingStatement (
     .catch(error => {
       statement.error = {
         statusCode: error?.response?.status,
+        message:
+          error?.response?.data?.errorMessage +
+          ' ' +
+          error?.response?.data?.rootCause
+      }
+      return statement
+    })
+}
+
+// Save a new financing statement.
+export async function createAmendmentStatement (statement: AmendmentStatementIF): Promise<AmendmentStatementIF> {
+  return axios
+    .post<AmendmentStatementIF>(
+      `financing-statements/${statement.baseRegistrationNumber}/amendments`,
+      statement,
+      getDefaultConfig()
+    )
+    .then(response => {
+      const data: AmendmentStatementIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      statement.error = {
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message:
           error?.response?.data?.errorMessage +
           ' ' +

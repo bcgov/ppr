@@ -4,15 +4,19 @@ import Vuetify from 'vuetify'
 import CompositionApi from '@vue/composition-api'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 
 import {
   cleanupParty,
+  saveAmendmentStatement,
   saveAmendmentStatementDraft,
   saveDischarge,
   saveFinancingStatement,
   saveFinancingStatementDraft,
   setupAmendmentStatementDraft,
-  setupFinancingStatementDraft
+  setupFinancingStatementDraft,
+  setupStateModelFromAmendmentDraft,
+  setupAmendmentStatementFromDraft
 } from '@/utils'
 import {
   AmendmentStatementIF,
@@ -22,7 +26,7 @@ import {
   PartyIF,
   StateModelIF
 } from '@/interfaces'
-import { APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
+import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
 
 // Components
 import { FolioNumberSummary } from '@/components/common'
@@ -30,6 +34,10 @@ import { FolioNumberSummary } from '@/components/common'
 // Other
 import {
   mockedAmendmentCourtOrder,
+  mockedDraftAmendmentAdd,
+  mockedDraftAmendmentCourtOrder,
+  mockedDraftAmendmentDelete,
+  mockedDraftAmendmentEdit,
   mockedModelAmendmdmentAdd,
   mockedModelAmendmdmentCourtOrder,
   mockedModelAmendmdmentDelete,
@@ -55,7 +63,11 @@ import {
   mockedVehicleCollateralDelete,
   mockedVehicleCollateralEdit,
   mockedGeneralCollateral1,
-  mockedLengthTrust1
+  mockedLengthTrust1,
+  mockedVehicleCollateralExisting,
+  mockedGeneralCollateralExisting,
+  mockedSecuredPartiesExisting,
+  mockedDebtorsExisting
 } from './test-data'
 
 Vue.use(Vuetify)
@@ -489,5 +501,190 @@ describe('Registration API Helper Save Draft Amendment Tests', () => {
     expect(draft.amendmentStatement).toBeDefined()
     expect(draft.amendmentStatement.baseRegistrationNumber).toBeDefined()
     expect(draft.amendmentStatement.documentId).toBeDefined()
+  })
+})
+
+describe('Registration API Helper Create Amendment Tests', () => {
+  // Use mock service directly - account id can be anything.
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
+
+  let wrapper: any
+
+  beforeEach(async () => {
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    document.body.setAttribute('data-app', 'true')
+    wrapper = mount(FolioNumberSummary, {
+      localVue,
+      propsData: {},
+      store,
+      vuetify
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('save amendment court order', async () => {
+    await store.dispatch('setRegistrationNumber', '0023001B')
+    await store.dispatch('setCourtOrderInformation', mockedAmendmentCourtOrder)
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAdd)
+    await store.dispatch('setAmendmentDescription', 'Test court order')
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: mockedRegisteringParty1,
+      securedParties: mockedSecuredPartiesAdd,
+      debtors: mockedDebtorsAdd
+    })
+
+    const registration:AmendmentStatementIF = await saveAmendmentStatement(wrapper.vm.$store.state.stateModel)
+    // console.log(JSON.stringify(statement))
+    expect(registration.createDateTime).toBeDefined()
+    expect(registration.baseRegistrationNumber).toBeDefined()
+    expect(registration.payment).toBeDefined()
+  })
+})
+
+describe('Draft Amendment Setup State Model Tests', () => {
+  let wrapper: any
+
+  beforeEach(async () => {
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    document.body.setAttribute('data-app', 'true')
+    wrapper = mount(FolioNumberSummary, {
+      localVue,
+      propsData: {},
+      store,
+      vuetify
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationNumber', '0023001B')
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
+    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: null,
+      securedParties: mockedSecuredPartiesExisting,
+      debtors: mockedDebtorsExisting
+    })
+    await flushPromises()
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('draft add setup model', async () => {
+    const model:StateModelIF =
+      setupStateModelFromAmendmentDraft(wrapper.vm.$store.state.stateModel, mockedDraftAmendmentAdd)
+    expect(model.registration.parties.registeringParty).toBeDefined()
+    expect(model.folioOrReferenceNumber).toBeDefined()
+    expect(model.registration.confirmDebtorName).toBeDefined()
+    expect(model.registration.amendmentDescription).toBeDefined()
+    expect(model.registration.parties.securedParties.length).toBe(2)
+    expect(model.registration.parties.securedParties[1].action).toBe(ActionTypes.ADDED)
+    expect(model.registration.parties.debtors.length).toBe(2)
+    expect(model.registration.parties.debtors[1].action).toBe(ActionTypes.ADDED)
+    expect(model.registration.collateral.vehicleCollateral.length).toBe(2)
+    expect(model.registration.collateral.vehicleCollateral[1].action).toBe(ActionTypes.ADDED)
+    expect(model.registration.collateral.generalCollateral.length).toBe(2)
+    expect(model.registration.collateral.generalCollateral[1].descriptionAdd).toBeDefined()
+  })
+
+  it('draft delete setup model', async () => {
+    const model:StateModelIF =
+      setupStateModelFromAmendmentDraft(wrapper.vm.$store.state.stateModel, mockedDraftAmendmentDelete)
+    expect(model.registration.parties.registeringParty).toBeDefined()
+    expect(model.folioOrReferenceNumber).toBeDefined()
+    expect(model.registration.confirmDebtorName).toBeDefined()
+    expect(model.registration.amendmentDescription).toBeDefined()
+    expect(model.registration.parties.securedParties[0].action).toBe(ActionTypes.REMOVED)
+    expect(model.registration.parties.debtors[0].action).toBe(ActionTypes.REMOVED)
+    expect(model.registration.collateral.vehicleCollateral[0].action).toBe(ActionTypes.REMOVED)
+    expect(model.registration.collateral.generalCollateral[2].descriptionDelete).toBeDefined()
+  })
+
+  it('draft edit setup model', async () => {
+    const model:StateModelIF =
+      setupStateModelFromAmendmentDraft(wrapper.vm.$store.state.stateModel, mockedDraftAmendmentEdit)
+    expect(model.registration.parties.registeringParty).toBeDefined()
+    expect(model.folioOrReferenceNumber).toBeDefined()
+    expect(model.registration.confirmDebtorName).toBeDefined()
+    expect(model.registration.amendmentDescription).toBeDefined()
+    expect(model.registration.parties.securedParties[0].action).toBe(ActionTypes.EDITED)
+    expect(model.registration.parties.debtors[0].action).toBe(ActionTypes.EDITED)
+    expect(model.registration.collateral.vehicleCollateral[0].action).toBe(ActionTypes.EDITED)
+    expect(model.registration.collateral.generalCollateral[3].descriptionAdd).toBeDefined()
+    expect(model.registration.collateral.generalCollateral[3].descriptionDelete).toBeDefined()
+  })
+
+  it('draft court order setup model', async () => {
+    const model:StateModelIF =
+      setupStateModelFromAmendmentDraft(wrapper.vm.$store.state.stateModel, mockedDraftAmendmentCourtOrder)
+    expect(model.registration.parties.registeringParty).toBeDefined()
+    expect(model.folioOrReferenceNumber).toBeDefined()
+    expect(model.registration.confirmDebtorName).toBeDefined()
+    expect(model.registration.amendmentDescription).toBeDefined()
+    expect(model.registration.courtOrderInformation).toBeDefined()
+  })
+})
+
+describe('Registration API Helper Load Amendment Draft Tests', () => {
+  // Use mock service directly - account id can be anything.
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('PPR_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/ppr/api/v1/')
+
+  let wrapper: any
+
+  beforeEach(async () => {
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    document.body.setAttribute('data-app', 'true')
+    wrapper = mount(FolioNumberSummary, {
+      localVue,
+      propsData: {},
+      store,
+      vuetify
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationNumber', '0023001B')
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
+    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: null,
+      securedParties: mockedSecuredPartiesExisting,
+      debtors: mockedDebtorsExisting
+    })
+    await flushPromises()
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('setup security agreement draft', async () => {
+    const model:StateModelIF = await setupAmendmentStatementFromDraft(wrapper.vm.$store.state.stateModel, 'D0034002')
+    expect(model.registration.parties.registeringParty).toBeDefined()
+    expect(model.folioOrReferenceNumber).toBeDefined()
+    expect(model.registration.confirmDebtorName).toBeDefined()
+    expect(model.registration.amendmentDescription).toBeDefined()
   })
 })
