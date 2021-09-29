@@ -34,7 +34,7 @@
         />
       </v-col>
     </v-row>
-    <v-row class="px-6" align="center">
+    <v-row class="px-6" align="center" v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT">
       <v-col cols="auto" class="pr-0">
         <v-checkbox
           id="add-registering-party"
@@ -61,7 +61,9 @@ import {
   watch,
   computed
 } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 import { partyCodeSearch } from '@/utils'
+import { RegistrationFlowType } from '@/enums'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import PartyAutocomplete from './PartyAutocomplete.vue'
 
@@ -85,6 +87,10 @@ export default defineComponent({
     'removeRegisteringParty'
   ],
   setup (props, context) {
+    const { getRegistrationFlowType } = useGetters<any>([
+      'getRegistrationFlowType'
+    ])
+    const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       searchValue: '',
       autoCompleteResults: null,
@@ -153,6 +159,8 @@ export default defineComponent({
       goToAddSecuredParty,
       addRegisteringParty,
       closeAutoComplete,
+      registrationFlowType,
+      RegistrationFlowType,
       ...toRefs(localState)
     }
   }

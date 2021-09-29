@@ -2,7 +2,7 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
-import { APIRegistrationTypes } from '@/enums'
+import { ActionTypes, APIRegistrationTypes } from '@/enums'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -29,7 +29,8 @@ export const useSecuredParty = (props, context) => {
       emailAddress: '',
       address: initAddress
     } as PartyIF,
-    currentIsBusiness: null
+    currentIsBusiness: null,
+    partyBusiness: null
   })
 
   const getSecuredParty = () => {
@@ -39,8 +40,11 @@ export const useSecuredParty = (props, context) => {
       // deep copy so original object doesn't get modified
       localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[props.activeIndex]))
       localState.currentIsBusiness = false
+      localState.partyBusiness = 'I'
       if (localState.currentSecuredParty.businessName) {
         localState.currentIsBusiness = true
+        localState.partyBusiness = 'B'
+        localState.currentSecuredParty.personName = Object.assign({}, initPerson)
       }
     } else {
       const blankSecuredParty = {
@@ -69,11 +73,21 @@ export const useSecuredParty = (props, context) => {
   const addEditSecuredParty = async () => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+    if (localState.partyBusiness === 'I') {
+      localState.currentSecuredParty.businessName = ''
+      // localState.searchValue = ''
+    } else {
+      localState.currentSecuredParty.personName.first = ''
+      localState.currentSecuredParty.personName.middle = ''
+      localState.currentSecuredParty.personName.last = ''
+    }
     // New secured party
     if (props.activeIndex === -1) {
+      localState.currentSecuredParty.action = ActionTypes.ADDED
       newList.push(localState.currentSecuredParty)
     } else {
-      // Edit vehicle
+      // Edit party
+      localState.currentSecuredParty.action = ActionTypes.EDITED
       newList.splice(props.activeIndex, 1, localState.currentSecuredParty)
     }
     parties.securedParties = newList
@@ -84,6 +98,7 @@ export const useSecuredParty = (props, context) => {
   const addSecuredParty = (newParty: PartyIF) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+    newParty.action = ActionTypes.ADDED
     newList.push(newParty)
     parties.securedParties = newList
     setAddSecuredPartiesAndDebtors(parties)
