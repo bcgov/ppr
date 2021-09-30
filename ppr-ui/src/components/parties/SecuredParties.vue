@@ -108,7 +108,7 @@
       <v-col>
         <v-data-table
           class="party-table"
-          :class="{ 'invalid-message': showErrorSecuredParties }"
+          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
           :headers="headers"
           :items="securedParties"
           disable-pagination
@@ -281,6 +281,7 @@ import {
   reactive,
   toRefs,
   computed,
+  watch,
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -310,6 +311,10 @@ export default defineComponent({
   },
   props: {
     isSummary: {
+      type: Boolean,
+      default: false
+    },
+    setShowInvalid: {
       type: Boolean,
       default: false
     }
@@ -358,9 +363,7 @@ export default defineComponent({
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       }),
-      showErrorSecuredParties: computed((): boolean => {
-        return parties.showInvalid && parties.securedParties.length === 0
-      }),
+      showErrorSecuredParties: parties.showInvalid,
       headers: [...partyTableHeaders, ...editTableHeaders]
     })
 
@@ -382,6 +385,7 @@ export default defineComponent({
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       localState.searchValue = { code: '', businessName: '' }
+      getSecuredPartyValidity()
     }
 
     const removeRegisteringParty = (): void => {
@@ -437,6 +441,7 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
+      getSecuredPartyValidity()
     }
 
     const fetchOtherSecuredParties = async () => {
@@ -468,6 +473,24 @@ export default defineComponent({
         fetchOtherSecuredParties()
       }
     })
+
+    const getSecuredPartyValidity = (): boolean => {
+      let validity = false
+      if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+        for (let i = 0; i < localState.securedParties.length; i++) {
+          // is valid if there is at least one debtor
+          if (localState.securedParties[i].action !== ActionTypes.REMOVED) {
+            validity = true
+          }
+        }
+      } else {
+        if (localState.securedParties.length > 0) {
+          validity = true
+        }
+      }
+      context.emit('setSecuredPartiesValid', validity)
+      return validity
+    }
 
     const filterList = (
       item: SearchPartyIF,
@@ -519,6 +542,10 @@ export default defineComponent({
       localState.showDialog = false
     }
 
+    watch(() => props.setShowInvalid, (val) => {
+      localState.showErrorSecuredParties = val
+    })
+
     return {
       removeParty,
       getName,
@@ -538,6 +565,7 @@ export default defineComponent({
       ActionTypes,
       undo,
       selectResult,
+      getSecuredPartyValidity,
       filterList,
       dialogSubmit,
       ...countryProvincesHelpers,
