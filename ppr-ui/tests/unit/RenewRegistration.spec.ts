@@ -124,9 +124,18 @@ describe('Renew registration component', () => {
       lifeYears: 1,
       showInvalid: false
     })
+    wrapper.vm.registrationValid = true
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
 
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
+  })
+
+  
+  it('doesnt proceed if validation errors', async () => {
+    wrapper.vm.registrationValid = false
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.vm.showInvalid).toBe(true)
   })
 })

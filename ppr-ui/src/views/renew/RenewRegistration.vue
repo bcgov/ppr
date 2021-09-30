@@ -16,8 +16,11 @@
               previous amendments or court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <registration-length-trust v-if="registrationType !== registrationTypeRL"
-          class="mt-15" :isRenewal="true" />
+          <registration-length-trust :setShowInvalid="showInvalid"
+            @lengthTrustValid="registrationValid = $event"
+            v-if="registrationType !== registrationTypeRL"
+            class="mt-15" :isRenewal="true"
+          />
           <registration-repairers-lien v-else
           class="mt-15" :isRenewal="true" />
           <div class="summary-header mt-15 pa-4 rounded-top">
@@ -223,15 +226,15 @@ export default class ReviewRegistration extends Vue {
   }
 
   private confirmRenewal (): void {
-    if (this.getLengthTrust.valid) {
+    if (this.registrationValid) {
       this.$router.push({
         name: RouteNames.CONFIRM_RENEWAL,
         query: { 'reg-num': this.registrationNumber }
       })
+      this.emitHaveData(false)
     } else {
       this.showInvalid = true
     }
-    this.emitHaveData(false)
   }
 
   private goToDashboard (): void {

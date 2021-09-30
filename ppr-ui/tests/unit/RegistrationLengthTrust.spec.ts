@@ -204,6 +204,16 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     expect(wrapper.find('#new-expiry').text()).toContain('March 31, 2022')
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
+    //also emits if valid
+    expect(wrapper.emitted().lengthTrustValid).toBeTruthy()
+  })
+
+  it('emits if invalid', async () => {
+    // set renewal length to bad value
+    wrapper.vm.$data.lifeYearsEdit = 'a'
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.lengthTrust.valid).toBe(false)
+    expect(wrapper.emitted().lengthTrustValid).toBeTruthy()
   })
   
 })
