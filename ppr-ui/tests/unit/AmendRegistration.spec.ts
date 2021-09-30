@@ -18,7 +18,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedFinancingStatementAll } from './test-data'
+import { mockedDraftAmendmentStatement, mockedFinancingStatementAll } from './test-data'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 
@@ -47,6 +47,12 @@ describe('Amendment registration component', () => {
     get.returns(new Promise(resolve => resolve({
       data: { ...mockedFinancingStatementAll }
     })))
+
+    const post = sandbox.stub(axios, 'post')
+    post.returns(new Promise(resolve => resolve({
+      data: { ...mockedDraftAmendmentStatement }
+    })))
+
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
     localVue.use(VueRouter)
@@ -94,7 +100,7 @@ describe('Amendment registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.AMEND)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Save and Resume Later')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Review and Complete')
   })
@@ -116,7 +122,12 @@ describe('Amendment registration component', () => {
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
-    
   })
 
+  it('saves the draft and redirects to dashboard', async () => {
+    wrapper.find(StickyContainer).vm.$emit('back', true)
+    await Vue.nextTick()
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
 })
