@@ -165,7 +165,19 @@
                     class="actions__more-actions"
                     :disabled="addEditInProgress"
                   >
+                  <v-list-item
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                      && row.item.action === ActionTypes.REMOVED"
+                      class="v-remove"
+                      @click="undo(row.index)"
+                    >
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-undo</v-icon>
+                        <span class="ml-1">Undo</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
                     <v-list-item
+                      v-else
                       class="v-remove"
                       @click="removeParty(row.index)"
                     >
@@ -400,6 +412,7 @@ export default defineComponent({
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
       localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
+      getSecuredPartyValidity()
     }
 
     const addRegisteringParty = () => {
@@ -511,11 +524,14 @@ export default defineComponent({
         businessName: party.businessName,
         emailAddress: party.emailAddress || '',
         address: party.address,
-        personName: { first: '', middle: '', last: '' }
+        personName: { first: '', middle: '', last: '' },
+        action: ActionTypes.ADDED
+      }
+      if (localState.securedParties[0].code === party.code) {
+        return
       }
       // if secured party already shown
-      if (localState.securedParties.length === 1) {
-        newParty.action = ActionTypes.EDITED
+      if (localState.securedParties.length > 0) {
         localState.currentPartyName = party.code + ' ' + party.businessName
         localState.savedParty = newParty
         localState.showDialog = true
@@ -529,10 +545,18 @@ export default defineComponent({
 
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) {
-        parties.securedParties = [localState.savedParty]
-        parties.valid = isPartiesValid(parties)
-        setAddSecuredPartiesAndDebtors(parties)
-        localState.securedParties = [localState.savedParty]
+        if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+          const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+          // original secured party must be shown as removed
+          const originalParty = originalParties.securedParties[0]
+          originalParty.action = ActionTypes.REMOVED
+          localState.securedParties = [originalParty, localState.savedParty]
+        } else {
+          parties.securedParties = [localState.savedParty]
+          parties.valid = isPartiesValid(parties)
+          setAddSecuredPartiesAndDebtors(parties)
+          localState.securedParties = [localState.savedParty]
+        }
       } else {
         localState.searchValue = {
           code: localState.securedParties[0].code,

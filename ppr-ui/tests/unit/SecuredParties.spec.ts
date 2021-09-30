@@ -6,6 +6,7 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
+import { cloneDeep } from 'lodash'
 import { mockedPartyCodeSearchResults, mockedSecuredParties2, mockedSecuredPartiesAmendment } from './test-data'
 import {
   mockedSecuredParties1,
@@ -18,7 +19,7 @@ import {
 import { SecuredParties, EditParty, PartySearch } from '@/components/parties'
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 import { SearchPartyIF } from '@/interfaces'
-import { RegistrationFlowType } from '@/enums'
+import { ActionTypes, RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -157,6 +158,55 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.find(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
 
   })
+
+  it('is not valid if you remove the secured party for admendment', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    const parties = cloneDeep(mockedSecuredParties2)
+    parties[0].action = ActionTypes.REMOVED
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: mockedRegisteringParty1,
+      securedParties: parties
+    })
+
+    //click remove
+    wrapper.find('.v-data-table .party-row .actions__more-actions .v-remove').trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
+  })
+
+  it('shows the the removed & added secured parties for admendment', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    const parties = cloneDeep(mockedSecuredParties1)
+    expect(parties.length).toEqual(1)
+    parties[0].action = ActionTypes.REMOVED
+    parties[1] = {
+      action: ActionTypes.ADDED,
+      businessName: 'SECURED PARTY COMPANY LTD.',
+      emailAddress: 'test@company.com',
+      address: {
+        street: '1234 Fort St.',
+        streetAdditional: '2nd floor',
+        city: 'Victoria',
+        region: 'BC',
+        country: 'CA',
+        postalCode: 'V8R1L2',
+        deliveryInstructions: ''
+      }
+    }
+   
+    
+    expect(parties.length).toEqual(2)
+    wrapper.vm.securedParties = parties
+    await Vue.nextTick()
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
+    // one removed party, one added party
+    expect(rowCount).toEqual(2)
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[1]
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('removed')
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('added')
+
+  })
 })
 
 describe('Secured party amendment tests', () => {
@@ -179,7 +229,7 @@ describe('Secured party amendment tests', () => {
 
   it('displays the correct rows when data is present', () => {
     const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
-    // three debtors, three rows
+    // three parties, three rows
     expect(rowCount).toEqual(3)
   })
 
@@ -199,6 +249,36 @@ describe('Secured party amendment tests', () => {
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Edit')
     expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
     expect(item3.querySelectorAll('td')[4].textContent).toContain('Undo')
+  })
+
+  it('displays the error', async () => {
+    const parties = cloneDeep(mockedSecuredParties1)
+    expect(parties.length).toEqual(1)
+    parties[0].action = ActionTypes.REMOVED
+    wrapper.vm.$data.securedParties = parties
+    wrapper.vm.$props.setShowInvalid = true
+    expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
+    wrapper.vm.$data.showErrorSecuredParties = true
+    await Vue.nextTick()
+    expect(wrapper.findAll('.invalid-message').length).toBe(1)
+  })
+
+
+  it('goes from valid to invalid', async () => {
+    const parties = cloneDeep(mockedSecuredParties1)
+    expect(parties.length).toEqual(1)
+    wrapper.vm.$data.securedParties = parties
+    await Vue.nextTick()
+    expect(wrapper.vm.getSecuredPartyValidity()).toBe(true)
+    // remove said secured party
+    // click the drop down arrow
+    wrapper.find('.v-data-table .party-row .actions__more-actions__btn').trigger('click')
+    await Vue.nextTick()
+    //click remove
+    wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
+
   })
 
 })
