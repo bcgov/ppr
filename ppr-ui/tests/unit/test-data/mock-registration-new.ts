@@ -149,6 +149,31 @@ export const mockedSecuredParties2: PartyIF[] = [
   }
 ]
 
+export const mockedSecuredPartiesAmendment: PartyIF[] = [
+  {
+    businessName: 'SECURED PARTY COMPANY LTD.',
+    emailAddress: 'test@person.com',
+    address: mockedAddress1,
+    action: ActionTypes.ADDED
+  },
+  {
+    personName: {
+      last: 'INDIVIDUAL PARTY',
+      first: 'TEST'
+    },
+    emailAddress: 'test@person.com',
+    address: mockedAddress1,
+    action: ActionTypes.EDITED
+  },
+  {
+    businessName: 'SOMEBODYS BUSINESS',
+    emailAddress: 'test@person.com',
+    address: mockedAddress1,
+    action: ActionTypes.REMOVED
+  }
+
+]
+
 export const mockedDebtors1: PartyIF[] = [
   {
     personName: {

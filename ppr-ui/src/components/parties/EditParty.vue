@@ -249,6 +249,7 @@ export default defineComponent({
     const {
       currentSecuredParty,
       currentIsBusiness,
+      partyBusiness,
       getSecuredParty,
       resetFormAndData,
       removeSecuredParty,
@@ -267,13 +268,12 @@ export default defineComponent({
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
-      partyBusiness: '',
       searchValue: '',
       hideDetails: false,
       toggleDialog: false,
       dialogResults: [],
       isPartyType: computed((): boolean => {
-        if (localState.partyBusiness === '') {
+        if (partyBusiness.value === '') {
           return false
         }
         return true
@@ -299,12 +299,12 @@ export default defineComponent({
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
       if (
         validateSecuredPartyForm(
-          localState.partyBusiness,
+          partyBusiness.value,
           currentSecuredParty
         ) === true
       ) {
         if (props.activeIndex === -1) {
-          if (currentSecuredParty.value.businessName) {
+          if ((currentSecuredParty.value.businessName) && (partyBusiness.value === 'B')) {
             // go to the service and see if there are similar secured parties
             const response: [SearchPartyIF] = await partyCodeSearch(
               currentSecuredParty.value.businessName, false
@@ -325,16 +325,6 @@ export default defineComponent({
       }
     }
 
-    const getPartyBusiness = () => {
-      const businessValue = currentIsBusiness.value
-      if (businessValue !== null) {
-        localState.partyBusiness = 'I'
-        if (businessValue) {
-          localState.partyBusiness = 'B'
-        }
-      }
-    }
-
     const setSearchValue = (searchValueTyped: string) => {
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
@@ -350,20 +340,6 @@ export default defineComponent({
     }
 
     watch(
-      () => localState.partyBusiness,
-      currentValue => {
-        if (currentValue === 'I') {
-          currentSecuredParty.value.businessName = ''
-          localState.searchValue = ''
-        } else {
-          currentSecuredParty.value.personName.first = ''
-          currentSecuredParty.value.personName.middle = ''
-          currentSecuredParty.value.personName.last = ''
-        }
-      }
-    )
-
-    watch(
       () => localState.searchValue,
       (val: string) => {
         localState.autoCompleteSearchValue = val
@@ -376,12 +352,12 @@ export default defineComponent({
     onMounted(() => {
       getSecuredParty()
       setSearchValue(currentSecuredParty.value.businessName)
-      getPartyBusiness()
     })
 
     return {
       currentSecuredParty,
       currentIsBusiness,
+      partyBusiness,
       resetFormAndData,
       removeSecuredParty,
       onSubmitForm,

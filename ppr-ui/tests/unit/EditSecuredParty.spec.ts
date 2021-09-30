@@ -57,7 +57,7 @@ describe('Secured Party add individual tests', () => {
   it('renders with default values', async () => {
     expect(wrapper.findComponent(EditParty).exists()).toBe(true)
     // radio button value is blank
-    expect(wrapper.vm.partyBusiness).toBe('')
+    expect(wrapper.vm.partyBusiness).toBe(null)
   })
 
   it('shows buttons on the form and remove button is disabled', async () => {

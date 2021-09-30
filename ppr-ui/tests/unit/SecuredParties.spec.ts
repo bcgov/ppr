@@ -6,7 +6,7 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
-import { mockedPartyCodeSearchResults, mockedSecuredParties2 } from './test-data'
+import { mockedPartyCodeSearchResults, mockedSecuredParties2, mockedSecuredPartiesAmendment } from './test-data'
 import {
   mockedSecuredParties1,
   mockedRegisteringParty1,
@@ -18,6 +18,7 @@ import {
 import { SecuredParties, EditParty, PartySearch } from '@/components/parties'
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 import { SearchPartyIF } from '@/interfaces'
+import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -156,4 +157,48 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.find(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
 
   })
+})
+
+describe('Secured party amendment tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      securedParties: mockedSecuredPartiesAmendment
+    })
+    await store.dispatch('setOriginalAddSecuredPartiesAndDebtors', {
+      securedParties: mockedSecuredPartiesAmendment
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct rows when data is present', () => {
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
+    // three debtors, three rows
+    expect(rowCount).toEqual(3)
+  })
+
+  it('displays the correct chips in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[2]
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('added')
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('edited')
+    expect(item3.querySelectorAll('td')[0].textContent).toContain('removed')
+  })
+
+  it('displays the correct actions in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[2]
+    expect(item1.querySelectorAll('td')[4].textContent).toContain('Edit')
+    expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
+    expect(item3.querySelectorAll('td')[4].textContent).toContain('Undo')
+  })
+
 })
