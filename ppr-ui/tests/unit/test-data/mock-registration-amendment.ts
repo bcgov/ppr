@@ -1,6 +1,7 @@
 import { ActionTypes, APIAmendmentTypes, APIVehicleTypes, DraftTypes, RegistrationFlowType } from '@/enums'
 import {
   CourtOrderIF,
+  DebtorNameIF,
   DraftIF,
   GeneralCollateralIF,
   PartyIF,
@@ -13,6 +14,10 @@ import {
   mockedRegisteringParty1,
   mockedSelectSecurityAgreement
 } from './mock-registration-new'
+
+const mockedDebtorName: DebtorNameIF = {
+  businessName: 'TEST DEBTOR INC.'
+}
 
 // Mock data to set in state model for unit tests.
 export const mockedAmendmentCourtOrder: CourtOrderIF = {
@@ -29,7 +34,7 @@ export const mockedGeneralCollateralAdd: GeneralCollateralIF[] = [
     descriptionAdd: 'ADD TEST GENERAL COLLATERAL'
   },
   {
-    collateralId: 300000,
+    collateralId: 100000,
     addedDateTime: '2021-09-16T05:56:20Z',
     description: 'UNCHANGED TEST GENERAL COLLATERAL'
   }
@@ -71,7 +76,8 @@ export const mockedVehicleCollateralAdd: VehicleCollateralIF[] = [
     action: ActionTypes.ADDED
   },
   {
-    id: 200000,
+    id: 100000,
+    vehicleId: 100000,
     type: APIVehicleTypes.BOAT,
     serialNumber: '123456789',
     year: 2010,
@@ -81,7 +87,8 @@ export const mockedVehicleCollateralAdd: VehicleCollateralIF[] = [
 ]
 export const mockedVehicleCollateralDelete: VehicleCollateralIF[] = [
   {
-    id: 1,
+    id: 100000,
+    vehicleId: 100000,
     type: APIVehicleTypes.MOTOR_VEHICLE,
     serialNumber: 'KM8J3CA46JU622994',
     year: 2018,
@@ -91,6 +98,7 @@ export const mockedVehicleCollateralDelete: VehicleCollateralIF[] = [
   },
   {
     id: 200000,
+    vehicleId: 200000,
     type: APIVehicleTypes.BOAT,
     serialNumber: '123456789',
     year: 2010,
@@ -101,6 +109,7 @@ export const mockedVehicleCollateralDelete: VehicleCollateralIF[] = [
 export const mockedVehicleCollateralEdit: VehicleCollateralIF[] = [
   {
     id: 100000,
+    vehicleId: 100000,
     type: APIVehicleTypes.MOTOR_VEHICLE,
     serialNumber: 'KM8J3CA46JU622994',
     year: 2018,
@@ -110,6 +119,7 @@ export const mockedVehicleCollateralEdit: VehicleCollateralIF[] = [
   },
   {
     id: 200000,
+    vehicleId: 200000,
     type: APIVehicleTypes.BOAT,
     serialNumber: '123456789',
     year: 2010,
@@ -140,7 +150,7 @@ export const mockedSecuredPartiesAdd: PartyIF[] = [
 ]
 export const mockedSecuredPartiesDelete: PartyIF[] = [
   {
-    partyId: 200000,
+    partyId: 100000,
     personName: {
       last: 'Delete INDIVIDUAL PARTY',
       first: 'TEST'
@@ -161,7 +171,7 @@ export const mockedSecuredPartiesDelete: PartyIF[] = [
 ]
 export const mockedSecuredPartiesEdit: PartyIF[] = [
   {
-    partyId: 200000,
+    partyId: 100000,
     personName: {
       last: 'Edit INDIVIDUAL PARTY',
       first: 'TEST'
@@ -204,7 +214,7 @@ export const mockedDebtorsAdd: PartyIF[] = [
 ]
 export const mockedDebtorsDelete: PartyIF[] = [
   {
-    partyId: 200000,
+    partyId: 100000,
     personName: {
       last: 'DELETE INDIVIDUAL DEBTOR',
       first: 'TEST',
@@ -226,7 +236,7 @@ export const mockedDebtorsDelete: PartyIF[] = [
 ]
 export const mockedDebtorsEdit: PartyIF[] = [
   {
-    partyId: 200000,
+    partyId: 100000,
     personName: {
       last: 'EDIT INDIVIDUAL DEBTOR',
       first: 'TEST',
@@ -247,16 +257,144 @@ export const mockedDebtorsEdit: PartyIF[] = [
   }
 ]
 
+export const mockedDebtorsExisting: PartyIF[] = [{
+  partyId: 100000,
+  personName: {
+    last: 'EXISTING DEBTOR',
+    first: 'TEST',
+    middle: '1'
+  },
+  address: mockedAddress1
+}]
+export const mockedSecuredPartiesExisting: PartyIF[] = [{
+  partyId: 100000,
+  personName: {
+    last: 'EXISTING SECURED PARTY',
+    first: 'TEST',
+    middle: '1'
+  },
+  address: mockedAddress1
+}]
+export const mockedVehicleCollateralExisting: VehicleCollateralIF[] = [{
+  id: 100000,
+  vehicleId: 100000,
+  type: APIVehicleTypes.MOTOR_VEHICLE,
+  serialNumber: 'KM8J3CA46JU622994',
+  year: 2018,
+  make: 'HYUNDAI',
+  model: 'TUSCON EXISTING'
+}]
+export const mockedGeneralCollateralExisting: GeneralCollateralIF[] = [{
+  collateralId: 100000,
+  addedDateTime: '2021-09-16T05:56:20Z',
+  description: 'UNCHANGED TEST GENERAL COLLATERAL'
+}]
+export const mockedGeneralCollateralNew: GeneralCollateralIF[] = [{
+  addedDateTime: '2021-09-16T05:56:20Z',
+  description: 'NEW TEST GENERAL COLLATERAL'
+}]
+export const mockedGeneralCollateralUpdate: GeneralCollateralIF[] = [{
+  collateralId: 100000,
+  addedDateTime: '2021-09-16T05:56:20Z',
+  description: 'ADD / DELETE TEST GENERAL COLLATERAL'
+}]
+
 export const mockedAmendmentStatement1: AmendmentStatementIF = {
   documentId: 'D0034002',
   baseRegistrationNumber: '023003B',
   description: 'Test',
   registeringParty: mockedRegisteringParty1,
-  changeType: APIAmendmentTypes.AMENDMENT
+  changeType: APIAmendmentTypes.AMENDMENT,
+  debtorName: mockedDebtorName
 }
 export const mockedDraftAmendmentStatement: DraftIF = {
   type: DraftTypes.AMENDMENT_STATEMENT,
   amendmentStatement: mockedAmendmentStatement1
+}
+
+export const mockedAmendmentAdd: AmendmentStatementIF = {
+  documentId: 'D0034002',
+  baseRegistrationNumber: '023003B',
+  description: 'Test Add',
+  registeringParty: mockedRegisteringParty1,
+  changeType: APIAmendmentTypes.AMENDMENT,
+  debtorName: mockedDebtorName,
+  addDebtors: [mockedDebtorsAdd[0]],
+  deleteDebtors: [],
+  addSecuredParties: [mockedSecuredPartiesAdd[0]],
+  deleteSecuredParties: [],
+  addGeneralCollateral: mockedGeneralCollateralNew,
+  deleteGeneralCollateral: [],
+  addVehicleCollateral: [mockedVehicleCollateralAdd[0]],
+  deleteVehicleCollateral: []
+}
+export const mockedAmendmentCourtOrderInfo: AmendmentStatementIF = {
+  documentId: 'D0034002',
+  baseRegistrationNumber: '023003B',
+  description: 'Test Add',
+  registeringParty: mockedRegisteringParty1,
+  changeType: APIAmendmentTypes.AMENDMENT,
+  debtorName: mockedDebtorName,
+  courtOrderInformation: mockedAmendmentCourtOrder,
+  addDebtors: [],
+  deleteDebtors: [],
+  addSecuredParties: [],
+  deleteSecuredParties: [],
+  addGeneralCollateral: [],
+  deleteGeneralCollateral: [],
+  addVehicleCollateral: [],
+  deleteVehicleCollateral: []
+}
+
+export const mockedAmendmentDelete: AmendmentStatementIF = {
+  documentId: 'D0034002',
+  baseRegistrationNumber: '023003B',
+  description: 'Test Delete',
+  registeringParty: mockedRegisteringParty1,
+  changeType: APIAmendmentTypes.AMENDMENT,
+  debtorName: mockedDebtorName,
+  deleteDebtors: [mockedDebtorsDelete[0]],
+  addDebtors: [],
+  deleteSecuredParties: [mockedSecuredPartiesDelete[0]],
+  addSecuredParties: [],
+  deleteGeneralCollateral: mockedGeneralCollateralUpdate,
+  addGeneralCollateral: [],
+  deleteVehicleCollateral: [mockedVehicleCollateralDelete[0]],
+  addVehicleCollateral: []
+}
+
+export const mockedAmendmentEdit: AmendmentStatementIF = {
+  documentId: 'D0034002',
+  baseRegistrationNumber: '023003B',
+  description: 'Test Edit',
+  registeringParty: mockedRegisteringParty1,
+  changeType: APIAmendmentTypes.AMENDMENT,
+  debtorName: mockedDebtorName,
+  addDebtors: [mockedDebtorsEdit[0]],
+  deleteDebtors: [mockedDebtorsEdit[0]],
+  addSecuredParties: [mockedSecuredPartiesEdit[0]],
+  deleteSecuredParties: [mockedSecuredPartiesEdit[0]],
+  addGeneralCollateral: mockedGeneralCollateralUpdate,
+  deleteGeneralCollateral: mockedGeneralCollateralUpdate,
+  addVehicleCollateral: [mockedVehicleCollateralEdit[0]],
+  deleteVehicleCollateral: [mockedVehicleCollateralEdit[0]]
+}
+
+export const mockedDraftAmendmentAdd: DraftIF = {
+  type: DraftTypes.AMENDMENT_STATEMENT,
+  amendmentStatement: mockedAmendmentAdd
+}
+export const mockedDraftAmendmentDelete: DraftIF = {
+  type: DraftTypes.AMENDMENT_STATEMENT,
+  amendmentStatement: mockedAmendmentDelete
+}
+export const mockedDraftAmendmentEdit: DraftIF = {
+  type: DraftTypes.AMENDMENT_STATEMENT,
+  amendmentStatement: mockedAmendmentEdit
+}
+export const mockedDraftAmendmentCourtOrder: DraftIF = {
+  type: DraftTypes.AMENDMENT_STATEMENT,
+  amendmentStatement: mockedAmendmentCourtOrderInfo
 }
 
 export const mockedModelAmendmdmentAdd: StateModelIF = {
@@ -278,7 +416,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
       vehicleCollateral: mockedVehicleCollateralAdd,
       generalCollateral: mockedGeneralCollateralAdd
     },
-    confirmDebtorName: null,
+    confirmDebtorName: mockedDebtorName,
     courtOrderInformation: null,
     creationDate: '',
     draft: {
@@ -371,7 +509,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
       vehicleCollateral: mockedVehicleCollateralDelete,
       generalCollateral: mockedGeneralCollateralDelete
     },
-    confirmDebtorName: null,
+    confirmDebtorName: mockedDebtorName,
     courtOrderInformation: null,
     creationDate: '',
     draft: {
@@ -464,7 +602,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
       vehicleCollateral: mockedVehicleCollateralEdit,
       generalCollateral: mockedGeneralCollateralEdit
     },
-    confirmDebtorName: null,
+    confirmDebtorName: mockedDebtorName,
     courtOrderInformation: null,
     creationDate: '',
     draft: {
@@ -558,7 +696,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
       vehicleCollateral: [],
       generalCollateral: []
     },
-    confirmDebtorName: null,
+    confirmDebtorName: mockedDebtorName,
     courtOrderInformation: mockedAmendmentCourtOrder,
     creationDate: '',
     draft: {

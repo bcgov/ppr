@@ -105,12 +105,13 @@ export interface RenewRegistrationIF {
 
 // Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
 export interface AmendmentStatementIF {
-  changeType?: APIAmendmentTypes, // If empty the API will figure this value out.
+  changeType?: APIAmendmentTypes, // Mandatory, can save draft without it.
   clientReferenceId?: string, // AKA folio max length 20.
   documentId?: string, // Optional draft ID if draft created.
-  description: string, // Mandatory description of amendment.
+  description?: string, // Mandatory description of amendment, can save draft without it.
   baseRegistrationNumber: string, // The identifier of the registration being amended.
-  registeringParty: PartyIF,
+  debtorName: DebtorNameIF, // Mandatory name of current debtor.
+  registeringParty?: PartyIF, // Mandatory, can save draft without it.
   courtOrderInformation?: CourtOrderIF, // Only populated if all court order elements present.
   addSecuredParties?: PartyIF[], // Only populated if adding.
   deleteSecuredParties?: PartyIF[], // Only populated if deleting.

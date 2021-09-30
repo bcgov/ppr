@@ -111,7 +111,8 @@ import {
   convertDate,
   getFeatureFlag,
   getFinancingStatement,
-  saveAmendmentStatementDraft
+  saveAmendmentStatementDraft,
+  setupAmendmentStatementFromDraft
 } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { StatusCodes } from 'http-status-codes'
@@ -134,6 +135,8 @@ export default class AmendRegistration extends Vue {
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setAmendmentDescription: ActionBindingIF
+  @Action setCourtOrderInformation: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setOriginalAddCollateral: ActionBindingIF
   @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -178,6 +181,11 @@ export default class AmendRegistration extends Vue {
   // the number of the registration being amended
   private get registrationNumber (): string {
     return (this.$route.query['reg-num'] as string) || ''
+  }
+
+  // the draft document id if loading data after the base registration.
+  private get documentId (): string {
+    return (this.$route.query['document-id'] as string) || ''
   }
 
   private get registrationTypeUI (): UIRegistrationTypes {
@@ -237,6 +245,26 @@ export default class AmendRegistration extends Vue {
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
       this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+
+      if (this.documentId) {
+        const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
+        if (stateModel.registration.draft.error) {
+          console.error('loadRegistration setupAmendmentStatementFromDraft error: status: ' +
+                        stateModel.registration.draft.error.statusCode + ' message: ' +
+                        stateModel.registration.draft.error.message)
+          this.emitError(stateModel.registration.draft.error)
+        } else {
+          this.setAddCollateral(stateModel.registration.collateral)
+          this.setLengthTrust(stateModel.registration.lengthTrust)
+          this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+          if (stateModel.registration.amendmentDescription) {
+            this.setAmendmentDescription(stateModel.registration.amendmentDescription)
+          }
+          if (stateModel.registration.courtOrderInformation) {
+            this.setCourtOrderInformation(stateModel.registration.courtOrderInformation)
+          }
+        }
+      }
     }
   }
 

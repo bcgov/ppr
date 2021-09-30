@@ -122,7 +122,6 @@ describe('Amendment registration component', () => {
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
-    
   })
 
   it('saves the draft and redirects to dashboard', async () => {
@@ -130,7 +129,5 @@ describe('Amendment registration component', () => {
     await Vue.nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-    
   })
-
 })

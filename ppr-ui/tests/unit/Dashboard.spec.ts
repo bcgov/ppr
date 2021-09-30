@@ -127,4 +127,10 @@ describe('Dashboard component', () => {
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
   })
+
+  it('routes to edit amendment statement from draft', async () => {
+    wrapper.findComponent(RegistrationTable).vm.$emit('editAmendmentDraft', { regNum: '100119B', docId: 'D9000207' })
+    await Vue.nextTick()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
+  })
 })

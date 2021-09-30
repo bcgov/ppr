@@ -777,7 +777,7 @@ export default defineComponent({
       if (item.type === DraftTypes.FINANCING_STATEMENT) {
         emit('editFinancingDraft', localState.currentRegistrationNumber)
       } else if (item.type === DraftTypes.AMENDMENT_STATEMENT) {
-        alert('TODO: start amendment edit draft.')
+        emit('editAmendmentDraft', { regNum: item.baseRegistrationNumber, docId: item.documentId })
       }
     }
 
