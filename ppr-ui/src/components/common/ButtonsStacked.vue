@@ -8,7 +8,9 @@
           outlined
           @click="back()"
         >
-          <v-icon color="primary" style="padding-top: 2px;">mdi-chevron-left</v-icon>
+          <v-icon v-if="backBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+            mdi-chevron-left
+          </v-icon>
           {{ backBtn }}
         </v-btn>
       </v-col>

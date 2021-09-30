@@ -121,6 +121,7 @@
               v-if="!showEditParty[row.index]"
               :key="row.item.id"
               class="party-row"
+              :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}"
             >
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>
@@ -133,6 +134,11 @@
                   <v-col cols="9">
                     <div>
                       {{ getName(row.item) }}
+                    </div>
+                    <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
+                      <v-chip x-small label color="#1669BB" text-color="white">
+                        {{ row.item.action }}
+                      </v-chip>
                     </div>
                   </v-col>
                 </v-row>
@@ -171,21 +177,48 @@
                   </v-list>
                 </div>
                 <div class="actions float-right" v-else>
-                  <span class="edit-action">
+                  <span
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
+                    class="edit-action"
+                  >
                     <v-btn
                       text
                       color="primary"
-                      class="edit-btn"
+                      class="smaller-button edit-btn"
+                      :id="'class-' + row.index + '-undo-btn'"
+                      @click="undo(row.index)"
+                      :disabled="addEditInProgress"
+                    >
+                      <v-icon small>mdi-undo</v-icon>
+                      <span>Undo</span>
+                    </v-btn>
+                  </span>
+                  <span v-else class="edit-action">
+                    <v-btn
+                      text
+                      color="primary"
+                      class="smaller-button edit-btn"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
                     >
                       <v-icon small>mdi-pencil</v-icon>
-                      <span>Edit</span>
+                      <span
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && row.item.action !== ActionTypes.ADDED"
+                      >
+                        Amend
+                      </span>
+                      <span v-else>Edit</span>
                     </v-btn>
                   </span>
 
-                  <span class="actions__more">
+                  <span class="actions__more"
+                    v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action !== ActionTypes.REMOVED) ||
+                    registrationFlowType !== RegistrationFlowType.AMENDMENT"
+                  >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
                         <v-btn
@@ -193,7 +226,7 @@
                           small
                           v-on="on"
                           color="primary"
-                          class="actions__more-actions__btn"
+                          class="smaller-actions actions__more-actions__btn"
                           :disabled="addEditInProgress"
                         >
                           <v-icon>mdi-menu-down</v-icon>
@@ -251,7 +284,7 @@ import {
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { isEqual } from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditParty from './EditParty.vue'
 import PartySearch from './PartySearch.vue'
@@ -265,6 +298,7 @@ import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeSearch } from '@/utils'
 import { useCountriesProvinces } from '@/composables/address/factories'
+import { ActionTypes, RegistrationFlowType } from '@/enums'
 
 export default defineComponent({
   components: {
@@ -284,11 +318,19 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const {
+      getAddSecuredPartiesAndDebtors,
+      getRegistrationType,
+      getOriginalAddSecuredPartiesAndDebtors,
+      getRegistrationFlowType
+    } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors',
+      'getRegistrationType',
+      'getOriginalAddSecuredPartiesAndDebtors',
+      'getRegistrationFlowType'
     ])
-    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
     const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationFlowType = getRegistrationFlowType.value
     const countryProvincesHelpers = useCountriesProvinces()
 
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
@@ -327,10 +369,18 @@ export default defineComponent({
       if (isRegisteringParty(localState.securedParties[index])) {
         localState.registeringPartyAdded = false
       }
-      localState.securedParties.splice(index, 1)
-      currentParties.securedParties = localState.securedParties
-      currentParties.valid = isPartiesValid(currentParties)
-      setAddSecuredPartiesAndDebtors(currentParties)
+      const currentParty = currentParties.securedParties[index]
+
+      if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentParty.action !== ActionTypes.ADDED)) {
+        currentParty.action = ActionTypes.REMOVED
+        localState.securedParties.splice(index, 1, currentParty)
+        setAddSecuredPartiesAndDebtors(currentParties)
+      } else {
+        localState.securedParties.splice(index, 1)
+        currentParties.securedParties = localState.securedParties
+        currentParties.valid = isPartiesValid(currentParties)
+        setAddSecuredPartiesAndDebtors(currentParties)
+      }
       localState.searchValue = { code: '', businessName: '' }
     }
 
@@ -341,6 +391,11 @@ export default defineComponent({
           localState.registeringPartyAdded = false
         }
       }
+    }
+
+    const undo = (index: number): void => {
+      const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+      localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
     }
 
     const addRegisteringParty = () => {
@@ -437,6 +492,7 @@ export default defineComponent({
       }
       // if secured party already shown
       if (localState.securedParties.length === 1) {
+        newParty.action = ActionTypes.EDITED
         localState.currentPartyName = party.code + ' ' + party.businessName
         localState.savedParty = newParty
         localState.showDialog = true
@@ -477,6 +533,10 @@ export default defineComponent({
       addressSchema,
       isSecuredPartyRestrictedList,
       registrationType,
+      registrationFlowType,
+      RegistrationFlowType,
+      ActionTypes,
+      undo,
       selectResult,
       filterList,
       dialogSubmit,
@@ -525,5 +585,14 @@ export default defineComponent({
 
 ::v-deep .v-list-item__content {
   padding: 6px 0;
+}
+
+.smaller-actions {
+  min-width: 34px !important;
+  padding: 0 8px !important;
+}
+
+.smaller-button {
+  padding: 0 12px !important;
 }
 </style>
