@@ -93,7 +93,9 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
 
   const collateral:AddCollateralIF = stateModel.registration.collateral
   // Conditionally set draft vehicle collateral
-  setAmendmentList(collateral.vehicleCollateral, statement.addVehicleCollateral, statement.deleteVehicleCollateral)
+  if (collateral.vehicleCollateral) {
+    setAmendmentList(collateral.vehicleCollateral, statement.addVehicleCollateral, statement.deleteVehicleCollateral)
+  }
   // Conditionally set draft general collateral
   if (collateral.generalCollateral && collateral.generalCollateral.length > 0) {
     for (let i = 0; i < collateral.generalCollateral.length; i++) {
