@@ -139,6 +139,10 @@ export default defineComponent({
     isRenewal: {
       type: Boolean,
       default: false
+    },
+    setShowInvalid: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -160,6 +164,7 @@ export default defineComponent({
       lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
+      showInvalid: getLengthTrust.value.showInvalid,
       lifeYearsHint:
         'Minimum 1 year, Maximum ' +
         feeInfoYears.quantityMax.toString() +

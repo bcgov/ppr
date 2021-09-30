@@ -119,6 +119,8 @@ export default class ReviewRegistration extends Vue {
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private financingStatementDate: Date = null
   private feeType = FeeSummaryTypes.RENEW
+  private showInvalid = false
+  private registrationValid = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -197,6 +199,7 @@ export default class ReviewRegistration extends Vue {
       if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
         lengthTrust.lifeYears = 1
         lengthTrust.valid = true
+        this.registrationValid = true
       }
       const parties = {
         valid: true,
@@ -226,6 +229,7 @@ export default class ReviewRegistration extends Vue {
         query: { 'reg-num': this.registrationNumber }
       })
     } else {
+      this.showInvalid = true
     }
     this.emitHaveData(false)
   }
