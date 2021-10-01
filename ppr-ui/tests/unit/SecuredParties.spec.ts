@@ -270,6 +270,7 @@ describe('Secured party amendment tests', () => {
     wrapper.vm.$data.securedParties = parties
     await Vue.nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(true)
+    expect(wrapper.findAll('.invalid-message').length).toBe(0)
     // remove said secured party
     // click the drop down arrow
     wrapper.find('.v-data-table .party-row .actions__more-actions__btn').trigger('click')
@@ -278,6 +279,9 @@ describe('Secured party amendment tests', () => {
     wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
+    wrapper.vm.$data.showErrorSecuredParties = true
+    await Vue.nextTick()
+    expect(wrapper.findAll('.invalid-message').length).toBe(1)
 
   })
 
