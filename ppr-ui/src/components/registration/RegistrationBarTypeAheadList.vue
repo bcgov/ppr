@@ -7,7 +7,6 @@
       @proceed="dialogSubmit($event)"
     />
     <v-autocomplete
-      id="registrationTypeAhead"
       class="registrationTypeAhead rounded-top"
       allow-overflow
       filled
@@ -184,10 +183,6 @@ export default defineComponent({
 
 ::v-deep .theme--light.v-list-item--disabled {
   min-height: 0;
-}
-
-.registrationTypeAhead {
-  z-index: 30;
 }
 
 .v-input__icon--clear {

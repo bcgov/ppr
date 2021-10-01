@@ -3,7 +3,7 @@
     <v-row no-gutters class="px-6">
       <v-col class="ml-n6" cols="4">
         <div class="actions">
-          <registration-bar-type-ahead-list v-if="hasRPPR"
+          <registration-bar-type-ahead-list v-if="!hasRPPR"
             :defaultLabel="labelText"
             :defaultDense="false"
             :defaultClearable="false"
