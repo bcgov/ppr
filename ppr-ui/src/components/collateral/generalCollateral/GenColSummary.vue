@@ -1,39 +1,41 @@
 <template>
   <v-container class="pa-0">
     <h3 style="line-height: 1rem;">General Collateral</h3>
-    <div v-if="registrationFlowType !== RegistrationFlowType.NEW" id="general-collateral-history" class="mt-10">
+    <div v-if="registrationFlowType !== RegistrationFlowType.NEW" id="general-collateral-history" class="mt-7">
       <v-btn id="gc-show-history-btn" class="ma-0 pa-0" color="primary" text @click="showingHistory = !showingHistory">
         <p class="ma-0">
           <span v-if="showingHistory">Hide </span>
           <span v-else>View </span>
-          General Collateral and Ammendments ({{ generalCollateral.length }})
+          General Collateral and Amendments ({{ generalCollateral.length }})
         </p>
       </v-btn>
       <div v-if="showingHistory" class="general-collateral-summary">
         <v-row v-for="(item, index) in generalCollateral" :key="index" no-gutters>
-          <v-col :class="[{ 'border-btm': index !== baseGenCollateralIndex }, 'pt-10']">
+          <v-col :class="[{ 'border-btm': index !== baseGenCollateralIndex,
+            'pb-30px': index !== baseGenCollateralIndex }, 'pt-30px']"
+          >
             <b v-if="item.addedDateTime">{{ asOfDateTime(item.addedDateTime) }}</b>
-            <div v-if="item.descriptionDelete" class="gc-description-delete pt-30px">
+            <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
               <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
                 <b>DELETED</b>
               </v-chip>
-              <p class="pt-5 ma-0">
+              <p class="pt-3 ma-0">
                 {{ item.descriptionDelete }}
               </p>
             </div>
-            <div v-if="item.descriptionAdd" class="gc-description-add pt-30px">
+            <div v-if="item.descriptionAdd" class="gc-description-add pt-5">
               <v-chip color="primary" label text-color="white" x-small>
                 <b>ADDED</b>
               </v-chip>
-              <p class="pt-5 ma-0">
+              <p class="pt-3 ma-0">
                 {{ item.descriptionAdd }}
               </p>
             </div>
-            <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description pt-30px">
+            <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description pt-5">
               <b v-if="registrationFlowType !== RegistrationFlowType.NEW">
-                Base Registration Collateral:
+                Base Registration General Collateral:
               </b>
-              <p v-if="item.description" class="pt-30px ma-0">
+              <p v-if="item.description" class="pt-5 ma-0">
                 {{ item.description }}
               </p>
             </div>
@@ -41,7 +43,7 @@
         </v-row>
       </div>
     </div>
-    <div v-else class="general-collateral-summary pt-10">
+    <div v-else class="general-collateral-summary pt-5">
       <p v-if="generalCollateral.length > 0" class="ma-0">
         {{ generalCollateral[0].description }}
       </p>

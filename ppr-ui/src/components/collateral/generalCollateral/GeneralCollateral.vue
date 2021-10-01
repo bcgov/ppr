@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="summaryView" style="padding: 16px 12px 0 30px;">
+  <v-container v-if="summaryView" style="padding: 28px 12px 0 30px;">
     <gen-col-summary />
   </v-container>
   <v-container v-else class="pa-0">

@@ -1,6 +1,6 @@
 <template>
-  <v-container v-if="isSummary">
-    <v-row no-gutters class="ps-6 pb-3" v-if="vehicleCollateral && vehicleCollateral.length > 0">
+  <v-container v-if="isSummary" class="pb-0">
+    <v-row no-gutters class="ps-6" v-if="vehicleCollateral && vehicleCollateral.length > 0">
       <v-col cols="3" class="pt-4 generic-label">
         Vehicle Collateral
       </v-col>
