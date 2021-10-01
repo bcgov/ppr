@@ -16,12 +16,9 @@
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
-          <registration-length-trust
+          <registration-length-trust-amendment
             class="mt-15"
-            :isSummary="true"
-            @setRegistrationLengthTrustValid="
-              registrationLengthTrustValid = $event
-            "
+            @setRegistrationLengthTrustValid="registrationLengthTrustValid = $event"
           />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
@@ -85,7 +82,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustAmendment } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
@@ -120,7 +117,7 @@ import { StatusCodes } from 'http-status-codes'
 @Component({
   components: {
     CautionBox,
-    RegistrationLengthTrust,
+    RegistrationLengthTrustAmendment,
     Collateral,
     Debtors,
     RegisteringPartySummary,
