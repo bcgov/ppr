@@ -8,6 +8,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { RegistrationLengthTrust } from '@/components/registration'
 // local types/helpers/etc.
 import { StateModelIF } from '@/interfaces'
+import { getLastEvent } from './utils'
 // unit test helpers/data
 import {
   mockedSelectSecurityAgreement,
@@ -204,6 +205,16 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     expect(wrapper.find('#new-expiry').text()).toContain('March 31, 2022')
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
+    //also emits if valid
+    expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeTruthy()
+  })
+
+  it('emits if invalid', async () => {
+    // set renewal length to bad value
+    wrapper.vm.$data.lifeYearsEdit = 'a'
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.lengthTrust.valid).toBe(false)
+    expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeFalsy()
   })
   
 })

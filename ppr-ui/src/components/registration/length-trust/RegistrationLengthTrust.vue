@@ -3,7 +3,7 @@
     fluid
     no-gutters
     class="white pb-6 pr-10 pl-8 rounded"
-    :class="{ 'invalid-message': lengthTrust.showInvalid }"
+    :class="{ 'invalid-message': showInvalid }"
   >
   <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
         <v-col cols="auto" class="pa-2">
@@ -25,7 +25,7 @@
     <div>
       <v-row class="pt-6" no-gutters>
         <v-col cols="3" class="generic-label">
-          <span :class="{ 'invalid-message': lengthTrust.showInvalid }"
+          <span :class="{ 'invalid-message': showInvalid }"
             >{{ regTitle }} Length</span
           >
         </v-col>
@@ -139,6 +139,10 @@ export default defineComponent({
     isRenewal: {
       type: Boolean,
       default: false
+    },
+    setShowInvalid: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -160,6 +164,7 @@ export default defineComponent({
       lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
+      showInvalid: getLengthTrust.value.showInvalid,
       lifeYearsHint:
         'Minimum 1 year, Maximum ' +
         feeInfoYears.quantityMax.toString() +
@@ -256,6 +261,9 @@ export default defineComponent({
         lt.lifeYears = 0
         setLengthTrust(lt)
       }
+      // inform parent component
+      context.emit('lengthTrustValid', lt.valid)
+      localState.showInvalid = lt.showInvalid
     }
 
     watch(
@@ -292,6 +300,9 @@ export default defineComponent({
           lt.valid = false
           setLengthTrust(lt)
         }
+        // inform parent component
+        context.emit('lengthTrustValid', lt.valid)
+        localState.showInvalid = lt.showInvalid
       }
     )
     watch(
@@ -300,6 +311,13 @@ export default defineComponent({
         const lt = localState.lengthTrust
         lt.trustIndenture = val
         setLengthTrust(lt)
+      }
+    )
+
+    watch(
+      () => props.setShowInvalid,
+      (val: boolean) => {
+        localState.showInvalid = val
       }
     )
 
