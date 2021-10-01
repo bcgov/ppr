@@ -40,16 +40,74 @@
       </v-row>
       <v-row no-gutters class="pt-7" style="margin-top: 2px; margin-bottom: 80px;">
         <v-col>
-          <v-row no-gutters
-                  id="registration-header"
-                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+          <v-row
+            id="registration-header"
+            :class="[$style['dashboard-title'], 'px-6', 'py-3', 'soft-corners-top']"
+            align="center"
+            no-gutters
+          >
             <v-col cols="auto">
               <b>My Registrations</b> ({{ registrationsLength }})
+            </v-col>
+            <v-col>
+              <v-row justify="end" no-gutters>
+                <v-col class="py-1" cols="auto">
+                  <v-text-field
+                    id="my-reg-table-filter"
+                    :class="[
+                      $style['text-input-style-above'],
+                      'column-selection',
+                      'ma-0',
+                      'soft-corners-top'
+                    ]"
+                    append-icon="mdi-filter-outline"
+                    dense
+                    hide-details
+                    label="Filter by Keyword"
+                    single-line
+                    style="width:270px"
+                    v-model="myRegSearch"
+                  />
+                </v-col>
+                <v-col class="pl-4 py-1" cols="auto">
+                  <v-select
+                    id="column-selection"
+                    :class="[
+                      $style['text-input-style-above'],
+                      'column-selection',
+                      'ma-0',
+                      'soft-corners-top'
+                    ]"
+                    attach
+                    autocomplete="off"
+                    dense
+                    hide-details="true"
+                    :items="myRegHeadersSelectable"
+                    item-text="text"
+                    :menu-props="{
+                      minWidth: '240px',
+                      maxHeight: 'none'
+                    }"
+                    multiple
+                    placeholder="Columns to Show"
+                    return-object
+                    style="width: 240px;"
+                    v-model="myRegHeadersSelected"
+                  >
+                    <template v-slot:selection="{ index }">
+                      <span v-if="index === 0">Columns to Show</span>
+                    </template>
+                  </v-select>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
           <v-row no-gutters class="white" style="min-height:300px">
             <v-col cols="12">
               <registration-table
+                :setHeaders="myRegHeaders"
+                :setSearch="myRegSearch"
+                :toggleSnackBar="myRegSnackBar"
                 @registrationTotal="showRegistrationTotal($event)"
                 @discharge="startDischarge($event)"
                 @renew="startRenewal($event)"
@@ -61,6 +119,10 @@
           </v-row>
         </v-col>
       </v-row>
+      <!-- FUTURE: remove this once adding registrations is implemented -->
+      <v-btn @click="myRegSnackBar = !myRegSnackBar">
+        show snack bar
+      </v-btn>
     </div>
   </v-container>
 </template>
@@ -74,9 +136,9 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
-import { ActionBindingIF, BreadcrumbIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
+import { ActionBindingIF, BaseHeaderIF, BreadcrumbIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
          SearchResponseIF, StateModelIF } from '@/interfaces' // eslint-disable-line
-import { tombstoneBreadcrumbDashboard } from '@/resources'
+import { registrationTableHeaders, tombstoneBreadcrumbDashboard } from '@/resources'
 import { getFeatureFlag, searchHistory, setupFinancingStatementDraft } from '@/utils'
 // local components
 import { Tombstone } from '@/components/tombstone'
@@ -121,7 +183,12 @@ export default class Dashboard extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private regLength: number = 0
+  private regLength = 0
+  private myRegHeaders = [...registrationTableHeaders]
+  private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
+  private myRegHeadersSelected = [...registrationTableHeaders]
+  private myRegSearch = ''
+  private myRegSnackBar = false
 
   mounted () {
     // clear search data in the store
@@ -129,6 +196,14 @@ export default class Dashboard extends Vue {
     this.setSearchedType(null)
     this.setSearchedValue('')
     this.setSearchResults(null)
+    // set default headers (temporary - this will be changed later to go off of user settings)
+    const headers = []
+    for (let i = 0; i < this.myRegHeadersSelected.length; i++) {
+      if (this.myRegHeadersSelected[i].display) {
+        headers.push(this.myRegHeadersSelected[i])
+      }
+    }
+    this.myRegHeadersSelected = headers
     this.onAppReady(this.appReady)
   }
 
@@ -247,6 +322,18 @@ export default class Dashboard extends Vue {
     }
   }
 
+  @Watch('myRegHeadersSelected')
+  private updateMyRegHeaders (val: BaseHeaderIF[]): void {
+    const headers = []
+    for (let i = 0; i < registrationTableHeaders.length; i++) {
+      if (registrationTableHeaders[i].value === 'actions') headers.push(registrationTableHeaders[i])
+      else if (this.myRegHeadersSelected.find(header => header.value === registrationTableHeaders[i].value)) {
+        headers.push(registrationTableHeaders[i])
+      }
+    }
+    this.myRegHeaders = headers
+  }
+
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
@@ -261,8 +348,22 @@ export default class Dashboard extends Vue {
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 .dashboard-title {
-  font-size: 1rem;
-  color: $gray9;
   background-color: $BCgovBlue0;
+  color: $gray9;
+  font-size: 1rem;
+}
+.text-input-style-above {
+  label {
+    font-size: 14px;
+    color: $gray7 !important;
+    padding-left: 6px;
+    margin-bottom: 10px;
+    margin-top: -2px;
+  }
+  span {
+    padding-left: 6px;
+    font-size: 14px;
+    color: $gray7;
+  }
 }
 </style>

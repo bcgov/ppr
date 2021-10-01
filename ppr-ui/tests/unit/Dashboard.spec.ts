@@ -6,14 +6,16 @@ import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
-
-// Components
+// local components
 import { Dashboard } from '@/views'
 import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
-
-// Other
+// local types/helpers, etc.
+import { RouteNames, UISearchTypes } from '@/enums'
+import { registrationTableHeaders } from '@/resources'
+import { axios } from '@/utils/axios-ppr'
+// unit test data, etc.
 import mockRouter from './MockRouter'
 import {
   mockedSearchResponse,
@@ -21,8 +23,6 @@ import {
   mockedSelectSecurityAgreement,
   mockedDraftFinancingStatementAll
 } from './test-data'
-import { RouteNames, UISearchTypes } from '@/enums'
-import { axios } from '@/utils/axios-ppr'
 
 Vue.use(Vuetify)
 
@@ -30,11 +30,14 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Events
-const selectedType = 'selected-registration-type'
+const selectedType = "selected-registration-type"
 
 // selectors
-const searchHeader: string = '#search-header'
-const historyHeader: string = '#search-history-header'
+const searchHeader = "#search-header"
+const historyHeader = "#search-history-header"
+const myRegHeader = "#registration-header"
+const myRegTblFilter = "#my-reg-table-filter"
+const myRegTblColSelection = "#column-selection"
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -76,11 +79,13 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
   })
+
   it('displays the search header', () => {
     const header = wrapper.findAll(searchHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Personal Property Search')
   })
+
   it('displays default search history header', () => {
     expect(wrapper.vm.getSearchHistory).toBeNull // eslint-disable-line no-unused-expressions
     expect(wrapper.vm.searchHistoryLength).toBe(0)
@@ -88,6 +93,7 @@ describe('Dashboard component', () => {
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('My Searches (0)')
   })
+
   it('updates the search history header based on history data', async () => {
     wrapper.vm.setSearchHistory(mockedSearchHistory.searches)
     await Vue.nextTick()
@@ -98,15 +104,44 @@ describe('Dashboard component', () => {
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('My Searches (6)')
   })
+
   it('routes to search after getting a search response', async () => {
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe('search')
   })
+
   it('routes to new registration after selecting registration type', async () => {
     wrapper.findComponent(RegistrationBar).vm.$emit(selectedType, mockedSelectSecurityAgreement)
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
+  })
+
+  it('displays my registration header and content', () => {
+    const header = wrapper.findAll(myRegHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('My Registrations (0)')
+    expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
+    expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+  })
+
+  it('updates the registration table when the filter is updated', async () => {
+    const filterText = 'test'
+    expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
+    wrapper.vm.$data.myRegSearch = filterText
+    await flushPromises()
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setSearch).toBe(filterText)
+  })
+
+  it('updates the registration table with column selection', async () => {
+    const newColumnSelection = [...registrationTableHeaders].slice(0,2)
+    expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
+    wrapper.vm.$data.myRegHeaders = newColumnSelection
+    await flushPromises()
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(newColumnSelection)
   })
 
   it('routes to discharge after selecting registration type', async () => {

@@ -427,23 +427,20 @@ tr.disabled-text-not-action td:last-child {
   font-style: normal;
 }
 
-.v-data-table .filter-row {
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  background-color: #ffffff;
-
-  td {
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-    height: 30px;
-  }
+.v-data-table .my-reg-filter {
+  height: 87px;
 
   input,
   label,
   .v-list-item,
-  v-select__selection {
+  .v-select__selection {
     font-size: 13px !important;
+    font-weight: normal;
   }
+}
+
+.v-data-table .my-reg-header {
+  height: 82px;
 }
 
 .primaryRow {
@@ -516,6 +513,9 @@ tr.disabled-text-not-action td:last-child {
 .registration-row {
   z-index: 5;
 }
+.registration-row td {
+  padding-left: 8px !important;
+}
 
 #registration-table.v-data-table > .v-data-table__wrapper > 
 table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
@@ -559,4 +559,12 @@ table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table
 // custom padding shortcut classes
 .pt-30px {
   padding-top: 30px;
+}
+
+// borders
+.border-btm {
+  border-bottom: 1px solid $gray3;
+}
+.border-tp {
+  border-top: 1px solid $gray3;
 }
