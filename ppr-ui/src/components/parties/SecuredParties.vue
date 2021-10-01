@@ -108,7 +108,7 @@
       <v-col>
         <v-data-table
           class="party-table"
-          :class="{ 'invalid-message': showErrorSecuredParties }"
+          :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
           :headers="headers"
           :items="securedParties"
           disable-pagination
@@ -165,7 +165,19 @@
                     class="actions__more-actions"
                     :disabled="addEditInProgress"
                   >
+                  <v-list-item
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                      && row.item.action === ActionTypes.REMOVED"
+                      class="v-remove"
+                      @click="undo(row.index)"
+                    >
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-undo</v-icon>
+                        <span class="ml-1">Undo</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
                     <v-list-item
+                      v-else
                       class="v-remove"
                       @click="removeParty(row.index)"
                     >
@@ -281,6 +293,7 @@ import {
   reactive,
   toRefs,
   computed,
+  watch,
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -310,6 +323,10 @@ export default defineComponent({
   },
   props: {
     isSummary: {
+      type: Boolean,
+      default: false
+    },
+    setShowInvalid: {
       type: Boolean,
       default: false
     }
@@ -358,9 +375,7 @@ export default defineComponent({
       showErrorSummary: computed((): boolean => {
         return !parties.valid
       }),
-      showErrorSecuredParties: computed((): boolean => {
-        return parties.showInvalid && parties.securedParties.length === 0
-      }),
+      showErrorSecuredParties: parties.showInvalid,
       headers: [...partyTableHeaders, ...editTableHeaders]
     })
 
@@ -382,6 +397,7 @@ export default defineComponent({
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       localState.searchValue = { code: '', businessName: '' }
+      getSecuredPartyValidity()
     }
 
     const removeRegisteringParty = (): void => {
@@ -396,6 +412,7 @@ export default defineComponent({
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
       localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
+      getSecuredPartyValidity()
     }
 
     const addRegisteringParty = () => {
@@ -437,6 +454,7 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
+      getSecuredPartyValidity()
     }
 
     const fetchOtherSecuredParties = async () => {
@@ -469,6 +487,24 @@ export default defineComponent({
       }
     })
 
+    const getSecuredPartyValidity = (): boolean => {
+      let validity = false
+      if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+        for (let i = 0; i < localState.securedParties.length; i++) {
+          // is valid if there is at least one debtor
+          if (localState.securedParties[i].action !== ActionTypes.REMOVED) {
+            validity = true
+          }
+        }
+      } else {
+        if (localState.securedParties.length > 0) {
+          validity = true
+        }
+      }
+      context.emit('setSecuredPartiesValid', validity)
+      return validity
+    }
+
     const filterList = (
       item: SearchPartyIF,
       queryText: string,
@@ -488,11 +524,14 @@ export default defineComponent({
         businessName: party.businessName,
         emailAddress: party.emailAddress || '',
         address: party.address,
-        personName: { first: '', middle: '', last: '' }
+        personName: { first: '', middle: '', last: '' },
+        action: ActionTypes.ADDED
+      }
+      if (localState.securedParties[0].code === party.code) {
+        return
       }
       // if secured party already shown
-      if (localState.securedParties.length === 1) {
-        newParty.action = ActionTypes.EDITED
+      if (localState.securedParties.length > 0) {
         localState.currentPartyName = party.code + ' ' + party.businessName
         localState.savedParty = newParty
         localState.showDialog = true
@@ -506,10 +545,18 @@ export default defineComponent({
 
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) {
-        parties.securedParties = [localState.savedParty]
-        parties.valid = isPartiesValid(parties)
-        setAddSecuredPartiesAndDebtors(parties)
-        localState.securedParties = [localState.savedParty]
+        if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+          const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+          // original secured party must be shown as removed
+          const originalParty = originalParties.securedParties[0]
+          originalParty.action = ActionTypes.REMOVED
+          localState.securedParties = [originalParty, localState.savedParty]
+        } else {
+          parties.securedParties = [localState.savedParty]
+          parties.valid = isPartiesValid(parties)
+          setAddSecuredPartiesAndDebtors(parties)
+          localState.securedParties = [localState.savedParty]
+        }
       } else {
         localState.searchValue = {
           code: localState.securedParties[0].code,
@@ -518,6 +565,10 @@ export default defineComponent({
       }
       localState.showDialog = false
     }
+
+    watch(() => props.setShowInvalid, (val) => {
+      localState.showErrorSecuredParties = val
+    })
 
     return {
       removeParty,
@@ -538,6 +589,7 @@ export default defineComponent({
       ActionTypes,
       undo,
       selectResult,
+      getSecuredPartyValidity,
       filterList,
       dialogSubmit,
       ...countryProvincesHelpers,

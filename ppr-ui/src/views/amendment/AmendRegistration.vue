@@ -43,7 +43,7 @@
           <h3 class="pt-6 px-1">Secured Parties</h3>
           <secured-parties
             @setSecuredPartiesValid="securedPartiesValid = $event"
-            class="pt-4"
+            :setShowInvalid="showInvalid" class="pt-4"
           />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtors
