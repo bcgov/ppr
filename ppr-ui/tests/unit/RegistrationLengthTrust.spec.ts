@@ -8,6 +8,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { RegistrationLengthTrust } from '@/components/registration'
 // local types/helpers/etc.
 import { StateModelIF } from '@/interfaces'
+import { getLastEvent } from './utils'
 // unit test helpers/data
 import {
   mockedSelectSecurityAgreement,
@@ -205,7 +206,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
     //also emits if valid
-    expect(wrapper.emitted().lengthTrustValid).toBeTruthy()
+    expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeTruthy()
   })
 
   it('emits if invalid', async () => {
@@ -213,7 +214,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     wrapper.vm.$data.lifeYearsEdit = 'a'
     await Vue.nextTick()
     expect(wrapper.vm.$data.lengthTrust.valid).toBe(false)
-    expect(wrapper.emitted().lengthTrustValid).toBeTruthy()
+    expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeFalsy()
   })
   
 })
