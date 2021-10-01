@@ -122,8 +122,10 @@ export default defineComponent({
 
     const exit = () => {
       // Reset to initial state on cancel.
-      localState.userInput.value = 0
-      localState.userInput.text = ''
+      if (localState.userInput) {
+        localState.userInput.value = 0
+        localState.userInput.text = ''
+      }
       localState.debtors = []
       context.emit('confirmationClose')
     }

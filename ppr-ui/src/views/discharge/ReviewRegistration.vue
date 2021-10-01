@@ -13,7 +13,7 @@
             </p>
             <p class="ma-0 pt-5">
               To view the full history of this registration including descriptions of any
-              amendments and any court orders, you will need to conduct a separate search.
+              previous amendments or court orders, you will need to conduct a separate search.
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt"/>

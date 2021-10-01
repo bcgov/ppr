@@ -175,7 +175,7 @@
                     outlined
                     color="error"
                     :disabled="activeIndex === -1"
-                    @click="removeParty()"
+                    @click="removeSecuredParty()"
                     id="remove-btn-party"
                     >Remove
                   </v-btn>
