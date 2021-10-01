@@ -85,7 +85,7 @@ describe('GenColSummary tests', () => {
     expect(wrapper.findAll(generalCollateralSummary).length).toBe(1)
     expect(wrapper.findAll(description).length).toBe(1)
     // base reg general collateral
-    expect(wrapper.findAll(description).at(0).text()).toContain('Base Registration Collateral:')
+    expect(wrapper.findAll(description).at(0).text()).toContain('Base Registration General Collateral:')
     expect(
       wrapper.findAll(description).at(0).text()
     ).toContain(mockedGeneralCollateral2[wrapper.vm.$data.baseGenCollateralIndex].description)
