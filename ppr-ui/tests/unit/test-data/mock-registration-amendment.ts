@@ -369,6 +369,7 @@ export const mockedAmendmentEdit: AmendmentStatementIF = {
   description: 'Test Edit',
   registeringParty: mockedRegisteringParty1,
   changeType: APIAmendmentTypes.AMENDMENT,
+  trustIndenture: true,
   debtorName: mockedDebtorName,
   addDebtors: [mockedDebtorsEdit[0]],
   deleteDebtors: [mockedDebtorsEdit[0]],
@@ -618,7 +619,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
       showInvalid: false,
       lifeYears: 0,
       lifeInfinite: false,
-      trustIndenture: false,
+      trustIndenture: true,
       lienAmount: '',
       surrenderDate: '',
       action: ActionTypes.EDITED
