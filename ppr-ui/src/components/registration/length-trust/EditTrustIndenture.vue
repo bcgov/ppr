@@ -78,6 +78,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ActionTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -109,6 +110,7 @@ export default defineComponent({
       if (localState.trustIndenture !== localState.existingTrustIndenture) {
         const lt = localState.lengthTrust
         lt.trustIndenture = localState.trustIndenture
+        lt.action = ActionTypes.EDITED
         setLengthTrust(lt)
       }
       context.emit('editTrustIndenture')

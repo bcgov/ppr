@@ -143,6 +143,7 @@ export default defineComponent({
     const undoTrustIndenture = (): void => {
       const lt = getLengthTrust.value
       lt.trustIndenture = localState.originalTrustIndenture
+      lt.action = ''
       setLengthTrust(lt)
     }
 
