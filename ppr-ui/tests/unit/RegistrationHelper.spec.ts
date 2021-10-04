@@ -579,6 +579,15 @@ describe('Draft Amendment Setup State Model Tests', () => {
       securedParties: mockedSecuredPartiesExisting,
       debtors: mockedDebtorsExisting
     })
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
     await flushPromises()
   })
 
@@ -628,6 +637,7 @@ describe('Draft Amendment Setup State Model Tests', () => {
     expect(model.registration.collateral.vehicleCollateral[0].action).toBe(ActionTypes.EDITED)
     expect(model.registration.collateral.generalCollateral[3].descriptionAdd).toBeDefined()
     expect(model.registration.collateral.generalCollateral[3].descriptionDelete).toBeDefined()
+    expect(model.registration.lengthTrust.action).toBe(ActionTypes.EDITED)
   })
 
   it('draft court order setup model', async () => {
@@ -638,6 +648,7 @@ describe('Draft Amendment Setup State Model Tests', () => {
     expect(model.registration.confirmDebtorName).toBeDefined()
     expect(model.registration.amendmentDescription).toBeDefined()
     expect(model.registration.courtOrderInformation).toBeDefined()
+    expect(model.registration.lengthTrust.action).toBeUndefined()
   })
 })
 

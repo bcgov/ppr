@@ -517,6 +517,11 @@ export function setupStateModelFromAmendmentDraft (stateModel:StateModelIF, draf
   if (draftAmendment.clientReferenceId) {
     stateModel.folioOrReferenceNumber = draftAmendment.clientReferenceId
   }
+  if ('trustIndenture' in draftAmendment &&
+      draftAmendment.trustIndenture !== stateModel.originalRegistration.lengthTrust.trustIndenture) {
+    stateModel.registration.lengthTrust.trustIndenture = draftAmendment.trustIndenture
+    stateModel.registration.lengthTrust.action = ActionTypes.EDITED
+  }
   const parties:AddPartiesIF = stateModel.registration.parties
   // setup secured parties.
   setupRegistrationPartyList(parties.securedParties, draftAmendment.addSecuredParties,

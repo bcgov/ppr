@@ -8,7 +8,7 @@ import sinon from 'sinon'
 // Components
 import { AmendRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
-import { RegistrationLengthTrust } from '@/components/registration'
+import { RegistrationLengthTrustAmendment } from '@/components/registration'
 import { StickyContainer } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
@@ -82,7 +82,7 @@ describe('Amendment registration component', () => {
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(5)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
-    expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
