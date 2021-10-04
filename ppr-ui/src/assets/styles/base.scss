@@ -556,9 +556,16 @@ table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table
   color: $error;
 }
 
-// custom padding shortcut classes
+// custom common padding shortcut classes
+.pb-30px {
+  padding-bottom: 30px !important;
+}
 .pt-30px {
-  padding-top: 30px;
+  padding-top: 30px !important;
+}
+.py-30px {
+  padding-bottom: 30px !important;
+  padding-top: 30px !important;
 }
 
 // borders

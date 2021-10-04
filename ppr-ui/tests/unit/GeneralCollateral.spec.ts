@@ -4,14 +4,11 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  mockedSelectSecurityAgreement
-} from './test-data'
 
 // local components
 import { GenColEdit, GenColSummary, GeneralCollateral } from '@/components/collateral'
 // local types/helpers/etc.
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { RegistrationFlowType } from '@/enums'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
