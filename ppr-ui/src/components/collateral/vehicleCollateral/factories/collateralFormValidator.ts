@@ -23,6 +23,11 @@ const validationSchema = {
         validator: Validators.maxLength.validator,
         customArgs: { length: 6, trim: true },
         message: 'Manufactured Home Registration Number must contain 6 digits'
+      },
+      {
+        validator: Validators.pattern.validator,
+        customArgs: { pattern: /^\d+$/ },
+        message: 'Manufactured Home Registration Number must contain 6 digits'
       }
     ],
     year: [

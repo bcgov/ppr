@@ -100,10 +100,25 @@ describe('Collateral validation tests', () => {
     )
   })
 
-  it('validates number for manufactured home', async () => {
+  it('validates number is correct for manufactured home', async () => {
     wrapper.find('#txt-type-drop').setValue('MH')
     await Vue.nextTick()
-    wrapper.find('#txt-man').setValue('ABCDEF123')
+    wrapper.find('#txt-man').setValue('444555')
+    wrapper.find('#txt-make').setValue('Honda')
+    wrapper.find('#txt-model').setValue('Civic')
+    wrapper.find('#txt-years').setValue(2012)
+    wrapper.find(doneButtonSelector).trigger('click')
+    await flushPromises()
+    const messages = wrapper.findAll('.v-messages__message')
+    // messages length is one when correct (because of the YYYY hint for year)
+    expect(messages.length).toBe(1)
+    
+  })
+
+  it('validates numbers only for manufactured home', async () => {
+    wrapper.find('#txt-type-drop').setValue('MH')
+    await Vue.nextTick()
+    wrapper.find('#txt-man').setValue('123$a')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
     wrapper.find('#txt-years').setValue(2012)

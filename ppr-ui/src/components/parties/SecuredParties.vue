@@ -270,7 +270,7 @@
                     <edit-party
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
-                      @removeParty="removeParty"
+                      @removeSecuredParty="removeParty"
                       @resetEvent="resetData"
                     />
                   </div>
