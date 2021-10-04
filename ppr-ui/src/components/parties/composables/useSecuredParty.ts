@@ -3,6 +3,7 @@ import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unus
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes } from '@/enums'
+import { checkAddress } from '@/composables/address/factories/address-factory'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -39,6 +40,7 @@ export const useSecuredParty = (props, context) => {
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[props.activeIndex]))
+      localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
       localState.currentIsBusiness = false
       localState.partyBusiness = 'I'
       if (localState.currentSecuredParty.businessName) {

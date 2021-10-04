@@ -204,3 +204,12 @@ export function formatAddress (address: AddressIF): AddressIF {
     deliveryInstructions: address.deliveryInstructions?.trim()
   }
 }
+
+export function checkAddress (address: AddressIF, schema: SchemaIF): AddressIF {
+  for(var addressProperty in schema) {
+    if (!address[addressProperty]) {
+      address[addressProperty] = ''
+    }
+  }
+  return address
+}
