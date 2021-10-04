@@ -16,10 +16,7 @@
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
-          <registration-length-trust-amendment
-            class="mt-15"
-            @setRegistrationLengthTrustValid="registrationLengthTrustValid = $event"
-          />
+          <registration-length-trust-amendment class="mt-15" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
