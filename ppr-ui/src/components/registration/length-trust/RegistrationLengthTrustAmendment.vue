@@ -34,7 +34,7 @@
               text
               color="primary"
               :class="[$style['smaller-button'], 'edit-btn']"
-              :id="'trust-indenture-undo-btn'"
+              id="trust-indenture-undo-btn"
               @click="undoTrustIndenture()"
               :disabled="editInProgress"
             >
@@ -47,7 +47,7 @@
               text
               color="primary"
               :class="[$style['smaller-button'], 'edit-btn']"
-              :id="'trust-indenture-undo-btn'"
+              id="trust-indenture-amend-btn"
               @click="initEdit()"
               :disabled="editInProgress"
             >

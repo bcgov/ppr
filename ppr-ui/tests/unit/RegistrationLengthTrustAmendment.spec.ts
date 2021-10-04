@@ -24,6 +24,12 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
+// Input field selectors / buttons
+const undoButton: string = '#trust-indenture-undo-btn'
+const amendButton: string = '#trust-indenture-amend-btn'
+const doneButton: string = '#done-btn-trust-indenture'
+const cancelButton: string = '#cancel-btn-trust-indenture'
+
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
  *
@@ -130,7 +136,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
   it('renders with trust indenture true', async () => {
     await store.dispatch('setOriginalLengthTrust', {
       valid: true,
-      trustIndenture: true,
+      trustIndenture: false,
       lifeInfinite: false,
       lifeYears: 5,
       showInvalid: false,
@@ -152,5 +158,59 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
     expect(wrapper.vm.editInProgress).toBe(false)
     expect(wrapper.vm.computedExpiryDateFormatted).toBeDefined()
+    expect(wrapper.find(undoButton).exists()).toBe(true)
+    wrapper.find(undoButton).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.find(amendButton).exists()).toBe(true)
+  })
+
+  it('renders with trust indenture false', async () => {
+    await store.dispatch('setOriginalLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
+    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.vm.showTrustIndenture).toBe(true)
+    expect(wrapper.vm.trustIndenture).toBe(false)
+    expect(wrapper.vm.showEditTrustIndenture).toBe(false)
+    expect(wrapper.vm.editInProgress).toBe(false)
+    expect(wrapper.vm.computedExpiryDateFormatted).toBeDefined()
+    expect(wrapper.find(amendButton).exists()).toBe(true)
+    wrapper.find(amendButton).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeTruthy()
+    expect(wrapper.findComponent(EditTrustIndenture).isVisible()).toBe(true)
+    expect(wrapper.vm.showEditTrustIndenture).toBe(true)
+    expect(wrapper.vm.editInProgress).toBe(true)
+    expect(wrapper.find(cancelButton).exists()).toBe(true)
+    wrapper.find(cancelButton).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeFalsy()
+    expect(wrapper.vm.showEditTrustIndenture).toBe(false)
+    expect(wrapper.vm.editInProgress).toBe(false)
+    wrapper.find(amendButton).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.showEditTrustIndenture).toBe(true)
+    expect(wrapper.vm.editInProgress).toBe(true)
+    expect(wrapper.find(doneButton).exists()).toBe(true)
+    wrapper.find(doneButton).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeFalsy()
+    expect(wrapper.vm.showEditTrustIndenture).toBe(false)
+    expect(wrapper.vm.editInProgress).toBe(false)
   })
 })
