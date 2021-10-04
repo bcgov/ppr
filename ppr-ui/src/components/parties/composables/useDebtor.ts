@@ -5,6 +5,7 @@ import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
 import { useParty } from '@/composables/useParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
+import { checkAddress } from '@/composables/address/factories/address-factory'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -48,6 +49,7 @@ export const useDebtor = (props, context) => {
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentDebtor = JSON.parse(JSON.stringify(debtors[props.activeIndex]))
+      localState.currentDebtor.address = checkAddress(localState.currentDebtor.address, PartyAddressSchema)
       localState.currentIsBusiness = false
       if (localState.currentDebtor.businessName) {
         localState.currentIsBusiness = true
