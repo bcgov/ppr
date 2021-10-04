@@ -199,7 +199,7 @@ export default class ReviewRegistration extends Vue {
         surrenderDate: financingStatement.surrenderDate || null,
         lienAmount: financingStatement.lienAmount || null
       } as LengthTrustIF
-      if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+      if (registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
         lengthTrust.lifeYears = 1
         lengthTrust.valid = true
         this.registrationValid = true
