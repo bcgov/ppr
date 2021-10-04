@@ -1,6 +1,5 @@
 import { Validators, createFormValidation } from '@lemoncode/fonk'
 import { rangeNumber } from '@lemoncode/fonk-range-number-validator'
-import { isNumber } from '@lemoncode/fonk-is-number-validator'
 import { serialNumberValidator } from '@/utils/validators/serial-number.validator'
 
 const validationSchema = {
@@ -26,8 +25,8 @@ const validationSchema = {
         message: 'Manufactured Home Registration Number must contain 6 digits'
       },
       {
-        validator: isNumber.validator,
-        customArgs: { length: 6, trim: true },
+        validator: Validators.pattern.validator,
+        customArgs: { pattern: /^\d+$/ },
         message: 'Manufactured Home Registration Number must contain 6 digits'
       }
     ],
