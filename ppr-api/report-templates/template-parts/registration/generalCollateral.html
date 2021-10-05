@@ -7,7 +7,7 @@
 {% if generalCollateral is defined and change is not defined %}
    {% for collateral in generalCollateral %}
       {% if collateral.addedDateTime is defined and collateral.addedDateTime == createDateTime %}
-         <div class="general-collateral-datetime pb-3 pb-2">Base Registration General Collateral:</div>
+         <div class="general-collateral-datetime pt-3 pb-2">Base Registration General Collateral:</div>
       {% else %}
          <div class="general-collateral-datetime pt-3 pb-2">{{ collateral.addedDateTime }}</div>
       {% endif %}
