@@ -98,6 +98,16 @@
       </table>          
     </div>      
 
+    {% if changes  %}
+      <div class="no-page-break">
+        <div class="separator-header mt-6"></div>
+        <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
+        <div class="section-statement mt-0">(as of {{changes[0].createDateTime}})</div>
+        <div class="separator-header mt-2"></div>
+      </div>
+      {% endif %}
+
+
     {# Use search order. #}
     <div class="container pt-4">
       [[registration/securedParties.html]]

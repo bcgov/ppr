@@ -5,7 +5,7 @@
     {
       "addGeneralCollateral": [
         {
-          "addedDateTime": "2021-09-17T20:34:01+00:00", 
+          "addedDateTime": "2021-09-23T01:24:58+00:00", 
           "collateralId": 200000003, 
           "description": "TEST GENERAL COLLATERAL CHANGE ADD."
         }
@@ -32,12 +32,12 @@
       ], 
       "baseRegistrationNumber": "TEST0001", 
       "changeRegistrationNumber": "TEST0010", 
-      "changeType": "SU",
+      "changeType": "SU", 
       "clientReferenceId": "TEST-CH-0010", 
-      "createDateTime": "2021-09-17T20:54:01+00:00", 
+      "createDateTime": "2021-09-23T01:24:58+00:00", 
       "deleteGeneralCollateral": [
         {
-          "addedDateTime": "2021-09-17T20:34:01+00:00", 
+          "addedDateTime": "2021-09-23T01:24:58+00:00", 
           "collateralId": 200010003, 
           "description": "TEST GENERAL COLLATERAL CHANGE DELETE."
         }
@@ -69,7 +69,7 @@
         }
       }, 
       "statementType": "CHANGE_STATEMENT"
-    },
+    }, 
     {
       "addSecuredParties": [
         {
@@ -91,7 +91,7 @@
       "changeRegistrationNumber": "TEST0009", 
       "changeType": "ST", 
       "clientReferenceId": "TEST-CH-0009", 
-      "createDateTime": "2021-09-17T20:49:01+00:00", 
+      "createDateTime": "2021-09-23T01:19:58+00:00", 
       "deleteSecuredParties": [
         {
           "address": {
@@ -145,7 +145,7 @@
       "changeRegistrationNumber": "TEST0008", 
       "changeType": "DT", 
       "clientReferenceId": "TEST-CH-0008", 
-      "createDateTime": "2021-09-17T20:44:01+00:00", 
+      "createDateTime": "2021-09-23T01:14:58+00:00", 
       "deleteDebtors": [
         {
           "address": {
@@ -197,7 +197,7 @@
       ], 
       "addGeneralCollateral": [
         {
-          "addedDateTime": "2021-09-17T20:39:01+00:00", 
+          "addedDateTime": "2021-09-23T01:09:58+00:00", 
           "collateralId": 200000002, 
           "description": "TEST GENERAL COLLATERAL AMEND ADD."
         }
@@ -238,9 +238,9 @@
         "courtRegistry": "Victoria", 
         "effectOfOrder": "Court Order to change something.", 
         "fileNumber": "BC123495", 
-        "orderDate": "2022-04-05T20:34:01+00:00"
+        "orderDate": "2022-04-11T01:04:58+00:00"
       }, 
-      "createDateTime": "2021-09-17T20:39:01+00:00", 
+      "createDateTime": "2021-09-23T01:09:58+00:00", 
       "deleteDebtors": [
         {
           "address": {
@@ -263,7 +263,7 @@
       ], 
       "deleteGeneralCollateral": [
         {
-          "addedDateTime": "2021-09-17T20:39:01+00:00", 
+          "addedDateTime": "2021-09-23T01:09:58+00:00", 
           "collateralId": 200010002, 
           "description": "TEST GENERAL COLLATERAL AMEND DELETE."
         }
@@ -314,7 +314,14 @@
     }
   ], 
   "clientReferenceId": "TEST-SA-0001", 
-  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "courtOrderInformation": {
+    "courtName": "Supreme Court of British Columbia", 
+    "courtRegistry": "Victoria", 
+    "effectOfOrder": "Court Order to change something.", 
+    "fileNumber": "BC123495", 
+    "orderDate": "2022-04-11T01:04:58+00:00"
+  }, 
+  "createDateTime": "2021-09-23T01:04:58+00:00", 
   "debtors": [
     {
       "address": {
@@ -344,17 +351,42 @@
       }, 
       "businessName": "TEST BUS 2 DEBTOR", 
       "partyId": 200000002
+    }, 
+    {
+      "added": true, 
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-00C8", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST 8 TRANSFER DEBTOR", 
+      "partyId": 200000024
     }
   ], 
-  "expiryDate": "2023-09-17T20:34:01+00:00", 
+  "expiryDate": "2023-09-23T01:04:58+00:00", 
   "generalCollateral": [
     {
-      "addedDateTime": "2021-09-17T20:34:01+00:00", 
+      "addedDateTime": "2021-09-23T01:24:58+00:00", 
+      "collateralId": 200000003, 
+      "descriptionAdd": "TEST GENERAL COLLATERAL CHANGE ADD.", 
+      "descriptionDelete": "TEST GENERAL COLLATERAL CHANGE DELETE."
+    }, 
+    {
+      "addedDateTime": "2021-09-23T01:09:58+00:00", 
+      "collateralId": 200000002, 
+      "descriptionAdd": "TEST GENERAL COLLATERAL AMEND ADD.", 
+      "descriptionDelete": "TEST GENERAL COLLATERAL AMEND DELETE."
+    }, 
+    {
+      "addedDateTime": "2021-09-23T01:04:58+00:00", 
       "collateralId": 200000001, 
       "description": "TEST0001 GC 2"
     }, 
     {
-      "addedDateTime": "2021-09-17T20:34:01+00:00", 
+      "addedDateTime": "2021-09-23T01:04:58+00:00", 
       "collateralId": 200000000, 
       "description": "TEST0001 GC 1"
     }
@@ -403,6 +435,19 @@
       "code": "200000000", 
       "emailAddress": "test-sp-client@gmail.com", 
       "partyId": 200000004
+    }, 
+    {
+      "added": true, 
+      "address": {
+        "city": "city", 
+        "country": "CA", 
+        "postalCode": "V8R3A5", 
+        "region": "BC", 
+        "street": "TEST-00C9", 
+        "streetAdditional": "line 2"
+      }, 
+      "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
+      "partyId": 200000026
     }
   ], 
   "statusType": "ACT", 
@@ -418,12 +463,22 @@
       "year": 2018
     }, 
     {
+      "added": true, 
+      "make": "BMW", 
+      "model": "Z4", 
+      "serialNumber": "JU622994", 
+      "type": "MV", 
+      "vehicleId": 200000007, 
+      "year": 2014
+    }, 
+    {
+      "added": true, 
       "make": "HOMCO IND. LTD DIPLOMAT", 
-      "manufacturedHomeRegistrationNumber": "021324", 
-      "serialNumber": "9407", 
+      "manufacturedHomeRegistrationNumber": "220000", 
+      "serialNumber": "999999", 
       "type": "MH", 
-      "vehicleId": 200000001, 
-      "year": 2001
+      "vehicleId": 200000008, 
+      "year": 2012
     }
   ]
 }

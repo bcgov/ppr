@@ -4,8 +4,8 @@
     {
       "baseRegistrationNumber": "TEST0005", 
       "clientReferenceId": "TEST-REN-0005", 
-      "createDateTime": "2021-09-17T20:39:01+00:00", 
-      "expiryDate": "2024-09-18T06:59:59+00:00", 
+      "createDateTime": "2021-09-23T01:09:58+00:00", 
+      "expiryDate": "2024-09-23T06:59:59+00:00", 
       "lifeYears": 2, 
       "registeringParty": {
         "address": {
@@ -27,7 +27,7 @@
     }
   ], 
   "clientReferenceId": "TEST-SA-0005", 
-  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "createDateTime": "2021-09-23T01:04:58+00:00", 
   "debtors": [
     {
       "address": {
@@ -46,7 +46,7 @@
       }
     }
   ], 
-  "expiryDate": "2023-09-17T20:34:01+00:00", 
+  "expiryDate": "2023-09-23T01:04:58+00:00", 
   "lifeYears": 2, 
   "registeringParty": {
     "address": {

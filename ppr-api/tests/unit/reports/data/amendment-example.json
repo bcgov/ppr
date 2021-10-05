@@ -122,6 +122,22 @@
   "expiryDate": "2026-09-04T06:59:59+00:00", 
   "generalCollateral": [
     {
+      "addedDateTime": "2021-09-03T22:00:00+00:00", 
+      "collateralId": 200000009, 
+      "descriptionAdd": "ADDING TEST0018 GC 5", 
+      "descriptionDelete": "DELETING TEST0018 GC 2"
+    }, 
+    {
+      "addedDateTime": "2021-09-03T21:00:00+00:00", 
+      "collateralId": 200000008, 
+      "descriptionDelete": "*** DELETED *** TEST0018 GC 1 *** DELETED *** "
+    }, 
+    {
+      "addedDateTime": "2021-09-03T20:00:00+00:00", 
+      "collateralId": 200000007, 
+      "descriptionAdd": "TEST0018 GC 4 AMEND ADD"
+    }, 
+    {
       "addedDateTime": "2021-09-03T19:00:00+00:00", 
       "collateralId": 200000006, 
       "description": "TEST0018 GC 3"

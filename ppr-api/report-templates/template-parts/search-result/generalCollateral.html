@@ -6,11 +6,10 @@
 
 {% if detail.financingStatement.generalCollateral is defined and change is not defined %}
    {% for collateral in detail.financingStatement.generalCollateral %}
-      {% if collateral.addedDateTime is defined %}
-         <div class="general-collateral-datetime pt-3 pb-2">{{ collateral.addedDateTime }}</div>
-      {% endif %}
       {% if collateral.addedDateTime is defined and collateral.addedDateTime == detail.financingStatement.createDateTime %}
-         <div class="general-collateral-datetime pb-3">Base Registration General Collateral:</div>
+         <div class="general-collateral-datetime pb-3 pb-2">Base Registration General Collateral:</div>
+      {% else %}
+         <div class="general-collateral-datetime pt-3 pb-2">{{ collateral.addedDateTime }}</div>
       {% endif %}
       {% if collateral.description is defined %}
          <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>

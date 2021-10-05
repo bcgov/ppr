@@ -1,96 +1,163 @@
 {
-  "baseRegistrationNumber": "TEST0004", 
+  "baseRegistrationNumber": "103088B", 
   "changes": [
     {
-      "baseRegistrationNumber": "TEST0004", 
-      "clientReferenceId": "TEST-DIS-0004", 
-      "createDateTime": "2021-09-18T20:34:01+00:00", 
-      "dischargeRegistrationNumber": "TEST00D4", 
+      "baseRegistrationNumber": "103088B", 
+      "clientReferenceId": "T-DC-3088B", 
+      "createDateTime": "2021-10-04T20:29:36+00:00", 
+      "dischargeRegistrationNumber": "103091B", 
+      "payment": {
+        "invoiceId": "12711", 
+        "receipt": "/api/v1/payment-requests/12711/receipts"
+      }, 
       "registeringParty": {
         "address": {
-          "city": "city", 
+          "city": "VICTORIA", 
           "country": "CA", 
-          "postalCode": "V8R3A5", 
+          "postalCode": "V8W 2V8", 
           "region": "BC", 
-          "street": "TEST-00D4", 
-          "streetAdditional": "line 2"
+          "street": "222 SUMMER STREET"
         }, 
-        "personName": {
-          "first": "TEST-DISCHARGE", 
-          "last": "REGISTERING", 
-          "middle": "4"
-        }
+        "businessName": "ABC SEARCHING COMPANY"
       }, 
       "statementType": "DISCHARGE_STATEMENT"
+    }, 
+    {
+      "addGeneralCollateral": [
+        {
+          "addedDateTime": "2021-10-04T19:38:43+00:00", 
+          "collateralId": 944, 
+          "description": "Add Third General Collateral"
+        }
+      ], 
+      "amendmentRegistrationNumber": "103090B", 
+      "baseRegistrationNumber": "103088B", 
+      "changeType": "AM", 
+      "clientReferenceId": "T-AS-AM-3088-3", 
+      "createDateTime": "2021-10-04T19:38:43+00:00", 
+      "deleteGeneralCollateral": [
+        {
+          "addedDateTime": "2021-10-04T19:38:43+00:00", 
+          "collateralId": 945, 
+          "description": "Delete previously added original General Collateral"
+        }
+      ], 
+      "description": "Add and Remove general collateral.", 
+      "payment": {
+        "invoiceId": "12710", 
+        "receipt": "/api/v1/payment-requests/12710/receipts"
+      }, 
+      "registeringParty": {
+        "address": {
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "V8W 2V8", 
+          "region": "BC", 
+          "street": "222 SUMMER STREET"
+        }, 
+        "businessName": "ABC SEARCHING COMPANY"
+      }, 
+      "statementType": "AMENDMENT_STATEMENT"
+    }, 
+    {
+      "addGeneralCollateral": [
+        {
+          "addedDateTime": "2021-10-04T19:36:09+00:00", 
+          "collateralId": 943, 
+          "description": "Add Second General Collateral"
+        }
+      ], 
+      "amendmentRegistrationNumber": "103089B", 
+      "baseRegistrationNumber": "103088B", 
+      "changeType": "AM", 
+      "clientReferenceId": "T-AS-AM-3088-1", 
+      "createDateTime": "2021-10-04T19:36:09+00:00", 
+      "description": "Add general collateral.", 
+      "payment": {
+        "invoiceId": "12709", 
+        "receipt": "/api/v1/payment-requests/12709/receipts"
+      }, 
+      "registeringParty": {
+        "address": {
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "V8W 2V8", 
+          "region": "BC", 
+          "street": "222 SUMMER STREET"
+        }, 
+        "businessName": "ABC SEARCHING COMPANY"
+      }, 
+      "statementType": "AMENDMENT_STATEMENT"
     }
   ], 
-  "clientReferenceId": "TEST-SA-0004", 
-  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "clientReferenceId": "T-API-DL-011", 
+  "createDateTime": "2021-10-04T19:32:20+00:00", 
   "debtors": [
     {
       "address": {
-        "city": "city", 
+        "city": "VICTORIA", 
         "country": "CA", 
-        "postalCode": "V8R3A5", 
+        "postalCode": "A1A 1A1", 
         "region": "BC", 
-        "street": "TEST-0004", 
-        "streetAdditional": "line 2"
+        "street": "721 DEBTOR AVE"
       }, 
-      "birthDate": "2005-04-02T14:00:00+00:00", 
-      "partyId": 200000012, 
-      "personName": {
-        "first": "TEST IND", 
-        "last": "DEBTOR", 
-        "middle": "4"
-      }
+      "birthDate": "1990-06-15T07:00:00+00:00", 
+      "businessName": "SA DEBTOR TEST 1 LTD.", 
+      "partyId": 3828
     }
   ], 
-  "dischargeRegistrationNumber": "TEST00D4", 
-  "dischargedDateTime": "2021-09-18T20:34:01+00:00", 
-  "expiryDate": "2023-09-17T20:34:01+00:00", 
-  "lifeYears": 2, 
+  "dischargeRegistrationNumber": "103091B", 
+  "dischargedDateTime": "2021-10-04T20:29:36+00:00", 
+  "expiryDate": "2022-10-05T06:59:59+00:00", 
+  "generalCollateral": [
+    {
+      "addedDateTime": "2021-10-04T19:38:43+00:00", 
+      "collateralId": 944, 
+      "descriptionAdd": "Add Third General Collateral", 
+      "descriptionDelete": "Delete previously added original General Collateral"
+    }, 
+    {
+      "addedDateTime": "2021-10-04T19:36:09+00:00", 
+      "collateralId": 943, 
+      "descriptionAdd": "Add Second General Collateral"
+    }, 
+    {
+      "addedDateTime": "2021-10-04T19:32:20+00:00", 
+      "collateralId": 942, 
+      "description": "General Collateral Orginal"
+    }
+  ], 
+  "lifeYears": 1, 
+  "payment": {
+    "invoiceId": "12708", 
+    "receipt": "/api/v1/payment-requests/12708/receipts"
+  }, 
   "registeringParty": {
     "address": {
-      "city": "city", 
+      "city": "VICTORIA", 
       "country": "CA", 
-      "postalCode": "V8R3A5", 
+      "postalCode": "V8W 2V8", 
       "region": "BC", 
-      "street": "TEST-0004", 
-      "streetAdditional": "line 2"
+      "street": "222 SUMMER STREET"
     }, 
-    "personName": {
-      "first": "TEST", 
-      "last": "REGISTERING", 
-      "middle": "4"
-    }
+    "businessName": "ABC SEARCHING COMPANY"
   }, 
   "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
   "registrationDescription": "PPSA SECURITY AGREEMENT", 
   "securedParties": [
     {
       "address": {
-        "city": "city", 
+        "city": "SIDNEY", 
         "country": "CA", 
-        "postalCode": "V8R3A5", 
+        "postalCode": "V7R 1R7", 
         "region": "BC", 
-        "street": "TEST-0004", 
-        "streetAdditional": "line 2"
+        "street": "3721 BEACON AVENUE"
       }, 
-      "businessName": "TEST 4 SECURED PARTY", 
-      "partyId": 200000013
+      "businessName": "BANK OF BRITISH COLUMBIA", 
+      "partyId": 3827
     }
   ], 
   "statusType": "HDC", 
   "trustIndenture": true, 
-  "type": "SA", 
-  "vehicleCollateral": [
-    {
-      "make": "HONDA", 
-      "model": "CIVIC", 
-      "serialNumber": "JU622994", 
-      "type": "MV", 
-      "vehicleId": 200000004, 
-      "year": 2018
-    }
-  ]
+  "type": "SA"
 }
