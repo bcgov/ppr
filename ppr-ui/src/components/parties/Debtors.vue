@@ -427,7 +427,7 @@ export default defineComponent({
 }
 
 .actions-border {
-  border-left: 1px solid #f1f3f5;
+  border-left: 1px solid $gray1;
 }
 
 .actions-up {
