@@ -89,7 +89,9 @@ export const useSecuredParty = (props, context) => {
       newList.push(localState.currentSecuredParty)
     } else {
       // Edit party
-      localState.currentSecuredParty.action = ActionTypes.EDITED
+      if (!localState.currentSecuredParty.action) {
+        localState.currentSecuredParty.action = ActionTypes.EDITED
+      }
       newList.splice(props.activeIndex, 1, localState.currentSecuredParty)
     }
     parties.securedParties = newList

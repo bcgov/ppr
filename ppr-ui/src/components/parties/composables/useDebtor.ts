@@ -6,6 +6,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { useParty } from '@/composables/useParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress } from '@/composables/address/factories/address-factory'
+import { cloneDeep, isEqual } from 'lodash'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -36,11 +37,13 @@ export const useDebtor = (props, context) => {
       address: initAddress,
       action: null
     } as PartyIF,
+    originalDebtor: null,
     year: '',
     day: '',
     monthValue: 0,
     months: Months,
     currentIsBusiness: props.isBusiness,
+    registrationFlowType: getRegistrationFlowType.value,
     showAllAddressErrors: false
   })
 
@@ -66,6 +69,7 @@ export const useDebtor = (props, context) => {
       }
       localState.currentDebtor = blankDebtor
     }
+    localState.originalDebtor = cloneDeep(localState.currentDebtor)
   }
 
   const resetFormAndData = (emitEvent: boolean): void => {
@@ -87,6 +91,12 @@ export const useDebtor = (props, context) => {
   }
 
   const addDebtor = () => {
+    // if they didn't change anything, just exit
+    if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
+    isEqual(localState.currentDebtor, localState.originalDebtor)) {
+      resetFormAndData(true)
+      return
+    }
     if (!localState.currentIsBusiness) {
       const dateOfBirth = new Date()
       // @ts-ignore - returned by toRef
@@ -109,7 +119,9 @@ export const useDebtor = (props, context) => {
       newList.push(localState.currentDebtor)
     } else {
       // Edit debtor
-      localState.currentDebtor.action = ActionTypes.EDITED
+      if (!localState.currentDebtor.action) {
+        localState.currentDebtor.action = ActionTypes.EDITED
+      }
       newList.splice(props.activeIndex, 1, localState.currentDebtor)
     }
     parties.debtors = newList
@@ -124,6 +136,8 @@ export const useDebtor = (props, context) => {
     resetFormAndData,
     removeDebtor,
     getMonthObject,
+    RegistrationFlowType,
+    ActionTypes,
     ...toRefs(localState)
   }
 }

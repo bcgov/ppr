@@ -185,7 +185,12 @@
                     :disabled="activeIndex === -1"
                     @click="removeDebtor()"
                     id="remove-btn-debtor"
-                    >Remove
+                    >
+                    <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && currentDebtor.action !== ActionTypes.ADDED">
+                      Delete
+                    </span>
+                    <span v-else>Remove</span>
                   </v-btn>
 
                   <v-btn
@@ -264,7 +269,10 @@ export default defineComponent({
       resetFormAndData,
       removeDebtor,
       addDebtor,
-      addressSchema
+      addressSchema,
+      RegistrationFlowType,
+      registrationFlowType,
+      ActionTypes
     } = useDebtor(props, context)
 
     const {
@@ -335,9 +343,12 @@ export default defineComponent({
       () => localState.searchValue,
       (val: string) => {
         localState.autoCompleteSearchValue = val
-        // show autocomplete results when there is a searchValue
-        localState.autoCompleteIsActive = val !== ''
-        currentDebtor.value.businessName = val
+        // only open if debtor name changed
+        if (currentDebtor.value.businessName !== val) {
+          // show autocomplete results when there is a searchValue
+          localState.autoCompleteIsActive = val !== ''
+          currentDebtor.value.businessName = val
+        }
       }
     )
 
@@ -369,6 +380,9 @@ export default defineComponent({
       updateValidity,
       validateEmail,
       errors,
+      RegistrationFlowType,
+      registrationFlowType,
+      ActionTypes,
       ...toRefs(localState)
     }
   }

@@ -21,7 +21,7 @@
           Trust Indenture
           <div v-if="trustIndentureModified">
             <v-chip x-small label color="#1669BB" text-color="white">
-                Amended
+                AMENDED
             </v-chip>
           </div>
         </v-col>
