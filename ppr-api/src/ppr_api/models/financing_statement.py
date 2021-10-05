@@ -209,9 +209,11 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if party.party_type == party_type or \
                (party_type == Party.PartyTypes.DEBTOR_COMPANY.value and
                 party.party_type == Party.PartyTypes.DEBTOR_INDIVIDUAL.value):
-                if party.registration_id == registration_id and \
-                    (not party.registration_id_end or \
-                        (self.verification_reg_id > 0 and self.verification_reg_id > party.registration_id_end)):
+                # If not current view only display financing statement registration parties.
+                # If current view and verification registration ID exists, include all active parties at the
+                # time of the registration.
+                # If current view include all active parties.
+                if party.registration_id == registration_id and not party.registration_id_end:
                     party_json = party.json
                 elif self.current_view_json and party.registration_id_end and \
                         self.verification_reg_id > 0 and self.verification_reg_id >= party.registration_id and \
