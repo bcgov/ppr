@@ -209,9 +209,20 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if party.party_type == party_type or \
                (party_type == Party.PartyTypes.DEBTOR_COMPANY.value and
                 party.party_type == Party.PartyTypes.DEBTOR_INDIVIDUAL.value):
-                if not self.current_view_json and party.registration_id == registration_id:
+                # If not current view only display financing statement registration parties.
+                # If current view and verification registration ID exists, include all active parties at the
+                # time of the registration.
+                # If current view include all active parties.
+                if party.registration_id == registration_id and not party.registration_id_end:
                     party_json = party.json
-                elif self.current_view_json and not party.registration_id_end:
+                elif self.current_view_json and party.registration_id_end and \
+                        self.verification_reg_id > 0 and self.verification_reg_id >= party.registration_id and \
+                        self.verification_reg_id < party.registration_id_end:
+                    party_json = party.json
+                    if self.mark_update_json and party.registration_id != registration_id:
+                        party_json['added'] = True
+                elif self.current_view_json and not party.registration_id_end and \
+                        (self.verification_reg_id < 1 or self.verification_reg_id >= party.registration_id):
                     party_json = party.json
                     if self.mark_update_json and party.registration_id != registration_id:
                         party_json['added'] = True
@@ -232,7 +243,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if collateral.registration_id == registration_id:
                 collateral_json = collateral.json
                 collateral_list.append(collateral_json)
-            elif self.current_view_json:
+            elif self.current_view_json and \
+                    (self.verification_reg_id < 1 or self.verification_reg_id >= collateral.registration_id):
                 collateral_json = collateral.current_json
                 # Either adding gc only or deleting gc description only.
                 if len(collateral.registration.general_collateral) == 1:
@@ -242,7 +254,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     delete_gc = collateral.registration.general_collateral[0]
                     if delete_gc.status and delete_gc.status == GeneralCollateralLegacy.StatusTypes.ADDED:
                         delete_gc = collateral.registration.general_collateral[1]
-                        collateral_json['descriptionDelete'] = delete_gc.description
+                    collateral_json['descriptionDelete'] = delete_gc.description
                     collateral_list.append(collateral_json)
 
         for collateral in reversed(self.general_collateral_legacy):
@@ -250,7 +262,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if collateral.registration_id == registration_id or not collateral.status:
                 collateral_json = collateral.json
                 collateral_list.append(collateral_json)
-            elif self.current_view_json:  # Add only solution for legacy records identical to new.
+            # Add only solution for legacy records identical to new records.
+            elif self.current_view_json and \
+                    (self.verification_reg_id < 1 or self.verification_reg_id >= collateral.registration_id):
                 collateral_json = collateral.current_json
                 # Either adding gc only or deleting gc description only.
                 if len(collateral.registration.general_collateral_legacy) == 1:
@@ -260,7 +274,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     delete_gc = collateral.registration.general_collateral_legacy[0]
                     if delete_gc.status and delete_gc.status == GeneralCollateralLegacy.StatusTypes.ADDED:
                         delete_gc = collateral.registration.general_collateral_legacy[1]
-                        collateral_json['descriptionDelete'] = delete_gc.description
+                    collateral_json['descriptionDelete'] = delete_gc.description
                     collateral_list.append(collateral_json)
         return collateral_list
 
@@ -272,9 +286,16 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         collateral_list = []
         for collateral in self.vehicle_collateral:
             collateral_json = None
-            if not self.current_view_json and collateral.registration_id == registration_id:
+            if collateral.registration_id == registration_id and not collateral.registration_id_end:
                 collateral_json = collateral.json
-            elif self.current_view_json and not collateral.registration_id_end:
+            elif self.current_view_json and collateral.registration_id_end and \
+                    self.verification_reg_id > 0 and self.verification_reg_id >= collateral.registration_id and \
+                    self.verification_reg_id < collateral.registration_id_end:
+                collateral_json = collateral.json
+                if self.mark_update_json and collateral.registration_id != registration_id:
+                    collateral_json['added'] = True
+            elif self.current_view_json and not collateral.registration_id_end and \
+                    (self.verification_reg_id < 1 or self.verification_reg_id >= collateral.registration_id):
                 collateral_json = collateral.json
                 if self.mark_update_json and collateral.registration_id != registration_id:
                     collateral_json['added'] = True

@@ -509,7 +509,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def verification_json(self, reg_num_name: str):
         """Generate verification statement json for API response and verification reports."""
-        self.financing_statement.current_view_json = False
+        self.financing_statement.current_view_json = True  # Changed to include the consolidated/current view.
         self.financing_statement.mark_update_json = True
         self.financing_statement.include_changes_json = True
         self.financing_statement.verification_reg_id = self.id

@@ -1,7 +1,13 @@
 {% if registeringParty is defined and change is not defined  %}
 <div class="no-page-break">
     <div class="separator mt-5"></div>
-    <div class="section-title mt-3">Registering Party Information</div>
+    <div class="section-title mt-3">
+        {% if changes is defined  %}
+            Original Registering Party
+        {% else %}
+            Registering Party Information
+        {% endif %}
+    </div>
     <table class="section-data section-data-table mt-4" role="presentation">
         <tr class="no-page-break">
             <td class="col-33">

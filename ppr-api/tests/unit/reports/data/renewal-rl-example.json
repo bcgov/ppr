@@ -9,10 +9,10 @@
         "courtRegistry": "Victoria", 
         "effectOfOrder": "Court Order to renew Repairer's Lien.", 
         "fileNumber": "BC123495", 
-        "orderDate": "2022-04-05T20:34:01+00:00"
+        "orderDate": "2022-04-11T01:04:58+00:00"
       }, 
-      "createDateTime": "2021-09-17T20:39:01+00:00", 
-      "expiryDate": "2022-09-13T06:59:59+00:00", 
+      "createDateTime": "2021-09-23T01:09:58+00:00", 
+      "expiryDate": "2022-09-18T06:59:59+00:00", 
       "lifeYears": 0, 
       "registeringParty": {
         "address": {
@@ -34,7 +34,14 @@
     }
   ], 
   "clientReferenceId": "TEST-RL-0001", 
-  "createDateTime": "2021-09-17T20:34:01+00:00", 
+  "courtOrderInformation": {
+    "courtName": "Supreme Court of British Columbia", 
+    "courtRegistry": "Victoria", 
+    "effectOfOrder": "Court Order to renew Repairer's Lien.", 
+    "fileNumber": "BC123495", 
+    "orderDate": "2022-04-11T01:04:58+00:00"
+  }, 
+  "createDateTime": "2021-09-23T01:04:58+00:00", 
   "debtors": [
     {
       "address": {
@@ -49,7 +56,7 @@
       "partyId": 200000006
     }
   ], 
-  "expiryDate": "2021-12-16T20:34:01+00:00", 
+  "expiryDate": "2021-12-22T01:04:58+00:00", 
   "lienAmount": "2000.00", 
   "registeringParty": {
     "address": {
@@ -86,7 +93,7 @@
     }
   ], 
   "statusType": "ACT", 
-  "surrenderDate": "2021-12-16T20:34:01+00:00", 
+  "surrenderDate": "2021-12-22T01:04:58+00:00", 
   "trustIndenture": false, 
   "type": "RL", 
   "vehicleCollateral": [
