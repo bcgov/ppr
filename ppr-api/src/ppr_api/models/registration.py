@@ -30,6 +30,7 @@ from .court_order import CourtOrder
 from .general_collateral import GeneralCollateral
 from .general_collateral_legacy import GeneralCollateralLegacy
 from .type_tables import RegistrationType
+from .trust_indenture import TrustIndenture
 from .vehicle_collateral import VehicleCollateral
 # noqa: I003
 
@@ -152,10 +153,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration['dischargeRegistrationNumber'] = self.registration_num
         elif self.registration_type == model_utils.REG_TYPE_RENEWAL:
             registration['renewalRegistrationNumber'] = self.registration_num
-        elif self.registration_type in (model_utils.REG_TYPE_AMEND, model_utils.REG_TYPE_AMEND_COURT):
+        elif self.registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
             registration['amendmentRegistrationNumber'] = self.registration_num
             if self.detail_description:
                 registration['description'] = self.detail_description
+            if self.financing_statement.trust_indenture:
+                for trust_indenture in self.financing_statement.trust_indenture:
+                    if self.id == trust_indenture.registration_id:
+                        registration['addTrustIndenture'] = True
+                    elif self.id == trust_indenture.registration_id_end:
+                        registration['removeTrustIndenture'] = True
         else:
             registration['changeRegistrationNumber'] = self.registration_num
 
@@ -540,14 +547,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.draft = draft
         registration.registration_type_cl = registration_type_cl
         if registration_type_cl in (model_utils.REG_CLASS_AMEND,
-                                    model_utils.REG_CLASS_AMEND_COURT,
-                                    model_utils.REG_CLASS_CHANGE):
-            registration.registration_type = json_data['changeType']
+                                    model_utils.REG_CLASS_AMEND_COURT):
+            json_data = model_utils.cleanup_amendment(json_data)
+            registration.registration_type = model_utils.amendment_change_type(json_data)
             if registration.registration_type == model_utils.REG_TYPE_AMEND_COURT:
                 registration.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
             if 'description' in json_data:
                 registration.detail_description = json_data['description']
-        if registration_type_cl == model_utils.REG_CLASS_RENEWAL:
+        elif registration_type_cl == model_utils.REG_CLASS_CHANGE:
+            registration.registration_type = json_data['changeType']
+        elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
             registration.registration_type = model_utils.REG_TYPE_RENEWAL
         elif registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
             registration.registration_type = model_utils.REG_TYPE_DISCHARGE
@@ -613,7 +622,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.general_collateral = GeneralCollateral.create_from_statement_json(json_data,
                                                                                            registration_id,
                                                                                            registration.financing_id)
-            # Close out deleted parties and collateral
+            # Possibly add a trust indenture
+            if 'addTrustIndenture' in json_data and json_data['addTrustIndenture']:
+                registration.trust_indenture = TrustIndenture.create_from_amendment_json(registration.financing_id,
+                                                                                         registration.id)
+
+            # Close out deleted parties and collateral, and trust indenture.
             Registration.delete_from_json(json_data, registration, financing_statement)
 
         return registration
@@ -695,6 +709,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                         financing_statement.vehicle_collateral)
                 if collateral:
                     collateral.registration_id_end = registration.id
+
+        if 'removeTrustIndenture' in json_data and json_data['removeTrustIndenture'] and \
+                financing_statement.trust_indenture:
+            for trust_indenture in financing_statement.trust_indenture:
+                if not trust_indenture.registration_id_end:
+                    trust_indenture.registration_id_end = registration.id
 
     @staticmethod
     def find_draft(json_data, registration_class: str, registration_type: str):

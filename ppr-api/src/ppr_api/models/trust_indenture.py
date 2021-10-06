@@ -15,8 +15,10 @@
 from __future__ import annotations
 
 from .db import db
-# Needed by the SQLAlchemy relationship
-from .registration import Registration  # noqa: F401 pylint: disable=unused-import
+
+
+TRUST_INDENTURE_YES = 'Y'
+TRUST_INDENTURE_NO = 'N'
 
 
 class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -55,18 +57,17 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         return trust_indenture
 
     @classmethod
-    def find_by_registration_number(cls, registration_num: str = None):
+    def find_by_registration_id(cls, registration_id: int):
         """Return a list of trust indenture objects by registration number."""
         trust_indenture = None
-        if registration_num:
-            trust_indenture = cls.query.filter(TrustIndenture.registration_id == Registration.id,
-                                               Registration.registration_num == registration_num) \
-                                        .order_by(TrustIndenture.id).all()
+        if registration_id:
+            trust_indenture = cls.query.filter(TrustIndenture.registration_id == registration_id) \
+                                        .order_by(TrustIndenture.id).one_or_none()
 
         return trust_indenture
 
     @classmethod
-    def find_by_financing_id(cls, financing_id: int = None):
+    def find_by_financing_id(cls, financing_id: int):
         """Return a list of trust indenture objects by financing statement ID."""
         trust_indenture = None
         if financing_id:
@@ -82,8 +83,18 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         if registration_id:
             trust_indenture.registration_id = registration_id
         if 'trustIndenture' in json_data and json_data['trustIndenture']:
-            trust_indenture.trust_indenture = 'Y'
+            trust_indenture.trust_indenture = TRUST_INDENTURE_YES
         else:
-            trust_indenture.trust_indenture = 'N'
+            trust_indenture.trust_indenture = TRUST_INDENTURE_NO
 
         return [trust_indenture]
+
+    @staticmethod
+    def create_from_amendment_json(financing_id: int, registration_id: int):
+        """Create a trust indenture object as part of an amendment registration: map json to db."""
+        trust_indenture = TrustIndenture()
+        trust_indenture.registration_id = registration_id
+        trust_indenture.financing_id = financing_id
+        trust_indenture.trust_indenture = TRUST_INDENTURE_YES
+
+        return trust_indenture

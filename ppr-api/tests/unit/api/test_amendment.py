@@ -23,6 +23,7 @@ import pytest
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, FINANCING_STATEMENT
 
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from ppr_api.models import utils as model_utils
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -258,6 +259,14 @@ TEST_GET_STATEMENT = [
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0002'),
     ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0007', 'TEST0001')
 ]
+TEST_DATA_AMENDMENT_CHANGE_TYPE = [
+    (model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL, False),
+    (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL, False),
+    (model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE, False),
+    (model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER, False),
+    (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
+    (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
+]
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
@@ -396,6 +405,86 @@ def test_amendment_success(session, client, jwt):
     assert 'amendmentRegistrationNumber' in json_data['changes'][0]
     assert json_data['baseRegistrationNumber'] == base_reg_num
     assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
+
+
+@pytest.mark.parametrize('change_type, is_general_collateral', TEST_DATA_AMENDMENT_CHANGE_TYPE)
+def test_change_types(session, client, jwt, change_type, is_general_collateral):
+    """Assert that setting the amendment change type from the amendment data works as expected."""
+    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+    json_data['changeType'] = change_type
+    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
+    del json_data['createDateTime']
+    del json_data['payment']
+    del json_data['documentId']
+    del json_data['amendmentRegistrationNumber']
+    del json_data['courtOrderInformation']
+    del json_data['addTrustIndenture']
+    del json_data['removeTrustIndenture']
+
+    if change_type in (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL,
+                       model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL,
+                       model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE):
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+    if change_type == model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE:
+        del json_data['addVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+    elif change_type == model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL:
+        del json_data['deleteVehicleCollateral']
+        del json_data['deleteGeneralCollateral']
+        if is_general_collateral:
+            del json_data['addVehicleCollateral']
+        else:
+            del json_data['addGeneralCollateral']
+    elif change_type == model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL:
+        if is_general_collateral:
+            del json_data['addVehicleCollateral']
+            del json_data['deleteVehicleCollateral']
+        else:
+            del json_data['addGeneralCollateral']
+            del json_data['deleteGeneralCollateral']
+    if change_type in (model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE,
+                       model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER,
+                       model_utils.REG_TYPE_AMEND_SP_TRANSFER):
+        del json_data['addVehicleCollateral']
+        del json_data['deleteVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+    if change_type == model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE:
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+    elif change_type == model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER:
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+    elif change_type == model_utils.REG_TYPE_AMEND_SP_TRANSFER:
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+
+    base_reg_num = 'TEST0001'
+
+    json_data['baseRegistrationNumber'] = base_reg_num
+    # Set well known ids for deletes
+    if 'deleteDebtors' in json_data:
+        json_data['deleteDebtors'][0]['partyId'] = 200000024
+    if 'deleteSecuredParties' in json_data:
+        json_data['deleteSecuredParties'][0]['partyId'] = 200000026
+    if 'deleteGeneralCollateral' in json_data:
+        json_data['deleteGeneralCollateral'][0]['collateraId'] = 200000000
+    if 'deleteVehicleCollateral' in json_data:
+        json_data['deleteVehicleCollateral'][0]['vehicleId'] = 200000008
+
+    rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/amendments',
+                     json=json_data,
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     content_type='application/json')
+    # check
+    # print(rv.json)
+    assert rv.status_code == HTTPStatus.CREATED
+    assert 'amendmentRegistrationNumber' in rv.json
 
 
 def create_financing_test(session, client, jwt):

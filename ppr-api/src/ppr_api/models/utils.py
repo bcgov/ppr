@@ -61,6 +61,13 @@ REG_TYPE_LAND_TAX_MH = 'LT'
 REG_TYPE_TAX_MH = 'MH'
 REG_TYPE_OTHER = 'OT'
 REG_TYPE_SECURITY_AGREEMENT = 'SA'
+# New amendment change types
+REG_TYPE_AMEND_ADDITION_COLLATERAL = 'AA'
+REG_TYPE_AMEND_DEBTOR_RELEASE = 'AR'
+REG_TYPE_AMEND_DEBTOR_TRANSFER = 'AD'
+REG_TYPE_AMEND_PARIAL_DISCHARGE = 'AP'
+REG_TYPE_AMEND_SP_TRANSFER = 'AS'
+REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL = 'AU'
 
 SEARCH_MATCH_EXACT = 'EXACT'
 SEARCH_MATCH_SIMILAR = 'SIMILAR'
@@ -125,6 +132,12 @@ REG_CLASS_TO_REG_TYPE = {
 # Mapping from registration type to registration class
 REG_TYPE_TO_REG_CLASS = {
     'AM': 'AMENDMENT',
+    'AA': 'AMENDMENT',
+    'AR': 'AMENDMENT',
+    'AD': 'AMENDMENT',
+    'AP': 'AMENDMENT',
+    'AS': 'AMENDMENT',
+    'AU': 'AMENDMENT',
     'CO': 'COURTORDER',
     'AC': 'CHANGE',
     'DR': 'CHANGE',
@@ -565,3 +578,66 @@ def is_financing(registration_class):
 def is_change(registration_class):
     """Check if the registration is a change or amendment for some conditions."""
     return registration_class and registration_class in (REG_CLASS_AMEND, REG_CLASS_AMEND_COURT, REG_CLASS_CHANGE)
+
+
+def cleanup_amendment(json_data):
+    """Delete empty amendment add/remove arrays."""
+    if 'addVehicleCollateral' in json_data and not json_data['addVehicleCollateral']:
+        del json_data['addVehicleCollateral']
+    if 'deleteVehicleCollateral' in json_data and not json_data['deleteVehicleCollateral']:
+        del json_data['deleteVehicleCollateral']
+    if 'addGeneralCollateral' in json_data and not json_data['addGeneralCollateral']:
+        del json_data['addGeneralCollateral']
+    if 'deleteGeneralCollateral' in json_data and not json_data['deleteGeneralCollateral']:
+        del json_data['deleteGeneralCollateral']
+    if 'addSecuredParties' in json_data and not json_data['addSecuredParties']:
+        del json_data['addSecuredParties']
+    if 'deleteSecuredParties' in json_data and not json_data['deleteSecuredParties']:
+        del json_data['deleteSecuredParties']
+    if 'addDebtors' in json_data and not json_data['addDebtors']:
+        del json_data['addDebtors']
+    if 'deleteDebtors' in json_data and not json_data['deleteDebtors']:
+        del json_data['deleteDebtors']
+    return json_data
+
+
+def amendment_change_type(json_data):
+    # pylint: disable=too-many-boolean-expressions
+    """Try to assign a more specific amendment change type based on the request data."""
+    if 'courtOrderInformation' in json_data:
+        return REG_TYPE_AMEND_COURT
+    if 'addTrustIndenture' in json_data or 'removeTrustIndenture' in json_data:
+        return REG_TYPE_AMEND
+    change_type = json_data['changeType']
+    if 'addVehicleCollateral' not in json_data and 'deleteVehicleCollateral' not in json_data and \
+            'addGeneralCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
+        if 'addDebtors' not in json_data and 'deleteDebtors' not in json_data and \
+                'addSecuredParties' in json_data and 'deleteSecuredParties' in json_data and \
+                len(json_data['addSecuredParties']) == 1 and len(json_data['deleteSecuredParties']) == 1:
+            change_type = REG_TYPE_AMEND_SP_TRANSFER
+        if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
+                'addDebtors' in json_data and 'deleteDebtors' in json_data and \
+                len(json_data['addDebtors']) == 1 and len(json_data['deleteDebtors']) == 1:
+            change_type = REG_TYPE_AMEND_DEBTOR_TRANSFER
+        if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
+                'addDebtors' not in json_data and 'deleteDebtors' in json_data and \
+                len(json_data['deleteDebtors']) == 1:
+            change_type = REG_TYPE_AMEND_DEBTOR_RELEASE
+    if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
+       'addDebtors' not in json_data and 'deleteDebtors' not in json_data:
+        if 'addVehicleCollateral' not in json_data and 'addGeneralCollateral' not in json_data and \
+                ('deleteVehicleCollateral' in json_data or 'addGeneralCollateral' in json_data):
+            change_type = REG_TYPE_AMEND_PARIAL_DISCHARGE
+        if ('addVehicleCollateral' in json_data or 'addGeneralCollateral' in json_data) and \
+                'deleteVehicleCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
+            change_type = REG_TYPE_AMEND_ADDITION_COLLATERAL
+        if 'addVehicleCollateral' in json_data and 'deleteVehicleCollateral' in json_data and \
+                len(json_data['addVehicleCollateral']) == 1 and len(json_data['deleteVehicleCollateral']) == 1 and \
+                'addGeneralCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
+            change_type = REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL
+        if 'addGeneralCollateral' in json_data and 'deleteGeneralCollateral' in json_data and \
+                len(json_data['addGeneralCollateral']) == 1 and len(json_data['deleteGeneralCollateral']) == 1 and \
+                'addVehicleCollateral' not in json_data and 'deleteVehicleCollateral' not in json_data:
+            change_type = REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL
+
+    return change_type
