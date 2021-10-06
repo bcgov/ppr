@@ -1,6 +1,6 @@
 <template>
   <v-container flat class="pa-0" id="court-order-summary">
-    <v-form v-model="isValid">
+    <v-form v-model="valid">
       <v-row no-gutters>
         <v-col class="generic-label"><h2>Court Order</h2></v-col>
       </v-row>
@@ -15,7 +15,7 @@
         <v-col
           cols="12"
           class="pa-0"
-          :class="showErrors && !isValid ? 'border-error-left' : ''"
+          :class="showErrors && !valid ? 'border-error-left' : ''"
         >
           <v-card flat>
             <v-row no-gutters style="padding: 0 30px;">
@@ -77,7 +77,7 @@
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
-                      id="date-text-field"
+                      id="court-date-text-field"
                       :value="computedDateFormatted"
                       filled
                       persistent-hint
@@ -94,7 +94,7 @@
                     </v-text-field>
                   </template>
                   <v-date-picker
-                    id="date-picker-calendar"
+                    id="court-date-picker-calendar"
                     v-model="orderDate"
                     elevation="15"
                     scrollable
@@ -170,12 +170,12 @@ export default defineComponent({
     ])
     const {
       errors,
+      valid,
       validateCourtOrderForm,
       isValidCourtOrderForm
     } = useCourtOrderValidation()
     const modal = false
     const localState = reactive({
-      isValid: true,
       courtName: '',
       courtRegistry: '',
       fileNumber: '',
@@ -196,11 +196,13 @@ export default defineComponent({
           )
           : ''
       }),
-      showErrors: props.setShowErrors,
-      rules: [
-        (v: string) => !v || v.length <= 15 || 'Maximum 15 characters reached' // maximum character count
-      ]
+      showErrors: props.setShowErrors
     })
+
+    const emitValid = async () => {
+      await isValidCourtOrderForm(localState.courtOrderInfo)
+      emit('courtOrderValid', valid.value)
+    }
 
     watch(
       () => props.setShowErrors,
@@ -212,51 +214,52 @@ export default defineComponent({
     watch(
       () => localState.courtName,
       (val: string) => {
-        emit('courtOrderValid', isValidCourtOrderForm(localState.courtOrderInfo))
         localState.courtOrderInfo.courtName = val
         setCourtOrderInformation(localState.courtOrderInfo)
+        emitValid()
       }
     )
 
     watch(
       () => localState.fileNumber,
       (val: string) => {
-        emit('courtOrderValid', isValidCourtOrderForm(localState.courtOrderInfo))
         localState.courtOrderInfo.fileNumber = val
         setCourtOrderInformation(localState.courtOrderInfo)
+        emitValid()
       }
     )
 
     watch(
       () => localState.courtRegistry,
       (val: string) => {
-        emit('courtOrderValid', isValidCourtOrderForm(localState.courtOrderInfo))
         localState.courtOrderInfo.courtRegistry = val
         setCourtOrderInformation(localState.courtOrderInfo)
+        emitValid()
       }
     )
 
     watch(
       () => localState.orderDate,
       (val: string) => {
-        emit('courtOrderValid', isValidCourtOrderForm(localState.courtOrderInfo))
         localState.courtOrderInfo.orderDate = val
         setCourtOrderInformation(localState.courtOrderInfo)
+        emitValid()
       }
     )
 
     watch(
       () => localState.effectOfOrder,
       (val: string) => {
-        emit('courtOrderValid', isValidCourtOrderForm(localState.courtOrderInfo))
         localState.courtOrderInfo.effectOfOrder = val
         setCourtOrderInformation(localState.courtOrderInfo)
+        emitValid()
       }
     )
 
     onMounted(() => {
       // initialize to blanks
-      if (getCourtOrderInformation.value === null) {
+      const courtOrderInfo = getCourtOrderInformation.value
+      if (courtOrderInfo === null) {
         localState.courtOrderInfo = {
           orderDate: '',
           effectOfOrder: '',
@@ -265,12 +268,20 @@ export default defineComponent({
           fileNumber: ''
         }
         setCourtOrderInformation(localState.courtOrderInfo)
+      } else {
+        localState.courtOrderInfo = courtOrderInfo
+        localState.orderDate = courtOrderInfo.orderDate
+        localState.effectOfOrder = courtOrderInfo.effectOfOrder
+        localState.courtName = courtOrderInfo.courtName
+        localState.courtRegistry = courtOrderInfo.courtRegistry
+        localState.fileNumber = courtOrderInfo.fileNumber
       }
     })
 
     return {
       modal,
       errors,
+      valid,
       ...toRefs(localState)
     }
   }

@@ -14,22 +14,24 @@ const createEmptyErrors = () => ({
 
 export const useCourtOrderValidation = () => {
   const errors = ref(createEmptyErrors())
+  const valid = ref(false)
 
   /* show the errors */
   const validateCourtOrderForm = async courtOrder => {
     const validationResult = await formValidation.validateForm(courtOrder)
     errors.value = { ...errors.value, ...validationResult.fieldErrors }
-    return validationResult.succeeded
+    valid.value = validationResult.succeeded
   }
 
   /* only return whether valid */
   const isValidCourtOrderForm = async courtOrder => {
     const validationResult = await formValidation.validateForm(courtOrder)
-    return validationResult.succeeded
+    valid.value = validationResult.succeeded
   }
 
   return {
     errors,
+    valid,
     isValidCourtOrderForm,
     validateCourtOrderForm
   }
