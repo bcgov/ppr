@@ -394,7 +394,7 @@ span.invalid-color {
 tr.disabled-text-not-action td {
   opacity: 0.4;
 }
-tr.disabled-text-not-action td:last-child {
+tr.disabled-text-not-action td:last-child, tr.disabled-text-not-action td:first-child {
   opacity: 1;
 }
 

@@ -125,14 +125,14 @@
             >
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>
-                  <v-col cols="3">
+                  <v-col cols="3" :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
                     <div class="icon-div mt-n1 pr-4">
                       <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
                       <v-icon v-else>mdi-account</v-icon>
                     </div>
                   </v-col>
                   <v-col cols="9">
-                    <div>
+                    <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
                       {{ getName(row.item) }}
                     </div>
                     <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
@@ -153,9 +153,9 @@
               <td>{{ row.item.emailAddress }}</td>
               <td>{{ row.item.code }}</td>
               <!-- Action Btns -->
-              <td class="actions-cell  px-0 py-2">
+              <td class="actions-cell actions-width px-0">
                 <div
-                  class="actions float-right"
+                  class="actions float-right actions-up"
                   v-if="
                     isRegisteringParty(row.item) ||
                       isSecuredPartyRestrictedList(registrationType)
@@ -188,25 +188,13 @@
                     </v-list-item>
                   </v-list>
                 </div>
-                <div class="actions float-right" v-else>
+                <div v-else class="actions-up actions float-right">
                   <span
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
-                    class="edit-action"
+                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                    || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                    (row.item.action === ActionTypes.ADDED) || !row.item.action)"
+                    class="edit-button"
                   >
-                    <v-btn
-                      text
-                      color="primary"
-                      class="smaller-button edit-btn"
-                      :id="'class-' + row.index + '-undo-btn'"
-                      @click="undo(row.index)"
-                      :disabled="addEditInProgress"
-                    >
-                      <v-icon small>mdi-undo</v-icon>
-                      <span>Undo</span>
-                    </v-btn>
-                  </span>
-                  <span v-else class="edit-action">
                     <v-btn
                       text
                       color="primary"
@@ -225,11 +213,10 @@
                       <span v-else>Edit</span>
                     </v-btn>
                   </span>
-
-                  <span class="actions__more"
-                    v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && row.item.action !== ActionTypes.REMOVED) ||
-                    registrationFlowType !== RegistrationFlowType.AMENDMENT"
+                  <span class="actions-border actions__more"
+                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                    || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!row.item.action ||
+                    row.item.action === ActionTypes.ADDED))"
                   >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
@@ -245,6 +232,63 @@
                         </v-btn>
                       </template>
                       <v-list class="actions__more-actions">
+                        <v-list-item @click="removeParty(row.index)">
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-delete</v-icon>
+                            <span
+                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && row.item.action !== ActionTypes.ADDED"
+                            >
+                              Delete
+                            </span>
+                            <span v-else class="ml-1">Remove</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </span>
+                  <span
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
+                    class="edit-button"
+                  >
+                    <v-btn
+                      text
+                      color="primary"
+                      class="smaller-button edit-btn"
+                      :id="'class-' + row.index + '-undo-btn'"
+                      @click="undo(row.index)"
+                      :disabled="addEditInProgress"
+                    >
+                      <v-icon small>mdi-undo</v-icon>
+                      <span>Undo</span>
+                    </v-btn>
+                  </span>
+
+                  <span class="actions-border actions__more"
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action === ActionTypes.EDITED"
+                  >
+                    <v-menu offset-y left nudge-bottom="4">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          text
+                          small
+                          v-on="on"
+                          color="primary"
+                          class="smaller-actions actions__more-actions__btn"
+                          :disabled="addEditInProgress"
+                        >
+                          <v-icon>mdi-menu-down</v-icon>
+                        </v-btn>
+                      </template>
+                      <v-list class="actions__more-actions">
+                        <v-list-item @click="initEdit(row.index)">
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-pencil</v-icon>
+                            <span class="ml-1">Amend</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
                         <v-list-item @click="removeParty(row.index)">
                           <v-list-item-subtitle>
                             <v-icon small>mdi-delete</v-icon>
@@ -646,5 +690,17 @@ export default defineComponent({
 
 .smaller-button {
   padding: 0 12px !important;
+}
+
+.actions-width {
+  width: 140px;
+}
+
+.actions-border {
+  border-left: 1px solid $gray1;
+}
+
+.actions-up {
+  margin-top: -10px;
 }
 </style>

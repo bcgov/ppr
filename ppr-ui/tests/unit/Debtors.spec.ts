@@ -130,18 +130,34 @@ describe('Debtor amendment tests', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
     const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[1]
     const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[2]
-    expect(item1.querySelectorAll('td')[0].textContent).toContain('edited')
-    expect(item2.querySelectorAll('td')[0].textContent).toContain('removed')
-    expect(item3.querySelectorAll('td')[0].textContent).toContain('added')
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('AMENDED')
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('DELETED')
+    expect(item3.querySelectorAll('td')[0].textContent).toContain('ADDED')
   })
 
-  it('displays the correct actions in the table rows', () => {
+  it('displays the correct actions in the table rows', async () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
     const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[1]
     const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[2]
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
+    const dropDowns = wrapper.findAll('.v-data-table .debtor-row .actions__more-actions__btn')
+    // 2 drop downs
+    expect(dropDowns.length).toBe(2)
+    // click the drop down arrow
+    dropDowns.at(0).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.findAll('.actions__more-actions .v-list-item__subtitle').length).toBe(2)
     expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
     expect(item3.querySelectorAll('td')[4].textContent).toContain('Edit')
+    // click the second drop down
+    dropDowns.at(1).trigger('click')
+    await Vue.nextTick()
+    const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
+    // options from first drop down
+    expect(options.at(0).text()).toContain('Amend')
+    expect(options.at(1).text()).toContain('Remove')
+    // option from second drop down
+    expect(options.at(2).text()).toContain('Remove')
   })
 
 })
@@ -166,7 +182,7 @@ describe('Debtor validation tests', () => {
     // one greyed out row
     expect(rowCount).toEqual(1)
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
-    expect(item1.querySelectorAll('td')[0].textContent).toContain('removed')
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('DELETED')
   })
 
   
