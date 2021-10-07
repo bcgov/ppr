@@ -181,7 +181,9 @@ export default defineComponent({
       fileNumber: '',
       orderDate: '',
       effectOfOrder: '',
-      courtOrderInfo: getCourtOrderInformation.value as CourtOrderIF,
+      courtOrderInfo: computed((): CourtOrderIF => {
+        return getCourtOrderInformation.value as CourtOrderIF
+      }),
       computedDateFormatted: computed((): string => {
         if (getCourtOrderInformation.value === null) {
           return ''
@@ -196,7 +198,12 @@ export default defineComponent({
           )
           : ''
       }),
-      showErrors: props.setShowErrors
+      showErrors: computed((): boolean => {
+        if (props.setShowErrors === true) {
+          validateCourtOrderForm(localState.courtOrderInfo)
+        }
+        return props.setShowErrors
+      })
     })
 
     const emitValid = async () => {
@@ -205,17 +212,11 @@ export default defineComponent({
     }
 
     watch(
-      () => props.setShowErrors,
-      val => {
-        validateCourtOrderForm(localState.courtOrderInfo)
-        localState.showErrors = val
-      }
-    )
-    watch(
       () => localState.courtName,
       (val: string) => {
-        localState.courtOrderInfo.courtName = val
-        setCourtOrderInformation(localState.courtOrderInfo)
+        const newCourtOrderInfo = localState.courtOrderInfo
+        newCourtOrderInfo.courtName = val
+        setCourtOrderInformation(newCourtOrderInfo)
         emitValid()
       }
     )
@@ -223,8 +224,9 @@ export default defineComponent({
     watch(
       () => localState.fileNumber,
       (val: string) => {
-        localState.courtOrderInfo.fileNumber = val
-        setCourtOrderInformation(localState.courtOrderInfo)
+        const newCourtOrderInfo = localState.courtOrderInfo
+        newCourtOrderInfo.fileNumber = val
+        setCourtOrderInformation(newCourtOrderInfo)
         emitValid()
       }
     )
@@ -232,8 +234,9 @@ export default defineComponent({
     watch(
       () => localState.courtRegistry,
       (val: string) => {
-        localState.courtOrderInfo.courtRegistry = val
-        setCourtOrderInformation(localState.courtOrderInfo)
+        const newCourtOrderInfo = localState.courtOrderInfo
+        newCourtOrderInfo.courtRegistry = val
+        setCourtOrderInformation(newCourtOrderInfo)
         emitValid()
       }
     )
@@ -241,8 +244,9 @@ export default defineComponent({
     watch(
       () => localState.orderDate,
       (val: string) => {
-        localState.courtOrderInfo.orderDate = val
-        setCourtOrderInformation(localState.courtOrderInfo)
+        const newCourtOrderInfo = localState.courtOrderInfo
+        newCourtOrderInfo.orderDate = val
+        setCourtOrderInformation(newCourtOrderInfo)
         emitValid()
       }
     )
@@ -250,31 +254,30 @@ export default defineComponent({
     watch(
       () => localState.effectOfOrder,
       (val: string) => {
-        localState.courtOrderInfo.effectOfOrder = val
-        setCourtOrderInformation(localState.courtOrderInfo)
+        const newCourtOrderInfo = localState.courtOrderInfo
+        newCourtOrderInfo.effectOfOrder = val
+        setCourtOrderInformation(newCourtOrderInfo)
         emitValid()
       }
     )
 
     onMounted(() => {
       // initialize to blanks
-      const courtOrderInfo = getCourtOrderInformation.value
-      if (courtOrderInfo === null) {
-        localState.courtOrderInfo = {
+      if (localState.courtOrderInfo === null) {
+        const newCourtOrderInfo = {
           orderDate: '',
           effectOfOrder: '',
           courtName: '',
           courtRegistry: '',
           fileNumber: ''
         }
-        setCourtOrderInformation(localState.courtOrderInfo)
+        setCourtOrderInformation(newCourtOrderInfo)
       } else {
-        localState.courtOrderInfo = courtOrderInfo
-        localState.orderDate = courtOrderInfo.orderDate
-        localState.effectOfOrder = courtOrderInfo.effectOfOrder
-        localState.courtName = courtOrderInfo.courtName
-        localState.courtRegistry = courtOrderInfo.courtRegistry
-        localState.fileNumber = courtOrderInfo.fileNumber
+        localState.orderDate = localState.courtOrderInfo.orderDate
+        localState.effectOfOrder = localState.courtOrderInfo.effectOfOrder
+        localState.courtName = localState.courtOrderInfo.courtName
+        localState.courtRegistry = localState.courtOrderInfo.courtRegistry
+        localState.fileNumber = localState.courtOrderInfo.fileNumber
       }
     })
 

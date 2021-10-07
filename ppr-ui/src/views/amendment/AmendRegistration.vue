@@ -161,6 +161,7 @@ export default class AmendRegistration extends Vue {
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
+  private courtOrderValid = true
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -273,7 +274,8 @@ export default class AmendRegistration extends Vue {
       this.debtorValid &&
       this.securedPartiesValid &&
       this.registrationLengthTrustValid &&
-      this.collateralValid
+      this.collateralValid &&
+      this.courtOrderValid
     ) {
       this.$router.push({
         name: RouteNames.CONFIRM_AMENDMENT,
