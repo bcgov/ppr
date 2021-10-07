@@ -31,7 +31,6 @@ from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -107,7 +106,7 @@ class FinancingResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'financingStatement', 'ppr')
-            extra_validation_msg = validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -209,7 +208,7 @@ class AmendmentResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
-            extra_validation_msg = validate_registration(request_json)
+            extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -228,7 +227,7 @@ class AmendmentResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
 
             # Verify delete party and collateral ID's
-            validate_delete_ids(request_json, statement)
+            resource_utils.validate_delete_ids(request_json, statement)
 
             # Set up the registration, pay, and save the data.
             registration = pay_and_save(request_json,
@@ -325,7 +324,7 @@ class ChangeResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'changeStatement', 'ppr')
-            extra_validation_msg = validate_registration(request_json)
+            extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -344,7 +343,7 @@ class ChangeResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
 
             # Verify delete party and collateral ID's
-            validate_delete_ids(request_json, statement)
+            resource_utils.validate_delete_ids(request_json, statement)
 
             # Set up the registration, pay, and save the data.
             registration = pay_and_save(request_json,
@@ -438,7 +437,7 @@ class RenewalResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'renewalStatement', 'ppr')
-            extra_validation_msg = validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -548,7 +547,7 @@ class DischargeResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
-            extra_validation_msg = validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -712,8 +711,8 @@ class GetRegistrationResource(Resource):
             return resource_utils.default_exception_response(default_exception)
 
 
-@cors_preflight('DELETE,POST,OPTIONS')
-@API.route('/registrations/<path:registration_num>', methods=['DELETE', 'POST', 'OPTIONS'])
+@cors_preflight('DELETE,GET,POST,OPTIONS')
+@API.route('/registrations/<path:registration_num>', methods=['DELETE', 'GET', 'POST', 'OPTIONS'])
 class AccountRegistrationResource(Resource):
     """Resource to maintain user account additional Financing Statements by registration number."""
 
@@ -755,6 +754,40 @@ class AccountRegistrationResource(Resource):
             extra_registration.save()
 
             return registration, HTTPStatus.CREATED
+
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get(registration_num):
+        """Get summary registrration information by registration number before adding to the user registrations list."""
+        try:
+            if registration_num is None:
+                return resource_utils.path_param_error_response('registration number')
+
+            # Quick check: must provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch summary registration by registration number
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num)
+            if registration is None:
+                return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
+
+            # Future: check if restricted access for crown charges.
+            if registration['registrationClass'] == model_utils.REG_CLASS_CROWN:
+                current_app.logger.info('Check restricted access when available.')
+
+            del registration['accountId']
+            del registration['existsCount']
+            return registration, HTTPStatus.OK
 
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
@@ -948,29 +981,3 @@ def get_payment_details(registration):
         'value': value
     }
     return details
-
-
-def validate_financing(json_data):
-    """Perform non-schema extra validation on a financing statement."""
-    error_msg = party_validator.validate_financing_parties(json_data)
-    error_msg += financing_validator.validate(json_data)
-    return error_msg
-
-
-def validate_registration(json_data):
-    """Perform non-schema extra validation on a non-financing registrations."""
-    error_msg = party_validator.validate_registration_parties(json_data)
-    error_msg += registration_validator.validate_collateral_ids(json_data)
-
-    return error_msg
-
-
-def validate_delete_ids(json_data, financing_statement):
-    """Perform non-schema extra validation on a change amendment delete party, collateral ID's."""
-    error_msg = party_validator.validate_party_ids(json_data, financing_statement)
-    error_msg += registration_validator.validate_collateral_ids(json_data, financing_statement)
-    if error_msg != '':
-        raise BusinessException(
-            error=error_msg,
-            status_code=HTTPStatus.BAD_REQUEST
-        )

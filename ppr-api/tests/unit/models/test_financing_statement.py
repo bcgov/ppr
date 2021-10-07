@@ -37,8 +37,9 @@ TEST_REGISTRATION_DATA = [
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff})
 TEST_REGISTRATION_NUMBER_DATA = [
     ('Valid', 'TEST0001', 'PS12345', HTTPStatus.OK, False),
+    ('Valid added from another account', 'TEST0019', 'PS12345', HTTPStatus.OK, False),
     ('Invalid reg num', 'TESTXXXX', 'PS12345', HTTPStatus.NOT_FOUND, False),
-    ('Mismatch account id non-staff', 'TEST0001', 'PS1234X', HTTPStatus.BAD_REQUEST, False),
+    ('Mismatch account id non-staff', 'TEST0001', 'PS1234X', HTTPStatus.UNAUTHORIZED, False),
     ('Expired non-staff', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, False),
     ('Discharged non-staff', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, False),
     ('Mismatch staff', 'TEST0001', 'PS1234X', HTTPStatus.OK, True),
@@ -202,7 +203,8 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
         assert result['createDateTime']
         assert result['debtors'][0]
         assert result['securedParties'][0]
-        assert result['vehicleCollateral'][0]
+        if reg_number == 'TEST0001':
+            assert result['vehicleCollateral'][0]
         assert result['expiryDate']
         assert result['lifeYears']
         if reg_number == 'TEST0001':

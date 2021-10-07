@@ -31,6 +31,7 @@ from .general_collateral import GeneralCollateral
 from .general_collateral_legacy import GeneralCollateralLegacy
 from .type_tables import RegistrationType
 from .trust_indenture import TrustIndenture
+from .user_extra_registration import UserExtraRegistration
 from .vehicle_collateral import VehicleCollateral
 # noqa: I003
 
@@ -371,11 +372,14 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             )
 
         if not staff and account_id and registration.account_id != account_id:
-            raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
-                                                                  registration_num=registration_num),
-                status_code=HTTPStatus.BAD_REQUEST
-            )
+            # Check extra registrations
+            extra_reg = UserExtraRegistration.find_by_registration_number(base_reg_num, account_id)
+            if not extra_reg:
+                raise BusinessException(
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
+                                                                      registration_num=registration_num),
+                    status_code=HTTPStatus.UNAUTHORIZED
+                )
 
         if not staff and model_utils.is_historical(registration.financing_statement):
             raise BusinessException(

@@ -31,6 +31,7 @@ from .trust_indenture import TrustIndenture  # noqa: F401 pylint: disable=unused
 from .party import Party  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .general_collateral import GeneralCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .general_collateral_legacy import GeneralCollateralLegacy  # noqa: F401 pylint: disable=unused-import; see above
+from .user_extra_registration import UserExtraRegistration  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 from .vehicle_collateral import VehicleCollateral  # noqa: F401 pylint: disable=unused-import; needed by the SQLAlchemy relationship
 
 
@@ -405,11 +406,15 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             )
 
         if not staff and account_id and statement.registration[0].account_id != account_id:
-            raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
-                                                                  registration_num=registration_num),
-                status_code=HTTPStatus.BAD_REQUEST
-            )
+            # Check extra registrations
+            extra_reg = UserExtraRegistration.find_by_registration_number(statement.registration[0].registration_num,
+                                                                          account_id)
+            if not extra_reg:
+                raise BusinessException(
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
+                                                                      registration_num=registration_num),
+                    status_code=HTTPStatus.UNAUTHORIZED
+                )
 
         if not staff and model_utils.is_historical(statement):
             raise BusinessException(
