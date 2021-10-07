@@ -13,7 +13,7 @@ import { StickyContainer } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // ppr enums/utils/etc.
-import { RouteNames } from '@/enums'
+import { ActionTypes, RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
@@ -130,4 +130,39 @@ describe('Amendment registration component', () => {
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
+
+
+  it('checks for length trust indenture & court order validity -if invalid', async () => {
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: true,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: '',
+      action: ActionTypes.EDITED
+    })
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.vm.showInvalid).toBe(true)
+  })
+
+  it('checks for length trust indenture & court order validity -if valid', async () => {
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: true,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: '',
+      action: ActionTypes.EDITED
+    })
+    wrapper.vm.courtOrderValid = true
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
+  })
+
 })
