@@ -158,7 +158,8 @@
                   class="actions float-right actions-up"
                   v-if="
                     isRegisteringParty(row.item) ||
-                      isSecuredPartyRestrictedList(registrationType)
+                      isSecuredPartyRestrictedList(registrationType) ||
+                      row.item.code > ''
                   "
                 >
                   <v-list

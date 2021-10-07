@@ -7,11 +7,14 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
 import { cloneDeep } from 'lodash'
-import { mockedPartyCodeSearchResults, mockedSecuredParties2, mockedSecuredPartiesAmendment } from './test-data'
 import {
   mockedSecuredParties1,
+  mockedSecuredParties2,
+  mockedSecuredParties3,
   mockedRegisteringParty1,
   mockedSelectSecurityAgreement,
+  mockedSecuredPartiesAmendment,
+  mockedPartyCodeSearchResults,
   mockedOtherCarbon
 } from './test-data'
 
@@ -193,7 +196,6 @@ describe('Secured Party Other registration type tests', () => {
         deliveryInstructions: ''
       }
     }
-   
     
     expect(parties.length).toEqual(2)
     wrapper.vm.securedParties = parties
@@ -303,5 +305,39 @@ describe('Secured party amendment tests', () => {
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
 
   })
+
+})
+
+
+describe('Secured party with code test', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      securedParties: mockedSecuredParties3
+    })
+    await store.dispatch('setOriginalAddSecuredPartiesAndDebtors', {
+      securedParties: mockedSecuredParties3
+    })
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+
+  it('displays remove only for a secured party with code', async () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
+    expect(item1.querySelectorAll('td')[4].textContent).toContain('Remove')
+    
+    const dropDowns = wrapper.findAll('.v-data-table .party-row .actions__more-actions__btn')
+    // 0 drop downs
+    expect(dropDowns.length).toBe(0)
+  
+
+  })
+
+  
 
 })

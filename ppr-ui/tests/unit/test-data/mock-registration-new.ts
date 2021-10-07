@@ -149,6 +149,15 @@ export const mockedSecuredParties2: PartyIF[] = [
   }
 ]
 
+export const mockedSecuredParties3: PartyIF[] = [
+  {
+    code: '777888',
+    businessName: 'SECURED PARTY COMPANY LTD.',
+    emailAddress: 'test@company.com',
+    address: mockedAddress1
+  }
+]
+
 export const mockedSecuredPartiesAmendment: PartyIF[] = [
   {
     businessName: 'SECURED PARTY COMPANY LTD.',
