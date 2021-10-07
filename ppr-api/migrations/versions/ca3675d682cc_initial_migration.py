@@ -868,6 +868,42 @@ def upgrade():
             'registration_type': 'RE',
             'registration_act': 'PPSA SECURITY ACT',
             'registration_desc': 'RENEWAL'
+        },
+        {
+            'registration_type_cl': 'AMENDMENT',
+            'registration_type': 'AA',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'ADDITION OF COLLATERAL/PROCEEDS'
+        },
+        {
+            'registration_type_cl': 'AMENDMENT',
+            'registration_type': 'AR',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'DEBTOR RELEASE'
+        },
+        {
+            'registration_type_cl': 'AMENDMENT',
+            'registration_type': 'AD',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'DEBTOR TRANSFER'
+        },
+        {
+            'registration_type_cl': 'AMENDMENT',
+            'registration_type': 'AP',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'PARTIAL DISCHARGE'
+        },
+        {
+            'registration_type_cl': 'AMENDMENT',
+            'registration_type': 'AS',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'SECURED PARTY TRANSFER'
+        },
+        {
+            'registration_type_cl': 'AMENDMENT',
+            'registration_type': 'AU',
+            'registration_act': 'PPSA SECURITY ACT',
+            'registration_desc': 'SUBSTITUTION OF COLLATERAL'
         }
       ]
     )

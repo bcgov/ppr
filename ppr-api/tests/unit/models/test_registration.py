@@ -86,6 +86,19 @@ TEST_VERIFICATION_DATA = [
     ('TEST0018', 'TEST0018A2', 'amendmentRegistrationNumber'),
     ('TEST0001', 'TEST0009', 'changeRegistrationNumber')
 ]
+# testdata pattern is ({change_type}, {is_general_collateral})
+TEST_DATA_AMENDMENT_CHANGE_TYPE = [
+    (model_utils.REG_TYPE_AMEND, False),
+    (model_utils.REG_TYPE_AMEND_COURT, False),
+    (model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL, False),
+    (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL, False),
+    (model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL, True),
+    (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL, True),
+    (model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE, False),
+    (model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER, False),
+    (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
+    (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
+]
 
 
 def test_find_by_id(session):
@@ -504,6 +517,8 @@ def test_save_amendment(session):
     del json_data['amendmentRegistrationNumber']
     del json_data['payment']
     del json_data['documentId']
+    del json_data['addTrustIndenture']
+    del json_data['removeTrustIndenture']
     json_data['changeType'] = 'CO'
 
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
@@ -549,6 +564,79 @@ def test_save_amendment(session):
     assert 'documentId' not in result
 
 
+def test_save_amendment_trust(session):
+    """Assert that creating an amendment statement adding/removing a trust indenture contains all expected elements."""
+    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+    del json_data['createDateTime']
+    del json_data['amendmentRegistrationNumber']
+    del json_data['payment']
+    del json_data['documentId']
+    del json_data['courtOrderInformation']
+    del json_data['addTrustIndenture']
+    del json_data['addSecuredParties']
+    del json_data['deleteSecuredParties']
+    del json_data['addDebtors']
+    del json_data['deleteDebtors']
+    del json_data['addVehicleCollateral']
+    del json_data['deleteVehicleCollateral']
+    del json_data['addGeneralCollateral']
+    del json_data['deleteGeneralCollateral']
+    json_data['changeType'] = 'AM'
+    json_data['removeTrustIndenture'] = True
+
+    financing_statement = FinancingStatement.find_by_financing_id(200000000)
+    assert financing_statement
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
+                                                 'TEST0001',
+                                                 'PS12345')
+#    print(registration.financing_id)
+#    print(registration.json)
+    registration.save()
+    result = registration.json
+    assert result
+    assert result['baseRegistrationNumber']
+    assert result['amendmentRegistrationNumber']
+    assert result['createDateTime']
+    assert result['registeringParty']
+    assert result['removeTrustIndenture']
+
+    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+    del json_data['createDateTime']
+    del json_data['amendmentRegistrationNumber']
+    del json_data['payment']
+    del json_data['documentId']
+    del json_data['courtOrderInformation']
+    del json_data['removeTrustIndenture']
+    del json_data['addSecuredParties']
+    del json_data['deleteSecuredParties']
+    del json_data['addDebtors']
+    del json_data['deleteDebtors']
+    del json_data['addVehicleCollateral']
+    del json_data['deleteVehicleCollateral']
+    del json_data['addGeneralCollateral']
+    del json_data['deleteGeneralCollateral']
+    json_data['changeType'] = 'AM'
+    json_data['addTrustIndenture'] = True
+
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
+                                                 'TEST0001',
+                                                 'PS12345')
+#    print(registration.financing_id)
+#    print(registration.json)
+    registration.save()
+    result = registration.json
+    assert result
+    assert result['baseRegistrationNumber']
+    assert result['amendmentRegistrationNumber']
+    assert result['createDateTime']
+    assert result['registeringParty']
+    assert result['addTrustIndenture']
+
+
 def test_save_amendment_from_draft(session):
     """Assert that creating an amendment statement from a draft on a non-RL financing statement.
 
@@ -558,6 +646,8 @@ def test_save_amendment_from_draft(session):
     del json_data['createDateTime']
     del json_data['amendmentRegistrationNumber']
     del json_data['payment']
+    del json_data['addTrustIndenture']
+    del json_data['removeTrustIndenture']
 
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
     assert financing_statement
@@ -722,3 +812,67 @@ def test_verification_json(session, base_reg_num, reg_num, reg_num_name):
     assert json_data['baseRegistrationNumber'] == base_reg_num
     assert len(json_data['changes']) >= 1
     assert json_data['changes'][0][reg_num_name] == reg_num
+
+
+@pytest.mark.parametrize('change_type, is_general_collateral', TEST_DATA_AMENDMENT_CHANGE_TYPE)
+def test_create_from_json(session, change_type, is_general_collateral):
+    """Assert that setting the amendment change type from the amendment data works as expected."""
+    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+    if change_type != model_utils.REG_TYPE_AMEND_COURT:
+        del json_data['courtOrderInformation']
+    if change_type != model_utils.REG_TYPE_AMEND:
+        del json_data['addTrustIndenture']
+        del json_data['removeTrustIndenture']
+
+    if change_type in (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL,
+                       model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL,
+                       model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE):
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+    if change_type == model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE:
+        del json_data['addVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+    elif change_type == model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL:
+        del json_data['deleteVehicleCollateral']
+        del json_data['deleteGeneralCollateral']
+        if is_general_collateral:
+            del json_data['addVehicleCollateral']
+        else:
+            del json_data['addGeneralCollateral']
+    elif change_type == model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL:
+        if is_general_collateral:
+            del json_data['addVehicleCollateral']
+            del json_data['deleteVehicleCollateral']
+        else:
+            del json_data['addGeneralCollateral']
+            del json_data['deleteGeneralCollateral']
+    if change_type in (model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE,
+                       model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER,
+                       model_utils.REG_TYPE_AMEND_SP_TRANSFER):
+        del json_data['addVehicleCollateral']
+        del json_data['deleteVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+    if change_type == model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE:
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+    elif change_type == model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER:
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+    elif change_type == model_utils.REG_TYPE_AMEND_SP_TRANSFER:
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+
+    financing_statement = FinancingStatement.find_by_financing_id(200000000)
+    assert financing_statement
+
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
+                                                 'TEST0001',
+                                                 'PS12345')
+    assert registration.registration_type == change_type

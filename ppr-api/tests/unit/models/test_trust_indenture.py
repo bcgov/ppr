@@ -33,15 +33,14 @@ def test_find_by_id(session):
     assert trust_indenture.trust_indenture == 'Y'
 
 
-def test_find_by_registration_num(session):
-    """Assert that find trust indenture by registration number contains all expected elements."""
-    trust_indenture = TrustIndenture.find_by_registration_number('TEST0001')
+def test_find_by_registration_id(session):
+    """Assert that find trust indenture by registration ID contains all expected elements."""
+    trust_indenture = TrustIndenture.find_by_registration_id(200000000)
     assert trust_indenture
-    assert len(trust_indenture) == 1
-    assert trust_indenture[0].id == 200000000
-    assert trust_indenture[0].registration_id == 200000000
-    assert trust_indenture[0].financing_id == 200000000
-    assert trust_indenture[0].trust_indenture == 'Y'
+    assert trust_indenture.id == 200000000
+    assert trust_indenture.registration_id == 200000000
+    assert trust_indenture.financing_id == 200000000
+    assert trust_indenture.trust_indenture == 'Y'
 
 
 def test_find_by_financing_id(session):
@@ -67,9 +66,9 @@ def test_find_by_financing_id_invalid(session):
     assert not trust_indenture
 
 
-def test_find_by_reg_num_invalid(session):
-    """Assert that find trust indenture by non-existent registration number returns the expected result."""
-    trust_indenture = TrustIndenture.find_by_registration_number('300000000')
+def test_find_by_reg_id_invalid(session):
+    """Assert that find trust indenture by non-existent registration ID returns the expected result."""
+    trust_indenture = TrustIndenture.find_by_registration_id('300000000')
     assert not trust_indenture
 
 

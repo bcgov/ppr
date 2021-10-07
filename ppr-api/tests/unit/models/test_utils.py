@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test Suite to ensure the datetime utility functions are working as expected."""
+import copy
 from datetime import timedelta as _timedelta
 
 import pytest
+from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT
 
 from ppr_api.models import utils as model_utils
 
@@ -79,6 +81,19 @@ TEST_DATA_EXPIRY_REGISTRATION = [
 TEST_DATA_LOCAL_TIMEZONE = [
     ('Daylight savings', '2021-09-01T06:59:59-00:00', '2021-08-31T23:59:59-07:00'),
     ('No daylight savings', '2021-02-01T07:59:59-00:00', '2021-01-31T23:59:59-08:00')
+]
+# testdata pattern is ({change_type}, {is_general_collateral})
+TEST_DATA_AMENDMENT_CHANGE_TYPE = [
+    (model_utils.REG_TYPE_AMEND, False),
+    (model_utils.REG_TYPE_AMEND_COURT, False),
+    (model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL, False),
+    (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL, False),
+    (model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL, True),
+    (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL, True),
+    (model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE, False),
+    (model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER, False),
+    (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
+    (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
 ]
 
 
@@ -258,3 +273,93 @@ def test_to_local_timezone(session, desc, utc_ts, local_ts):
     assert adjusted_ts.minute == 59
     assert adjusted_ts.second == 59
     assert local_iso == local_ts
+
+
+@pytest.mark.parametrize('change_type, is_general_collateral', TEST_DATA_AMENDMENT_CHANGE_TYPE)
+def test_amendment_change_type(change_type, is_general_collateral):
+    """Assert that setting the amendment change type from the amendment data works as expected."""
+    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+    if change_type != model_utils.REG_TYPE_AMEND_COURT:
+        del json_data['courtOrderInformation']
+    if change_type != model_utils.REG_TYPE_AMEND:
+        del json_data['addTrustIndenture']
+        del json_data['removeTrustIndenture']
+
+    if change_type in (model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL,
+                       model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL,
+                       model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE):
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+    if change_type == model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE:
+        del json_data['addVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+    elif change_type == model_utils.REG_TYPE_AMEND_ADDITION_COLLATERAL:
+        del json_data['deleteVehicleCollateral']
+        del json_data['deleteGeneralCollateral']
+        if is_general_collateral:
+            del json_data['addVehicleCollateral']
+        else:
+            del json_data['addGeneralCollateral']
+    elif change_type == model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL:
+        if is_general_collateral:
+            del json_data['addVehicleCollateral']
+            del json_data['deleteVehicleCollateral']
+        else:
+            del json_data['addGeneralCollateral']
+            del json_data['deleteGeneralCollateral']
+    if change_type in (model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE,
+                       model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER,
+                       model_utils.REG_TYPE_AMEND_SP_TRANSFER):
+        del json_data['addVehicleCollateral']
+        del json_data['deleteVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+    if change_type == model_utils.REG_TYPE_AMEND_DEBTOR_RELEASE:
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+    elif change_type == model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER:
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+    elif change_type == model_utils.REG_TYPE_AMEND_SP_TRANSFER:
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+
+    # print(json_data)
+    type = model_utils.amendment_change_type(json_data)
+    assert type == change_type
+
+
+def test_cleanup_amendment():
+    """Assert that removing empty lists/arrays from amendment data works as expected."""
+    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+    # print(json_data)
+    json_data = model_utils.cleanup_amendment(json_data)
+    assert 'addVehicleCollateral' in json_data
+    assert 'deleteVehicleCollateral' in json_data
+    assert 'addGeneralCollateral' in json_data
+    assert 'deleteGeneralCollateral' in json_data
+    assert 'addSecuredParties' in json_data
+    assert 'deleteSecuredParties' in json_data
+    assert 'addDebtors' in json_data
+    assert 'deleteDebtors' in json_data
+    json_data['addVehicleCollateral'] = []
+    json_data['deleteVehicleCollateral'] = []
+    json_data['addGeneralCollateral'] = []
+    json_data['deleteGeneralCollateral'] = []
+    json_data['addSecuredParties'] = []
+    json_data['deleteSecuredParties'] = []
+    json_data['addDebtors'] = []
+    json_data['deleteDebtors'] = []
+    json_data = model_utils.cleanup_amendment(json_data)
+    assert 'addVehicleCollateral' not in json_data
+    assert 'deleteVehicleCollateral' not in json_data
+    assert 'addGeneralCollateral' not in json_data
+    assert 'deleteGeneralCollateral' not in json_data
+    assert 'addSecuredParties' not in json_data
+    assert 'deleteSecuredParties' not in json_data
+    assert 'addDebtors' not in json_data
+    assert 'deleteDebtors' not in json_data
