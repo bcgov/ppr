@@ -71,15 +71,41 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id, business_srch_key)
     VALUES(200000067, 'DB', 200000029, 200000014, null, null, null, null, null, 'TEST 19A DEBTOR INC.',
-           null, 200000030, searchkey_business_name('TEST 19 DEBTOR INC.'))
+           null, 200000031, searchkey_business_name('TEST 19 DEBTOR INC.'))
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)
     VALUES(200000068, 'SP', 200000029, 200000014, null, null, null, null, null, 'TEST 19A SECURED PARTY',
-           null, 200000030)
+           null, 200000031)
 ;
 INSERT INTO general_collateral(id, registration_id, financing_id, registration_id_end, description, status)
   VALUES(200000012, 200000029, 200000014, null, 'TEST0019A GC 1', null)
+;
+
+-- Add an amendment for registration access testing
+INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
+                  registration_number, update_ts, draft)
+  VALUES(200000033, 'D-T-0019AM', 'PS00001', timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 
+         'PPSALIEN', 'SA', 'TEST0019', null, '{}');
+INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
+                         registration_type_cl, registration_ts, draft_id, life, lien_value,
+                         surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
+    VALUES(200000030, 200000013, 'TEST0019AM', 'TEST0019', 'AM', 'PPSALIEN', 
+           timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 200000033, null,
+           null, null, 'PS00001', 'TEST-AM1-0019', null, null)
+;
+INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
+  VALUES(200000032, 'TEST-0019AM', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
+;
+INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
+                  middle_initial, last_name, business_name, birth_date, address_id)
+    VALUES(200000069, 'RG', 200000030, 200000013, null, null, 'TEST', '19AM', 'REGISTERING', null,
+           null, 200000032)
+;
+INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
+                  middle_initial, last_name, business_name, birth_date, address_id, business_srch_key)
+    VALUES(200000070, 'DB', 200000030, 200000013, null, null, null, null, null, 'TEST 19 AMEND ADD DEBTOR',
+           null, 200000032, searchkey_business_name('TEST 19 AMEND ADD DEBTOR'))
 ;
 
 -- TEST0019 end

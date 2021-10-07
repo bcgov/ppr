@@ -17,6 +17,9 @@ from http import HTTPStatus
 
 from flask import jsonify, current_app
 
+from ppr_api.exceptions import BusinessException
+from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
+
 
 ACCOUNT_REQUIRED = 'Account-Id header required.'
 
@@ -131,3 +134,29 @@ def base_debtor_invalid_response():
     message = 'No exact match found for provided base debtor name.'
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+
+
+def validate_financing(json_data):
+    """Perform non-schema extra validation on a financing statement."""
+    error_msg = party_validator.validate_financing_parties(json_data)
+    error_msg += financing_validator.validate(json_data)
+    return error_msg
+
+
+def validate_registration(json_data):
+    """Perform non-schema extra validation on a non-financing registrations."""
+    error_msg = party_validator.validate_registration_parties(json_data)
+    error_msg += registration_validator.validate_collateral_ids(json_data)
+
+    return error_msg
+
+
+def validate_delete_ids(json_data, financing_statement):
+    """Perform non-schema extra validation on a change amendment delete party, collateral ID's."""
+    error_msg = party_validator.validate_party_ids(json_data, financing_statement)
+    error_msg += registration_validator.validate_collateral_ids(json_data, financing_statement)
+    if error_msg != '':
+        raise BusinessException(
+            error=error_msg,
+            status_code=HTTPStatus.BAD_REQUEST
+        )

@@ -307,6 +307,18 @@ TEST_USER_LIST_DELETE = [
     ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
     ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019')
 ]
+# testdata pattern is ({description}, {roles}, {status}, {account_id}, {reg_num})
+TEST_USER_LIST_GET = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019'),
+    ('Valid Request base reg num', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0018'),
+    ('Valid Request amendment reg num', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0018A3'),
+    ('Valid Request base reg num added account', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0019'),
+    ('Valid Request amendment reg num added account', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0019AM'),
+    ('Valid Request Amendment', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0019AM'),
+    ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
+    ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019')
+]
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num})
 TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
@@ -476,6 +488,26 @@ def test_account_delete_registration(session, client, jwt, desc, roles, status, 
 
     # check
     assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST_GET)
+def test_account_get_registration(session, client, jwt, desc, roles, status, account_id, reg_num):
+    """Assert that a request to get a registration from the user list works as expected."""
+    headers = None
+    # setup
+    if account_id:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.get('/api/v1/financing-statements/registrations/' + reg_num,
+                          headers=headers)
+
+    # check
+    assert response.status_code == status
+    if status == HTTPStatus.OK:
+        assert response.json['baseRegistrationNumber']
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, reg_num', TEST_GET_STATEMENT)
