@@ -49,7 +49,10 @@
             @setCollateralValid="collateralValid = $event"
             class="mt-15"
           />
-          <court-order class="mt-15" :setShowErrors="showInvalid" />
+          <court-order class="mt-15"
+            :setShowErrors="showInvalid"
+            @setCourtOrderValid="courtOrderValid = $event"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -88,7 +91,8 @@ import {
   APIRegistrationTypes, // eslint-disable-line no-unused-vars
   RouteNames, // eslint-disable-line no-unused-vars
   UIRegistrationTypes, // eslint-disable-line no-unused-vars
-  RegistrationFlowType // eslint-disable-line no-unused-vars
+  RegistrationFlowType, // eslint-disable-line no-unused-vars
+  ActionTypes
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
@@ -128,6 +132,7 @@ export default class AmendRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
   @Getter getStateModel: StateModelIF
+  @Getter getLengthTrust: LengthTrustIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -161,7 +166,7 @@ export default class AmendRegistration extends Vue {
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
-  private courtOrderValid = true
+  private courtOrderValid = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -270,12 +275,18 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
+    let courtValid = true
+    // only count court order validity if length trust edited
+    if (this.getLengthTrust.action === ActionTypes.EDITED) {
+      courtValid = this.courtOrderValid
+    }
+
     if (
       this.debtorValid &&
       this.securedPartiesValid &&
       this.registrationLengthTrustValid &&
       this.collateralValid &&
-      this.courtOrderValid
+      courtValid
     ) {
       this.$router.push({
         name: RouteNames.CONFIRM_AMENDMENT,
