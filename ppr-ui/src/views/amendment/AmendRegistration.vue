@@ -49,6 +49,7 @@
             @setCollateralValid="collateralValid = $event"
             class="mt-15"
           />
+          <court-order class="mt-15" :setShowErrors="showInvalid" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -77,7 +78,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { CautionBox, StickyContainer } from '@/components/common'
+import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
 import { RegistrationLengthTrustAmendment } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
@@ -114,6 +115,7 @@ import { StatusCodes } from 'http-status-codes'
 @Component({
   components: {
     CautionBox,
+    CourtOrder,
     RegistrationLengthTrustAmendment,
     Collateral,
     Debtors,
@@ -159,6 +161,7 @@ export default class AmendRegistration extends Vue {
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
+  private courtOrderValid = true
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -271,7 +274,8 @@ export default class AmendRegistration extends Vue {
       this.debtorValid &&
       this.securedPartiesValid &&
       this.registrationLengthTrustValid &&
-      this.collateralValid
+      this.collateralValid &&
+      this.courtOrderValid
     ) {
       this.$router.push({
         name: RouteNames.CONFIRM_AMENDMENT,
