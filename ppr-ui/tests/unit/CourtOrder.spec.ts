@@ -73,14 +73,14 @@ describe('Court Order component', () => {
     wrapper.find('#effect-of-order').setValue('Test Effect')
 
     await flushPromises()
-    expect(getLastEvent(wrapper, 'courtOrderValid')).toBe(true)
+    expect(getLastEvent(wrapper, 'setCourtOrderValid')).toBe(true)
     
   })
 
   it('sets the validity to false for blank fields', async () => {
     wrapper.vm.$data.courtName = ' '
     await flushPromises()
-    expect(getLastEvent(wrapper, 'courtOrderValid')).toBe(false)
+    expect(getLastEvent(wrapper, 'setCourtOrderValid')).toBe(false)
     
   })
 })

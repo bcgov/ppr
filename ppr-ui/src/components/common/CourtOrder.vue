@@ -208,7 +208,7 @@ export default defineComponent({
 
     const emitValid = async () => {
       await isValidCourtOrderForm(localState.courtOrderInfo)
-      emit('courtOrderValid', valid.value)
+      emit('setCourtOrderValid', valid.value)
     }
 
     watch(
