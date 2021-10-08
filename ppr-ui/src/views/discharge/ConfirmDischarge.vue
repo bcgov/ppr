@@ -1,14 +1,15 @@
 <template>
   <v-container
     v-if="dataLoaded"
+    id="confirm-discharge"
     class="view-container pa-15 pt-14"
     fluid
     style="min-width: 960px;"
   >
     <base-dialog
-      attach="#app"
-      :options="options"
-      :display="showCancelDialog"
+      setAttach="#confirm-discharge"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="cancel($event)"
     />
     <div class="container pa-0" style="min-width: 960px;">
@@ -86,6 +87,7 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
+import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
@@ -110,9 +112,9 @@ import {
   DialogOptionsIF, // eslint-disable-line no-unused-vars
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { RegistrationTypes, dischargeCancelDialog } from '@/resources'
+import { RegistrationTypes } from '@/resources'
+import { dischargeCancelDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
-import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {

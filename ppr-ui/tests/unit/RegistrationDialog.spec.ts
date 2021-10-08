@@ -8,7 +8,7 @@ import flushPromises from 'flush-promises'
 
 // Local
 import { RegistrationOtherDialog } from '@/components/dialogs'
-import { registrationOtherDialog } from '@/resources'
+import { registrationOtherDialog } from '@/resources/dialogOptions'
 
 Vue.use(Vuetify)
 

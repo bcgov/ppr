@@ -6,7 +6,11 @@ import CompositionApi from '@vue/composition-api'
 import { mount, Wrapper, createLocalVue } from '@vue/test-utils'
 // local
 import { RegistrationConfirmation } from '@/components/dialogs'
-import { dischargeConfirmationDialog, amendConfirmationDialog, renewConfirmationDialog } from '@/resources'
+import {
+  dischargeConfirmationDialog,
+  amendConfirmationDialog,
+  renewConfirmationDialog
+} from '@/resources/dialogOptions'
 import { axios } from '@/utils/axios-ppr'
 import { mockedDebtorNames } from './test-data'
 import flushPromises from 'flush-promises'

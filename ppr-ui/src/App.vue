@@ -81,7 +81,7 @@ import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
+import { fetchError, loginError, paymentError, saveSearchError } from '@/resources/dialogOptions'
 import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
 import {

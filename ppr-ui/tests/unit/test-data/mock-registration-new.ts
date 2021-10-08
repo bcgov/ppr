@@ -181,7 +181,7 @@ export const mockedDebtors1: PartyIF[] = [
       first: 'TEST',
       middle: '1'
     },
-    birthDate: '1990-06-15T16:42:00-08:00',
+    birthDate: '1990-06-15T16:42:00+00:00',
     address: mockedAddress1
   }
 ]

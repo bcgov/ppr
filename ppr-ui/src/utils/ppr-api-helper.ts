@@ -16,9 +16,11 @@ import {
   SearchPartyIF,
   DebtorNameIF,
   RegistrationSummaryIF,
-  RenewRegistrationIF
+  RenewRegistrationIF,
+  ErrorIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
+import { APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -348,21 +350,24 @@ export async function partyCodeSearch (
 }
 
 // Get registration history
-export async function registrationHistory (): Promise<[RegistrationSummaryIF]> {
+export async function registrationHistory (): Promise<{
+  registrations: RegistrationSummaryIF[],
+  error: ErrorIF
+}> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
     .get('financing-statements/registrations', config)
     .then(response => {
-      const data = response?.data
+      const data = response?.data as RegistrationSummaryIF[]
       if (!data) {
         throw new Error('Invalid API response')
       }
-      return data
+      return { registrations: data, error: null }
     })
     .catch(error => {
       return {
-        searches: null,
+        registrations: null,
         error: {
           statusCode:
             error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
@@ -373,21 +378,24 @@ export async function registrationHistory (): Promise<[RegistrationSummaryIF]> {
 }
 
 // Get draft history
-export async function draftHistory (): Promise<[DraftResultIF]> {
+export async function draftHistory (): Promise<{
+  drafts: DraftResultIF[],
+  error: ErrorIF
+}> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
     .get('drafts', config)
     .then(response => {
-      const data = response?.data
+      const data = response?.data as DraftResultIF[]
       if (!data) {
         throw new Error('Invalid API response')
       }
-      return data
+      return { drafts: data, error: null }
     })
     .catch(error => {
       return {
-        searches: null,
+        drafts: null,
         error: {
           statusCode:
             error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
@@ -528,6 +536,74 @@ export async function getFinancingStatement (
         registeringParty: null,
         securedParties: [],
         debtors: [],
+        error: {
+          statusCode: error?.response?.status,
+          message:
+            error?.response?.data?.errorMessage +
+            ' ' +
+            error?.response?.data?.rootCause
+        }
+      }
+    })
+}
+
+// Add registration to My Registrations
+export async function addRegistrationSummary (
+  registrationNum: string
+): Promise<RegistrationSummaryIF> {
+  return axios
+    .post(`financing-statements/registrations/${registrationNum}`, {}, getDefaultConfig())
+    .then(response => {
+      const data = response?.data as RegistrationSummaryIF
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        baseRegistrationNumber: '',
+        createDateTime: '',
+        path: '',
+        registeringParty: '',
+        registrationClass: '',
+        registrationDescription: '',
+        registrationType: null,
+        securedParties: '',
+        error: {
+          statusCode: error?.response?.status,
+          message:
+            error?.response?.data?.errorMessage +
+            ' ' +
+            error?.response?.data?.rootCause
+        }
+      }
+    })
+}
+
+// Get registration summary information
+export async function getRegistrationSummary (
+  registrationNum: string
+): Promise<RegistrationSummaryIF> {
+  return axios
+    .get(`financing-statements/registrations/${registrationNum}`, getDefaultConfig())
+    .then(response => {
+      const data = response?.data as RegistrationSummaryIF
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        baseRegistrationNumber: '',
+        createDateTime: '',
+        path: '',
+        registeringParty: '',
+        registrationClass: '',
+        registrationDescription: '',
+        registrationType: null,
+        securedParties: '',
         error: {
           statusCode: error?.response?.status,
           message:

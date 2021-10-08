@@ -1,5 +1,14 @@
 <template>
-  <v-container fluid class="view-container px-15 py-10 ma-0">
+  <v-container id="dashboard" class="view-container px-15 py-10 ma-0" fluid>
+    <v-overlay v-model="loading">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
+    <base-dialog
+      setAttach="#dashboard"
+      :setDisplay="myRegAddDialogDisplay"
+      :setOptions="myRegAddDialog"
+      @proceed="myRegAddDialogProceed($event)"
+    />
     <div class="container pa-0">
       <v-row no-gutters>
         <v-col>
@@ -36,7 +45,55 @@
         </v-col>
       </v-row>
       <v-row class="pt-15" no-gutters>
-        <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
+        <v-col cols="auto">
+          <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
+        </v-col>
+        <v-col class="pl-3">
+          <v-row justify="end" no-gutters>
+            <v-col cols="auto" style="padding-top: 23px;">
+              <v-tooltip
+                class="pa-2"
+                content-class="top-tooltip"
+                top
+                transition="fade-transition"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+                </template>
+                <div class="pt-2 pb-2">
+                  {{ tooltipTxtRegSrch }}
+                </div>
+              </v-tooltip>
+              <label :class="[$style['copy-normal'], 'pl-1']">
+                Retrieve an existing registration to add to your table:
+              </label>
+            </v-col>
+            <v-col class="pl-3 pt-3" cols="auto">
+              <v-text-field
+                id="my-reg-add"
+                :class="[
+                  $style['text-input-style-above'],
+                  'column-selection',
+                  'ma-0',
+                  'soft-corners-top'
+                ]"
+                append-icon="mdi-magnify"
+                dense
+                :error-messages="myRegAddInvalid ? 'error' : ''"
+                hide-details
+                label="Registration Number"
+                persistent-hint
+                single-line
+                style="width:270px"
+                v-model="myRegAdd"
+                @keypress.enter="findRegistration(myRegAdd)"
+              />
+              <p v-if="myRegAddInvalid" :class="[$style['validation-msg'], 'mx-3', 'my-1']">
+                Registration numbers contain 7 characters
+              </p>
+            </v-col>
+          </v-row>
+        </v-col>
       </v-row>
       <v-row no-gutters class="pt-7" style="margin-top: 2px; margin-bottom: 80px;">
         <v-col>
@@ -47,7 +104,7 @@
             no-gutters
           >
             <v-col cols="auto">
-              <b>My Registrations</b> ({{ registrationsLength }})
+              <b>My Registrations</b> ({{ myRegistrationsLength }})
             </v-col>
             <v-col>
               <v-row justify="end" no-gutters>
@@ -66,7 +123,7 @@
                     label="Filter by Keyword"
                     single-line
                     style="width:270px"
-                    v-model="myRegSearch"
+                    v-model="myRegFilter"
                   />
                 </v-col>
                 <v-col class="pl-4 py-1" cols="auto">
@@ -106,23 +163,20 @@
             <v-col cols="12">
               <registration-table
                 :setHeaders="myRegHeaders"
-                :setSearch="myRegSearch"
+                :setRegistrationHistory="myRegistrations"
+                :setSearch="myRegFilter"
                 :toggleSnackBar="myRegSnackBar"
-                @registrationTotal="showRegistrationTotal($event)"
                 @discharge="startDischarge($event)"
                 @renew="startRenewal($event)"
                 @amend="startAmendment($event)"
                 @editFinancingDraft="startFinancingDraft($event)"
-                @editAmendmentDraft="startAmendmentDraft"
+                @editAmendmentDraft="startAmendmentDraft($event)"
+                @error="emitError($event)"
               />
             </v-col>
           </v-row>
         </v-col>
       </v-row>
-      <!-- FUTURE: remove this once adding registrations is implemented -->
-      <v-btn @click="myRegSnackBar = !myRegSnackBar">
-        show snack bar
-      </v-btn>
     </div>
   </v-container>
 </template>
@@ -136,11 +190,42 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
-import { ActionBindingIF, BaseHeaderIF, BreadcrumbIF, ErrorIF, RegistrationTypeIF, // eslint-disable-line
-         SearchResponseIF, StateModelIF } from '@/interfaces' // eslint-disable-line
-import { registrationTableHeaders, tombstoneBreadcrumbDashboard } from '@/resources'
-import { getFeatureFlag, searchHistory, setupFinancingStatementDraft } from '@/utils'
+import {
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  BaseHeaderIF, // eslint-disable-line no-unused-vars
+  BreadcrumbIF, // eslint-disable-line no-unused-vars
+  DialogOptionsIF, // eslint-disable-line no-unused-vars
+  DraftResultIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  RegistrationSummaryIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, // eslint-disable-line no-unused-vars
+  SearchResponseIF, // eslint-disable-line no-unused-vars
+  StateModelIF // eslint-disable-line no-unused-vars
+} from '@/interfaces'
+import {
+  registrationTableHeaders,
+  RegistrationTypes,
+  tombstoneBreadcrumbDashboard
+} from '@/resources'
+import {
+  registrationAddErrorDialog,
+  registrationAlreadyAddedDialog,
+  registrationFoundDialog,
+  registrationNotFoundDialog,
+  registrationRestrictedDialog
+} from '@/resources/dialogOptions'
+import {
+  addRegistrationSummary,
+  convertDate,
+  draftHistory,
+  getFeatureFlag,
+  getRegistrationSummary,
+  registrationHistory,
+  searchHistory,
+  setupFinancingStatementDraft
+} from '@/utils'
 // local components
+import { BaseDialog } from '@/components/dialogs'
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
@@ -148,6 +233,7 @@ import { RegistrationBar } from '@/components/registration'
 
 @Component({
   components: {
+    BaseDialog,
     RegistrationBar,
     SearchHistory,
     SearchBar,
@@ -183,12 +269,20 @@ export default class Dashboard extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private regLength = 0
+  private loading = false
+  private myRegAdd = ''
+  private myRegAddDialog: DialogOptionsIF = null
+  private myRegAddDialogError = false
+  private myRegAddDialogDisplay = false
+  private myRegDataDrafts: DraftResultIF[] = []
+  private myRegDataHistory: RegistrationSummaryIF[] = []
+  private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
   private myRegHeadersSelected = [...registrationTableHeaders]
-  private myRegSearch = ''
   private myRegSnackBar = false
+  private tooltipTxtRegSrch = 'Retrieve existing registrations you would like to ' +
+    'renew, discharge or amend that are not already in your My Registrations table'
 
   mounted () {
     // clear search data in the store
@@ -207,20 +301,124 @@ export default class Dashboard extends Vue {
     this.onAppReady(this.appReady)
   }
 
+  private get breadcrumbs (): Array<BreadcrumbIF> {
+    return tombstoneBreadcrumbDashboard
+  }
+
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get myRegistrations () {
+    return [...this.myRegDataDrafts, ...this.myRegDataHistory]
+  }
+
+  private get myRegistrationsLength (): number {
+    return this.myRegistrations?.length || 0
+  }
+
+  private get myRegAddInvalid (): boolean {
+    return ![0, 7].includes(this.myRegAdd?.trim().length || 0)
   }
 
   private get searchHistoryLength (): number {
     return this.getSearchHistory?.length || 0
   }
 
-  private get registrationsLength (): number {
-    return this.regLength
+  private async addRegistration (regNum: string): Promise<void> {
+    this.loading = true
+    const addReg = await addRegistrationSummary(regNum)
+    if (!addReg.error) {
+      // add to my registrations list
+      this.myRegDataHistory.unshift(addReg)
+      this.myRegSnackBar = !this.myRegSnackBar
+    } else {
+      await this.myRegAddErrSetDialog(addReg.error)
+    }
+    this.loading = false
   }
 
-  private get breadcrumbs (): Array<BreadcrumbIF> {
-    return tombstoneBreadcrumbDashboard
+  private async findRegistration (regNum: string): Promise<void> {
+    if (this.myRegAddInvalid || !regNum) return
+
+    this.loading = true
+    this.myRegAddDialog = null
+    regNum = regNum.trim()
+    const reg = await getRegistrationSummary(regNum)
+    if (!reg.error) {
+      this.myRegAddFoundSetDialog(regNum, reg)
+    } else {
+      this.myRegAddErrSetDialog(reg.error)
+    }
+    this.loading = false
+  }
+
+  private myRegAddErrSetDialog (error: ErrorIF): void {
+    this.myRegAddDialogError = true
+    switch (error.statusCode) {
+      case StatusCodes.NOT_FOUND:
+        this.myRegAddDialog = { ...registrationNotFoundDialog }
+        this.myRegAddDialog.text = 'An existing registration with the ' +
+          `registration number ${this.myRegAdd} was not found. Please ` +
+          'check the registration number and try again.'
+        break
+      case StatusCodes.UNAUTHORIZED:
+        this.myRegAddDialog = { ...registrationRestrictedDialog }
+        this.myRegAddDialog.text = 'An existing registration was found with ' +
+          `the registration number <b>${this.myRegAdd}</b> but access is ` +
+          'restricted and it is not available to add to your registrations ' +
+          'table. Please contact us if you require assistance.'
+        break
+      case StatusCodes.CONFLICT:
+        this.myRegAddDialog = { ...registrationAlreadyAddedDialog }
+        this.myRegAddDialog.text = 'The registration with the registration number ' +
+          `<b>${this.myRegAdd}</b> is already in your registrations table.`
+        break
+      default:
+        this.myRegAddDialog = { ...registrationAddErrorDialog }
+    }
+    this.myRegAddDialogDisplay = true
+  }
+
+  private myRegAddFoundSetDialog (searchedRegNum: string, reg: RegistrationSummaryIF): void {
+    this.myRegAddDialog = Object.assign({ ...registrationFoundDialog })
+    // if the searched registration is a child of the base registration
+    if (searchedRegNum?.trim()?.toUpperCase() !== reg.baseRegistrationNumber?.trim()?.toUpperCase()) {
+      this.myRegAddDialog.text = `The registration number you entered (<b>${searchedRegNum}</b>) ` +
+        'is associated with the follwing base registration. Would you like to add this ' +
+        'base registration to your registrations table? Adding the base registration to your ' +
+        'registrations table will automatically include all associated registrations.'
+    }
+    this.myRegAddDialog.textExtra = [
+      '<b>Base Registration Number:</b> ',
+      '<b>Base Registration Date:</b> ',
+      '<b>Registration Type:</b> ',
+      '<b>Registering Party:</b> '
+    ]
+    this.myRegAddDialog.textExtra[0] += reg.baseRegistrationNumber
+    if (reg.createDateTime) {
+      const createDate = new Date(reg.createDateTime)
+      this.myRegAddDialog.textExtra[1] += convertDate(createDate, false, false)
+    } else {
+      this.myRegAddDialog.textExtra[1] += 'N/A'
+    }
+    const regType = RegistrationTypes.find((regType: RegistrationTypeIF) => {
+      if (regType.registrationTypeAPI === reg.registrationType) {
+        return true
+      }
+    })
+    this.myRegAddDialog.textExtra[2] += regType.registrationTypeUI
+    this.myRegAddDialog.textExtra[3] += reg.registeringParty
+    this.myRegAddDialogDisplay = true
+  }
+
+  private myRegAddDialogProceed (val: boolean): void {
+    if (!val || this.myRegAddDialogError) {
+      this.myRegAddDialogError = false
+    } else {
+      this.addRegistration(this.myRegAdd)
+    }
+    this.myRegAddDialogDisplay = false
   }
 
   private startDischarge (regNum: string): void {
@@ -272,10 +470,6 @@ export default class Dashboard extends Vue {
     this.emitHaveData(false)
   }
 
-  private showRegistrationTotal (total: number): void {
-    this.regLength = total
-  }
-
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
@@ -307,6 +501,14 @@ export default class Dashboard extends Vue {
       this.emitError({ statusCode: StatusCodes.NOT_FOUND })
     } else {
       this.setSearchHistory(resp?.searches)
+    }
+    const myRegDrafts = await draftHistory()
+    const myRegHistory = await registrationHistory()
+    if (myRegDrafts?.error || myRegHistory?.error) {
+      this.emitError({ statusCode: StatusCodes.NOT_FOUND })
+    } else {
+      this.myRegDataDrafts = myRegDrafts.drafts
+      this.myRegDataHistory = myRegHistory.registrations
     }
     // tell App that we're finished loading
     this.emitHaveData(true)
@@ -347,6 +549,10 @@ export default class Dashboard extends Vue {
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+.copy-normal {
+  color: $gray7;
+  font-size: 0.875rem;
+}
 .dashboard-title {
   background-color: $BCgovBlue0;
   color: $gray9;
@@ -354,10 +560,9 @@ export default class Dashboard extends Vue {
 }
 .text-input-style-above {
   label {
-    font-size: 14px;
+    font-size: 0.875rem;
     color: $gray7 !important;
     padding-left: 6px;
-    margin-bottom: 10px;
     margin-top: -2px;
   }
   span {
@@ -365,5 +570,10 @@ export default class Dashboard extends Vue {
     font-size: 14px;
     color: $gray7;
   }
+}
+.validation-msg {
+  color: $error;
+  font-size: 0.75rem;
+  position: absolute;
 }
 </style>

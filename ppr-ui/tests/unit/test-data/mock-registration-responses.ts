@@ -1,28 +1,46 @@
-import { APIRegistrationTypes, DraftTypes } from '@/enums'
+import { APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const mockedRegistration1: RegistrationSummaryIF = {
-  registrationNumber: 'GOV12343',
+  baseRegistrationNumber: 'GOV2343',
   clientReferenceId: 'ABC123',
-  registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
-  registeringParty: 'John Doe',
-  securedParties: 'Bank of Nova Scotia',
+  createDateTime: '2021-07-20T17:21:17+00:00',
   expireDays: '100', // Number of days until expiry
-  statusType: 'ACT',
+  lastUpdateDateTime: '2021-10-04T18:26:11+00:00',
   path: '/path/to/doc',
-  createDateTime: '2021-07-20T17:21:17+00:00'
+  registeringParty: 'John Doe',
+  registrationClass: 'PPSALIEN',
+  registrationDescription: 'PPSA SECURITY AGREEMENT',
+  registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
+  securedParties: 'Bank of Nova Scotia',
+  statusType: 'ACT'
 }
 
 export const mockedRegistration2: RegistrationSummaryIF = {
-  registrationNumber: 'BC456789',
+  baseRegistrationNumber: 'BC456788',
   clientReferenceId: '',
-  registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
-  registeringParty: 'ICBC',
-  securedParties: 'Bank of Montreal',
-  expireDays: '10', // Number of days until expiry
-  statusType: 'ACT',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  expireDays: '316',
   path: '/path/to/doc',
-  createDateTime: '2021-07-20T17:21:17+00:00'
+  registeringParty: 'ICBC',
+  registrationClass: 'PPSALIEN',
+  registrationDescription: 'REPAIRERS LIEN',
+  registrationType: APIAmendmentTypes.AMENDMENT,
+  securedParties: 'Bank of Montreal',
+  statusType: 'ACT'
+}
+
+export const mockedRegistration2Child: RegistrationSummaryIF = {
+  baseRegistrationNumber: 'BC456788',
+  clientReferenceId: '',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  path: '/path/to/doc',
+  registeringParty: 'ICBC',
+  registrationClass: 'AMENDMENT',
+  registrationDescription: 'AMENDMENT/OTHER CHANGE',
+  registrationNumber: 'BC456789',
+  registrationType: APIAmendmentTypes.AMENDMENT,
+  securedParties: 'Bank of Montreal'
 }
 
 export const mockedDraft1: DraftResultIF = {
