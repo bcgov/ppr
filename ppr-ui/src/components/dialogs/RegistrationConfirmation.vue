@@ -171,6 +171,9 @@ export default defineComponent({
       () => props.display,
       (val: boolean) => {
         localState.displayValue = val
+        if (val === false) {
+          localState.validationErrors = ''
+        }
       }
     )
 
