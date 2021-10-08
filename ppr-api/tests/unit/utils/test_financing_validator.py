@@ -235,7 +235,8 @@ def test_validate_rl(session, desc, valid, lien_amount, surrender_date, message_
     # setup
     json_data = copy.deepcopy(FINANCING)
     json_data['type'] = model_utils.REG_TYPE_REPAIRER_LIEN
-    json_data['lifeYears'] = 1
+    del json_data['lifeYears']
+    del json_data['lifeInfinite']
     del json_data['trustIndenture']
     if lien_amount is not None:
         json_data['lienAmount'] = lien_amount

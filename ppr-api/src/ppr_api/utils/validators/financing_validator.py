@@ -106,7 +106,8 @@ def validate_life(json_data, reg_type: str, reg_class: str):
             error_msg += LI_INVALID
     elif reg_type == model_utils.REG_TYPE_REPAIRER_LIEN and 'lifeInfinite' in json_data and json_data['lifeInfinite']:
         error_msg += LI_NOT_ALLOWED
-    elif 'lifeYears' not in json_data and 'lifeInfinite' not in json_data:
+    elif reg_type != model_utils.REG_TYPE_REPAIRER_LIEN and 'lifeYears' not in json_data and \
+            'lifeInfinite' not in json_data:
         error_msg += LIFE_MISSING
     elif json_data.get('lifeYears', -1) > 0 and json_data.get('lifeInfinite'):
         error_msg += LIFE_INVALID
