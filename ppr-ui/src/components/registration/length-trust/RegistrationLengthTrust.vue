@@ -71,7 +71,7 @@
       </v-row>
       <v-row>
         <v-col cols="3"></v-col>
-        <v-col cols="9" class="pl-2" v-if="!infinityPreselected()"><v-divider class="ml-0" /></v-col>
+        <v-col cols="9" class="pl-2" v-if="renewalView || showTrustIndenture"><v-divider class="ml-0" /></v-col>
       </v-row>
       <v-row no-gutters class="py-6" v-if="renewalView">
         <v-col cols="3" class="generic-label">New Expiry</v-col>
