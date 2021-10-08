@@ -2,7 +2,7 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { APIRegistrationTypes } from '@/enums'
+import { ActionTypes, APIRegistrationTypes } from '@/enums'
 
 export const useVehicle = (props, context) => {
   const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
@@ -69,13 +69,17 @@ export const useVehicle = (props, context) => {
   }
 
   const addVehicle = () => {
-    let newList = [...getVehicleCollateral.value] as VehicleCollateralIF[] // eslint-disable-line
+    let newList = getVehicleCollateral.value as VehicleCollateralIF[] || []// eslint-disable-line
     // New vehicle
     if (props.activeIndex === -1) {
+      localState.currentVehicle.action = ActionTypes.ADDED
       localState.currentVehicle.id = newList.length + 1
       newList.push(localState.currentVehicle)
     } else {
       // Edit vehicle
+      if (!localState.currentVehicle.action) {
+        localState.currentVehicle.action = ActionTypes.EDITED
+      }
       newList.splice(props.activeIndex, 1, localState.currentVehicle)
     }
     setVehicleCollateral(newList)

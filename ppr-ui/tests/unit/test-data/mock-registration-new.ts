@@ -117,6 +117,38 @@ export const mockedVehicleCollateral1: VehicleCollateralIF[] = [
   }
 ]
 
+
+export const mockedVehicleCollateralAmendment: VehicleCollateralIF[] = [
+  {
+    id: 1,
+    type: APIVehicleTypes.MOTOR_VEHICLE,
+    serialNumber: 'KM8J3CA46JU622994',
+    year: 2018,
+    make: 'HYUNDAI',
+    model: 'TUSCON',
+    action: ActionTypes.EDITED
+  },
+  {
+    id: 2,
+    type: APIVehicleTypes.BOAT,
+    serialNumber: '123456789',
+    year: 2010,
+    make: 'CREST LINER',
+    model: '1700 VISION',
+    action: ActionTypes.REMOVED
+  },
+  {
+    id: 3,
+    type: APIVehicleTypes.MANUFACTURED_HOME,
+    serialNumber: 'ABC123',
+    year: 2000,
+    make: 'Dreamer',
+    model: 'Luxury Edition',
+    action: ActionTypes.ADDED
+  }
+
+]
+
 export const generalCollateralText: string = 'All the debtor’s present and after acquired personal property, ' +
 'including but not restricted to machinery, equipment, furniture, fixtures and receivables.'
 
