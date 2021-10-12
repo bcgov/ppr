@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
+import { APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import { CourtOrderIF, DebtorNameIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
 import { ErrorIF } from './error-interface'
 
@@ -15,6 +15,7 @@ export interface FinancingStatementIF {
   documentId?: string, // Optional draft ID if draft created.
   registrationDescription?: string, // Returned on creation.
   registrationAct?: string, // Returned on creation.
+  registrationNumber?: string, // Included in a successful response. The identifier for the registration.
   registeringParty: PartyIF,
   securedParties: PartyIF[],
   debtors: PartyIF[],
@@ -26,7 +27,7 @@ export interface FinancingStatementIF {
   lienAmount?: string, // RL only
   surrenderDate?: string, // RL only
   expiryDate?: string, // The date and time upon which the statement will expire. Empty if lifeInfinite true.
-  baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
+  baseRegistrationNumber?: string, // Included in a successful response. The identifier for the base registration.
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
   otherTypeDescription?: string, // Included if type is Other
@@ -44,7 +45,7 @@ export interface DraftIF {
 }
 
 export interface DraftResultIF {
-  type: string, // One of enum DraftTypes.
+  type: DraftTypes, // One of enum DraftTypes.
   documentId?: string,
   baseRegistrationNumber?: string,
   registrationType: string,
@@ -54,26 +55,29 @@ export interface DraftResultIF {
   lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
   clientReferenceId: string,
   error?: ErrorIF
+  hide?: boolean
 }
 
 // Financing Statement registration interface.
 // All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
 export interface RegistrationSummaryIF {
-  registrationNumber: string,
+  baseRegistrationNumber: string, // The identifier for the base registration.
+  changes?: RegistrationSummaryIF[] // Child registrations (amendments, etc.)
   clientReferenceId?: string, // AKA folio max length 20.
-  registrationType: string, // One of enum APIRegistrationTypes.
-  registrationDescription?: string, // Returned on creation.
-  registrationClass?: string, // Returned on creation.
-  registeringParty: string,
-  securedParties: string,
-  expireDays?: string, // Number of days until expiry
-  statusType?: string,
+  createDateTime: string,
+  error?: ErrorIF, // set if err'd only
+  expireDays?: string, // Number of days until expiry. Base registrations only.
+  hide?: boolean // set/used in table only
+  lastUpdateDateTime?: string, // Timestamp of last draft update. Base registratioons only.
   path: string,
-  baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
-  createDateTime?: string, // Included in a successful response.
-  lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
-  error?: ErrorIF,
-  hide?: boolean
+  registeringName?: string,
+  registeringParty: string,
+  registrationClass: string,
+  registrationDescription: string,
+  registrationNumber?: string, // The identifier for the registration if it is not the base registration.
+  registrationType: APIRegistrationTypes | APIAmendmentTypes,
+  securedParties: string,
+  statusType?: string, // Base registrations only
 }
 
 // Discharge Registration interface. Base registration number, debtor name, and registering party are required.

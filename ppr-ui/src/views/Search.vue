@@ -101,7 +101,7 @@ import {
   ActionBindingIF, DialogOptionsIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { selectionConfirmaionDialog } from '@/resources'
+import { selectionConfirmaionDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
 // local components
 import { ConfirmationDialog } from '@/components/dialogs'

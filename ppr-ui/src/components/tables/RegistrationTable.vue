@@ -166,7 +166,7 @@
                 label="Status"
                 v-model="status"
                 id="txt-status"
-                @change="filterResults"
+                @change="filterResults(tableData)"
                 clearable
               >
                 <template slot="item" slot-scope="data">
@@ -249,7 +249,7 @@
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
           <td v-if="inSelectedHeaders('createDateTime')">
-            <span v-if="row.item.statusType !== 'D'">
+            <span v-if="row.item && !row.item.type">
               {{ getFormattedDate(row.item.createDateTime) }}
             </span>
             <span v-else>
@@ -278,7 +278,7 @@
           <td v-if="inSelectedHeaders('vs')">
             <v-btn
               :id="`pdf-btn-${row.item.id}`"
-              v-if="row.item.statusType !== 'D'"
+              v-if="row.item && !row.item.type"
               :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
               depressed
               :loading="row.item.path === loadingPDF"
@@ -291,7 +291,7 @@
 
           <!-- Action Btns -->
           <td class="actions-cell px-0 py-4">
-            <div class="actions" v-if="row.item.statusType === 'D'">
+            <div class="actions" v-if="row.item && row.item.type">
               <span class="edit-action">
                 <v-btn
                   color="primary"
@@ -329,7 +329,7 @@
               </span>
             </div>
 
-            <div class="actions" v-if="row.item.statusType !== 'D'">
+            <div class="actions" v-if="row.item && !row.item.type">
               <span class="edit-action">
                 <v-btn
                   color="primary"
@@ -412,13 +412,13 @@
       timeout="4000"
       v-model="showSnackbar"
     >
-      <v-row align="center" no-gutters>
+      <v-row no-gutters>
         <v-col cols="11">
-          Registration was successfully added to your table
+          Registration was successfully added to your table.
         </v-col>
-        <v-col>
+        <v-col cols="1">
           <v-btn
-            class="snackbar-btn-close float-right ma-0 pa-0"
+            class="snackbar-btn-close float-right ma-0 mr-n2 pa-0"
             icon
             :ripple="false"
             small
@@ -438,8 +438,7 @@ import {
   reactive,
   toRefs,
   watch,
-  computed,
-  onMounted
+  computed
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
@@ -447,13 +446,14 @@ import {
   dischargeConfirmationDialog,
   amendConfirmationDialog,
   renewConfirmationDialog
-} from '@/resources'
-import { registrationHistory, draftHistory, registrationPDF } from '@/utils' // eslint-disable-line
+} from '@/resources/dialogOptions'
+import { registrationPDF } from '@/utils' // eslint-disable-line
 import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   AccountProductSubscriptionIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  BaseHeaderIF // eslint-disable-line no-unused-vars
+  BaseHeaderIF, // eslint-disable-line no-unused-vars
+  DraftResultIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
   AccountProductCodes,
@@ -474,15 +474,21 @@ export default defineComponent({
     setHeaders: {
       default: [] as BaseHeaderIF[]
     },
+    setLoading: {
+      default: false
+    },
     setSearch: {
       type: String,
       default: ''
+    },
+    setRegistrationHistory: {
+      default: [] as RegistrationSummaryIF[] | DraftResultIF[]
     },
     toggleSnackBar: {
       default: false
     }
   },
-  setup (props, { emit, root }) {
+  setup (props, { emit }) {
     const {
       getFormattedDate,
       getRegistrationType,
@@ -522,12 +528,14 @@ export default defineComponent({
       datePickerErr: false,
       registrationDate: '',
       loadingPDF: '',
-      loadingData: true,
       currentOrder: 'asc',
       selectedSort: 'number',
       showSnackbar: false,
       headers: computed(() => {
         return props.setHeaders
+      }),
+      loadingData: computed(() => {
+        return props.setLoading
       }),
       pickerStartClass: computed(() => {
         if (!localState.submittedStartDateTmp && localState.datePickerErr) { return 'picker-title picker-err' }
@@ -536,6 +544,9 @@ export default defineComponent({
       pickerEndClass: computed(() => {
         if (!localState.submittedEndDateTmp && localState.datePickerErr) { return 'picker-title picker-err' }
         return 'picker-title'
+      }),
+      registrationHistory: computed(() => {
+        return props.setRegistrationHistory
       }),
       search: computed(() => {
         return props.setSearch
@@ -555,11 +566,11 @@ export default defineComponent({
       )
     })
 
-    const rowClass = (item: RegistrationSummaryIF): string => {
-      if (item.statusType === 'D') {
+    const rowClass = (item): string => {
+      if (item?.type) {
         return 'font-italic'
       } else {
-        if (item.baseRegistrationNumber === item.registrationNumber) {
+        if (item?.baseRegistrationNumber === item?.registrationNumber) {
           return 'base-registration-row'
         }
       }
@@ -567,10 +578,8 @@ export default defineComponent({
       return ''
     }
 
-    const displayRegistrationNumber = (
-      baseReg: string,
-      actualReg: string
-    ): string => {
+    const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
+      if (!actualReg) actualReg = 'Pending'
       if (baseReg) {
         if (baseReg === actualReg) {
           return '<b>' + baseReg + '</b>'
@@ -738,9 +747,9 @@ export default defineComponent({
       localState.currentRegistrationNumber = item.documentId as string
       localState.currentAction = 'editDraft'
       localState.showDialog = false
-      if (item.type === DraftTypes.FINANCING_STATEMENT) {
+      if (item?.type === DraftTypes.FINANCING_STATEMENT) {
         emit('editFinancingDraft', localState.currentRegistrationNumber)
-      } else if (item.type === DraftTypes.AMENDMENT_STATEMENT) {
+      } else if (item?.type === DraftTypes.AMENDMENT_STATEMENT) {
         emit('editAmendmentDraft', { regNum: item.baseRegistrationNumber, docId: item.documentId })
       }
     }
@@ -784,40 +793,18 @@ export default defineComponent({
       return false
     }
 
-    /** Get the drafts and financing statements from the api. */
-    onMounted(async () => {
-      try {
-        const registrations = await registrationHistory()
-        const drafts = await draftHistory()
-        if (drafts) {
-          Array.prototype.push.apply(tableData.value, drafts)
-          // assign a draft status to draft agreements
-          for (let i = 0; i < tableData.value.length; i++) {
-            if (!tableData.value[i].statusType) {
-              tableData.value[i].statusType = 'D'
-            }
-            if (!tableData.value[i].registrationNumber) {
-              tableData.value[i].registrationNumber = 'Pending'
-            }
-          }
-        }
-        if (registrations) {
-          Array.prototype.push.apply(tableData.value, registrations)
-        }
-        localState.loadingData = false
-        originalData.value = tableData.value
-        emit('registrationTotal', originalData.value.length)
-      } catch (error) {
-        alert(error)
-      }
-    })
-
     watch(
       () => localState.registrationDate,
       (val: string) => {
         registrationDateFormatted.value = formatDate(val)
       }
     )
+
+    watch(() => localState.registrationHistory, (val) => {
+      originalData.value = [...val]
+      filterResults(originalData.value)
+      emit('registrationTotal', val.length)
+    }, { deep: true, immediate: true })
 
     watch(() => props.toggleSnackBar, () => {
       localState.showSnackbar = true

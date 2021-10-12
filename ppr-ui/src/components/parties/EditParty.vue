@@ -177,6 +177,7 @@
                     :disabled="activeIndex === -1"
                     @click="removeSecuredParty()"
                     id="remove-btn-party"
+                    class="remove-btn"
                     >Remove
                   </v-btn>
 

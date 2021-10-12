@@ -153,6 +153,7 @@ p {
 .dialog-title {
   color: $gray9;
   font-size: 1.5rem;
+  line-height: 1.625rem;
 }
 
 .dialog-text {
@@ -574,4 +575,29 @@ table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table
 }
 .border-tp {
   border-top: 1px solid $gray3;
+}
+
+.smaller-actions {
+  min-width: 34px !important;
+  padding: 0 8px !important;
+}
+
+.smaller-button {
+  padding: 0 12px !important;
+}
+
+.actions-width {
+  width: 140px;
+}
+
+.actions-col {
+  width: 115px;
+}
+
+.actions-border {
+  border-left: 1px solid $gray1;
+}
+
+.actions-up {
+  margin-top: -10px;
 }
