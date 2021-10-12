@@ -7,7 +7,6 @@
       @proceed="dialogSubmit($event)"
     />
     <v-autocomplete
-      id="registrationTypeAhead"
       class="registrationTypeAhead rounded-top"
       allow-overflow
       filled
@@ -56,7 +55,8 @@ import { defineComponent, onMounted, reactive, toRefs, watch } from '@vue/compos
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { registrationOtherDialog, RegistrationTypes } from '@/resources'
+import { RegistrationTypes } from '@/resources'
+import { registrationOtherDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   components: {
@@ -177,6 +177,25 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
+::v-deep .v-text-field--filled .v-input__control .v-input__slot {
+  max-height: 45px;
+  min-height: 45px;
+}
+
+::v-deep .v-select__slot, ::v-deep .v-input__slot {
+  max-height: 45px;
+  label {
+    color: $gray7 !important;
+    font-size: 14px;
+    margin-top: -4px;
+    padding-left: 6px;
+  }
+}
+
+::v-deep .v-text-field--full-width .v-input__append-inner, .v-text-field--enclosed .v-input__append-inner {
+  margin-top: 11px !important;
+}
+
 ::v-deep .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
   color: $gray7 !important;
   min-height: 0;
@@ -184,10 +203,6 @@ export default defineComponent({
 
 ::v-deep .theme--light.v-list-item--disabled {
   min-height: 0;
-}
-
-.registrationTypeAhead {
-  z-index: 30;
 }
 
 .v-input__icon--clear {

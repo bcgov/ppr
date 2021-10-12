@@ -1,7 +1,7 @@
 <template>
   <v-container id="registration-bar" fluid no-gutters class="registration-bar pa-0">
-    <v-row no-gutters class="px-6">
-      <v-col class="ml-n6" cols="4">
+    <v-row no-gutters style="min-width: 345px">
+      <v-col>
         <div class="actions">
           <registration-bar-type-ahead-list v-if="hasRPPR"
             :defaultLabel="labelText"

@@ -1,6 +1,6 @@
 import { APIStatusTypes, UIStatusTypes } from '@/enums'
 
-export const StatusTypes: Array<any> = [
+export const StatusTypes = [
   {
     value: APIStatusTypes.DRAFT,
     text: UIStatusTypes.DRAFT

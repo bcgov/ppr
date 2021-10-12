@@ -33,7 +33,7 @@ const allRegistrations: Array<RegistrationTypeIF> = RegistrationTypes
 const selected = 'selected'
 
 // Input field selectors / buttons
-const registrationTypeAhead = '#registrationTypeAhead'
+const registrationTypeAhead = '.registrationTypeAhead'
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.

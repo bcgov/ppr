@@ -5,7 +5,12 @@ import { mount, Wrapper } from '@vue/test-utils'
 // local
 import { ErrorDialog } from '@/components/dialogs'
 import { ErrorContact } from '@/components/common'
-import { fetchError, loginError, paymentError, saveSearchError } from '@/resources'
+import {
+  fetchError,
+  loginError,
+  paymentError,
+  saveSearchError
+} from '@/resources/dialogOptions'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)

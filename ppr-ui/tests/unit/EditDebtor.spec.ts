@@ -177,7 +177,7 @@ describe('Debtor edit individual tests', () => {
     expect(wrapper.findComponent(EditDebtor).exists()).toBe(true)
     expect(wrapper.vm.currentDebtor.personName.first).toEqual('TEST')
     expect(wrapper.vm.currentDebtor.personName.last).toEqual('INDIVIDUAL DEBTOR')
-    expect(wrapper.vm.currentDebtor.birthDate).toEqual('1990-06-15T16:42:00-08:00')
+    expect(wrapper.vm.currentDebtor.birthDate).toEqual('1990-06-15T16:42:00+00:00')
   })
 
   it('Emits reset event', async () => {
