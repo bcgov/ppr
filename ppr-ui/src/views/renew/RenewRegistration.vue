@@ -195,13 +195,9 @@ export default class ReviewRegistration extends Vue {
     ) {
       if (!this.registrationNumber || !this.getConfirmDebtorName) {
         if (!this.registrationNumber) {
-          console.error(
-            'No registration number given to discharge. Redirecting to dashboard...'
-          )
+          console.error('No registration number given to discharge. Redirecting to dashboard...')
         } else {
-          console.error(
-            'No debtor name confirmed for discharge. Redirecting to dashboard...'
-          )
+          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
         }
         this.$router.push({
           name: RouteNames.DASHBOARD
@@ -209,10 +205,7 @@ export default class ReviewRegistration extends Vue {
         return
       }
       this.financingStatementDate = new Date()
-      const financingStatement = await getFinancingStatement(
-        true,
-        this.registrationNumber
-      )
+      const financingStatement = await getFinancingStatement(true, this.registrationNumber)
       if (financingStatement.error) {
         this.emitError(financingStatement.error)
       } else {
