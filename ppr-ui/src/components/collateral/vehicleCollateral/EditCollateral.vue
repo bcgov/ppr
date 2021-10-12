@@ -157,6 +157,7 @@
                     color="error"
                     :disabled="activeIndex === -1"
                     @click="removeVehicle()"
+                    class="remove-btn"
                     id="remove-btn-collateral"
                     >Remove
                   </v-btn>

@@ -97,8 +97,8 @@
               <td>{{ row.item.emailAddress }}</td>
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
-              <td :class="[$style['actions-width'], 'actions-cell', 'px-0']">
-                <div :class="[$style['actions-up'], 'actions', 'float-right']">
+              <td class="actions-width actions-cell px-0">
+                <div class="actions-up actions float-right">
                   <span
                     v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                     || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -108,7 +108,7 @@
                     <v-btn
                       text
                       color="primary"
-                      :class="[$style['smaller-button'], 'edit-btn']"
+                      class="smaller-button edit-btn"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
@@ -123,7 +123,7 @@
                       <span v-else>Edit</span>
                     </v-btn>
                   </span>
-                  <span :class="[$style['actions-border'], 'actions__more']"
+                  <span class="actions-border actions__more"
                     v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                     || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!row.item.action ||
                     row.item.action === ActionTypes.ADDED))"
@@ -135,7 +135,7 @@
                           small
                           v-on="on"
                           color="primary"
-                          :class="[$style['smaller-actions'], 'actions__more-actions__btn']"
+                          class="smaller-actions actions__more-actions__btn"
                           :disabled="addEditInProgress"
                         >
                           <v-icon>mdi-menu-down</v-icon>
@@ -165,7 +165,7 @@
                     <v-btn
                       text
                       color="primary"
-                      :class="[$style['smaller-button'], 'edit-btn']"
+                      class="smaller-button edit-btn"
                       :id="'class-' + row.index + '-undo-btn'"
                       @click="undo(row.index)"
                       :disabled="addEditInProgress"
@@ -175,7 +175,7 @@
                     </v-btn>
                   </span>
 
-                  <span :class="[$style['actions-border'], 'actions__more']"
+                  <span class="actions-border actions__more"
                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                     && row.item.action === ActionTypes.EDITED"
                   >
@@ -186,7 +186,7 @@
                           small
                           v-on="on"
                           color="primary"
-                          :class="[$style['smaller-actions'], 'actions__more-actions__btn']"
+                          class="smaller-actions actions__more-actions__btn"
                           :disabled="addEditInProgress"
                         >
                           <v-icon>mdi-menu-down</v-icon>
@@ -413,24 +413,4 @@ export default defineComponent({
   white-space: inherit;
 }
 
-.smaller-actions {
-  min-width: 34px !important;
-  padding: 0 8px !important;
-}
-
-.smaller-button {
-  padding: 0 12px !important;
-}
-
-.actions-width {
-  width: 140px;
-}
-
-.actions-border {
-  border-left: 1px solid $gray1;
-}
-
-.actions-up {
-  margin-top: -10px;
-}
 </style>

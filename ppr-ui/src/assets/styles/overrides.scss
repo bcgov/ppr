@@ -225,7 +225,7 @@ tbody {
   color: $gray7 !important;
 }
 
-.v-application #remove-btn:disabled {
+.v-application .v-btn.v-btn--outlined.remove-btn:disabled {
   color: #d3272c !important;
   caret-color: #d3272c !important;
   opacity: 0.4 !important;
@@ -311,6 +311,7 @@ tbody {
 .party-table.v-data-table td,
 .debtor-table.v-data-table td,
 .party-summary-table.v-data-table td,
+.collateral-table.v-data-table td,
 .registration-table.v-data-table td {
   text-overflow: initial;
   white-space: initial;

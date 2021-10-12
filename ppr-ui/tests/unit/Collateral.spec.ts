@@ -33,9 +33,8 @@ const validCollateralIcon = '.agreement-valid-icon'
  * @returns a Wrapper<any> object with the given parameters.
  */
 function createComponent (
-  isSummary: boolean,
-  registrationTypeAPI: APIRegistrationTypes
-): Wrapper<any> {
+  isSummary: boolean
+  ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
@@ -43,8 +42,7 @@ function createComponent (
   return mount(Collateral, {
     localVue,
     propsData: {
-      isSummary: isSummary,
-      setRegistrationType: registrationTypeAPI
+      isSummary: isSummary
     },
     store,
     vuetify
@@ -65,7 +63,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
       showInvalid: false
     })
 
-    wrapper = createComponent(true, registrationType.registrationTypeAPI)
+    wrapper = createComponent(true)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -141,6 +139,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   })
 
   it('renders edit view properly when no collateral exists', async () => {
+
     await wrapper.setProps({ isSummary: false })
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
@@ -214,7 +213,7 @@ describe('Collateral Lien unpaid wages tests', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(true, registrationType.registrationTypeAPI)
+    wrapper = createComponent(true)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -260,7 +259,7 @@ describe('Collateral Lien unpaid wages tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    const wrapper2 = createComponent(true)
     expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
     wrapper2.destroy()
@@ -274,7 +273,7 @@ describe('Collateral Lien unpaid wages tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    const wrapper2 = createComponent(true)
     expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
     wrapper2.destroy()
@@ -295,7 +294,7 @@ describe('Collateral Carbon Tax tests', () => {
       showInvalid: false
     })
 
-    wrapper = createComponent(true, registrationType.registrationTypeAPI)
+    wrapper = createComponent(true)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -341,7 +340,7 @@ describe('Collateral Carbon Tax tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    const wrapper2 = createComponent(true)
     expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
     wrapper2.destroy()
   })
@@ -354,9 +353,44 @@ describe('Collateral Carbon Tax tests', () => {
       valid: false,
       showInvalid: false
     })
-    const wrapper2 = createComponent(true, registrationType.registrationTypeAPI)
+    const wrapper2 = createComponent(true)
     expect(wrapper2.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper2.findComponent(GeneralCollateral).exists()).toBe(false)
     wrapper2.destroy()
   })
+})
+
+
+describe('Collateral SA tests for amendments', () => {
+  let wrapper: Wrapper<any>
+  const registrationType = mockedSelectSecurityAgreement()
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+
+    wrapper = createComponent(false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('vehicle collateral and general collateral properly for amendments', async () => {
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    //should still render for amendments
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+   
+  })
+
+  
 })
