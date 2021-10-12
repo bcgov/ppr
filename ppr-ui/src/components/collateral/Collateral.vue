@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0 pb-10" v-if="summaryView">
+  <v-container fluid no-gutters
+    class="white pa-0 pb-10"
+    v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
+  >
     <v-card flat id="collateral-summary">
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
@@ -25,13 +28,13 @@
         </v-row>
       </v-container>
       <vehicle-collateral
-        v-if="vehicleCollateralLength > 0"
-        :isSummary="true"
+        v-if="vehicleCollateralLength > 0 || !summaryView"
+        :isSummary="summaryView"
         :showInvalid="showInvalid"
       />
       <general-collateral
-        v-if="generalCollateralLength > 0"
-        :isSummary="true"
+        v-if="generalCollateralLength > 0 || !summaryView"
+        :isSummary="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
       />
     </v-card>
   </v-container>
@@ -97,14 +100,14 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
-    },
-    setRegistrationType: String as () => APIRegistrationTypes
+    }
   },
   setup (props, context) {
     const {
       getAddCollateral,
-      getRegistrationFlowType
-    } = useGetters<any>(['getAddCollateral', 'getRegistrationFlowType'])
+      getRegistrationFlowType,
+      getRegistrationType
+    } = useGetters<any>(['getAddCollateral', 'getRegistrationFlowType', 'getRegistrationType'])
 
     const {
       setCollateralShowInvalid,
@@ -113,6 +116,8 @@ export default defineComponent({
     } = useActions<any>(['setCollateralShowInvalid', 'setCollateralValid', 'setGeneralCollateral'])
 
     const router = context.root.$router
+    const registrationFlowType = getRegistrationFlowType.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const {
       hasVehicleCollateral,
@@ -125,8 +130,9 @@ export default defineComponent({
 
     const localState = reactive({
       generalCollateralValid: true,
-      registrationType: props.setRegistrationType,
-      summaryView: props.isSummary,
+      summaryView: computed((): boolean => {
+        return props.isSummary
+      }),
       collateral: computed((): AddCollateralIF => {
         return getAddCollateral.value as AddCollateralIF
       }),
@@ -149,11 +155,11 @@ export default defineComponent({
         getRegistrationFlowType.value === RegistrationFlowType.NEW &&
         localState.collateral?.generalCollateral?.length === 0
       ) {
-        if (hasGeneralCollateral(localState.registrationType)) {
-          if (localState.registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
+        if (hasGeneralCollateral(registrationType)) {
+          if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
             setGeneralCollateral([{ description: 'All the personal property of the debtor' }])
           }
-          if (hasGeneralCollateralText(localState.registrationType)) {
+          if (hasGeneralCollateralText(registrationType)) {
             setGeneralCollateral([{
               description: 'All the debtor’s present and after acquired personal property, including ' +
                 'but not restricted to machinery, equipment, furniture, fixtures and receivables.'
@@ -164,13 +170,13 @@ export default defineComponent({
     })
 
     const getCollateralDescription = (): string => {
-      if (hasVehicleCollateral() && hasGeneralCollateral(localState.registrationType)) {
+      if (hasVehicleCollateral() && hasGeneralCollateral(registrationType)) {
         return 'At least one form of collateral (vehicle or general)'
       }
       if (mustHaveManufacturedHomeCollateral()) {
         return 'At least one manufactured home as vehicle collateral'
       }
-      if (hasGeneralCollateral(localState.registrationType)) {
+      if (hasGeneralCollateral(registrationType)) {
         return 'General Collateral'
       }
       if (hasVehicleCollateral()) {
@@ -216,6 +222,9 @@ export default defineComponent({
       goToCollateral,
       hasGeneralCollateral,
       getCollateralDescription,
+      registrationFlowType,
+      registrationType,
+      RegistrationFlowType,
       ...toRefs(localState)
     }
   }

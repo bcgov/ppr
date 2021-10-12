@@ -6,7 +6,7 @@ import { mount, Wrapper } from '@vue/test-utils'
 // local
 import { ConfirmationDialog } from '@/components/dialogs'
 import { SettingOptions } from '@/enums'
-import { paymentConfirmaionDialog, selectionConfirmaionDialog } from '@/resources'
+import { paymentConfirmaionDialog, selectionConfirmaionDialog } from '@/resources/dialogOptions'
 import { axios } from '@/utils/axios-ppr'
 import { mockedDefaultUserSettingsResponse, mockedDisablePayUserSettingsResponse } from './test-data'
 import { getLastEvent } from './utils'

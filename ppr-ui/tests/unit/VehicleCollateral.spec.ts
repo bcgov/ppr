@@ -6,11 +6,13 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedVehicleCollateral1,
-  mockedSelectSecurityAgreement
+  mockedSelectSecurityAgreement,
+  mockedVehicleCollateralAmendment
 } from './test-data'
 
 // Components
 import { EditCollateral, VehicleCollateral } from '@/components/collateral'
+import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -113,4 +115,58 @@ describe('Vehicle collateral edit tests', () => {
     expect(vehicleItem1.querySelectorAll('td')[3].textContent).toContain('TUSCON')
     expect(vehicleItem1.querySelectorAll('td')[4].textContent).toContain('KM8J3CA46JU622994')
   })
+})
+
+describe('Vehicle Collateral amendment tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent(false, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct vehicle rows when data is present', () => {
+    const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row').length
+    expect(vehicleRowCount).toEqual(3)
+  })
+
+  it('displays the correct chips in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[2]
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('AMENDED')
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('DELETED')
+    expect(item3.querySelectorAll('td')[0].textContent).toContain('ADDED')
+  })
+
+  it('displays the correct actions in the table rows', async () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[1]
+    const item3 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[2]
+    expect(item1.querySelectorAll('td')[6].textContent).toContain('Undo')
+    const dropDowns = wrapper.findAll('.v-data-table .vehicle-row .actions__more-actions__btn')
+    // 2 drop downs
+    expect(dropDowns.length).toBe(2)
+    // click the drop down arrow
+    dropDowns.at(0).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.findAll('.actions__more-actions .v-list-item__subtitle').length).toBe(2)
+    expect(item2.querySelectorAll('td')[6].textContent).toContain('Undo')
+    expect(item3.querySelectorAll('td')[6].textContent).toContain('Edit')
+    // click the second drop down
+    dropDowns.at(1).trigger('click')
+    await Vue.nextTick()
+    const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
+    // options from first drop down
+    expect(options.at(0).text()).toContain('Amend')
+    expect(options.at(1).text()).toContain('Remove')
+    // option from second drop down
+    expect(options.at(2).text()).toContain('Remove')
+  })
+
 })

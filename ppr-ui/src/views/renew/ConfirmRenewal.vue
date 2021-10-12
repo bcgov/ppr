@@ -1,14 +1,15 @@
 <template>
   <v-container
     v-if="dataLoaded"
+    id="confirm-renewal"
     class="view-container pa-15 pt-14"
     fluid
     style="min-width: 960px;"
   >
     <base-dialog
-      attach="#app"
-      :options="options"
-      :display="showCancelDialog"
+      setAttach="#confirm-renewal"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="cancel($event)"
     />
     <div class="container pa-0" style="min-width: 960px;">
@@ -75,6 +76,7 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
+import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
@@ -88,6 +90,7 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   RenewRegistrationIF, // eslint-disable-line no-unused-vars
@@ -100,11 +103,9 @@ import {
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
-
-import { RegistrationTypes, renewCancelDialog } from '@/resources'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { RegistrationTypes } from '@/resources'
+import { renewCancelDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
-import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {

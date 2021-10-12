@@ -146,7 +146,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
 import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
-import { SearchTypes, paymentConfirmaionDialog } from '@/resources'
+import { SearchTypes } from '@/resources'
+import { paymentConfirmaionDialog } from '@/resources/dialogOptions'
 import {
   IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchCriteriaIF, // eslint-disable-line no-unused-vars

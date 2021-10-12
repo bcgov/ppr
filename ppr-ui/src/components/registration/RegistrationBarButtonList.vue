@@ -8,8 +8,8 @@
         @click="selectRegistration(registrationTypeValues.SECURITY_AGREEMENT)"
       >
         <template>
-          <v-icon class="pr-1">mdi-plus</v-icon>
-          Add New {{ registrationTypes.SECURITY_AGREEMENT }}
+          <v-icon class="pr-2">mdi-note-plus-outline</v-icon>
+          Create New {{ registrationTypes.SECURITY_AGREEMENT }}
         </template>
       </v-btn>
       <!-- dropdown menu -->
@@ -196,7 +196,7 @@ div.v-menu__content.theme--light.menuable__content__active {
 }
 .registration-bar-btn {
   min-width: 0 !important;
-  width: 270px;
+  width: 285px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   background-color: $primary-blue;

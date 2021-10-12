@@ -1,7 +1,6 @@
-import { RegistrationSummaryIF, DraftResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { RegistrationTypesStandard, StatusTypes } from '@/resources'
-import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
+import { UIRegistrationTypes, APIRegistrationTypes, APIStatusTypes, UIStatusTypes } from '@/enums'
 
 export const useRegistration = () => {
   const localState = reactive({
@@ -40,7 +39,8 @@ export const useRegistration = () => {
     }
   }
 
-  const getStatusDescription = (status: string): string => {
+  const getStatusDescription = (status: APIStatusTypes): string => {
+    if (!status) return UIStatusTypes.DRAFT
     for (let i = 0; i < StatusTypes.length; i++) {
       if (StatusTypes[i].value === status) {
         return StatusTypes[i].text
@@ -52,14 +52,15 @@ export const useRegistration = () => {
     return ''
   }
 
-  const getRegistrationType = (status: string): string => {
-    if (status) {
-      const keyValue = Object.keys(APIRegistrationTypes).find(
-        name => APIRegistrationTypes[name] === status
-      )
-      return UIRegistrationTypes[keyValue]
-    }
-    return ''
+  const getRegistrationType = (
+    regType: APIRegistrationTypes
+  ): UIRegistrationTypes | string => {
+    if (!regType) return ''
+
+    const keyValue = Object.keys(APIRegistrationTypes).find(
+      name => APIRegistrationTypes[name] === regType
+    )
+    return UIRegistrationTypes[keyValue]
   }
 
   const clearFilters = () => {

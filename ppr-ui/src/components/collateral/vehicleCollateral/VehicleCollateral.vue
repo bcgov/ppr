@@ -1,6 +1,10 @@
 <template>
   <v-container v-if="isSummary" class="pb-0">
-    <v-row no-gutters class="ps-6" v-if="vehicleCollateral && vehicleCollateral.length > 0">
+    <v-row
+      no-gutters
+      class="ps-6"
+      v-if="vehicleCollateral && vehicleCollateral.length > 0"
+    >
       <v-col cols="3" class="pt-4 generic-label">
         Vehicle Collateral
       </v-col>
@@ -16,9 +20,21 @@
           no-data-text="No vehicle collateral"
         >
           <template v-slot:item="row" class="vehicle-data-table">
-            <tr :key="row.item.id">
+            <tr :key="row.item.id" :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}">
               <td :class="[$style['summary-cell'], 'pl-0']">
+                <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
                 {{ getVehicleDescription(row.item.type) }}
+                </div>
+                <div
+                  v-if="
+                    row.item.action &&
+                      registrationFlowType === RegistrationFlowType.AMENDMENT
+                  "
+                >
+                  <v-chip x-small label color="#1669BB" text-color="white">
+                    {{ row.item.action }}
+                  </v-chip>
+                </div>
               </td>
               <td>{{ row.item.year }}</td>
               <td>{{ row.item.make }}</td>
@@ -35,7 +51,10 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-container v-else class="pa-0" fluid no-gutters>
+  <v-container v-else
+    :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'"
+    fluid no-gutters
+  >
     <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral()">
       <v-col>
         <v-btn
@@ -82,9 +101,17 @@
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
               class="vehicle-row"
+              :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}"
             >
               <td class="pl-4">
-                {{ getVehicleDescription(row.item.type) }}
+                <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
+                  {{ getVehicleDescription(row.item.type) }}
+                </div>
+                <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
+                  <v-chip x-small label color="#1669BB" text-color="white">
+                    {{ row.item.action }}
+                  </v-chip>
+                </div>
               </td>
               <td>
                 {{ row.item.year }}
@@ -99,23 +126,37 @@
               </td>
 
               <!-- Action Btns -->
-              <td class="actions-cell px-0 py-2">
-                <div class="actions">
-                  <span class="edit-action">
+              <td class="actions-width actions-cell px-0 py-2">
+                <div class="actions actions-up float-right">
+                  <span
+                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                    || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                    (row.item.action === ActionTypes.ADDED) || !row.item.action)"
+                  >
                     <v-btn
                       text
                       color="primary"
-                      class="edit-btn"
+                      class="edit-btn smaller-button"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
                     >
                       <v-icon small>mdi-pencil</v-icon>
-                      <span>Edit</span>
+                      <span
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && row.item.action !== ActionTypes.ADDED"
+                      >
+                        Amend
+                      </span>
+                      <span v-else>Edit</span>
                     </v-btn>
                   </span>
 
-                  <span class="actions__more">
+                  <span class="actions-border actions__more"
+                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                    || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!row.item.action ||
+                    row.item.action === ActionTypes.ADDED))"
+                  >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
                         <v-btn
@@ -123,13 +164,71 @@
                           small
                           v-on="on"
                           color="primary"
-                          class="actions__more-actions__btn"
+                          class="smaller-actions actions__more-actions__btn"
+                          style="padding-right: 0px !important;"
                           :disabled="addEditInProgress"
                         >
                           <v-icon>mdi-menu-down</v-icon>
                         </v-btn>
                       </template>
                       <v-list class="actions__more-actions">
+                        <v-list-item @click="removeVehicle(row.index)">
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-delete</v-icon>
+                            <span
+                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && row.item.action !== ActionTypes.ADDED"
+                            >
+                              Delete
+                            </span>
+                            <span v-else class="ml-1">Remove</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </span>
+                  <span
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
+                    class="edit-button"
+                  >
+                    <v-btn
+                      text
+                      color="primary"
+                      class="smaller-button edit-btn"
+                      :id="'class-' + row.index + '-undo-btn'"
+                      @click="undo(row.index)"
+                      :disabled="addEditInProgress"
+                    >
+                      <v-icon small>mdi-undo</v-icon>
+                      <span>Undo</span>
+                    </v-btn>
+                  </span>
+
+                  <span class="actions-border actions__more"
+                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action === ActionTypes.EDITED"
+                  >
+                    <v-menu offset-y left nudge-bottom="4">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          text
+                          small
+                          v-on="on"
+                          color="primary"
+                          class="smaller-actions actions__more-actions__btn"
+                          :disabled="addEditInProgress"
+                        >
+                          <v-icon>mdi-menu-down</v-icon>
+                        </v-btn>
+                      </template>
+                      <v-list class="actions__more-actions">
+                        <v-list-item @click="initEdit(row.index)">
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-pencil</v-icon>
+                            <span class="ml-1">Amend</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
                         <v-list-item @click="removeVehicle(row.index)">
                           <v-list-item-subtitle>
                             <v-icon small>mdi-delete</v-icon>
@@ -177,10 +276,11 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local components
 import { EditCollateral } from '.'
 // local types/etc.
-import { APIVehicleTypes } from '@/enums'
+import { ActionTypes, APIVehicleTypes, RegistrationFlowType } from '@/enums'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -197,10 +297,16 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getVehicleCollateral } = useGetters<any>(['getVehicleCollateral'])
+    const { getVehicleCollateral, getRegistrationFlowType, getOriginalAddCollateral } = useGetters<any>([
+      'getVehicleCollateral',
+      'getRegistrationFlowType',
+      'getOriginalAddCollateral'
+    ])
     const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
 
     const { hasVehicleCollateral } = useVehicle(props, context)
+
+    const registrationFlowType = getRegistrationFlowType.value
 
     const localState = reactive({
       activeIndex: -1,
@@ -243,14 +349,23 @@ export default defineComponent({
         return headersToShow
       }),
       vehicleCollateral: computed((): VehicleCollateralIF[] => {
-        return getVehicleCollateral.value as VehicleCollateralIF[] || []
+        return (getVehicleCollateral.value as VehicleCollateralIF[]) || []
       })
     })
 
     const removeVehicle = (index: number): void => {
-      // FUTURE: update this to action: removed when doing ammendments
-      let newVCollateral = [...localState.vehicleCollateral] // eslint-disable-line
-      newVCollateral.splice(index, 1)
+      const newVCollateral = [...localState.vehicleCollateral]
+      const currentVehicle = localState.vehicleCollateral[index]
+      if (
+        registrationFlowType === RegistrationFlowType.AMENDMENT &&
+        currentVehicle.action !== ActionTypes.ADDED
+      ) {
+        currentVehicle.action = ActionTypes.REMOVED
+        newVCollateral.splice(index, 1, currentVehicle)
+      } else {
+        // eslint-disable-line
+        newVCollateral.splice(index, 1)
+      }
       setVehicleCollateral(newVCollateral)
     }
 
@@ -277,9 +392,20 @@ export default defineComponent({
       localState.showEditVehicle = [false]
     }
 
-    watch(() => props.showInvalid, (val: boolean) => {
-      localState.showErrorComponent = val
-    })
+    const undo = (index: number): void => {
+      const newVCollateral = [...localState.vehicleCollateral]
+      const originalCollateral = getOriginalAddCollateral.value
+      newVCollateral.splice(index, 1, cloneDeep(originalCollateral.vehicleCollateral[index]))
+      setVehicleCollateral(newVCollateral)
+      // getDebtorValidity()
+    }
+
+    watch(
+      () => props.showInvalid,
+      (val: boolean) => {
+        localState.showErrorComponent = val
+      }
+    )
 
     return {
       removeVehicle,
@@ -288,6 +414,10 @@ export default defineComponent({
       resetData,
       getVehicleDescription,
       hasVehicleCollateral,
+      registrationFlowType,
+      RegistrationFlowType,
+      ActionTypes,
+      undo,
       ...toRefs(localState)
     }
   }

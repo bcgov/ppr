@@ -35,7 +35,7 @@
           <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
-          <collateral class="mt-15" :isSummary="true" :setRegistrationType="registrationType" />
+          <collateral class="mt-15" :isSummary="true" />
           <court-order
             :setShowErrors="showInvalid"
             @setCourtOrderValid="registrationValid = $event"

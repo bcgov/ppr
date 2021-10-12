@@ -45,7 +45,6 @@
             :setShowInvalid="showInvalid"
           />
           <collateral
-            :setRegistrationType="registrationType"
             @setCollateralValid="collateralValid = $event"
             class="mt-15"
           />

@@ -185,6 +185,7 @@
                     :disabled="activeIndex === -1"
                     @click="removeDebtor()"
                     id="remove-btn-debtor"
+                    class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                               && currentDebtor.action !== ActionTypes.ADDED">

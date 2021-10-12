@@ -684,24 +684,4 @@ export default defineComponent({
   padding: 6px 0;
 }
 
-.smaller-actions {
-  min-width: 34px !important;
-  padding: 0 8px !important;
-}
-
-.smaller-button {
-  padding: 0 12px !important;
-}
-
-.actions-width {
-  width: 140px;
-}
-
-.actions-border {
-  border-left: 1px solid $gray1;
-}
-
-.actions-up {
-  margin-top: -10px;
-}
 </style>

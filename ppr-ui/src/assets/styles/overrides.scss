@@ -225,7 +225,7 @@ tbody {
   color: $gray7 !important;
 }
 
-.v-application #remove-btn:disabled {
+.v-application .v-btn.v-btn--outlined.remove-btn:disabled {
   color: #d3272c !important;
   caret-color: #d3272c !important;
   opacity: 0.4 !important;
@@ -311,6 +311,7 @@ tbody {
 .party-table.v-data-table td,
 .debtor-table.v-data-table td,
 .party-summary-table.v-data-table td,
+.collateral-table.v-data-table td,
 .registration-table.v-data-table td {
   text-overflow: initial;
   white-space: initial;
@@ -564,9 +565,18 @@ tbody {
 .v-snack__wrapper.theme--dark {
   background-color: $gray7;
   margin-bottom: 140px;
-  width: 500px;
+  width: 450px;
 }
 .v-snack__wrapper .v-snack__content {
   font-size: 0.875rem;
-  padding: 16px;
+  letter-spacing: normal;
+  padding: 18px 20px;
+}
+
+.snackbar-btn-close.v-btn--icon.v-size--small,
+.snackbar-btn-close.v-btn--icon.v-size--small::before,
+.snackbar-btn-close.v-btn--icon.v-size--small .v-icon {
+  background-color: transparent;
+  height: 14px;
+  width: 14px;
 }

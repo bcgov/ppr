@@ -317,8 +317,20 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   statement.clientReferenceId = stateModel.folioOrReferenceNumber
   // Now save the draft.
   draft.financingStatement = statement
-  var draftResponse:DraftIF = null
-  var apiCall:String = ''
+  let draftResponse:DraftIF = null
+  let apiCall:String = ''
+  if (draft.amendmentStatement !== undefined) {
+    delete draft.amendmentStatement
+  }
+  if (draft.financingStatement.registeringParty !== undefined && draft.financingStatement.registeringParty === null) {
+    delete draft.financingStatement.registeringParty
+  }
+  if (draft.createDateTime !== undefined && draft.createDateTime === null) {
+    draft.createDateTime = ''
+  }
+  if (draft.lastUpdateDateTime !== undefined && draft.lastUpdateDateTime === null) {
+    draft.lastUpdateDateTime = ''
+  }
   if (draft.financingStatement.documentId !== undefined && draft.financingStatement.documentId !== '') {
     apiCall = 'update'
     draftResponse = await updateDraft(draft)
@@ -366,12 +378,14 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   if (draft !== null && draft.financingStatement !== null) {
     statement.documentId = draft.financingStatement.documentId
   }
-  if (statement.type === 'SA') {
+  if (statement.type === APIRegistrationTypes.SECURITY_AGREEMENT) {
     statement.trustIndenture = trustLength.trustIndenture
   } else if (statement.type === APIRegistrationTypes.REPAIRERS_LIEN) {
     statement.lienAmount = trustLength.lienAmount
     statement.surrenderDate = trustLength.surrenderDate + 'T08:00:00+00:00'
-    statement.lifeYears = 1
+    // Don't need for a Repairer's Lien registration.
+    delete statement.lifeYears
+    delete statement.lifeInfinite
   }
   // Now tidy up, deleting objects that are empty strings to pass validation.
   // For example, party.birthDate = '' will fail validation.

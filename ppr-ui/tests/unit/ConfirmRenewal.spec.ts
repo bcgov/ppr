@@ -106,18 +106,18 @@ describe('Confirm Renewal new registration component', () => {
 
   it('processes cancel button action', async () => {
     // dialog doesn't start visible
-    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     // pressing cancel triggers dialog
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
-    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(true)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(true)
     // if dialog emits proceed false it closes + stays on page
     await wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
-    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
     // if dialog emits proceed true it goes to dashboard
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
     await wrapper.findComponent(BaseDialog).vm.$emit('proceed', true)
-    expect(wrapper.findComponent(BaseDialog).vm.$props.display).toBe(false)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
