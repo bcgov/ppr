@@ -282,12 +282,16 @@ export default class ConfirmDischarge extends Vue {
       console.error(apiResponse.error)
       alert('There was an internal error attempting to save this renewal. Please try again later.')
     } else {
+      // unset registration number
+      this.setRegistrationNumber(null)
       // On success return to dashboard
       this.goToDashboard()
     }
   }
 
   private goToDashboard (): void {
+    // unset registration number
+    this.setRegistrationNumber(null)
     this.$router.push({
       name: RouteNames.DASHBOARD
     })
