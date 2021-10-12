@@ -365,3 +365,16 @@ export const mockedPartyCodeSearchResponse: SearchPartyIF[] = [{
   code: '456',
   address: mockedAddress1
 }]
+
+export const mockedFinancingStatementRepairers: FinancingStatementIF = {
+  type: APIRegistrationTypes.REPAIRERS_LIEN,
+  clientReferenceId: 'UT-100001',
+  registeringParty: mockedRegisteringParty1,
+  securedParties: mockedSecuredParties1,
+  debtors: mockedDebtors1,
+  vehicleCollateral: mockedVehicleCollateral1,
+  generalCollateral: mockedGeneralCollateral2,
+  lifeYears: 1,
+  trustIndenture: false,
+  lifeInfinite: false
+}

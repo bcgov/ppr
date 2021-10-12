@@ -371,6 +371,7 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   } else if (statement.type === APIRegistrationTypes.REPAIRERS_LIEN) {
     statement.lienAmount = trustLength.lienAmount
     statement.surrenderDate = trustLength.surrenderDate + 'T08:00:00+00:00'
+    statement.lifeYears = 1
   }
   // Now tidy up, deleting objects that are empty strings to pass validation.
   // For example, party.birthDate = '' will fail validation.

@@ -36,6 +36,12 @@
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
           <collateral class="mt-15" :isSummary="true" :setRegistrationType="registrationType" />
+          <court-order
+            :setShowErrors="showInvalid"
+            @setCourtOrderValid="registrationValid = $event"
+            v-if="registrationType === registrationTypeRL"
+            class="mt-15"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -63,7 +69,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { CautionBox, StickyContainer } from '@/components/common'
+import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
@@ -94,6 +100,7 @@ import { StatusCodes } from 'http-status-codes'
     DebtorSummary,
     RegisteringPartySummary,
     SecuredPartySummary,
+    CourtOrder,
     StickyContainer
   }
 })
@@ -202,7 +209,6 @@ export default class ReviewRegistration extends Vue {
       if (registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
         lengthTrust.lifeYears = 1
         lengthTrust.valid = true
-        this.registrationValid = true
       }
       const parties = {
         valid: true,
