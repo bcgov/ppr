@@ -11,8 +11,10 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col>Indicate the General Collater to be deleted from or added to this registration.
-          To view the existing General Collateral for this registration, conduct a seperate search.
+        <v-col
+          >Indicate the General Collater to be deleted from or added to this
+          registration. To view the existing General Collateral for this
+          registration, conduct a seperate search.
         </v-col>
       </v-row>
       <v-row>
@@ -53,7 +55,6 @@
           />
         </v-col>
       </v-row>
-
     </v-card>
   </v-container>
 </template>
@@ -86,7 +87,7 @@ export default defineComponent({
       delDesc: '',
       addDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return getGeneralCollateral.value as GeneralCollateralIF[] || []
+        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
@@ -96,14 +97,19 @@ export default defineComponent({
       })
     })
 
+    watch(
+      () => localState.addDesc,
+      (val: string) => {
+        setGeneralCollateral([{ descriptionAdd: val }])
+      }
+    )
 
-    watch(() => localState.addDesc, (val: string) => {
-          setGeneralCollateral([{ descriptionAdd: val }])
-    })
-
-    watch(() => localState.delDesc, (val: string) => {
-          setGeneralCollateral([{ descriptionDelete: val }])
-    })
+    watch(
+      () => localState.delDesc,
+      (val: string) => {
+        setGeneralCollateral([{ descriptionDelete: val }])
+      }
+    )
 
     return {
       ...toRefs(localState)
