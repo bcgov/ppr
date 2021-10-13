@@ -268,7 +268,7 @@ describe('Secured party amendment tests', () => {
     expect(options.at(0).text()).toContain('Remove')
     expect(options.at(1).text()).toContain('Amend')
     // option from second drop down
-    expect(options.at(2).text()).toContain('Remove')
+    expect(options.at(2).text()).toContain('Delete')
 
   })
 
@@ -305,7 +305,6 @@ describe('Secured party amendment tests', () => {
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
 
   })
-
 })
 
 
