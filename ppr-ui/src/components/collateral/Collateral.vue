@@ -34,7 +34,7 @@
       />
       <general-collateral
         v-if="generalCollateralLength > 0 || !summaryView"
-        :isSummary="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
+        :isSummary="summaryView"
       />
     </v-card>
   </v-container>

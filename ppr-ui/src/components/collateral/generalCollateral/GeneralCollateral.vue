@@ -1,12 +1,18 @@
 <template>
-  <v-container v-if="summaryView" style="padding: 28px 12px 0 30px;">
-    <gen-col-summary />
-  </v-container>
   <v-container
-    v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT"
+    v-if="summaryView || (registrationFlowType === RegistrationFlowType.AMENDMENT && !amendMode)"
     style="padding: 28px 12px 0 30px;"
   >
-    <gen-col-amend />
+    <gen-col-summary
+      @initGenColAmend="amendMode = $event"
+      :setShowHistory="registrationFlowType === RegistrationFlowType.AMENDMENT"
+    />
+  </v-container>
+  <v-container
+    v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
+    style="padding: 28px 12px 0 30px;"
+  >
+    <gen-col-amend @closeGenColAmend="amendMode = false" />
   </v-container>
   <v-container v-else class="pa-0">
     <gen-col-edit
@@ -56,6 +62,7 @@ export default defineComponent({
     const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       summaryView: props.isSummary,
+      amendMode: false,
       showInvalid: computed((): boolean => {
         return props.setShowInvalid
       })

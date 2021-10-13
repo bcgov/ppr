@@ -6,24 +6,24 @@
       flat
     >
       <v-row no-gutters class="py-6">
-        <v-col class="generic-label pa-4">
+        <v-col class="generic-label">
           General Collateral
         </v-col>
       </v-row>
       <v-row>
         <v-col
-          >Indicate the General Collater to be deleted from or added to this
+          >Indicate the General Collateral to be deleted from or added to this
           registration. To view the existing General Collateral for this
           registration, conduct a seperate search.
         </v-col>
       </v-row>
       <v-row>
-        <v-col>
+        <v-col class="generic-label">
           General Collateral to be Deleted
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="9" class="pr-4">
+        <v-col class="pr-4">
           <v-textarea
             v-model="delDesc"
             id="general-collateral-delete-desc"
@@ -37,12 +37,12 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col>
+        <v-col class="generic-label">
           General Collateral to be Added
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="9" class="pr-4">
+        <v-col class="pr-4">
           <v-textarea
             v-model="addDesc"
             id="general-collateral-add-desc"
@@ -55,6 +55,31 @@
           />
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <div class="form__row form__btns">
+            <v-btn
+              large
+              id="done-btn-gen-col"
+              class="ml-auto"
+              color="primary"
+              @click="onSubmitForm()"
+            >
+              Done
+            </v-btn>
+
+            <v-btn
+              id="cancel-btn-gen-col"
+              large
+              outlined
+              color="primary"
+              @click="resetFormAndData()"
+            >
+              Cancel
+            </v-btn>
+          </div>
+        </v-col>
+      </v-row>
     </v-card>
   </v-container>
 </template>
@@ -64,7 +89,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch,
+  onMounted,
   computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -80,7 +105,9 @@ export default defineComponent({
   },
   emits: ['valid'],
   setup (props, { emit }) {
-    const { getGeneralCollateral } = useGetters<any>(['getGeneralCollateral'])
+    const { getGeneralCollateral } = useGetters<any>([
+      'getGeneralCollateral'
+    ])
     const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
 
     const localState = reactive({
@@ -97,21 +124,42 @@ export default defineComponent({
       })
     })
 
-    watch(
-      () => localState.addDesc,
-      (val: string) => {
-        setGeneralCollateral([{ descriptionAdd: val }])
+    const onSubmitForm = () => {
+      const newGeneralCollateral = localState.generalCollateral
+      const amendedGC = {
+        descriptionAdd: localState.addDesc,
+        descriptionDelete: localState.delDesc
       }
-    )
+      if (newGeneralCollateral.length > 0) {
+        if (newGeneralCollateral[newGeneralCollateral.length - 1].addedDateTime !== undefined) {
+          newGeneralCollateral.push(amendedGC)
+        } else {
+          newGeneralCollateral[newGeneralCollateral.length - 1] = amendedGC
+        }
+      } else {
+        newGeneralCollateral.push(amendedGC)
+      }
+      setGeneralCollateral(newGeneralCollateral)
+      emit('closeGenColAmend')
+    }
 
-    watch(
-      () => localState.delDesc,
-      (val: string) => {
-        setGeneralCollateral([{ descriptionDelete: val }])
+    const resetFormAndData = () => {
+      emit('closeGenColAmend')
+    }
+
+    onMounted(() => {
+      const gc = localState.generalCollateral
+      if (gc.length > 0) {
+        if (gc[gc.length - 1].addedDateTime === undefined) {
+          localState.addDesc = gc[gc.length - 1].descriptionAdd
+          localState.delDesc = gc[gc.length - 1].descriptionDelete
+        }
       }
-    )
+    })
 
     return {
+      onSubmitForm,
+      resetFormAndData,
       ...toRefs(localState)
     }
   }
