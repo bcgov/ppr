@@ -8,7 +8,13 @@
             :class="{ 'error-text': invalidSection }"
           >
             <span v-if="activeIndex === -1">Add</span>
-            <span v-else>Edit</span>
+            <span v-else>
+              <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)">
+                Amend
+              </span>
+              <span v-else>Edit</span>
+            </span>
             <span v-if="currentIsBusiness"> a Business<br />Debtor</span>
             <span v-else> an Individual<br />Debtor</span>
           </label>
@@ -188,6 +194,7 @@
                     class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && currentDebtor.action
                               && currentDebtor.action !== ActionTypes.ADDED">
                       Delete
                     </span>

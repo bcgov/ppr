@@ -2,7 +2,7 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
-import { ActionTypes, APIRegistrationTypes } from '@/enums'
+import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress } from '@/composables/address/factories/address-factory'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -20,8 +20,8 @@ export const useSecuredParty = (props, context) => {
   const { setAddSecuredPartiesAndDebtors } = useActions<any>([
     'setAddSecuredPartiesAndDebtors'
   ])
-  const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors'
+  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
+    'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
   ])
   const localState = reactive({
     currentSecuredParty: {
@@ -31,7 +31,8 @@ export const useSecuredParty = (props, context) => {
       address: initAddress
     } as PartyIF,
     currentIsBusiness: null,
-    partyBusiness: null
+    partyBusiness: null,
+    registrationFlowType: getRegistrationFlowType.value
   })
 
   const getSecuredParty = () => {
@@ -153,6 +154,7 @@ export const useSecuredParty = (props, context) => {
     updateAddress,
     addSecuredParty,
     isSecuredPartyRestrictedList,
+    RegistrationFlowType,
     ...toRefs(localState)
   }
 }
