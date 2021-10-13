@@ -8,7 +8,7 @@ import sinon from 'sinon'
 // Components
 import { AmendRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
-import { RegistrationLengthTrustAmendment } from '@/components/registration'
+import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { StickyContainer } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
@@ -83,6 +83,9 @@ describe('Amendment registration component', () => {
     expect(state.registration.lengthTrust.lifeYears).toBe(5)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    // check amendment description
+    expect(state.registration.amendmentDescription).toBe('')
+    expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
@@ -131,7 +134,6 @@ describe('Amendment registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
-
   it('checks for length trust indenture & court order validity -if invalid', async () => {
     await store.dispatch('setLengthTrust', {
       valid: true,
@@ -164,5 +166,4 @@ describe('Amendment registration component', () => {
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
   })
-
 })

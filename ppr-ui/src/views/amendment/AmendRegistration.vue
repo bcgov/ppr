@@ -48,6 +48,9 @@
             @setCollateralValid="collateralValid = $event"
             class="mt-15"
           />
+          <amendment-description class="mt-15"
+            :setShowErrors="showInvalid"
+          />
           <court-order class="mt-15"
             :setShowErrors="showInvalid"
             @setCourtOrderValid="courtOrderValid = $event"
@@ -82,7 +85,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
-import { RegistrationLengthTrustAmendment } from '@/components/registration'
+import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
@@ -117,11 +120,12 @@ import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
+    AmendmentDescription,
     CautionBox,
     CourtOrder,
-    RegistrationLengthTrustAmendment,
     Collateral,
     Debtors,
+    RegistrationLengthTrustAmendment,
     RegisteringPartySummary,
     SecuredParties,
     StickyContainer
