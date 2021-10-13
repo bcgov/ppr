@@ -90,26 +90,12 @@
         </p>
       </v-btn>
       <div v-if="showingHistory" class="general-collateral-summary">
-        <v-row
-          v-for="(item, index) in generalCollateral" :key="index" no-gutters
-        >
-          <v-col :class="[{
-                'border-btm': index !== baseGenCollateralIndex,
-                'pb-30px': index !== baseGenCollateralIndex,
-              },'pt-30px',]"
-          >
+        <v-row v-for="(item, index) in generalCollateral" :key="index" no-gutters>
+          <v-col :class="[{ 'border-btm': index !== baseGenCollateralIndex,
+            'pb-30px': index !== baseGenCollateralIndex }, 'pt-30px']">
             <b v-if="item.addedDateTime">{{ asOfDateTime(item.addedDateTime) }}</b>
-            <div
-              v-if="item.descriptionDelete"
-              class="gc-description-delete pt-5"
-            >
-              <v-chip
-                class="badge-delete"
-                color="primary"
-                label
-                text-color="white"
-                x-small
-              >
+            <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
+              <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
                 <b>DELETED</b>
               </v-chip>
               <p class="pt-3 ma-0">
@@ -124,10 +110,7 @@
                 {{ item.descriptionAdd }}
               </p>
             </div>
-            <div
-              v-if="item.description && index === baseGenCollateralIndex"
-              class="gc-description pt-5"
-            >
+            <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description pt-5">
               <b v-if="registrationFlowType !== RegistrationFlowType.NEW">
                 Base Registration General Collateral:
               </b>
@@ -187,11 +170,9 @@ export default defineComponent({
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
-      registrationFlowType: computed(
-        (): RegistrationFlowType => {
-          return getRegistrationFlowType.value
-        }
-      )
+      registrationFlowType: computed((): RegistrationFlowType => {
+        return getRegistrationFlowType.value
+      })
     })
 
     const initGenColAmend = () => {
