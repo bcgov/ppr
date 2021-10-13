@@ -6,7 +6,7 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // local components
-import { GenColEdit, GenColSummary, GeneralCollateral } from '@/components/collateral'
+import { GenColEdit, GenColSummary, GeneralCollateral, GenColAmend } from '@/components/collateral'
 // local types/helpers/etc.
 import { RegistrationFlowType } from '@/enums'
 import { getLastEvent } from './utils'
@@ -75,5 +75,14 @@ describe('General Collateral tests', () => {
     // passes validation from edit component
     wrapper.findComponent(GenColEdit).vm.$emit('valid', false)
     expect(getLastEvent(wrapper, 'valid')).toBe(false)
+  })
+
+
+  it('renders amendment view for amendments', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent(true, false)
+    wrapper.vm.$data.amendMode = true
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+    expect(wrapper.findComponent(GenColAmend).exists()).toBe(false)
   })
 })

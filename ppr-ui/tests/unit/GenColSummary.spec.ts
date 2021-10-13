@@ -114,3 +114,43 @@ describe('GenColSummary tests', () => {
     }
   })
 })
+
+describe('GenColSummary Amendment tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {    
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders showing general collateral and amend button', async () => {
+    const newDescription = 'new description'
+    await store.dispatch('setGeneralCollateral', [{ description: newDescription, addedDateTime: '2021-10-21' }])
+    wrapper = createComponent()
+    expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
+    expect(wrapper.vm.showingHistory).toBe(false)
+    expect(wrapper.findAll(title).length).toBe(1)
+    //it starts with history open
+    expect(wrapper.findAll(history).length).toBe(1)
+    expect(wrapper.findAll(historyBtn).length).toBe(1)
+    //amend button
+    expect(wrapper.findAll('#gen-col-amend-btn').length).toBe(1)
+
+  })
+
+  it('renders showing general collateral and undo button', async () => {
+    await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
+    wrapper = createComponent()
+    expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
+    expect(wrapper.vm.showingHistory).toBe(false)
+    expect(wrapper.findAll(title).length).toBe(1)
+    //it starts with history open
+    expect(wrapper.findAll(history).length).toBe(1)
+    expect(wrapper.findAll(historyBtn).length).toBe(1)
+    //undo button
+    expect(wrapper.findAll('#gen-col-undo-btn').length).toBe(1)
+
+  })
+})

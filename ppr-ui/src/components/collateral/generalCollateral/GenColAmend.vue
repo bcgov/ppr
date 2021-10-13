@@ -140,11 +140,11 @@ export default defineComponent({
         newGeneralCollateral.push(amendedGC)
       }
       setGeneralCollateral(newGeneralCollateral)
-      emit('closeGenColAmend')
+      emit('closeGenColAmend', true)
     }
 
     const resetFormAndData = () => {
-      emit('closeGenColAmend')
+      emit('closeGenColAmend', true)
     }
 
     onMounted(() => {

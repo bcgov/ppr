@@ -16,7 +16,7 @@
             text
             color="primary"
             class="smaller-button edit-btn"
-            id="gen-col-undo-btn'"
+            id="gen-col-undo-btn"
             @click="undo()"
           >
             <v-icon small>mdi-undo</v-icon>
@@ -26,14 +26,14 @@
         <span
           v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               (generalCollateral.length === 0 ||
-                generalCollateral[generalCollateral.length - 1].addedDateTime === undefined)"
+                generalCollateral[generalCollateral.length - 1].addedDateTime !== undefined)"
           class="edit-button"
         >
           <v-btn
             text
             color="primary"
             class="smaller-button edit-btn"
-            id="gen-col-amend-btn'"
+            id="gen-col-amend-btn"
             @click="initGenColAmend()"
           >
             <v-icon small>mdi-pencil</v-icon>
