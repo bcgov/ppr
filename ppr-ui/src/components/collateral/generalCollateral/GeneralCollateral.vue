@@ -1,6 +1,18 @@
 <template>
-  <v-container v-if="summaryView" style="padding: 28px 12px 0 30px;">
-    <gen-col-summary />
+  <v-container
+    v-if="summaryView || (registrationFlowType === RegistrationFlowType.AMENDMENT && !amendMode)"
+    style="padding: 28px 12px 0 30px;"
+  >
+    <gen-col-summary
+      @initGenColAmend="amendMode = $event"
+      :setShowHistory="registrationFlowType === RegistrationFlowType.AMENDMENT"
+    />
+  </v-container>
+  <v-container
+    v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
+    style="padding: 28px 12px 0 30px;"
+  >
+    <gen-col-amend @closeGenColAmend="amendMode = false" />
   </v-container>
   <v-container v-else class="pa-0">
     <gen-col-edit
@@ -18,15 +30,17 @@ import {
   toRefs
 } from '@vue/composition-api'
 // local components
-import { GenColEdit, GenColSummary } from '.'
+import { GenColEdit, GenColSummary, GenColAmend } from '.'
 // local types/helpers/etc.
-import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'GeneralCollateral',
   components: {
     GenColEdit,
-    GenColSummary
+    GenColSummary,
+    GenColAmend
   },
   props: {
     isSummary: {
@@ -41,8 +55,14 @@ export default defineComponent({
   },
   emits: ['valid'],
   setup (props, { emit }) {
+    const {
+      getRegistrationFlowType
+    } = useGetters<any>(['getRegistrationFlowType'])
+
+    const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       summaryView: props.isSummary,
+      amendMode: false,
       showInvalid: computed((): boolean => {
         return props.setShowInvalid
       })
@@ -54,6 +74,8 @@ export default defineComponent({
 
     return {
       emitValid,
+      registrationFlowType,
+      RegistrationFlowType,
       ...toRefs(localState)
     }
   }

@@ -1,8 +1,88 @@
 <template>
   <v-container class="pa-0">
-    <h3 style="line-height: 1rem;">General Collateral</h3>
-    <div v-if="registrationFlowType !== RegistrationFlowType.NEW" id="general-collateral-history" class="mt-7">
-      <v-btn id="gc-show-history-btn" class="ma-0 pa-0" color="primary" text @click="showingHistory = !showingHistory">
+    <v-row no-gutters>
+      <v-col cols="10">
+        <h3 style="line-height: 1rem;">General Collateral</h3>
+      </v-col>
+      <v-col>
+        <div class="float-right">
+        <span
+          v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
+              generalCollateral.length > 0 &&
+              generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
+          class="edit-button"
+        >
+          <v-btn
+            text
+            color="primary"
+            class="smaller-button edit-btn"
+            id="gen-col-undo-btn"
+            @click="undo()"
+          >
+            <v-icon small>mdi-undo</v-icon>
+            <span>Undo</span>
+          </v-btn>
+        </span>
+        <span
+          v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
+              (generalCollateral.length === 0 ||
+                generalCollateral[generalCollateral.length - 1].addedDateTime !== undefined)"
+          class="edit-button"
+        >
+          <v-btn
+            text
+            color="primary"
+            class="smaller-button edit-btn"
+            id="gen-col-amend-btn"
+            @click="initGenColAmend()"
+          >
+            <v-icon small>mdi-pencil</v-icon>
+            <span>Amend</span>
+          </v-btn>
+        </span>
+        <span
+          class="actions-border actions__more"
+          v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
+              generalCollateral.length > 0 &&
+              generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
+        >
+          <v-menu offset-y left nudge-bottom="4">
+            <template v-slot:activator="{ on }">
+              <v-btn
+                text
+                small
+                v-on="on"
+                color="primary"
+                class="smaller-actions actions__more-actions__btn"
+              >
+                <v-icon>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list class="actions__more-actions">
+              <v-list-item @click="initGenColAmend()">
+                <v-list-item-subtitle>
+                  <v-icon small>mdi-pencil</v-icon>
+                  <span class="ml-1">Amend</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </span>
+        </div>
+      </v-col>
+    </v-row>
+    <div
+      v-if="registrationFlowType !== RegistrationFlowType.NEW"
+      id="general-collateral-history"
+      class="mt-7"
+    >
+      <v-btn
+        id="gc-show-history-btn"
+        class="ma-0 pa-0"
+        color="primary"
+        text
+        @click="showingHistory = !showingHistory"
+      >
         <p class="ma-0">
           <span v-if="showingHistory">Hide </span>
           <span v-else>View </span>
@@ -12,8 +92,7 @@
       <div v-if="showingHistory" class="general-collateral-summary">
         <v-row v-for="(item, index) in generalCollateral" :key="index" no-gutters>
           <v-col :class="[{ 'border-btm': index !== baseGenCollateralIndex,
-            'pb-30px': index !== baseGenCollateralIndex }, 'pt-30px']"
-          >
+            'pb-30px': index !== baseGenCollateralIndex }, 'pt-30px']">
             <b v-if="item.addedDateTime">{{ asOfDateTime(item.addedDateTime) }}</b>
             <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
               <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
@@ -57,7 +136,7 @@ import {
   toRefs,
   computed
 } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -65,24 +144,46 @@ import { convertDate } from '@/utils'
 
 export default defineComponent({
   name: 'GenColSummary',
-  setup () {
+  props: {
+    setShowHistory: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, { emit }) {
     const {
       getGeneralCollateral,
+      getOriginalAddCollateral,
       getRegistrationFlowType
-    } = useGetters<any>(['getGeneralCollateral', 'getRegistrationFlowType'])
+    } = useGetters<any>([
+      'getGeneralCollateral',
+      'getOriginalAddCollateral',
+      'getRegistrationFlowType'
+    ])
+    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
 
     const localState = reactive({
-      showingHistory: false,
+      showingHistory: props.setShowHistory,
       baseGenCollateralIndex: computed(() => {
         return (localState.generalCollateral?.length || 0) - 1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return getGeneralCollateral.value as GeneralCollateralIF[] || []
+        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
       registrationFlowType: computed((): RegistrationFlowType => {
         return getRegistrationFlowType.value
       })
     })
+
+    const initGenColAmend = () => {
+      emit('initGenColAmend', true)
+    }
+
+    const undo = () => {
+      const originalGeneralCollateral =
+        getOriginalAddCollateral.value.generalCollateral
+      setGeneralCollateral(originalGeneralCollateral)
+    }
 
     const asOfDateTime = (dateString: string) => {
       const asOfDate = new Date(dateString)
@@ -92,6 +193,8 @@ export default defineComponent({
     return {
       asOfDateTime,
       RegistrationFlowType,
+      initGenColAmend,
+      undo,
       ...toRefs(localState)
     }
   }
@@ -103,12 +206,13 @@ export default defineComponent({
 .border-btm {
   border-bottom: 1px solid $gray3;
 }
+
 .general-collateral-summary {
   font-size: 0.875rem;
   line-height: 1.375rem;
   color: $gray7;
 }
-::v-deep .v-btn:not(.v-btn--round).v-size--default {
+#gc-show-history-btn {
   font-size: 0.875rem;
   height: 1rem;
   min-width: 0;
