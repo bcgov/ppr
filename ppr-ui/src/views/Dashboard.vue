@@ -4,10 +4,18 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog
+      id="myRegAddDialog"
       setAttach=""
       :setDisplay="myRegAddDialogDisplay"
       :setOptions="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
+    />
+    <base-dialog
+      id="myRegDeleteDialog"
+      setAttach=""
+      :setDisplay="myRegDeleteDialogDisplay"
+      :setOptions="myRegDeleteDialog"
+      @proceed="myRegDeleteDialogProceed($event)"
     />
     <registration-confirmation
       attach=""
@@ -221,7 +229,9 @@ import {
   registrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog,
-  renewConfirmationDialog
+  renewConfirmationDialog,
+  tableDeleteDialog,
+  tableRemoveDialog
 } from '@/resources/dialogOptions'
 import {
   addRegistrationSummary,
@@ -285,6 +295,7 @@ export default class Dashboard extends Vue {
   private myRegAction: TableActions = null
   private myRegActionDialog: DialogOptionsIF = dischargeConfirmationDialog
   private myRegActionDialogDisplay = false
+  private myRegActionDocId = ''
   private myRegActionRegNum = ''
   private myRegActionRoute: RouteNames = null
   private myRegAdd = ''
@@ -293,6 +304,8 @@ export default class Dashboard extends Vue {
   private myRegAddDialogDisplay = false
   private myRegDataDrafts: DraftResultIF[] = []
   private myRegDataHistory: RegistrationSummaryIF[] = []
+  private myRegDeleteDialogDisplay = false
+  private myRegDeleteDialog: DialogOptionsIF = null
   private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
@@ -419,6 +432,7 @@ export default class Dashboard extends Vue {
 
   private myRegActionHandler ({ action, docId, regNum }): void {
     this.myRegAction = action as TableActions
+    this.myRegActionDocId = docId as string
     this.myRegActionRegNum = regNum as string
     switch (action) {
       case TableActions.AMEND:
@@ -437,16 +451,14 @@ export default class Dashboard extends Vue {
         this.myRegActionDialogDisplay = true
         break
       case TableActions.DELETE:
-        // FUTURE: set dialog options / show dialog for confirm
-        this.deleteDraft(docId)
-        this.myRegAction = null
-        this.myRegActionRegNum = ''
+        this.myRegDeleteDialog = tableDeleteDialog
+        this.myRegDeleteDialogDisplay = true
         break
       case TableActions.REMOVE:
-        // FUTURE: set dialog options / show dialog for confirm
-        this.removeRegistration(regNum)
-        this.myRegAction = null
-        this.myRegActionRegNum = ''
+        console.log('HERE')
+        this.myRegDeleteDialog = tableRemoveDialog
+        this.myRegDeleteDialogDisplay = true
+        console.log(this.myRegDeleteDialogDisplay)
         break
       case TableActions.EDIT_AMEND:
         this.editDraftAmend(docId, regNum)
@@ -456,6 +468,7 @@ export default class Dashboard extends Vue {
         break
       default:
         this.myRegAction = null
+        this.myRegActionDocId = ''
         this.myRegActionRegNum = ''
         console.error('Action not implemented.')
     }
@@ -527,6 +540,17 @@ export default class Dashboard extends Vue {
       this.addRegistration(this.myRegAdd)
     }
     this.myRegAddDialogDisplay = false
+  }
+
+  private myRegDeleteDialogProceed (val: boolean): void {
+    if (val) {
+      if (this.myRegAction === TableActions.DELETE) this.deleteDraft(this.myRegActionDocId)
+      if (this.myRegAction === TableActions.REMOVE) this.removeRegistration(this.myRegActionRegNum)
+    }
+    this.myRegAction = null
+    this.myRegActionDocId = ''
+    this.myRegActionRegNum = ''
+    this.myRegDeleteDialogDisplay = false
   }
 
   /** Redirects browser to Business Registry home page. */

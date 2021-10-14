@@ -19,7 +19,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
 export const mockedRegistration2: RegistrationSummaryIF = {
   baseRegistrationNumber: 'BC456788',
   clientReferenceId: '',
-  createDateTime: '2021-07-20T17:21:17+00:00',
+  createDateTime: '2021-08-20T17:21:17+00:00',
   expireDays: '316',
   path: '/path/to/doc',
   registeringParty: 'ICBC',

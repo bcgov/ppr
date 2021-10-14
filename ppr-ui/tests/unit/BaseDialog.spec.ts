@@ -15,7 +15,9 @@ import {
   registrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog,
-  renewCancelDialog
+  renewCancelDialog,
+  tableDeleteDialog,
+  tableRemoveDialog
 } from '@/resources/dialogOptions'
 import { getLastEvent } from './utils'
 
@@ -44,7 +46,9 @@ describe('Base Dialog tests', () => {
     { ...registrationFoundDialog },
     { ...registrationNotFoundDialog },
     { ...registrationRestrictedDialog },
-    { ...renewCancelDialog }
+    { ...renewCancelDialog },
+    { ...tableDeleteDialog },
+    { ...tableRemoveDialog }
   ]
 
   beforeEach(async () => {
