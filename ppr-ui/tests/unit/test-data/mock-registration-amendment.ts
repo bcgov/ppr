@@ -369,7 +369,7 @@ export const mockedAmendmentEdit: AmendmentStatementIF = {
   description: 'Test Edit',
   registeringParty: mockedRegisteringParty1,
   changeType: APIAmendmentTypes.AMENDMENT,
-  trustIndenture: true,
+  addTrustIndenture: true,
   debtorName: mockedDebtorName,
   addDebtors: [mockedDebtorsEdit[0]],
   deleteDebtors: [mockedDebtorsEdit[0]],

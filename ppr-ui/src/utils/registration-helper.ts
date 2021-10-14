@@ -175,9 +175,11 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
   if (stateModel.registration.lengthTrust.action &&
       stateModel.registration.lengthTrust.action === ActionTypes.EDITED &&
       registrationType.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
-    statement.trustIndenture = stateModel.registration.lengthTrust.trustIndenture
-  } else {
-    statement.trustIndenture = false
+    if (stateModel.registration.lengthTrust.trustIndenture) {
+      statement.addTrustIndenture = true
+    } else {
+      statement.removeTrustIndenture = true
+    }
   }
   const parties:AddPartiesIF = stateModel.registration.parties
   // Conditionally set draft debtors.
@@ -532,9 +534,13 @@ export function setupStateModelFromAmendmentDraft (stateModel:StateModelIF, draf
   if (draftAmendment.clientReferenceId) {
     stateModel.folioOrReferenceNumber = draftAmendment.clientReferenceId
   }
-  if ('trustIndenture' in draftAmendment &&
-      draftAmendment.trustIndenture !== stateModel.originalRegistration.lengthTrust.trustIndenture) {
-    stateModel.registration.lengthTrust.trustIndenture = draftAmendment.trustIndenture
+  if ('addTrustIndenture' in draftAmendment && draftAmendment.addTrustIndenture &&
+      !stateModel.originalRegistration.lengthTrust.trustIndenture) {
+    stateModel.registration.lengthTrust.trustIndenture = true
+    stateModel.registration.lengthTrust.action = ActionTypes.EDITED
+  } else if ('removeTrustIndenture' in draftAmendment && draftAmendment.removeTrustIndenture &&
+              stateModel.originalRegistration.lengthTrust.trustIndenture) {
+    stateModel.registration.lengthTrust.trustIndenture = false
     stateModel.registration.lengthTrust.action = ActionTypes.EDITED
   }
   const parties:AddPartiesIF = stateModel.registration.parties

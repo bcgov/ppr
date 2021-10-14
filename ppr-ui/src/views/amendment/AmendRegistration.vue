@@ -142,6 +142,7 @@ export default class AmendRegistration extends Vue {
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setAmendmentDescription: ActionBindingIF
   @Action setCourtOrderInformation: ActionBindingIF
+  @Action setFolioOrReferenceNumber: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setOriginalAddCollateral: ActionBindingIF
   @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -212,7 +213,8 @@ export default class AmendRegistration extends Vue {
     }
     // Conditionally load: could be coming back from confirm.
     const model:StateModelIF = this.getStateModel
-    if (model.registration.registrationNumber === this.registrationNumber && model.originalRegistration) {
+    if (model.registration.registrationNumber === this.registrationNumber &&
+        model.originalRegistration && !this.documentId) {
       return
     }
     this.financingStatementDate = new Date()
@@ -263,9 +265,10 @@ export default class AmendRegistration extends Vue {
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
       this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+      // Reset anything left in the store that is amendment registration related.
       this.setAmendmentDescription('')
       this.setCourtOrderInformation(courtOrder)
-
+      this.setFolioOrReferenceNumber('')
       if (this.documentId) {
         const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
         if (stateModel.registration.draft.error) {
