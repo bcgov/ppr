@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pb-6  px-0 rounded">
+  <v-container v-if="!summaryView" fluid no-gutters class="pb-6  px-0 rounded">
     <v-row no-gutters class="summary-header pa-2 mb-8">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-message-text</v-icon>
@@ -38,6 +38,17 @@
       </v-row>
     </v-card>
   </v-container>
+  <v-container v-else class="white pa-0" fluid no-gutters>
+    <h2 class="pl-3">Details Description</h2>
+    <v-row no-gutters class="py-8">
+      <v-col cols="3" class="generic-label pl-5">
+        Details Description
+      </v-col>
+      <v-col cols="9" class="summary-text pr-4">
+        {{ detailDescription }}
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -46,6 +57,10 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
   props: {
+    isSummary: {
+      type: Boolean,
+      default: false
+    },
     setShowErrors: {
       type: Boolean,
       default: false
@@ -58,6 +73,7 @@ export default defineComponent({
 
     const localState = reactive({
       detailDescription: '',
+      summaryView: props.isSummary,
       amendmentDescription: computed((): string => {
         return getAmendmentDescription.value || ''
       }),
@@ -89,4 +105,10 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+
+.detail-description-summary {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  color: $gray7;
+}
 </style>

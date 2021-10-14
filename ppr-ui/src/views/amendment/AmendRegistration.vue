@@ -105,7 +105,8 @@ import {
   AddCollateralIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
-  DraftIF // eslint-disable-line no-unused-vars
+  DraftIF, // eslint-disable-line no-unused-vars
+  CourtOrderIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import {
@@ -209,6 +210,11 @@ export default class AmendRegistration extends Vue {
       })
       return
     }
+    // Conditionally load: could be coming back from confirm.
+    const model:StateModelIF = this.getStateModel
+    if (model.registration.registrationNumber === this.registrationNumber && model.originalRegistration) {
+      return
+    }
     this.financingStatementDate = new Date()
     const financingStatement = await getFinancingStatement(true, this.registrationNumber)
     if (financingStatement.error) {
@@ -239,6 +245,13 @@ export default class AmendRegistration extends Vue {
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
+      const courtOrder: CourtOrderIF = {
+        courtRegistry: '',
+        courtName: '',
+        fileNumber: '',
+        effectOfOrder: '',
+        orderDate: ''
+      }
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
@@ -250,6 +263,8 @@ export default class AmendRegistration extends Vue {
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
       this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+      this.setAmendmentDescription('')
+      this.setCourtOrderInformation(courtOrder)
 
       if (this.documentId) {
         const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
