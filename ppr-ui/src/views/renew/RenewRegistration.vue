@@ -53,7 +53,7 @@
             :setShowErrors="showInvalid"
             @setCourtOrderValid="registrationValid = $event"
             v-if="registrationType === registrationTypeRL"
-            class="mt-15"
+            class="mt-15" />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
