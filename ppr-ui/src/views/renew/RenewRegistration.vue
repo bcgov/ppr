@@ -1,5 +1,10 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-15 pt-14" fluid style="min-width: 960px;">
+  <v-container
+    v-if="dataLoaded"
+    class="view-container pa-15 pt-14"
+    fluid
+    style="min-width: 960px;"
+  >
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -7,22 +12,27 @@
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               This is the current registration information as of
-              <b>{{ asOfDateTime }}.</b> Review this information to ensure it is correct
-              <span v-if="registrationType !== registrationTypeRL"> and select the length
-              of time you would like to renew this registration for</span>.<br/>
+              <b>{{ asOfDateTime }}.</b> Review this information to ensure it is
+              correct
+              <span v-if="registrationType !== registrationTypeRL">
+                and select the length of time you would like to renew this
+                registration for</span
+              >.<br />
             </p>
             <p class="ma-0 pt-5">
-              To view the full history of this registration including descriptions of any
-              previous amendments or court orders, you will need to conduct a separate search.
+              To view the full history of this registration including
+              descriptions of any previous amendments or court orders, you will
+              need to conduct a separate search.
             </p>
           </div>
-          <registration-length-trust :setShowInvalid="showInvalid"
+          <registration-length-trust
+            :setShowInvalid="showInvalid"
             @lengthTrustValid="registrationValid = $event"
             v-if="registrationType !== registrationTypeRL"
-            class="mt-15" :isRenewal="true"
+            class="mt-15"
+            :isRenewal="true"
           />
-          <registration-repairers-lien v-else
-          class="mt-15" :isRenewal="true" />
+          <registration-repairers-lien v-else class="mt-15" :isRenewal="true" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -30,12 +40,16 @@
             </label>
           </div>
           <h3 class="pt-6 px-1">Original Registering Party</h3>
-          <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
+          <registering-party-summary
+            class="pt-4"
+            :setEnableNoDataAction="false"
+          />
           <h3 class="pt-6 px-1">Secured Parties</h3>
           <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
           <collateral class="mt-15" :isSummary="true" />
+
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -64,9 +78,16 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer } from '@/components/common'
-import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
+import {
+  RegistrationLengthTrust,
+  RegistrationRepairersLien
+} from '@/components/registration'
 import { Collateral } from '@/components/collateral'
-import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
+import {
+  DebtorSummary,
+  RegisteringPartySummary,
+  SecuredPartySummary
+} from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import {
   APIRegistrationTypes, // eslint-disable-line no-unused-vars
@@ -75,8 +96,12 @@ import {
   UIRegistrationTypes // eslint-disable-line no-unused-vars
 } from '@/enums'
 import {
-  ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, AddCollateralIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  AddPartiesIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, // eslint-disable-line no-unused-vars
+  AddCollateralIF, // eslint-disable-line no-unused-vars
+  LengthTrustIF, // eslint-disable-line no-unused-vars
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
@@ -101,6 +126,8 @@ export default class ReviewRegistration extends Vue {
   @Getter getConfirmDebtorName: DebtorNameIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getLengthTrust: LengthTrustIF
+  @Getter getRegistrationFlowType: RegistrationFlowType
+  @Getter getRegistrationNumber: String
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -139,7 +166,7 @@ export default class ReviewRegistration extends Vue {
 
   // the number of the registration being renewed
   private get registrationNumber (): string {
-    return this.$route.query['reg-num'] as string || ''
+    return (this.$route.query['reg-num'] as string) || ''
   }
 
   private get registrationTypeUI (): UIRegistrationTypes {
@@ -162,62 +189,69 @@ export default class ReviewRegistration extends Vue {
   }
 
   private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber || !this.getConfirmDebtorName) {
-      if (!this.registrationNumber) {
-        console.error('No registration number given to discharge. Redirecting to dashboard...')
-      } else {
-        console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+    if (
+      !this.getRegistrationNumber ||
+      this.getRegistrationFlowType !== RegistrationFlowType.RENEWAL
+    ) {
+      if (!this.registrationNumber || !this.getConfirmDebtorName) {
+        if (!this.registrationNumber) {
+          console.error('No registration number given to discharge. Redirecting to dashboard...')
+        } else {
+          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+        }
+        this.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
       }
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-    this.financingStatementDate = new Date()
-    const financingStatement = await getFinancingStatement(true, this.registrationNumber)
-    if (financingStatement.error) {
-      this.emitError(financingStatement.error)
-    } else {
-      // load data into the store
-      const registrationType = RegistrationTypes.find(
-        (reg, index) => {
+      this.financingStatementDate = new Date()
+      const financingStatement = await getFinancingStatement(true, this.registrationNumber)
+      if (financingStatement.error) {
+        this.emitError(financingStatement.error)
+      } else {
+        // load data into the store
+        const registrationType = RegistrationTypes.find((reg, index) => {
           if (reg.registrationTypeAPI === financingStatement.type) {
             return true
           }
         })
-      const collateral = {
-        valid: true,
-        vehicleCollateral: financingStatement.vehicleCollateral,
-        generalCollateral: financingStatement.generalCollateral
-      } as AddCollateralIF
-      const lengthTrust = {
-        valid: false,
-        showInvalid: false,
-        trustIndenture: financingStatement.trustIndenture || false,
-        lifeInfinite: false,
-        lifeYears: null,
-        surrenderDate: financingStatement.surrenderDate || null,
-        lienAmount: financingStatement.lienAmount || null
-      } as LengthTrustIF
-      if (registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
-        lengthTrust.lifeYears = 1
-        lengthTrust.valid = true
-        this.registrationValid = true
+        const collateral = {
+          valid: true,
+          vehicleCollateral: financingStatement.vehicleCollateral,
+          generalCollateral: financingStatement.generalCollateral
+        } as AddCollateralIF
+        const lengthTrust = {
+          valid: false,
+          showInvalid: false,
+          trustIndenture: financingStatement.trustIndenture || false,
+          lifeInfinite: false,
+          lifeYears: null,
+          surrenderDate: financingStatement.surrenderDate || null,
+          lienAmount: financingStatement.lienAmount || null
+        } as LengthTrustIF
+        if (
+          registrationType.registrationTypeAPI ===
+          APIRegistrationTypes.REPAIRERS_LIEN
+        ) {
+          lengthTrust.lifeYears = 1
+          lengthTrust.valid = true
+          this.registrationValid = true
+        }
+        const parties = {
+          valid: true,
+          registeringParty: financingStatement.registeringParty,
+          securedParties: financingStatement.securedParties,
+          debtors: financingStatement.debtors
+        } as AddPartiesIF
+        this.setRegistrationCreationDate(financingStatement.createDateTime)
+        this.setRegistrationExpiryDate(financingStatement.expiryDate)
+        this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
+        this.setRegistrationType(registrationType)
+        this.setAddCollateral(collateral)
+        this.setLengthTrust(lengthTrust)
+        this.setAddSecuredPartiesAndDebtors(parties)
+        this.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
       }
-      const parties = {
-        valid: true,
-        registeringParty: financingStatement.registeringParty,
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      this.setRegistrationCreationDate(financingStatement.createDateTime)
-      this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      this.setRegistrationType(registrationType)
-      this.setAddCollateral(collateral)
-      this.setLengthTrust(lengthTrust)
-      this.setAddSecuredPartiesAndDebtors(parties)
-      this.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
     }
   }
 
@@ -238,6 +272,8 @@ export default class ReviewRegistration extends Vue {
   }
 
   private goToDashboard (): void {
+    // unset registration number
+    this.setRegistrationNumber(null)
     this.$router.push({
       name: RouteNames.DASHBOARD
     })
@@ -246,14 +282,18 @@ export default class ReviewRegistration extends Vue {
 
   /** Emits Have Data event. */
   @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
+  private emitHaveData (haveData: Boolean = true): void {}
 
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) alert('This registration does not exist.')
-    else if (error.statusCode === StatusCodes.BAD_REQUEST) alert('You do not have access to this registration.')
-    else alert('There was an internal error loading this registration. Please try again later.')
+    if (error.statusCode === StatusCodes.NOT_FOUND) {
+      alert('This registration does not exist.')
+    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
+      alert('You do not have access to this registration.')
+    } else {
+      alert('There was an internal error loading this registration. Please try again later.')
+    }
     this.emitHaveData(true)
     this.$router.push({
       name: RouteNames.DASHBOARD
