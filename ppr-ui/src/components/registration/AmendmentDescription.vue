@@ -73,7 +73,9 @@ export default defineComponent({
 
     const localState = reactive({
       detailDescription: '',
-      summaryView: props.isSummary,
+      summaryView: computed((): boolean => {
+        return props.isSummary
+      }),
       amendmentDescription: computed((): string => {
         return getAmendmentDescription.value || ''
       }),
@@ -105,10 +107,4 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-
-.detail-description-summary {
-  font-size: 0.875rem;
-  line-height: 1.375rem;
-  color: $gray7;
-}
 </style>

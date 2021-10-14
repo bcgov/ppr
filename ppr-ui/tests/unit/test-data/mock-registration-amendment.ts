@@ -381,6 +381,30 @@ export const mockedAmendmentEdit: AmendmentStatementIF = {
   deleteVehicleCollateral: [mockedVehicleCollateralEdit[0]]
 }
 
+export const mockedAmendmentResponse: AmendmentStatementIF = {
+  documentId: '',
+  baseRegistrationNumber: '023003B',
+  description: 'Test Edit',
+  registeringParty: mockedRegisteringParty1,
+  changeType: APIAmendmentTypes.AMENDMENT,
+  addTrustIndenture: true,
+  debtorName: mockedDebtorName,
+  addDebtors: [mockedDebtorsEdit[0]],
+  deleteDebtors: [mockedDebtorsEdit[0]],
+  addSecuredParties: [mockedSecuredPartiesEdit[0]],
+  deleteSecuredParties: [mockedSecuredPartiesEdit[0]],
+  addGeneralCollateral: mockedGeneralCollateralUpdate,
+  deleteGeneralCollateral: mockedGeneralCollateralUpdate,
+  addVehicleCollateral: [mockedVehicleCollateralEdit[0]],
+  deleteVehicleCollateral: [mockedVehicleCollateralEdit[0]],
+  amendmentRegistrationNumber: '023003B',
+  createDateTime: '2021-09-03T21:00:00+00:00',
+  payment: {
+    invoiceId: '12535',
+    receipt: '/api/v1/payment-requests/12535/receipts'
+  }
+}
+
 export const mockedDraftAmendmentAdd: DraftIF = {
   type: DraftTypes.AMENDMENT_STATEMENT,
   amendmentStatement: mockedAmendmentAdd

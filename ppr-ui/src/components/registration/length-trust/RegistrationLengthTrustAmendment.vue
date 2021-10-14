@@ -17,7 +17,7 @@
         <v-col cols="3" class="generic-label">
           Trust Indenture
           <div v-if="trustIndentureModified">
-            <v-chip x-small label color="#1669BB" text-color="white">
+            <v-chip x-small label color="primary" text-color="white">
                 AMENDED
             </v-chip>
           </div>
@@ -74,7 +74,7 @@
       <v-col cols="3" class="generic-label pl-5">
         Trust Indenture
         <div v-if="trustIndentureModified">
-          <v-chip x-small label color="#1669BB" text-color="white">
+          <v-chip x-small label color="primary" text-color="white">
               AMENDED
           </v-chip>
         </div>
@@ -127,13 +127,15 @@ export default defineComponent({
 
     const localState = reactive({
       showEditTrustIndenture: false,
-      summaryView: props.isSummary,
       editInProgress: false,
       originalTrustIndenture: getOriginalLengthTrust.value.trustIndenture,
       lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
       trustIndentureHint: '',
       showTrustIndenture: computed((): boolean => {
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
+      }),
+      summaryView: computed((): boolean => {
+        return props.isSummary
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (getLengthTrust.value.lifeInfinite) {

@@ -42,28 +42,38 @@
             </div>
 
             <div v-if="showDebtors">
+              <v-divider v-if="showSecuredParties"></v-divider>
               <!-- To do: add amended debtors -->
             </div>
 
             <div v-if="showVehicleCollateral || showGeneralCollateral">
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
+                <v-divider v-if="showSecuredParties || showDebtors"></v-divider>
                 <!-- To do: add vehicle collateral summary -->
               </div>
               <div v-if="showGeneralCollateral">
+                <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral"></v-divider>
                 <!-- To do: add general collateral summary -->
               </div>
             </div>
 
-            <amendment-description class="pt-14" :isSummary="true" />
+            <div class="pb-4">
+              <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
+                               showGeneralCollateral"></v-divider>
+              <amendment-description class="pt-14" :isSummary="true" />
+            </div>
 
             <div v-if="showCourtOrder">
+              <v-divider></v-divider>
               <!-- To do: add court order summary -->
             </div>
 
             <div v-if="showLengthTrustIndenture">
+              <v-divider></v-divider>
               <registration-length-trust-amendment class="pt-14" :isSummary="true" />
             </div>
+
           </div>
 
           <h2 class="pt-14">
@@ -135,9 +145,11 @@ import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/compon
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
-  AmendmentStatementIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
+  AddCollateralIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
+  AmendmentStatementIF, // eslint-disable-line no-unused-vars
+  CourtOrderIF, // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
@@ -170,12 +182,15 @@ import { StatusCodes } from 'http-status-codes'
   }
 })
 export default class ConfirmAmendment extends Vue {
+  @Getter getAddCollateral: AddCollateralIF
+  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
+  @Getter getAmendmentDescription: string
   @Getter getConfirmDebtorName: DebtorNameIF
+  @Getter getCourtOrderInformation: CourtOrderIF
+  @Getter getLengthTrust: LengthTrustIF
+  @Getter getRegistrationNumber: string
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
-  @Getter getLengthTrust: LengthTrustIF
-  @Getter getAmendmentDescription: string
-  @Getter getRegistrationNumber: string
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
@@ -257,31 +272,30 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get showCourtOrder (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    if (stateModel.registration.courtOrderInformation &&
-        (stateModel.registration.courtOrderInformation?.courtName ||
-         stateModel.registration.courtOrderInformation?.courtRegistry ||
-         stateModel.registration.courtOrderInformation?.fileNumber ||
-         stateModel.registration.courtOrderInformation?.orderDate ||
-         stateModel.registration.courtOrderInformation?.effectOfOrder)) {
+    const courtOrder: CourtOrderIF = this.getCourtOrderInformation
+    if (courtOrder &&
+        (courtOrder?.courtName.length > 0 ||
+         courtOrder?.courtRegistry.length > 0 ||
+         courtOrder?.fileNumber.length > 0 ||
+         courtOrder?.orderDate.length > 0 ||
+         courtOrder?.effectOfOrder.length > 0)) {
       return true
     }
     return false
   }
 
   private get showLengthTrustIndenture (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    if (stateModel.registration.lengthTrust.action) {
+    const lengthTrust: LengthTrustIF = this.getLengthTrust
+    if (lengthTrust.action) {
       return true
     }
     return false
   }
 
   private get showSecuredParties (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    const securedParties = stateModel.registration.parties.securedParties
-    for (let i = 0; i < securedParties.length; i++) {
-      if (securedParties[i].action) {
+    const parties: AddPartiesIF = this.getAddSecuredPartiesAndDebtors
+    for (let i = 0; i < parties.securedParties.length; i++) {
+      if (parties.securedParties[i].action) {
         return true
       }
     }
@@ -289,10 +303,9 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get showDebtors (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    const debtors = stateModel.registration.parties.debtors
-    for (let i = 0; i < debtors.length; i++) {
-      if (debtors[i].action) {
+    const parties: AddPartiesIF = this.getAddSecuredPartiesAndDebtors
+    for (let i = 0; i < parties.debtors.length; i++) {
+      if (parties.debtors[i].action) {
         return true
       }
     }
@@ -300,13 +313,12 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get showVehicleCollateral (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    const collateral = stateModel.registration.collateral.vehicleCollateral
-    if (!collateral) {
+    const addCollateral:AddCollateralIF = this.getAddCollateral
+    if (!addCollateral.vehicleCollateral) {
       return false
     }
-    for (let i = 0; i < collateral.length; i++) {
-      if (collateral[i].action) {
+    for (let i = 0; i < addCollateral.vehicleCollateral.length; i++) {
+      if (addCollateral.vehicleCollateral[i].action) {
         return true
       }
     }
@@ -314,13 +326,12 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get showGeneralCollateral (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    const collateral = stateModel.registration.collateral.generalCollateral
-    if (!collateral) {
+    const addCollateral:AddCollateralIF = this.getAddCollateral
+    if (!addCollateral.generalCollateral) {
       return false
     }
-    for (let i = 0; i < collateral.length; i++) {
-      if (collateral[i].descriptionAdd || collateral[i].descriptionDelete) {
+    for (let i = 0; i < addCollateral.generalCollateral.length; i++) {
+      if (addCollateral.generalCollateral[i].descriptionAdd || addCollateral.generalCollateral[i].descriptionDelete) {
         return true
       }
     }
@@ -328,23 +339,23 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get collateralValid (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    return (stateModel.registration.collateral.valid || (!this.showGeneralCollateral && !this.showVehicleCollateral))
+    const addCollateral:AddCollateralIF = this.getAddCollateral
+    return (addCollateral.valid || (!this.showGeneralCollateral && !this.showVehicleCollateral))
   }
 
   private get partiesValid (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    return (stateModel.registration.parties.valid || (!this.showSecuredParties && !this.showDebtors))
+    const parties: AddPartiesIF = this.getAddSecuredPartiesAndDebtors
+    return (parties.valid || (!this.showSecuredParties && !this.showDebtors))
   }
 
   private get courtOrderValid (): boolean {
-    const stateModel: StateModelIF = this.getStateModel
-    return (!stateModel.registration.courtOrderInformation ||
-            (stateModel.registration.courtOrderInformation.courtName.length > 0 &&
-            stateModel.registration.courtOrderInformation.courtRegistry.length > 0 &&
-            stateModel.registration.courtOrderInformation.fileNumber.length > 0 &&
-            stateModel.registration.courtOrderInformation.orderDate.length > 0 &&
-            stateModel.registration.courtOrderInformation.effectOfOrder.length > 0))
+    const courtOrder: CourtOrderIF = this.getCourtOrderInformation
+    return (!courtOrder ||
+            (courtOrder.courtName.length > 0 &&
+            courtOrder.courtRegistry.length > 0 &&
+            courtOrder.fileNumber.length > 0 &&
+            courtOrder.orderDate.length > 0 &&
+            courtOrder.effectOfOrder.length > 0))
   }
 
   private get stickyComponentErrMsg (): string {
