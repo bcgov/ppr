@@ -632,18 +632,38 @@ export default defineComponent({
         return 'Infinite'
       } else {
         if (days > 364) {
-          const years = days / 365
-          const daysRemaining = days % 365
+          const today = new Date()
+          const expireDate = new Date()
+          expireDate.setDate(expireDate.getDate() + days)
+
+          var dateExpiry = new Date(
+            Date.UTC(
+              expireDate.getUTCFullYear(),
+              expireDate.getUTCMonth(),
+              expireDate.getUTCDate()
+            )
+          )
+          var dateToday = new Date(
+            Date.UTC(
+              today.getUTCFullYear(),
+              today.getUTCMonth(),
+              today.getUTCDate()
+            )
+          )
+
+          let daysDiff = dateExpiry.getDate() - dateToday.getDate()
+          if (daysDiff < 0) {
+            dateExpiry.setFullYear(dateExpiry.getFullYear() - 1)
+            daysDiff = dateExpiry.getDate() - dateToday.getDate()
+          }
+          const years = dateExpiry.getFullYear() - dateToday.getFullYear()
+
           let yearText = ' years '
           if (years === 1) {
             yearText = ' year '
           }
-          return (
-            Math.floor(years).toString() +
-            yearText +
-            daysRemaining.toString() +
-            ' days'
-          )
+
+          return years.toString() + yearText + daysDiff.toString() + ' days'
         }
         if (days < 30) {
           return (
