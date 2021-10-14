@@ -258,6 +258,10 @@ export default defineComponent({
         validateSerial(currentVehicle.value)
       } else {
         validateInput(fieldname, currentVehicle.value[fieldname])
+        // remove serial number validation if manufactured home number entered
+        if (fieldname === 'manufacturedHomeRegistrationNumber') {
+          validateSerial(currentVehicle.value)
+        }
       }
     }
 
