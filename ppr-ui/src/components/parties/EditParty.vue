@@ -16,7 +16,13 @@
             :class="{ 'error-text': invalidSection }"
           >
             <span v-if="activeIndex === -1" class="">Add</span>
-            <span v-else>Edit</span>
+            <span v-else>
+              <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
+                Amend
+              </span>
+              <span v-else>Edit</span>
+            </span>
             Secured Party
           </label>
         </v-col>
@@ -178,7 +184,13 @@
                     @click="removeSecuredParty()"
                     id="remove-btn-party"
                     class="remove-btn"
-                    >Remove
+                    >
+                    <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && currentSecuredParty.action
+                              && currentSecuredParty.action !== ActionTypes.ADDED">
+                      Delete
+                    </span>
+                    <span v-else>Remove</span>
                   </v-btn>
 
                   <v-btn
@@ -255,6 +267,8 @@ export default defineComponent({
       resetFormAndData,
       removeSecuredParty,
       addEditSecuredParty,
+      registrationFlowType,
+      RegistrationFlowType,
       updateAddress,
       addressSchema
     } = useSecuredParty(props, context)
@@ -371,6 +385,8 @@ export default defineComponent({
       setCloseAutoComplete,
       errors,
       closeAndReset,
+      registrationFlowType,
+      RegistrationFlowType,
       ...toRefs(localState)
     }
   }

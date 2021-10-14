@@ -155,7 +155,7 @@ describe('Debtor amendment tests', () => {
     const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
     // options from first drop down
     expect(options.at(0).text()).toContain('Amend')
-    expect(options.at(1).text()).toContain('Remove')
+    expect(options.at(1).text()).toContain('Delete')
     // option from second drop down
     expect(options.at(2).text()).toContain('Remove')
   })
@@ -184,7 +184,6 @@ describe('Debtor validation tests', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
     expect(item1.querySelectorAll('td')[0].textContent).toContain('DELETED')
   })
-
   
   it('displays the error', async () => {
     wrapper.vm.$props.setShowInvalid = true

@@ -370,6 +370,12 @@ export default class AmendRegistration extends Vue {
     this.emitHaveData(true)
     this.dataLoaded = true
   }
+
+  @Watch('debtorValid')
+  @Watch('securedPartiesValid')
+  private showInvalidComponents (val: boolean): void {
+    this.showInvalid = true
+  }
 }
 </script>
 
