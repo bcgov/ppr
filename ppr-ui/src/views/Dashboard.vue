@@ -4,10 +4,17 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog
-      setAttach="#dashboard"
+      setAttach=""
       :setDisplay="myRegAddDialogDisplay"
       :setOptions="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
+    />
+    <registration-confirmation
+      attach=""
+      :options="myRegActionDialog"
+      :display="myRegActionDialogDisplay"
+      :registrationNumber="myRegActionRegNum"
+      @proceed="myRegActionDialogHandler($event)"
     />
     <div class="container pa-0">
       <v-row no-gutters>
@@ -46,7 +53,10 @@
       </v-row>
       <v-row class="pt-15" no-gutters>
         <v-col cols="auto">
-          <registration-bar class="soft-corners-bottom" @selected-registration-type="startRegistration($event)"/>
+          <registration-bar
+            class="soft-corners-bottom"
+            @selected-registration-type="startNewRegistration($event)"
+          />
         </v-col>
         <v-col class="pl-3">
           <v-row justify="end" no-gutters>
@@ -166,11 +176,7 @@
                 :setRegistrationHistory="myRegistrations"
                 :setSearch="myRegFilter"
                 :toggleSnackBar="myRegSnackBar"
-                @discharge="startDischarge($event)"
-                @renew="startRenewal($event)"
-                @amend="startAmendment($event)"
-                @editFinancingDraft="startFinancingDraft($event)"
-                @editAmendmentDraft="startAmendmentDraft($event)"
+                @action="myRegActionHandler($event)"
                 @error="emitError($event)"
               />
             </v-col>
@@ -189,7 +195,7 @@ import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums'
+import { RouteNames, TableActions } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   BaseHeaderIF, // eslint-disable-line no-unused-vars
@@ -208,15 +214,20 @@ import {
   tombstoneBreadcrumbDashboard
 } from '@/resources'
 import {
+  amendConfirmationDialog,
+  dischargeConfirmationDialog,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
   registrationNotFoundDialog,
-  registrationRestrictedDialog
+  registrationRestrictedDialog,
+  renewConfirmationDialog
 } from '@/resources/dialogOptions'
 import {
   addRegistrationSummary,
   convertDate,
+  deleteDraft,
+  deleteRegistrationSummary,
   draftHistory,
   getFeatureFlag,
   getRegistrationSummary,
@@ -225,7 +236,7 @@ import {
   setupFinancingStatementDraft
 } from '@/utils'
 // local components
-import { BaseDialog } from '@/components/dialogs'
+import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
@@ -235,6 +246,7 @@ import { RegistrationBar } from '@/components/registration'
   components: {
     BaseDialog,
     RegistrationBar,
+    RegistrationConfirmation,
     SearchHistory,
     SearchBar,
     Tombstone,
@@ -270,6 +282,11 @@ export default class Dashboard extends Vue {
   private registryUrl: string
 
   private loading = false
+  private myRegAction: TableActions = null
+  private myRegActionDialog: DialogOptionsIF = dischargeConfirmationDialog
+  private myRegActionDialogDisplay = false
+  private myRegActionRegNum = ''
+  private myRegActionRoute: RouteNames = null
   private myRegAdd = ''
   private myRegAddDialog: DialogOptionsIF = null
   private myRegAddDialogError = false
@@ -338,6 +355,44 @@ export default class Dashboard extends Vue {
     this.loading = false
   }
 
+  private async deleteDraft (docId: string): Promise<void> {
+    this.loading = true
+    const deletion = await deleteDraft(docId)
+    if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
+      // FUTURE: set dialog options / show dialog for error
+      console.error('Failed to delete draft. Please try again later.')
+    } else {
+      // remove from table
+      this.myRegDataDrafts = this.myRegDataDrafts.filter(reg => reg.documentId !== docId)
+    }
+    this.loading = false
+  }
+
+  private editDraftAmend (docId: string, regNum: string): void {
+    this.resetNewRegistration(null) // Clear store data from the previous registration.
+    // Go to the Amendment first step which loads the base registration and draft data.
+    this.$router.push({
+      name: RouteNames.AMEND_REGISTRATION,
+      query: { 'reg-num': regNum, 'document-id': docId }
+    })
+    this.emitHaveData(false)
+  }
+
+  private async editDraftNew (documentId: string): Promise<void> {
+    this.resetNewRegistration(null) // Clear store data from the previous registration.
+    // Get draft details and setup store for editing the draft financing statement.
+    const stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
+    if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
+      alert('Attempt to get draft for editing failed.')
+    } else {
+      this.setLengthTrust(stateModel.registration.lengthTrust)
+      this.setAddCollateral(stateModel.registration.collateral)
+      this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+      // Go to the first step.
+      this.$router.push({ name: RouteNames.LENGTH_TRUST })
+    }
+  }
+
   private async findRegistration (regNum: string): Promise<void> {
     if (this.myRegAddInvalid || !regNum) return
 
@@ -351,6 +406,59 @@ export default class Dashboard extends Vue {
       this.myRegAddErrSetDialog(reg.error)
     }
     this.loading = false
+  }
+
+  private myRegActionDialogHandler (proceed: boolean): void {
+    if (proceed) {
+      this.startNewChildDraft(this.myRegActionRegNum, this.myRegActionRoute)
+    }
+    this.myRegAction = null
+    this.myRegActionRegNum = ''
+    this.myRegActionDialogDisplay = false
+  }
+
+  private myRegActionHandler ({ action, docId, regNum }): void {
+    this.myRegAction = action as TableActions
+    this.myRegActionRegNum = regNum as string
+    switch (action) {
+      case TableActions.AMEND:
+        this.myRegActionRoute = RouteNames.AMEND_REGISTRATION
+        this.myRegActionDialog = amendConfirmationDialog
+        this.myRegActionDialogDisplay = true
+        break
+      case TableActions.DISCHARGE:
+        this.myRegActionRoute = RouteNames.REVIEW_DISCHARGE
+        this.myRegActionDialog = dischargeConfirmationDialog
+        this.myRegActionDialogDisplay = true
+        break
+      case TableActions.RENEW:
+        this.myRegActionRoute = RouteNames.RENEW_REGISTRATION
+        this.myRegActionDialog = renewConfirmationDialog
+        this.myRegActionDialogDisplay = true
+        break
+      case TableActions.DELETE:
+        // FUTURE: set dialog options / show dialog for confirm
+        this.deleteDraft(docId)
+        this.myRegAction = null
+        this.myRegActionRegNum = ''
+        break
+      case TableActions.REMOVE:
+        // FUTURE: set dialog options / show dialog for confirm
+        this.removeRegistration(regNum)
+        this.myRegAction = null
+        this.myRegActionRegNum = ''
+        break
+      case TableActions.EDIT_AMEND:
+        this.editDraftAmend(docId, regNum)
+        break
+      case TableActions.EDIT_NEW:
+        this.editDraftNew(docId)
+        break
+      default:
+        this.myRegAction = null
+        this.myRegActionRegNum = ''
+        console.error('Action not implemented.')
+    }
   }
 
   private myRegAddErrSetDialog (error: ErrorIF): void {
@@ -421,62 +529,34 @@ export default class Dashboard extends Vue {
     this.myRegAddDialogDisplay = false
   }
 
-  private startDischarge (regNum: string): void {
-    this.$router.push({
-      name: RouteNames.REVIEW_DISCHARGE,
-      query: { 'reg-num': regNum }
-    })
-    this.emitHaveData(false)
-  }
-
-  private startRenewal (regNum: string): void {
-    this.$router.push({
-      name: RouteNames.RENEW_REGISTRATION,
-      query: { 'reg-num': regNum }
-    })
-    this.emitHaveData(false)
-  }
-
-  private startAmendment (regNum: string): void {
-    this.$router.push({
-      name: RouteNames.AMEND_REGISTRATION,
-      query: { 'reg-num': regNum }
-    })
-    this.emitHaveData(false)
-  }
-
-  private async startFinancingDraft (documentId: string): Promise<void> {
-    this.resetNewRegistration(null) // Clear store data from the previous registration.
-    // Get draft details and setup store for editing the draft financing statement.
-    const stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
-    if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
-      alert('Attempt to get draft for editing failed.')
-    } else {
-      this.setLengthTrust(stateModel.registration.lengthTrust)
-      this.setAddCollateral(stateModel.registration.collateral)
-      this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
-      // Go to the first step.
-      this.$router.push({ name: RouteNames.LENGTH_TRUST })
-    }
-  }
-
-  private async startAmendmentDraft ({ regNum, docId }): Promise<void> {
-    this.resetNewRegistration(null) // Clear store data from the previous registration.
-    // Go to the Amendment first step which loads the base registration and draft data.
-    this.$router.push({
-      name: RouteNames.AMEND_REGISTRATION,
-      query: { 'reg-num': regNum, 'document-id': docId }
-    })
-    this.emitHaveData(false)
-  }
-
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
   }
 
+  private async removeRegistration (regNum: string): Promise<void> {
+    this.loading = true
+    const removal = await deleteRegistrationSummary(regNum)
+    if (removal.statusCode !== StatusCodes.NO_CONTENT) {
+      // FUTURE: set dialog options / show dialog for error
+      console.error('Failed to remove registration. Please try again later.')
+    } else {
+      // remove from table
+      this.myRegDataHistory = this.myRegDataHistory.filter(reg => reg.baseRegistrationNumber !== regNum)
+    }
+    this.loading = false
+  }
+
+  private startNewChildDraft (regNum: string, routeName: RouteNames): void {
+    this.$router.push({
+      name: routeName,
+      query: { 'reg-num': regNum }
+    })
+    this.emitHaveData(false)
+  }
+
   /** Set registration type in the store and route to the first registration step */
-  private startRegistration (selectedRegistration: RegistrationTypeIF): void {
+  private startNewRegistration (selectedRegistration: RegistrationTypeIF): void {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     this.setRegistrationType(selectedRegistration)
     this.$router.push({ name: RouteNames.LENGTH_TRUST })

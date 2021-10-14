@@ -9,9 +9,8 @@ import flushPromises from 'flush-promises'
 // local components
 import { RegistrationTable } from '@/components/tables'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
-import { RegistrationConfirmation } from '@/components/dialogs'
 // local types/helpers/etc.
-import { AccountProductCodes, AccountProductMemberships } from '@/enums'
+import { AccountProductCodes, AccountProductMemberships, TableActions } from '@/enums'
 import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 // unit test data/helpers
@@ -20,8 +19,10 @@ import {
   mockedDraft1,
   mockedRegistration2,
   mockedRegistration2Child,
-  mockedDraft2
+  mockedDraft2,
+  mockedDraftAmend
 } from './test-data'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -175,36 +176,9 @@ describe('Test registration table with results', () => {
 
   })
 
-  it('shows the discharge modal', async () => {
+  it('emits button actions properly for complete registrations', async () => {
     await wrapper.setProps({ setRegistrationHistory: registrationHistory })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    // the api is going to be called twice, once for drafts and once for registrations
-    // the tests can't tell the difference, so the same one is called twice
-    await Vue.nextTick()
-    await Vue.nextTick()
-    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
-    const buttons = wrapper.findAll('.actions__more-actions__btn')
-    expect(buttons.length).toBe(1)
-
-    buttons.at(0).trigger('click')
-    await Vue.nextTick()
-
-    //it renders the actions drop down
-    const menuItems = wrapper.findAll('.v-list-item__subtitle')
-    expect(menuItems.length).toBe(4)
-    expect(menuItems.at(1).text()).toContain('Total Discharge')
-
-    //click the discharge
-    menuItems.at(1).trigger('click')
-    await flushPromises()
-    const dialog = wrapper.findComponent(RegistrationConfirmation)
-    expect(dialog.isVisible()).toBe(true)
-  })
-
-  it('shows the amendment modal', async () => {
-    await wrapper.setProps({ setRegistrationHistory: registrationHistory })
-    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     const buttons = wrapper.findAll('.actions__more-actions__btn')
     expect(buttons.length).toBe(1)
 
@@ -215,36 +189,45 @@ describe('Test registration table with results', () => {
     const menuItems = wrapper.findAll('.v-list-item__subtitle')
     expect(menuItems.length).toBe(4)
     expect(menuItems.at(0).text()).toContain('Amend')
+    expect(menuItems.at(1).text()).toContain('Total Discharge')
+    expect(menuItems.at(2).text()).toContain('Renew')
+    expect(menuItems.at(3).text()).toContain('Remove From Table')
 
-    //click the amendment
-    menuItems.at(0).trigger('click')
-    await flushPromises()
-    const dialog = wrapper.findComponent(RegistrationConfirmation)
-    
-    expect(dialog.isVisible()).toBe(true)
+    // click items and check emit
+    const actions = [TableActions.AMEND, TableActions.DISCHARGE, TableActions.RENEW, TableActions.REMOVE]
+    for (let i = 0; i < actions.length; i++) {
+      await menuItems.at(i).trigger('click')
+      expect(getLastEvent(wrapper, 'action')).toEqual(
+        { action: actions[i], regNum: registrationHistory[0].baseRegistrationNumber }
+      )
+    }
   })
 
-  it('shows the renewal modal', async () => {
-    await wrapper.setProps({ setRegistrationHistory: registrationHistory })
+  it('emits button actions properly for draft registrations', async () => {
+    const drafts = [mockedDraft1, mockedDraftAmend]
+    await wrapper.setProps({ setRegistrationHistory: drafts })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     const buttons = wrapper.findAll('.actions__more-actions__btn')
-    expect(buttons.length).toBe(1)
+    expect(buttons.length).toBe(drafts.length)
+    // amend draft: i=0, normal draft: i=1
+    for (let i = 0; i < drafts.length; i++) {
+      buttons.at(i).trigger('click')
+      await Vue.nextTick()
 
-    buttons.at(0).trigger('click')
-    await Vue.nextTick()
+      // it renders the actions drop down
+      const menuItems = wrapper.findAll('.v-list-item__subtitle')
+      expect(menuItems.length).toBe(i + 1)
+      expect(menuItems.at(i).text()).toContain('Delete Draft')
 
-    //it renders the actions drop down
-    const menuItems = wrapper.findAll('.v-list-item__subtitle')
-    expect(menuItems.length).toBe(4)
-    expect(menuItems.at(2).text()).toContain('Renew')
-
-    //click the renewal
-    menuItems.at(2).trigger('click')
-    await flushPromises()
-    const dialog = wrapper.findComponent(RegistrationConfirmation)
-    
-    expect(dialog.isVisible()).toBe(true)
+      // click delete and check emit
+      await menuItems.at(i).trigger('click')
+      expect(getLastEvent(wrapper, 'action')).toEqual(
+        {
+          action: TableActions.DELETE,
+          docId: drafts[i].documentId
+        }
+      )
+    }
   })
 
   it('shows the snackbar when toggled', async () => {

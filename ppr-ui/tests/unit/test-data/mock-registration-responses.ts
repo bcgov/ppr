@@ -64,3 +64,14 @@ export const mockedDraft2: DraftResultIF = {
   createDateTime: '2021-08-01T17:21:17+00:00',
   clientReferenceId: ''
 }
+
+export const mockedDraftAmend: DraftResultIF = {
+  type: DraftTypes.AMENDMENT_STATEMENT,
+  documentId: 'D9000019',
+  baseRegistrationNumber: 'GOV2343',
+  registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
+  registrationDescription: '',
+  path: '/path/to/doc',
+  createDateTime: '2021-08-05T17:21:17+00:00',
+  clientReferenceId: 'FFF555'
+}

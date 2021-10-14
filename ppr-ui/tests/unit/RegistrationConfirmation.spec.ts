@@ -4,16 +4,19 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, Wrapper, createLocalVue } from '@vue/test-utils'
-// local
+import flushPromises from 'flush-promises'
+// local components
 import { RegistrationConfirmation } from '@/components/dialogs'
+// local types/helpers/resources/etc.
 import {
   dischargeConfirmationDialog,
   amendConfirmationDialog,
   renewConfirmationDialog
 } from '@/resources/dialogOptions'
 import { axios } from '@/utils/axios-ppr'
+// local test stuff
 import { mockedDebtorNames } from './test-data'
-import flushPromises from 'flush-promises'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -98,7 +101,7 @@ describe('Registration Confirmation Dialog', () => {
     wrapper.find(accept).trigger('click')
     await flushPromises()
 
-    expect(wrapper.emitted().proceed).toBeTruthy()
+    expect(getLastEvent(wrapper, 'proceed')).toBe(true)
 
     expect(store.getters.getConfirmDebtorName.businessName).toBe('Forrest Gump')
   })
@@ -115,7 +118,7 @@ describe('Registration Confirmation Dialog', () => {
     expect(wrapper.find(cancel).exists()).toBe(true)
     wrapper.find(cancel).trigger('click')
     await flushPromises()
-    expect(wrapper.emitted().confirmationClose).toBeTruthy()
+    expect(getLastEvent(wrapper, 'proceed')).toBe(false)
     expect(wrapper.vm.userInput.value).toBe(0)
     expect(wrapper.vm.userInput.text).toBe('')
   })

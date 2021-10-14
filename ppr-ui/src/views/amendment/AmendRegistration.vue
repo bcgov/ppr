@@ -301,7 +301,7 @@ export default class AmendRegistration extends Vue {
     const stateModel: StateModelIF = this.getStateModel
     const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
     if (draft.error !== undefined) {
-      console.log(
+      console.error(
         'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
       )
     }

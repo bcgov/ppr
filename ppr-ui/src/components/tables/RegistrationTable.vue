@@ -1,13 +1,5 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
-    <registration-confirmation
-      attach="#app"
-      :options="currentDialogOptions"
-      :display="showDialog"
-      :registrationNumber="currentRegistrationNumber"
-      @proceed="handleDialogSubmit()"
-      @confirmationClose="closeConfirmation()"
-    />
     <v-card
       v-if="showSubmittedDatePicker"
       :class="[$style['date-selection'], 'registration-date']"
@@ -319,7 +311,7 @@
                   </template>
                   <v-list class="actions__more-actions">
                     <v-list-item>
-                      <v-list-item-subtitle>
+                      <v-list-item-subtitle @click="deleteDraft(row.item, TableActions.DELETE)">
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Delete Draft</span>
                       </v-list-item-subtitle>
@@ -328,7 +320,6 @@
                 </v-menu>
               </span>
             </div>
-
             <div class="actions" v-if="row.item && !row.item.type">
               <span class="edit-action">
                 <v-btn
@@ -356,18 +347,16 @@
                     </v-btn>
                   </template>
                   <v-list class="actions__more-actions registration-actions">
-                    <v-list-item v-if="isAllowedAmendment(row.item)">
-                      <v-list-item-subtitle>
+                    <v-list-item v-if="isActive(row.item)">
+                      <v-list-item-subtitle @click="handleAction(row.item, TableActions.AMEND)">
                         <v-icon small>mdi-pencil</v-icon>
-                        <span class="ml-1" @click="amend(row.item)">Amend</span>
+                        <span class="ml-1">Amend</span>
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item v-if="isAllowedDischarge(row.item)">
-                      <v-list-item-subtitle>
+                    <v-list-item v-if="isActive(row.item)">
+                      <v-list-item-subtitle @click="handleAction(row.item, TableActions.DISCHARGE)">
                         <v-icon small>mdi-note-remove-outline</v-icon>
-                        <span class="ml-1" @click="discharge(row.item)"
-                          >Total Discharge</span
-                        >
+                        <span class="ml-1">Total Discharge</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-tooltip
@@ -379,14 +368,12 @@
                       <template v-slot:activator="{ on: onTooltip }">
                         <div v-on="onTooltip">
                           <v-list-item
-                            v-if="isAllowedRenewal(row.item)"
+                            v-if="isActive(row.item)"
                             :disabled="row.item.expireDays === -99"
                           >
-                            <v-list-item-subtitle>
+                            <v-list-item-subtitle @click="handleAction(row.item, TableActions.RENEW)">
                               <v-icon small>mdi-calendar-clock</v-icon>
-                              <span class="ml-1" @click="renew(row.item)"
-                                >Renew</span
-                              >
+                              <span class="ml-1">Renew</span>
                             </v-list-item-subtitle>
                           </v-list-item>
                         </div>
@@ -394,7 +381,7 @@
                       Infinite registrations cannot be renewed.
                     </v-tooltip>
                     <v-list-item>
-                      <v-list-item-subtitle>
+                      <v-list-item-subtitle @click="handleAction(row.item, TableActions.REMOVE)">
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Remove From Table</span>
                       </v-list-item-subtitle>
@@ -441,13 +428,10 @@ import {
   computed
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
-
-import {
-  dischargeConfirmationDialog,
-  amendConfirmationDialog,
-  renewConfirmationDialog
-} from '@/resources/dialogOptions'
 import { registrationPDF } from '@/utils' // eslint-disable-line
+// local components
+import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
+// local types/helpers/etc.
 import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   AccountProductSubscriptionIF, // eslint-disable-line no-unused-vars
@@ -456,18 +440,16 @@ import {
   DraftResultIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
-  AccountProductCodes,
+  AccountProductCodes, // eslint-disable-line no-unused-vars
   AccountProductRoles, // eslint-disable-line no-unused-vars
-  APIStatusTypes,
-  DraftTypes
+  APIStatusTypes, // eslint-disable-line no-unused-vars
+  DraftTypes, // eslint-disable-line no-unused-vars
+  TableActions // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { RegistrationConfirmation } from '@/components/dialogs'
-import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 
 export default defineComponent({
   components: {
-    RegistrationConfirmation,
     RegistrationBarTypeAheadList
   },
   props: {
@@ -517,20 +499,24 @@ export default defineComponent({
     ])
 
     const localState = reactive({
+      currentOrder: 'asc',
+      datePickerErr: false,
+      loadingPDF: '',
+      registrationDate: '',
       registrationDateFormatted: '',
-      currentDialogOptions: dischargeConfirmationDialog,
-      currentAction: '',
-      showDialog: false,
-      currentRegistrationNumber: '',
+      selectedSort: 'number',
       showSubmittedDatePicker: false,
       submittedStartDateTmp: null,
       submittedEndDateTmp: null,
-      datePickerErr: false,
-      registrationDate: '',
-      loadingPDF: '',
-      currentOrder: 'asc',
-      selectedSort: 'number',
       showSnackbar: false,
+      hasRPPR: computed(() => {
+        const productSubscriptions =
+          getAccountProductSubscriptions.value as AccountProductSubscriptionIF
+        return (
+          productSubscriptions?.[AccountProductCodes.RPPR].roles
+            .includes(AccountProductRoles.EDIT) || false
+        )
+      }),
       headers: computed(() => {
         return props.setHeaders
       }),
@@ -538,44 +524,22 @@ export default defineComponent({
         return props.setLoading
       }),
       pickerStartClass: computed(() => {
-        if (!localState.submittedStartDateTmp && localState.datePickerErr) { return 'picker-title picker-err' }
+        if (!localState.submittedStartDateTmp && localState.datePickerErr) return 'picker-title picker-err'
         return 'picker-title'
       }),
       pickerEndClass: computed(() => {
-        if (!localState.submittedEndDateTmp && localState.datePickerErr) { return 'picker-title picker-err' }
+        if (!localState.submittedEndDateTmp && localState.datePickerErr) return 'picker-title picker-err'
         return 'picker-title'
       }),
-      registrationHistory: computed(() => {
-        return props.setRegistrationHistory
-      }),
-      search: computed(() => {
-        return props.setSearch
+      registrationHistory: computed(() => { return props.setRegistrationHistory }),
+      search: computed(() => { return props.setSearch })
+    })
+
+    const deleteDraft = (item: DraftResultIF): void => {
+      emit('action', {
+        action: TableActions.DELETE,
+        docId: item.documentId
       })
-    })
-
-    const inSelectedHeaders = (search: string) => {
-      return localState.headers.find((header) => { return header.value === search })
-    }
-
-    const hasRPPR = computed(() => {
-      const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
-      return (
-        productSubscriptions?.[AccountProductCodes.RPPR].roles.includes(
-          AccountProductRoles.EDIT
-        ) || false
-      )
-    })
-
-    const rowClass = (item): string => {
-      if (item?.type) {
-        return 'font-italic'
-      } else {
-        if (item?.baseRegistrationNumber === item?.registrationNumber) {
-          return 'base-registration-row'
-        }
-      }
-
-      return ''
     }
 
     const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
@@ -596,10 +560,68 @@ export default defineComponent({
       return actualReg
     }
 
-    const formatDate = (date: string): string => {
-      if (!date) return ''
-      const [year, month, day] = date.split('-')
-      return `${year}/${month}/${day}`
+    const downloadPDF = async (path: string): Promise<any> => {
+      localState.loadingPDF = path
+      const pdf = await registrationPDF(path)
+      if (!pdf || pdf?.error) {
+        emit('error', { statusCode: 404 })
+      } else {
+        /* solution from https://github.com/axios/axios/issues/1392 */
+
+        // it is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        const blob = new Blob([pdf], { type: 'application/pdf' })
+
+        // IE doesn't allow using a blob object directly as link href
+        // instead it is necessary to use msSaveOrOpenBlob
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, path)
+        } else {
+          // for other browsers, create a link pointing to the ObjectURL containing the blob
+          const url = window.URL.createObjectURL(blob)
+          const a = window.document.createElement('a')
+          window.document.body.appendChild(a)
+          a.setAttribute('style', 'display: none')
+          a.href = url
+          a.download = path.replace('/ppr/api/v1/', '')
+          a.click()
+          window.URL.revokeObjectURL(url)
+          a.remove()
+        }
+      }
+      localState.loadingPDF = ''
+    }
+
+    const editDraft = (item: DraftResultIF): void => {
+      if (item?.type === DraftTypes.FINANCING_STATEMENT) {
+        emit('action', { action: TableActions.EDIT_NEW, docId: item.documentId })
+      } else if (item?.type === DraftTypes.AMENDMENT_STATEMENT) {
+        emit('action', {
+          action: TableActions.EDIT_AMEND,
+          docId: item.documentId,
+          regNum: item.baseRegistrationNumber
+        })
+      }
+    }
+
+    const handleAction = (item: RegistrationSummaryIF, action: TableActions): void => {
+      emit('action', { action: action, regNum: item.baseRegistrationNumber })
+    }
+
+    const inSelectedHeaders = (search: string) => {
+      return localState.headers.find((header) => { return header.value === search })
+    }
+
+    const rowClass = (item): string => {
+      if (item?.type) {
+        return 'font-italic'
+      } else {
+        if (item?.baseRegistrationNumber === item?.registrationNumber) {
+          return 'base-registration-row'
+        }
+      }
+
+      return ''
     }
 
     const showExpireDays = (days: number): string => {
@@ -690,115 +712,13 @@ export default defineComponent({
       registrationType.value = val.registrationTypeAPI
     }
 
-    const downloadPDF = async (path: string): Promise<any> => {
-      localState.loadingPDF = path
-      const pdf = await registrationPDF(path)
-      if (!pdf || pdf?.error) {
-        emit('error', { statusCode: 404 })
-      } else {
-        /* solution from https://github.com/axios/axios/issues/1392 */
-
-        // it is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const blob = new Blob([pdf], { type: 'application/pdf' })
-
-        // IE doesn't allow using a blob object directly as link href
-        // instead it is necessary to use msSaveOrOpenBlob
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(blob, path)
-        } else {
-          // for other browsers, create a link pointing to the ObjectURL containing the blob
-          const url = window.URL.createObjectURL(blob)
-          const a = window.document.createElement('a')
-          window.document.body.appendChild(a)
-          a.setAttribute('style', 'display: none')
-          a.href = url
-          a.download = path.replace('/ppr/api/v1/', '')
-          a.click()
-          window.URL.revokeObjectURL(url)
-          a.remove()
-        }
-      }
-      localState.loadingPDF = ''
+    const isActive = (item: RegistrationSummaryIF): boolean => {
+      return item.statusType === APIStatusTypes.ACTIVE
     }
 
-    const discharge = (item): void => {
-      localState.currentDialogOptions = dischargeConfirmationDialog
-      localState.currentRegistrationNumber = item.registrationNumber as string
-      localState.currentAction = 'discharge'
-      localState.showDialog = true
-    }
-
-    const renew = (item): void => {
-      localState.currentDialogOptions = renewConfirmationDialog
-      localState.currentRegistrationNumber = item.registrationNumber as string
-      localState.currentAction = 'renew'
-      localState.showDialog = true
-    }
-
-    const amend = (item): void => {
-      localState.currentDialogOptions = amendConfirmationDialog
-      localState.currentRegistrationNumber = item.registrationNumber as string
-      localState.currentAction = 'amend'
-      localState.showDialog = true
-    }
-
-    const editDraft = (item): void => {
-      localState.currentRegistrationNumber = item.documentId as string
-      localState.currentAction = 'editDraft'
-      localState.showDialog = false
-      if (item?.type === DraftTypes.FINANCING_STATEMENT) {
-        emit('editFinancingDraft', localState.currentRegistrationNumber)
-      } else if (item?.type === DraftTypes.AMENDMENT_STATEMENT) {
-        emit('editAmendmentDraft', { regNum: item.baseRegistrationNumber, docId: item.documentId })
-      }
-    }
-
-    const handleDialogSubmit = (): void => {
-      if (localState.currentAction === 'discharge') {
-        emit('discharge', localState.currentRegistrationNumber)
-      }
-      if (localState.currentAction === 'renew') {
-        emit('renew', localState.currentRegistrationNumber)
-      }
-      if (localState.currentAction === 'amend') {
-        emit('amend', localState.currentRegistrationNumber)
-      }
-      localState.showDialog = false
-    }
-
-    const closeConfirmation = (): void => {
-      localState.currentRegistrationNumber = null
-      localState.showDialog = false
-    }
-
-    const isAllowedRenewal = (item): boolean => {
-      if (item.statusType === APIStatusTypes.ACTIVE) {
-        return true
-      }
-      return false
-    }
-
-    const isAllowedDischarge = (item): boolean => {
-      if (item.statusType === APIStatusTypes.ACTIVE) {
-        return true
-      }
-      return false
-    }
-
-    const isAllowedAmendment = (item): boolean => {
-      if (item.statusType === APIStatusTypes.ACTIVE) {
-        return true
-      }
-      return false
-    }
-
-    watch(
-      () => localState.registrationDate,
-      (val: string) => {
-        registrationDateFormatted.value = formatDate(val)
-      }
-    )
+    watch(() => localState.registrationDate, (val: string) => {
+      registrationDateFormatted.value = val.replaceAll('-', '/')
+    })
 
     watch(() => localState.registrationHistory, (val) => {
       originalData.value = [...val]
@@ -812,16 +732,12 @@ export default defineComponent({
 
     return {
       getFormattedDate,
-      dischargeConfirmationDialog,
-      closeConfirmation,
       getRegistrationType,
       getStatusDescription,
       showExpireDays,
-      discharge,
-      handleDialogSubmit,
-      renew,
-      amend,
+      deleteDraft,
       editDraft,
+      handleAction,
       rowClass,
       registrationNumber,
       displayRegistrationNumber,
@@ -829,7 +745,6 @@ export default defineComponent({
       shouldClearType,
       registrationDateFormatted,
       registrationTypes,
-      hasRPPR,
       selectRegistration,
       registeredBy,
       registeringParty,
@@ -840,15 +755,14 @@ export default defineComponent({
       statusTypes,
       tableData,
       filterResults,
-      isAllowedRenewal,
-      isAllowedDischarge,
-      isAllowedAmendment,
+      isActive,
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
       clearFilters,
       selectAndSort,
       inSelectedHeaders,
+      TableActions,
       ...toRefs(localState)
     }
   }

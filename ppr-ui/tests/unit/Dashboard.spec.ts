@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import { shallowMount, createLocalVue, Wrapper, mount } from '@vue/test-utils'
+import { createLocalVue, Wrapper, mount } from '@vue/test-utils'
 import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
@@ -13,7 +13,7 @@ import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
-import { RouteNames, UISearchTypes } from '@/enums'
+import { RouteNames, TableActions, UISearchTypes } from '@/enums'
 import { registrationTableHeaders } from '@/resources'
 import { axios } from '@/utils/axios-ppr'
 // unit test data, etc.
@@ -24,11 +24,16 @@ import {
   mockedSelectSecurityAgreement,
   mockedDraftFinancingStatementStep1,
   mockedRegistration1,
-  mockedDraft1
+  mockedDraft1,
+  mockedFinancingStatementComplete,
+  mockedDraftFinancingStatementAll,
+  mockedDebtorNames,
+  mockedDraftAmend
 } from './test-data'
 import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
-import { BaseDialog } from '@/components/dialogs'
-import { registrationFoundDialog } from '@/resources/dialogOptions'
+import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
+import { amendConfirmationDialog, dischargeConfirmationDialog, registrationFoundDialog, renewConfirmationDialog } from '@/resources/dialogOptions'
+import { StatusCodes } from 'http-status-codes'
 
 Vue.use(Vuetify)
 
@@ -56,6 +61,7 @@ describe('Dashboard component', () => {
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
+  const regNum = '123456B'
   const draftDocId = 'D0034001'
 
   beforeEach(async () => {
@@ -68,11 +74,15 @@ describe('Dashboard component', () => {
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
     const getDraft = getStub.withArgs(`drafts/${draftDocId}`)
-    getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementStep1 })))
+    getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
     const getMyRegDrafts = getStub.withArgs('drafts')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
     const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
+    const getRegistration = getStub.withArgs(`financing-statements/${regNum}`)
+    getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
+    const getDebtorNames = getStub.withArgs(`financing-statements/${regNum}/debtorNames`)
+    getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -93,9 +103,15 @@ describe('Dashboard component', () => {
 
   it('renders Dashboard View with child components', () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    // dialogs
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(false)
   })
 
   it('displays the search header', () => {
@@ -114,8 +130,7 @@ describe('Dashboard component', () => {
 
   it('updates the search history header based on history data', async () => {
     wrapper.vm.setSearchHistory(mockedSearchHistory.searches)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await flushPromises()
     expect(wrapper.vm.getSearchHistory?.length).toBe(6)
     expect(wrapper.vm.searchHistoryLength).toBe(6)
     const header = wrapper.findAll(historyHeader)
@@ -125,37 +140,87 @@ describe('Dashboard component', () => {
 
   it('routes to search after getting a search response', async () => {
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
-    await Vue.nextTick()
+    await flushPromises()
     expect(wrapper.vm.$route.name).toBe('search')
   })
 
   it('routes to new registration after selecting registration type', async () => {
     wrapper.findComponent(RegistrationBar).vm.$emit(selectedType, mockedSelectSecurityAgreement)
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
-  })
-
-  it('routes to discharge after selecting registration type', async () => {
-    wrapper.findComponent(RegistrationTable).vm.$emit('discharge', '123456B')
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
-  })
-
-  it('routes to renew after selecting registration type', async () => {
-    wrapper.findComponent(RegistrationTable).vm.$emit('renew', '123456B')
-    await Vue.nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
-  })
-
-  it('routes to edit financing statement', async () => {
-    wrapper.findComponent(RegistrationTable).vm.$emit('editFinancingDraft', draftDocId)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
   })
 
-  it('routes to edit amendment statement from draft', async () => {
-    wrapper.findComponent(RegistrationTable).vm.$emit('editAmendmentDraft', { regNum: '100119B', docId: 'D9000207' })
-    await Vue.nextTick()
+  it('completes the beginning of discharge flow', async () => {
+    // emit discharge action
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.DISCHARGE, regNum: regNum }
+    )
+    await flushPromises()
+    // dialog shows
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options)
+      .toEqual(dischargeConfirmationDialog)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber)
+      .toBe(regNum)
+    // emit proceed to discharge
+    wrapper.findComponent(RegistrationConfirmation).vm.$emit('proceed', true)
+    await flushPromises()
+    // goes to review discharge page
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
+  })
+
+  it('completes the beginning of renew flow', async () => {
+    // emit renew action
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.RENEW, regNum: regNum }
+    )
+    await flushPromises()
+    // dialog shows
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options)
+      .toEqual(renewConfirmationDialog)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber)
+      .toBe(regNum)
+    // emit proceed to renew
+    wrapper.findComponent(RegistrationConfirmation).vm.$emit('proceed', true)
+    // goes to renew page
+    expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
+  })
+
+  it('completes the beginning of new amend flow', async () => {
+    // emit amend action
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.AMEND, regNum: regNum }
+    )
+    await flushPromises()
+    // dialog shows
+    expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(true)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options)
+      .toEqual(amendConfirmationDialog)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber)
+      .toBe(regNum)
+    // emit proceed to amend
+    wrapper.findComponent(RegistrationConfirmation).vm.$emit('proceed', true)
+    // goes to amend page
+    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
+  })
+
+  it('routes to edit financing statement after table emits edit draft action', async () => {
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.EDIT_NEW, docId: draftDocId }
+    )
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
+  })
+
+  it('routes to edit amendment statement after table emits edit amend action', async () => {
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.EDIT_AMEND, docId: draftDocId, regNum: regNum }
+    )
+    await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 })
@@ -164,13 +229,14 @@ describe('Dashboard registration table tests', () => {
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
-  const myRegDrafts: DraftResultIF[] = [mockedDraft1]
+  const myRegDrafts: DraftResultIF[] = [mockedDraft1, mockedDraftAmend]
   const myRegHistory: RegistrationSummaryIF[] = [mockedRegistration1]
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
+    // get stubs
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
@@ -178,6 +244,9 @@ describe('Dashboard registration table tests', () => {
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: myRegDrafts })))
     const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: myRegHistory })))
+    // delete stubs
+    const deleteStub = sandbox.stub(axios, 'delete')
+    deleteStub.returns(new Promise (resolve => resolve({ status: StatusCodes.NO_CONTENT })))
 
     const localVue = createLocalVue()
     localVue.use(CompositionApi)
@@ -200,12 +269,12 @@ describe('Dashboard registration table tests', () => {
     expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistory)
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('My Registrations (2)')
+    expect(header.at(0).text()).toContain(`My Registrations (${myRegDrafts.length + myRegHistory.length})`)
     expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([myRegDrafts[0], myRegHistory[0]])
+      .toEqual([...myRegDrafts, ...myRegHistory])
   })
 
   it('updates the registration table when the filter is updated', async () => {
@@ -224,6 +293,42 @@ describe('Dashboard registration table tests', () => {
     await flushPromises()
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(newColumnSelection)
+  })
+
+  it('deletes drafts', async () => {
+    const myRegDraftsCopy = [...myRegDrafts]
+    // check setup
+    expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
+      .toEqual([...myRegDraftsCopy, ...myRegHistory])
+    // emit delete action
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.DELETE, docId: myRegDraftsCopy[0].documentId }
+    )
+    await flushPromises()
+    // draft is removed from table
+    myRegDraftsCopy.shift()
+    expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
+      .toEqual([...myRegDraftsCopy, ...myRegHistory])
+  })
+
+  it('removes complete registrations', async () => {
+    const myRegHistoryCopy = [...myRegHistory]
+    // check setup
+    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryCopy)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
+      .toEqual([...myRegDrafts, ...myRegHistoryCopy])
+    // emit delete action
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action', { action: TableActions.REMOVE, regNum: myRegHistoryCopy[0].baseRegistrationNumber }
+    )
+    await flushPromises()
+    // registration is removed from table
+    myRegHistoryCopy.shift()
+    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryCopy)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
+      .toEqual([...myRegDrafts, ...myRegHistoryCopy])
   })
 })
 
