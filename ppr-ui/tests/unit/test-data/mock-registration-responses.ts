@@ -49,7 +49,7 @@ export const mockedRegistration3: RegistrationSummaryIF = {
   baseRegistrationNumber: '003423B',
   clientReferenceId: '',
   createDateTime: '2019-08-20T17:21:17+00:00',
-  expireDays: '0',
+  expireDays: 0,
   path: '/path/to/doc',
   registeringParty: 'ICBC',
   registrationClass: 'PPSALIEN',
