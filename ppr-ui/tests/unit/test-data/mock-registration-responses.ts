@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
+import { APIAmendmentTypes, APIRegistrationTypes, APIStatusTypes, DraftTypes } from '@/enums'
 import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const mockedRegistration1: RegistrationSummaryIF = {
@@ -14,7 +14,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   registrationNumber: 'GOV2343',
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
   securedParties: 'Bank of Nova Scotia',
-  statusType: 'ACT'
+  statusType: APIStatusTypes.ACTIVE
 }
 
 export const mockedRegistration2: RegistrationSummaryIF = {
@@ -29,7 +29,7 @@ export const mockedRegistration2: RegistrationSummaryIF = {
   registrationNumber: 'BC456788',
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal',
-  statusType: 'ACT'
+  statusType: APIStatusTypes.ACTIVE
 }
 
 export const mockedRegistration2Child: RegistrationSummaryIF = {
@@ -43,6 +43,21 @@ export const mockedRegistration2Child: RegistrationSummaryIF = {
   registrationNumber: 'BC456789',
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal'
+}
+
+export const mockedRegistration3: RegistrationSummaryIF = {
+  baseRegistrationNumber: '003423B',
+  clientReferenceId: '',
+  createDateTime: '2019-08-20T17:21:17+00:00',
+  expireDays: 0,
+  path: '/path/to/doc',
+  registeringParty: 'ICBC',
+  registrationClass: 'PPSALIEN',
+  registrationDescription: 'REPAIRERS LIEN',
+  registrationNumber: '003423B',
+  registrationType: APIAmendmentTypes.AMENDMENT,
+  securedParties: 'Bank of Montreal',
+  statusType: APIStatusTypes.DISCHARGED
 }
 
 export const mockedDraft1: DraftResultIF = {

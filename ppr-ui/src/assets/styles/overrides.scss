@@ -473,9 +473,7 @@ tbody {
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
-  width:130px !important;
-  text-align: right !important;
-  padding-right: 20px !important;
+  min-width: 156px;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper div.v-select__selection {
@@ -556,6 +554,7 @@ tbody {
 
 .registration-actions .v-list-item {
   min-height: 36px;
+  cursor: pointer;
 }
 
 .theme--light.v-list-item .v-list-item__mask {
