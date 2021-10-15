@@ -284,7 +284,7 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
 // used for secured parties/debtors in edit mode
 export const editTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-sm pa-0',
+    class: 'actions-width pa-0',
     sortable: false,
     text: '',
     value: 'edit'

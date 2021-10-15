@@ -2,7 +2,7 @@
   <v-footer class="white pa-0">
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
-        <v-col cols="9">
+        <v-col cols="6">
           <span class="pr-3" v-if="buttonConfig.showCancel">
             <v-btn
               id="reg-cancel-btn"
@@ -33,7 +33,7 @@
             Save
           </v-btn>
         </v-col>
-        <v-col cols="3" justify="end">
+        <v-col cols="6" justify="end">
           <v-btn
             id="reg-next-btn"
             color="primary"
