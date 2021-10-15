@@ -80,7 +80,7 @@ export default defineComponent({
         return getAmendmentDescription.value || ''
       }),
       showErrorComponent: computed((): boolean => {
-        return (props.setShowErrors && localState.detailDescription.length > 4000)
+        return (props.setShowErrors && !localState.valid)
       }),
       valid: computed((): boolean => {
         return (localState.detailDescription?.length || 0) <= 4000
