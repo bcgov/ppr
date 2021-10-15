@@ -146,7 +146,11 @@ describe('Test registration table with results', () => {
           // child registration
           expect(rows.at(i).text()).toContain('N/A')
         } else {
-          expect(rows.at(i).text()).toContain('1 year 135 days')
+          if (reg.expireDays === 500) {
+            expect(rows.at(i).text()).toContain('1 year 135 days')
+          } else {
+            expect(rows.at(i).text()).toContain(reg.expireDays)
+          }
         }
         expect(rows.at(i).text()).toContain(reg.registeringParty)
         expect(rows.at(i).text()).toContain(reg.securedParties)
