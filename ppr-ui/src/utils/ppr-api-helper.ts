@@ -20,7 +20,6 @@ import {
   ErrorIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
-import { APIAmendmentTypes, APIRegistrationTypes } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -321,6 +320,25 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
     })
 }
 
+// Delete an existing draft (any type) by documentId.
+export async function deleteDraft (documentId: string): Promise<ErrorIF> {
+  if (!documentId) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No document ID given.' }
+  return axios
+    .delete<void>(`drafts/${documentId}`, getDefaultConfig())
+    .then(response => {
+      return { statusCode: response?.status as StatusCodes }
+    })
+    .catch(error => {
+      return {
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message:
+          error?.response?.data?.errorMessage +
+          ' ' +
+          error?.response?.data?.rootCause
+      }
+    })
+}
+
 // Search the party code db
 export async function partyCodeSearch (
   nameOrCode: string, exactSearch: boolean
@@ -611,6 +629,26 @@ export async function getRegistrationSummary (
             ' ' +
             error?.response?.data?.rootCause
         }
+      }
+    })
+}
+
+// delete registration summary information from table
+export async function deleteRegistrationSummary (
+  registrationNum: string
+): Promise<ErrorIF> {
+  return axios
+    .delete(`financing-statements/registrations/${registrationNum}`, getDefaultConfig())
+    .then(response => {
+      return { statusCode: response?.status as StatusCodes }
+    })
+    .catch(error => {
+      return {
+        statusCode: error?.response?.status,
+        message:
+          error?.response?.data?.errorMessage +
+          ' ' +
+          error?.response?.data?.rootCause
       }
     })
 }

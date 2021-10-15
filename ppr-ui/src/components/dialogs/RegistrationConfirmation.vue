@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="displayValue" width="45rem" persistent attach="#app">
+  <v-dialog v-model="displayValue" width="45rem" persistent :attach="attachValue">
     <v-card>
       <v-row no-gutters class="pl-10 pt-7">
         <v-col cols="11">
@@ -86,7 +86,7 @@ export default defineComponent({
     },
     registrationNumber: String
   },
-  emits: ['proceed', 'confirmationClose'],
+  emits: ['proceed'],
   setup (props, context) {
     const { setRegistrationConfirmDebtorName } = useActions<any>([
       'setRegistrationConfirmDebtorName'
@@ -113,7 +113,7 @@ export default defineComponent({
               c.personName?.last === localState.userInput.value
           )
           setRegistrationConfirmDebtorName(chosenDebtor)
-          context.emit('proceed')
+          context.emit('proceed', true)
         }
       } else {
         localState.validationErrors = 'This field is required'
@@ -127,7 +127,7 @@ export default defineComponent({
         localState.userInput.text = ''
       }
       localState.debtors = []
-      context.emit('confirmationClose')
+      context.emit('proceed', false)
     }
 
     const getDebtors = async () => {
