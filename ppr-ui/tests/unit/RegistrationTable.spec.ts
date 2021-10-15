@@ -128,6 +128,7 @@ describe('Test registration table with results', () => {
     expect(wrapper.vm.$props.setRegistrationHistory).toEqual(registrationHistory)
     expect(wrapper.findAll(tableRow).length).toBe(1)
     expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].baseRegistrationNumber)
+    // 500 days converted to year & days
     expect(wrapper.findAll(tableRow).at(0).text()).toContain('1 year 135 days')
     expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].registeringParty)
     expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].securedParties)

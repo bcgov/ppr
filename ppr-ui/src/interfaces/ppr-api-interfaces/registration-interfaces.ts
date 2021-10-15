@@ -66,7 +66,7 @@ export interface RegistrationSummaryIF {
   registrationClass?: string, // Returned on creation.
   registeringParty: string,
   securedParties: string,
-  expireDays?: string, // Number of days until expiry
+  expireDays?: number, // Number of days until expiry
   statusType?: string,
   path: string,
   baseRegistrationNumber?: string, // Included in a successful response. The identifier for the registration.
