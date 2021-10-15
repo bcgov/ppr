@@ -1,8 +1,5 @@
 <template>
-  <v-container
-    fluid
-    no-gutters
-    class="white pb-6 pr-10 pl-8 rounded">
+  <v-container v-if="!summaryView" fluid no-gutters class="white pb-6 pr-10 pl-8 rounded">
     <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
@@ -20,7 +17,7 @@
         <v-col cols="3" class="generic-label">
           Trust Indenture
           <div v-if="trustIndentureModified">
-            <v-chip x-small label color="#1669BB" text-color="white">
+            <v-chip x-small label color="primary" text-color="white">
                 AMENDED
             </v-chip>
           </div>
@@ -71,6 +68,22 @@
       </v-row>
     </div>
   </v-container>
+  <v-container v-else class="white pa-0" fluid no-gutters>
+    <h2 class="pl-3">Trust Indenture</h2>
+    <v-row no-gutters class="py-8">
+      <v-col cols="3" class="generic-label pl-5">
+        Trust Indenture
+        <div v-if="trustIndentureModified">
+          <v-chip x-small label color="primary" text-color="white">
+              AMENDED
+          </v-chip>
+        </div>
+      </v-col>
+      <v-col cols="9" class="summary-text">
+          {{ trustIndentureSummary }}
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -96,6 +109,10 @@ export default defineComponent({
     EditTrustIndenture
   },
   props: {
+    isSummary: {
+      type: Boolean,
+      default: false
+    }
   },
   setup (props, context) {
     const { setLengthTrust } = useActions<any>(['setLengthTrust'])
@@ -117,6 +134,9 @@ export default defineComponent({
       showTrustIndenture: computed((): boolean => {
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
+      summaryView: computed((): boolean => {
+        return props.isSummary
+      }),
       computedExpiryDateFormatted: computed((): string => {
         if (getLengthTrust.value.lifeInfinite) {
           return 'No Expiry'
@@ -136,7 +156,7 @@ export default defineComponent({
         return localState.lengthTrust.trustIndenture ? 'Yes' : 'No'
       }),
       trustIndentureModified: computed((): boolean => {
-        return localState.trustIndenture !== localState.originalTrustIndenture
+        return localState.lengthTrust.trustIndenture !== localState.originalTrustIndenture
       })
     })
 

@@ -36,6 +36,7 @@ const cancelButton: string = '#cancel-btn-trust-indenture'
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
 function createComponent (
+  isSummary: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -43,6 +44,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(RegistrationLengthTrustAmendment, {
     localVue,
+    propsData: { isSummary },
     store,
     vuetify
   })
@@ -62,7 +64,7 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
       debtors: mockedDebtorsExisting
     })
     await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
-    wrapper = createComponent()
+    wrapper = createComponent(false)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -89,6 +91,7 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
     })
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
     expect(wrapper.vm.showTrustIndenture).toBe(false)
+    expect(wrapper.vm.summaryView).toBe(false)
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
     expect(wrapper.vm.editInProgress).toBe(false)
     expect(wrapper.vm.computedExpiryDateFormatted).toBeDefined()
@@ -110,7 +113,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     })
     await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
 
-    wrapper = createComponent()
+    wrapper = createComponent(false)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -136,6 +139,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
       lienAmount: ''
     })
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.vm.summaryView).toBe(false)
     expect(wrapper.vm.showTrustIndenture).toBe(true)
     expect(wrapper.vm.trustIndenture).toBe(true)
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
@@ -167,6 +171,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
       lienAmount: ''
     })
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.vm.summaryView).toBe(false)
     expect(wrapper.vm.showTrustIndenture).toBe(true)
     expect(wrapper.vm.trustIndenture).toBe(false)
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
@@ -195,5 +200,54 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeFalsy()
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
     expect(wrapper.vm.editInProgress).toBe(false)
+  })
+})
+
+describe('RegistrationLengthTrustAmendment summary view tests', () => {
+  let wrapper: Wrapper<any>
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationNumber', '0023001B')
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
+    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: null,
+      securedParties: mockedSecuredPartiesExisting,
+      debtors: mockedDebtorsExisting
+    })
+    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
+    await store.dispatch('setOriginalLengthTrust', {
+      valid: true,
+      trustIndenture: true,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
+    wrapper = createComponent(true)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with trust indenture changed to false', async () => {
+    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.vm.summaryView).toBe(true)
+    expect(wrapper.vm.showTrustIndenture).toBe(true)
+    expect(wrapper.vm.showEditTrustIndenture).toBe(false)
+    expect(wrapper.vm.editInProgress).toBe(false)
+    expect(wrapper.vm.trustIndentureModified).toBe(true)
+    expect(wrapper.vm.trustIndentureSummary).toBe('No')
   })
 })

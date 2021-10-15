@@ -12,7 +12,8 @@ import {
   Search,
   Signin,
   Signout,
-  AmendRegistration
+  AmendRegistration,
+  ConfirmAmendment
 } from '@/views'
 import { RouteNames } from '@/enums'
 
@@ -88,7 +89,7 @@ export const routes = [
   {
     path: '/amendment/confirm-admendment',
     name: RouteNames.CONFIRM_AMENDMENT,
-    component: AmendRegistration,
+    component: ConfirmAmendment,
     meta: {
       requiresAuth: true
     }
