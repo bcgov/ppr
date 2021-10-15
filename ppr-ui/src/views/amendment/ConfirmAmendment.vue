@@ -1,14 +1,15 @@
 <template>
   <v-container
     v-if="dataLoaded"
+    id="confirm-amendment"
     class="view-container pa-15 pt-14"
     fluid
     style="min-width: 960px;"
   >
     <base-dialog
-      attach="#app"
-      :options="options"
-      :display="showCancelDialog"
+      setAttach="#confirm-amendment"
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
       @proceed="cancel($event)"
     />
     <div class="container pa-0" style="min-width: 960px;">
