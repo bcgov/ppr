@@ -238,13 +238,15 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      const lt = localState.lengthTrust
       if (infinityPreselected()) {
-        const lt = localState.lengthTrust
         lt.valid = true
         lt.lifeInfinite = true
         lt.lifeYears = null
         setLengthTrust(lt)
       }
+      // inform parent component
+      context.emit('lengthTrustValid', lt.valid)
     })
 
     const setLifeInfinite = (val: boolean): void => {
