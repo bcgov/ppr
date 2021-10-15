@@ -11,6 +11,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   registeringParty: 'John Doe',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'PPSA SECURITY AGREEMENT',
+  registrationNumber: 'GOV2343',
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
   securedParties: 'Bank of Nova Scotia',
   statusType: 'ACT'
@@ -25,6 +26,7 @@ export const mockedRegistration2: RegistrationSummaryIF = {
   registeringParty: 'ICBC',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'REPAIRERS LIEN',
+  registrationNumber: 'BC456788',
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal',
   statusType: 'ACT'
