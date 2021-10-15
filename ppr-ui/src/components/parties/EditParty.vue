@@ -288,7 +288,7 @@ export default defineComponent({
       toggleDialog: false,
       dialogResults: [],
       isPartyType: computed((): boolean => {
-        if ((partyBusiness.value === '') || (partyBusiness.value === null)) {
+        if (!partyBusiness.value) {
           return false
         }
         return true
