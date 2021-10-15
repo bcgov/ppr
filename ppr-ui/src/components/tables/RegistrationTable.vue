@@ -241,7 +241,7 @@
             {{ getRegistrationType(row.item.registrationType) }}
           </td>
           <td v-if="inSelectedHeaders('createDateTime')">
-            <span v-if="row.item && !row.item.type">
+            <span v-if="!isDraft(row.item)">
               {{ getFormattedDate(row.item.createDateTime) }}
             </span>
             <span v-else>
@@ -270,7 +270,7 @@
           <td v-if="inSelectedHeaders('vs')">
             <v-btn
               :id="`pdf-btn-${row.item.id}`"
-              v-if="row.item && !row.item.type"
+              v-if="!isDraft(row.item)"
               :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
               depressed
               :loading="row.item.path === loadingPDF"
@@ -283,56 +283,39 @@
 
           <!-- Action Btns -->
           <td class="actions-cell px-0 py-4">
-            <div class="actions" v-if="row.item && row.item.type">
-              <span class="edit-action">
+            <v-row class="actions" no-gutters>
+              <v-col class="edit-action pa-0" cols="auto">
                 <v-btn
+                  v-if="isDraft(row.item)"
+                  :id="`action-btn-${row.index}`"
+                  :class="$style['edit-btn']"
                   color="primary"
                   elevation="0"
-                  :class="$style['edit-btn']"
-                  :id="'class-' + row.index + '-change-added-btn'"
+                  @click="editDraft(row.item)"
                 >
-                  <span @click="editDraft(row.item)">Edit</span>
+                  <span>Edit</span>
                 </v-btn>
-              </span>
-
-              <span class="actions__more">
-                <v-menu offset-y left nudge-bottom="4">
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      small
-                      v-on="on"
-                      elevation="0"
-                      color="primary"
-                      class="actions__more-actions__btn"
-                      :class="$style['down-btn']"
-                    >
-                      <v-icon>mdi-menu-down</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list class="actions__more-actions">
-                    <v-list-item>
-                      <v-list-item-subtitle @click="deleteDraft(row.item, TableActions.DELETE)">
-                        <v-icon small>mdi-delete</v-icon>
-                        <span class="ml-1">Delete Draft</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </span>
-            </div>
-            <div class="actions" v-if="row.item && !row.item.type">
-              <span class="edit-action">
                 <v-btn
+                  v-else-if="!isExpired(row.item) && !isDischarged(row.item)"
+                  :id="`action-btn-${row.index}`"
+                  :class="$style['edit-btn']"
                   color="primary"
                   elevation="0"
-                  :class="$style['edit-btn']"
-                  :id="'class-' + row.index + '-change-added-btn'"
+                  @click="handleAction(row.item, TableActions.AMEND)"
                 >
-                  <span>Open</span>
+                  <span>Amend</span>
                 </v-btn>
-              </span>
-
-              <span class="actions__more">
+                <v-btn
+                  v-else
+                  :id="`action-btn-${row.index}`"
+                  :class="$style['edit-btn']"
+                  color="primary"
+                  elevation="0"
+                >
+                  <span>Re-Register</span>
+                </v-btn>
+              </v-col>
+              <v-col class="actions__more pa-0">
                 <v-menu offset-y left nudge-bottom="4">
                   <template v-slot:activator="{ on: onMenu }">
                     <v-btn
@@ -347,14 +330,14 @@
                     </v-btn>
                   </template>
                   <v-list class="actions__more-actions registration-actions">
-                    <v-list-item v-if="isActive(row.item)">
-                      <v-list-item-subtitle @click="handleAction(row.item, TableActions.AMEND)">
-                        <v-icon small>mdi-pencil</v-icon>
-                        <span class="ml-1">Amend</span>
+                    <v-list-item v-if="isDraft(row.item)">
+                      <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="deleteDraft(row.item, TableActions.DELETE)">
+                        <v-icon small>mdi-delete</v-icon>
+                        <span class="ml-1">Delete Draft</span>
                       </v-list-item-subtitle>
                     </v-list-item>
-                    <v-list-item v-if="isActive(row.item)">
-                      <v-list-item-subtitle @click="handleAction(row.item, TableActions.DISCHARGE)">
+                    <v-list-item v-if="isActive(row.item) && !isExpired(row.item) && !isDischarged(row.item)">
+                      <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="handleAction(row.item, TableActions.DISCHARGE)">
                         <v-icon small>mdi-note-remove-outline</v-icon>
                         <span class="ml-1">Total Discharge</span>
                       </v-list-item-subtitle>
@@ -368,10 +351,10 @@
                       <template v-slot:activator="{ on: onTooltip }">
                         <div v-on="onTooltip">
                           <v-list-item
-                            v-if="isActive(row.item)"
+                            v-if="isActive(row.item) && !isExpired(row.item) && !isDischarged(row.item)"
                             :disabled="row.item.expireDays === -99"
                           >
-                            <v-list-item-subtitle @click="handleAction(row.item, TableActions.RENEW)">
+                            <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="handleAction(row.item, TableActions.RENEW)">
                               <v-icon small>mdi-calendar-clock</v-icon>
                               <span class="ml-1">Renew</span>
                             </v-list-item-subtitle>
@@ -380,16 +363,16 @@
                       </template>
                       Infinite registrations cannot be renewed.
                     </v-tooltip>
-                    <v-list-item>
-                      <v-list-item-subtitle @click="handleAction(row.item, TableActions.REMOVE)">
+                    <v-list-item v-if="!isDraft(row.item)">
+                      <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="handleAction(row.item, TableActions.REMOVE)">
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Remove From Table</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
                 </v-menu>
-              </span>
-            </div>
+              </v-col>
+            </v-row>
           </td>
         </tr>
       </template>
@@ -745,6 +728,19 @@ export default defineComponent({
       return item.statusType === APIStatusTypes.ACTIVE
     }
 
+    const isDischarged = (item: RegistrationSummaryIF): boolean => {
+      return item.statusType === APIStatusTypes.DISCHARGED
+    }
+
+    const isDraft = (item: any): boolean => {
+      // RegistrationSummaryIF | DraftResultIF
+      return item.type !== undefined
+    }
+
+    const isExpired = (item: RegistrationSummaryIF): boolean => {
+      return item.statusType === APIStatusTypes.EXPIRED
+    }
+
     watch(() => localState.registrationDate, (val: string) => {
       registrationDateFormatted.value = val.replaceAll('-', '/')
     })
@@ -785,6 +781,9 @@ export default defineComponent({
       tableData,
       filterResults,
       isActive,
+      isDischarged,
+      isDraft,
+      isExpired,
       updateSubmittedRange,
       resetSubmittedRange,
       downloadPDF,
@@ -836,17 +835,17 @@ export default defineComponent({
   text-decoration: underline;
 }
 .edit-btn {
-  font-weight: normal !important;
-  height: 30px !important;
-  font-size: 14px !important;
-  border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  margin-top: -16px;
+  border-top-right-radius: 0;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  height: 35px !important;
+  width: 100px;
 }
 .down-btn {
-  height: 30px !important;
-  border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  margin-top: -16px;
+  border-top-left-radius: 0;
+  height: 35px !important;
+  width: 35px;
 }
 </style>

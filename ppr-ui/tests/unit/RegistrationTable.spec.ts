@@ -20,7 +20,8 @@ import {
   mockedRegistration2,
   mockedRegistration2Child,
   mockedDraft2,
-  mockedDraftAmend
+  mockedDraftAmend,
+  mockedRegistration3
 } from './test-data'
 import { getLastEvent } from './utils'
 
@@ -182,36 +183,92 @@ describe('Test registration table with results', () => {
   })
 
   it('emits button actions properly for complete registrations', async () => {
-    await wrapper.setProps({ setRegistrationHistory: registrationHistory })
+    await wrapper.setProps({ setRegistrationHistory: [mockedRegistration1, mockedRegistration3] })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    const buttons = wrapper.findAll('.actions__more-actions__btn')
-    expect(buttons.length).toBe(1)
 
+    // main buttons: active vs discharged/expired
+    const activeRegButton = wrapper.findAll('#action-btn-0')
+    expect(activeRegButton.length).toBe(1)
+    expect(activeRegButton.at(0).text()).toContain('Amend')
+    activeRegButton.at(0).trigger('click')
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'action')).toEqual(
+      { action: TableActions.AMEND, regNum: mockedRegistration1.baseRegistrationNumber }
+    )
+
+    const dischargedRegButton = wrapper.findAll('#action-btn-1')
+    expect(dischargedRegButton.length).toBe(1)
+    expect(dischargedRegButton.at(0).text()).toContain('Re-Register')
+    // FUTURE: test it emits the correct thing here once built
+    activeRegButton.at(0).trigger('click')
+
+    // dropdown buttons
+    const buttons = wrapper.findAll('.actions__more-actions__btn')
+    expect(buttons.length).toBe(2)
+
+    // click dropdown for active reg
     buttons.at(0).trigger('click')
     await Vue.nextTick()
 
     //it renders the actions drop down
-    const menuItems = wrapper.findAll('.v-list-item__subtitle')
-    expect(menuItems.length).toBe(4)
-    expect(menuItems.at(0).text()).toContain('Amend')
-    expect(menuItems.at(1).text()).toContain('Total Discharge')
-    expect(menuItems.at(2).text()).toContain('Renew')
-    expect(menuItems.at(3).text()).toContain('Remove From Table')
+    const menuItems = wrapper.findAll(`.dropdown-btn-${0}`)
+    expect(menuItems.length).toBe(3)
+    expect(menuItems.at(0).text()).toContain('Total Discharge')
+    expect(menuItems.at(1).text()).toContain('Renew')
+    expect(menuItems.at(2).text()).toContain('Remove From Table')
 
     // click items and check emit
-    const actions = [TableActions.AMEND, TableActions.DISCHARGE, TableActions.RENEW, TableActions.REMOVE]
+    const actions = [TableActions.DISCHARGE, TableActions.RENEW, TableActions.REMOVE]
     for (let i = 0; i < actions.length; i++) {
       await menuItems.at(i).trigger('click')
       expect(getLastEvent(wrapper, 'action')).toEqual(
-        { action: actions[i], regNum: registrationHistory[0].baseRegistrationNumber }
+        { action: actions[i], regNum: mockedRegistration1.baseRegistrationNumber }
       )
     }
+
+    // click dropdown for discharged reg
+    buttons.at(1).trigger('click')
+    await Vue.nextTick()
+    //it renders the remove action in drop down
+    const menuItemsDishcarge = wrapper.findAll(`.dropdown-btn-${1}`)
+    expect(menuItemsDishcarge.length).toBe(1)
+    expect(menuItemsDishcarge.at(0).text()).toContain('Remove From Table')
+    await menuItemsDishcarge.at(0).trigger('click')
+    expect(getLastEvent(wrapper, 'action')).toEqual(
+      { action: TableActions.REMOVE, regNum: mockedRegistration3.baseRegistrationNumber }
+    )
   })
 
   it('emits button actions properly for draft registrations', async () => {
     const drafts = [mockedDraft1, mockedDraftAmend]
     await wrapper.setProps({ setRegistrationHistory: drafts })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+
+    // main buttons: new vs amend
+    const draftNewRegButton = wrapper.findAll('#action-btn-0')
+    expect(draftNewRegButton.length).toBe(1)
+    expect(draftNewRegButton.at(0).text()).toContain('Edit')
+    draftNewRegButton.at(0).trigger('click')
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'action')).toEqual(
+      { action: TableActions.EDIT_NEW, docId: mockedDraft1.documentId }
+    )
+
+    const draftAmendRegButton = wrapper.findAll('#action-btn-1')
+    expect(draftAmendRegButton.length).toBe(1)
+    expect(draftAmendRegButton.at(0).text()).toContain('Edit')
+    draftAmendRegButton.at(0).trigger('click')
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'action'))
+      .toEqual(
+        {
+          action: TableActions.EDIT_AMEND,
+          docId: mockedDraftAmend.documentId,
+          regNum: mockedDraftAmend.baseRegistrationNumber
+        }
+      )
+
+    // drop down buttons
     const buttons = wrapper.findAll('.actions__more-actions__btn')
     expect(buttons.length).toBe(drafts.length)
     // amend draft: i=0, normal draft: i=1
@@ -220,12 +277,12 @@ describe('Test registration table with results', () => {
       await Vue.nextTick()
 
       // it renders the actions drop down
-      const menuItems = wrapper.findAll('.v-list-item__subtitle')
-      expect(menuItems.length).toBe(i + 1)
-      expect(menuItems.at(i).text()).toContain('Delete Draft')
+      const menuItems = wrapper.findAll(`.dropdown-btn-${i}`)
+      expect(menuItems.length).toBe(1)
+      expect(menuItems.at(0).text()).toContain('Delete Draft')
 
       // click delete and check emit
-      await menuItems.at(i).trigger('click')
+      await menuItems.at(0).trigger('click')
       expect(getLastEvent(wrapper, 'action')).toEqual(
         {
           action: TableActions.DELETE,
