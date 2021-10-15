@@ -586,6 +586,7 @@ export async function addRegistrationSummary (
         registeringParty: '',
         registrationClass: '',
         registrationDescription: '',
+        registrationNumber: '',
         registrationType: null,
         securedParties: '',
         error: {
@@ -620,6 +621,7 @@ export async function getRegistrationSummary (
         registeringParty: '',
         registrationClass: '',
         registrationDescription: '',
+        registrationNumber: '',
         registrationType: null,
         securedParties: '',
         error: {

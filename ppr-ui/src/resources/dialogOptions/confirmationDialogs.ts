@@ -43,3 +43,21 @@ export const renewConfirmationDialog: DialogOptionsIF = {
   label: 'a Renewal',
   text: ''
 }
+
+// table deletion
+export const tableDeleteDialog: DialogOptionsIF = {
+  acceptText: 'Delete',
+  cancelText: 'Cancel',
+  title: 'Delete Draft',
+  text: 'Are you sure you want to permanently delete this draft registration ' +
+    'and remove it from your registrations table?'
+}
+
+export const tableRemoveDialog: DialogOptionsIF = {
+  acceptText: 'Remove',
+  cancelText: 'Cancel',
+  title: 'Remove From Table',
+  text: 'Are you sure you want to remove this registration from your registrations ' +
+    'table? If you remove this registration from your table, you can add it back later ' +
+    'by retrieving the registration using the base registration number.'
+}

@@ -7,14 +7,25 @@ import { createLocalVue, Wrapper, mount } from '@vue/test-utils'
 import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
+import { StatusCodes } from 'http-status-codes'
 // local components
 import { Dashboard } from '@/views'
+import { RegistrationConfirmation } from '@/components/dialogs'
 import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
 import { RouteNames, TableActions, UISearchTypes } from '@/enums'
+import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
+import {
+  amendConfirmationDialog,
+  dischargeConfirmationDialog,
+  registrationFoundDialog,
+  renewConfirmationDialog,
+  tableDeleteDialog,
+  tableRemoveDialog
+} from '@/resources/dialogOptions'
 import { axios } from '@/utils/axios-ppr'
 // unit test data, etc.
 import mockRouter from './MockRouter'
@@ -22,18 +33,14 @@ import {
   mockedSearchResponse,
   mockedSearchHistory,
   mockedSelectSecurityAgreement,
-  mockedDraftFinancingStatementStep1,
   mockedRegistration1,
   mockedDraft1,
   mockedFinancingStatementComplete,
   mockedDraftFinancingStatementAll,
   mockedDebtorNames,
-  mockedDraftAmend
+  mockedDraftAmend,
+  mockedRegistration2
 } from './test-data'
-import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
-import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
-import { amendConfirmationDialog, dischargeConfirmationDialog, registrationFoundDialog, renewConfirmationDialog } from '@/resources/dialogOptions'
-import { StatusCodes } from 'http-status-codes'
 
 Vue.use(Vuetify)
 
@@ -46,6 +53,8 @@ const selectedType = "selected-registration-type"
 // selectors
 const searchHeader = "#search-header"
 const historyHeader = "#search-history-header"
+const myRegAddDialog = "#myRegAddDialog"
+const myRegDeleteDialog = "#myRegDeleteDialog"
 const myRegHeader = "#registration-header"
 const myRegAddTextBox = "#my-reg-add"
 const myRegTblFilter = "#my-reg-table-filter"
@@ -108,8 +117,10 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     // dialogs
-    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
-    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
+    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(false)
+    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(false)
   })
@@ -244,6 +255,9 @@ describe('Dashboard registration table tests', () => {
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: myRegDrafts })))
     const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: myRegHistory })))
+    const getDebtorNames = getStub
+      .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
+    getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
     // delete stubs
     const deleteStub = sandbox.stub(axios, 'delete')
     deleteStub.returns(new Promise (resolve => resolve({ status: StatusCodes.NO_CONTENT })))
@@ -306,6 +320,13 @@ describe('Dashboard registration table tests', () => {
       'action', { action: TableActions.DELETE, docId: myRegDraftsCopy[0].documentId }
     )
     await flushPromises()
+    // dialog shows
+    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setOptions).toEqual(tableDeleteDialog)
+    // emit proceed with delete
+    wrapper.find(myRegDeleteDialog).vm.$emit('proceed', true)
+    await flushPromises()
     // draft is removed from table
     myRegDraftsCopy.shift()
     expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
@@ -320,9 +341,17 @@ describe('Dashboard registration table tests', () => {
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...myRegDrafts, ...myRegHistoryCopy])
     // emit delete action
+    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
     wrapper.findComponent(RegistrationTable).vm.$emit(
       'action', { action: TableActions.REMOVE, regNum: myRegHistoryCopy[0].baseRegistrationNumber }
     )
+    await flushPromises()
+    // dialog shows
+    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setOptions).toEqual(tableRemoveDialog)
+    // emit proceed with delete
+    wrapper.find(myRegDeleteDialog).vm.$emit('proceed', true)
     await flushPromises()
     // registration is removed from table
     myRegHistoryCopy.shift()
@@ -348,7 +377,7 @@ describe('Dashboard add registration tests', () => {
     const getMyRegDrafts = getStub.withArgs('drafts')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
     const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
-    getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
+    getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(
       `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
@@ -392,15 +421,15 @@ describe('Dashboard add registration tests', () => {
     await flushPromises()
     expect(wrapper.vm.myRegAddDialogDisplay).toBe(true)
     expect(wrapper.vm.loading).toBe(false)
-    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
-    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.findComponent(BaseDialog).vm.$props.setOptions.text)
+    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.text)
       .toContain(registrationFoundDialog.text)
     expect(wrapper.vm.myRegAddDialogError).toBe(false)
-    expect(wrapper.vm.myRegDataHistory).toEqual([])
-    wrapper.findComponent(BaseDialog).vm.$emit('proceed', true)
+    expect(wrapper.vm.myRegDataHistory).toEqual([mockedRegistration2])
+    wrapper.find(myRegAddDialog).vm.$emit('proceed', true)
     await flushPromises()
-    expect(wrapper.vm.myRegDataHistory).toEqual([myRegAdd])
-    expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
+    expect(wrapper.vm.myRegDataHistory).toEqual([myRegAdd, mockedRegistration2])
+    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(false)
   })
 })

@@ -11,6 +11,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   registeringParty: 'John Doe',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'PPSA SECURITY AGREEMENT',
+  registrationNumber: 'GOV2343',
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
   securedParties: 'Bank of Nova Scotia',
   statusType: 'ACT'
@@ -19,12 +20,13 @@ export const mockedRegistration1: RegistrationSummaryIF = {
 export const mockedRegistration2: RegistrationSummaryIF = {
   baseRegistrationNumber: 'BC456788',
   clientReferenceId: '',
-  createDateTime: '2021-07-20T17:21:17+00:00',
+  createDateTime: '2021-08-20T17:21:17+00:00',
   expireDays: '316',
   path: '/path/to/doc',
   registeringParty: 'ICBC',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'REPAIRERS LIEN',
+  registrationNumber: 'BC456788',
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal',
   statusType: 'ACT'
