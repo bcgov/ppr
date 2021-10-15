@@ -27,12 +27,12 @@
       <template v-slot:item="{ parent, item }">
         <template v-if="item.class === 'registration-list-header'">
           <v-list-item-content style="padding: 9px 0;">
-            <v-row style="width: 45rem;">
+            <v-row style="width: 45rem; pointer-events: all;" @click="toggleGroup(item.group)">
               <v-col class="py-0" align-self="center" cols="11">
                 <span class="registration-list-header">{{ item.text }}</span>
               </v-col>
               <v-col class="py-0" align-self="center" cols="auto">
-                <v-btn icon small @click="toggleGroup(item.group)" style="pointer-events: all;">
+                <v-btn icon small style="pointer-events: all;">
                   <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
                   <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
                 </v-btn>
