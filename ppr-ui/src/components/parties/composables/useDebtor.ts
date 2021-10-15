@@ -91,6 +91,10 @@ export const useDebtor = (props, context) => {
   }
 
   const addDebtor = () => {
+    // messes with debtor comparison for individual
+    if (localState.currentDebtor.businessName === undefined) {
+      delete localState.currentDebtor.businessName
+    }
     // if they didn't change anything, just exit
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
     isEqual(localState.currentDebtor, localState.originalDebtor)) {
