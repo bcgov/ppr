@@ -5,7 +5,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   baseRegistrationNumber: 'GOV2343',
   clientReferenceId: 'ABC123',
   createDateTime: '2021-07-20T17:21:17+00:00',
-  expireDays: '100', // Number of days until expiry
+  expireDays: '500', // Number of days until expiry
   lastUpdateDateTime: '2021-10-04T18:26:11+00:00',
   path: '/path/to/doc',
   registeringParty: 'John Doe',

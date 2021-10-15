@@ -128,7 +128,7 @@ describe('Test registration table with results', () => {
     expect(wrapper.vm.$props.setRegistrationHistory).toEqual(registrationHistory)
     expect(wrapper.findAll(tableRow).length).toBe(1)
     expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].baseRegistrationNumber)
-    expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].expireDays)
+    expect(wrapper.findAll(tableRow).at(0).text()).toContain('1 year 135 days')
     expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].registeringParty)
     expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].securedParties)
     // test adding multiple rows + drafts
@@ -145,7 +145,7 @@ describe('Test registration table with results', () => {
           // child registration
           expect(rows.at(i).text()).toContain('N/A')
         } else {
-          expect(rows.at(i).text()).toContain(reg.expireDays)
+          expect(rows.at(i).text()).toContain('1 year 135 days')
         }
         expect(rows.at(i).text()).toContain(reg.registeringParty)
         expect(rows.at(i).text()).toContain(reg.securedParties)
