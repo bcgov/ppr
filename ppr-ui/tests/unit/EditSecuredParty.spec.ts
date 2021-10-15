@@ -11,7 +11,6 @@ import sinon from 'sinon'
 
 // Components
 import { EditParty } from '@/components/parties'
-import { VehicleTypes } from '@/resources'
 
 Vue.use(Vuetify)
 

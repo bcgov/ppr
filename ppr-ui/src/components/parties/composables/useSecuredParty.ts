@@ -4,6 +4,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress } from '@/composables/address/factories/address-factory'
+import { cloneDeep, isEqual } from 'lodash'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -32,7 +33,8 @@ export const useSecuredParty = (props, context) => {
     } as PartyIF,
     currentIsBusiness: null,
     partyBusiness: null,
-    registrationFlowType: getRegistrationFlowType.value
+    registrationFlowType: getRegistrationFlowType.value,
+    originalSecuredParty: null
   })
 
   const getSecuredParty = () => {
@@ -50,6 +52,7 @@ export const useSecuredParty = (props, context) => {
         localState.currentSecuredParty.personName = Object.assign({}, initPerson)
       }
     } else {
+      localState.partyBusiness = null
       const blankSecuredParty = {
         businessName: '',
         personName: Object.assign({}, initPerson),
@@ -59,6 +62,7 @@ export const useSecuredParty = (props, context) => {
       }
       localState.currentSecuredParty = blankSecuredParty
     }
+    localState.originalSecuredParty = cloneDeep(localState.currentSecuredParty)
   }
 
   const addressSchema = PartyAddressSchema
@@ -76,6 +80,12 @@ export const useSecuredParty = (props, context) => {
   const addEditSecuredParty = async () => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+    // if they didn't change anything, just exit
+    if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
+    isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
+      resetFormAndData(true)
+      return
+    }
     if (localState.partyBusiness === 'I') {
       localState.currentSecuredParty.businessName = ''
       // localState.searchValue = ''
@@ -155,6 +165,7 @@ export const useSecuredParty = (props, context) => {
     addSecuredParty,
     isSecuredPartyRestrictedList,
     RegistrationFlowType,
+    ActionTypes,
     ...toRefs(localState)
   }
 }
