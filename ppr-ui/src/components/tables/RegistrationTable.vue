@@ -650,8 +650,8 @@ export default defineComponent({
               today.getUTCDate()
             )
           )
-          let currentDayOfYear = getDayOfYear(dateToday)
-          let expDayOfYear = getDayOfYear(dateExpiry)
+          const currentDayOfYear = getDayOfYear(dateToday)
+          const expDayOfYear = getDayOfYear(dateExpiry)
           let daysDiff = expDayOfYear - currentDayOfYear
           if (daysDiff < 0) {
             dateExpiry.setFullYear(dateExpiry.getFullYear() - 1)
@@ -703,10 +703,10 @@ export default defineComponent({
     }
 
     const getDayOfYear = (dateOfYear: Date) => {
-      var start = new Date(dateOfYear.getFullYear(), 0, 0);
-      var diff = (dateOfYear - start) + ((start.getTimezoneOffset() - dateOfYear.getTimezoneOffset()) * 60 * 1000);
-      var oneDay = 1000 * 60 * 60 * 24;
-      return Math.floor(diff / oneDay);
+      var start = new Date(dateOfYear.getFullYear(), 0, 0)
+      var diff = (dateOfYear - start) + ((start.getTimezoneOffset() - dateOfYear.getTimezoneOffset()) * 60 * 1000)
+      var oneDay = 1000 * 60 * 60 * 24
+      return Math.floor(diff / oneDay)
     }
 
     const updateSubmittedRange = () => {
