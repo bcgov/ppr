@@ -17,7 +17,7 @@
 
 from http import HTTPStatus
 
-from flask import request, current_app, jsonify, g
+from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
@@ -73,9 +73,9 @@ class SearchResultsResource(Resource):
 
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value, token['name'])
+                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return jsonify(response_data), HTTPStatus.OK
 
@@ -110,9 +110,9 @@ class SearchResultsResource(Resource):
 
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value, token['name'])
+                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return jsonify(response_data), HTTPStatus.OK
 

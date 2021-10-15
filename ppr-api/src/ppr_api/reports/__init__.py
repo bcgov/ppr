@@ -14,12 +14,15 @@ from http import HTTPStatus
 from flask import jsonify
 from flask_babel import _
 
+from ppr_api.resources.utils import get_account_name
+
 from .report import Report, ReportTypes
 
 
-def get_pdf(report_data, account_id, report_type=None, account_name=None):
+def get_pdf(report_data, account_id, report_type=None, token=None):
     """Generate a PDF of the provided report type using the provided data."""
     try:
+        account_name = get_account_name(token)
         return Report(report_data, account_id, report_type, account_name).get_pdf()
     except FileNotFoundError:
         # We don't have a template for it, so it must only be available on paper.

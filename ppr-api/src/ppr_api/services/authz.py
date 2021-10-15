@@ -30,6 +30,7 @@ STAFF_ROLE = 'staff'
 BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
+USER_ORGS_PATH = 'users/orgs'
 
 
 #  def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool:
@@ -127,6 +128,41 @@ def authorized_token(  # pylint: disable=too-many-return-statements
             return False
 
     return False
+
+
+def user_orgs(token: str) -> dict:
+    """Auth API call to get user organizations for the user identified by the token."""
+    response = None
+    if not token:
+        return response
+
+    service_url = current_app.config.get('AUTH_SVC_URL')
+    api_url = service_url + '/' if service_url[-1] != '/' else service_url
+    api_url += USER_ORGS_PATH
+
+    try:
+        headers = {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        # current_app.logger.debug('Auth get user orgs url=' + url)
+        http = Session()
+        retries = Retry(total=3,
+                        backoff_factor=0.1,
+                        status_forcelist=[500, 502, 503, 504])
+        http.mount('http://', HTTPAdapter(max_retries=retries))
+        ret_val = http.get(url=api_url, headers=headers)
+        current_app.logger.debug('Auth get user orgs response status: ' + str(ret_val.status_code))
+        # current_app.logger.debug('Auth get user orgs response data:')
+        response = ret_val.json()
+        # current_app.logger.debug(response)
+    except (exceptions.ConnectionError,  # pylint: disable=broad-except
+            exceptions.Timeout,
+            ValueError,
+            Exception) as err:
+        current_app.logger.error(f'Authorization connection failure using svc:{api_url}', err)
+
+    return response
 
 
 def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements

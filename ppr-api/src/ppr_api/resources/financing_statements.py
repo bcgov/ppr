@@ -114,9 +114,9 @@ class FinancingResource(Resource):
             statement = pay_and_save_financing(request_json, account_id)
 
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return statement.json, HTTPStatus.CREATED
 
@@ -170,9 +170,9 @@ class GetFinancingResource(Resource):
             else:
                 statement.current_view_json = current_param
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return statement.json, HTTPStatus.OK
 
@@ -238,12 +238,11 @@ class AmendmentResource(Resource):
 
             response_json = registration.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json,
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               token['name'])
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.CREATED
 
@@ -286,9 +285,9 @@ class GetAmendmentResource(Resource):
 
             response_json = statement.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.OK
 
@@ -301,7 +300,7 @@ class GetAmendmentResource(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/<path:registration_num>/changes', methods=['POST', 'OPTIONS'])
 class ChangeResource(Resource):
-    """Resource to register an change statement by registration number."""
+    """Resource to fetch a change statement by registration number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -354,9 +353,9 @@ class ChangeResource(Resource):
 
             response_json = registration.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.CREATED
 
@@ -399,9 +398,9 @@ class GetChangeResource(Resource):
 
             response_json = statement.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.OK
 
@@ -464,9 +463,9 @@ class RenewalResource(Resource):
 
             response_json = registration.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.CREATED
 
@@ -509,9 +508,9 @@ class GetRenewalResource(Resource):
 
             response_json = statement.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value, token['name'])
+                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.OK
 
@@ -574,12 +573,11 @@ class DischargeResource(Resource):
                                         account_id)
             response_json = registration.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json,
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               token['name'])
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.CREATED
 
@@ -622,12 +620,11 @@ class GetDischargeResource(Resource):
 
             response_json = statement.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
-                token = g.jwt_oidc_token_info
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json,
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               token['name'])
+                               jwt.get_token_auth_header())
 
             return response_json, HTTPStatus.OK
 
