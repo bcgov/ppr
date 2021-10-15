@@ -422,6 +422,7 @@ export default class Dashboard extends Vue {
   }
 
   private myRegActionDialogHandler (proceed: boolean): void {
+    // handles the response from the confirmation dialog in the amend/renew/discharge flow
     if (proceed) {
       this.startNewChildDraft(this.myRegActionRegNum, this.myRegActionRoute)
     }
@@ -455,10 +456,8 @@ export default class Dashboard extends Vue {
         this.myRegDeleteDialogDisplay = true
         break
       case TableActions.REMOVE:
-        console.log('HERE')
         this.myRegDeleteDialog = tableRemoveDialog
         this.myRegDeleteDialogDisplay = true
-        console.log(this.myRegDeleteDialogDisplay)
         break
       case TableActions.EDIT_AMEND:
         this.editDraftAmend(docId, regNum)
