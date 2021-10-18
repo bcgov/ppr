@@ -293,7 +293,8 @@ TEST_GET_LIST = [
 TEST_USER_LIST = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019A'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019A'),
-    ('Valid Request', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0019A'),
+    ('Valid Request Extra', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0019A'),
+    ('Valid Request User', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0017'),
     ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
     ('Already exists user', [PPR_ROLE], HTTPStatus.CONFLICT, 'PS12345', 'TEST0001'),
     ('Already exists extra', [PPR_ROLE], HTTPStatus.CONFLICT, 'PS12345', 'TEST0019'),
@@ -303,7 +304,8 @@ TEST_USER_LIST = [
 TEST_USER_LIST_DELETE = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019'),
-    ('Valid Request', [PPR_ROLE], HTTPStatus.NO_CONTENT, 'PS12345', 'TEST0019'),
+    ('Extra Valid Request', [PPR_ROLE], HTTPStatus.NO_CONTENT, 'PS12345', 'TEST0019'),
+    ('User Valid Request', [PPR_ROLE], HTTPStatus.NO_CONTENT, 'PS12345', 'TEST0005'),
     ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
     ('Invalid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019')
 ]

@@ -16,13 +16,12 @@
 Common constants used across models and utilities for mapping type codes
 between the API and the database in both directions.
 """
-
-from datetime import time, tzinfo  # noqa: F401 pylint: disable=unused-import
-from datetime import date
+from datetime import date  # noqa: F401 pylint: disable=unused-import
 from datetime import datetime as _datetime
-from datetime import timedelta, timezone
+from datetime import time, timedelta, timezone
 
 import pytz
+from flask import current_app
 
 
 # Local timzone
@@ -268,7 +267,12 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name
+                           WHERE u.username = r.user_id) END) AS registering_name,
+      (SELECT COUNT(id)
+         FROM user_extra_registrations uer
+        WHERE uer.registration_number = r.registration_number
+          AND uer.account_id = r.account_id
+          AND uer.removed_ind = 'Y') AS removed_count
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -308,7 +312,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name
+                           WHERE u.username = r.user_id) END) AS registering_name,
+       0 AS removed_count
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -318,7 +323,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                     AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
                     AND r2.registration_number IN (SELECT uer.registration_number
                                                       FROM user_extra_registrations uer
-                                                     WHERE uer.account_id = :query_account))
+                                                     WHERE uer.account_id = :query_account
+                                                       AND uer.removed_ind IS NULL))
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
@@ -409,6 +415,11 @@ ERR_FINANCING_HISTORICAL = \
 ERR_REGISTRATION_ACCOUNT = 'The account ID {account_id} does not match registration number {registration_num}.'
 ERR_REGISTRATION_MISMATCH = \
     'The registration {registration_num} does not match the Financing Statement registration {base_reg_num}.'
+
+
+def get_max_registrations_size():
+    """Get the configurable results maximum size for account registrations."""
+    return int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
 
 
 def format_ts(time_stamp):
