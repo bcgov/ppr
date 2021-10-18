@@ -73,6 +73,7 @@ describe('Vehicle collateral summary tests', () => {
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
     expect(wrapper.find('.collateral-table').exists()).toBe(true)
   })
+
 })
 
 describe('Vehicle collateral edit tests', () => {
@@ -164,7 +165,7 @@ describe('Vehicle Collateral amendment tests', () => {
     const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
     // options from first drop down
     expect(options.at(0).text()).toContain('Amend')
-    expect(options.at(1).text()).toContain('Remove')
+    expect(options.at(1).text()).toContain('Delete')
     // option from second drop down
     expect(options.at(2).text()).toContain('Remove')
   })
