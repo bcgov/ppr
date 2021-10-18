@@ -453,6 +453,10 @@ tbody {
   width: auto;
 }
 
+#registration-table.full-width.v-data-table > .v-data-table__wrapper > table {
+  width: 100%;
+}
+
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th, 
@@ -460,12 +464,19 @@ tbody {
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
   padding: 0 5px;
+  width: 100%;
 }
 
-#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action,
-#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.registration-action { 
-  width:130px !important;
-  padding-left: 15px !important;
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > th.registration-action,
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell { 
+  background-color: white;
+  border-left: 1px solid $gray3;
+  box-shadow: -3px 0 4px -1px $gray5;
+  left: 0;
+  position: sticky;
+  right: 0;
+  width: 156px;
+  z-index: 5;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th {

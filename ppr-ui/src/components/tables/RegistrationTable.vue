@@ -53,7 +53,7 @@
       v-if="!loadingData"
       id="registration-table"
       class="registration-table pl-4"
-      :class="$style['reg-table']"
+      :class="[$style['reg-table'], { 'full-width': headers.length <= 1 }]"
       disable-pagination
       disable-sort
       :expanded.sync="expandedList"
@@ -69,158 +69,167 @@
       :sort-desc="[false, true]"
     >
       <template v-slot:header="{ props }">
-        <th
-          v-for="(header, index) in props.headers"
-          :key="index"
-          :class="header.class"
-          class="border-btm text-left pa-0"
-        >
-          <v-row class="my-reg-header pl-2 pt-8" no-gutters @click="selectAndSort(header.value)">
-            <v-col>
-              {{ header.text }}
-              <span v-if="header.value === selectedSort && header.sortable">
-                <v-icon v-if="currentOrder === 'asc'" small style="color: black;">
-                  mdi-arrow-down
-                </v-icon>
-                <v-icon v-else small style="color: black;">
-                  mdi-arrow-up
-                </v-icon>
-              </span>
-            </v-col>
-          </v-row>
-          <v-row class="border-tp my-reg-filter pl-2 pt-5" no-gutters>
-            <v-col>
-              <v-text-field
-                v-if="header.value === 'registrationNumber'"
-                filled
-                single-line
-                hide-details="true"
-                v-model="registrationNumber"
-                type="text"
-                label="Number"
-                dense
-              />
-              <div v-if="header.value === 'registrationType'">
-                <registration-bar-type-ahead-list
-                  v-if="hasRPPR"
-                  :defaultLabel="'Registration Type'"
-                  :defaultDense="true"
-                  :defaultClearable="true"
-                  :defaultClear="shouldClearType"
-                  @selected="selectRegistration($event)"
-                />
-                <v-select
-                  v-else
-                  :items="registrationTypes"
+        <thead v-if="headers.length > 1">
+          <th
+            v-for="(header, index) in props.headers"
+            :key="index"
+            :class="header.class"
+            class="border-btm text-left pa-0"
+          >
+            <v-row class="my-reg-header pl-2 pt-8" no-gutters @click="selectAndSort(header.value)">
+              <v-col>
+                {{ header.text }}
+                <span v-if="header.value === selectedSort && header.sortable">
+                  <v-icon v-if="currentOrder === 'asc'" small style="color: black;">
+                    mdi-arrow-down
+                  </v-icon>
+                  <v-icon v-else small style="color: black;">
+                    mdi-arrow-up
+                  </v-icon>
+                </span>
+              </v-col>
+            </v-row>
+            <v-row class="border-tp my-reg-filter pl-2 pt-5" no-gutters>
+              <v-col>
+                <v-text-field
+                  v-if="header.value === 'registrationNumber'"
+                  filled
                   single-line
-                  item-text="registrationTypeUI"
-                  item-value="registrationTypeAPI"
-                  class="table-registration-types"
+                  hide-details="true"
+                  v-model="registrationNumber"
+                  type="text"
+                  label="Number"
+                  dense
+                />
+                <div v-if="header.value === 'registrationType'">
+                  <registration-bar-type-ahead-list
+                    v-if="hasRPPR"
+                    :defaultLabel="'Registration Type'"
+                    :defaultDense="true"
+                    :defaultClearable="true"
+                    :defaultClear="shouldClearType"
+                    @selected="selectRegistration($event)"
+                  />
+                  <v-select
+                    v-else
+                    :items="registrationTypes"
+                    single-line
+                    item-text="registrationTypeUI"
+                    item-value="registrationTypeAPI"
+                    class="table-registration-types"
+                    filled
+                    dense
+                    clearable
+                    label="Registration Type"
+                    v-model="registrationType"
+                    id="txt-type"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                  >
+                    <template slot="item" slot-scope="data">
+                      <span class="list-item">
+                        {{ data.item.registrationTypeUI }}
+                      </span>
+                    </template>
+                  </v-select>
+                </div>
+                <div
+                  v-if="header.value === 'createDateTime'"
+                  @click="showSubmittedDatePicker = true"
+                >
+                  <v-text-field
+                    v-if="header.value === 'createDateTime'"
+                    filled
+                    single-line
+                    id="reg-textfield"
+                    data-test-id="reg-date-text"
+                    v-model="registrationDateFormatted"
+                    hint="YYYY/MM/DD"
+                    append-icon="mdi-calendar"
+                    dense
+                    clearable
+                    hide-details="true"
+                  />
+                </div>
+                <v-select
+                  v-if="header.value === 'statusType'"
+                  :items="statusTypes"
+                  hide-details
+                  single-line
                   filled
                   dense
+                  label="Status"
+                  v-model="status"
+                  id="txt-status"
+                  @change="filterResults(tableData)"
                   clearable
-                  label="Registration Type"
-                  v-model="registrationType"
-                  id="txt-type"
-                  :menu-props="{ bottom: true, offsetY: true }"
                 >
                   <template slot="item" slot-scope="data">
                     <span class="list-item">
-                      {{ data.item.registrationTypeUI }}
+                      {{ data.item.text }}
                     </span>
                   </template>
                 </v-select>
-              </div>
-              <div
-                v-if="header.value === 'createDateTime'"
-                @click="showSubmittedDatePicker = true"
-              >
                 <v-text-field
-                  v-if="header.value === 'createDateTime'"
+                  v-if="header.value === 'registeringName'"
                   filled
                   single-line
-                  id="reg-textfield"
-                  data-test-id="reg-date-text"
-                  v-model="registrationDateFormatted"
-                  hint="YYYY/MM/DD"
-                  append-icon="mdi-calendar"
-                  dense
-                  clearable
                   hide-details="true"
+                  v-model="registeredBy"
+                  type="text"
+                  label="Registered By"
+                  dense
                 />
-              </div>
-              <v-select
-                v-if="header.value === 'statusType'"
-                :items="statusTypes"
-                hide-details
-                single-line
-                filled
-                dense
-                label="Status"
-                v-model="status"
-                id="txt-status"
-                @change="filterResults(tableData)"
-                clearable
-              >
-                <template slot="item" slot-scope="data">
-                  <span class="list-item">
-                    {{ data.item.text }}
-                  </span>
-                </template>
-              </v-select>
-              <v-text-field
-                v-if="header.value === 'registeringName'"
-                filled
-                single-line
-                hide-details="true"
-                v-model="registeredBy"
-                type="text"
-                label="Registered By"
-                dense
-              />
-              <v-text-field
-                v-if="header.value === 'registeringParty'"
-                filled
-                single-line
-                hide-details="true"
-                v-model="registeringParty"
-                type="text"
-                label="Registering Party"
-                dense
-              />
-              <v-text-field
-                v-if="header.value === 'securedParties'"
-                filled
-                single-line
-                hide-details="true"
-                v-model="securedParties"
-                type="text"
-                label="Secured Parties"
-                dense
-              />
-              <v-text-field
-                v-if="header.value === 'clientReferenceId'"
-                filled
-                single-line
-                hide-details="true"
-                v-model="folioNumber"
-                type="text"
-                label=""
-                dense
-              />
-              <v-btn
-                v-if="header.value === 'actions'"
-                :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'pa-0']"
-                color="primary"
-                text
-                @click="clearFilters()"
-              >
-                Clear Filters
-                <v-icon class="pl-1 pt-1">mdi-close</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
-        </th>
+                <v-text-field
+                  v-if="header.value === 'registeringParty'"
+                  filled
+                  single-line
+                  hide-details="true"
+                  v-model="registeringParty"
+                  type="text"
+                  label="Registering Party"
+                  dense
+                />
+                <v-text-field
+                  v-if="header.value === 'securedParties'"
+                  filled
+                  single-line
+                  hide-details="true"
+                  v-model="securedParties"
+                  type="text"
+                  label="Secured Parties"
+                  dense
+                />
+                <v-text-field
+                  v-if="header.value === 'clientReferenceId'"
+                  filled
+                  single-line
+                  hide-details="true"
+                  v-model="folioNumber"
+                  type="text"
+                  label=""
+                  dense
+                />
+                <v-btn
+                  v-if="header.value === 'actions' && headers.length > 1"
+                  :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pt-4']"
+                  color="primary"
+                  text
+                  @click="clearFilters()"
+                >
+                  Clear Filters
+                  <v-icon class="pl-1 pt-1">mdi-close</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </th>
+        </thead>
+        <thead v-else>
+          <th>
+            <p class="pa-10 ma-0" >
+              No columns selected to show. Please select columns to see registration information.
+            </p>
+          </th>
+        </thead>
       </template>
       <template v-slot:item="row" class="registration-data-table">
         <tr
@@ -283,7 +292,7 @@
           </td>
 
           <!-- Action Btns -->
-          <td class="actions-cell px-0 py-4">
+          <td v-if="headers.length > 1" class="actions-cell pl-2 py-4">
             <v-row class="actions" no-gutters>
               <v-col class="edit-action pa-0" cols="auto">
                 <v-btn
@@ -515,6 +524,7 @@ export default defineComponent({
         )
       }),
       headers: computed(() => {
+        console.log(props.setHeaders)
         return props.setHeaders
       }),
       loadingData: computed(() => {
