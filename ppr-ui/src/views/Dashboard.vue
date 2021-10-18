@@ -313,7 +313,7 @@ export default class Dashboard extends Vue {
   private myRegHeadersSelected = [...registrationTableHeaders]
   private myRegSnackBar = false
   private tooltipTxtRegSrch = 'Retrieve existing registrations you would like to ' +
-    'renew, discharge or amend that are not already in your My Registrations table'
+    'renew, discharge or amend that are not already in your registrations table.'
 
   mounted () {
     // clear search data in the store
@@ -480,7 +480,7 @@ export default class Dashboard extends Vue {
       case StatusCodes.NOT_FOUND:
         this.myRegAddDialog = { ...registrationNotFoundDialog }
         this.myRegAddDialog.text = 'An existing registration with the ' +
-          `registration number ${this.myRegAdd} was not found. Please ` +
+          `registration number <b>${this.myRegAdd}</b> was not found. Please ` +
           'check the registration number and try again.'
         break
       case StatusCodes.UNAUTHORIZED:

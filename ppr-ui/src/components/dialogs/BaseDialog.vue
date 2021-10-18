@@ -87,9 +87,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#accept-btn {
-  font-weight: normal;
-}
 .close-btn, .close-btn:hover, .close-btn::before {
   background-color: transparent;
   height: 24px;
