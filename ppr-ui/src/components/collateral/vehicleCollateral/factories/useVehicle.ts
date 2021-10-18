@@ -2,11 +2,14 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { ActionTypes, APIRegistrationTypes } from '@/enums'
+import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 
 export const useVehicle = (props, context) => {
-  const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
-  const { getVehicleCollateral } = useGetters<any>(['getVehicleCollateral'])
+  const {
+    getRegistrationType,
+    getRegistrationFlowType,
+    getVehicleCollateral
+  } = useGetters<any>(['getRegistrationType', 'getRegistrationFlowType', 'getVehicleCollateral'])
   const { setCollateralValid } = useActions<any>(['setCollateralValid'])
   const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
 
@@ -16,6 +19,7 @@ export const useVehicle = (props, context) => {
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
     vehicleTypesNoMH: VehicleTypesNoMH,
+    registrationFlowType: getRegistrationFlowType.value,
     getSerialLabel: computed(function () {
       switch (localState.currentVehicle.type) {
         case '':
@@ -125,6 +129,8 @@ export const useVehicle = (props, context) => {
     hasVehicleCollateral,
     mustHaveManufacturedHomeCollateral,
     excludesManufacturedHomeCollateral,
+    ActionTypes,
+    RegistrationFlowType,
     ...toRefs(localState)
   }
 }

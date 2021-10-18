@@ -1,25 +1,28 @@
 <template>
-  <v-container
-    v-if="summaryView || (registrationFlowType === RegistrationFlowType.AMENDMENT && !amendMode)"
-    style="padding: 28px 12px 0 30px;"
-  >
-    <gen-col-summary
-      @initGenColAmend="amendMode = $event"
-      :setShowHistory="registrationFlowType === RegistrationFlowType.AMENDMENT"
-    />
-  </v-container>
-  <v-container
-    v-else-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
-    style="padding: 28px 12px 0 30px;"
-  >
-    <gen-col-amend @closeGenColAmend="amendMode = false" />
-  </v-container>
-  <v-container v-else class="pa-0">
-    <gen-col-edit
-      :showInvalid="showInvalid"
-      @valid="emitValid"
-    />
-  </v-container>
+  <div class="pa-0 ma-0">
+    <v-container
+      v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
+      style="padding: 28px 12px 0 30px;"
+    >
+      <gen-col-amend @closeGenColAmend="amendMode = false" />
+    </v-container>
+    <v-container
+      v-if="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
+      style="padding: 28px 12px 0 30px;"
+    >
+      <gen-col-summary
+        @initGenColAmend="amendMode = $event"
+        :setShowHistory="registrationFlowType === RegistrationFlowType.AMENDMENT"
+        :setShowAmendLink="!amendMode"
+      />
+    </v-container>
+    <v-container v-else class="pa-0">
+      <gen-col-edit
+        :showInvalid="showInvalid"
+        @valid="emitValid"
+      />
+    </v-container>
+  </div>
 </template>
 
 <script lang="ts">

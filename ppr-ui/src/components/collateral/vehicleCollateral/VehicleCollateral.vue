@@ -232,7 +232,13 @@
                         <v-list-item @click="removeVehicle(row.index)">
                           <v-list-item-subtitle>
                             <v-icon small>mdi-delete</v-icon>
-                            <span class="ml-1">Remove</span>
+                            <span
+                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && row.item.action !== ActionTypes.ADDED"
+                            >
+                              Delete
+                            </span>
+                            <span v-else class="ml-1">Remove</span>
                           </v-list-item-subtitle>
                         </v-list-item>
                       </v-list>
