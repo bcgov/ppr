@@ -52,7 +52,8 @@
             :setShowErrors="showInvalid"
           />
           <court-order class="mt-15"
-            :setShowErrors="showInvalid"
+            :setShowErrors="showCourtInvalid"
+            :setRequireCourtOrder="requireCourtOrder"
             @setCourtOrderValid="courtOrderValid = $event"
           />
         </v-col>
@@ -168,6 +169,7 @@ export default class AmendRegistration extends Vue {
   private financingStatementDate: Date = null
   private debtorValid = true
   private showInvalid = false
+  private showCourtInvalid = false
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
@@ -183,6 +185,13 @@ export default class AmendRegistration extends Vue {
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+  }
+
+  private get requireCourtOrder (): boolean {
+    if (this.getLengthTrust.action === ActionTypes.EDITED) {
+      return true
+    }
+    return false
   }
 
   // the number of the registration being amended
@@ -296,18 +305,12 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
-    let courtValid = true
-    // only count court order validity if length trust edited
-    if (this.getLengthTrust.action === ActionTypes.EDITED) {
-      courtValid = this.courtOrderValid
-    }
-
     if (
       this.debtorValid &&
       this.securedPartiesValid &&
       this.registrationLengthTrustValid &&
       this.collateralValid &&
-      courtValid
+      this.courtOrderValid
     ) {
       this.$router.push({
         name: RouteNames.CONFIRM_AMENDMENT,
@@ -316,6 +319,7 @@ export default class AmendRegistration extends Vue {
       this.emitHaveData(false)
     } else {
       this.showInvalid = true
+      this.showCourtInvalid = true
     }
   }
 
