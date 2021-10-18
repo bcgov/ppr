@@ -186,7 +186,6 @@
                     class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && currentSecuredParty.action
                               && currentSecuredParty.action !== ActionTypes.ADDED">
                       Delete
                     </span>
@@ -270,6 +269,7 @@ export default defineComponent({
       registrationFlowType,
       RegistrationFlowType,
       updateAddress,
+      ActionTypes,
       addressSchema
     } = useSecuredParty(props, context)
 
@@ -288,7 +288,7 @@ export default defineComponent({
       toggleDialog: false,
       dialogResults: [],
       isPartyType: computed((): boolean => {
-        if (partyBusiness.value === '') {
+        if (!partyBusiness.value) {
           return false
         }
         return true
@@ -387,6 +387,7 @@ export default defineComponent({
       closeAndReset,
       registrationFlowType,
       RegistrationFlowType,
+      ActionTypes,
       ...toRefs(localState)
     }
   }

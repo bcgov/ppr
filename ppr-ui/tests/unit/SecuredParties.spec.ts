@@ -269,7 +269,6 @@ describe('Secured party amendment tests', () => {
     expect(options.at(1).text()).toContain('Amend')
     // option from second drop down
     expect(options.at(2).text()).toContain('Delete')
-
   })
 
   it('displays the error', async () => {
@@ -328,7 +327,7 @@ describe('Secured party with code test', () => {
 
   it('displays remove only for a secured party with code', async () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
-    expect(item1.querySelectorAll('td')[4].textContent).toContain('Remove')
+    expect(item1.querySelectorAll('td')[4].textContent).toContain('Delete')
     
     const dropDowns = wrapper.findAll('.v-data-table .party-row .actions__more-actions__btn')
     // 0 drop downs
