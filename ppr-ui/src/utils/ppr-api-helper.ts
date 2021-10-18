@@ -1,6 +1,6 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
-import { StatusCodes } from 'http-status-codes'
+import { BAD_REQUEST, StatusCodes } from 'http-status-codes'
 
 // Interfaces
 import {
@@ -569,6 +569,7 @@ export async function getFinancingStatement (
 export async function addRegistrationSummary (
   registrationNum: string
 ): Promise<RegistrationSummaryIF> {
+  registrationNum = registrationNum?.toUpperCase()
   return axios
     .post(`financing-statements/registrations/${registrationNum}`, {}, getDefaultConfig())
     .then(response => {
@@ -603,7 +604,8 @@ export async function addRegistrationSummary (
 // Get registration summary information
 export async function getRegistrationSummary (
   registrationNum: string
-): Promise<RegistrationSummaryIF> {
+): Promise<(RegistrationSummaryIF)> {
+  registrationNum = registrationNum?.toUpperCase()
   return axios
     .get(`financing-statements/registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
