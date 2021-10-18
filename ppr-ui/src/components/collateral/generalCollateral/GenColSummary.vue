@@ -193,7 +193,7 @@ export default defineComponent({
         let curIndex = 0
         var lowestTime
         // find the entry with the lowest added date time
-        for (var i=0; i < localState.generalCollateral.length; i++) {
+        for (var i = 0; i < localState.generalCollateral.length; i++) {
           if (localState.generalCollateral[i].addedDateTime) {
             if (!lowestTime || localState.generalCollateral[i].addedDateTime < lowestTime) {
               lowestTime = localState.generalCollateral[i].addedDateTime
@@ -215,7 +215,7 @@ export default defineComponent({
       }),
       generalCollateralLength: computed((): number => {
         if (getGeneralCollateral.value.length > 0) {
-          if (localState.lastGeneralCollateral.addedDateTime){
+          if (localState.lastGeneralCollateral.addedDateTime) {
             return getGeneralCollateral.value.length
           } else {
             return getGeneralCollateral.value.length - 1
