@@ -13,8 +13,7 @@
       <v-row>
         <v-col
           >Indicate the General Collateral to be deleted from or added to this
-          registration. To view the existing General Collateral for this
-          registration, conduct a seperate search.
+          registration.
         </v-col>
       </v-row>
       <v-row>
@@ -130,16 +129,18 @@ export default defineComponent({
         descriptionAdd: localState.addDesc,
         descriptionDelete: localState.delDesc
       }
-      if (newGeneralCollateral.length > 0) {
-        if (newGeneralCollateral[newGeneralCollateral.length - 1].addedDateTime !== undefined) {
-          newGeneralCollateral.push(amendedGC)
+      if (localState.addDesc || localState.delDesc) {
+        if (newGeneralCollateral.length > 0) {
+          if (newGeneralCollateral[newGeneralCollateral.length - 1].addedDateTime !== undefined) {
+            newGeneralCollateral.push(amendedGC)
+          } else {
+            newGeneralCollateral[newGeneralCollateral.length - 1] = amendedGC
+          }
         } else {
-          newGeneralCollateral[newGeneralCollateral.length - 1] = amendedGC
+          newGeneralCollateral.push(amendedGC)
         }
-      } else {
-        newGeneralCollateral.push(amendedGC)
+        setGeneralCollateral(newGeneralCollateral)
       }
-      setGeneralCollateral(newGeneralCollateral)
       emit('closeGenColAmend', true)
     }
 

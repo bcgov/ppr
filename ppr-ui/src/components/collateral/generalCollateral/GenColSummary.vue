@@ -5,7 +5,7 @@
         <h3 style="line-height: 1rem;">General Collateral</h3>
       </v-col>
       <v-col>
-        <div class="float-right">
+        <div class="float-right" v-if="showAmendLink">
         <span
           v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               generalCollateral.length > 0 &&
@@ -71,6 +71,26 @@
         </div>
       </v-col>
     </v-row>
+    <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+              && lastGeneralCollateral
+              && !lastGeneralCollateral.addedDateTime" class="pa-0">
+      <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
+        <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
+          <b>DELETED</b>
+        </v-chip>
+        <p class="pt-3 ma-0">
+          {{ lastGeneralCollateral.descriptionDelete }}
+        </p>
+      </div>
+      <div v-if="lastGeneralCollateral.descriptionAdd" class="gc-description-add pt-5">
+        <v-chip color="primary" label text-color="white" x-small>
+          <b>ADDED</b>
+        </v-chip>
+        <p class="pt-3 ma-0">
+          {{ lastGeneralCollateral.descriptionAdd }}
+        </p>
+      </div>
+    </div>
     <div
       v-if="registrationFlowType !== RegistrationFlowType.NEW"
       id="general-collateral-history"
@@ -86,14 +106,14 @@
         <p class="ma-0">
           <span v-if="showingHistory">Hide </span>
           <span v-else>View </span>
-          General Collateral and Amendments ({{ generalCollateral.length }})
+          General Collateral and Changes and Amendments ({{ generalCollateralLength }})
         </p>
       </v-btn>
       <div v-if="showingHistory" class="general-collateral-summary">
         <v-row v-for="(item, index) in generalCollateral" :key="index" no-gutters>
-          <v-col :class="[{ 'border-btm': index !== baseGenCollateralIndex,
+          <v-col v-if="item.addedDateTime" :class="[{ 'border-btm': index !== baseGenCollateralIndex,
             'pb-30px': index !== baseGenCollateralIndex }, 'pt-30px']">
-            <b v-if="item.addedDateTime">{{ asOfDateTime(item.addedDateTime) }}</b>
+            <b>{{ asOfDateTime(item.addedDateTime) }}</b>
             <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
               <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
                 <b>DELETED</b>
@@ -141,6 +161,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   name: 'GenColSummary',
@@ -148,6 +169,10 @@ export default defineComponent({
     setShowHistory: {
       type: Boolean,
       default: false
+    },
+    setShowAmendLink: {
+      type: Boolean,
+      default: true
     }
   },
   setup (props, { emit }) {
@@ -165,13 +190,44 @@ export default defineComponent({
     const localState = reactive({
       showingHistory: props.setShowHistory,
       baseGenCollateralIndex: computed(() => {
-        return (localState.generalCollateral?.length || 0) - 1
+        let curIndex = 0
+        var lowestTime
+        // find the entry with the lowest added date time
+        for (var i = 0; i < localState.generalCollateral.length; i++) {
+          if (localState.generalCollateral[i].addedDateTime) {
+            if (!lowestTime || localState.generalCollateral[i].addedDateTime < lowestTime) {
+              lowestTime = localState.generalCollateral[i].addedDateTime
+              curIndex = i
+            }
+          }
+        }
+        return curIndex
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
+      lastGeneralCollateral: computed((): GeneralCollateralIF => {
+        const gcArray = getGeneralCollateral.value
+        if (gcArray.length) {
+          return gcArray[gcArray.length - 1]
+        }
+        return null
+      }),
+      generalCollateralLength: computed((): number => {
+        if (getGeneralCollateral.value.length > 0) {
+          if (localState.lastGeneralCollateral.addedDateTime) {
+            return getGeneralCollateral.value.length
+          } else {
+            return getGeneralCollateral.value.length - 1
+          }
+        }
+        return 0
+      }),
       registrationFlowType: computed((): RegistrationFlowType => {
         return getRegistrationFlowType.value
+      }),
+      showAmendLink: computed((): boolean => {
+        return props.setShowAmendLink
       })
     })
 
@@ -181,7 +237,7 @@ export default defineComponent({
 
     const undo = () => {
       const originalGeneralCollateral =
-        getOriginalAddCollateral.value.generalCollateral
+        cloneDeep(getOriginalAddCollateral.value.generalCollateral)
       setGeneralCollateral(originalGeneralCollateral)
     }
 

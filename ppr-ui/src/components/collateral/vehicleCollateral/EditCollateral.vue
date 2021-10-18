@@ -8,7 +8,13 @@
             :class="{ 'error-text': invalidSection }"
           >
             <span v-if="activeIndex === -1" class="pl-4"> Add Vehicle </span>
-            <span v-else class="ml-n3">Edit Vehicle</span>
+            <span v-else class="ml-n3">
+              <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)">
+                Amend
+              </span>
+              <span v-else>Edit</span>
+               Vehicle</span>
           </label>
         </v-col>
         <v-col cols="9">
@@ -221,7 +227,11 @@ export default defineComponent({
       getSerialLabel,
       // @ts-ignore - returned by toRef
       getSerialDisabled,
+      // @ts-ignore - returned by toRef
+      registrationFlowType,
       getVehicle,
+      ActionTypes,
+      RegistrationFlowType,
       resetFormAndData,
       removeVehicle,
       addVehicle,
@@ -280,6 +290,9 @@ export default defineComponent({
       vehicleTypesNoMH,
       getSerialLabel,
       getSerialDisabled,
+      registrationFlowType,
+      RegistrationFlowType,
+      ActionTypes,
       mustHaveManufacturedHomeCollateral,
       excludesManufacturedHomeCollateral,
       changeVehicleType
