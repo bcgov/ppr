@@ -194,8 +194,7 @@
                     class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && currentDebtor.action
-                              && currentDebtor.action !== ActionTypes.ADDED">
+                              && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
                     <span v-else>Remove</span>

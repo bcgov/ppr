@@ -186,7 +186,7 @@
                     class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && currentSecuredParty.action !== ActionTypes.ADDED">
+                              && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
                     <span v-else>Remove</span>
