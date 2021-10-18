@@ -167,9 +167,9 @@ def get_account_name(token: str, account_id: str = None):
     """Lookup the account organization name from the user token with an auth api call."""
     orgs = user_orgs(token)
     if orgs and 'orgs' in orgs:
-        if (len(orgs) == 1 or not account_id):
+        if (len(orgs['orgs']) == 1 or not account_id):
             return orgs['orgs'][0]['name']
-        for org in orgs:
+        for org in orgs['orgs']:
             if org['id'] == int(account_id):
                 return org['name']
     return None
