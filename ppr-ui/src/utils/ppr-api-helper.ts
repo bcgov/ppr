@@ -1,6 +1,6 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
-import { BAD_REQUEST, StatusCodes } from 'http-status-codes'
+import { StatusCodes } from 'http-status-codes'
 
 // Interfaces
 import {
