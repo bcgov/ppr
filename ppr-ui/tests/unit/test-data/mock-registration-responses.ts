@@ -61,6 +61,7 @@ export const mockedRegistration3: RegistrationSummaryIF = {
 }
 
 export const mockedDraft1: DraftResultIF = {
+  lastUpdateDateTime: '2021-08-03T17:21:17+00:00',
   type: DraftTypes.FINANCING_STATEMENT,
   documentId: 'D9000018',
   baseRegistrationNumber: '',
@@ -72,6 +73,7 @@ export const mockedDraft1: DraftResultIF = {
 }
 
 export const mockedDraft2: DraftResultIF = {
+  lastUpdateDateTime: '2021-08-01T17:21:17+00:00',
   type: DraftTypes.FINANCING_STATEMENT,
   documentId: 'D9000338',
   baseRegistrationNumber: '',
@@ -83,6 +85,7 @@ export const mockedDraft2: DraftResultIF = {
 }
 
 export const mockedDraftAmend: DraftResultIF = {
+  lastUpdateDateTime: '2021-08-05T17:21:17+00:00',
   type: DraftTypes.AMENDMENT_STATEMENT,
   documentId: 'D9000019',
   baseRegistrationNumber: 'GOV2343',

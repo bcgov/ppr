@@ -615,7 +615,26 @@ export default class Dashboard extends Vue {
     if (myRegDrafts?.error || myRegHistory?.error) {
       this.emitError({ statusCode: StatusCodes.NOT_FOUND })
     } else {
-      this.myRegDataDrafts = myRegDrafts.drafts
+      // add child drafts to their base registration in registration history
+      for (let i = 0; i < myRegDrafts.drafts.length; i++) {
+        const parentDrafts = [] as DraftResultIF[]
+        // check if it has a parent reg
+        if (myRegDrafts.drafts[i].baseRegistrationNumber) {
+          // find parent reg
+          for (let k = 0; k < myRegHistory.registrations.length; k++) {
+            if (myRegHistory.registrations[k].baseRegistrationNumber === myRegDrafts.drafts[i].baseRegistrationNumber) {
+              // add child draft to parent reg
+              if (!myRegHistory.registrations[k].changes) myRegHistory.registrations[k].changes = []
+              myRegHistory.registrations[k].changes.unshift(myRegDrafts.drafts[i])
+            }
+          }
+        } else {
+          // doesn't have a parent reg, this will be added to the normal draft results
+          parentDrafts.push(myRegDrafts.drafts[i])
+        }
+        // only add parent drafts to draft results
+        this.myRegDataDrafts = parentDrafts
+      }
       this.myRegDataHistory = myRegHistory.registrations
     }
     // tell App that we're finished loading

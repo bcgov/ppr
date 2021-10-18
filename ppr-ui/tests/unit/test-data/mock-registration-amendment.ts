@@ -445,7 +445,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     courtOrderInformation: null,
     creationDate: '',
     draft: {
-      type: '',
+      type: null,
       financingStatement: null,
       amendmentStatement: null,
       createDateTime: null,
@@ -538,7 +538,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     courtOrderInformation: null,
     creationDate: '',
     draft: {
-      type: '',
+      type: null,
       financingStatement: null,
       amendmentStatement: null,
       createDateTime: null,
@@ -631,7 +631,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     courtOrderInformation: null,
     creationDate: '',
     draft: {
-      type: '',
+      type: null,
       financingStatement: null,
       amendmentStatement: null,
       createDateTime: null,
@@ -725,7 +725,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     courtOrderInformation: mockedAmendmentCourtOrder,
     creationDate: '',
     draft: {
-      type: '',
+      type: null,
       financingStatement: null,
       amendmentStatement: null,
       createDateTime: null,

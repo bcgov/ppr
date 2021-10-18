@@ -24,7 +24,7 @@ export const stateModel: StateModelIF = {
     courtOrderInformation: null,
     creationDate: '',
     draft: {
-      type: '',
+      type: null,
       financingStatement: null,
       amendmentStatement: null,
       createDateTime: null,

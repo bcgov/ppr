@@ -54,18 +54,19 @@
       id="registration-table"
       class="registration-table pl-4"
       :class="$style['reg-table']"
+      disable-pagination
+      disable-sort
+      :expanded.sync="expandedList"
+      fixed-header
       :headers="headers"
+      hide-default-footer
+      hide-default-header
+      height="600px"
       :items="tableData"
+      no-data-text="No registrations created yet."
       :search="search"
       sort-by="registrationNumber"
       :sort-desc="[false, true]"
-      disable-pagination
-      disable-sort
-      hide-default-footer
-      hide-default-header
-      fixed-header
-      height="600px"
-      no-data-text="No registrations created yet."
     >
       <template v-slot:header="{ props }">
         <th
@@ -331,13 +332,19 @@
                   </template>
                   <v-list class="actions__more-actions registration-actions">
                     <v-list-item v-if="isDraft(row.item)">
-                      <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="deleteDraft(row.item, TableActions.DELETE)">
+                      <v-list-item-subtitle
+                        :class="`dropdown-btn-${row.index}`"
+                        @click="deleteDraft(row.item, TableActions.DELETE)"
+                      >
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Delete Draft</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item v-if="isActive(row.item) && !isExpired(row.item) && !isDischarged(row.item)">
-                      <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="handleAction(row.item, TableActions.DISCHARGE)">
+                      <v-list-item-subtitle
+                        :class="`dropdown-btn-${row.index}`"
+                        @click="handleAction(row.item, TableActions.DISCHARGE)"
+                      >
                         <v-icon small>mdi-note-remove-outline</v-icon>
                         <span class="ml-1">Total Discharge</span>
                       </v-list-item-subtitle>
@@ -354,7 +361,10 @@
                             v-if="isActive(row.item) && !isExpired(row.item) && !isDischarged(row.item)"
                             :disabled="row.item.expireDays === -99"
                           >
-                            <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="handleAction(row.item, TableActions.RENEW)">
+                            <v-list-item-subtitle
+                              :class="`dropdown-btn-${row.index}`"
+                              @click="handleAction(row.item, TableActions.RENEW)"
+                            >
                               <v-icon small>mdi-calendar-clock</v-icon>
                               <span class="ml-1">Renew</span>
                             </v-list-item-subtitle>
@@ -364,7 +374,10 @@
                       Infinite registrations cannot be renewed.
                     </v-tooltip>
                     <v-list-item v-if="!isDraft(row.item)">
-                      <v-list-item-subtitle :class="`dropdown-btn-${row.index}`" @click="handleAction(row.item, TableActions.REMOVE)">
+                      <v-list-item-subtitle
+                        :class="`dropdown-btn-${row.index}`"
+                        @click="handleAction(row.item, TableActions.REMOVE)"
+                      >
                         <v-icon small>mdi-delete</v-icon>
                         <span class="ml-1">Remove From Table</span>
                       </v-list-item-subtitle>
@@ -447,7 +460,7 @@ export default defineComponent({
       default: ''
     },
     setRegistrationHistory: {
-      default: [] as RegistrationSummaryIF[] | DraftResultIF[]
+      default: [] as (RegistrationSummaryIF | DraftResultIF)[]
     },
     toggleSnackBar: {
       default: false
@@ -484,6 +497,7 @@ export default defineComponent({
     const localState = reactive({
       currentOrder: 'asc',
       datePickerErr: false,
+      expandedList: [],
       loadingPDF: '',
       registrationDate: '',
       registrationDateFormatted: '',
