@@ -18,6 +18,7 @@ from http import HTTPStatus
 from flask import jsonify, current_app
 
 from ppr_api.exceptions import BusinessException
+from ppr_api.services.authz import user_orgs
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
 
@@ -160,3 +161,15 @@ def validate_delete_ids(json_data, financing_statement):
             error=error_msg,
             status_code=HTTPStatus.BAD_REQUEST
         )
+
+
+def get_account_name(token: str, account_id: str = None):
+    """Lookup the account organization name from the user token with an auth api call."""
+    orgs = user_orgs(token)
+    if orgs and 'orgs' in orgs:
+        if (len(orgs) == 1 or not account_id):
+            return orgs['orgs'][0]['name']
+        for org in orgs:
+            if org['id'] == int(account_id):
+                return org['name']
+    return None
