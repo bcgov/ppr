@@ -18,8 +18,6 @@ from enum import Enum
 from http import HTTPStatus
 import json
 
-from flask import current_app
-
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
 
@@ -402,50 +400,52 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         results_json = []
         registrations_json = []
         if account_id:
-            max_results_size = int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
             results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
-                                         {'query_account': account_id, 'max_results_size': max_results_size})
+                                         {'query_account': account_id,
+                                          'max_results_size': model_utils.get_max_registrations_size()})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                    reg_num = str(mapping['registration_number'])
-                    base_reg_num = str(mapping['base_reg_number'])
-                    registering_name = str(mapping['registering_name'])
-                    if not registering_name:
-                        registering_name = ''
-                    result = {
-                        'registrationNumber': reg_num,
-                        'baseRegistrationNumber': base_reg_num,
-                        'createDateTime': model_utils.format_ts(mapping['registration_ts']),
-                        'registrationType': str(mapping['registration_type']),
-                        'registrationDescription': str(mapping['registration_desc']),
-                        'registrationClass': str(mapping['registration_type_cl']),
-                        'statusType': str(mapping['state']),
-                        'expireDays': int(mapping['expire_days']),
-                        'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
-                        'registeringParty': str(mapping['registering_party']),
-                        'securedParties': str(mapping['secured_party']),
-                        'clientReferenceId': str(mapping['client_reference_id']),
-                        'registeringName': registering_name
-                    }
-                    reg_class = result['registrationClass']
-                    if model_utils.is_financing(reg_class):
-                        result['baseRegistrationNumber'] = reg_num
-                        result['path'] = FINANCING_PATH + reg_num
-                    elif reg_class == model_utils.REG_CLASS_DISCHARGE:
-                        result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
-                    elif reg_class == model_utils.REG_CLASS_RENEWAL:
-                        result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
-                    elif reg_class == model_utils.REG_CLASS_CHANGE:
-                        result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
-                    elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
-                        result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
+                    removed_count = int(mapping['removed_count'])
+                    if removed_count < 1:
+                        reg_num = str(mapping['registration_number'])
+                        base_reg_num = str(mapping['base_reg_number'])
+                        registering_name = str(mapping['registering_name'])
+                        if not registering_name:
+                            registering_name = ''
+                        result = {
+                            'registrationNumber': reg_num,
+                            'baseRegistrationNumber': base_reg_num,
+                            'createDateTime': model_utils.format_ts(mapping['registration_ts']),
+                            'registrationType': str(mapping['registration_type']),
+                            'registrationDescription': str(mapping['registration_desc']),
+                            'registrationClass': str(mapping['registration_type_cl']),
+                            'statusType': str(mapping['state']),
+                            'expireDays': int(mapping['expire_days']),
+                            'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
+                            'registeringParty': str(mapping['registering_party']),
+                            'securedParties': str(mapping['secured_party']),
+                            'clientReferenceId': str(mapping['client_reference_id']),
+                            'registeringName': registering_name
+                        }
+                        reg_class = result['registrationClass']
+                        if model_utils.is_financing(reg_class):
+                            result['baseRegistrationNumber'] = reg_num
+                            result['path'] = FINANCING_PATH + reg_num
+                        elif reg_class == model_utils.REG_CLASS_DISCHARGE:
+                            result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
+                        elif reg_class == model_utils.REG_CLASS_RENEWAL:
+                            result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
+                        elif reg_class == model_utils.REG_CLASS_CHANGE:
+                            result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
+                        elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+                            result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
-                    if collapse and not model_utils.is_financing(reg_class):
-                        registrations_json.append(result)
-                    else:
-                        results_json.append(result)
+                        if collapse and not model_utils.is_financing(reg_class):
+                            registrations_json.append(result)
+                        else:
+                            results_json.append(result)
                 if collapse:
                     return Registration.build_account_collapsed_json(results_json, registrations_json)
 
@@ -491,6 +491,18 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
                     result['existsCount'] = int(mapping['exists_count'])
                     result['accountId'] = str(mapping['account_id'])
+                    # Another account already added.
+                    if result['existsCount'] > 0 and result['accountId'] != account_id:
+                        result['inUserList'] = True
+                    # User account previously removed (can be added back).
+                    elif result['existsCount'] > 0 and result['accountId'] == account_id:
+                        result['inUserList'] = False
+                    # User account added by default.
+                    elif result['accountId'] == account_id:
+                        result['inUserList'] = True
+                    # Another account excludec by default.
+                    else:
+                        result['inUserList'] = False
                 elif reg_class == model_utils.REG_CLASS_DISCHARGE:
                     result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
                 elif reg_class == model_utils.REG_CLASS_RENEWAL:

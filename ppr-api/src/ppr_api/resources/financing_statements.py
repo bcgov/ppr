@@ -735,20 +735,26 @@ class AccountRegistrationResource(Resource):
             registration = Registration.find_summary_by_reg_num(account_id, registration_num)
             if registration is None:
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
+
+            # Save the base registration: request may be a change registration number.
+            base_reg_num = registration['baseRegistrationNumber']
+
+            # Check if registration was created by the account and deleted. If so, restore it.
+            if registration['accountId'] == account_id and registration['existsCount'] > 0:
+                UserExtraRegistration.delete(base_reg_num, account_id)
             # Check if duplicate.
-            if registration['accountId'] == account_id or registration['existsCount'] > 0:
+            elif registration['accountId'] == account_id or registration['existsCount'] > 0:
                 return resource_utils.duplicate_error_response(DUPLICATE_REGISTRATION_ERROR.format(registration_num))
 
             # Future: check if restricted access for crown charges.
             if registration['registrationClass'] == model_utils.REG_CLASS_CROWN:
                 current_app.logger.info('Check restricted access when available.')
 
-            # Save the base registration: request may be a change registration number.
-            base_reg_num = registration['baseRegistrationNumber']
+            if registration['accountId'] != account_id:
+                extra_registration = UserExtraRegistration(account_id=account_id, registration_number=base_reg_num)
+                extra_registration.save()
             del registration['accountId']
             del registration['existsCount']
-            extra_registration = UserExtraRegistration(account_id=account_id, registration_number=base_reg_num)
-            extra_registration.save()
 
             return registration, HTTPStatus.CREATED
 
@@ -808,12 +814,19 @@ class AccountRegistrationResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
 
             # Try and get existing record
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num)
             extra_registration = UserExtraRegistration.find_by_registration_number(registration_num, account_id)
-            if extra_registration is None:
+            if extra_registration is None and registration is None:
                 return resource_utils.not_found_error_response('user account registration', registration_num)
 
-            # Delete.
-            UserExtraRegistration.delete(registration_num, account_id)
+            # Remove another account's financing statement registration.
+            if extra_registration and not extra_registration.removed_ind:
+                UserExtraRegistration.delete(registration_num, account_id)
+            # Mark the user account's financing statement registration as removed
+            elif not extra_registration and registration['accountId'] == account_id:
+                extra_registration = UserExtraRegistration(account_id=account_id, registration_number=registration_num)
+                extra_registration.removed_ind = UserExtraRegistration.REMOVE_IND
+                extra_registration.save()
 
             return '', HTTPStatus.NO_CONTENT
 

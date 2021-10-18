@@ -37,12 +37,26 @@ def test_find_by_registration_number(session):
     assert registration.registration_number == 'TEST0019'
 
 
-def test_save(session):
-    """Assert that saving a user extra registration works as expected."""
+def test_save_add(session):
+    """Assert that saving an added user extra registration works as expected."""
     registration = UserExtraRegistration(account_id='PS12345', registration_number='TEST0019A')
     registration.save()
     assert registration.id > 0
     UserExtraRegistration.delete('TEST0019A', 'PS12345')
+
+
+def test_save_remove(session):
+    """Assert that saving a removed user extra registration works as expected."""
+    registration = UserExtraRegistration(account_id='PS12345', registration_number='TEST0005')
+    registration.removed_ind = UserExtraRegistration.REMOVE_IND
+    registration.save()
+    assert registration.id > 0
+    reg2 = UserExtraRegistration.find_by_registration_number('TEST0005', 'PS12345')
+    assert reg2
+    assert reg2.removed_ind == UserExtraRegistration.REMOVE_IND
+    UserExtraRegistration.delete('TEST0005', 'PS12345')
+    registration = UserExtraRegistration.find_by_registration_number('TEST0005', 'PS12345')
+    assert not registration
 
 
 def test_delete(session):

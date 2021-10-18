@@ -38,8 +38,16 @@ INSERT INTO general_collateral(id, registration_id, financing_id, registration_i
   VALUES(200000011, 200000028, 200000013, null, 'TEST0019 GC 1', null)
 ;
 -- one added
-INSERT INTO user_extra_registrations(id, account_id, registration_number)
-  VALUES(200000000, 'PS12345', 'TEST0019')
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000000, 'PS12345', 'TEST0019', null)
+;
+-- user account with no history
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000001, 'PS12345', 'TEST0017', 'Y')
+;
+-- user account with history
+INSERT INTO user_extra_registrations(id, account_id, registration_number, removed_ind)
+  VALUES(200000002, 'PS12345', 'TEST0002', 'Y')
 ;
 
 -- one that can be added
@@ -90,7 +98,7 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
-    VALUES(200000030, 200000013, 'TEST0019AM', 'TEST0019', 'AM', 'PPSALIEN', 
+    VALUES(200000030, 200000013, 'TEST0019AM', 'TEST0019', 'AM', 'AMENDMENT',
            timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 200000033, null,
            null, null, 'PS00001', 'TEST-AM1-0019', null, null)
 ;
