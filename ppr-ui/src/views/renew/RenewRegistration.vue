@@ -103,7 +103,8 @@ import {
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   AddCollateralIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF // eslint-disable-line no-unused-vars
+  DebtorNameIF, // eslint-disable-line no-unused-vars
+  CourtOrderIF
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationTypes } from '@/resources'
@@ -140,6 +141,7 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
+  @Action setCourtOrderInformation: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -244,6 +246,14 @@ export default class ReviewRegistration extends Vue {
           securedParties: financingStatement.securedParties,
           debtors: financingStatement.debtors
         } as AddPartiesIF
+        const courtOrder: CourtOrderIF = {
+          courtRegistry: '',
+          courtName: '',
+          fileNumber: '',
+          effectOfOrder: '',
+          orderDate: ''
+        }
+        this.setCourtOrderInformation(courtOrder)
         this.setRegistrationCreationDate(financingStatement.createDateTime)
         this.setRegistrationExpiryDate(financingStatement.expiryDate)
         this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
