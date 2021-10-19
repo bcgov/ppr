@@ -569,6 +569,7 @@ export async function getFinancingStatement (
 export async function addRegistrationSummary (
   registrationNum: string
 ): Promise<RegistrationSummaryIF> {
+  registrationNum = registrationNum?.toUpperCase()
   return axios
     .post(`financing-statements/registrations/${registrationNum}`, {}, getDefaultConfig())
     .then(response => {
@@ -603,13 +604,18 @@ export async function addRegistrationSummary (
 // Get registration summary information
 export async function getRegistrationSummary (
   registrationNum: string
-): Promise<RegistrationSummaryIF> {
+): Promise<(RegistrationSummaryIF)> {
+  registrationNum = registrationNum?.toUpperCase()
   return axios
     .get(`financing-statements/registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
       const data = response?.data as RegistrationSummaryIF
-      if (!data) {
-        throw new Error('Invalid API response')
+      if (!data) throw new Error('Invalid API response')
+      if (data.inUserList) {
+        data.error = {
+          statusCode: StatusCodes.CONFLICT,
+          message: 'Registration is already added to this account.'
+        }
       }
       return data
     })

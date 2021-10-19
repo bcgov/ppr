@@ -59,7 +59,7 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row class="pt-15" no-gutters>
+      <v-row class="pt-15" align="baseline" no-gutters>
         <v-col cols="auto">
           <registration-bar
             class="soft-corners-bottom"
@@ -104,6 +104,7 @@
                 single-line
                 style="width:270px"
                 v-model="myRegAdd"
+                @click:append="findRegistration(myRegAdd)"
                 @keypress.enter="findRegistration(myRegAdd)"
               />
               <p v-if="myRegAddInvalid" :class="[$style['validation-msg'], 'mx-3', 'my-1']">
@@ -300,7 +301,7 @@ export default class Dashboard extends Vue {
   private myRegActionRoute: RouteNames = null
   private myRegAdd = ''
   private myRegAddDialog: DialogOptionsIF = null
-  private myRegAddDialogError = false
+  private myRegAddDialogError: StatusCodes = null
   private myRegAddDialogDisplay = false
   private myRegDataDrafts: DraftResultIF[] = []
   private myRegDataHistory: RegistrationSummaryIF[] = []
@@ -312,7 +313,7 @@ export default class Dashboard extends Vue {
   private myRegHeadersSelected = [...registrationTableHeaders]
   private myRegSnackBar = false
   private tooltipTxtRegSrch = 'Retrieve existing registrations you would like to ' +
-    'renew, discharge or amend that are not already in your My Registrations table'
+    'renew, discharge or amend that are not already in your registrations table.'
 
   mounted () {
     // clear search data in the store
@@ -363,7 +364,7 @@ export default class Dashboard extends Vue {
       this.myRegDataHistory.unshift(addReg)
       this.myRegSnackBar = !this.myRegSnackBar
     } else {
-      await this.myRegAddErrSetDialog(addReg.error)
+      this.myRegAddErrSetDialog(addReg.error)
     }
     this.loading = false
   }
@@ -474,12 +475,12 @@ export default class Dashboard extends Vue {
   }
 
   private myRegAddErrSetDialog (error: ErrorIF): void {
-    this.myRegAddDialogError = true
+    this.myRegAddDialogError = error.statusCode
     switch (error.statusCode) {
       case StatusCodes.NOT_FOUND:
         this.myRegAddDialog = { ...registrationNotFoundDialog }
         this.myRegAddDialog.text = 'An existing registration with the ' +
-          `registration number ${this.myRegAdd} was not found. Please ` +
+          `registration number <b>${this.myRegAdd}</b> was not found. Please ` +
           'check the registration number and try again.'
         break
       case StatusCodes.UNAUTHORIZED:
@@ -505,7 +506,7 @@ export default class Dashboard extends Vue {
     // if the searched registration is a child of the base registration
     if (searchedRegNum?.trim()?.toUpperCase() !== reg.baseRegistrationNumber?.trim()?.toUpperCase()) {
       this.myRegAddDialog.text = `The registration number you entered (<b>${searchedRegNum}</b>) ` +
-        'is associated with the follwing base registration. Would you like to add this ' +
+        'is associated with the following base registration. Would you like to add this ' +
         'base registration to your registrations table? Adding the base registration to your ' +
         'registrations table will automatically include all associated registrations.'
     }
@@ -533,11 +534,15 @@ export default class Dashboard extends Vue {
   }
 
   private myRegAddDialogProceed (val: boolean): void {
-    if (!val || this.myRegAddDialogError) {
-      this.myRegAddDialogError = false
-    } else {
+    // add registration or not
+    if (val && !this.myRegAddDialogError) {
       this.addRegistration(this.myRegAdd)
     }
+    // reset values
+    if (this.myRegAddDialogError !== StatusCodes.NOT_FOUND) {
+      this.myRegAdd = ''
+    }
+    this.myRegAddDialogError = null
     this.myRegAddDialogDisplay = false
   }
 
