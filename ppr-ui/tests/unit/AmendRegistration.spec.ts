@@ -122,6 +122,7 @@ describe('Amendment registration component', () => {
   })
 
   it('goes to the confirmation page', async () => {
+    wrapper.vm.courtOrderValid = true
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
@@ -166,4 +167,5 @@ describe('Amendment registration component', () => {
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
   })
+
 })
