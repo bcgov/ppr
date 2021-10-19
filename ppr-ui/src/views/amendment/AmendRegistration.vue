@@ -334,6 +334,8 @@ export default class AmendRegistration extends Vue {
   }
 
   private goToDashboard (): void {
+    // unset registration number
+    this.setRegistrationNumber(null)
     this.$router.push({
       name: RouteNames.DASHBOARD
     })
