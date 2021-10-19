@@ -584,7 +584,7 @@ export default defineComponent({
         personName: { first: '', middle: '', last: '' },
         action: ActionTypes.ADDED
       }
-      if (localState.securedParties[0].code === party.code) {
+      if ((localState.securedParties.length > 0) && (localState.securedParties[0].code === party.code)) {
         return
       }
       // if secured party already shown
