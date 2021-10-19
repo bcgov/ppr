@@ -755,6 +755,8 @@ class AccountRegistrationResource(Resource):
                 extra_registration.save()
             del registration['accountId']
             del registration['existsCount']
+            if 'inUserList' in registration:
+                del registration['inUserList']
 
             return registration, HTTPStatus.CREATED
 

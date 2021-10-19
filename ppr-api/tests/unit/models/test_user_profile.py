@@ -20,12 +20,38 @@ import pytest
 
 from ppr_api.models import User, UserProfile
 
+# Properties can be anything, using show* for testing.
+REGISTRATIONS_TABLE = {
+    'showColumn1': True,
+    'showColumn2': False,
+    'showColumn3': True,
+    'showColumn4': False
+}
+UPDATED_REGISTRATIONS_TABLE = {
+    'showColumn1': False,
+    'showColumn2': True,
+    'showColumn3': False,
+    'showColumn4': True
+}
+# Properties can be anything, using misc* for testing.
+MISC_PREFERENCES = {
+    'preference1': 'A',
+    'preference2': False,
+    'preference3': 3
+}
+UPDATED_MISC_PREFERENCES = {
+    'preference1': 'B',
+    'preference2': True,
+    'preference3': 10
+}
 
 ALL_JSON = {
     'paymentConfirmationDialog': True,
     'selectConfirmationDialog': False,
     'defaultDropDowns': True,
-    'defaultTableFilters': True
+    'defaultTableFilters': True,
+    'registrationsTable': REGISTRATIONS_TABLE,
+    'miscellaneousPreferences': MISC_PREFERENCES
 }
 PAYMENT_JSON = {
     'paymentConfirmationDialog': True
@@ -35,7 +61,9 @@ SELECT_JSON = {
 }
 COMBO_JSON = {
     'paymentConfirmationDialog': True,
-    'selectConfirmationDialog': False
+    'selectConfirmationDialog': False,
+    'registrationsTable': UPDATED_REGISTRATIONS_TABLE,
+    'miscellaneousPreferences': UPDATED_MISC_PREFERENCES
 }
 
 TOKEN1 = {
@@ -82,6 +110,15 @@ def test_create_from_json(session, client, jwt, json_data):
     assert profile.search_selection_confirmation
     assert profile.default_table_filters
     assert profile.default_drop_downs
+    if 'registrationsTable' in json_data:
+        assert profile.registrations_table['showColumn1']
+        assert not profile.registrations_table['showColumn2']
+        assert profile.registrations_table['showColumn3']
+        assert not profile.registrations_table['showColumn4']
+    if 'miscellaneousPreferences' in json_data:
+        assert profile.misc_preferences['preference1'] == 'A'
+        assert not profile.misc_preferences['preference2'] 
+        assert profile.misc_preferences['preference3'] == 3
 
 
 @pytest.mark.parametrize('token', TEST_TOKEN_DATA)
@@ -198,6 +235,8 @@ def test_create_user_profile(session, client, jwt):
     assert save_json['selectConfirmationDialog'] == ALL_JSON['selectConfirmationDialog']
     assert save_json['defaultDropDowns'] == ALL_JSON['defaultDropDowns']
     assert save_json['defaultTableFilters'] == ALL_JSON['defaultTableFilters']
+    assert save_json['registrationsTable'] == ALL_JSON['registrationsTable']
+    assert save_json['miscellaneousPreferences'] == ALL_JSON['miscellaneousPreferences']
 
 
 def test_update_user_profile(session, client, jwt):
@@ -212,3 +251,5 @@ def test_update_user_profile(session, client, jwt):
     save_json = user_profile.json
     assert save_json['paymentConfirmationDialog'] == COMBO_JSON['paymentConfirmationDialog']
     assert save_json['selectConfirmationDialog'] == COMBO_JSON['selectConfirmationDialog']
+    assert save_json['registrationsTable'] == COMBO_JSON['registrationsTable']
+    assert save_json['miscellaneousPreferences'] == COMBO_JSON['miscellaneousPreferences']

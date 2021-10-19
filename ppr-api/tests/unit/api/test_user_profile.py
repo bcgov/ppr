@@ -24,10 +24,30 @@ from ppr_api.services.authz import STAFF_ROLE, PPR_ROLE, COLIN_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
 
+# Properties can be anything, using show* for testing.
+REGISTRATIONS_TABLE = {
+    'showColumn1': True,
+    'showColumn2': False,
+    'showColumn3': True,
+    'showColumn4': False
+}
+# Properties can be anything, using misc* for testing.
+MISC_PREFERENCES = {
+    'preference1': 'A',
+    'preference2': False,
+    'preference3': 3
+}
 TEST_UPDATE_JSON = {
     'paymentConfirmationDialog': True,
     'selectConfirmationDialog': False
 }
+TEST_UPDATE_REG_TABLE_JSON = {
+    'registrationsTable': REGISTRATIONS_TABLE
+}
+TEST_UPDATE_MISC_JSON = {
+    'miscellaneousPreferences': MISC_PREFERENCES
+}
+
 TEST_INVALID_JSON = {
 }
 # testdata pattern is ({description}, {is staff}, {include account}, {response status}, {role})
@@ -39,7 +59,9 @@ TEST_DATA = [
 ]
 # testdata pattern is ({description}, {is staff}, {include account}, {response status}, {role}, {data})
 TEST_DATA_UPDATE = [
-    ('Valid', False, True, HTTPStatus.OK, PPR_ROLE, TEST_UPDATE_JSON),
+    ('Valid default settings', False, True, HTTPStatus.OK, PPR_ROLE, TEST_UPDATE_JSON),
+    ('Valid registration table', False, True, HTTPStatus.OK, PPR_ROLE, TEST_UPDATE_REG_TABLE_JSON),
+    ('Valid miscellaneous preferences', False, True, HTTPStatus.OK, PPR_ROLE, TEST_UPDATE_MISC_JSON),
     ('Missing account ID', False, False, HTTPStatus.BAD_REQUEST, PPR_ROLE, TEST_UPDATE_JSON),
     ('Staff missing account ID', True, False, HTTPStatus.OK, PPR_ROLE, TEST_UPDATE_JSON),
     ('Valid data but unauthorized', False, True, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, TEST_UPDATE_JSON),
@@ -100,6 +122,7 @@ def test_update_user_profile(session, client, jwt, desc, staff, include_account,
                       headers=headers,
                       content_type='application/json')
     # check
+    print(rv.json)
     assert rv.status_code == status
     if rv.status_code == HTTPStatus.OK:
         response_data = rv.json
@@ -108,3 +131,9 @@ def test_update_user_profile(session, client, jwt, desc, staff, include_account,
         assert 'selectConfirmationDialog' in response_data
         assert 'defaultDropDowns' in response_data
         assert 'defaultTableFilters' in response_data
+        if desc == 'Valid registration table':
+            assert 'registrationsTable' in response_data
+            assert response_data['registrationsTable'] == TEST_UPDATE_REG_TABLE_JSON['registrationsTable']
+        elif desc == 'Valid miscellaneous preferences':
+            assert 'miscellaneousPreferences' in response_data
+            assert response_data['miscellaneousPreferences'] == TEST_UPDATE_MISC_JSON['miscellaneousPreferences']

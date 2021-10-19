@@ -92,9 +92,10 @@ class UserProfileResource(Resource):
             request_json = request.get_json(silent=True)
             current_app.logger.debug(f'Updating user profile for {account_id} with values: {request_json}')
             # Validate against the schema.
-            valid_format, errors = schema_utils.validate(request_json, 'userProfile', 'common')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR)
+            if not bypass_validation(request_json):
+                valid_format, errors = schema_utils.validate(request_json, 'userProfile', 'common')
+                if not valid_format:
+                    return resource_utils.validation_error_response(errors, VAL_ERROR)
 
             token = g.jwt_oidc_token_info
             current_app.logger.debug(f'Updating user profile for {account_id} with token: {token}')
@@ -115,3 +116,14 @@ class UserProfileResource(Resource):
         except Exception as default_exception:   # noqa: B902; return nicer default error
             current_app.logger.error(f'Get user profile {account_id} failed: ' + repr(default_exception))
             return resource_utils.default_exception_response(default_exception)
+
+
+def bypass_validation(request_json) -> bool:
+    """If only updating registrations table or miscelaneous preferences skip schema validation."""
+    if ('registrationsTable' in request_json or 'miscellaneousPreferences' in request_json) and \
+        ('paymentConfirmationDialog' not in request_json and 
+         'selectConfirmationDialog' not in request_json and
+         'defaultDropDowns' not in request_json and
+         'defaultTableFilters' not in request_json):
+        return True
+    return False

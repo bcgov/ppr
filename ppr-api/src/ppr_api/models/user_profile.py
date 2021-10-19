@@ -41,6 +41,10 @@ class UserProfile(db.Model):
     search_selection_confirmation = db.Column(db.String(1), nullable=False)
     default_drop_downs = db.Column(db.String(1), nullable=False)
     default_table_filters = db.Column(db.String(1), nullable=False)
+    # user account my registrations table preferences: UI can pass whatever settings it wants; API stores as is.
+    registrations_table = db.Column('registrations_table', db.JSON, nullable=True)
+    # Additional user account miscellaneous preferences: UI can pass whatever settings it wants; API stores as is.
+    misc_preferences = db.Column('misc_preferences', db.JSON, nullable=True)
 
     # parent keys
 
@@ -57,6 +61,10 @@ class UserProfile(db.Model):
             'defaultDropDowns': bool(self.default_drop_downs == 'Y'),
             'defaultTableFilters': bool(self.default_table_filters == 'Y')
         }
+        if self.registrations_table:
+            profile['registrationsTable'] = self.registrations_table
+        if self.misc_preferences:
+            profile['miscellaneousPreferences'] = self.misc_preferences
         return profile
 
     def save(self):
@@ -85,7 +93,11 @@ class UserProfile(db.Model):
             self.default_drop_downs = BOOLEAN_TO_DB_VALUE[profile_json['defaultDropDowns']]
         if 'defaultTableFilters' in profile_json:
             self.default_table_filters = BOOLEAN_TO_DB_VALUE[profile_json['defaultTableFilters']]
-
+        if 'registrationsTable' in profile_json:
+            self.registrations_table = profile_json['registrationsTable']
+        if 'miscellaneousPreferences' in profile_json:
+            self.misc_preferences = profile_json['miscellaneousPreferences']
+    
         current_app.logger.debug('Updating username ' + self.user.username + ' profile  to {}'.format(self.json))
         self.save()
 
@@ -126,4 +138,8 @@ class UserProfile(db.Model):
             user_profile.default_table_filters = 'Y'
         else:
             user_profile.default_table_filters = 'N'
+        if 'registrationsTable' in profile_json:
+            user_profile.registrations_table = profile_json['registrationsTable']
+        if 'miscellaneousPreferences' in profile_json:
+            user_profile.misc_preferences = profile_json['miscellaneousPreferences']
         return user_profile
