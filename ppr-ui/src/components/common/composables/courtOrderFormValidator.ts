@@ -5,35 +5,35 @@ const validationSchema = {
     courtName: [
       {
         validator: Validators.required.validator,
-        message: 'Court name is required',
+        message: 'Enter the court name',
         customArgs: { trim: true }
       }
     ],
     courtRegistry: [
       {
         validator: Validators.required.validator,
-        message: 'Registry is required',
+        message: 'Enter the court registry',
         customArgs: { trim: true }
       }
     ],
     fileNumber: [
       {
         validator: Validators.required.validator,
-        message: 'File number is required',
+        message: 'Enter the court file number',
         customArgs: { trim: true }
       }
     ],
     orderDate: [
       {
         validator: Validators.required.validator,
-        message: 'Date of order is required',
+        message: 'Select the date of the order',
         customArgs: { trim: true }
       }
     ],
     effectOfOrder: [
       {
         validator: Validators.required.validator,
-        message: 'Effect of order is required',
+        message: 'Enter the effect of order',
         customArgs: { trim: true }
       }
     ]

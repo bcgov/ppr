@@ -1,147 +1,146 @@
 <template>
-  <v-container flat class="pa-0" id="court-order-summary">
-    <v-form v-model="valid">
-      <v-row no-gutters>
-        <v-col class="generic-label"><h2>Court Order</h2></v-col>
-      </v-row>
-      <v-row no-gutters class="pb-6 pt-4">
-        <v-col>
-          If this registration is pursuant to a court order, enter the court
-          order information below.
-        </v-col>
-      </v-row>
-
-      <v-row class="no-gutters">
-        <v-col
-          cols="12"
-          class="pa-0"
-          :class="showErrors && !valid ? 'border-error-left' : ''"
-        >
-          <v-card flat>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-10">Court Name</v-col>
-              <v-col cols="9" class="pt-8">
+  <v-container v-if="!summaryView" fluid no-gutters class="pb-6  px-0 rounded">
+    <v-row no-gutters class="summary-header pa-2 mb-8">
+      <v-col cols="auto" class="pa-2">
+        <v-icon color="darkBlue">mdi-message-text</v-icon>
+        <label class="pl-3">
+          <strong>Court Order</strong>
+        </label>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class="pb-6">
+      <v-col>
+        If this registration is pursuant to a court order, enter the court order
+        information below, otherwise leave the Court Order information empty.
+      </v-col>
+    </v-row>
+    <v-card
+      id="court-order"
+      :class="showErrors && !valid ? 'border-error-left' : ''"
+      flat
+    >
+      <v-form v-model="valid">
+        <v-row no-gutters style="padding: 0 30px;">
+          <v-col cols="3" class="generic-label pt-10">Court Name</v-col>
+          <v-col cols="9" class="pt-8">
+            <v-text-field
+              filled
+              id="txt-court-name"
+              label="Court Name"
+              v-model="courtName"
+              persistent-hint
+              :error-messages="
+                errors.courtName.message ? errors.courtName.message : ''
+              "
+            />
+          </v-col>
+        </v-row>
+        <v-row no-gutters style="padding: 0 30px;">
+          <v-col cols="3" class="generic-label pt-6">Court Registry</v-col>
+          <v-col cols="9" class="pt-4">
+            <v-text-field
+              filled
+              id="txt-court-registry"
+              label="Court Registry"
+              v-model="courtRegistry"
+              persistent-hint
+              :error-messages="
+                errors.courtRegistry.message ? errors.courtRegistry.message : ''
+              "
+            />
+          </v-col>
+        </v-row>
+        <v-row no-gutters style="padding: 0 30px;">
+          <v-col cols="3" class="generic-label pt-6">Court File Number</v-col>
+          <v-col cols="9" class="pt-4">
+            <v-text-field
+              filled
+              id="txt-court-file-number"
+              label="Court File Number"
+              v-model="fileNumber"
+              persistent-hint
+              :error-messages="
+                errors.fileNumber.message ? errors.fileNumber.message : ''
+              "
+            />
+          </v-col>
+        </v-row>
+        <v-row no-gutters style="padding: 0 30px;">
+          <v-col cols="3" class="generic-label pt-6">Date of Order</v-col>
+          <v-col cols="9" class="pt-4">
+            <v-dialog
+              ref="dialog"
+              v-model="modal"
+              :return-value.sync="orderDate"
+              persistent
+              width="450px"
+            >
+              <template v-slot:activator="{ on, attrs }">
                 <v-text-field
+                  id="court-date-text-field"
+                  :value="computedDateFormatted"
                   filled
-                  id="txt-court-name"
-                  label="Court Name"
-                  v-model="courtName"
                   persistent-hint
+                  label="Date of Order"
+                  append-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  v-on:click:append="on.click"
                   :error-messages="
-                    errors.courtName.message ? errors.courtName.message : ''
+                    errors.orderDate.message ? errors.orderDate.message : ''
                   "
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-6">Court Registry</v-col>
-              <v-col cols="9" class="pt-4">
-                <v-text-field
-                  filled
-                  id="txt-court-registry"
-                  label="Court Registry"
-                  v-model="courtRegistry"
-                  persistent-hint
-                  :error-messages="
-                    errors.courtRegistry.message ? errors.courtRegistry.message : ''
-                  "
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-6"
-                >Court File Number</v-col
-              >
-              <v-col cols="9" class="pt-4">
-                <v-text-field
-                  filled
-                  id="txt-court-file-number"
-                  label="Court File Number"
-                  v-model="fileNumber"
-                  persistent-hint
-                  :error-messages="
-                    errors.fileNumber.message ? errors.fileNumber.message : ''
-                  "
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-6">Date of Order</v-col>
-              <v-col cols="9" class="pt-4">
-                <v-dialog
-                  ref="dialog"
-                  v-model="modal"
-                  :return-value.sync="orderDate"
-                  persistent
-                  width="450px"
                 >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      id="court-date-text-field"
-                      :value="computedDateFormatted"
-                      filled
-                      persistent-hint
-                      label="Date of Order"
-                      append-icon="mdi-calendar"
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                      v-on:click:append="on.click"
-                      :error-messages="
-                      errors.orderDate.message ? errors.orderDate.message : ''
-                      "
-                    >
-                    </v-text-field>
-                  </template>
-                  <v-date-picker
-                    id="court-date-picker-calendar"
-                    v-model="orderDate"
-                    elevation="15"
-                    scrollable
-                    width="450px"
-                  >
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      text
-                      color="primary"
-                      @click="$refs.dialog.save(orderDate)"
-                    >
-                      <strong>OK</strong>
-                    </v-btn>
-                    <v-btn text color="primary" @click="modal = false">
-                      Cancel
-                    </v-btn>
-                  </v-date-picker>
-                </v-dialog>
-              </v-col>
-            </v-row>
-            <v-row no-gutters style="padding: 0 30px;">
-              <v-col cols="3" class="generic-label pt-6"
-                >Effect of Order</v-col
+                </v-text-field>
+              </template>
+              <v-date-picker
+                id="court-date-picker-calendar"
+                v-model="orderDate"
+                elevation="15"
+                scrollable
+                :min="minCourtDate"
+                :max="maxCourtDate"
+                width="450px"
               >
-              <v-col cols="9" class="pt-4">
-                <v-textarea
-                  v-model="effectOfOrder"
-                  id="effect-of-order"
-                  auto-grow
-                  counter="4000"
-                  filled
-                  label="Effect of Order"
-                  class="white pt-2 text-input-field"
-                  :error-messages="
-                    errors.effectOfOrder.message ? errors.effectOfOrder.message : ''
-                  "
-                />
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-form>
+                <v-spacer></v-spacer>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.dialog.save(orderDate)"
+                >
+                  <strong>OK</strong>
+                </v-btn>
+                <v-btn text color="primary" @click="modal = false">
+                  Cancel
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-col>
+        </v-row>
+        <v-row no-gutters style="padding: 0 30px;">
+          <v-col cols="3" class="generic-label pt-6">Effect of Order</v-col>
+          <v-col cols="9" class="pt-4">
+            <v-textarea
+              v-model="effectOfOrder"
+              id="effect-of-order"
+              auto-grow
+              counter="4000"
+              filled
+              label="Effect of Order"
+              class="white pt-2 text-input-field"
+              :error-messages="
+                errors.effectOfOrder.message ? errors.effectOfOrder.message : ''
+              "
+            />
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-card>
   </v-container>
 </template>
 
 <script lang="ts">
+import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
 import {
@@ -159,14 +158,17 @@ export default defineComponent({
   props: {
     setShowErrors: {
       default: false
+    },
+    setRequireCourtOrder: {
+      default: false
     }
   },
   setup (props, { emit }) {
     const { setCourtOrderInformation } = useActions<any>([
       'setCourtOrderInformation'
     ])
-    const { getCourtOrderInformation } = useGetters<any>([
-      'getCourtOrderInformation'
+    const { getCourtOrderInformation, getRegistrationType, getRegistrationCreationDate } = useGetters<any>([
+      'getCourtOrderInformation', 'getRegistrationType', 'getRegistrationCreationDate'
     ])
     const {
       errors,
@@ -175,40 +177,70 @@ export default defineComponent({
       isValidCourtOrderForm
     } = useCourtOrderValidation()
     const modal = false
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const localState = reactive({
       courtName: '',
       courtRegistry: '',
       fileNumber: '',
       orderDate: '',
       effectOfOrder: '',
-      courtOrderInfo: computed((): CourtOrderIF => {
-        return getCourtOrderInformation.value as CourtOrderIF
-      }),
+      courtOrderInfo: computed(
+        (): CourtOrderIF => {
+          return getCourtOrderInformation.value as CourtOrderIF
+        }
+      ),
       computedDateFormatted: computed((): string => {
         if (getCourtOrderInformation.value === null) {
           return ''
         }
         return getCourtOrderInformation.value?.orderDate !== ''
           ? convertDate(
-            new Date(
-              getCourtOrderInformation.value.orderDate + 'T09:00:00Z'
-            ),
+            new Date(getCourtOrderInformation.value.orderDate + 'T09:00:00Z'),
             false,
             false
           )
           : ''
       }),
+      requireCourtOrder: computed((): boolean => {
+        return props.setRequireCourtOrder
+      }),
       showErrors: computed((): boolean => {
-        if (props.setShowErrors === true) {
+        if ((props.setShowErrors === true) && (shouldValidate())) {
           validateCourtOrderForm(localState.courtOrderInfo)
         }
         return props.setShowErrors
+      }),
+      minCourtDate: computed((): string => {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
+          var minDate = new Date(getRegistrationCreationDate.value)
+          return minDate.toISOString()
+        } else {
+          return '0'
+        }
+      }),
+      maxCourtDate: computed((): string => {
+        var maxDate = new Date()
+        return maxDate.toISOString()
       })
     })
 
     const emitValid = async () => {
-      await isValidCourtOrderForm(localState.courtOrderInfo)
-      emit('setCourtOrderValid', valid.value)
+      if (!shouldValidate()) {
+        valid.value = true
+        emit('setCourtOrderValid', valid.value)
+      } else {
+        await isValidCourtOrderForm(localState.courtOrderInfo)
+        emit('setCourtOrderValid', valid.value)
+      }
+    }
+
+    const shouldValidate = () => {
+      if ((localState.courtName) || (localState.courtRegistry) ||
+          (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
+          (localState.requireCourtOrder)) {
+        return true
+      }
+      return false
     }
 
     watch(
@@ -246,6 +278,8 @@ export default defineComponent({
       (val: string) => {
         const newCourtOrderInfo = localState.courtOrderInfo
         newCourtOrderInfo.orderDate = val
+        // date cannot be in the future
+
         setCourtOrderInformation(newCourtOrderInfo)
         emitValid()
       }
@@ -270,6 +304,10 @@ export default defineComponent({
           courtName: '',
           courtRegistry: '',
           fileNumber: ''
+        }
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
+          localState.effectOfOrder = 'Order directs the effective life of the Repairer\'s Lien be extended' +
+                                      ' an additional 180 days'
         }
         setCourtOrderInformation(newCourtOrderInfo)
       } else {
