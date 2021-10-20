@@ -134,7 +134,8 @@ export default defineComponent({
           if (newGeneralCollateral[newGeneralCollateral.length - 1].addedDateTime !== undefined) {
             newGeneralCollateral.push(amendedGC)
           } else {
-            newGeneralCollateral[newGeneralCollateral.length - 1] = amendedGC
+            newGeneralCollateral.pop()
+            newGeneralCollateral.push(amendedGC)
           }
         } else {
           newGeneralCollateral.push(amendedGC)
