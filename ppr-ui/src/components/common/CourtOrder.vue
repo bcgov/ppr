@@ -26,8 +26,9 @@
             <v-text-field
               filled
               id="txt-court-name"
-              label="Court Name"
+              label="Enter the court name"
               v-model="courtName"
+              hint="For example: Supreme Court of British Columbia"
               persistent-hint
               :error-messages="
                 errors.courtName.message ? errors.courtName.message : ''
@@ -41,8 +42,9 @@
             <v-text-field
               filled
               id="txt-court-registry"
-              label="Court Registry"
+              label="Enter the court registry"
               v-model="courtRegistry"
+              hint="The location (city) of the court. For example: Richmond"
               persistent-hint
               :error-messages="
                 errors.courtRegistry.message ? errors.courtRegistry.message : ''
@@ -56,7 +58,7 @@
             <v-text-field
               filled
               id="txt-court-file-number"
-              label="Court File Number"
+              label="Enter the court file number"
               v-model="fileNumber"
               persistent-hint
               :error-messages="
@@ -81,9 +83,9 @@
                   :value="computedDateFormatted"
                   filled
                   persistent-hint
-                  label="Date of Order"
+                  label="Select the date of the order"
                   append-icon="mdi-calendar"
-                  readonly
+                  clearable
                   v-bind="attrs"
                   v-on="on"
                   v-on:click:append="on.click"
@@ -124,9 +126,9 @@
               v-model="effectOfOrder"
               id="effect-of-order"
               auto-grow
-              counter="4000"
+              counter="512"
               filled
-              label="Effect of Order"
+              label="Enter the effect of order"
               class="white pt-2 text-input-field"
               :error-messages="
                 errors.effectOfOrder.message ? errors.effectOfOrder.message : ''
