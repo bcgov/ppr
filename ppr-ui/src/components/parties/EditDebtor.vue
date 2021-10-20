@@ -194,6 +194,7 @@
                     class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && currentIndex !== -1
                               && (!currentDebtor.action || currentDebtor.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
@@ -234,6 +235,7 @@ import {
   defineComponent,
   onMounted,
   watch,
+  computed,
   reactive,
   toRefs
 } from '@vue/composition-api'
@@ -296,7 +298,10 @@ export default defineComponent({
       searchValue: '',
       hideDetails: false,
       month: { value: 0, text: '' },
-      showAllAddressErrors: false
+      showAllAddressErrors: false,
+      currentIndex: computed((): number => {
+        return props.activeIndex
+      })
     })
 
     const onSubmitForm = async () => {
