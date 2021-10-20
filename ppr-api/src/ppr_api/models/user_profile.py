@@ -97,7 +97,7 @@ class UserProfile(db.Model):
             self.registrations_table = profile_json['registrationsTable']
         if 'miscellaneousPreferences' in profile_json:
             self.misc_preferences = profile_json['miscellaneousPreferences']
-    
+
         current_app.logger.debug('Updating username ' + self.user.username + ' profile  to {}'.format(self.json))
         self.save()
 

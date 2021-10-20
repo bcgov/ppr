@@ -20,6 +20,7 @@ import pytest
 
 from ppr_api.models import User, UserProfile
 
+
 # Properties can be anything, using show* for testing.
 REGISTRATIONS_TABLE = {
     'showColumn1': True,
@@ -111,14 +112,14 @@ def test_create_from_json(session, client, jwt, json_data):
     assert profile.default_table_filters
     assert profile.default_drop_downs
     if 'registrationsTable' in json_data:
-        assert profile.registrations_table['showColumn1']
-        assert not profile.registrations_table['showColumn2']
-        assert profile.registrations_table['showColumn3']
-        assert not profile.registrations_table['showColumn4']
+        assert 'showColumn1' in profile.registrations_table
+        assert 'showColumn2' in profile.registrations_table
+        assert 'showColumn3' in profile.registrations_table
+        assert 'showColumn4' in profile.registrations_table
     if 'miscellaneousPreferences' in json_data:
-        assert profile.misc_preferences['preference1'] == 'A'
-        assert not profile.misc_preferences['preference2'] 
-        assert profile.misc_preferences['preference3'] == 3
+        assert 'preference1' in profile.misc_preferences
+        assert 'preference2' in profile.misc_preferences
+        assert 'preference3' in profile.misc_preferences
 
 
 @pytest.mark.parametrize('token', TEST_TOKEN_DATA)

@@ -120,10 +120,10 @@ class UserProfileResource(Resource):
 
 def bypass_validation(request_json) -> bool:
     """If only updating registrations table or miscelaneous preferences skip schema validation."""
-    if ('registrationsTable' in request_json or 'miscellaneousPreferences' in request_json) and \
-        ('paymentConfirmationDialog' not in request_json and 
-         'selectConfirmationDialog' not in request_json and
-         'defaultDropDowns' not in request_json and
-         'defaultTableFilters' not in request_json):
-        return True
+    if 'registrationsTable' in request_json or 'miscellaneousPreferences' in request_json:
+        if 'paymentConfirmationDialog' not in request_json and \
+                'selectConfirmationDialog' not in request_json and \
+                'defaultDropDowns' not in request_json and \
+                'defaultTableFilters' not in request_json:
+            return True
     return False
