@@ -186,6 +186,7 @@
                     class="remove-btn"
                     >
                     <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && currentIndex !== -1
                               && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
@@ -293,7 +294,10 @@ export default defineComponent({
         }
         return true
       }),
-      showAllAddressErrors: false
+      showAllAddressErrors: false,
+      currentIndex: computed((): number => {
+        return props.activeIndex
+      })
     })
 
     const showDialog = () => {
