@@ -59,7 +59,10 @@
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
                 <v-divider v-if="showSecuredParties || showDebtors"></v-divider>
-                <!-- To do: add vehicle collateral summary -->
+                <vehicle-collateral
+                  :isSummary="true"
+                  :showInvalid="false"
+                />
               </div>
               <div v-if="showGeneralCollateral">
                 <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral"></v-divider>
