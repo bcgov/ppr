@@ -152,6 +152,7 @@ import {
 import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
+import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -191,6 +192,7 @@ import { StatusCodes } from 'http-status-codes'
     RegisteringPartySummary,
     SecuredPartySummary,
     DebtorSummary,
+    VehicleCollateral,
     RegistrationLengthTrustAmendment,
     StickyContainer
   }

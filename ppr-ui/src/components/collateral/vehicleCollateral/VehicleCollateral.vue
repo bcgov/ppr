@@ -355,7 +355,18 @@ export default defineComponent({
         return headersToShow
       }),
       vehicleCollateral: computed((): VehicleCollateralIF[] => {
-        return (getVehicleCollateral.value as VehicleCollateralIF[]) || []
+        const vehicles = getVehicleCollateral.value as VehicleCollateralIF[] || []
+        if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (localState.summaryView)) {
+          const displayArray = []
+          for (let i = 0; i < vehicles.length; i++) {
+            if (vehicles[i].action) {
+              displayArray.push(vehicles[i])
+            }
+          }
+          return displayArray
+        } else {
+          return vehicles
+        }
       })
     })
 
