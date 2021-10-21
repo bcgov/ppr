@@ -122,7 +122,6 @@ def test_update_user_profile(session, client, jwt, desc, staff, include_account,
                       headers=headers,
                       content_type='application/json')
     # check
-    print(rv.json)
     assert rv.status_code == status
     if rv.status_code == HTTPStatus.OK:
         response_data = rv.json
