@@ -12,7 +12,7 @@
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               Review the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br />
+              <b>{{ asOfDateTime }}.</b><br /><br />
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
             </p>

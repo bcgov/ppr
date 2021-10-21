@@ -4,4 +4,5 @@ export interface PartySummaryOptionsI {
   iconImage: string // can be '' if no icon desired
   isDebtorSummary: boolean
   enableNoDataAction: boolean
+  isRegisteringParty: boolean
 }
