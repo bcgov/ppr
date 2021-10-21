@@ -393,10 +393,11 @@ span.invalid-color {
   opacity: 0.4;
 }
 
-tr.disabled-text-not-action td {
+tr.disabled-text-not-action td, tr.disabled-text-not-first td {
   opacity: 0.4;
 }
-tr.disabled-text-not-action td:last-child, tr.disabled-text-not-action td:first-child {
+tr.disabled-text-not-action td:last-child, tr.disabled-text-not-action td:first-child,
+tr.disabled-text-not-first td:first-child {
   opacity: 1;
 }
 

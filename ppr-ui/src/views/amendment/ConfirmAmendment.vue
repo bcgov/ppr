@@ -38,13 +38,21 @@
             </v-col>
           </v-row>
           <div class="white ma-0">
-            <div v-if="showSecuredParties">
-              <!-- To do: add amended secured parties -->
+            <div v-if="showSecuredParties" class="pa-4">
+              <h3>Secured Parties</h3>
+              <secured-party-summary
+                class="secured-party-summary"
+                :setEnableNoDataAction="true"
+              />
             </div>
 
-            <div v-if="showDebtors">
+            <div v-if="showDebtors" class="pa-4">
               <v-divider v-if="showSecuredParties"></v-divider>
-              <!-- To do: add amended debtors -->
+              <h3>Debtors</h3>
+              <debtor-summary
+                class="debtor-summary"
+                :setEnableNoDataAction="true"
+              />
             </div>
 
             <div v-if="showVehicleCollateral || showGeneralCollateral">
@@ -139,7 +147,7 @@ import {
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { RegisteringPartySummary } from '@/components/parties/summaries'
+import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 
 // local helpers/enums/interfaces/resources
@@ -178,6 +186,8 @@ import { StatusCodes } from 'http-status-codes'
     CautionBox,
     FolioNumberSummary,
     RegisteringPartySummary,
+    SecuredPartySummary,
+    DebtorSummary,
     RegistrationLengthTrustAmendment,
     StickyContainer
   }

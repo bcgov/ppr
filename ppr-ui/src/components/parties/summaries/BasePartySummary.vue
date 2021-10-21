@@ -20,7 +20,8 @@
           no-data-text=""
         >
           <template v-slot:item="row" class="party-data-table">
-            <tr :key="row.item.id" class="party-row">
+            <tr :key="row.item.id" class="party-row"
+            :class="{ 'disabled-text-not-first': row.item.action === ActionTypes.REMOVED}">
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>
                   <v-col cols="3">
@@ -30,8 +31,18 @@
                     </div>
                   </v-col>
                   <v-col cols="9">
-                    <div>
+                    <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
                       {{ getName(row.item) }}
+                    </div>
+                    <div
+                      v-if="
+                        row.item.action &&
+                          registrationFlowType === RegistrationFlowType.AMENDMENT
+                      "
+                    >
+                      <v-chip x-small label color="primary" text-color="white">
+                        {{ row.item.action }}
+                      </v-chip>
                     </div>
                   </v-col>
                 </v-row>
@@ -67,14 +78,17 @@
 import {
   defineComponent,
   reactive,
+  computed,
   toRefs
 } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 
 // local
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
 import { useParty } from '@/composables/useParty'
 import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationFlowType, ActionTypes } from '@/enums'
 
 export default defineComponent({
   name: 'BasePartySummary',
@@ -86,7 +100,7 @@ export default defineComponent({
       default: () => [] as Array<BaseHeaderIF>
     },
     setItems: {
-      default: () => [] as PartyIF
+      default: () => [] as Array<PartyIF>
     },
     setOptions: {
       default: () => {
@@ -102,9 +116,25 @@ export default defineComponent({
   },
   emits: ['triggerNoDataAction'],
   setup (props, { emit }) {
+    const { getRegistrationFlowType } = useGetters<any>([
+      'getRegistrationFlowType'
+    ])
+    const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       headers: props.setHeaders,
-      items: props.setItems,
+      items: computed((): PartyIF[] => {
+        if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+          const displayArray = []
+          for (let i = 0; i < props.setItems.length; i++) {
+            if (props.setItems[i].action) {
+              displayArray.push(props.setItems[i])
+            }
+          }
+          return displayArray
+        } else {
+          return props.setItems
+        }
+      }),
       options: props.setOptions
     })
     const noDataAction = (): void => {
@@ -114,6 +144,9 @@ export default defineComponent({
 
     return {
       ...toRefs(localState),
+      registrationFlowType,
+      RegistrationFlowType,
+      ActionTypes,
       getFormattedBirthdate,
       getName,
       isBusiness,
