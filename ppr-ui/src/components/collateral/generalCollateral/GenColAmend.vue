@@ -136,7 +136,7 @@ export default defineComponent({
           if (newGeneralCollateral[newGeneralCollateral.length - 1].addedDateTime !== undefined) {
             newGeneralCollateral.push(amendedGC)
           } else {
-            // otherwise, pop the old general collateral off the end of the array, and push the new one 
+            // otherwise, pop the old general collateral off the end of the array, and push the new one
             // one (pop and push required to keep refs)
             newGeneralCollateral.pop()
             newGeneralCollateral.push(amendedGC)
