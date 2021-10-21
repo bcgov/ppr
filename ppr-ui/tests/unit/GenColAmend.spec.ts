@@ -95,4 +95,19 @@ describe('GenColAmend tests', () => {
     expect(store.getters.getAddCollateral.generalCollateral.length).toBe(1)
   })
 
+
+  it('saves amended general collateral over the previous one', async () => {
+    await store.dispatch('setGeneralCollateral',
+    [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest'}])
+    wrapper = createComponent(false)
+    wrapper.find('#general-collateral-delete-desc').setValue('JOE')
+    wrapper.find('#general-collateral-add-desc').setValue('SCHMOE')
+    wrapper.find(doneButtonSelector).trigger('click')
+    expect(getLastEvent(wrapper, 'closeGenColAmend')).toBeTruthy()
+    await flushPromises()
+    // store should still have 1 item now (replaced the last one)
+    expect(store.getters.getAddCollateral.generalCollateral.length).toBe(1)
+    expect(store.getters.getAddCollateral.generalCollateral[0].descriptionAdd).toBe('SCHMOE')
+  })
+
 })

@@ -3,6 +3,7 @@ import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { cloneDeep, isEqual } from 'lodash'
 
 export const useVehicle = (props, context) => {
   const {
@@ -42,7 +43,8 @@ export const useVehicle = (props, context) => {
     }),
     getSerialDisabled: computed(function () {
       return localState.currentVehicle.type === ''
-    })
+    }),
+    originalVehicle: null
   })
 
   const getVehicle = () => {
@@ -50,6 +52,7 @@ export const useVehicle = (props, context) => {
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentVehicle = JSON.parse(JSON.stringify(vehicles[props.activeIndex]))
+      localState.originalVehicle = cloneDeep(localState.currentVehicle)
     } else {
       localState.currentVehicle = {
         id: -1,
@@ -80,6 +83,12 @@ export const useVehicle = (props, context) => {
       localState.currentVehicle.id = newList.length + 1
       newList.push(localState.currentVehicle)
     } else {
+      // if they didn't change anything, just exit
+      if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
+        isEqual(localState.currentVehicle, localState.originalVehicle)) {
+        resetFormAndData(true)
+        return
+      }
       // Edit vehicle
       if (!localState.currentVehicle.action) {
         localState.currentVehicle.action = ActionTypes.EDITED
