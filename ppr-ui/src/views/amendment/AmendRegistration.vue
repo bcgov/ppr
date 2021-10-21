@@ -13,6 +13,8 @@
             <p class="ma-0">
               Review the current information for this registration as of
               <b>{{ asOfDateTime }}.</b><br />
+              To view the full history of this registration including descriptions of any amendments and
+              any court orders, you will need to conduct a separate search.
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
