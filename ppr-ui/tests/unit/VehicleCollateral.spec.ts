@@ -60,10 +60,13 @@ describe('Vehicle collateral summary tests', () => {
   })
 
   it('renders with summary version with empty collateral', async () => {
+    await store.dispatch('setVehicleCollateral', null)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     // won't show edit collateral component until click
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
+    expect(wrapper.vm.vehicleCollateral.length).toBe(0)
     expect(wrapper.find('.collateral-table').exists()).toBe(false)
+    
   })
 
   it('renders with summary version with vehicle collateral', async () => {
@@ -171,3 +174,37 @@ describe('Vehicle Collateral amendment tests', () => {
   })
 
 })
+
+
+describe('Vehicle Collateral summary amendment tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment)
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent(true, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct vehicle rows when data is present', () => {
+    const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.collateral-table tr').length
+    expect(wrapper.vm.summaryView).toBe(true)
+    // 3 rows plus header
+    expect(vehicleRowCount).toEqual(4)
+  })
+
+  it('displays the correct chips in the table rows', () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.collateral-table tr')[1]
+    const item2 = wrapper.vm.$el.querySelectorAll('.collateral-table tr')[2]
+    const item3 = wrapper.vm.$el.querySelectorAll('.collateral-table tr')[3]
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('AMENDED')
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('DELETED')
+    expect(item3.querySelectorAll('td')[0].textContent).toContain('ADDED')
+  })
+
+  
+})
+
