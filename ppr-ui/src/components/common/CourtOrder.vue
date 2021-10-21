@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="!summaryView" fluid no-gutters class="pb-6  px-0 rounded">
+  <v-container fluid no-gutters class="pb-6  px-0 rounded">
     <v-row no-gutters class="summary-header pa-2 mb-8">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-message-text</v-icon>
@@ -176,7 +176,8 @@ export default defineComponent({
       errors,
       valid,
       validateCourtOrderForm,
-      isValidCourtOrderForm
+      isValidCourtOrderForm,
+      resetErrors
     } = useCourtOrderValidation()
     const modal = false
     const registrationType = getRegistrationType.value?.registrationTypeAPI
@@ -228,7 +229,7 @@ export default defineComponent({
 
     const emitValid = async () => {
       if (!shouldValidate()) {
-        valid.value = true
+        resetErrors()
         emit('setCourtOrderValid', valid.value)
       } else {
         await isValidCourtOrderForm(localState.courtOrderInfo)
