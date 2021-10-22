@@ -137,6 +137,7 @@ export default class AmendRegistration extends Vue {
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
   @Getter getStateModel: StateModelIF
   @Getter getLengthTrust: LengthTrustIF
+  @Getter getAmendmentDescription: string
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -173,6 +174,7 @@ export default class AmendRegistration extends Vue {
   private registrationLengthTrustValid = true
   private collateralValid = true
   private courtOrderValid = false
+  private fromConfirmation = false
   private requireCourtOrder = false
 
   private get asOfDateTime (): string {
@@ -189,7 +191,12 @@ export default class AmendRegistration extends Vue {
 
   // the number of the registration being amended
   private get registrationNumber (): string {
-    return (this.$route.query['reg-num'] as string) || ''
+    let regNum = this.$route.query['reg-num'] as string
+    if (regNum && regNum.endsWith('-confirm')) {
+      this.fromConfirmation = true
+      regNum = regNum.replace('-confirm', '')
+    }
+    return regNum || ''
   }
 
   // the draft document id if loading data after the base registration.
@@ -214,9 +221,7 @@ export default class AmendRegistration extends Vue {
       return
     }
     // Conditionally load: could be coming back from confirm.
-    const model:StateModelIF = this.getStateModel
-    if (model.registration.registrationNumber === this.registrationNumber &&
-        model.originalRegistration && !this.documentId) {
+    if (this.fromConfirmation) {
       return
     }
     this.financingStatementDate = new Date()
@@ -298,11 +303,13 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
+    const description = this.getAmendmentDescription
     if (
       this.debtorValid &&
       this.securedPartiesValid &&
       this.registrationLengthTrustValid &&
       this.collateralValid &&
+      (!description || description.length <= 4000) &&
       this.courtOrderValid
     ) {
       this.$router.push({
