@@ -165,7 +165,13 @@
                     @click="removeVehicle()"
                     class="remove-btn"
                     id="remove-btn-collateral"
-                    >Remove
+                    >
+                    <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                              && currentIndex !== -1
+                              && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)">
+                      Delete
+                    </span>
+                    <span v-else>Remove</span>
                   </v-btn>
 
                   <v-btn
@@ -198,7 +204,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from '@vue/composition-api'
+import { defineComponent, onMounted, reactive, computed, toRefs } from '@vue/composition-api'
 
 import { useCollateralValidation, useVehicle } from './factories'
 import { APIVehicleTypes } from '@/enums'
@@ -245,6 +251,12 @@ export default defineComponent({
       validateCollateralForm,
       resetSerialError
     } = useCollateralValidation()
+
+    const localState = reactive({
+      currentIndex: computed((): number => {
+        return props.activeIndex
+      })
+    })
 
     onMounted(() => {
       getVehicle()
@@ -295,7 +307,8 @@ export default defineComponent({
       ActionTypes,
       mustHaveManufacturedHomeCollateral,
       excludesManufacturedHomeCollateral,
-      changeVehicleType
+      changeVehicleType,
+      ...toRefs(localState)
     }
   }
 })
