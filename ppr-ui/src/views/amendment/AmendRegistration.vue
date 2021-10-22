@@ -94,8 +94,7 @@ import {
   APIRegistrationTypes, // eslint-disable-line no-unused-vars
   RouteNames, // eslint-disable-line no-unused-vars
   UIRegistrationTypes, // eslint-disable-line no-unused-vars
-  RegistrationFlowType, // eslint-disable-line no-unused-vars
-  ActionTypes
+  RegistrationFlowType // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
@@ -176,6 +175,7 @@ export default class AmendRegistration extends Vue {
   private collateralValid = true
   private courtOrderValid = false
   private fromConfirmation = false
+  private requireCourtOrder = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -187,13 +187,6 @@ export default class AmendRegistration extends Vue {
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get requireCourtOrder (): boolean {
-    if (this.getLengthTrust.action === ActionTypes.EDITED) {
-      return true
-    }
-    return false
   }
 
   // the number of the registration being amended
