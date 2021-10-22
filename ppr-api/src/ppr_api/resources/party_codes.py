@@ -104,3 +104,34 @@ class ClientPartyHeadOfficeResource(Resource):
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/accounts', methods=['GET', 'OPTIONS'])
+class ClientPartyAccountResource(Resource):
+    """Resource for looking up client parties belonging to an account linke to a BCOL number."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    @jwt.requires_auth
+    def get():
+        """Get a list of client parties associated with an account-BCOL number pair."""
+        try:
+            # Quick check: must be staff or provide an account ID.
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
+
+            # Verify request JWT and account ID
+            if not authorized(account_id, jwt):
+                return resource_utils.unauthorized_error_response(account_id)
+
+            # Try to fetch client parties: no results is an empty list.
+            current_app.logger.debug(f'Getting {account_id}  party codes.')
+            parties = ClientCode.find_by_account_id(account_id, True)
+            return jsonify(parties), HTTPStatus.OK
+
+        except BusinessException as exception:
+            return resource_utils.business_exception_response(exception)
+        except Exception as default_exception:   # noqa: B902; return nicer default error
+            return resource_utils.default_exception_response(default_exception)

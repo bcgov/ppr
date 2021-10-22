@@ -22,7 +22,7 @@ from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import FinancingStatement, Registration, UserExtraRegistration
+from ppr_api.models import AccountBcolId, FinancingStatement, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.resources import utils as resource_utils
@@ -746,9 +746,10 @@ class AccountRegistrationResource(Resource):
             elif registration['accountId'] == account_id or registration['existsCount'] > 0:
                 return resource_utils.duplicate_error_response(DUPLICATE_REGISTRATION_ERROR.format(registration_num))
 
-            # Future: check if restricted access for crown charges.
-            if registration['registrationClass'] == model_utils.REG_CLASS_CROWN:
-                current_app.logger.info('Check restricted access when available.')
+            # Restricted access check for crown charge class of registration types.
+            if not is_staff(jwt) and registration['registrationClass'] == model_utils.REG_CLASS_CROWN and \
+                    not AccountBcolId.crown_charge_account(account_id):
+                return resource_utils.cc_forbidden_error_response(account_id)
 
             if registration['accountId'] != account_id:
                 extra_registration = UserExtraRegistration(account_id=account_id, registration_number=base_reg_num)
@@ -786,9 +787,10 @@ class AccountRegistrationResource(Resource):
             if registration is None:
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
 
-            # Future: check if restricted access for crown charges.
-            if registration['registrationClass'] == model_utils.REG_CLASS_CROWN:
-                current_app.logger.info('Check restricted access when available.')
+            # Restricted access check for crown charge class of registration types.
+            if not is_staff(jwt) and registration['registrationClass'] == model_utils.REG_CLASS_CROWN and \
+                    not AccountBcolId.crown_charge_account(account_id):
+                return resource_utils.cc_forbidden_error_response(account_id)
 
             del registration['accountId']
             del registration['existsCount']

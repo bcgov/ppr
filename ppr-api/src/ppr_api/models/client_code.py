@@ -17,6 +17,7 @@ Client parties are reusable registering parties and secured parties.
 """
 from __future__ import annotations
 
+from .account_bcol_id import AccountBcolId  # noqa: F401 pylint: disable=unused-import
 # Needed by the SQLAlchemy relationship
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .db import db
@@ -96,16 +97,28 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         return party_codes
 
     @classmethod
-    def find_by_account_number(cls, account_number: int):
-        """Return a list of client parties searching by account number."""
+    def find_by_account_id(cls, account_id: str, crown_charge: bool = True):
+        """Return a list of client parties searching by account ID using the account id - bcol id mapping table."""
         party_codes = []
-        if account_number:
-            party_list = db.session.query(ClientCode).filter(ClientCode.bconline_account == account_number).all()
-            if not party_list:
-                return party_codes
+        if not account_id:
+            return party_codes
+
+        bcol_accounts = AccountBcolId.find_by_account_id(account_id)
+        ids = []
+        if bcol_accounts:
+            for account in bcol_accounts:
+                if crown_charge and account.crown_charge_ind and \
+                        account.crown_charge_ind == AccountBcolId.CROWN_CHARGE_YES:
+                    ids.append(account.bconline_account)
+                elif not crown_charge and not account.crown_charge_ind:
+                    ids.append(account.bconline_account)
+        if not ids:
+            return party_codes
+
+        party_list = db.session.query(ClientCode).filter(ClientCode.bconline_account.in_(ids)).all()
+        if party_list:
             for party in party_list:
                 party_codes.append(party.json)
-
         return party_codes
 
     @classmethod

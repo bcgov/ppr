@@ -26,10 +26,11 @@ TEST_DATA_PARTY_CODE = [
     ('Exists', True, '200000000'),
     ('Does not exist', False, '12345')
 ]
-# testdata pattern is ({description}, {results_size}, {search_value})
+# testdata pattern is ({description}, {account_id}, {results_size}, {crown_charge})
 TEST_DATA_ACCOUNT_NUMBER = [
-    ('No results', 0, 99999),
-    ('Results', 6, 12345)
+    ('CC account with bcol number mapping', 'PS12345', 2, True),
+    ('Non CC account with bcol number mapping', 'PS00001', 1, False),
+    ('Account with no bcol number mapping', 'PS1234X', 0, False)
 ]
 # testdata pattern is ({description}, {results_size}, {search_value})
 TEST_DATA_BRANCH_CODE = [
@@ -103,10 +104,10 @@ def test_find_by_branch_code(session, desc, results_size, search_value):
         assert not parties
 
 
-@pytest.mark.parametrize('desc,results_size,search_value', TEST_DATA_ACCOUNT_NUMBER)
-def test_find_by_account_number(session, desc, results_size, search_value):
-    """Assert that find client parties by account number matching contains all expected elements."""
-    parties = ClientCode.find_by_account_number(search_value)
+@pytest.mark.parametrize('desc,account_id,results_size,crown_charge', TEST_DATA_ACCOUNT_NUMBER)
+def test_find_by_account_id(session, desc, account_id, results_size, crown_charge):
+    """Assert that find client parties by account id contains all expected elements."""
+    parties = ClientCode.find_by_account_id(account_id, crown_charge)
     if results_size > 0:
         assert parties
         assert len(parties) >= results_size
