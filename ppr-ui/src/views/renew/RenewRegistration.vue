@@ -51,6 +51,7 @@
           <collateral class="mt-15" :isSummary="true" />
           <court-order
             :setShowErrors="showInvalid"
+            :setRequireCourtOrder="true"
             @setCourtOrderValid="registrationValid = $event"
             v-if="registrationType === registrationTypeRL"
             class="mt-15" />
