@@ -173,7 +173,7 @@ export default class AmendRegistration extends Vue {
   private securedPartiesValid = true
   private registrationLengthTrustValid = true
   private collateralValid = true
-  private courtOrderValid = false
+  private courtOrderValid = true
 
   private get asOfDateTime (): string {
     // return formatted date

@@ -18,6 +18,8 @@ import { ConfirmAmendment } from '@/views'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
+import { GenColSummary } from '@/components/collateral/generalCollateral'
+
 
 // Other
 import mockRouter from './MockRouter'
@@ -82,6 +84,8 @@ describe('Confirm Amendment registration component', () => {
       lienAmount: ''
     })
     await store.dispatch('setAmendmentDescription', 'test')
+    await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
+    
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -110,6 +114,8 @@ describe('Confirm Amendment registration component', () => {
 
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
+    
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
