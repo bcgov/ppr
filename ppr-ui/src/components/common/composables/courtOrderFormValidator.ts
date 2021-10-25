@@ -5,36 +5,56 @@ const validationSchema = {
     courtName: [
       {
         validator: Validators.required.validator,
-        message: 'Enter the court name',
+        message: 'This field is required',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.maxLength.validator,
+        message: 'Maximum 256 characters',
+        customArgs: { length: 256 }
       }
     ],
     courtRegistry: [
       {
         validator: Validators.required.validator,
-        message: 'Enter the court registry',
+        message: 'This field is required',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.maxLength.validator,
+        message: 'Maximum 64 characters',
+        customArgs: { length: 64 }
       }
     ],
     fileNumber: [
       {
         validator: Validators.required.validator,
-        message: 'Enter the court file number',
+        message: 'This field is required',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.maxLength.validator,
+        message: 'Maximum 20 characters',
+        customArgs: { length: 20 }
       }
     ],
     orderDate: [
       {
         validator: Validators.required.validator,
-        message: 'Select the date of the order',
+        message: 'This field is required',
         customArgs: { trim: true }
       }
     ],
     effectOfOrder: [
       {
         validator: Validators.required.validator,
-        message: 'Enter the effect of order',
+        message: 'This field is required',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.maxLength.validator,
+        message: 'Maximum 512 characters',
+        customArgs: { length: 512 }
       }
     ]
   }
