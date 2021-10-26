@@ -53,7 +53,8 @@ describe('Party Summary SA tests', () => {
       header: 'true',
       iconColor: '',
       iconImage: '',
-      isDebtorSummary: false
+      isDebtorSummary: false,
+      isRegisteringParty: false
     })
   })
   afterEach(() => {
@@ -81,7 +82,8 @@ describe('Secured Party list tests', () => {
       header: 'true',
       iconColor: '',
       iconImage: '',
-      isDebtorSummary: false
+      isDebtorSummary: false,
+      isRegisteringParty: false
     })
   })
   afterEach(() => {
@@ -118,7 +120,8 @@ describe('Debtor list tests', () => {
       header: 'true',
       iconColor: '',
       iconImage: '',
-      isDebtorSummary: true
+      isDebtorSummary: true,
+      isRegisteringParty: false
     })
   })
   afterEach(() => {
@@ -157,7 +160,8 @@ describe('Secured Party amendment list tests', () => {
       header: 'true',
       iconColor: '',
       iconImage: '',
-      isDebtorSummary: false
+      isDebtorSummary: false,
+      isRegisteringParty: false
     })
   })
   afterEach(() => {

@@ -12,7 +12,9 @@
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
               Review the current information for this registration as of
-              <b>{{ asOfDateTime }}.</b><br />
+              <b>{{ asOfDateTime }}.</b><br /><br />
+              To view the full history of this registration including descriptions of any amendments and
+              any court orders, you will need to conduct a separate search.
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
@@ -137,6 +139,7 @@ export default class AmendRegistration extends Vue {
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
   @Getter getStateModel: StateModelIF
   @Getter getLengthTrust: LengthTrustIF
+  @Getter getAmendmentDescription: string
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -173,6 +176,7 @@ export default class AmendRegistration extends Vue {
   private registrationLengthTrustValid = true
   private collateralValid = true
   private courtOrderValid = true
+  private fromConfirmation = false
   private requireCourtOrder = false
 
   private get asOfDateTime (): string {
@@ -189,7 +193,12 @@ export default class AmendRegistration extends Vue {
 
   // the number of the registration being amended
   private get registrationNumber (): string {
-    return (this.$route.query['reg-num'] as string) || ''
+    let regNum = this.$route.query['reg-num'] as string
+    if (regNum && regNum.endsWith('-confirm')) {
+      this.fromConfirmation = true
+      regNum = regNum.replace('-confirm', '')
+    }
+    return regNum || ''
   }
 
   // the draft document id if loading data after the base registration.
@@ -214,9 +223,7 @@ export default class AmendRegistration extends Vue {
       return
     }
     // Conditionally load: could be coming back from confirm.
-    const model:StateModelIF = this.getStateModel
-    if (model.registration.registrationNumber === this.registrationNumber &&
-        model.originalRegistration && !this.documentId) {
+    if (this.fromConfirmation) {
       return
     }
     this.financingStatementDate = new Date()
@@ -298,11 +305,13 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
+    const description = this.getAmendmentDescription
     if (
       this.debtorValid &&
       this.securedPartiesValid &&
       this.registrationLengthTrustValid &&
       this.collateralValid &&
+      (!description || description.length <= 4000) &&
       this.courtOrderValid
     ) {
       this.$router.push({

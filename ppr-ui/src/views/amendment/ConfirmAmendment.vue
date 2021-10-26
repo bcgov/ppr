@@ -440,7 +440,7 @@ export default class ConfirmAmendment extends Vue {
   private goToReviewAmendment (): void {
     this.$router.push({
       name: RouteNames.AMEND_REGISTRATION,
-      query: { 'reg-num': this.registrationNumber }
+      query: { 'reg-num': this.registrationNumber + '-confirm' }
     })
     this.emitHaveData(false)
   }

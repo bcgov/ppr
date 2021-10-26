@@ -109,7 +109,8 @@ export default defineComponent({
           header: '',
           iconColor: '',
           iconImage: '',
-          isDebtorSummary: false
+          isDebtorSummary: false,
+          isRegisteringParty: false
         } as PartySummaryOptionsI
       }
     }
@@ -123,7 +124,7 @@ export default defineComponent({
     const localState = reactive({
       headers: props.setHeaders,
       items: computed((): PartyIF[] => {
-        if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+        if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (!localState.options.isRegisteringParty)) {
           const displayArray = []
           for (let i = 0; i < props.setItems.length; i++) {
             if (props.setItems[i].action) {

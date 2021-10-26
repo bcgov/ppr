@@ -217,7 +217,7 @@ export default defineComponent({
         return null
       }),
       generalCollateralLength: computed((): number => {
-        if (getGeneralCollateral.value.length > 0) {
+        if (getGeneralCollateral.value && getGeneralCollateral.value.length > 0) {
           if (localState.lastGeneralCollateral.addedDateTime) {
             return getGeneralCollateral.value.length
           } else {
