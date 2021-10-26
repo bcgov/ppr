@@ -106,7 +106,7 @@ describe('TableRow tests', () => {
       const baseReg = registrationHistory[i] as RegistrationSummaryIF
       const draftReg = registrationHistory[i] as DraftResultIF
 
-      const isChild = draftReg.type && draftReg.baseRegistrationNumber ||
+      const isChild = (draftReg.type && draftReg.baseRegistrationNumber) ||
         (baseReg.registrationNumber && baseReg.registrationNumber !== baseReg.baseRegistrationNumber)
       await wrapper.setProps({
         setChild: isChild,
@@ -329,7 +329,11 @@ describe('TableRow tests', () => {
     expect(menuItems.at(0).text()).toContain('Delete Draft')
     await menuItems.at(0).trigger('click')
     expect(getLastEvent(wrapper, 'action')).toEqual(
-      { action: TableActions.DELETE, docId: mockedDraftAmend.documentId, regNum: mockedDraftAmend.baseRegistrationNumber }
+      {
+        action: TableActions.DELETE,
+        docId: mockedDraftAmend.documentId,
+        regNum: mockedDraftAmend.baseRegistrationNumber
+      }
     )
   })
 })

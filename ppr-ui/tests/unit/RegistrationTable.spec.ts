@@ -135,7 +135,8 @@ describe('Test registration table with results', () => {
     expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setChild).toBe(false)
     expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setHeaders).toEqual(wrapper.vm.headers)
     expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setIsExpanded).toBe(false)
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem).toEqual(wrapper.vm.$props.setRegistrationHistory[0])
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem)
+      .toEqual(wrapper.vm.$props.setRegistrationHistory[0])
 
     // test adding multiple rows + drafts
     await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
