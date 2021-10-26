@@ -10,7 +10,9 @@ import {
   mockedFinancingStatementAll,
   mockedDebtorNames,
   mockedAmendmentResponse,
-  mockedDraftAmendmentStatement
+  mockedDraftAmendmentStatement,
+  mockedVehicleCollateral1,
+  mockedGeneralCollateral1
 } from './test-data'
 
 // Components
@@ -211,6 +213,11 @@ describe('Confirm Amendment registration save registration', () => {
       surrenderDate: '',
       lienAmount: ''
     })
+    await store.dispatch('setAddCollateral', {
+      vehicleCollateral: mockedVehicleCollateral1,
+      generalCollateral: mockedGeneralCollateral1,
+      valid: true
+    })
     await store.dispatch('setAmendmentDescription', 'test')
 
     // create a Local Vue and install router on it
@@ -237,7 +244,10 @@ describe('Confirm Amendment registration save registration', () => {
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
-
+    expect(wrapper.vm.collateralValid).toBe(true)
+    expect(wrapper.vm.partiesValid).toBe(true)
+    expect(wrapper.vm.courtOrderValid).toBe(true)
+    
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
