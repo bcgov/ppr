@@ -13,12 +13,24 @@ INSERT INTO addresses(id, street, street_additional, city, region, postal_code, 
 -- Client Party code names and addresses
 INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTACT_NAME,CONTACT_AREA_CD,
 			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
-  VALUES (200000000,200000000,200000000,'TEST PARTY CODE 1', 12345,'TEST SP CONTACT NAME','604','2171234',
+  VALUES (200000000,200000000,200000000,'TEST PARTY CODE 1', 200000000,'TEST SP CONTACT NAME','604','2171234',
           'test-sp-client@gmail.com',null,'SPUSER',null);
 INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTACT_NAME,CONTACT_AREA_CD,
 			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
-  VALUES (200000001,200000001,200000001,'TEST PARTY CODE 2',12345,'TEST RP CONTACT NAME','604','2171234',
+  VALUES (200000001,200000001,200000001,'TEST PARTY CODE 2',200000001,'TEST RP CONTACT NAME','604','2171234',
           'test-rp-client@gmail.com',null,'RPUSER',null);
+INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTACT_NAME,CONTACT_AREA_CD,
+			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
+  VALUES (200000002,200000002,200000001,'TEST PARTY CODE 3',200000002,'TEST 3 CONTACT NAME','604','2171234',
+          'test-3-client@gmail.com',null,'T3USER',null);
+
+-- Account ID BCOL Account Number mapping
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)
+  VALUES (200000000, 'PS12345', 200000000, 'Y');
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)
+  VALUES (200000001, 'PS12345', 200000001, 'Y');
+INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)
+  VALUES (200000002, 'PS00001', 200000002, null);
 
 -- Add code_historical when Bob provides examples of how name/address changes work.
 
