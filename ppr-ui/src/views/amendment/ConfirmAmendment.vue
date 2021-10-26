@@ -110,7 +110,10 @@
             :setShowErrors="showErrors"
             class="pt-10"
           />
-          <!-- Certify goes here when available -->
+          <certify-information
+            :setShowErrors="showErrors"
+            class="pt-10"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -143,6 +146,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
   CautionBox,
+  CertifyInformation,
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
@@ -157,6 +161,7 @@ import {
   AddCollateralIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
   AmendmentStatementIF, // eslint-disable-line no-unused-vars
+  CertifyIF, // eslint-disable-line no-unused-vars
   CourtOrderIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
@@ -184,6 +189,7 @@ import { StatusCodes } from 'http-status-codes'
     AmendmentDescription,
     BaseDialog,
     CautionBox,
+    CertifyInformation,
     FolioNumberSummary,
     RegisteringPartySummary,
     SecuredPartySummary,
@@ -196,6 +202,7 @@ export default class ConfirmAmendment extends Vue {
   @Getter getAddCollateral: AddCollateralIF
   @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
   @Getter getAmendmentDescription: string
+  @Getter getCertifyInformation: CertifyIF
   @Getter getConfirmDebtorName: DebtorNameIF
   @Getter getCourtOrderInformation: CourtOrderIF
   @Getter getLengthTrust: LengthTrustIF
@@ -369,6 +376,10 @@ export default class ConfirmAmendment extends Vue {
             courtOrder.effectOfOrder.length > 0))
   }
 
+  private get certifyInformationValid (): boolean {
+    return this.getCertifyInformation.valid
+  }
+
   private get stickyComponentErrMsg (): string {
     if (!this.validFolio && this.showErrors) {
       return '< Please complete required information'
@@ -462,7 +473,7 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private async submitAmendment (): Promise<void> {
-    if (!this.validFolio) {
+    if (!this.validFolio || !this.certifyInformationValid) {
       this.showErrors = true
       return
     }

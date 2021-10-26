@@ -366,7 +366,7 @@ import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
-import { partyCodeSearch } from '@/utils'
+import { partyCodeAccount } from '@/utils'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 
@@ -518,10 +518,7 @@ export default defineComponent({
       localState.loading = true
       if (parties.registeringParty) {
         // go to the service and see if there are similar secured parties
-        const response: [SearchPartyIF] = await partyCodeSearch(
-          parties.registeringParty.businessName,
-          true
-        )
+        const response: [SearchPartyIF] = await partyCodeAccount()
         // check if any results
         if (response?.length > 0) {
           localState.partyResults = response

@@ -13,6 +13,11 @@ export const stateModel: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
+  certifyInformation: {
+    valid: false,
+    certified: false,
+    legalName: ''
+  },
   registration: {
     amendmentDescription: '',
     collateral: {
