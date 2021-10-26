@@ -52,351 +52,203 @@
     <v-data-table
       v-if="!loadingData"
       id="registration-table"
-      class="registration-table pl-4"
-      :class="[$style['reg-table'], { 'full-width': headers.length <= 1 }]"
+      class="registration-table"
+      :class="{ 'full-width': headers.length <= 1 }"
       disable-pagination
       disable-sort
-      :expanded.sync="expandedList"
+      :expanded.sync="expanded"
       fixed-header
       :headers="headers"
+      height="620px"
       hide-default-footer
       hide-default-header
-      height="600px"
       :items="tableData"
+      item-key="baseRegistrationNumber"
       no-data-text="No registrations created yet."
-      :search="search"
-      sort-by="registrationNumber"
       :sort-desc="[false, true]"
     >
       <template v-slot:header="{ props }">
         <thead v-if="headers.length > 1">
-          <th
-            v-for="(header, index) in props.headers"
-            :key="index"
-            :class="header.class"
-            class="border-btm text-left pa-0"
-          >
-            <v-row class="my-reg-header pl-2 pt-8" no-gutters @click="selectAndSort(header.value)">
-              <v-col>
-                {{ header.text }}
-                <span v-if="header.value === selectedSort && header.sortable">
-                  <v-icon v-if="currentOrder === 'asc'" small style="color: black;">
-                    mdi-arrow-down
-                  </v-icon>
-                  <v-icon v-else small style="color: black;">
-                    mdi-arrow-up
-                  </v-icon>
-                </span>
-              </v-col>
-            </v-row>
-            <v-row class="border-tp my-reg-filter pl-2 pt-5" no-gutters>
-              <v-col>
-                <v-text-field
-                  v-if="header.value === 'registrationNumber'"
-                  filled
-                  single-line
-                  hide-details="true"
-                  v-model="registrationNumber"
-                  type="text"
-                  label="Number"
-                  dense
-                />
-                <div v-if="header.value === 'registrationType'">
-                  <registration-bar-type-ahead-list
-                    v-if="hasRPPR"
-                    :defaultLabel="'Registration Type'"
-                    :defaultDense="true"
-                    :defaultClearable="true"
-                    :defaultClear="shouldClearType"
-                    @selected="selectRegistration($event)"
-                  />
-                  <v-select
-                    v-else
-                    :items="registrationTypes"
-                    single-line
-                    item-text="registrationTypeUI"
-                    item-value="registrationTypeAPI"
-                    class="table-registration-types"
-                    filled
-                    dense
-                    clearable
-                    label="Registration Type"
-                    v-model="registrationType"
-                    id="txt-type"
-                    :menu-props="{ bottom: true, offsetY: true }"
-                  >
-                    <template slot="item" slot-scope="data">
-                      <span class="list-item">
-                        {{ data.item.registrationTypeUI }}
-                      </span>
-                    </template>
-                  </v-select>
-                </div>
-                <div
-                  v-if="header.value === 'createDateTime'"
-                  @click="showSubmittedDatePicker = true"
-                >
+          <tr>
+            <th
+              v-for="(header, index) in props.headers"
+              :key="index"
+              :class="header.class"
+              class="text-left pa-0"
+            >
+              <v-row class="my-reg-header pl-3" no-gutters @click="selectAndSort(header.value)">
+                <v-col :class="{ 'pl-7': header.value === 'actions' }">
+                  {{ header.text }}
+                  <span v-if="header.value === selectedSort && header.sortable">
+                    <v-icon v-if="currentOrder === 'asc'" small style="color: black;">
+                      mdi-arrow-down
+                    </v-icon>
+                    <v-icon v-else small style="color: black;">
+                      mdi-arrow-up
+                    </v-icon>
+                  </span>
+                </v-col>
+              </v-row>
+              <v-row class="my-reg-filter pl-3 pt-2" no-gutters>
+                <v-col>
                   <v-text-field
-                    v-if="header.value === 'createDateTime'"
+                    v-if="header.value === 'registrationNumber'"
                     filled
                     single-line
-                    id="reg-textfield"
-                    data-test-id="reg-date-text"
-                    v-model="registrationDateFormatted"
-                    hint="YYYY/MM/DD"
-                    append-icon="mdi-calendar"
-                    dense
-                    clearable
                     hide-details="true"
+                    v-model="registrationNumber"
+                    type="text"
+                    label="Number"
+                    dense
                   />
-                </div>
-                <v-select
-                  v-if="header.value === 'statusType'"
-                  :items="statusTypes"
-                  hide-details
-                  single-line
-                  filled
-                  dense
-                  label="Status"
-                  v-model="status"
-                  id="txt-status"
-                  @change="filterResults(tableData)"
-                  clearable
-                >
-                  <template slot="item" slot-scope="data">
-                    <span class="list-item">
-                      {{ data.item.text }}
-                    </span>
-                  </template>
-                </v-select>
-                <v-text-field
-                  v-if="header.value === 'registeringName'"
-                  filled
-                  single-line
-                  hide-details="true"
-                  v-model="registeredBy"
-                  type="text"
-                  label="Registered By"
-                  dense
-                />
-                <v-text-field
-                  v-if="header.value === 'registeringParty'"
-                  filled
-                  single-line
-                  hide-details="true"
-                  v-model="registeringParty"
-                  type="text"
-                  label="Registering Party"
-                  dense
-                />
-                <v-text-field
-                  v-if="header.value === 'securedParties'"
-                  filled
-                  single-line
-                  hide-details="true"
-                  v-model="securedParties"
-                  type="text"
-                  label="Secured Parties"
-                  dense
-                />
-                <v-text-field
-                  v-if="header.value === 'clientReferenceId'"
-                  filled
-                  single-line
-                  hide-details="true"
-                  v-model="folioNumber"
-                  type="text"
-                  label=""
-                  dense
-                />
-                <v-btn
-                  v-if="header.value === 'actions' && headers.length > 1"
-                  :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pt-4']"
-                  color="primary"
-                  text
-                  @click="clearFilters()"
-                >
-                  Clear Filters
-                  <v-icon class="pl-1 pt-1">mdi-close</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-          </th>
+                  <div v-if="header.value === 'registrationType'">
+                    <registration-bar-type-ahead-list
+                      v-if="hasRPPR"
+                      id="reg-type-select"
+                      :defaultLabel="'Registration Type'"
+                      :defaultDense="true"
+                      :defaultClearable="true"
+                      :defaultClear="shouldClearType"
+                      @selected="selectRegistration($event)"
+                    />
+                    <v-select
+                      v-else
+                      :items="registrationTypes"
+                      single-line
+                      item-text="registrationTypeUI"
+                      item-value="registrationTypeAPI"
+                      class="table-registration-types"
+                      filled
+                      dense
+                      clearable
+                      label="Registration Type"
+                      v-model="registrationType"
+                      id="txt-type"
+                      :menu-props="{ bottom: true, offsetY: true }"
+                    >
+                      <template slot="item" slot-scope="data">
+                        <span class="list-item">
+                          {{ data.item.registrationTypeUI }}
+                        </span>
+                      </template>
+                    </v-select>
+                  </div>
+                  <div
+                    v-if="header.value === 'createDateTime'"
+                    @click="showSubmittedDatePicker = true"
+                  >
+                    <v-text-field
+                      v-if="header.value === 'createDateTime'"
+                      :id="$style['reg-textfield']"
+                      class="reg-textfield"
+                      :class="{ 'active': dateTxt === 'Custom' }"
+                      append-icon="mdi-calendar"
+                      dense
+                      clearable
+                      filled
+                      hide-details="true"
+                      :label="'Date'"
+                      single-line
+                      v-model="dateTxt"
+                    />
+                  </div>
+                  <v-select
+                    v-if="header.value === 'statusType'"
+                    :items="statusTypes"
+                    hide-details
+                    single-line
+                    filled
+                    dense
+                    item-class="list-item"
+                    label="Status"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    v-model="status"
+                    @change="filterResults(tableData)"
+                    clearable
+                  />
+                  <v-text-field
+                    v-if="header.value === 'registeringName'"
+                    filled
+                    single-line
+                    hide-details="true"
+                    v-model="registeredBy"
+                    type="text"
+                    label="Registered By"
+                    dense
+                  />
+                  <v-text-field
+                    v-if="header.value === 'registeringParty'"
+                    filled
+                    single-line
+                    hide-details="true"
+                    v-model="registeringParty"
+                    type="text"
+                    label="Registering Party"
+                    dense
+                  />
+                  <v-text-field
+                    v-if="header.value === 'securedParties'"
+                    filled
+                    single-line
+                    hide-details="true"
+                    v-model="securedParties"
+                    type="text"
+                    label="Secured Parties"
+                    dense
+                  />
+                  <v-text-field
+                    v-if="header.value === 'clientReferenceId'"
+                    filled
+                    single-line
+                    hide-details="true"
+                    v-model="folioNumber"
+                    type="text"
+                    label=""
+                    dense
+                  />
+                  <v-btn
+                    v-if="header.value === 'actions' && headers.length > 1 && showClearBtn"
+                    :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pl-6', 'pt-4']"
+                    color="primary"
+                    text
+                    @click="clearFilters()"
+                  >
+                    Clear Filters
+                    <v-icon class="pl-1 pt-1">mdi-close</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </th>
+          </tr>
         </thead>
         <thead v-else>
-          <th>
-            <p class="pa-10 ma-0" >
-              No columns selected to show. Please select columns to see registration information.
-            </p>
-          </th>
+          <tr>
+            <th>
+              <p class="pa-10 ma-0" >
+                No columns selected to show. Please select columns to see registration information.
+              </p>
+            </th>
+          </tr>
         </thead>
       </template>
-      <template v-slot:item="row" class="registration-data-table">
-        <tr
-          :key="row.item.id"
-          class="registration-row"
-          v-if="!row.item.hide"
-          :class="rowClass(row.item)"
-        >
-          <td
-            v-if="inSelectedHeaders('registrationNumber')"
-            v-html="
-              displayRegistrationNumber(
-                row.item.baseRegistrationNumber,
-                row.item.registrationNumber
-              )
-            "
-          ></td>
-          <td v-if="inSelectedHeaders('registrationType')">
-            {{ getRegistrationType(row.item.registrationType) }}
-          </td>
-          <td v-if="inSelectedHeaders('createDateTime')">
-            <span v-if="!isDraft(row.item)">
-              {{ getFormattedDate(row.item.createDateTime) }}
-            </span>
-            <span v-else>
-              Not Registered
-            </span>
-          </td>
-          <td v-if="inSelectedHeaders('statusType')">
-            {{ getStatusDescription(row.item.statusType) }}
-          </td>
-          <td v-if="inSelectedHeaders('registeringName')">
-            {{ row.item.registeringName }}
-          </td>
-          <td v-if="inSelectedHeaders('registeringParty')">
-            {{ row.item.registeringParty || '' }}
-          </td>
-          <td v-if="inSelectedHeaders('securedParties')">
-            {{ row.item.securedParties || '' }}
-          </td>
-          <td v-if="inSelectedHeaders('clientReferenceId')">
-            {{ row.item.clientReferenceId }}
-          </td>
-          <td
-            v-if="inSelectedHeaders('expireDays')"
-            v-html="showExpireDays(row.item.expireDays)"
-          ></td>
-          <td v-if="inSelectedHeaders('vs')">
-            <v-btn
-              :id="`pdf-btn-${row.item.id}`"
-              v-if="!isDraft(row.item)"
-              :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
-              depressed
-              :loading="row.item.path === loadingPDF"
-              @click="downloadPDF(row.item.path)"
-            >
-              <v-icon class="ma-0" left small>mdi-file-pdf-outline</v-icon>
-              <span :class="[$style['pdf-btn-text'], 'ma-0']">PDF</span>
-            </v-btn>
-          </td>
-
-          <!-- Action Btns -->
-          <td v-if="headers.length > 1" class="actions-cell pl-2 py-4">
-            <v-row class="actions" no-gutters>
-              <v-col class="edit-action pa-0" cols="auto">
-                <v-btn
-                  v-if="isDraft(row.item)"
-                  :id="`action-btn-${row.index}`"
-                  :class="$style['edit-btn']"
-                  color="primary"
-                  elevation="0"
-                  @click="editDraft(row.item)"
-                >
-                  <span>Edit</span>
-                </v-btn>
-                <v-btn
-                  v-else-if="!isExpired(row.item) && !isDischarged(row.item)"
-                  :id="`action-btn-${row.index}`"
-                  :class="$style['edit-btn']"
-                  color="primary"
-                  elevation="0"
-                  @click="handleAction(row.item, TableActions.AMEND)"
-                >
-                  <span>Amend</span>
-                </v-btn>
-                <v-btn
-                  v-else
-                  :id="`action-btn-${row.index}`"
-                  :class="$style['edit-btn']"
-                  color="primary"
-                  elevation="0"
-                >
-                  <span>Re-Register</span>
-                </v-btn>
-              </v-col>
-              <v-col class="actions__more pa-0">
-                <v-menu offset-y left nudge-bottom="4">
-                  <template v-slot:activator="{ on: onMenu }">
-                    <v-btn
-                      small
-                      elevation="0"
-                      v-on="onMenu"
-                      color="primary"
-                      class="actions__more-actions__btn"
-                      :class="$style['down-btn']"
-                    >
-                      <v-icon>mdi-menu-down</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list class="actions__more-actions registration-actions">
-                    <v-list-item v-if="isDraft(row.item)">
-                      <v-list-item-subtitle
-                        :class="`dropdown-btn-${row.index}`"
-                        @click="deleteDraft(row.item, TableActions.DELETE)"
-                      >
-                        <v-icon small>mdi-delete</v-icon>
-                        <span class="ml-1">Delete Draft</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item v-if="isActive(row.item) && !isExpired(row.item) && !isDischarged(row.item)">
-                      <v-list-item-subtitle
-                        :class="`dropdown-btn-${row.index}`"
-                        @click="handleAction(row.item, TableActions.DISCHARGE)"
-                      >
-                        <v-icon small>mdi-note-remove-outline</v-icon>
-                        <span class="ml-1">Total Discharge</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                    <v-tooltip
-                      left
-                      content-class="left-tooltip pa-2 mr-2"
-                      transition="fade-transition"
-                      :disabled="row.item.expireDays !== -99"
-                    >
-                      <template v-slot:activator="{ on: onTooltip }">
-                        <div v-on="onTooltip">
-                          <v-list-item
-                            v-if="isActive(row.item) && !isExpired(row.item) && !isDischarged(row.item)"
-                            :disabled="row.item.expireDays === -99"
-                          >
-                            <v-list-item-subtitle
-                              :class="`dropdown-btn-${row.index}`"
-                              @click="handleAction(row.item, TableActions.RENEW)"
-                            >
-                              <v-icon small>mdi-calendar-clock</v-icon>
-                              <span class="ml-1">Renew</span>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </div>
-                      </template>
-                      Infinite registrations cannot be renewed.
-                    </v-tooltip>
-                    <v-list-item v-if="!isDraft(row.item)">
-                      <v-list-item-subtitle
-                        :class="`dropdown-btn-${row.index}`"
-                        @click="handleAction(row.item, TableActions.REMOVE)"
-                      >
-                        <v-icon small>mdi-delete</v-icon>
-                        <span class="ml-1">Remove From Table</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </v-col>
-            </v-row>
-          </td>
-        </tr>
+      <template v-slot:item="{ expand, item, isExpanded }" class="registration-data-table">
+        <table-row
+          :setHeaders="headers"
+          :setIsExpanded="isExpanded"
+          :setItem="item"
+          @action="emitRowAction($event)"
+          @toggleExpand="item.expand = !isExpanded, expand(!isExpanded)"
+        />
+      </template>
+      <template v-slot:expanded-item="{ item }" class="registration-data-table">
+        <table-row
+          v-for="change in item.changes"
+          :key="change.documentId"
+          :setChild="true"
+          :setHeaders="headers"
+          :setItem="change"
+          @action="emitRowAction($event)"
+        />
       </template>
     </v-data-table>
     <v-snackbar
@@ -426,16 +278,16 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   reactive,
   toRefs,
-  watch,
-  computed
+  watch
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
-import { registrationPDF } from '@/utils' // eslint-disable-line
 // local components
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
+import { TableRow } from './common'
 // local types/helpers/etc.
 import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
@@ -447,15 +299,15 @@ import {
 import {
   AccountProductCodes, // eslint-disable-line no-unused-vars
   AccountProductRoles, // eslint-disable-line no-unused-vars
-  APIStatusTypes, // eslint-disable-line no-unused-vars
-  DraftTypes, // eslint-disable-line no-unused-vars
   TableActions // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import { RegistrationTypesStandard, StatusTypes } from '@/resources'
 
 export default defineComponent({
   components: {
-    RegistrationBarTypeAheadList
+    RegistrationBarTypeAheadList,
+    TableRow
   },
   props: {
     setHeaders: {
@@ -476,10 +328,13 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    // getters
+    const { getAccountProductSubscriptions } = useGetters<any>([
+      'getAccountProductSubscriptions'
+    ])
+    // helpers
     const {
-      getFormattedDate,
-      getRegistrationType,
-      getStatusDescription,
+      dateTxt,
       registrationNumber,
       registeredBy,
       registeringParty,
@@ -488,30 +343,23 @@ export default defineComponent({
       shouldClearType,
       status,
       registrationType,
-      registrationTypes,
-      daysToExpiry,
       submittedStartDate,
       submittedEndDate,
-      registrationDateFormatted,
-      statusTypes,
+      originalData,
       tableData,
       filterResults,
-      clearFilters,
-      originalData
+      clearFilters
     } = useRegistration()
-    const { getAccountProductSubscriptions } = useGetters<any>([
-      'getAccountProductSubscriptions'
-    ])
 
     const localState = reactive({
       currentOrder: 'asc',
       datePickerErr: false,
-      expandedList: [],
+      expanded: [],
       loadingPDF: '',
-      registrationDate: '',
-      registrationDateFormatted: '',
-      selectedSort: 'number',
+      registrationTypes: [...RegistrationTypesStandard].slice(1),
+      selectedSort: 'createDateTime',
       showSubmittedDatePicker: false,
+      statusTypes: [...StatusTypes],
       submittedStartDateTmp: null,
       submittedEndDateTmp: null,
       showSnackbar: false,
@@ -524,7 +372,6 @@ export default defineComponent({
         )
       }),
       headers: computed(() => {
-        console.log(props.setHeaders)
         return props.setHeaders
       }),
       loadingData: computed(() => {
@@ -539,150 +386,25 @@ export default defineComponent({
         return 'picker-title'
       }),
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
-      search: computed(() => { return props.setSearch })
+      search: computed(() => { return props.setSearch }),
+      showClearBtn: computed((): boolean => {
+        if (
+          dateTxt.value || registrationNumber.value || registrationType.value ||
+          status.value || registeredBy.value || registeringParty.value ||
+          securedParties.value || folioNumber.value
+        ) {
+          return true
+        }
+        return false
+      })
     })
 
-    const deleteDraft = (item: DraftResultIF): void => {
+    const emitRowAction = ({ action, docId, regNum }): void => {
       emit('action', {
-        action: TableActions.DELETE,
-        docId: item.documentId
+        action: action as TableActions,
+        docId: docId as string,
+        regNum: regNum as string
       })
-    }
-
-    const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
-      if (!actualReg) actualReg = 'Pending'
-      if (baseReg) {
-        if (baseReg === actualReg) {
-          return '<b>' + baseReg + '</b>'
-        }
-        return (
-          '<b>' +
-          baseReg +
-          '</b>' +
-          '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
-          actualReg +
-          '</span>'
-        )
-      }
-      return actualReg
-    }
-
-    const downloadPDF = async (path: string): Promise<any> => {
-      localState.loadingPDF = path
-      const pdf = await registrationPDF(path)
-      if (!pdf || pdf?.error) {
-        emit('error', { statusCode: 404 })
-      } else {
-        /* solution from https://github.com/axios/axios/issues/1392 */
-
-        // it is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const blob = new Blob([pdf], { type: 'application/pdf' })
-
-        // IE doesn't allow using a blob object directly as link href
-        // instead it is necessary to use msSaveOrOpenBlob
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(blob, path)
-        } else {
-          // for other browsers, create a link pointing to the ObjectURL containing the blob
-          const url = window.URL.createObjectURL(blob)
-          const a = window.document.createElement('a')
-          window.document.body.appendChild(a)
-          a.setAttribute('style', 'display: none')
-          a.href = url
-          a.download = path.replace('/ppr/api/v1/', '')
-          a.click()
-          window.URL.revokeObjectURL(url)
-          a.remove()
-        }
-      }
-      localState.loadingPDF = ''
-    }
-
-    const editDraft = (item: DraftResultIF): void => {
-      if (item?.type === DraftTypes.FINANCING_STATEMENT) {
-        emit('action', { action: TableActions.EDIT_NEW, docId: item.documentId })
-      } else if (item?.type === DraftTypes.AMENDMENT_STATEMENT) {
-        emit('action', {
-          action: TableActions.EDIT_AMEND,
-          docId: item.documentId,
-          regNum: item.baseRegistrationNumber
-        })
-      }
-    }
-
-    const handleAction = (item: RegistrationSummaryIF, action: TableActions): void => {
-      emit('action', { action: action, regNum: item.baseRegistrationNumber })
-    }
-
-    const inSelectedHeaders = (search: string) => {
-      return localState.headers.find((header) => { return header.value === search })
-    }
-
-    const rowClass = (item): string => {
-      if (item?.type) {
-        return 'font-italic'
-      } else {
-        if (item?.baseRegistrationNumber === item?.registrationNumber) {
-          return 'base-registration-row'
-        }
-      }
-
-      return ''
-    }
-
-    const showExpireDays = (days: number): string => {
-      if (!days) {
-        return 'N/A'
-      }
-      if (days === -99) {
-        return 'Infinite'
-      } else {
-        if (days > 364) {
-          const today = new Date()
-          const expireDate = new Date()
-          expireDate.setDate(expireDate.getDate() + days)
-
-          var dateExpiry = new Date(
-            Date.UTC(
-              expireDate.getUTCFullYear(),
-              expireDate.getUTCMonth(),
-              expireDate.getUTCDate()
-            )
-          )
-          var dateToday = new Date(
-            Date.UTC(
-              today.getUTCFullYear(),
-              today.getUTCMonth(),
-              today.getUTCDate()
-            )
-          )
-          const currentDayOfYear = getDayOfYear(dateToday)
-          const expDayOfYear = getDayOfYear(dateExpiry)
-          let daysDiff = expDayOfYear - currentDayOfYear
-          if (daysDiff < 0) {
-            dateExpiry.setFullYear(dateExpiry.getFullYear() - 1)
-            daysDiff = 365 + daysDiff
-          }
-          const years = dateExpiry.getFullYear() - dateToday.getFullYear()
-
-          let yearText = ' years '
-          if (years === 1) {
-            yearText = ' year '
-          }
-
-          return years.toString() + yearText + daysDiff.toString() + ' days'
-        }
-        if (days < 30) {
-          return (
-            '<span class="invalid-color">' +
-            days.toString() +
-            ' days' +
-            '</span>'
-          )
-        }
-        return days.toString() + ' days'
-      }
     }
 
     const selectAndSort = (col: string) => {
@@ -709,15 +431,8 @@ export default defineComponent({
       localState.selectedSort = col
     }
 
-    const getDayOfYear = (dateOfYear: Date) => {
-      var start = new Date(dateOfYear.getFullYear(), 0, 0)
-      var diff = (dateOfYear.valueOf() - start.valueOf()) +
-        ((start.getTimezoneOffset() - dateOfYear.getTimezoneOffset()) * 60 * 1000)
-      var oneDay = 1000 * 60 * 60 * 24
-      return Math.floor(diff / oneDay)
-    }
-
     const updateSubmittedRange = () => {
+      dateTxt.value = 'Custom'
       if (
         !localState.submittedStartDateTmp ||
         !localState.submittedEndDateTmp
@@ -729,7 +444,6 @@ export default defineComponent({
       submittedStartDate.value = localState.submittedStartDateTmp
       submittedEndDate.value = localState.submittedEndDateTmp
       localState.showSubmittedDatePicker = false
-      registrationDateFormatted.value = 'Custom'
     }
 
     const resetSubmittedRange = () => {
@@ -745,34 +459,24 @@ export default defineComponent({
 
     const selectRegistration = (val: RegistrationTypeIF) => {
       shouldClearType.value = false
-      registrationType.value = val.registrationTypeAPI
+      registrationType.value = val?.registrationTypeAPI || ''
     }
 
-    const isActive = (item: RegistrationSummaryIF): boolean => {
-      return item.statusType === APIStatusTypes.ACTIVE
-    }
-
-    const isDischarged = (item: RegistrationSummaryIF): boolean => {
-      return item.statusType === APIStatusTypes.DISCHARGED
-    }
-
-    const isDraft = (item: any): boolean => {
-      // RegistrationSummaryIF | DraftResultIF
-      return item.type !== undefined
-    }
-
-    const isExpired = (item: RegistrationSummaryIF): boolean => {
-      return item.statusType === APIStatusTypes.EXPIRED
-    }
-
-    watch(() => localState.registrationDate, (val: string) => {
-      registrationDateFormatted.value = val.replaceAll('-', '/')
+    watch(() => dateTxt.value, (val) => {
+      if (!val) {
+        submittedStartDate.value = null
+        submittedEndDate.value = null
+        localState.submittedStartDateTmp = null
+        localState.submittedEndDateTmp = null
+      }
+      if (val && val !== 'Custom') {
+        dateTxt.value = ''
+      }
     })
 
     watch(() => localState.registrationHistory, (val) => {
       originalData.value = [...val]
-      filterResults(originalData.value)
-      emit('registrationTotal', val.length)
+      tableData.value = filterResults(originalData.value)
     }, { deep: true, immediate: true })
 
     watch(() => props.toggleSnackBar, () => {
@@ -780,40 +484,24 @@ export default defineComponent({
     })
 
     return {
-      getFormattedDate,
-      getRegistrationType,
-      getStatusDescription,
-      showExpireDays,
-      deleteDraft,
-      editDraft,
-      handleAction,
-      rowClass,
+      dateTxt,
+      emitRowAction,
       registrationNumber,
-      displayRegistrationNumber,
       registrationType,
       shouldClearType,
-      registrationDateFormatted,
-      registrationTypes,
       selectRegistration,
       registeredBy,
       registeringParty,
       securedParties,
       folioNumber,
-      daysToExpiry,
       status,
-      statusTypes,
+      originalData,
       tableData,
       filterResults,
-      isActive,
-      isDischarged,
-      isDraft,
-      isExpired,
       updateSubmittedRange,
       resetSubmittedRange,
-      downloadPDF,
       clearFilters,
       selectAndSort,
-      inSelectedHeaders,
       TableActions,
       ...toRefs(localState)
     }
@@ -823,13 +511,13 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+#reg-textfield {
+  cursor: pointer !important;
+}
 .clear-filters-btn, .clear-filters-btn::before, .clear-filters-btn::after {
   background-color: transparent !important;
   height: 1rem !important;
   min-width: 0 !important;
-}
-.reg-table {
-  max-height: 620px;
 }
 .date-selection {
   border-radius: 5px;

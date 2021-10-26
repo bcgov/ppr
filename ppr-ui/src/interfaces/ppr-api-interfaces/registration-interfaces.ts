@@ -50,6 +50,7 @@ export interface DraftResultIF {
   documentId: string, // identifier for the draft
   lastUpdateDateTime: string, // Timestamp of last draft update.
   path: string,
+  registeringName?: string,
   registrationDescription: string,
   registrationType: APIRegistrationTypes | APIAmendmentTypes,
   type: DraftTypes // One of enum DraftTypes.
@@ -63,11 +64,13 @@ export interface RegistrationSummaryIF {
   changes?: (RegistrationSummaryIF | DraftResultIF) []
   createDateTime?: string, // Included in a successful response.
   error?: ErrorIF,
+  expand?: boolean, // used in UI table to toggle expansion. Updated by filter fn.
   expireDays?: number, // Number of days until expiry
   hide?: boolean, // FUTURE: take this out -- added by UI and is unnecessary
   inUserList?: boolean, // whether the registration is in their table or not
   lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
   path: string,
+  registeringName?: string,
   registeringParty: string,
   registrationDescription?: string, // Returned on creation.
   registrationClass?: string, // Returned on creation.

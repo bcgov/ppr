@@ -431,7 +431,7 @@ tr.disabled-text-not-first td:first-child {
 }
 
 .v-data-table .my-reg-filter {
-  height: 87px;
+  height: 70px;
 
   input,
   label,
@@ -443,7 +443,7 @@ tr.disabled-text-not-first td:first-child {
 }
 
 .v-data-table .my-reg-header {
-  height: 82px;
+  height: 40px;
 }
 
 .primaryRow {
@@ -509,20 +509,44 @@ tr.disabled-text-not-first td:first-child {
   vertical-align: bottom;
 }
 
-.base-registration-row {
-  background: rgba(241, 243, 245, 0.5);
-  font-weight: bold;
-}
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row td.actions-cell,
 .registration-row {
-  z-index: 5;
+  // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+  background-color: #f2f6fb !important;
+  z-index: 3;
 }
 .registration-row td {
-  padding-left: 8px !important;
+  padding-left: 12px !important;
+}
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.base-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.base-registration-row td.actions-cell,
+.registration-row.base-registration-row {
+  background-color: white !important;
+  font-weight: bold;
+}
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.base-registration-row.rollover-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.base-registration-row.rollover-effect td.actions-cell,
+.registration-row.base-registration-row.rollover-effect {
+  background-color: $blueSelected !important;
+}
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.draft-registration-row:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.draft-registration-row td.actions-cell,
+.registration-row.draft-registration-row {
+  // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
+  background: #f8f9fa !important;
 }
 
-#registration-table.v-data-table > .v-data-table__wrapper > 
-table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
-  background: rgba(241, 243, 245, 0.5) !important;
+.min-column-lg {
+  min-width: 15.5rem;
 }
 
 .min-column-md {

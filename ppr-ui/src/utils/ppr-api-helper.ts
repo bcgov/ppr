@@ -378,7 +378,6 @@ export async function registrationHistory (): Promise<{
     .get('financing-statements/registrations?collapse=true', config)
     .then(response => {
       const data = response?.data as RegistrationSummaryIF[]
-      console.log(data)
       if (!data) {
         throw new Error('Invalid API response')
       }
@@ -407,7 +406,6 @@ export async function draftHistory (): Promise<{
     .get('drafts', config)
     .then(response => {
       const data = response?.data as DraftResultIF[]
-      console.log(data)
       if (!data) {
         throw new Error('Invalid API response')
       }

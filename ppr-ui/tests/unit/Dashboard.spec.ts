@@ -8,6 +8,7 @@ import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
 import { StatusCodes } from 'http-status-codes'
+import { cloneDeep } from 'lodash'
 // local components
 import { Dashboard } from '@/views'
 import { RegistrationConfirmation } from '@/components/dialogs'
@@ -86,7 +87,7 @@ describe('Dashboard component', () => {
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
     const getMyRegDrafts = getStub.withArgs('drafts')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
     const getRegistration = getStub.withArgs(`financing-statements/${regNum}`)
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
@@ -240,8 +241,15 @@ describe('Dashboard registration table tests', () => {
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
-  const myRegDrafts: DraftResultIF[] = [mockedDraft1, mockedDraftAmend]
-  const myRegHistory: RegistrationSummaryIF[] = [mockedRegistration1]
+  const myRegDrafts: DraftResultIF[] = [{ ...mockedDraft1 }, { ...mockedDraftAmend }]
+  const myRegHistory: RegistrationSummaryIF[] = [{ ...mockedRegistration1 }]
+  const parentDrafts: DraftResultIF[] = [{ ...mockedDraft1 }]
+  // setup baseReg with added child draft
+  let baseReg = { ...mockedRegistration1 }
+  baseReg.changes = [{ ...mockedDraftAmend }]
+  baseReg.expand = false
+  const myRegHistoryWithChildren = [baseReg]
+
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
@@ -252,9 +260,9 @@ describe('Dashboard registration table tests', () => {
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
     const getMyRegDrafts = getStub.withArgs('drafts')
-    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: myRegDrafts })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
-    getMyRegHistory.returns(new Promise(resolve => resolve({ data: myRegHistory })))
+    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
+    getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
     const getDebtorNames = getStub
       .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
@@ -279,26 +287,29 @@ describe('Dashboard registration table tests', () => {
   })
 
   it('displays my registration header and content', () => {
-    expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDrafts)
-    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistory)
+    // myRegDrafts contains a child that will be put into a baseReg
+    expect(wrapper.vm.myRegDataDrafts).toEqual(parentDrafts)
+    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain(`My Registrations (${myRegDrafts.length + myRegHistory.length})`)
-    expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
+    expect(header.at(0).text()).toContain(`My Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`)
+    // removed filter until UX decides they want it or not
+    // expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([...myRegDrafts, ...myRegHistory])
+      .toEqual([...parentDrafts, ...myRegHistoryWithChildren])
   })
 
-  it('updates the registration table when the filter is updated', async () => {
-    const filterText = 'test'
-    expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
-    wrapper.vm.$data.myRegFilter = filterText
-    await flushPromises()
-    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    expect(wrapper.findComponent(RegistrationTable).vm.$props.setSearch).toBe(filterText)
-  })
+  // removed filter until UX decides they want it or not
+  // it('updates the registration table when the filter is updated', async () => {
+  //   const filterText = 'test'
+  //   expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
+  //   wrapper.vm.$data.myRegFilter = filterText
+  //   await flushPromises()
+  //   expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+  //   expect(wrapper.findComponent(RegistrationTable).vm.$props.setSearch).toBe(filterText)
+  // })
 
   it('updates the registration table with column selection', async () => {
     const newColumnSelection = [...registrationTableHeaders].slice(0,2)
@@ -309,12 +320,12 @@ describe('Dashboard registration table tests', () => {
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(newColumnSelection)
   })
 
-  it('deletes drafts', async () => {
-    const myRegDraftsCopy = [...myRegDrafts]
+  it('deletes parent drafts', async () => {
+    const myRegDraftsCopy = [...parentDrafts]
     // check setup
     expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([...myRegDraftsCopy, ...myRegHistory])
+      .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
     // emit delete action
     wrapper.findComponent(RegistrationTable).vm.$emit(
       'action', { action: TableActions.DELETE, docId: myRegDraftsCopy[0].documentId }
@@ -331,15 +342,45 @@ describe('Dashboard registration table tests', () => {
     myRegDraftsCopy.shift()
     expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([...myRegDraftsCopy, ...myRegHistory])
+      .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
+  })
+
+  it('deletes child drafts', async () => {
+    const myRegDraftsCopy = myRegHistoryWithChildren[0].changes[0] as DraftResultIF
+    // check setup
+    expect(wrapper.vm.myRegDataDrafts).toEqual(parentDrafts)
+    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
+    expect(wrapper.vm.myRegDataHistory[0].changes[0]).toEqual(myRegDraftsCopy)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
+      .toEqual([...parentDrafts, ...myRegHistoryWithChildren])
+    // emit delete action
+    wrapper.findComponent(RegistrationTable).vm.$emit(
+      'action',
+      { 
+        action: TableActions.DELETE,
+        docId: myRegDraftsCopy.documentId,
+        regNum: myRegDraftsCopy.baseRegistrationNumber
+      }
+    )
+    await flushPromises()
+    // dialog shows
+    expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find(myRegDeleteDialog).vm.$props.setOptions).toEqual(tableDeleteDialog)
+    // emit proceed with delete
+    wrapper.find(myRegDeleteDialog).vm.$emit('proceed', true)
+    await flushPromises()
+    // draft is removed from table
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
+      .toEqual([...parentDrafts, ...myRegHistory])
   })
 
   it('removes complete registrations', async () => {
-    const myRegHistoryCopy = [...myRegHistory]
+    const myRegHistoryCopy = [...myRegHistoryWithChildren]
     // check setup
     expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([...myRegDrafts, ...myRegHistoryCopy])
+      .toEqual([...parentDrafts, ...myRegHistoryCopy])
     // emit delete action
     expect(wrapper.find(myRegDeleteDialog).exists()).toBe(true)
     wrapper.findComponent(RegistrationTable).vm.$emit(
@@ -357,7 +398,7 @@ describe('Dashboard registration table tests', () => {
     myRegHistoryCopy.shift()
     expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
-      .toEqual([...myRegDrafts, ...myRegHistoryCopy])
+      .toEqual([...parentDrafts, ...myRegHistoryCopy])
   })
 })
 
@@ -376,7 +417,7 @@ describe('Dashboard add registration tests', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
     const getMyRegDrafts = getStub.withArgs('drafts')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(

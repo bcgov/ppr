@@ -8,6 +8,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   expireDays: 500, // Number of days until expiry
   lastUpdateDateTime: '2021-10-04T18:26:11+00:00',
   path: '/path/to/doc',
+  registeringName: 'Reg Name 1',
   registeringParty: 'John Doe',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'PPSA SECURITY AGREEMENT',
@@ -23,6 +24,7 @@ export const mockedRegistration2: RegistrationSummaryIF = {
   createDateTime: '2021-08-20T17:21:17+00:00',
   expireDays: 316,
   path: '/path/to/doc',
+  registeringName: 'Reg Name 2',
   registeringParty: 'ICBC',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'REPAIRERS LIEN',
@@ -37,6 +39,7 @@ export const mockedRegistration2Child: RegistrationSummaryIF = {
   clientReferenceId: '',
   createDateTime: '2021-07-20T17:21:17+00:00',
   path: '/path/to/doc',
+  registeringName: 'Reg Name 2',
   registeringParty: 'ICBC',
   registrationClass: 'AMENDMENT',
   registrationDescription: 'AMENDMENT/OTHER CHANGE',
@@ -51,6 +54,7 @@ export const mockedRegistration3: RegistrationSummaryIF = {
   createDateTime: '2019-08-20T17:21:17+00:00',
   expireDays: 0,
   path: '/path/to/doc',
+  registeringName: 'Reg Name 3',
   registeringParty: 'ICBC',
   registrationClass: 'PPSALIEN',
   registrationDescription: 'REPAIRERS LIEN',
@@ -94,4 +98,39 @@ export const mockedDraftAmend: DraftResultIF = {
   path: '/path/to/doc',
   createDateTime: '2021-08-05T17:21:17+00:00',
   clientReferenceId: 'FFF555'
+}
+
+export const mockedRegistration1Collapsed: RegistrationSummaryIF = {
+  baseRegistrationNumber: 'GOV2343',
+  changes: [ mockedDraftAmend ],
+  clientReferenceId: 'ABC123',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  expireDays: 500, // Number of days until expiry
+  lastUpdateDateTime: '2021-10-04T18:26:11+00:00',
+  path: '/path/to/doc',
+  registeringName: 'Reg Name 1',
+  registeringParty: 'John Doe',
+  registrationClass: 'PPSALIEN',
+  registrationDescription: 'PPSA SECURITY AGREEMENT',
+  registrationNumber: 'GOV2343',
+  registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
+  securedParties: 'Bank of Nova Scotia',
+  statusType: APIStatusTypes.ACTIVE
+}
+
+export const mockedRegistration2Collapsed: RegistrationSummaryIF = {
+  baseRegistrationNumber: 'BC456788',
+  changes: [ mockedRegistration2Child ],
+  clientReferenceId: '',
+  createDateTime: '2021-08-20T17:21:17+00:00',
+  expireDays: 316,
+  path: '/path/to/doc',
+  registeringName: 'Reg Name 2',
+  registeringParty: 'ICBC',
+  registrationClass: 'PPSALIEN',
+  registrationDescription: 'REPAIRERS LIEN',
+  registrationNumber: 'BC456788',
+  registrationType: APIAmendmentTypes.AMENDMENT,
+  securedParties: 'Bank of Montreal',
+  statusType: APIStatusTypes.ACTIVE
 }
