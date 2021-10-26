@@ -403,15 +403,16 @@ export default defineComponent({
     }
 
     const showExpireDays = (days: number): string => {
-      if (localState.isChild) return ''
-      if (!days) return 'N/A'
-      if (days === -99) return 'Infinite'
-      else {
+      if (!days) {
+        return 'N/A'
+      }
+      if (days === -99) {
+        return 'Infinite'
+      } else {
         if (days > 364) {
           const today = new Date()
           const expireDate = new Date()
           expireDate.setDate(expireDate.getDate() + days)
-
           var dateExpiry = new Date(
             Date.UTC(
               expireDate.getUTCFullYear(),
@@ -434,12 +435,10 @@ export default defineComponent({
             daysDiff = 365 + daysDiff
           }
           const years = dateExpiry.getFullYear() - dateToday.getFullYear()
-
           let yearText = ' years '
           if (years === 1) {
             yearText = ' year '
           }
-
           return years.toString() + yearText + daysDiff.toString() + ' days'
         }
         if (days < 30) {

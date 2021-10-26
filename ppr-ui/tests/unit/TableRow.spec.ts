@@ -165,7 +165,7 @@ describe('TableRow tests', () => {
           // status type
           expect(rowData.at(3).text()).toEqual('')
           // expiry days
-          expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays('N/A'))
+          expect(rowData.at(8).text()).toContain('N/A')
           // action btn is not there
           expect(rowData.at(10).text()).toContain('')
         }
