@@ -7,6 +7,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
 // local components
+import { DatePicker } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
 import { TableRow } from '@/components/tables/common'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
@@ -35,6 +36,7 @@ const regTable = '#registration-table'
 const tableHeader = '.my-reg-header'
 const tableFilter = '.my-reg-filter'
 const tableRow = '.registration-row'
+const dateFilter = '.date-filter'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -235,6 +237,27 @@ describe('Test registration table with results', () => {
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Registration Type')
 
+  })
+
+  it('renders and displays the date picker', async () => {
+    expect(wrapper.vm.showDatePicker).toBe(false)
+    expect(wrapper.findComponent(DatePicker).exists()).toBe(true)
+    expect(wrapper.findComponent(DatePicker).isVisible()).toBe(false)
+    expect(wrapper.findComponent(DatePicker).vm.$props.setEndDate).toBe(null)
+    expect(wrapper.findComponent(DatePicker).vm.$props.setStartDate).toBe(null)
+    expect(wrapper.find(dateFilter).exists()).toBe(true)
+    expect(wrapper.find(dateFilter).trigger('click'))
+    await flushPromises()
+    expect(wrapper.vm.showDatePicker).toBe(true)
+    expect(wrapper.findComponent(DatePicker).isVisible()).toBe(true)
+    const startDate = '2021-10-24'
+    const endDate = '2021-10-26'
+    wrapper.findComponent(DatePicker).vm.$emit('submit', { endDate: endDate, startDate: startDate })
+    await flushPromises()
+    expect(wrapper.vm.showDatePicker).toBe(false)
+    expect(wrapper.findComponent(DatePicker).isVisible()).toBe(false)
+    expect(wrapper.vm.submittedStartDate).toBe(startDate)
+    expect(wrapper.vm.submittedEndDate).toBe(endDate)
   })
 
   it('emits button actions from TableRow', async () => {

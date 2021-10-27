@@ -1,53 +1,12 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
-    <v-card
-      v-if="showSubmittedDatePicker"
-      :class="[$style['date-selection'], 'registration-date']"
-      elevation="6"
-    >
-      <v-row no-gutters>
-        <v-col cols="6" :class="pickerStartClass">Select Start Date:</v-col>
-        <v-col cols="6" class="pl-4" :class="pickerEndClass"
-          >Select End Date:</v-col
-        >
-      </v-row>
-      <v-row>
-        <v-col cols="6">
-          <v-date-picker
-            color="primary"
-            :max="submittedEndDateTmp"
-            v-model="submittedStartDateTmp"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-date-picker
-            color="primary"
-            :min="submittedStartDateTmp"
-            v-model="submittedEndDateTmp"
-          />
-        </v-col>
-      </v-row>
-      <v-row no-gutters justify="end">
-        <v-col cols="auto pr-4">
-          <v-btn
-            class="date-selection-btn bold"
-            text
-            ripple
-            small
-            @click="updateSubmittedRange"
-            >OK</v-btn
-          >
-          <v-btn
-            class="date-selection-btn ml-4"
-            text
-            ripple
-            small
-            @click="resetSubmittedRange"
-            >Cancel</v-btn
-          >
-        </v-col>
-      </v-row>
-    </v-card>
+    <date-picker
+      v-show="showDatePicker"
+      ref="datePicker"
+      :setEndDate="submittedEndDate"
+      :setStartDate="submittedStartDate"
+      @submit="updateDateRange($event)"
+    />
 
     <v-data-table
       v-if="!loadingData"
@@ -135,12 +94,12 @@
                   </div>
                   <div
                     v-if="header.value === 'createDateTime'"
-                    @click="showSubmittedDatePicker = true"
+                    @click="showDatePicker = true"
                   >
                     <v-text-field
                       v-if="header.value === 'createDateTime'"
                       :id="$style['reg-textfield']"
-                      class="reg-textfield"
+                      class="reg-textfield date-filter"
                       :class="{ 'active': dateTxt === 'Custom' }"
                       append-icon="mdi-calendar"
                       dense
@@ -281,11 +240,14 @@ import {
   computed,
   defineComponent,
   reactive,
+  ref,
   toRefs,
   watch
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
+import flushPromises from 'flush-promises'
 // local components
+import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { TableRow } from './common'
 // local types/helpers/etc.
@@ -306,6 +268,7 @@ import { RegistrationTypesStandard, StatusTypes } from '@/resources'
 
 export default defineComponent({
   components: {
+    DatePicker,
     RegistrationBarTypeAheadList,
     TableRow
   },
@@ -328,6 +291,8 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    // refs
+    const datePicker = ref(null)
     // getters
     const { getAccountProductSubscriptions } = useGetters<any>([
       'getAccountProductSubscriptions'
@@ -353,15 +318,12 @@ export default defineComponent({
 
     const localState = reactive({
       currentOrder: 'asc',
-      datePickerErr: false,
       expanded: [],
       loadingPDF: '',
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       selectedSort: 'createDateTime',
-      showSubmittedDatePicker: false,
+      showDatePicker: false,
       statusTypes: [...StatusTypes],
-      submittedStartDateTmp: null,
-      submittedEndDateTmp: null,
       showSnackbar: false,
       hasRPPR: computed(() => {
         const productSubscriptions =
@@ -376,14 +338,6 @@ export default defineComponent({
       }),
       loadingData: computed(() => {
         return props.setLoading
-      }),
-      pickerStartClass: computed(() => {
-        if (!localState.submittedStartDateTmp && localState.datePickerErr) return 'picker-title picker-err'
-        return 'picker-title'
-      }),
-      pickerEndClass: computed(() => {
-        if (!localState.submittedEndDateTmp && localState.datePickerErr) return 'picker-title picker-err'
-        return 'picker-title'
       }),
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
@@ -431,30 +385,13 @@ export default defineComponent({
       localState.selectedSort = col
     }
 
-    const updateSubmittedRange = () => {
-      dateTxt.value = 'Custom'
-      if (
-        !localState.submittedStartDateTmp ||
-        !localState.submittedEndDateTmp
-      ) {
-        localState.datePickerErr = true
-        return
-      }
-      localState.datePickerErr = false
-      submittedStartDate.value = localState.submittedStartDateTmp
-      submittedEndDate.value = localState.submittedEndDateTmp
-      localState.showSubmittedDatePicker = false
-    }
+    const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
+      if (!(dates.endDate && dates.startDate)) dateTxt.value = ''
+      else dateTxt.value = 'Custom'
 
-    const resetSubmittedRange = () => {
-      // reset validation
-      localState.datePickerErr = false
-      // reset tmp values
-      localState.submittedStartDateTmp = null
-      localState.submittedEndDateTmp = null
-      // reset submittedInterval (will not trigger a search)
-      // hide date picker
-      localState.showSubmittedDatePicker = false
+      submittedStartDate.value = dates.startDate
+      submittedEndDate.value = dates.endDate
+      localState.showDatePicker = false
     }
 
     const selectRegistration = (val: RegistrationTypeIF) => {
@@ -466,8 +403,6 @@ export default defineComponent({
       if (!val) {
         submittedStartDate.value = null
         submittedEndDate.value = null
-        localState.submittedStartDateTmp = null
-        localState.submittedEndDateTmp = null
       }
       if (val && val !== 'Custom') {
         dateTxt.value = ''
@@ -479,11 +414,22 @@ export default defineComponent({
       tableData.value = filterResults(originalData.value)
     }, { deep: true, immediate: true })
 
+    watch(() => localState.showDatePicker, async (val) => {
+      if (val) {
+        await flushPromises()
+        // wait to ensure it is visible before attempting to scroll to it
+        if (datePicker?.value?.$el?.scrollIntoView) {
+          datePicker.value.$el.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    })
+
     watch(() => props.toggleSnackBar, () => {
       localState.showSnackbar = true
     })
 
     return {
+      datePicker,
       dateTxt,
       emitRowAction,
       registrationNumber,
@@ -498,10 +444,11 @@ export default defineComponent({
       originalData,
       tableData,
       filterResults,
-      updateSubmittedRange,
-      resetSubmittedRange,
+      updateDateRange,
       clearFilters,
       selectAndSort,
+      submittedEndDate,
+      submittedStartDate,
       TableActions,
       ...toRefs(localState)
     }
