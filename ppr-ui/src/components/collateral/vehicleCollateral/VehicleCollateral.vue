@@ -2,13 +2,16 @@
   <v-container v-if="isSummary" class="pb-0">
     <v-row
       no-gutters
-      class="ps-6"
+      :class="registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''"
       v-if="vehicleCollateral && vehicleCollateral.length > 0"
     >
       <v-col cols="3" class="pt-4 generic-label">
         Vehicle Collateral
       </v-col>
-      <v-col class="pt-6 pb-0">
+      <v-col
+        :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'ps-4' : ''"
+        class="pt-6 pb-0"
+      >
         <v-data-table
           class="collateral-table"
           :headers="headers"
@@ -20,8 +23,8 @@
           no-data-text="No vehicle collateral"
         >
           <template v-slot:item="row" class="vehicle-data-table">
-            <tr :key="row.item.id" :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}">
-              <td :class="[$style['summary-cell'], 'pl-0']">
+            <tr :key="row.item.id" :class="rowClass(row.item.action)">
+              <td class="summary-cell pl-0">
                 <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
                 {{ getVehicleDescription(row.item.type) }}
                 </div>
@@ -39,10 +42,10 @@
               <td>{{ row.item.year }}</td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
-              <td :class="[$style['vehicle-cell']]">
+              <td  :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}" class="vehicle-cell">
                 {{ row.item.serialNumber }}
               </td>
-              <td v-if="getMH">
+              <td v-if="getMH" :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
                 {{ row.item.manufacturedHomeRegistrationNumber }}
               </td>
             </tr>
@@ -101,7 +104,7 @@
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
               class="vehicle-row"
-              :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}"
+              :class="rowClass(row.item.action)"
             >
               <td class="pl-4">
                 <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
@@ -118,7 +121,7 @@
               </td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
-              <td :class="[$style['vehicle-cell']]">
+              <td class="vehicle-cell">
                 {{ row.item.serialNumber }}
               </td>
               <td v-if="getMH">
@@ -355,7 +358,18 @@ export default defineComponent({
         return headersToShow
       }),
       vehicleCollateral: computed((): VehicleCollateralIF[] => {
-        return (getVehicleCollateral.value as VehicleCollateralIF[]) || []
+        const vehicles = getVehicleCollateral.value as VehicleCollateralIF[] || []
+        if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (localState.summaryView)) {
+          const displayArray = []
+          for (let i = 0; i < vehicles.length; i++) {
+            if (vehicles[i].action) {
+              displayArray.push(vehicles[i])
+            }
+          }
+          return displayArray
+        } else {
+          return vehicles
+        }
       })
     })
 
@@ -373,6 +387,19 @@ export default defineComponent({
         newVCollateral.splice(index, 1)
       }
       setVehicleCollateral(newVCollateral)
+    }
+
+    const rowClass = (action): string => {
+      if (!action) {
+        return ''
+      }
+      if (action === ActionTypes.REMOVED && !localState.summaryView) {
+        return 'disabled-text-not-action'
+      }
+      if (action === ActionTypes.REMOVED && localState.summaryView) {
+        return 'disabled-text-not-first'
+      }
+      return ''
     }
 
     const getVehicleDescription = (code: string): string => {
@@ -424,21 +451,16 @@ export default defineComponent({
       RegistrationFlowType,
       ActionTypes,
       undo,
+      rowClass,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  font-size: 0.875rem;
-}
-.summary-text {
-  font-size: 14px;
-  color: $gray7;
-}
+
 .summary-cell {
   overflow: visible;
   text-overflow: inherit;

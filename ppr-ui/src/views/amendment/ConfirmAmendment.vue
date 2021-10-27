@@ -59,7 +59,10 @@
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
                 <v-divider v-if="showSecuredParties || showDebtors"></v-divider>
-                <!-- To do: add vehicle collateral summary -->
+                <vehicle-collateral
+                  :isSummary="true"
+                  :showInvalid="false"
+                />
               </div>
               <div v-if="showGeneralCollateral" class="pt-4">
                 <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral"></v-divider>
@@ -154,6 +157,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
+import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -193,6 +197,7 @@ import { StatusCodes } from 'http-status-codes'
     RegisteringPartySummary,
     SecuredPartySummary,
     DebtorSummary,
+    VehicleCollateral,
     GenColSummary,
     RegistrationLengthTrustAmendment,
     StickyContainer
