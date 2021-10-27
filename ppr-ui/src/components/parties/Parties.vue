@@ -53,9 +53,9 @@
                 >mdi-information-outline</v-icon
               >
             </template>
-            The Registering Party is based on your account information and
-            cannot be changed here. This information can be changed by updating
-            your BC Registries account information.
+            The default Registering Party is based on your BC Registries user account information.
+            This information can be updated within your account settings.
+            You can change to a different Registering Party by using the Change button.
           </v-tooltip>
         </h3>
         <registering-party @setRegisteringParty="setRegisteringParty" />

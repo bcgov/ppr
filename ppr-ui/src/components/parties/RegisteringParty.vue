@@ -34,6 +34,18 @@
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
+                <td class="actions-cell actions-width px-0">
+                <div class="actions float-right actions-up">
+                  <v-list class="actions__more-actions">
+                    <v-list-item class="v-remove">
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-pencil</v-icon>
+                        <span class="ml-1">Change</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
+                </div>
+                </td>
               </tr>
             </template>
           </v-data-table>
@@ -58,7 +70,7 @@ import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-u
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
 
-import { registeringTableHeaders } from '@/resources'
+import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { getRegisteringPartyFromAuth } from '@/utils'
 import { PartyAddressSchema } from '@/schemas'
 
@@ -96,7 +108,7 @@ export default defineComponent({
     const { getName, isBusiness } = useParty()
     const localState = reactive({
       registeringParty: null,
-      partyHeaders: registeringTableHeaders
+      partyHeaders: [...registeringTableHeaders, ...editTableHeaders]
     })
 
     return {
