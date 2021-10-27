@@ -89,6 +89,7 @@
                   v-bind="attrs"
                   v-on="on"
                   v-on:click:append="on.click"
+                  @click:clear="orderDate = ''"
                   :error-messages="
                     errors.orderDate.message ? errors.orderDate.message : ''
                   "
@@ -239,7 +240,7 @@ export default defineComponent({
 
     const shouldValidate = () => {
       if ((localState.courtName) || (localState.courtRegistry) ||
-          (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
+          (localState.fileNumber) || (localState.computedDateFormatted) || (localState.effectOfOrder) ||
           (localState.requireCourtOrder)) {
         return true
       }
