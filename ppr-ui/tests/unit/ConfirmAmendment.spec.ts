@@ -10,7 +10,9 @@ import {
   mockedFinancingStatementAll,
   mockedDebtorNames,
   mockedAmendmentResponse,
-  mockedDraftAmendmentStatement
+  mockedDraftAmendmentStatement,
+  mockedVehicleCollateral1,
+  mockedGeneralCollateral1
 } from './test-data'
 
 // Components
@@ -18,6 +20,8 @@ import { ConfirmAmendment } from '@/views'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
+import { GenColSummary } from '@/components/collateral/generalCollateral'
+
 
 // Other
 import mockRouter from './MockRouter'
@@ -82,6 +86,8 @@ describe('Confirm Amendment registration component', () => {
       lienAmount: ''
     })
     await store.dispatch('setAmendmentDescription', 'test')
+    await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
+    
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -110,6 +116,8 @@ describe('Confirm Amendment registration component', () => {
 
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
+    
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
@@ -205,6 +213,11 @@ describe('Confirm Amendment registration save registration', () => {
       surrenderDate: '',
       lienAmount: ''
     })
+    await store.dispatch('setAddCollateral', {
+      vehicleCollateral: mockedVehicleCollateral1,
+      generalCollateral: mockedGeneralCollateral1,
+      valid: true
+    })
     await store.dispatch('setAmendmentDescription', 'test')
 
     // create a Local Vue and install router on it
@@ -231,7 +244,10 @@ describe('Confirm Amendment registration save registration', () => {
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
-
+    expect(wrapper.vm.collateralValid).toBe(true)
+    expect(wrapper.vm.partiesValid).toBe(true)
+    expect(wrapper.vm.courtOrderValid).toBe(true)
+    
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
