@@ -470,4 +470,8 @@ export default defineComponent({
 .vehicle-cell {
   text-transform: uppercase;
 }
+
+::v-deep .v-chip .v-chip__content {
+  font-weight: 700;
+}
 </style>
