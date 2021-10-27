@@ -94,18 +94,19 @@ export default defineComponent({
     const localState = reactive({
       legalName: '',
       certified: false,
-      showErrors: props.setShowErrors,
+      warningText: 'Note: It is an offence to make a false or misleading statement in respect of a material fact ' +
+                   'in arecord submitted to the Corporate Registry for filing. See section XX of the Personal ' +
+                   'Property Security Act.',
+      // showErrors: props.setShowErrors,
+      showErrors: computed((): boolean => {
+        return props.setShowErrors
+      }),
       showErrorComponent: computed((): boolean => {
         return (localState.showErrors && !localState.valid)
       }),
       certifyInformation: null,
       currentDate: computed((): string => {
         return convertDate(new Date(), false, false)
-      }),
-      warningText: computed((): string => {
-        return 'Note: It is an offence to make a false or misleading statement in respect of a material fact in a ' +
-               'record submitted to the Corporate Registry for filing. See section XX of the Personal ' +
-               'Property Security Act.'
       }),
       legalNameMessage: computed((): string => {
         if (localState.showErrors && localState.legalName.trim().length < 1) {
@@ -130,9 +131,10 @@ export default defineComponent({
       ]
     })
 
-    watch(() => props.setShowErrors, (val) => {
+    /* watch(() => props.setShowErrors, (val) => {
       localState.showErrors = val
     })
+    */
     watch(
       () => localState.legalName,
       (val: string) => {
@@ -167,8 +169,4 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-
-.certify-checkbox {
- vertical-align: middle !important;
-}
 </style>
