@@ -25,13 +25,15 @@
             {{ displayDate(item.searchDateTime) }}
           </template>
           <template v-slot:[`item.pdf`]="{ item }">
-            <v-btn :id="`pdf-btn-${item.searchId}`"
-                   :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
-                   depressed
-                   :loading="item.searchId === loadingPDF"
-                   @click="downloadPDF(item.searchId)">
-              <v-icon class="ma-0" left small>mdi-file-pdf-outline</v-icon>
-              <span :class="[$style['pdf-btn-text'], 'ma-0']">PDF</span>
+            <v-btn
+              :id="`pdf-btn-${item.searchId}`"
+              class="pdf-btn px-0 mt-n3"
+              depressed
+              :loading="item.searchId === loadingPDF"
+              @click="downloadPDF(item.searchId)"
+            >
+              <img src="@/assets/svgs/custom-pdf-icon.svg">
+              <span class="pl-1">PDF</span>
             </v-btn>
           </template>
         </v-data-table>

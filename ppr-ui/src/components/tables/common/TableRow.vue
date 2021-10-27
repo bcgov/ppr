@@ -109,7 +109,7 @@
     </td>
     <td
       v-if="inSelectedHeaders('expireDays')"
-      v-html="showExpireDays(item.expireDays)"
+      v-html="showExpireDays(item)"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     />
     <td
@@ -119,13 +119,13 @@
       <v-btn
         :id="`pdf-btn-${item.id}`"
         v-if="!isDraft(item)"
-        :class="[$style['pdf-btn'], 'px-0', 'mt-n3']"
+        class="pdf-btn px-0 mt-n3"
         depressed
         :loading="item.path === loadingPDF"
         @click="downloadPDF(item.path)"
       >
-        <v-icon class="ma-0" left small>mdi-file-pdf-outline</v-icon>
-        <span :class="[$style['pdf-btn-text'], 'ma-0']">PDF</span>
+        <img src="@/assets/svgs/custom-pdf-icon.svg">
+        <span class="pl-1">PDF</span>
       </v-btn>
     </td>
 
@@ -402,7 +402,11 @@ export default defineComponent({
       return item.statusType === APIStatusTypes.EXPIRED
     }
 
-    const showExpireDays = (days: number): string => {
+    const showExpireDays = (item: RegistrationSummaryIF): string => {
+      if (localState.isChild) return ''
+      if (isExpired(item) || isDischarged(item)) return '&nbsp;-'
+
+      const days = item.expireDays
       if (!days) {
         return 'N/A'
       }
@@ -515,17 +519,5 @@ export default defineComponent({
   font-weight: normal !important;
   height: 35px !important;
   width: 100px;
-}
-.pdf-btn {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-  justify-content: start;
-}
-.pdf-btn::before {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-}
-.pdf-btn-text {
-  text-decoration: underline;
 }
 </style>

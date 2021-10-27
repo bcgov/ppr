@@ -144,7 +144,11 @@ describe('TableRow tests', () => {
           // status type
           expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
           // expire days
-          expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays(baseReg.expireDays))
+          if ([APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
+            expect(rowData.at(8).text()).toContain('-')
+          } else {
+            expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays(baseReg))
+          }
           // action btn
           if (![APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
             expect(rowData.at(10).text()).toContain('Amend')
@@ -165,7 +169,7 @@ describe('TableRow tests', () => {
           // status type
           expect(rowData.at(3).text()).toEqual('')
           // expiry days
-          expect(rowData.at(8).text()).toContain('N/A')
+          expect(rowData.at(8).text()).toEqual('')
           // action btn is not there
           expect(rowData.at(10).text()).toContain('')
         }
@@ -190,11 +194,14 @@ describe('TableRow tests', () => {
         expect(rowData.exists()).toBe(true)
         expect(rowData.length).toBe(11)
         // reg num
-        expect(rowData.at(0).text()).toContain('Pending')
+        expect(rowData.at(0).text()).toBe('Pending')
         // submitted date
-        expect(rowData.at(2).text()).toEqual('Not Registered')
+        expect(rowData.at(2).text()).toBe('Not Registered')
         // status type
         expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
+        // expire days
+        if (isChild) expect(rowData.at(8).text()).toEqual('')
+        else expect(rowData.at(8).text()).toBe('N/A')
         // pdf
         expect(rowData.at(9).text()).toEqual('')
         // action btn
