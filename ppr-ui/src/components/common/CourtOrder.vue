@@ -89,6 +89,7 @@
                   v-bind="attrs"
                   v-on="on"
                   v-on:click:append="on.click"
+                  @click:clear="orderDate = ''"
                   :error-messages="
                     errors.orderDate.message ? errors.orderDate.message : ''
                   "

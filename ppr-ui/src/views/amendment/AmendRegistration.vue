@@ -56,7 +56,7 @@
           <court-order class="mt-15"
             :setShowErrors="showCourtInvalid"
             :setRequireCourtOrder="requireCourtOrder"
-            @setCourtOrderValid="courtOrderValid = $event"
+            @setCourtOrderValid="setCourtOrderValid($event)"
           />
         </v-col>
         <v-col class="pl-6" cols="3">
@@ -346,6 +346,13 @@ export default class AmendRegistration extends Vue {
       name: RouteNames.DASHBOARD
     })
     this.emitHaveData(false)
+  }
+
+  private setCourtOrderValid (valid): void {
+    this.courtOrderValid = valid
+    if (valid) {
+      this.showCourtInvalid = false
+    }
   }
 
   /** Emits Have Data event. */
