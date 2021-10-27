@@ -23,6 +23,7 @@ from ppr_api.utils.validators import financing_validator, party_validator, regis
 
 
 ACCOUNT_REQUIRED = 'Account-Id header required.'
+CROWN_CHARGE_FORBIDDEN = 'The account ID {account_id} is not authorized to access a Crown Charge registration.'
 
 
 def serialize(errors):
@@ -99,6 +100,13 @@ def unauthorized_error_response(account_id):
     message = f'Authorization failure submitting a request for {account_id}.'
     current_app.logger.info(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
+
+
+def cc_forbidden_error_response(account_id):
+    """Build a crown charge registration class access forbidden error response."""
+    message = CROWN_CHARGE_FORBIDDEN.format(account_id=account_id)
+    current_app.logger.info(str(HTTPStatus.FORBIDDEN.value) + ': ' + message)
+    return jsonify({'message': message}), HTTPStatus.FORBIDDEN
 
 
 def path_param_error_response(param_name):

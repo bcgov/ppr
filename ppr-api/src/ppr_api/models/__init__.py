@@ -16,6 +16,7 @@
 # flake8: noqa I001
 from .db import db
 from .address import Address
+from .account_bcol_id import AccountBcolId
 from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
 from .court_order import CourtOrder
@@ -46,8 +47,8 @@ from .vehicle_collateral import VehicleCollateral
 
 
 __all__ = ('db',
-           'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft', 'FinancingStatement',
-           'GeneralCollateral', 'GeneralCollateralLegacy', 'Party', 'PartyType', 'PreviousFinancingStatement',
-           'ProvinceType', 'Registration', 'RegistrationType', 'RegistrationTypeClass', 'SearchRequest', 'SearchResult',
-           'SearchType', 'StateType', 'SerialType', 'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile',
-           'VehicleCollateral')
+           'AccountBcolId', 'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft',
+           'FinancingStatement', 'GeneralCollateral', 'GeneralCollateralLegacy', 'Party', 'PartyType',
+           'PreviousFinancingStatement', 'ProvinceType', 'Registration', 'RegistrationType', 'RegistrationTypeClass',
+           'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType', 'TrustIndenture', 'User',
+           'UserExtraRegistration', 'UserProfile', 'VehicleCollateral')

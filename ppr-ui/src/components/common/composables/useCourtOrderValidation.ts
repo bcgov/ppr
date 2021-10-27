@@ -29,10 +29,16 @@ export const useCourtOrderValidation = () => {
     valid.value = validationResult.succeeded
   }
 
+  const resetErrors = () => {
+    errors.value = { ...createEmptyErrors() }
+    valid.value = true
+  }
+
   return {
     errors,
     valid,
     isValidCourtOrderForm,
+    resetErrors,
     validateCourtOrderForm
   }
 }

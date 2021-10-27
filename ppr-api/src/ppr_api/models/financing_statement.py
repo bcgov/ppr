@@ -214,7 +214,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 # If current view and verification registration ID exists, include all active parties at the
                 # time of the registration.
                 # If current view include all active parties.
-                if party.registration_id == registration_id and not party.registration_id_end:
+                if party.registration_id == registration_id and \
+                   (not party.registration_id_end or not self.current_view_json):
                     party_json = party.json
                 elif self.current_view_json and party.registration_id_end and \
                         self.verification_reg_id > 0 and self.verification_reg_id >= party.registration_id and \
@@ -287,7 +288,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         collateral_list = []
         for collateral in self.vehicle_collateral:
             collateral_json = None
-            if collateral.registration_id == registration_id and not collateral.registration_id_end:
+            if collateral.registration_id == registration_id and \
+                    (not collateral.registration_id_end or not self.current_view_json):
                 collateral_json = collateral.json
             elif self.current_view_json and collateral.registration_id_end and \
                     self.verification_reg_id > 0 and self.verification_reg_id >= collateral.registration_id and \

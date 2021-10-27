@@ -295,6 +295,8 @@ TEST_USER_LIST = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019A'),
     ('Valid Request Extra', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0019A'),
     ('Valid Request User', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0017'),
+    ('Valid Request cc authorized', [PPR_ROLE], HTTPStatus.CREATED, 'PS12345', 'TEST0020'),
+    ('Forbidden Request not cc authorized', [PPR_ROLE], HTTPStatus.FORBIDDEN, 'PS0001', 'TEST0020'),
     ('Not found', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
     ('Already exists user', [PPR_ROLE], HTTPStatus.CONFLICT, 'PS12345', 'TEST0001'),
     ('Already exists extra', [PPR_ROLE], HTTPStatus.CONFLICT, 'PS12345', 'TEST0019'),
@@ -314,6 +316,8 @@ TEST_USER_LIST_GET = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'TEST0019'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'TEST0019'),
     ('Valid Request base reg num', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0018'),
+    ('Valid Request cc authorized', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0020'),
+    ('Forbidden Request not cc authorized', [PPR_ROLE], HTTPStatus.FORBIDDEN, 'PS0001', 'TEST0020'),
     ('Valid Request amendment reg num', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0018A3'),
     ('Valid Request base reg num added account', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0019'),
     ('Valid Request amendment reg num added account', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'TEST0019AM'),
@@ -461,7 +465,7 @@ def test_account_add_registration(session, client, jwt, desc, roles, status, acc
     headers = None
     # setup
     if account_id:
-        headers = create_header_account(jwt, roles)
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
     else:
         headers = create_header(jwt, roles)
 
@@ -498,7 +502,7 @@ def test_account_get_registration(session, client, jwt, desc, roles, status, acc
     headers = None
     # setup
     if account_id:
-        headers = create_header_account(jwt, roles)
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
     else:
         headers = create_header(jwt, roles)
 

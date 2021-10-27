@@ -131,10 +131,15 @@ export default defineComponent({
       }
       if (localState.addDesc || localState.delDesc) {
         if (newGeneralCollateral.length > 0) {
+          // if there is no general collateral at the end of the array with a blank date time,
+          // we know we are adding
           if (newGeneralCollateral[newGeneralCollateral.length - 1].addedDateTime !== undefined) {
             newGeneralCollateral.push(amendedGC)
           } else {
-            newGeneralCollateral[newGeneralCollateral.length - 1] = amendedGC
+            // otherwise, pop the old general collateral off the end of the array, and push the new one
+            // one (pop and push required to keep refs)
+            newGeneralCollateral.pop()
+            newGeneralCollateral.push(amendedGC)
           }
         } else {
           newGeneralCollateral.push(amendedGC)

@@ -41,6 +41,15 @@ TEST_DATA_HEAD_OFFICE = [
     ('Staff missing account ID', True, False, HTTPStatus.OK, PPR_ROLE, 'RBC Royal Bank'),
     ('Valid data but unauthorized', False, True, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, '9999')
 ]
+# testdata pattern is ({description}, {is staff}, {response status}, {role}, {account_id}, {has_data})
+TEST_DATA_ACCOUNT = [
+    ('Valid non-staff non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS1234X', False),
+    ('Valid non-staff CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', True),
+    ('Valid non-staff non CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00001', False),
+    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False),
+    ('Staff missing account ID', True, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False),
+    ('Unauthorized role', False, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, 'PS12345', False)
+]
 
 
 @pytest.mark.parametrize('desc,staff,include_account,status,role,search_value', TEST_DATA_PARTY_CODE)
@@ -94,6 +103,38 @@ def test_get_head_office_codes(session, client, jwt, desc, staff, include_accoun
         if search_value != '8999':
             assert rv.json
             assert len(rv.json) == 4
+        else:
+            assert not rv.json
+
+
+@pytest.mark.parametrize('desc,staff,status,role,account_id,has_data', TEST_DATA_ACCOUNT)
+def test_get_account_codes(session, client, jwt, desc, staff, status, role, account_id, has_data):
+    """Assert that a get party code information by account ID returns the expected response code and data."""
+    # setup
+    headers = None
+    if account_id:
+        if staff:
+            headers = create_header_account(jwt, [role, STAFF_ROLE], 'test-user', account_id)
+        else:
+            headers = create_header_account(jwt, [role], 'test-user', account_id)
+    else:
+        if staff:
+            headers = create_header(jwt, [role, STAFF_ROLE])
+        else:
+            headers = create_header(jwt, [role])
+
+    # test
+    rv = client.get('/api/v1/party-codes/accounts', headers=headers)
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        if has_data:
+            assert rv.json
+            client_code_json = rv.json
+            assert len(client_code_json) > 0
+            for client_party in client_code_json:
+                assert client_party['code']
+                assert client_party['businessName']
         else:
             assert not rv.json
 

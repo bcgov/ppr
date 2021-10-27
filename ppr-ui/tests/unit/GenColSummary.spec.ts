@@ -153,4 +153,20 @@ describe('GenColSummary Amendment tests', () => {
     expect(wrapper.findAll('#gen-col-undo-btn').length).toBe(1)
 
   })
+
+  it('shows/hides items depending on the props', async () => {
+    wrapper = createComponent()
+    wrapper.vm.$props.setShowHistory = false
+    wrapper.vm.$props.setShowAmendLink = false
+    wrapper.vm.$props.setShowViewLink = false
+    await Vue.nextTick()
+    expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
+    expect(wrapper.vm.showingHistory).toBe(false)
+    expect(wrapper.findAll(title).length).toBe(1)
+    //history button should not show
+    expect(wrapper.findAll(historyBtn).length).toBe(0)
+    //undo button should not show
+    expect(wrapper.findAll('#gen-col-undo-btn').length).toBe(0)
+
+  })
 })

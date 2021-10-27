@@ -73,7 +73,10 @@
     </v-row>
     <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
               && lastGeneralCollateral
-              && !lastGeneralCollateral.addedDateTime" class="pa-0">
+              && showAmendLink
+              && !lastGeneralCollateral.addedDateTime"
+              class="pa-0"
+              :class="{'ps-6': !showViewLink}">
       <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
         <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
           <b>DELETED</b>
@@ -97,6 +100,7 @@
       class="mt-7"
     >
       <v-btn
+        v-if="showViewLink"
         id="gc-show-history-btn"
         class="ma-0 pa-0"
         color="primary"
@@ -106,7 +110,7 @@
         <p class="ma-0">
           <span v-if="showingHistory">Hide </span>
           <span v-else>View </span>
-          General Collateral and Changes and Amendments ({{ generalCollateralLength }})
+          General Collateral Changes and Amendments ({{ generalCollateralLength }})
         </p>
       </v-btn>
       <div v-if="showingHistory" class="general-collateral-summary">
@@ -173,6 +177,10 @@ export default defineComponent({
     setShowAmendLink: {
       type: Boolean,
       default: true
+    },
+    setShowViewLink: {
+      type: Boolean,
+      default: true
     }
   },
   setup (props, { emit }) {
@@ -191,14 +199,10 @@ export default defineComponent({
       showingHistory: props.setShowHistory,
       baseGenCollateralIndex: computed(() => {
         let curIndex = 0
-        var lowestTime
         // find the entry with the lowest added date time
         for (var i = 0; i < localState.generalCollateral.length; i++) {
-          if (localState.generalCollateral[i].addedDateTime) {
-            if (!lowestTime || localState.generalCollateral[i].addedDateTime < lowestTime) {
-              lowestTime = localState.generalCollateral[i].addedDateTime
-              curIndex = i
-            }
+          if (localState.generalCollateral[i].description) {
+            curIndex = i
           }
         }
         return curIndex
@@ -207,14 +211,13 @@ export default defineComponent({
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
       lastGeneralCollateral: computed((): GeneralCollateralIF => {
-        const gcArray = getGeneralCollateral.value
-        if (gcArray.length) {
-          return gcArray[gcArray.length - 1]
+        if (localState.generalCollateral.length) {
+          return localState.generalCollateral[localState.generalCollateral.length - 1]
         }
         return null
       }),
       generalCollateralLength: computed((): number => {
-        if (getGeneralCollateral.value.length > 0) {
+        if (getGeneralCollateral.value && getGeneralCollateral.value.length > 0) {
           if (localState.lastGeneralCollateral.addedDateTime) {
             return getGeneralCollateral.value.length
           } else {
@@ -228,6 +231,9 @@ export default defineComponent({
       }),
       showAmendLink: computed((): boolean => {
         return props.setShowAmendLink
+      }),
+      showViewLink: computed((): boolean => {
+        return props.setShowViewLink
       })
     })
 
