@@ -84,3 +84,54 @@ describe('Court Order component', () => {
     
   })
 })
+
+
+describe('Court Order summary component', () => {
+  let wrapper: any
+
+  beforeEach(async () => {
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    document.body.setAttribute('data-app', 'true')
+    await store.dispatch('setCourtOrderInformation', 
+    {
+      courtName: 'ABC',
+      courtRegistry: '123',
+      orderDate: '2021-10-07',
+      fileNumber: 'DEF',
+      effectOfOrder: 'Good'
+    })
+    wrapper = mount(CourtOrder, {
+      localVue,
+      propsData: { setSummary: true },
+      store,
+      vuetify
+    })
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders the view with text boxes', () => {
+    expect(wrapper.findComponent(CourtOrder).exists()).toBe(true)
+    expect(wrapper.find('#court-name-display').exists()).toBe(true)
+    expect(wrapper.find('#txt-court-name').exists()).toBe(false)
+    expect(wrapper.find('#court-registry-display').exists()).toBe(true)
+    expect(wrapper.find('#txt-court-registry').exists()).toBe(false)
+    expect(wrapper.find('#txt-court-file-number').exists()).toBe(false)
+    expect(wrapper.find('#file-number-display').exists()).toBe(true)
+    expect(wrapper.find('#court-date-text-field').exists()).toBe(false)
+    expect(wrapper.find('#date-display').exists()).toBe(true)
+    expect(wrapper.find('#effect-display').exists()).toBe(true)
+    expect(wrapper.find('#effect-of-order').exists()).toBe(false)
+
+    expect(wrapper.find('#court-name-display').text()).toContain('ABC')
+    expect(wrapper.find('#court-registry-display').text()).toContain('123')
+    expect(wrapper.find('#file-number-display').text()).toContain('DEF')
+    expect(wrapper.find('#effect-display').text()).toContain('Good')
+  })
+
+})
