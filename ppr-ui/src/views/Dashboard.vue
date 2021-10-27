@@ -476,24 +476,25 @@ export default class Dashboard extends Vue {
 
   private myRegAddErrSetDialog (error: ErrorIF): void {
     this.myRegAddDialogError = error.statusCode
+    const regNum = this.myRegAdd?.trim()?.toUpperCase()
     switch (error.statusCode) {
       case StatusCodes.NOT_FOUND:
         this.myRegAddDialog = { ...registrationNotFoundDialog }
         this.myRegAddDialog.text = 'An existing registration with the ' +
-          `registration number <b>${this.myRegAdd}</b> was not found. Please ` +
+          `registration number <b>${regNum}</b> was not found. Please ` +
           'check the registration number and try again.'
         break
       case StatusCodes.UNAUTHORIZED:
         this.myRegAddDialog = { ...registrationRestrictedDialog }
         this.myRegAddDialog.text = 'An existing registration was found with ' +
-          `the registration number <b>${this.myRegAdd}</b> but access is ` +
+          `the registration number <b>${regNum}</b> but access is ` +
           'restricted and it is not available to add to your registrations ' +
           'table. Please contact us if you require assistance.'
         break
       case StatusCodes.CONFLICT:
         this.myRegAddDialog = { ...registrationAlreadyAddedDialog }
         this.myRegAddDialog.text = 'The registration with the registration number ' +
-          `<b>${this.myRegAdd}</b> is already in your registrations table.`
+          `<b>${regNum}</b> is already in your registrations table.`
         break
       default:
         this.myRegAddDialog = { ...registrationAddErrorDialog }
@@ -503,8 +504,9 @@ export default class Dashboard extends Vue {
 
   private myRegAddFoundSetDialog (searchedRegNum: string, reg: RegistrationSummaryIF): void {
     this.myRegAddDialog = Object.assign({ ...registrationFoundDialog })
+    searchedRegNum = searchedRegNum?.trim()?.toUpperCase()
     // if the searched registration is a child of the base registration
-    if (searchedRegNum?.trim()?.toUpperCase() !== reg.baseRegistrationNumber?.trim()?.toUpperCase()) {
+    if (searchedRegNum !== reg.baseRegistrationNumber?.trim()?.toUpperCase()) {
       this.myRegAddDialog.text = `The registration number you entered (<b>${searchedRegNum}</b>) ` +
         'is associated with the following base registration. Would you like to add this ' +
         'base registration to your registrations table? Adding the base registration to your ' +
