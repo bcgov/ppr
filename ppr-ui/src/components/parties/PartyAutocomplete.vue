@@ -155,16 +155,16 @@ export default defineComponent({
 
 .auto-complete-item:hover {
   color: $primary-blue !important;
-  background-color: #e0e0e05c !important;
+  background-color: $gray1 !important;
 }
 
 .auto-complete-item[aria-selected='true'] {
   color: $primary-blue !important;
-  background-color: #e4edf7 !important;
+  background-color: $blueSelected !important;
 }
 
 .auto-complete-item:focus {
-  background-color: #dee2e6b8 !important;
+  background-color: $gray3 !important;
 }
 
 @media (min-width: 960px) {
