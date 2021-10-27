@@ -72,6 +72,7 @@
               <v-tooltip
                 class="pa-2"
                 content-class="top-tooltip"
+                nudge-right="2"
                 top
                 transition="fade-transition"
               >

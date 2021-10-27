@@ -184,7 +184,8 @@ describe('TableRow tests', () => {
         // secured party
         expect(rowData.at(6).text()).toContain(baseReg.securedParties)
         // pdf
-        expect(rowData.at(9).text()).toContain('PDF')
+        if (baseReg.path) expect(rowData.at(9).text()).toContain('PDF')
+        else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
         
       } else {
         // draft registration
