@@ -82,7 +82,7 @@
 
             <div v-if="showCourtOrder">
               <v-divider></v-divider>
-              <!-- To do: add court order summary -->
+              <court-order :setSummary="true" />
             </div>
 
             <div v-if="showLengthTrustIndenture">
@@ -150,6 +150,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
   CautionBox,
+  CourtOrder,
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
@@ -199,6 +200,7 @@ import { StatusCodes } from 'http-status-codes'
     DebtorSummary,
     VehicleCollateral,
     GenColSummary,
+    CourtOrder,
     RegistrationLengthTrustAmendment,
     StickyContainer
   }

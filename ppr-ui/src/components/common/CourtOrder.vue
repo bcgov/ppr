@@ -1,5 +1,36 @@
 <template>
-  <v-container fluid no-gutters class="pb-6  px-0 rounded">
+  <v-container v-if="isSummary">
+    <v-row no-gutters class="pa-2">
+      <v-col cols="auto">
+        <label>
+          <strong>Court Order</strong>
+        </label>
+      </v-col>
+    </v-row>
+    <v-row no-gutters style="padding: 15px 30px;">
+          <v-col cols="3" class="generic-label">Court Name</v-col>
+          <v-col cols="9" id="court-name-display">{{ courtName }}</v-col>
+    </v-row>
+    <v-row no-gutters style="padding: 15px 30px;">
+          <v-col cols="3" class="generic-label">Court Registry</v-col>
+          <v-col cols="9" id="court-registry-display">{{ courtRegistry }}</v-col>
+    </v-row>
+    <v-row no-gutters style="padding: 15px 30px;">
+          <v-col cols="3" class="generic-label">Court File Number</v-col>
+          <v-col cols="9" id="file-number-display"> {{ fileNumber }}
+          </v-col>
+    </v-row>
+    <v-row no-gutters style="padding: 15px 30px;">
+          <v-col cols="3" class="generic-label">Date of Order</v-col>
+          <v-col cols="9" id="date-display">{{ computedDateFormatted }}</v-col>
+    </v-row>
+    <v-row no-gutters style="padding: 15px 30px;">
+          <v-col cols="3" class="generic-label">Effect of Order</v-col>
+          <v-col cols="9" id="effect-display">{{ effectOfOrder }}</v-col>
+    </v-row>
+
+  </v-container>
+  <v-container v-else fluid no-gutters class="pb-6  px-0 rounded">
     <v-row no-gutters class="summary-header pa-2 mb-8">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-message-text</v-icon>
@@ -163,6 +194,9 @@ export default defineComponent({
     },
     setRequireCourtOrder: {
       default: false
+    },
+    setSummary: {
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -206,6 +240,9 @@ export default defineComponent({
       }),
       requireCourtOrder: computed((): boolean => {
         return props.setRequireCourtOrder
+      }),
+      isSummary: computed((): boolean => {
+        return props.setSummary
       }),
       showErrors: computed((): boolean => {
         if ((props.setShowErrors === true) && (shouldValidate())) {
