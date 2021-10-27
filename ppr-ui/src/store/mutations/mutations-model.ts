@@ -107,7 +107,7 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.parties.securedParties = []
   state.stateModel.registration.parties.debtors = []
   state.stateModel.registration.draft = {
-    type: '',
+    type: null,
     financingStatement: null,
     amendmentStatement: null,
     createDateTime: null,

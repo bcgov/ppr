@@ -127,7 +127,8 @@
             </v-col>
             <v-col>
               <v-row justify="end" no-gutters>
-                <v-col class="py-1" cols="auto">
+                <!-- commented out until groomed / design verifies it is needed -->
+                <!-- <v-col class="py-1" cols="auto">
                   <v-text-field
                     id="my-reg-table-filter"
                     :class="[
@@ -137,14 +138,16 @@
                       'soft-corners-top'
                     ]"
                     append-icon="mdi-filter-outline"
+                    autocomplete="new-password"
                     dense
                     hide-details
                     label="Filter by Keyword"
+                    :name="Math.random()"
                     single-line
                     style="width:270px"
                     v-model="myRegFilter"
                   />
-                </v-col>
+                </v-col> -->
                 <v-col class="pl-4 py-1" cols="auto">
                   <v-select
                     id="column-selection"
@@ -161,8 +164,10 @@
                     :items="myRegHeadersSelectable"
                     item-text="text"
                     :menu-props="{
+                      bottom: true,
                       minWidth: '240px',
-                      maxHeight: 'none'
+                      maxHeight: 'none',
+                      offsetY: true
                     }"
                     multiple
                     placeholder="Columns to Show"
@@ -369,19 +374,6 @@ export default class Dashboard extends Vue {
     this.loading = false
   }
 
-  private async deleteDraft (docId: string): Promise<void> {
-    this.loading = true
-    const deletion = await deleteDraft(docId)
-    if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
-      // FUTURE: set dialog options / show dialog for error
-      console.error('Failed to delete draft. Please try again later.')
-    } else {
-      // remove from table
-      this.myRegDataDrafts = this.myRegDataDrafts.filter(reg => reg.documentId !== docId)
-    }
-    this.loading = false
-  }
-
   private editDraftAmend (docId: string, regNum: string): void {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     // Go to the Amendment first step which loads the base registration and draft data.
@@ -550,7 +542,7 @@ export default class Dashboard extends Vue {
 
   private myRegDeleteDialogProceed (val: boolean): void {
     if (val) {
-      if (this.myRegAction === TableActions.DELETE) this.deleteDraft(this.myRegActionDocId)
+      if (this.myRegAction === TableActions.DELETE) this.removeDraft(this.myRegActionRegNum, this.myRegActionDocId)
       if (this.myRegAction === TableActions.REMOVE) this.removeRegistration(this.myRegActionRegNum)
     }
     this.myRegAction = null
@@ -562,6 +554,37 @@ export default class Dashboard extends Vue {
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
+  }
+
+  private async removeDraft (regNum: string, docId: string): Promise<void> {
+    this.loading = true
+    const deletion = await deleteDraft(docId)
+    if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
+      // FUTURE: set dialog options / show dialog for error
+      console.error('Failed to delete draft. Please try again later.')
+    } else {
+      // remove from table
+      if (!regNum) {
+        // is not a child
+        this.myRegDataDrafts = this.myRegDataDrafts.filter(reg => reg.documentId !== docId)
+      } else {
+        // is a child of another base registration
+        for (let i = 0; i < this.myRegDataHistory.length; i++) {
+          // find base registration and filter draft out of changes array
+          if (this.myRegDataHistory[i].baseRegistrationNumber === regNum) {
+            const changes = this.myRegDataHistory[i].changes as any
+            this.myRegDataHistory[i].changes = changes.filter(reg => reg.documentId !== docId)
+            if (this.myRegDataHistory[i].changes.length === 0) {
+              // remove now irrelevant fields
+              delete this.myRegDataHistory[i].changes
+              delete this.myRegDataHistory[i].expand
+            }
+            break
+          }
+        }
+      }
+    }
+    this.loading = false
   }
 
   private async removeRegistration (regNum: string): Promise<void> {
@@ -614,10 +637,30 @@ export default class Dashboard extends Vue {
     }
     const myRegDrafts = await draftHistory()
     const myRegHistory = await registrationHistory()
+
     if (myRegDrafts?.error || myRegHistory?.error) {
       this.emitError({ statusCode: StatusCodes.NOT_FOUND })
     } else {
-      this.myRegDataDrafts = myRegDrafts.drafts
+      // add child drafts to their base registration in registration history
+      const parentDrafts = [] as DraftResultIF[]
+      for (let i = 0; i < myRegDrafts.drafts.length; i++) {
+        // check if it has a parent reg
+        if (myRegDrafts.drafts[i].baseRegistrationNumber) {
+          // find parent reg
+          for (let k = 0; k < myRegHistory.registrations.length; k++) {
+            if (myRegHistory.registrations[k].baseRegistrationNumber === myRegDrafts.drafts[i].baseRegistrationNumber) {
+              // add child draft to parent reg
+              if (!myRegHistory.registrations[k].changes) myRegHistory.registrations[k].changes = []
+              myRegHistory.registrations[k].changes.unshift(myRegDrafts.drafts[i])
+            }
+          }
+        } else {
+          // doesn't have a parent reg, this will be added to the normal draft results
+          parentDrafts.push(myRegDrafts.drafts[i])
+        }
+      }
+      // only add parent drafts to draft results
+      this.myRegDataDrafts = parentDrafts
       this.myRegDataHistory = myRegHistory.registrations
     }
     // tell App that we're finished loading

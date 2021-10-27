@@ -93,6 +93,19 @@ export enum APIAmendmentTypes {
     COLLATERAL_SUBSTITUTION = 'AU', // Only adding and removing collateral.
     DEBTOR_TRANSFER = 'AD', // Only adding and removing a debtor.
     DEBTOR_RELEASE = 'AR', // Only removing a debtor.
+    DISCHARGE = 'DC',
     PARTIAL_DISCHARGE = 'AP', // Only removing collateral.
     SECURED_PARTY_TRANSFER = 'AS' // Only adding and removing a secured party.
+}
+
+export enum UIAmendmentTypes {
+    AMENDMENT = 'Amendment',
+    COURT_ORDER = 'Court Order',
+    COLLATERAL_ADDITION = 'Collateral Addition',
+    COLLATERAL_SUBSTITUTION = 'Collateral Substitution',
+    DEBTOR_TRANSFER = 'Debtor Transfer',
+    DEBTOR_RELEASE = 'Debtor Release',
+    DISCHARGE = 'Discharge',
+    PARTIAL_DISCHARGE = 'Partial Discharge',
+    SECURED_PARTY_TRANSFER = 'Secured Party Transfer'
 }

@@ -397,7 +397,7 @@ export async function registrationHistory (): Promise<{
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
-    .get('financing-statements/registrations', config)
+    .get('financing-statements/registrations?collapse=true', config)
     .then(response => {
       const data = response?.data as RegistrationSummaryIF[]
       if (!data) {
