@@ -10,6 +10,7 @@ import {
   mockedFinancingStatementAll,
   mockedDebtorNames,
   mockedAmendmentResponse,
+  mockedAmendmentCertified,
   mockedDraftAmendmentStatement,
   mockedVehicleCollateral1,
   mockedGeneralCollateral1
@@ -17,7 +18,7 @@ import {
 
 // Components
 import { ConfirmAmendment } from '@/views'
-import { FolioNumberSummary, StickyContainer } from '@/components/common'
+import { CertifyInformation, FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
@@ -116,6 +117,7 @@ describe('Confirm Amendment registration component', () => {
 
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     
     // check registering party
@@ -219,6 +221,7 @@ describe('Confirm Amendment registration save registration', () => {
       valid: true
     })
     await store.dispatch('setAmendmentDescription', 'test')
+    await store.dispatch('setCertifyInformation', mockedAmendmentCertified)
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()

@@ -1,6 +1,7 @@
 import { ActionTypes, APIAmendmentTypes, APIVehicleTypes, DraftTypes, RegistrationFlowType } from '@/enums'
 import {
   CourtOrderIF,
+  CertifyIF,
   DebtorNameIF,
   DraftIF,
   GeneralCollateralIF,
@@ -26,6 +27,12 @@ export const mockedAmendmentCourtOrder: CourtOrderIF = {
   fileNumber: 'file#',
   orderDate: '2021-09-03T18:00:00+00:00',
   effectOfOrder: 'effect of order'
+}
+
+export const mockedAmendmentCertified: CertifyIF = {
+  valid: true,
+  certified: true,
+  legalName: 'Certify Name'
 }
 
 export const mockedGeneralCollateralAdd: GeneralCollateralIF[] = [
@@ -434,6 +441,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
+  certifyInformation: mockedAmendmentCertified,
   registration: {
     amendmentDescription: 'Adding',
     collateral: {
@@ -527,6 +535,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
+  certifyInformation: mockedAmendmentCertified,
   registration: {
     amendmentDescription: 'Deleting',
     collateral: {
@@ -620,6 +629,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
+  certifyInformation: mockedAmendmentCertified,
   registration: {
     amendmentDescription: 'Editing',
     collateral: {
@@ -714,6 +724,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     keycloakRoles: [],
     authRoles: []
   },
+  certifyInformation: mockedAmendmentCertified,
   registration: {
     amendmentDescription: 'Court Order',
     collateral: {

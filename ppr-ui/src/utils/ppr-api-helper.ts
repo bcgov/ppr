@@ -367,6 +367,28 @@ export async function partyCodeSearch (
     })
 }
 
+// Search for the crown charge client party codes linked to the account.
+export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios
+    .get('party-codes/accounts', config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        error: {
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+        }
+      }
+    })
+}
+
 // Get registration history
 export async function registrationHistory (): Promise<{
   registrations: RegistrationSummaryIF[],

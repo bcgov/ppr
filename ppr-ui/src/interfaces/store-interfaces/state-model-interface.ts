@@ -1,6 +1,6 @@
 import { RegistrationFlowType } from '@/enums'
 import {
-  AccountInformationIF, AuthorizationIF, RegistrationTypeIF, SearchResponseIF,
+  AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF,
   SearchTypeIF, UserInfoIF
 } from '@/interfaces'
 import { AccountProductSubscriptionIF } from '../account-interfaces'
@@ -13,6 +13,7 @@ export interface StateModelIF {
   accountProductSubscriptions: AccountProductSubscriptionIF
   authorization: AuthorizationIF
   folioOrReferenceNumber: string
+  certifyInformation: CertifyIF
   registration: {
     amendmentDescription: string // amendments only
     collateral: AddCollateralIF
