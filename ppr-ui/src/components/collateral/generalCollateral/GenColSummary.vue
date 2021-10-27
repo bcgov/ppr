@@ -1,11 +1,11 @@
 <template>
   <v-container class="pa-0">
-    <v-row no-gutters>
+    <v-row no-gutters v-if="showAmendLink">
       <v-col cols="10">
         <h3 style="line-height: 1rem;">General Collateral</h3>
       </v-col>
       <v-col>
-        <div class="float-right" v-if="showAmendLink">
+        <div class="float-right">
         <span
           v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               generalCollateral.length > 0 &&
