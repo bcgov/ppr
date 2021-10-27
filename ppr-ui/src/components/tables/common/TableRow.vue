@@ -109,7 +109,7 @@
     </td>
     <td
       v-if="inSelectedHeaders('expireDays')"
-      v-html="showExpireDays(item.expireDays)"
+      v-html="showExpireDays(item)"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     />
     <td
@@ -470,7 +470,11 @@ export default defineComponent({
       return item.statusType === APIStatusTypes.EXPIRED
     }
 
-    const showExpireDays = (days: number): string => {
+    const showExpireDays = (item: RegistrationSummaryIF): string => {
+      if (localState.isChild) return ''
+      if (isExpired(item) || isDischarged(item)) return '&nbsp;-'
+
+      const days = item.expireDays
       if (!days) {
         return 'N/A'
       }
