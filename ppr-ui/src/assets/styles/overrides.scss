@@ -631,3 +631,14 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   height: 14px;
   width: 14px;
 }
+
+.pdf-btn {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+  justify-content: start;
+}
+.pdf-btn::before, .pdf-btn::after, .pdf-btn:hover {
+  background-color: transparent !important;
+  color: $primary-blue !important;
+  text-decoration: underline;
+}
