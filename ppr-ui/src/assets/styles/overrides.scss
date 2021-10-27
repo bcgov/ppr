@@ -89,6 +89,11 @@ tbody {
   background-color: white;
 }
 
+input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
+.my-reg-filter .col .v-input.v-text-field .v-input__control .v-input__slot {
+  cursor: pointer !important;
+}
+
 // Dialogs
 .v-dialog {
   margin: 2rem;
@@ -396,6 +401,7 @@ tbody {
 }
 
 .registration-table .v-data-table__wrapper {
+  max-height: 620px;
   overflow-x: auto;
 }
 
@@ -403,9 +409,15 @@ tbody {
   background-color: transparent !important;
 }
 
-.registration-table th {
+.registration-table tr th {
   font-size: 0.875rem !important;
 }
+
+.registration-table tr th:first-child {
+  padding-left: 16px !important;
+}
+
+
 .column-selection .v-list {
   z-index: 9999;
 }
@@ -437,10 +449,10 @@ tbody {
 .column-selection .v-input__icon .v-icon {
   color: $gray7;
   font-size: 1.25rem;
-  padding: 12px 16px 0 0;
+  margin: 20px 16px 0 0 !important;
 }
 .column-selection .v-input__icon .mdi-menu-down {
-  margin-top: -6px !important;
+  margin-top: 0 !important;
 }
 
 .registration-date .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):not(.v-btn--rounded)
@@ -453,19 +465,37 @@ tbody {
   width: auto;
 }
 
+#registration-table.full-width.v-data-table > .v-data-table__wrapper > table {
+  width: 100%;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td:first-child {
+  padding-left: 28px !important;
+}
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
-  padding: 0 5px;
+  font-size: 0.875rem !important;
+  padding: 0;
+  width: 100%;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action,
-#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.registration-action { 
-  width:130px !important;
-  padding-left: 15px !important;
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {
+  border-left: 1px solid $gray3;
+  box-shadow: -3px 0 4px -1px $gray5;
+  left: 0;
+  position: sticky;
+  right: 0;
+  width: 156px;
+  z-index: 3;
+}
+
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th.registration-action {
+  z-index: 4;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
@@ -528,10 +558,32 @@ tbody {
 }
 
 #registration-table .v-input__icon--clear, #registration-table {
-  .v-icon.mdi-close, .v-icon.mdi-calendar {
+  .v-icon.mdi-close {
     color: $primary-blue;
     font-size: 18px;
     margin-bottom: 2px;
+  }
+}
+
+#registration-table {
+  .v-icon.mdi-calendar {
+    color: $gray7;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+}
+
+#registration-table .active {
+  .v-icon.mdi-calendar {
+    color: $primary-blue;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+}
+
+#reg-type-select .registrationTypeAhead {
+  label {
+    margin-top: 1px;
   }
 }
 

@@ -3,6 +3,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  CertifyIF,
   CourtOrderIF,
   DebtorNameIF,
   DraftIF,
@@ -56,6 +57,10 @@ export const setAmendmentDescription: ActionIF = ({ commit }, description: strin
 
 export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): void => {
   commit('mutateAuthRoles', authRoles)
+}
+
+export const setCertifyInformation: ActionIF = ({ commit }, certifyInformation: CertifyIF): void => {
+  commit('mutateCertifyInformation', certifyInformation)
 }
 
 export const setCollateralShowInvalid = ({ commit }, show: boolean): void => {

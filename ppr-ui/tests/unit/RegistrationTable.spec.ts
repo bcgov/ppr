@@ -8,6 +8,7 @@ import flushPromises from 'flush-promises'
 
 // local components
 import { RegistrationTable } from '@/components/tables'
+import { TableRow } from '@/components/tables/common'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 // local types/helpers/etc.
 import { AccountProductCodes, AccountProductMemberships, TableActions } from '@/enums'
@@ -17,11 +18,11 @@ import { registrationTableHeaders } from '@/resources'
 import {
   mockedRegistration1,
   mockedDraft1,
-  mockedRegistration2,
-  mockedRegistration2Child,
   mockedDraft2,
   mockedDraftAmend,
-  mockedRegistration3
+  mockedRegistration3,
+  mockedRegistration1Collapsed,
+  mockedRegistration2Collapsed
 } from './test-data'
 import { getLastEvent } from './utils'
 
@@ -65,9 +66,9 @@ describe('Test registration table with results', () => {
   const newRegistrationHistory: (RegistrationSummaryIF | DraftResultIF)[] = [
     mockedDraft1,
     mockedDraft2,
-    mockedRegistration1,
-    mockedRegistration2,
-    mockedRegistration2Child
+    mockedRegistration1Collapsed,
+    mockedRegistration2Collapsed,
+    mockedRegistration3
   ]
 
   beforeEach(async () => {
@@ -94,6 +95,7 @@ describe('Test registration table with results', () => {
     expect(filters.length).toBe(headers.length)
 
     expect(wrapper.vm.$props.setRegistrationHistory).toEqual([])
+    expect(wrapper.findComponent(TableRow).exists()).toBe(false)
     const rows = wrapper.findAll(tableRow)
     expect(rows.length).toBe(0)
     
@@ -123,45 +125,100 @@ describe('Test registration table with results', () => {
 
   it('updates with registration history when given', async () => {
     expect(wrapper.vm.$props.setRegistrationHistory).toEqual([])
+    expect(wrapper.findComponent(TableRow).exists()).toBe(false)
     expect(wrapper.findAll(tableRow).length).toBe(0)
     // test adding 1 row
     await wrapper.setProps({ setRegistrationHistory: registrationHistory })
     expect(wrapper.vm.$props.setRegistrationHistory).toEqual(registrationHistory)
-    expect(wrapper.findAll(tableRow).length).toBe(1)
-    expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].baseRegistrationNumber)
-    // 500 days converted to year & days
-    expect(wrapper.findAll(tableRow).at(0).text()).toContain('1 year 135 days')
-    expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].registeringParty)
-    expect(wrapper.findAll(tableRow).at(0).text()).toContain(registrationHistory[0].securedParties)
+    expect(wrapper.findComponent(TableRow).exists()).toBe(true)
+    expect(wrapper.findAllComponents(TableRow).length).toBe(1)
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setChild).toBe(false)
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setHeaders).toEqual(wrapper.vm.headers)
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setIsExpanded).toBe(false)
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem)
+      .toEqual(wrapper.vm.$props.setRegistrationHistory[0])
+
     // test adding multiple rows + drafts
     await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
     expect(wrapper.vm.$props.setRegistrationHistory).toEqual(newRegistrationHistory)
-    const rows = wrapper.findAll(tableRow)
+    const rows = wrapper.findAllComponents(TableRow)
     expect(rows.length).toBe(newRegistrationHistory.length)
     for (let i = 0; i < rows.length; i++) {
-      if (newRegistrationHistory[i].baseRegistrationNumber) {
-        // not a draft
-        const reg = newRegistrationHistory[i] as RegistrationSummaryIF
-        expect(rows.at(i).text()).toContain(reg.baseRegistrationNumber)
-        if (reg.registrationNumber && reg.registrationNumber !== reg.baseRegistrationNumber) {
-          // child registration
-          expect(rows.at(i).text()).toContain('N/A')
-        } else {
-          if (reg.expireDays === 500) {
-            expect(rows.at(i).text()).toContain('1 year 135 days')
-          } else {
-            expect(rows.at(i).text()).toContain(reg.expireDays)
-          }
-        }
-        expect(rows.at(i).text()).toContain(reg.registeringParty)
-        expect(rows.at(i).text()).toContain(reg.securedParties)
-        expect(rows.at(i).text()).toContain('PDF')
-      } else {
-        // draft
-        expect(rows.at(i).text()).toContain('Pending')
-        expect(rows.at(i).text()).toContain('Draft')
+      const reg = newRegistrationHistory[i] as RegistrationSummaryIF
+      expect(rows.at(i).vm.$props.setChild).toBe(false)
+      expect(rows.at(i).vm.$props.setHeaders).toEqual(wrapper.vm.headers)
+      expect(rows.at(i).vm.$props.setIsExpanded).toBe(false)
+      expect(rows.at(i).vm.$props.setItem).toEqual(reg)
+
+      // expands / collapses if it has children
+      if (reg.changes) {
+        // expand
+        rows.at(i).vm.$emit('toggleExpand', true)
+        await flushPromises()
+        expect(rows.at(i).vm.$props.setIsExpanded).toEqual(true)
+        // child row will not be part of original rows list
+        const childRow = wrapper.findAllComponents(TableRow).at(i+1)
+        expect(childRow.vm.$props.setChild).toBe(true)
+        expect(childRow.vm.$props.setHeaders).toEqual(wrapper.vm.headers)
+        expect(childRow.vm.$props.setIsExpanded).toBe(false)
+        expect(childRow.vm.$props.setItem).toEqual(reg.changes[0])
+        // collapse
+        rows.at(i).vm.$emit('toggleExpand', true)
+        await flushPromises()
+        expect(rows.at(i).vm.$props.setIsExpanded).toEqual(false)
+        // verify next row in table is not the child 
+        expect(wrapper.findAllComponents(TableRow).at(i+1).vm.$props.setChild).toBe(false)
+        expect(wrapper.findAllComponents(TableRow).at(i+1).vm.$props.setItem).not.toEqual(reg.changes[0])
       }
     }
+  })
+
+  it('filters table data properly', async () => {
+    // FUTURE: add tests for all filters
+    await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
+    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(newRegistrationHistory)
+    expect(wrapper.findAllComponents(TableRow).length).toBe(5)
+    // clear filters button only shows when a filter is active
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
+    // filter reg number parent only match
+    const parentRegNumMatch = '23'
+    wrapper.vm.registrationNumber = parentRegNumMatch
+    await flushPromises()
+    // clear filters btn shows
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(1)
+    expect(wrapper.findAllComponents(TableRow).length).toBe(2)
+    for (let i = 0; i < wrapper.findAllComponents(TableRow).length; i++) {
+      expect(wrapper.findAllComponents(TableRow).at(i)
+        .vm.$props.setItem.baseRegistrationNumber).toContain(parentRegNumMatch)
+      expect(wrapper.findAllComponents(TableRow).at(i).vm.$props.setChild).toBe(false)
+      expect(wrapper.findAllComponents(TableRow).at(i).vm.$props.setIsExpanded).toBe(false)
+    }
+    // clear filters btn clears the filter
+    await wrapper.find('.v-btn.registration-action').trigger('click')
+    await flushPromises()
+    expect(wrapper.vm.registrationNumber).toBe('')
+    expect(wrapper.findAllComponents(TableRow).length).toBe(5)
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
+
+    // filter reg number child only match -> parent should show expanded
+    const childRegNumMatch = 'BC456789'
+    wrapper.vm.registrationNumber = childRegNumMatch
+    await flushPromises()
+    expect(wrapper.findAllComponents(TableRow).length).toBe(2)
+    // first item should be parent
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setChild).toBe(false)
+    expect(wrapper.findAllComponents(TableRow).at(0)
+      .vm.$props.setItem.baseRegistrationNumber).not.toContain(childRegNumMatch)
+    expect(wrapper.findAllComponents(TableRow).at(0)
+      .vm.$props.setItem.changes[0].registrationNumber).toContain(childRegNumMatch)
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setIsExpanded).toBe(true)
+    // second item should be child
+    const parentRegNum = wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem.baseRegistrationNumber
+    expect(wrapper.findAllComponents(TableRow).at(1).vm.$props.setChild).toBe(true)
+    expect(wrapper.findAllComponents(TableRow).at(1)
+      .vm.$props.setItem.baseRegistrationNumber).toBe(parentRegNum)
+    expect(wrapper.findAllComponents(TableRow).at(1)
+      .vm.$props.setItem.registrationNumber).toContain(childRegNumMatch)
   })
 
   it('renders and displays the typeahead dropdown', async () => {
@@ -173,8 +230,6 @@ describe('Test registration table with results', () => {
     })
     await wrapper.setProps({ setRegistrationHistory: registrationHistory })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-    // the api is going to be called twice, once for drafts and once for registrations
-    // the tests can't tell the difference, so the same one is called twice
     await flushPromises()
     expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(true)
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
@@ -182,114 +237,49 @@ describe('Test registration table with results', () => {
 
   })
 
-  it('emits button actions properly for complete registrations', async () => {
-    await wrapper.setProps({ setRegistrationHistory: [mockedRegistration1, mockedRegistration3] })
+  it('emits button actions from TableRow', async () => {
+    await wrapper.setProps({ setRegistrationHistory: [mockedRegistration1] })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-
-    // main buttons: active vs discharged/expired
-    const activeRegButton = wrapper.findAll('#action-btn-0')
-    expect(activeRegButton.length).toBe(1)
-    expect(activeRegButton.at(0).text()).toContain('Amend')
-    activeRegButton.at(0).trigger('click')
-    await flushPromises()
-    expect(getLastEvent(wrapper, 'action')).toEqual(
-      { action: TableActions.AMEND, regNum: mockedRegistration1.baseRegistrationNumber }
-    )
-
-    const dischargedRegButton = wrapper.findAll('#action-btn-1')
-    expect(dischargedRegButton.length).toBe(1)
-    expect(dischargedRegButton.at(0).text()).toContain('Re-Register')
-    // FUTURE: test it emits the correct thing here once built
-    activeRegButton.at(0).trigger('click')
-
-    // dropdown buttons
-    const buttons = wrapper.findAll('.actions__more-actions__btn')
-    expect(buttons.length).toBe(2)
-
-    // click dropdown for active reg
-    buttons.at(0).trigger('click')
-    await Vue.nextTick()
-
-    //it renders the actions drop down
-    const menuItems = wrapper.findAll(`.dropdown-btn-${0}`)
-    expect(menuItems.length).toBe(3)
-    expect(menuItems.at(0).text()).toContain('Total Discharge')
-    expect(menuItems.at(1).text()).toContain('Renew')
-    expect(menuItems.at(2).text()).toContain('Remove From Table')
-
-    // click items and check emit
-    const actions = [TableActions.DISCHARGE, TableActions.RENEW, TableActions.REMOVE]
+    expect(wrapper.findAllComponents(TableRow).length).toBeGreaterThan(0)
+    // complete reg actions
+    const actions = [TableActions.AMEND, TableActions.DISCHARGE, TableActions.RENEW, TableActions.REMOVE]
     for (let i = 0; i < actions.length; i++) {
-      await menuItems.at(i).trigger('click')
-      expect(getLastEvent(wrapper, 'action')).toEqual(
+      wrapper.findAllComponents(TableRow).at(0).vm.$emit(
+        'action',
         { action: actions[i], regNum: mockedRegistration1.baseRegistrationNumber }
       )
+      await flushPromises()
+      expect(getLastEvent(wrapper, 'action')).toEqual(
+        { action: actions[i], docId: undefined, regNum: mockedRegistration1.baseRegistrationNumber }
+      )
     }
 
-    // click dropdown for discharged reg
-    buttons.at(1).trigger('click')
-    await Vue.nextTick()
-    //it renders the remove action in drop down
-    const menuItemsDishcarge = wrapper.findAll(`.dropdown-btn-${1}`)
-    expect(menuItemsDishcarge.length).toBe(1)
-    expect(menuItemsDishcarge.at(0).text()).toContain('Remove From Table')
-    await menuItemsDishcarge.at(0).trigger('click')
-    expect(getLastEvent(wrapper, 'action')).toEqual(
-      { action: TableActions.REMOVE, regNum: mockedRegistration3.baseRegistrationNumber }
-    )
-  })
-
-  it('emits button actions properly for draft registrations', async () => {
-    const drafts = [mockedDraft1, mockedDraftAmend]
-    await wrapper.setProps({ setRegistrationHistory: drafts })
-    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
-
-    // main buttons: new vs amend
-    const draftNewRegButton = wrapper.findAll('#action-btn-0')
-    expect(draftNewRegButton.length).toBe(1)
-    expect(draftNewRegButton.at(0).text()).toContain('Edit')
-    draftNewRegButton.at(0).trigger('click')
-    await flushPromises()
-    expect(getLastEvent(wrapper, 'action')).toEqual(
+    // edit new draft
+    wrapper.findAllComponents(TableRow).at(0).vm.$emit(
+      'action',
       { action: TableActions.EDIT_NEW, docId: mockedDraft1.documentId }
     )
-
-    const draftAmendRegButton = wrapper.findAll('#action-btn-1')
-    expect(draftAmendRegButton.length).toBe(1)
-    expect(draftAmendRegButton.at(0).text()).toContain('Edit')
-    draftAmendRegButton.at(0).trigger('click')
     await flushPromises()
-    expect(getLastEvent(wrapper, 'action'))
-      .toEqual(
-        {
-          action: TableActions.EDIT_AMEND,
-          docId: mockedDraftAmend.documentId,
-          regNum: mockedDraftAmend.baseRegistrationNumber
-        }
-      )
-
-    // drop down buttons
-    const buttons = wrapper.findAll('.actions__more-actions__btn')
-    expect(buttons.length).toBe(drafts.length)
-    // amend draft: i=0, normal draft: i=1
-    for (let i = 0; i < drafts.length; i++) {
-      buttons.at(i).trigger('click')
-      await Vue.nextTick()
-
-      // it renders the actions drop down
-      const menuItems = wrapper.findAll(`.dropdown-btn-${i}`)
-      expect(menuItems.length).toBe(1)
-      expect(menuItems.at(0).text()).toContain('Delete Draft')
-
-      // click delete and check emit
-      await menuItems.at(0).trigger('click')
-      expect(getLastEvent(wrapper, 'action')).toEqual(
-        {
-          action: TableActions.DELETE,
-          docId: drafts[i].documentId
-        }
-      )
-    }
+    expect(getLastEvent(wrapper, 'action')).toEqual(
+      { action: TableActions.EDIT_NEW, docId: mockedDraft1.documentId, regNum: undefined }
+    )
+    // edit amendment draft
+    wrapper.findAllComponents(TableRow).at(0).vm.$emit(
+      'action',
+      {
+        action: TableActions.EDIT_AMEND,
+        docId: mockedDraftAmend.documentId,
+        regNum: mockedDraftAmend.baseRegistrationNumber
+      }
+    )
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'action')).toEqual(
+      {
+        action: TableActions.EDIT_AMEND,
+        docId: mockedDraftAmend.documentId,
+        regNum: mockedDraftAmend.baseRegistrationNumber
+      }
+    )
   })
 
   it('shows the snackbar when toggled', async () => {

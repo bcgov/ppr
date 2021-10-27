@@ -3,6 +3,7 @@ import {
   AccountInformationIF,
   AddCollateralIF,
   AddPartiesIF,
+  CertifyIF,
   CourtOrderIF,
   DebtorNameIF,
   DraftIF,
@@ -51,6 +52,10 @@ export const mutateAmendmentDescription = (state: StateIF, description: string) 
 
 export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
   state.stateModel.authorization.authRoles = authRoles
+}
+
+export const mutateCertifyInformation = (state: StateIF, certifyInformation: CertifyIF) => {
+  state.stateModel.certifyInformation = certifyInformation
 }
 
 export const mutateCollateralShowInvalid = (state: StateIF, value: boolean) => {
@@ -102,7 +107,7 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.parties.securedParties = []
   state.stateModel.registration.parties.debtors = []
   state.stateModel.registration.draft = {
-    type: '',
+    type: null,
     financingStatement: null,
     amendmentStatement: null,
     createDateTime: null,
@@ -112,6 +117,11 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.confirmDebtorName = null
   state.stateModel.registration.courtOrderInformation = null
   state.stateModel.registration.amendmentDescription = ''
+  state.stateModel.certifyInformation = {
+    valid: false,
+    certified: false,
+    legalName: ''
+  }
 }
 
 export const mutateRegistrationConfirmDebtorName = (state: StateIF, debtorName: DebtorNameIF) => {

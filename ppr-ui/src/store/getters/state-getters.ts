@@ -5,6 +5,7 @@ import {
   AddCollateralIF,
   AddPartiesIF,
   ButtonConfigIF,
+  CertifyIF,
   CourtOrderIF,
   DebtorNameIF,
   DraftIF,
@@ -65,6 +66,11 @@ export const getOriginalAddSecuredPartiesAndDebtors = (state: StateIF): AddParti
 /** The change registration base or confirm debtor name. */
 export const getConfirmDebtorName = (state: StateIF): DebtorNameIF => {
   return state.stateModel.registration.confirmDebtorName
+}
+
+/** The certify information for the registration confirmation. */
+export const getCertifyInformation = (state: StateIF): CertifyIF => {
+  return state.stateModel.certifyInformation
 }
 
 /** The registration court order information object. */

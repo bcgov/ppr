@@ -1,29 +1,30 @@
-import { reactive, toRefs, watch, computed } from '@vue/composition-api'
-import { RegistrationTypesStandard, StatusTypes } from '@/resources'
-import { UIRegistrationTypes, APIRegistrationTypes, APIStatusTypes, UIStatusTypes } from '@/enums'
+import { reactive, toRefs, watch } from '@vue/composition-api'
+import { StatusTypes } from '@/resources'
+import {
+  APIAmendmentTypes,
+  APIRegistrationTypes,
+  APIStatusTypes,
+  UIAmendmentTypes,
+  UIRegistrationTypes,
+  UIStatusTypes
+} from '@/enums'
+import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const useRegistration = () => {
   const localState = reactive({
-    tableData: [],
+    dateTxt: '',
     originalData: [],
     registrationNumber: '',
     registrationType: '',
     status: '',
+    tableData: [],
     registeredBy: '',
     registeringParty: '',
     securedParties: '',
     shouldClearType: false,
-    registrationDateFormatted: '',
     folioNumber: '',
-    daysToExpiry: '',
     submittedStartDate: null,
-    submittedEndDate: null,
-    registrationTypes: computed(function () {
-      const types = [...RegistrationTypesStandard]
-      types.shift()
-      return types
-    }),
-    statusTypes: StatusTypes
+    submittedEndDate: null
   })
 
   const getFormattedDate = (dateStr: string): string => {
@@ -53,17 +54,26 @@ export const useRegistration = () => {
   }
 
   const getRegistrationType = (
-    regType: APIRegistrationTypes
-  ): UIRegistrationTypes | string => {
+    regType: APIRegistrationTypes | APIAmendmentTypes
+  ): UIRegistrationTypes | UIAmendmentTypes | string => {
     if (!regType) return ''
 
-    const keyValue = Object.keys(APIRegistrationTypes).find(
+    const keyValueRegType = Object.keys(APIRegistrationTypes).find(
       name => APIRegistrationTypes[name] === regType
     )
-    return UIRegistrationTypes[keyValue]
+    if (keyValueRegType) return UIRegistrationTypes[keyValueRegType]
+
+    const keyValueAmType = Object.keys(APIAmendmentTypes).find(
+      name => APIAmendmentTypes[name] === regType
+    )
+    if (keyValueAmType) return UIAmendmentTypes[keyValueAmType]
+
+    // should never get here
+    return ''
   }
 
   const clearFilters = () => {
+    localState.dateTxt = ''
     localState.registrationNumber = ''
     localState.registrationType = ''
     localState.status = ''
@@ -71,233 +81,184 @@ export const useRegistration = () => {
     localState.registeringParty = ''
     localState.securedParties = ''
     localState.folioNumber = ''
-    localState.daysToExpiry = ''
     localState.submittedStartDate = null
     localState.submittedEndDate = null
     localState.shouldClearType = true
-    localState.registrationDateFormatted = ''
   }
 
-  const filterResults = (originalData: Array<any>): void => {
-    const newTableData = [...originalData]
-    // start off by showing everthing
-    for (let i = 0; i < newTableData.length; i++) {
-      newTableData[i].hide = false
+  const passFilter = (
+    item: RegistrationSummaryIF,
+    filter: (param: RegistrationSummaryIF | DraftResultIF) => boolean
+  ): boolean => {
+    // check base reg
+    if (filter(item)) {
+      item.expand = false
+      return true
     }
-    // then filter values one at a time, if they contain a value
-    if (localState.registeringParty) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].registeringParty) {
-          if (
-            !originalData[i].registeringParty.includes(
-              localState.registeringParty
-            )
-          ) {
-            newTableData[i].hide = true
-          }
-        }
+    // check each child
+    for (let i = 0; i < item.changes?.length || 0; i++) {
+      if (filter(item.changes[i])) {
+        // child reg passes
+        item.expand = true
+        return true
       }
     }
-
-    if (localState.registeredBy) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].registeredBy) {
-          if (!originalData[i].registeredBy.includes(localState.registeredBy)) {
-            newTableData[i].hide = true
-          }
-        } else {
-          newTableData[i].hide = true
-        }
-      }
-    }
-
-    if (localState.registrationType) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].registrationType) {
-          if (
-            originalData[i].registrationType !== localState.registrationType
-          ) {
-            newTableData[i].hide = true
-          }
-        }
-      }
-    }
-
-    if (localState.registeringParty) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].registeringParty) {
-          if (
-            !originalData[i].registeringParty.includes(
-              localState.registeringParty
-            )
-          ) {
-            newTableData[i].hide = true
-          }
-        } else {
-          newTableData[i].hide = true
-        }
-      }
-    }
-
-    if (localState.securedParties) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].securedParties) {
-          if (
-            !originalData[i].securedParties.includes(localState.securedParties)
-          ) {
-            newTableData[i].hide = true
-          }
-        } else {
-          newTableData[i].hide = true
-        }
-      }
-    }
-
-    if (localState.folioNumber) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].clientReferenceId) {
-          if (
-            !originalData[i].clientReferenceId.includes(localState.folioNumber)
-          ) {
-            newTableData[i].hide = true
-          }
-        } else {
-          newTableData[i].hide = true
-        }
-      }
-    }
-
-    if (localState.registrationNumber) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].registrationNumber) {
-          if (
-            !originalData[i].registrationNumber.includes(
-              localState.registrationNumber
-            )
-          ) {
-            newTableData[i].hide = true
-          }
-        }
-      }
-    }
-
-    if (localState.status) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].statusType) {
-          if (originalData[i].statusType !== localState.status) {
-            newTableData[i].hide = true
-          }
-        }
-      }
-    }
-
-    if (localState.daysToExpiry) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].expireDays) {
-          if (originalData[i].expireDays === localState.daysToExpiry) {
-            newTableData[i].hide = true
-          }
-        }
-      }
-    }
-
-    if (localState.submittedStartDate) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].createDateTime) {
-          const originalStartDate = originalData[i].createDateTime.substring(
-            0,
-            10
-          )
-          if (localState.submittedStartDate > originalStartDate) {
-            newTableData[i].hide = true
-          }
-        }
-      }
-    }
-
-    if (localState.submittedEndDate) {
-      for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i].createDateTime) {
-          const originalEndDate = originalData[i].createDateTime.substring(
-            0,
-            10
-          )
-          if (localState.submittedEndDate < originalEndDate) {
-            newTableData[i].hide = true
-          }
-        }
-      }
-    }
-
-    localState.tableData = newTableData
+    // neither the base reg or its children pass
+    item.expand = false
+    return false
   }
 
-  watch(
-    () => localState.registeringParty,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
+  const filterResults = (originalData: RegistrationSummaryIF[]): any[] => {
+    const newTableData = [] // filtered list of base registrations
+    for (let i = 0; i < originalData.length; i++) {
+      // start by setting expand to false if relevant
+      if (originalData[i].changes) originalData[i].expand = false
+      if (localState.registrationNumber) {
+        const regNumFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          return item.registrationNumber?.toUpperCase().includes(localState.registrationNumber.toUpperCase())
+        }
+        if (!passFilter(originalData[i], regNumFilter)) {
+          // reg num filter is active and filters out this item
+          continue
+        }
+      }
 
-  watch(
-    () => localState.registrationType,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
+      if (localState.registrationType) {
+        const regTypeFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          return item.registrationType === localState.registrationType
+        }
+        if (!passFilter(originalData[i], regTypeFilter)) {
+          // reg type filter is active and filters out this item
+          continue
+        }
+      }
 
-  watch(
-    () => localState.registrationNumber,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
-  watch(
-    () => localState.folioNumber,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
-  watch(
-    () => localState.securedParties,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
-  watch(
-    () => localState.registeredBy,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
+      if (localState.status) {
+        const statusFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          const convertedStatus = item.statusType || APIStatusTypes.DRAFT
+          return convertedStatus === localState.status
+        }
+        if (!passFilter(originalData[i], statusFilter)) {
+          // status filter is active and filters out this item
+          continue
+        }
+      }
 
-  watch(
-    () => localState.status,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
+      if (localState.registeringParty) {
+        const regPartyFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          return item.registeringParty?.toUpperCase().includes(localState.registeringParty.toUpperCase())
+        }
+        if (!passFilter(originalData[i], regPartyFilter)) {
+          // reg party filter is active and filters out this item
+          continue
+        }
+      }
 
-  watch(
-    () => localState.daysToExpiry,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
+      if (localState.registeredBy) {
+        const regByFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          return item.registeringName?.toUpperCase().includes(localState.registeredBy.toUpperCase())
+        }
+        if (!passFilter(originalData[i], regByFilter)) {
+          // reg by filter is active and filters out this item
+          continue
+        }
+      }
 
-  watch(
-    () => localState.submittedStartDate,
-    () => {
-      filterResults(localState.originalData)
-    }
-  )
+      if (localState.securedParties) {
+        const secPartyFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          return item.securedParties?.toUpperCase().includes(localState.securedParties.toUpperCase())
+        }
+        if (!passFilter(originalData[i], secPartyFilter)) {
+          // sec party filter is active and filters out this item
+          continue
+        }
+      }
 
-  watch(
-    () => localState.submittedEndDate,
-    () => {
-      filterResults(localState.originalData)
+      if (localState.folioNumber) {
+        const folioFilter = (item: any): boolean => {
+          // item is RegistrationSummaryIF or DraftResultIF
+          return item.clientReferenceId?.toUpperCase().includes(localState.folioNumber.toUpperCase())
+        }
+        if (!passFilter(originalData[i], folioFilter)) {
+          // folio filter is active and filters out this item
+          continue
+        }
+      }
+
+      if (localState.submittedStartDate && localState.submittedEndDate) {
+        const sDateFilter = (item: any): boolean => {
+          if (item.createDateTime) {
+            const created = item.createDateTime.substring(0, 10)
+            if (created < localState.submittedStartDate) return false
+          }
+          return true
+        }
+        const eDateFilter = (item: any): boolean => {
+          if (item.createDateTime) {
+            const created = item.createDateTime.substring(0, 10)
+            if (created > localState.submittedEndDate) return false
+          }
+          return true
+        }
+        const dateFilter = (item: any): boolean => {
+          return sDateFilter(item) && eDateFilter(item)
+        }
+        if (!passFilter(originalData[i], dateFilter)) {
+          // submitted range filter is active and filters out this item
+          continue
+        }
+      }
+
+      // passed all filters, add to the new list
+      newTableData.push({ ...originalData[i] })
     }
-  )
+
+    // return new filtered list
+    return newTableData
+  }
+
+  // filter watchers
+  watch(() => localState.registeringParty, (val) => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.registrationType, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.registrationNumber, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.folioNumber, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.securedParties, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.registeredBy, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.status, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.submittedStartDate, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
+
+  watch(() => localState.submittedEndDate, () => {
+    localState.tableData = filterResults(localState.originalData)
+  })
 
   return {
     getFormattedDate,

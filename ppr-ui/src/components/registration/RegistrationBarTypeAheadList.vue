@@ -8,6 +8,7 @@
     />
     <v-autocomplete
       class="registrationTypeAhead rounded-top"
+      :class="{ 'reg-filter': isClearable }"
       allow-overflow
       filled
       :filter="filterList"
@@ -69,11 +70,8 @@ export default defineComponent({
   props: {
     defaultLabel: String,
     defaultDense: Boolean,
-    defaultClearable: Boolean,
-    defaultClear: {
-      type: Boolean,
-      default: false
-    }
+    defaultClearable: { default: false },
+    defaultClear: { default: false }
   },
   name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
@@ -158,7 +156,8 @@ export default defineComponent({
     })
 
     watch(() => localState.selected, (val: RegistrationTypeIF) => {
-      if (val) selectRegistration(val)
+      if (localState.isClearable) emit('selected', val)
+      else if (val) selectRegistration(val)
     })
 
     watch(() => props.defaultClear, (val: boolean) => {
@@ -186,7 +185,7 @@ export default defineComponent({
   min-height: 45px;
 }
 
-::v-deep .v-select__slot, ::v-deep .v-input__slot {
+#registrationTypeAhead ::v-deep .v-select__slot, ::v-deep .v-input__slot {
   max-height: 45px;
   label {
     color: $gray7 !important;
