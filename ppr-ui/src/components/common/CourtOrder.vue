@@ -240,7 +240,7 @@ export default defineComponent({
 
     const shouldValidate = () => {
       if ((localState.courtName) || (localState.courtRegistry) ||
-          (localState.fileNumber) || (localState.computedDateFormatted) || (localState.effectOfOrder) ||
+          (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
           (localState.requireCourtOrder)) {
         return true
       }
