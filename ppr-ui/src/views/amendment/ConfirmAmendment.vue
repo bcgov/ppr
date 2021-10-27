@@ -61,9 +61,13 @@
                 <v-divider v-if="showSecuredParties || showDebtors"></v-divider>
                 <!-- To do: add vehicle collateral summary -->
               </div>
-              <div v-if="showGeneralCollateral">
+              <div v-if="showGeneralCollateral" class="pt-4">
                 <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral"></v-divider>
-                <!-- To do: add general collateral summary -->
+                <gen-col-summary class="pa-4"
+                  :setShowAmendLink="false"
+                  :setShowHistory="false"
+                  :setShowViewLink="false"
+                />
               </div>
             </div>
 
@@ -151,6 +155,7 @@ import {
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
+import { GenColSummary } from '@/components/collateral/generalCollateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 
@@ -194,6 +199,7 @@ import { StatusCodes } from 'http-status-codes'
     RegisteringPartySummary,
     SecuredPartySummary,
     DebtorSummary,
+    GenColSummary,
     RegistrationLengthTrustAmendment,
     StickyContainer
   }
@@ -349,7 +355,7 @@ export default class ConfirmAmendment extends Vue {
       return false
     }
     for (let i = 0; i < addCollateral.generalCollateral.length; i++) {
-      if (addCollateral.generalCollateral[i].descriptionAdd || addCollateral.generalCollateral[i].descriptionDelete) {
+      if (!addCollateral.generalCollateral[i].collateralId) {
         return true
       }
     }

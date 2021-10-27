@@ -74,7 +74,9 @@
     <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
               && lastGeneralCollateral
               && showAmendLink
-              && !lastGeneralCollateral.addedDateTime" class="pa-0">
+              && !lastGeneralCollateral.addedDateTime"
+              class="pa-0"
+              :class="{'ps-6': !showViewLink}">
       <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
         <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
           <b>DELETED</b>
@@ -98,6 +100,7 @@
       class="mt-7"
     >
       <v-btn
+        v-if="showViewLink"
         id="gc-show-history-btn"
         class="ma-0 pa-0"
         color="primary"
@@ -174,6 +177,10 @@ export default defineComponent({
     setShowAmendLink: {
       type: Boolean,
       default: true
+    },
+    setShowViewLink: {
+      type: Boolean,
+      default: true
     }
   },
   setup (props, { emit }) {
@@ -224,6 +231,9 @@ export default defineComponent({
       }),
       showAmendLink: computed((): boolean => {
         return props.setShowAmendLink
+      }),
+      showViewLink: computed((): boolean => {
+        return props.setShowViewLink
       })
     })
 
