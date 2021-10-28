@@ -477,7 +477,7 @@ export default class Dashboard extends Vue {
           `registration number <b>${regNum}</b> was not found. Please ` +
           'check the registration number and try again.'
         break
-      case StatusCodes.UNAUTHORIZED:
+      case StatusCodes.FORBIDDEN || StatusCodes.UNAUTHORIZED:
         this.myRegAddDialog = { ...registrationRestrictedDialog }
         this.myRegAddDialog.text = 'An existing registration was found with ' +
           `the registration number <b>${regNum}</b> but access is ` +
