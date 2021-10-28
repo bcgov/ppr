@@ -34,6 +34,18 @@
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
+                <td class="actions-cell actions-width px-0" v-if="registrationFlowType === RegistrationFlowType.NEW">
+                <div class="actions float-right actions-up">
+                  <v-list class="actions__more-actions">
+                    <v-list-item class="v-remove" @click="changeRegisteringParty()">
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-pencil</v-icon>
+                        <span class="ml-1">Change</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
+                </div>
+                </td>
               </tr>
             </template>
           </v-data-table>
@@ -51,6 +63,7 @@ import {
   defineComponent,
   onMounted,
   reactive,
+  computed,
   toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -58,9 +71,10 @@ import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-u
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
 
-import { registeringTableHeaders } from '@/resources'
+import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { getRegisteringPartyFromAuth } from '@/utils'
 import { PartyAddressSchema } from '@/schemas'
+import { RegistrationFlowType } from '@/enums'
 
 export default defineComponent({
   components: {
@@ -70,11 +84,12 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
     ])
     var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
+    const registrationFlowType = getRegistrationFlowType.value
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
@@ -96,12 +111,25 @@ export default defineComponent({
     const { getName, isBusiness } = useParty()
     const localState = reactive({
       registeringParty: null,
-      partyHeaders: registeringTableHeaders
+      partyHeaders: computed((): Array<any> => {
+        if (registrationFlowType === RegistrationFlowType.NEW) {
+          return [...registeringTableHeaders, ...editTableHeaders]
+        } else {
+          return registeringTableHeaders
+        }
+      })
     })
+
+    const changeRegisteringParty = () => {
+      context.emit('changeRegisteringParty')
+    }
 
     return {
       getName,
       isBusiness,
+      registrationFlowType,
+      changeRegisteringParty,
+      RegistrationFlowType,
       addressSchema,
       ...toRefs(localState)
     }
