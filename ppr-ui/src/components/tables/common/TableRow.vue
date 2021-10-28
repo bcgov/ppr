@@ -118,7 +118,7 @@
     >
       <v-btn
         :id="`pdf-btn-${item.id}`"
-        v-if="!isDraft(item)"
+        v-if="!isDraft(item) && item.path"
         class="pdf-btn px-0 mt-n3"
         depressed
         :loading="item.path === loadingPDF"
@@ -127,6 +127,21 @@
         <img src="@/assets/svgs/custom-pdf-icon.svg">
         <span class="pl-1">PDF</span>
       </v-btn>
+      <v-tooltip
+        v-else-if="!isDraft(item)"
+        class="pa-2"
+        content-class="top-tooltip"
+        nudge-right="2"
+        top
+        transition="fade-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+        </template>
+        <div class="pt-2 pb-2">
+          {{ tooltipTxtPdf }}
+        </div>
+      </v-tooltip>
     </td>
 
     <!-- Action Btns -->
@@ -307,24 +322,6 @@ export default defineComponent({
       })
     }
 
-    const displayRegistrationNumber = (baseReg: string, actualReg: string): string => {
-      if (!actualReg) actualReg = 'Pending'
-      if (baseReg) {
-        if (baseReg === actualReg) {
-          return '<b>' + baseReg + '</b>'
-        }
-        return (
-          '<b>' +
-          baseReg +
-          '</b>' +
-          '<br><span class="font-italic font-weight-regular">Registration Number:<br>' +
-          actualReg +
-          '</span>'
-        )
-      }
-      return actualReg
-    }
-
     const downloadPDF = async (path: string): Promise<any> => {
       localState.loadingPDF = path
       const pdf = await registrationPDF(path)
@@ -461,6 +458,10 @@ export default defineComponent({
       emit('toggleExpand', val)
     }
 
+    const tooltipTxtPdf = 'Verification Statements are only available ' +
+      'to Secured Parties or the Registering Party of this filing. To ' +
+      'view the details of this registration you must conduct a search.'
+
     watch(() => props.setItem, (val) => {
     }, { deep: true, immediate: true })
 
@@ -473,10 +474,8 @@ export default defineComponent({
       editDraft,
       handleAction,
       registrationNumber,
-      displayRegistrationNumber,
       registeringParty,
       securedParties,
-      status,
       isActive,
       isDischarged,
       isDraft,
@@ -485,6 +484,7 @@ export default defineComponent({
       inSelectedHeaders,
       TableActions,
       toggleExpand,
+      tooltipTxtPdf,
       ...toRefs(localState)
     }
   }
