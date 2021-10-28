@@ -20,6 +20,7 @@ import copy
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import FinancingStatement, Registration, utils as model_utils
@@ -28,6 +29,7 @@ from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 
 
+MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 # prep sample post renewal statement data
 STATEMENT_VALID = {
     'baseRegistrationNumber': 'TEST0001',
@@ -196,6 +198,8 @@ TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST00R5', 'TEST0005'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST00R5', 'TEST0005'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0005'),
+    ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021RE', 'TEST0021'),
+    ('Unauthorized Request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019RE', 'TEST0019'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0005'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST00R5', 'TEST0001'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0001'),
@@ -226,6 +230,7 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
 def test_get_renewal(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get renewal registration statement works as expected."""
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
     if has_account:

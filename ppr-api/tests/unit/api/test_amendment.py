@@ -20,6 +20,7 @@ import copy
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, FINANCING_STATEMENT
 
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
@@ -27,6 +28,7 @@ from ppr_api.models import utils as model_utils
 from tests.unit.services.utils import create_header, create_header_account
 
 
+MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 # prep sample post amendment statement data
 SAMPLE_JSON = copy.deepcopy(AMENDMENT_STATEMENT)
 STATEMENT_VALID = {
@@ -254,6 +256,8 @@ TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0007', 'TEST0001'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0007', 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
+    ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021AM', 'TEST0021'),
+    ('Unauthorized Request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019AM', 'TEST0019'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0001'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0007', 'TEST0002'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0002'),
@@ -294,6 +298,7 @@ def test_create_amendment(session, client, jwt, desc, json_data, roles, status, 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
 def test_get_amendment(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get amendment registration statement works as expected."""
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
     if has_account:
