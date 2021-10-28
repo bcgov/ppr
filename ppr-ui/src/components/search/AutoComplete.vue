@@ -1,27 +1,21 @@
 <template>
   <v-card v-if="showAutoComplete" :class="['mt-1', $style['auto-complete-card']]" elevation="5">
-    <v-row no-gutters justify="end" :class="$style['close-btn-row']">
-      <v-col cols="auto" justify="end" class="pt-0">
-        <v-btn append
-               icon
-               x-small
-               right
-               :id="$style['auto-complete-close-btn']"
-               class="auto-complete-close-btn"
-               @click="autoCompleteIsActive=false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row no-gutters justify="center" class="pl-2 pr-5">
-      <v-col no-gutters cols="auto">
+    <v-row no-gutters justify="center">
+      <v-col no-gutters cols="12">
         <v-list class="pt-0">
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item v-for="(result, i) in autoCompleteResults"
                          :key="i"
-                         :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]">
+                         :class="['pt-0', 'pb-0', 'pl-3', $style['auto-complete-item']]">
               <v-list-item-content class="pt-2 pb-2">
-                <v-list-item-title v-text="result.value"></v-list-item-title>
+                <v-list-item-subtitle>
+                  <v-row :class="$style['auto-complete-row']">
+                    <v-col cols="12" :class="$style['title-size']">
+                      {{ result.value }}
+                    </v-col>
+                  </v-row>
+                </v-list-item-subtitle>
+                <!--<v-list-item-title v-text="result.value"></v-list-item-title>-->
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -101,12 +95,45 @@ export default defineComponent({
 .auto-complete-item {
   min-height: 0;
 }
+
+@media (min-width: 960px) {
+  .auto-complete-card {
+    width: 700px;
+  }
+}
+
 .auto-complete-card {
-  max-width: 30rem;
   position: absolute;
   z-index: 3;
 }
 .close-btn-row {
   height: 1rem;
 }
+
+.auto-complete-item:hover {
+  color: $primary-blue !important;
+  background-color: $gray1 !important;
+}
+
+.auto-complete-item[aria-selected='true'] {
+  color: $primary-blue !important;
+  background-color: $blueSelected !important;
+}
+
+.auto-complete-item:focus {
+  background-color: $gray3 !important;
+}
+
+.auto-complete-row {
+  width: 35rem;
+  color: $gray7 !important;
+}
+.auto-complete-row:hover {
+  color: $primary-blue !important;
+}
+
+.title-size {
+  font-size: 1rem;
+}
+
 </style>

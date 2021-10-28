@@ -113,8 +113,9 @@ describe('AutoComplete component', () => {
     expect(autoCompleteNames.length).toBe(0)
     expect(getLastEvent(wrapper, hideDetails)).toBeFalsy()
     expect(getLastEvent(wrapper, searchValue)).toBeNull()
+
   })
-  it('does closes display when close buton clicked', async () => {
+  it('does closes display when outside clicked', async () => {
     wrapper.setProps({ searchValue: 'test' })
     // 3 ticks: watcher update, method run, results update
     await Vue.nextTick()
@@ -122,9 +123,9 @@ describe('AutoComplete component', () => {
     await Vue.nextTick()
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNames.length).toBe(5)
-    wrapper.find(closeButtonSelector).trigger('click')
+    //simulate clicking outside the autocomplete
+    wrapper.vm.$data.autoCompleteIsActive = false
     await Vue.nextTick()
-    expect(wrapper.vm.$data.autoCompleteIsActive).toBeFalsy()
     expect(wrapper.vm.$data.autoCompleteResults).toEqual([])
     expect(wrapper.vm.$data.showAutoComplete).toBeFalsy()
     expect(getLastEvent(wrapper, hideDetails)).toBeFalsy()
