@@ -93,6 +93,8 @@ export const stateModel: StateModelIF = {
     lastname: '',
     username: '',
     settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }

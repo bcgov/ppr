@@ -16,8 +16,8 @@ import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
-import { RouteNames, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
+import { RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
+import { DraftResultIF, RegistrationSummaryIF, StateIF, StateModelIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   amendConfirmationDialog,
@@ -40,7 +40,9 @@ import {
   mockedDraftFinancingStatementAll,
   mockedDebtorNames,
   mockedDraftAmend,
-  mockedRegistration2
+  mockedRegistration2,
+  mockedUpdateRegTableUserSettingsResponse,
+  mockedErrorUserSettingsResponse
 } from './test-data'
 
 Vue.use(Vuetify)
@@ -58,7 +60,6 @@ const myRegAddDialog = "#myRegAddDialog"
 const myRegDeleteDialog = "#myRegDeleteDialog"
 const myRegHeader = "#registration-header"
 const myRegAddTextBox = "#my-reg-add"
-const myRegTblFilter = "#my-reg-table-filter"
 const myRegTblColSelection = "#column-selection"
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
@@ -93,6 +94,12 @@ describe('Dashboard component', () => {
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
     const getDebtorNames = getStub.withArgs(`financing-statements/${regNum}/debtorNames`)
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
+    
+    const patchStub = sandbox.stub(axios, 'patch')
+    const patchUserSettings = patchStub.withArgs('user-profile')
+    patchUserSettings.returns(new Promise(resolve => resolve(
+      { data: mockedUpdateRegTableUserSettingsResponse }
+    )))
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -249,6 +256,7 @@ describe('Dashboard registration table tests', () => {
   baseReg.changes = [{ ...mockedDraftAmend }]
   baseReg.expand = false
   const myRegHistoryWithChildren = [baseReg]
+  const newColumnSelection = [...registrationTableHeaders].slice(3)
 
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
@@ -269,6 +277,23 @@ describe('Dashboard registration table tests', () => {
     // delete stubs
     const deleteStub = sandbox.stub(axios, 'delete')
     deleteStub.returns(new Promise (resolve => resolve({ status: StatusCodes.NO_CONTENT })))
+    // patch stubs
+    const patchStub = sandbox.stub(axios, 'patch')
+    const patchUserSettings = patchStub.withArgs('user-profile')
+    patchUserSettings.returns(new Promise(resolve => resolve(
+      // error will cause UI to ignore response and use default / whatever the user selected
+      { data: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection }}}
+    )))
+
+    // set base selected columns
+    await store.dispatch(
+      'setUserInfo',
+      { 
+        settings: {
+          [SettingOptions.REGISTRATION_TABLE]: { columns: registrationTableHeaders }
+        }
+      }
+    )
 
     const localVue = createLocalVue()
     localVue.use(CompositionApi)
@@ -311,11 +336,31 @@ describe('Dashboard registration table tests', () => {
   //   expect(wrapper.findComponent(RegistrationTable).vm.$props.setSearch).toBe(filterText)
   // })
 
-  it('updates the registration table with column selection', async () => {
-    const newColumnSelection = [...registrationTableHeaders].slice(0,2)
+  it('updates the registration table with new headers', async () => {
+    // ensure original is based off settings patch stub
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(registrationTableHeaders)
+    // update dashboard headers variable directly
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
     wrapper.vm.$data.myRegHeaders = newColumnSelection
     await flushPromises()
+    expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(newColumnSelection)
+  })
+
+  it('updates the registration table with new headers from column selection', async () => {
+    // ensure original selection is based off settings patch stub
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(registrationTableHeaders)
+    // update column selection
+    expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
+    wrapper.vm.myRegHeadersSelected = newColumnSelection
+    await flushPromises()
+    // verify dashboard values updated
+    expect(wrapper.vm.myRegHeadersSelected).toEqual(newColumnSelection)
+    expect(wrapper.vm.myRegHeaders).toEqual(newColumnSelection)
+    // verify store updated with patch response
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings[SettingOptions.REGISTRATION_TABLE].columns)
+      .toEqual(newColumnSelection)
+    // verify table props updated
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setHeaders).toEqual(newColumnSelection)
   })
@@ -429,6 +474,12 @@ describe('Dashboard add registration tests', () => {
       `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
     )
     postMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
+    // patch stubs
+    const patchStub = sandbox.stub(axios, 'patch')
+    const patchUserSettings = patchStub.withArgs('user-profile')
+    patchUserSettings.returns(new Promise(resolve => resolve(
+      { data: mockedUpdateRegTableUserSettingsResponse }
+    )))
 
     const localVue = createLocalVue()
     localVue.use(CompositionApi)

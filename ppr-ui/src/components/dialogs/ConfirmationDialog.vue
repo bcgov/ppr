@@ -60,6 +60,7 @@ import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
 import { Action } from 'vuex-class'
 
 // local
+import { SettingOptions } from '@/enums' // eslint-disable-line
 import { ActionBindingIF, DialogOptionsIF, UserSettingsIF } from '@/interfaces' // eslint-disable-line
 import { updateUserSettings } from '@/utils'
 
@@ -70,7 +71,7 @@ export default class ConfirmationDialog extends Vue {
   @Prop() private attach: string
   @Prop() private display: boolean
   @Prop() private options: DialogOptionsIF
-  @Prop() private settingOption: string
+  @Prop() private settingOption: SettingOptions
 
   private preventDialog: boolean = false
   private updateFailed: boolean = false

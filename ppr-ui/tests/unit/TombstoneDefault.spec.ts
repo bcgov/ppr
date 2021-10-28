@@ -70,6 +70,8 @@ describe('TombstoneDefault component tests', () => {
     lastname: 'tester',
     username: '123d3crr3',
     settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
