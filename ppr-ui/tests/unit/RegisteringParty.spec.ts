@@ -80,5 +80,7 @@ describe('RegisteringParty store tests', () => {
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
+    
+    expect(wrapper.find('.actions-cell').exists()).toBeTruthy()
   })
 })
