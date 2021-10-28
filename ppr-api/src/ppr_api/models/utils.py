@@ -243,7 +243,7 @@ FETCH FIRST :max_results_size ROWS ONLY
 """
 
 QUERY_ACCOUNT_REGISTRATIONS = """
-SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
        CASE WHEN fs.life = 99 THEN -99
             ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
@@ -288,7 +288,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
 UNION (
-SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
        CASE WHEN fs.life = 99 THEN -99
             ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,

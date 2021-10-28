@@ -67,21 +67,16 @@ class FinancingResource(Resource):
     def get():
         """Get the list of financing statements created by the header account ID."""
         try:
-
             # Quick check: must provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch financing statement list for account ID
             statement_list = FinancingStatement.find_all_by_account_id(account_id)
-
             return jsonify(statement_list), HTTPStatus.OK
-
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -141,21 +136,20 @@ class GetFinancingResource(Resource):
         try:
             if registration_num is None:
                 return resource_utils.path_param_error_response('registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch financing statement by registration number
             # Not found throws a business exception.
             statement = FinancingStatement.find_by_registration_number(registration_num,
                                                                        account_id,
                                                                        is_staff(jwt))
+            # Extra check account name matches either registering party or a secured party name.
+            resource_utils.check_access_financing(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
 
             # Set to false to exclude change history.
             statement.include_changes_json = False
@@ -267,30 +261,27 @@ class GetAmendmentResource(Resource):
         try:
             if amendment_registration_num is None:
                 return resource_utils.path_param_error_response('amendment registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(amendment_registration_num,
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
+            # Extra check account name matches either registering party or a secured party name.
+            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
 
             response_json = statement.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.OK
-
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -380,30 +371,27 @@ class GetChangeResource(Resource):
         try:
             if change_registration_num is None:
                 return resource_utils.path_param_error_response('change registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(change_registration_num,
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
+            # Extra check account name matches either registering party or a secured party name.
+            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
 
             response_json = statement.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.OK
-
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -490,30 +478,27 @@ class GetRenewalResource(Resource):
         try:
             if renewal_registration_num is None:
                 return resource_utils.path_param_error_response('renewal registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(renewal_registration_num,
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
+            # Extra check account name matches either registering party or a secured party name.
+            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
 
             response_json = statement.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.OK
-
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -602,21 +587,20 @@ class GetDischargeResource(Resource):
         try:
             if discharge_registration_num is None:
                 return resource_utils.path_param_error_response('discharge registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(discharge_registration_num,
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
+            # Extra check account name matches either registering party or a secured party name.
+            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
 
             response_json = statement.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
@@ -625,9 +609,7 @@ class GetDischargeResource(Resource):
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.OK
-
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -698,7 +680,11 @@ class GetRegistrationResource(Resource):
                 collapse_param = False
 
             # Try to fetch financing statement list for account ID
-            statement_list = Registration.find_all_by_account_id(account_id, collapse_param)
+            # To access a registration report, use the account name to match on registering/secured parties.
+            account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
+            statement_list = Registration.find_all_by_account_id(account_id,
+                                                                 collapse_param,
+                                                                 account_name)
 
             return jsonify(statement_list), HTTPStatus.OK
 
@@ -768,7 +754,7 @@ class AccountRegistrationResource(Resource):
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
     def get(registration_num):
-        """Get summary registrration information by registration number before adding to the user registrations list."""
+        """Get summary registration information by registration number before adding to the user registrations list."""
         try:
             if registration_num is None:
                 return resource_utils.path_param_error_response('registration number')

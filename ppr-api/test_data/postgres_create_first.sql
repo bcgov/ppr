@@ -23,6 +23,12 @@ INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTAC
 			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
   VALUES (200000002,200000002,200000001,'TEST PARTY CODE 3',200000002,'TEST 3 CONTACT NAME','604','2171234',
           'test-3-client@gmail.com',null,'T3USER',null);
+-- Name matches auth mock service org name
+INSERT INTO client_codes(HEAD_ID, ID, ADDRESS_ID, NAME, BCONLINE_ACCOUNT, CONTACT_NAME,CONTACT_AREA_CD,
+			            CONTACT_PHONE_NUMBER, EMAIL_ADDRESS, USERS_ID, USER_ID, DATE_TS)
+  VALUES (200000003,200000003,200000001,'PH Testing PPR with PAD',200000002,'TEST 4 CONTACT NAME','604','2171234',
+          'test-4-client@gmail.com',null,'T4USER',null);
+
 
 -- Account ID BCOL Account Number mapping
 INSERT INTO account_bcol_ids(id, account_id, bconline_account, crown_charge_ind)

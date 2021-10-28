@@ -58,7 +58,7 @@ TEST_ACCOUNT_REGISTRATION_DATA = [
 TEST_ACCOUNT_ADD_REGISTRATION_DATA = [
     ('TEST0018', 'PS12345', 1, 0, 3, True),
     ('TEST0019A', 'PS12345', 1, 0, 0, False),
-    ('TEST0019', 'PS12345', 1, 1, 1, True),
+    ('TEST0019', 'PS12345', 1, 1, 3, True),
     ('TEST0002', 'PS12345', 1, 1, 1, False),
     ('TESXXXXX', 'PS12345', 0, 1, 0, False)
 ]
@@ -102,6 +102,14 @@ TEST_DATA_AMENDMENT_CHANGE_TYPE = [
     (model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER, False),
     (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
     (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
+]
+# testdata pattern is ({user_account_id}, {reg_account_id}, {account_name}, {rp_name}, {sp_names}, {can_access})
+TEST_ACCOUNT_REPORT_ACCESS_DATA = [
+    ('PS12345', 'PS12345', 'TEST_NAME', 'DIFF', 'DIFF1, DIFF2, DIFF3', True),
+    ('PS12345', 'PS1234X', 'TEST_NAME', 'DIFF', 'DIFF1, DIFF2, DIFF3', False),
+    ('PS12345', 'PS1234X', None, 'TEST_NAME', 'DIFF1, DIFF2, DIFF3', False),
+    ('PS12345', 'PS1234X', 'TEST NAME', 'TEST NAME', 'DIFF1, DIFF2, DIFF3', True),
+    ('PS12345', 'PS1234X', 'TEST NAME', 'DIFF', 'DIFF1, DIFF2, TEST NAME', True)
 ]
 
 
@@ -220,7 +228,7 @@ def test_find_by_id_cs_su(session):
                          TEST_ACCOUNT_REGISTRATION_DATA)
 def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_reg_num, user_removed_reg_num):
     """Assert that the financing statement summary list by account id first item contains all expected elements."""
-    statement_list = Registration.find_all_by_account_id(account_id, collapse)
+    statement_list = Registration.find_all_by_account_id(account_id, collapse, 'PH Testing PPR with PAD')
     found_added: bool = False
     found_removed: bool = False
 
@@ -238,7 +246,12 @@ def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_
         assert statement['createDateTime']
         assert statement['lastUpdateDateTime']
         assert statement['registeringName']
-        assert statement['path']
+        if statement['registrationNumber'] in ('TEST0019'):
+            assert not statement['path']
+        elif 'baseRegistrationNumber' in statement and statement['baseRegistrationNumber'] == 'TEST0019':
+            assert not statement['path']
+        else:
+            assert statement['path']
         if statement['registrationClass'] not in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
             assert statement['baseRegistrationNumber']
         if not collapse or statement['registrationClass'] in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
@@ -825,6 +838,19 @@ def test_verification_json(session, base_reg_num, reg_num, reg_num_name):
     assert json_data['baseRegistrationNumber'] == base_reg_num
     assert len(json_data['changes']) >= 1
     assert json_data['changes'][0][reg_num_name] == reg_num
+
+
+@pytest.mark.parametrize('user_account_id,reg_account_id,account_name,rp_name,sp_names,can_access',
+                         TEST_ACCOUNT_REPORT_ACCESS_DATA)
+def test_can_access_report(session, user_account_id, reg_account_id, account_name, rp_name, sp_names, can_access):
+    """Assert that registration can access report check works as expected."""
+    json_data = {
+        'account_id': reg_account_id,
+        'registeringParty': rp_name,
+        'securedParties': sp_names
+    }
+    test_access = Registration.can_access_report(user_account_id, account_name, json_data)
+    assert test_access == can_access
 
 
 @pytest.mark.parametrize('change_type, is_general_collateral', TEST_DATA_AMENDMENT_CHANGE_TYPE)

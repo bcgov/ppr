@@ -20,6 +20,7 @@ import copy
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 
 from ppr_api.models import FinancingStatement, Registration
 from ppr_api.resources.financing_statements import get_payment_details, get_payment_details_financing, \
@@ -28,6 +29,8 @@ from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
 from ppr_api.services.payment.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account
 
+
+MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 
 # prep sample post financing statement data
 FINANCING_VALID = {
@@ -330,6 +333,8 @@ TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
+    ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021'),
+    ('Unauthorized Request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX'),
     ('Invalid expired non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0013'),
     ('Invalid discharged non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0014'),
@@ -519,6 +524,7 @@ def test_account_get_registration(session, client, jwt, desc, roles, status, acc
 @pytest.mark.parametrize('desc,roles,status,has_account, reg_num', TEST_GET_STATEMENT)
 def test_get_statement(session, client, jwt, desc, roles, status, has_account, reg_num):
     """Assert that a get financing statement by registration number works as expected."""
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
     if has_account:

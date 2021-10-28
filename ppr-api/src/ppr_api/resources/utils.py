@@ -24,6 +24,10 @@ from ppr_api.utils.validators import financing_validator, party_validator, regis
 
 ACCOUNT_REQUIRED = 'Account-Id header required.'
 CROWN_CHARGE_FORBIDDEN = 'The account ID {account_id} is not authorized to access a Crown Charge registration.'
+ACCOUNT_ACCESS = 'The account ID {account_id} cannot access statement information for ' + \
+                 'registration number {registration_num}.'
+PARTY_REGISTERING = 'RG'
+PARTY_SECURED = 'SP'
 
 
 def serialize(errors):
@@ -181,3 +185,49 @@ def get_account_name(token: str, account_id: str = None):
             if org['id'] == int(account_id):
                 return org['name']
     return None
+
+
+def check_access_financing(token: str, staff: bool, account_id: str, statement):
+    """Extra check on account access to a financing statement."""
+    if staff or (account_id and statement.registration[0].account_id == account_id):
+        return
+
+    account_name = get_account_name(token, account_id)
+    access = False
+    if account_name:
+        for party in statement.registration[0].parties:
+            if party.party_type in (PARTY_REGISTERING, PARTY_SECURED) and \
+                    party.business_name and party.business_name == account_name:
+                access = True
+            elif party.client_code and party.client_code.name == account_name:
+                access = True
+    if not access:
+        reg_num = statement.registration[0].registration_num
+        current_app.logger.error('Account name ' + account_name + ' cannot access registration ' + reg_num)
+        raise BusinessException(
+            error=ACCOUNT_ACCESS.format(account_id=account_id, registration_num=reg_num),
+            status_code=HTTPStatus.UNAUTHORIZED
+        )
+
+
+def check_access_registration(token: str, staff: bool, account_id: str, statement):
+    """Extra check on account access to a registration."""
+    if staff or (account_id and statement.account_id == account_id):
+        return
+
+    account_name = get_account_name(token, account_id)
+    access = False
+    if account_name:
+        for party in statement.financing_statement.parties:
+            if party.party_type in (PARTY_REGISTERING, PARTY_SECURED) and \
+                    party.business_name and party.business_name == account_name:
+                access = True
+            elif party.client_code and party.client_code.name == account_name:
+                access = True
+    if not access:
+        reg_num = statement.registration_num
+        current_app.logger.error('Account name ' + account_name + ' cannot access registration ' + reg_num)
+        raise BusinessException(
+            error=ACCOUNT_ACCESS.format(account_id=account_id, registration_num=reg_num),
+            status_code=HTTPStatus.UNAUTHORIZED
+        )

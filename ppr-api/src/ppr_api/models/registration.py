@@ -395,8 +395,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str = None, collapse: bool = False):
-        """Return a summary list of recent registrations belonging to an account."""
+    def find_all_by_account_id(  # pylint: disable=too-many-locals
+            cls, account_id: str, collapse: bool = False, account_name: str = None):
+        """Return a summary list of recent registrations belonging to an account.
+
+        To access a verification statement report, one of the followng conditions must be true:
+        1. The request account ID matches the registration account ID.
+        2. The request account name matches the registration registering party name.
+        3. The request account name matches one of the base registration secured party names.
+        """
         results_json = []
         registrations_json = []
         if account_id:
@@ -415,6 +422,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         if not registering_name:
                             registering_name = ''
                         result = {
+                            'account_id': str(mapping['account_id']),
                             'registrationNumber': reg_num,
                             'baseRegistrationNumber': base_reg_num,
                             'createDateTime': model_utils.format_ts(mapping['registration_ts']),
@@ -442,12 +450,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                             result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
+                        # Set if user can access verification statement.
+                        if not Registration.can_access_report(account_id, account_name, result):
+                            result['path'] = ''
+
                         if collapse and not model_utils.is_financing(reg_class):
                             registrations_json.append(result)
                         else:
                             results_json.append(result)
                 if collapse:
-                    return Registration.build_account_collapsed_json(results_json, registrations_json)
+                    return Registration.__build_account_collapsed_json(results_json, registrations_json)
 
         return results_json
 
@@ -500,7 +512,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     # User account added by default.
                     elif result['accountId'] == account_id:
                         result['inUserList'] = True
-                    # Another account excludec by default.
+                    # Another account excluded by default.
                     else:
                         result['inUserList'] = False
                 elif reg_class == model_utils.REG_CLASS_DISCHARGE:
@@ -519,7 +531,22 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return result
 
     @staticmethod
-    def build_account_collapsed_json(financing_json, registrations_json):
+    def can_access_report(account_id: str, account_name: str, reg_json) -> bool:
+        """Determine if request account can view the registration verification statement."""
+        reg_account_id = reg_json['account_id']
+        del reg_json['account_id']  # Only use this for report access checking.
+        if account_id == reg_account_id:
+            return True
+        if account_name:
+            if reg_json['registeringParty'] == account_name:
+                return True
+            sp_names = reg_json['securedParties']
+            if sp_names and account_name in sp_names:
+                return True
+        return False
+
+    @staticmethod
+    def __build_account_collapsed_json(financing_json, registrations_json):
         """Organize account registrations as parent/child financing statement/change registrations."""
         for statement in financing_json:
             changes = []
