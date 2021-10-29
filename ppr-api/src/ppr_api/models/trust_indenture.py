@@ -17,13 +17,11 @@ from __future__ import annotations
 from .db import db
 
 
-TRUST_INDENTURE_YES = 'Y'
-TRUST_INDENTURE_NO = 'N'
-
-
 class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the financing statement trust indenture information."""
 
+    TRUST_INDENTURE_YES = 'Y'
+    TRUST_INDENTURE_NO = 'N'
     __tablename__ = 'trust_indentures'
 
     id = db.Column('id', db.Integer, db.Sequence('trust_id_seq'), primary_key=True)
@@ -83,9 +81,9 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         if registration_id:
             trust_indenture.registration_id = registration_id
         if 'trustIndenture' in json_data and json_data['trustIndenture']:
-            trust_indenture.trust_indenture = TRUST_INDENTURE_YES
+            trust_indenture.trust_indenture = TrustIndenture.TRUST_INDENTURE_YES
         else:
-            trust_indenture.trust_indenture = TRUST_INDENTURE_NO
+            trust_indenture.trust_indenture = TrustIndenture.TRUST_INDENTURE_NO
 
         return [trust_indenture]
 
@@ -95,6 +93,6 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         trust_indenture = TrustIndenture()
         trust_indenture.registration_id = registration_id
         trust_indenture.financing_id = financing_id
-        trust_indenture.trust_indenture = TRUST_INDENTURE_YES
+        trust_indenture.trust_indenture = TrustIndenture.TRUST_INDENTURE_YES
 
         return trust_indenture

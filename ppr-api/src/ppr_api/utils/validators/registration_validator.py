@@ -37,16 +37,17 @@ def validate_collateral_ids(json_data, financing_statement=None):
                 if not existing:
                     error_msg += DELETE_INVALID_ID_VEHICLE.format(str(collateral_id))
 
-    # Check delete general collateral ID's
-    if 'deleteGeneralCollateral' in json_data:
-        for collateral in json_data['deleteGeneralCollateral']:
-            if 'collateralId' not in collateral:
-                error_msg += DELETE_MISSING_ID_GENERAL
-            elif financing_statement:
-                collateral_id = collateral['collateralId']
-                existing = find_general_collateral_by_id(collateral_id, financing_statement.general_collateral)
-                if not existing:
-                    error_msg += DELETE_INVALID_ID_GENERAL.format(str(collateral_id))
+    # Check delete general collateral ID's.
+    # Removed: with th "add only" model the check on delete general collateral ID is no longer required.
+    # if 'deleteGeneralCollateral' in json_data:
+    #    for collateral in json_data['deleteGeneralCollateral']:
+    #        if 'collateralId' not in collateral:
+    #            error_msg += DELETE_MISSING_ID_GENERAL
+    #        elif financing_statement:
+    #            collateral_id = collateral['collateralId']
+    #            existing = find_general_collateral_by_id(collateral_id, financing_statement.general_collateral)
+    #            if not existing:
+    #                error_msg += DELETE_INVALID_ID_GENERAL.format(str(collateral_id))
 
     return error_msg
 
