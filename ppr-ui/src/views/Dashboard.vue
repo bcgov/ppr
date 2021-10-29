@@ -210,7 +210,7 @@ import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames, TableActions } from '@/enums' // eslint-disable-line no-unused-vars
+import { RouteNames, SettingOptions, TableActions } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   BaseHeaderIF, // eslint-disable-line no-unused-vars
@@ -221,7 +221,8 @@ import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, // eslint-disable-line no-unused-vars
-  StateModelIF // eslint-disable-line no-unused-vars
+  StateModelIF, // eslint-disable-line no-unused-vars
+  UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
   registrationTableHeaders,
@@ -250,7 +251,8 @@ import {
   getRegistrationSummary,
   registrationHistory,
   searchHistory,
-  setupFinancingStatementDraft
+  setupFinancingStatementDraft,
+  updateUserSettings
 } from '@/utils'
 // local components
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
@@ -275,6 +277,7 @@ export default class Dashboard extends Vue {
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter getUserSettings: UserSettingsIF
 
   @Action resetNewRegistration: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF
@@ -287,6 +290,7 @@ export default class Dashboard extends Vue {
   @Action setLengthTrust: ActionBindingIF
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setUserSettings: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -327,14 +331,6 @@ export default class Dashboard extends Vue {
     this.setSearchedType(null)
     this.setSearchedValue('')
     this.setSearchResults(null)
-    // set default headers (temporary - this will be changed later to go off of user settings)
-    const headers = []
-    for (let i = 0; i < this.myRegHeadersSelected.length; i++) {
-      if (this.myRegHeadersSelected[i].display) {
-        headers.push(this.myRegHeadersSelected[i])
-      }
-    }
-    this.myRegHeadersSelected = headers
     this.onAppReady(this.appReady)
   }
 
@@ -664,6 +660,19 @@ export default class Dashboard extends Vue {
       this.myRegDataDrafts = parentDrafts
       this.myRegDataHistory = myRegHistory.registrations
     }
+    // update columns selected with user settings
+    if (this.getUserSettings?.[SettingOptions.REGISTRATION_TABLE]?.columns) {
+      this.myRegHeadersSelected = this.getUserSettings[SettingOptions.REGISTRATION_TABLE].columns
+    } else {
+      // set default headers
+      const headers = []
+      for (let i = 0; i < this.myRegHeadersSelected.length; i++) {
+        if (this.myRegHeadersSelected[i].display) {
+          headers.push(this.myRegHeadersSelected[i])
+        }
+      }
+      this.myRegHeadersSelected = headers
+    }
     // tell App that we're finished loading
     this.emitHaveData(true)
   }
@@ -679,15 +688,28 @@ export default class Dashboard extends Vue {
   }
 
   @Watch('myRegHeadersSelected')
-  private updateMyRegHeaders (val: BaseHeaderIF[]): void {
+  private async updateMyRegHeaders (val: BaseHeaderIF[]): Promise<void> {
     const headers = []
     for (let i = 0; i < registrationTableHeaders.length; i++) {
       if (registrationTableHeaders[i].value === 'actions') headers.push(registrationTableHeaders[i])
-      else if (this.myRegHeadersSelected.find(header => header.value === registrationTableHeaders[i].value)) {
+      else if (val.find(header => header.value === registrationTableHeaders[i].value)) {
         headers.push(registrationTableHeaders[i])
       }
     }
     this.myRegHeaders = headers
+    // update settings
+    let settings: UserSettingsIF = await updateUserSettings(
+      SettingOptions.REGISTRATION_TABLE,
+      { columns: val }
+    )
+    if (settings?.error) {
+      // FUTURE: notify failure to save? - just log and continue for now
+      console.error('Failed to save selected columns to user settings.')
+      // save new settings to session (they won't be included in an error response)
+      settings = this.getUserSettings
+      settings[SettingOptions.REGISTRATION_TABLE] = { columns: val }
+    }
+    this.setUserSettings(settings)
   }
 
   @Emit('error')

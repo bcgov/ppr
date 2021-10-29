@@ -516,6 +516,8 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     lastname: '',
     username: '',
     settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
@@ -610,6 +612,8 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     lastname: '',
     username: '',
     settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
@@ -705,6 +709,8 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     lastname: '',
     username: '',
     settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
@@ -799,6 +805,8 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     lastname: '',
     username: '',
     settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }

@@ -17,9 +17,11 @@ import {
   DebtorNameIF,
   RegistrationSummaryIF,
   RenewRegistrationIF,
-  ErrorIF
+  ErrorIF,
+  BaseHeaderIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
+import { SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -190,6 +192,8 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
       return {
         paymentConfirmationDialog: true,
         selectConfirmationDialog: true,
+        defaultDropDowns: true,
+        defaultTableFilters: true,
         error: {
           statusCode:
             error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
@@ -201,8 +205,8 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
 
 // Update user setting
 export async function updateUserSettings (
-  setting: string,
-  settingValue: boolean
+  setting: SettingOptions,
+  settingValue: boolean | { columns: BaseHeaderIF[] }
 ): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
@@ -219,6 +223,8 @@ export async function updateUserSettings (
       return {
         paymentConfirmationDialog: true,
         selectConfirmationDialog: true,
+        defaultDropDowns: true,
+        defaultTableFilters: true,
         error: {
           statusCode:
             error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
