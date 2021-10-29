@@ -32,7 +32,8 @@ export const mockedAmendmentCourtOrder: CourtOrderIF = {
 export const mockedAmendmentCertified: CertifyIF = {
   valid: true,
   certified: true,
-  legalName: 'Certify Name'
+  legalName: 'Authorizing Name',
+  registeringParty: mockedRegisteringParty1
 }
 
 export const mockedGeneralCollateralAdd: GeneralCollateralIF[] = [

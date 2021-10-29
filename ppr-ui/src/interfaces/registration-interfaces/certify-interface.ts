@@ -1,6 +1,9 @@
-// New registration certify check interface.
+import { PartyIF } from '@/interfaces'
+
+// New registration authorizing/certify check interface.
 export interface CertifyIF {
   valid: boolean,
   certified: boolean,
-  legalName: string
+  legalName: string,
+  registeringParty?: PartyIF
 }
