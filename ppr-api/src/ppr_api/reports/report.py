@@ -56,7 +56,7 @@ TO_CHANGE_TYPE_DESCRIPTION = {
     'DR': 'Debtor Release',
     'AR': 'Debtor Release',
     'DT': 'Debtor Transfer',
-    'Ad': 'Debtor Transfer',
+    'AD': 'Debtor Transfer',
     'PD': 'Partial Discharge',
     'AP': 'Partial Discharge',
     'ST': 'Secured Party Transfer',
