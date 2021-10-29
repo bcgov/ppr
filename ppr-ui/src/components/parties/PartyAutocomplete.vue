@@ -56,7 +56,8 @@
                 <v-list-item-subtitle>
                   <v-row :class="$style['auto-complete-row']">
                     <v-col cols="12" :class="$style['title-size']">
-                      No matches found. Check your name or number, or add a Secured party
+                      No matches found. Check your name or number, or add a
+                      {{ partyWord }} party
                       that doesn't have a code.
                     </v-col>
                   </v-row>
@@ -70,10 +71,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from './composables/useSecuredParty'
+import { ActionTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -84,17 +86,30 @@ export default defineComponent({
     setAutoCompleteActive: {
       type: Boolean,
       default: false
+    },
+    setIsRegisteringParty: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
-    const { addSecuredParty } = useSecuredParty(props, context)
+    const { addSecuredParty, setRegisteringParty } = useSecuredParty(props, context)
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
       searchValue: '',
       autoCompleteIsActive: props.setAutoCompleteActive,
       autoCompleteSelected: -1,
       autoCompleteResults: [],
-      resultAdded: []
+      resultAdded: [],
+      isRegisteringParty: computed((): boolean => {
+        return props.setIsRegisteringParty
+      }),
+      partyWord: computed((): string => {
+        if (props.setIsRegisteringParty) {
+          return 'Registering'
+        }
+        return 'Secured'
+      })
     })
 
     const addResult = (party: SearchPartyIF, resultIndex) => {
@@ -107,7 +122,12 @@ export default defineComponent({
         address: party.address,
         personName: { first: '', middle: '', last: '' }
       }
-      addSecuredParty(newParty)
+      if (localState.isRegisteringParty) {
+        newParty.action = ActionTypes.EDITED
+        setRegisteringParty(newParty)
+      } else {
+        addSecuredParty(newParty)
+      }
       context.emit('selectItem')
       closeAutoComplete()
     }

@@ -86,14 +86,6 @@ export const useSecuredParty = (props, context) => {
       resetFormAndData(true)
       return
     }
-    if (localState.partyBusiness === 'I') {
-      localState.currentSecuredParty.businessName = ''
-      // localState.searchValue = ''
-    } else {
-      localState.currentSecuredParty.personName.first = ''
-      localState.currentSecuredParty.personName.middle = ''
-      localState.currentSecuredParty.personName.last = ''
-    }
     // New secured party
     if (props.activeIndex === -1) {
       localState.currentSecuredParty.action = ActionTypes.ADDED
@@ -108,6 +100,13 @@ export const useSecuredParty = (props, context) => {
     parties.securedParties = newList
     setAddSecuredPartiesAndDebtors(parties)
     context.emit('resetEvent')
+  }
+
+  const setRegisteringParty = (registeringParty: PartyIF) => {
+    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    registeringParty.action = ActionTypes.EDITED
+    parties.registeringParty = registeringParty
+    setAddSecuredPartiesAndDebtors(parties)
   }
 
   const addSecuredParty = (newParty: PartyIF) => {
@@ -166,6 +165,7 @@ export const useSecuredParty = (props, context) => {
     isSecuredPartyRestrictedList,
     RegistrationFlowType,
     ActionTypes,
+    setRegisteringParty,
     ...toRefs(localState)
   }
 }

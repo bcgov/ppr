@@ -37,10 +37,16 @@
                 <td class="actions-cell actions-width px-0" v-if="registrationFlowType === RegistrationFlowType.NEW">
                 <div class="actions float-right actions-up">
                   <v-list class="actions__more-actions">
-                    <v-list-item class="v-remove" @click="changeRegisteringParty()">
+                    <v-list-item class="v-remove" v-if="!row.item.action" @click="changeRegisteringParty()">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-pencil</v-icon>
                         <span class="ml-1">Change</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item class="v-remove" v-else @click="undo()">
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-undo</v-icon>
+                        <span class="ml-1">Undo</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -95,14 +101,10 @@ export default defineComponent({
     onMounted(async () => {
       if (parties.registeringParty === null) {
         try {
-          const regParty = await getRegisteringPartyFromAuth()
-          parties.registeringParty = regParty
-          setAddSecuredPartiesAndDebtors(parties)
-          localState.registeringParty = [regParty]
-          context.emit('setRegisteringParty')
+          getRegisteringParty()
         } catch (e) {
           localState.registeringParty = null
-          console.error('RegisteringParty.vue onMounted error: ' + e.message)
+          console.error('RegisteringParty.vue onMounted error: ' + ((e as Error).message))
         }
       } else {
         localState.registeringParty = [parties.registeringParty]
@@ -124,6 +126,19 @@ export default defineComponent({
       context.emit('changeRegisteringParty')
     }
 
+    const undo = async () => {
+      getRegisteringParty()
+    }
+
+    const getRegisteringParty = async () => {
+      var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+      const regParty = await getRegisteringPartyFromAuth()
+      parties.registeringParty = regParty
+      setAddSecuredPartiesAndDebtors(parties)
+      localState.registeringParty = [regParty]
+      context.emit('setRegisteringParty')
+    }
+
     return {
       getName,
       isBusiness,
@@ -131,6 +146,7 @@ export default defineComponent({
       changeRegisteringParty,
       RegistrationFlowType,
       addressSchema,
+      undo,
       ...toRefs(localState)
     }
   }
