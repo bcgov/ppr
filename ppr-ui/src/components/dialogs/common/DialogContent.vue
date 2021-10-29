@@ -11,7 +11,7 @@
       </v-col>
     </v-row>
     <v-row v-if="hasContactInfo" class="pt-5" no-gutters>
-      <v-col cols="auto">
+      <v-col>
         <error-contact />
       </v-col>
     </v-row>
