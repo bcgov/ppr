@@ -103,6 +103,7 @@ import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
+  CertifyIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   AddCollateralIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
@@ -155,6 +156,7 @@ export default class AmendRegistration extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
+  @Action setCertifyInformation: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -263,6 +265,12 @@ export default class AmendRegistration extends Vue {
         effectOfOrder: '',
         orderDate: ''
       }
+      const certifyInfo: CertifyIF = {
+        valid: false,
+        certified: false,
+        legalName: '',
+        registeringParty: null
+      }
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
@@ -278,6 +286,7 @@ export default class AmendRegistration extends Vue {
       this.setAmendmentDescription('')
       this.setCourtOrderInformation(courtOrder)
       this.setFolioOrReferenceNumber('')
+      this.setCertifyInformation(certifyInfo)
       if (this.documentId) {
         const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
         if (stateModel.registration.draft.error) {
