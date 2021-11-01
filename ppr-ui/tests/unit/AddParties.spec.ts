@@ -65,6 +65,11 @@ function createComponent (): Wrapper<any> {
 describe('Add Parties new registration component', () => {
   let wrapper: any
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', null)
@@ -173,4 +178,5 @@ describe('Add Parties new registration component', () => {
       wrapper.destroy()
     }
   })
+
 })
