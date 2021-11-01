@@ -16,7 +16,7 @@
           </v-row>
           <v-row no-gutters class="pt-5">
             <v-col class="text-md-center ml-8">
-              <h1 :class="$style['dialogTitle']">{{ totalParties }} Similar Secured Parties Found</h1>
+              <h1 :class="$style['dialogTitle']">{{ totalParties }} Similar {{ partyWord }} Parties Found</h1>
             </v-col>
           </v-row>
         </v-col>
@@ -31,14 +31,14 @@
 
       <div>
         <p class="text-md-center px-6 pt-3" :class="$style['intro']">
-          One or more similar Secured Parties were found. Do you want to use an
-          existing Secured Party listed below or use your information to create
-          a new Secured Party?
+          One or more similar {{ partyWord }} Parties were found. Do you want to use an
+          existing {{ partyWord }} Party listed below or use your information to create
+          a new {{ partyWord }} Party?
         </p>
       </div>
       <div :class="$style['partyWindow']">
-        <div class="text-md-center generic-label">
-          Use my information and create a new Secured Party:
+        <div class="text-md-center generic-label" id="create-new-party">
+          Use my information and create a new {{ partyWord }} Party:
         </div>
 
         <v-container class="currentParty">
@@ -75,7 +75,7 @@
         </v-container>
 
         <div class="text-md-center generic-label">
-          Use an existing Secured Party:
+          Use an existing {{ partyWord }} Party:
         </div>
         <v-container>
           <v-row
@@ -98,7 +98,7 @@
                 {{ getCountryName(result.address.country) }}
               </div>
               <div :class="$style['addressText']">
-                Secured Party Code: {{ result.code }}
+                {{ partyWord }} Party Code: {{ result.code }}
               </div>
             </v-col>
             <v-col cols="2" class="pt-5"
@@ -133,7 +133,6 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch,
   computed
 } from '@vue/composition-api'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -141,6 +140,7 @@ import { useSecuredParty } from '@/components/parties/composables/useSecuredPart
 import {
   useCountriesProvinces
 } from '@/composables/address/factories'
+import { ActionTypes } from '@/enums'
 
 export default defineComponent({
   props: {
@@ -150,22 +150,38 @@ export default defineComponent({
     },
     defaultResults: {
       type: Array as () => Array<SearchPartyIF>
-    }
+    },
+    defaultIsRegisteringParty: Boolean
   },
   setup (props, context) {
     const localState = reactive({
-      results: props.defaultResults,
-      party: props.defaultParty,
-      dialog: props.defaultDialog,
       showSelected: true,
+      party: computed((): PartyIF => {
+        return props.defaultParty
+      }),
+      dialog: computed((): boolean => {
+        return props.defaultDialog
+      }),
+      isRegisteringParty: computed((): boolean => {
+        return props.defaultIsRegisteringParty
+      }),
+      results: computed((): Array<SearchPartyIF> => {
+        return props.defaultResults
+      }),
       totalParties: computed((): number => {
         return props.defaultResults.length
+      }),
+      partyWord: computed((): string => {
+        if (props.defaultIsRegisteringParty) {
+          return 'Registering'
+        }
+        return 'Secured'
       })
     })
 
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const { addSecuredParty } = useSecuredParty(props, context)
+    const { addSecuredParty, setRegisteringParty } = useSecuredParty(props, context)
 
     const selectParty = (idx: number) => {
       const selectedResult = localState.results[idx]
@@ -175,12 +191,22 @@ export default defineComponent({
         emailAddress: selectedResult.emailAddress,
         code: selectedResult.code
       }
-      addSecuredParty(newParty)
+      if (localState.isRegisteringParty) {
+        newParty.action = ActionTypes.EDITED
+        setRegisteringParty(newParty)
+      } else {
+        addSecuredParty(newParty)
+      }
       context.emit('emitResetClose')
     }
 
     const createParty = () => {
-      addSecuredParty(localState.party)
+      if (localState.isRegisteringParty) {
+        localState.party.action = ActionTypes.EDITED
+        setRegisteringParty(localState.party)
+      } else {
+        addSecuredParty(localState.party)
+      }
       context.emit('emitResetClose')
     }
 
@@ -191,27 +217,6 @@ export default defineComponent({
     const onHover = () => {
       localState.showSelected = false
     }
-
-    watch(
-      () => props.defaultDialog,
-      (val: boolean) => {
-        localState.dialog = val
-      }
-    )
-
-    watch(
-      () => props.defaultParty,
-      (party: PartyIF) => {
-        localState.party = party
-      }
-    )
-
-    watch(
-      () => props.defaultResults,
-      (parties: Array<SearchPartyIF>) => {
-        localState.results = parties
-      }
-    )
 
     return {
       selectParty,

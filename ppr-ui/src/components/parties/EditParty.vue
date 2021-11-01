@@ -5,6 +5,7 @@
       :defaultDialog="toggleDialog"
       :defaultParty="currentSecuredParty"
       :defaultResults="dialogResults"
+      :defaultIsRegisteringParty="isRegisteringParty"
       @emitResetClose="closeAndReset"
       @emitClose="toggleDialog = false"
     />
@@ -23,7 +24,7 @@
               </span>
               <span v-else>Edit</span>
             </span>
-            Secured Party
+            <span v-if="isRegisteringParty"> Registering</span><span v-else> Secured</span> Party
           </label>
         </v-col>
         <v-col cols="9">
@@ -180,6 +181,7 @@
                     large
                     outlined
                     color="error"
+                    v-if="!isRegisteringParty"
                     :disabled="activeIndex === -1"
                     @click="removeSecuredParty()"
                     id="remove-btn-party"
@@ -255,6 +257,10 @@ export default defineComponent({
     invalidSection: {
       type: Boolean,
       default: false
+    },
+    setIsRegisteringParty: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['addEditParty', 'resetEvent'],
@@ -271,6 +277,7 @@ export default defineComponent({
       RegistrationFlowType,
       updateAddress,
       ActionTypes,
+      setRegisteringParty,
       addressSchema
     } = useSecuredParty(props, context)
 
@@ -297,6 +304,9 @@ export default defineComponent({
       showAllAddressErrors: false,
       currentIndex: computed((): number => {
         return props.activeIndex
+      }),
+      isRegisteringParty: computed((): boolean => {
+        return props.setIsRegisteringParty
       })
     })
 
@@ -322,6 +332,15 @@ export default defineComponent({
           currentSecuredParty
         ) === true
       ) {
+        if (partyBusiness.value === 'I') {
+          currentSecuredParty.value.businessName = ''
+          // localState.searchValue = ''
+        } else {
+          currentSecuredParty.value.personName.first = ''
+          currentSecuredParty.value.personName.middle = ''
+          currentSecuredParty.value.personName.last = ''
+        }
+
         if (props.activeIndex === -1) {
           if ((currentSecuredParty.value.businessName) && (partyBusiness.value === 'B')) {
             // go to the service and see if there are similar secured parties
@@ -337,8 +356,12 @@ export default defineComponent({
             }
           }
         }
-
-        addEditSecuredParty()
+        if (localState.isRegisteringParty) {
+          setRegisteringParty(currentSecuredParty.value)
+          context.emit('resetEvent')
+        } else {
+          addEditSecuredParty()
+        }
       } else {
         localState.showAllAddressErrors = true
       }

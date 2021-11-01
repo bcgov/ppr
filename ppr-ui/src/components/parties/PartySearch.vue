@@ -4,7 +4,7 @@
       <v-col cols="6">
         <v-text-field
           filled
-          label="Secured Party Code or Name"
+          :label="isRegisteringParty ? 'Registering Party Code or Name' : 'Secured Party Code or Name'"
           id="txt-code"
           v-model="searchValue"
           persistent-hint
@@ -20,7 +20,7 @@
           :class="{ 'disabled-text': autoCompleteDisabled }"
           @click="goToAddSecuredParty"
           :disabled="autoCompleteDisabled"
-          >Add a Secured Party that doesn't have a code</a
+          >Add a {{ partyWord}} Party that doesn't have a code</a
         >
       </v-col>
     </v-row>
@@ -30,11 +30,16 @@
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
           :setAutoCompleteActive="setAutoCompleteActive"
-          @selectItem="searchValue = ''"
+          :setIsRegisteringParty="isRegisteringParty"
+          @selectItem="selectItem"
         />
       </v-col>
     </v-row>
-    <v-row class="px-6" align="center" v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT">
+    <v-row
+      class="px-6"
+      align="center"
+      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty"
+    >
       <v-col cols="auto" class="pr-0">
         <v-checkbox
           id="add-registering-party"
@@ -79,6 +84,10 @@ export default defineComponent({
     registeringPartyAdded: {
       type: Boolean,
       default: false
+    },
+    setIsRegisteringParty: {
+      type: Boolean,
+      default: false
     }
   },
   emits: [
@@ -96,6 +105,15 @@ export default defineComponent({
       autoCompleteResults: null,
       autoCompleteDisabled: computed((): boolean => {
         return props.isAutoCompleteDisabled
+      }),
+      isRegisteringParty: computed((): boolean => {
+        return props.setIsRegisteringParty
+      }),
+      partyWord: computed((): string => {
+        if (props.setIsRegisteringParty) {
+          return 'Registering'
+        }
+        return 'Secured'
       }),
       setAutoCompleteActive: false,
       registeringPartySelected: false,
@@ -123,6 +141,11 @@ export default defineComponent({
     const closeAutoComplete = () => {
       localState.setAutoCompleteActive = false
       localState.autoCompleteResults = []
+    }
+
+    const selectItem = () => {
+      localState.searchValue = ''
+      context.emit('hideSearch')
     }
 
     const updateAutoCompleteResults = async (searchValue: string) => {
@@ -161,6 +184,7 @@ export default defineComponent({
       closeAutoComplete,
       registrationFlowType,
       RegistrationFlowType,
+      selectItem,
       ...toRefs(localState)
     }
   }

@@ -8,6 +8,11 @@ import { mockedRegisteringParty1 } from './test-data'
 
 // Components
 import { RegisteringParty } from '@/components/parties'
+import { ActionTypes, RegistrationFlowType } from '@/enums'
+import flushPromises from 'flush-promises'
+import sinon from 'sinon'
+import { axios } from '@/utils/axios-ppr'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -82,5 +87,74 @@ describe('RegisteringParty store tests', () => {
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
     
     expect(wrapper.find('.actions-cell').exists()).toBeTruthy()
+  })
+})
+
+
+describe('RegisteringParty store undo test', () => {
+  let wrapper: Wrapper<any>
+  let sandbox
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+
+  beforeEach(async () => {
+
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: 
+      {
+        businessName: 'ABC REGISTERING COMPANY LTD.',
+        address: {
+          street: '1234 Fort St.',
+          streetAdditional: '2nd floor',
+          city: 'Victoria',
+          region: 'BC',
+          country: 'CA',
+          postalCode: 'V8R1L2',
+          deliveryInstructions: ''
+        },
+        action: ActionTypes.EDITED
+      }
+    })
+
+
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    get.returns(
+      new Promise(resolve => resolve({
+        data: {
+          businessName: 'ANOTHER COMPANY',
+        }
+      })))
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+
+
+  it('displays the correct data in the table rows', async () => {
+    
+    
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row')[0]
+
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
+    expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
+    
+    expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
+  })
+
+  it('displays the correct data in the table rows', async () => {
+    let dropButtons = wrapper.findAll('.actions__more-actions .v-remove')
+    expect(dropButtons.length).toBe(1)
+    dropButtons.at(0).trigger('click')
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'setRegisteringParty')).toBe(null)
   })
 })
