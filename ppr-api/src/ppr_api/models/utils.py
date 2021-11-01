@@ -637,7 +637,7 @@ def amendment_change_type(json_data):
     if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
        'addDebtors' not in json_data and 'deleteDebtors' not in json_data:
         if 'addVehicleCollateral' not in json_data and 'addGeneralCollateral' not in json_data and \
-                ('deleteVehicleCollateral' in json_data or 'addGeneralCollateral' in json_data):
+                ('deleteVehicleCollateral' in json_data or 'deleteGeneralCollateral' in json_data):
             change_type = REG_TYPE_AMEND_PARIAL_DISCHARGE
         if ('addVehicleCollateral' in json_data or 'addGeneralCollateral' in json_data) and \
                 'deleteVehicleCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:

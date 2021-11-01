@@ -665,11 +665,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.general_collateral = GeneralCollateral.create_from_statement_json(json_data,
                                                                                            registration_id,
                                                                                            registration.financing_id)
-            # Possibly add a trust indenture
-            if 'addTrustIndenture' in json_data and json_data['addTrustIndenture']:
+            # Possibly add/remove a trust indenture
+            if ('addTrustIndenture' in json_data and json_data['addTrustIndenture']) or \
+                    ('removeTrustIndenture' in json_data and json_data['removeTrustIndenture']):
                 registration.trust_indenture = TrustIndenture.create_from_amendment_json(registration.financing_id,
                                                                                          registration.id)
-
+                if 'removeTrustIndenture' in json_data and json_data['removeTrustIndenture']:
+                    registration.trust_indenture.trust_indenture = TrustIndenture.TRUST_INDENTURE_NO
             # Close out deleted parties and collateral, and trust indenture.
             Registration.delete_from_json(json_data, registration, financing_statement)
 
@@ -756,7 +758,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'removeTrustIndenture' in json_data and json_data['removeTrustIndenture'] and \
                 financing_statement.trust_indenture:
             for trust_indenture in financing_statement.trust_indenture:
-                if not trust_indenture.registration_id_end:
+                if trust_indenture.registration_id != registration.id and not trust_indenture.registration_id_end:
+                    trust_indenture.registration_id_end = registration.id
+        # Could be transitioning with removed with a record to added: close out removed record.
+        elif 'addTrustIndenture' in json_data and json_data['addTrustIndenture'] and \
+                financing_statement.trust_indenture:
+            for trust_indenture in financing_statement.trust_indenture:
+                if trust_indenture.registration_id != registration.id and not trust_indenture.registration_id_end:
                     trust_indenture.registration_id_end = registration.id
 
     @staticmethod

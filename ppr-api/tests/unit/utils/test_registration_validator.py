@@ -110,8 +110,7 @@ AMENDMENT_VALID = {
   ],
   'deleteGeneralCollateral': [
     {
-      'description': 'Fridges and stoves. Proceeds: Accts Receivable.',
-      'collateralId': 123435
+      'description': 'Fridges and stoves. Proceeds: Accts Receivable.'
     }
   ],
   'addGeneralCollateral': [
@@ -222,8 +221,7 @@ AMENDMENT_INVALID = {
 # testdata pattern is ({description}, {registration data}, {valid}, {message contents})
 TEST_COLLATERAL_IDS_DATA = [
     ('Valid collateral IDs', AMENDMENT_VALID, True, None),
-    ('Missing delete vehicle id', AMENDMENT_INVALID, False, validator.DELETE_MISSING_ID_VEHICLE),
-    ('Missing delete general id', AMENDMENT_INVALID, False, validator.DELETE_MISSING_ID_GENERAL)
+    ('Missing delete vehicle id', AMENDMENT_INVALID, False, validator.DELETE_MISSING_ID_VEHICLE)
 ]
 
 
@@ -246,10 +244,7 @@ def test_actual_collateral_ids(session):
     error_msg = validator.validate_collateral_ids(json_data, statement)
     assert error_msg != ''
     assert error_msg.find('Invalid vehicleId') != -1
-    assert error_msg.find('Invalid collateralId') != -1
-
     json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
-    json_data['deleteGeneralCollateral'][0]['collateralId'] = statement.general_collateral[0].id
     error_msg = validator.validate_collateral_ids(json_data, statement)
     if error_msg != '':
         print(error_msg)

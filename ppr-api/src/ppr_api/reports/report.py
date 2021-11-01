@@ -49,15 +49,21 @@ TO_VEHICLE_TYPE_DESCRIPTION = {
 
 # Map from API change/amendment registration change type to report description
 TO_CHANGE_TYPE_DESCRIPTION = {
-    'AC': 'ADDITION OF COLLATERAL / PROCEEDS',
-    'AM': 'AMENDMENT / OTHER CHANGE',
-    'CO': 'COURT ORDER',
-    'DR': 'DEBTOR RELEASE',
-    'DT': 'DEBTOR TRANSFER',
-    'PD': 'PARTIAL DISCHARGE',
-    'ST': 'SECURED PARTY TRANSFER',
-    'SU': 'SUBSTITUTION OF COLLATERAL / PROCEEDS',
-    'RC': 'REGISTRY CORRECTION'
+    'AC': 'Collateral Addition',
+    'AA': 'Collateral Addition',
+    'AM': 'Amendment',
+    'CO': 'Court Order',
+    'DR': 'Debtor Release',
+    'AR': 'Debtor Release',
+    'DT': 'Debtor Transfer',
+    'AD': 'Debtor Transfer',
+    'PD': 'Partial Discharge',
+    'AP': 'Partial Discharge',
+    'ST': 'Secured Party Transfer',
+    'AS': 'Secured Party Transfer',
+    'SU': 'Collateral Substitution',
+    'AU': 'Collateral Substitution',
+    'RC': 'Registry Correction'
 }
 
 
