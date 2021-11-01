@@ -2,19 +2,22 @@
   <v-container :class="[$style['main-results-div'], 'pa-0', 'white']">
     <v-row v-if="historyLength !== 0" no-gutters class="pt-4">
       <v-col cols="12">
-        <v-data-table v-if="searchHistory"
-                      id="search-history-table"
-                      hide-default-footer
-                      fixed
-                      fixed-header
-                      :headers="headers"
-                      height="20rem"
-                      :items="searchHistory"
-                      item-key="searchId"
-                      :items-per-page="-1"
-                      sort-by="searchDateTime"
-                      sort-desc
-                      return-object>
+        <v-data-table
+          v-if="searchHistory"
+          id="search-history-table"
+          hide-default-footer
+          fixed
+          fixed-header
+          :headers="headers"
+          height="20rem"
+          :items="searchHistory"
+          item-key="searchId"
+          :items-per-page="-1"
+          mobile-breakpoint="0"
+          sort-by="searchDateTime"
+          sort-desc
+          return-object
+        >
           <template v-slot:[`item.searchQuery.criteria.value`]="{ item }">
             {{ displaySearchValue(item.searchQuery) }}
           </template>
@@ -32,7 +35,7 @@
               :loading="item.searchId === loadingPDF"
               @click="downloadPDF(item.searchId)"
             >
-              <img src="@/assets/svgs/custom-pdf-icon.svg">
+              <img src="@/assets/svgs/pdf-icon-blue.svg">
               <span class="pl-1">PDF</span>
             </v-btn>
           </template>

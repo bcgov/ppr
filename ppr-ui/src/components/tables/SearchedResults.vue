@@ -1,39 +1,48 @@
 <template>
-  <v-container :class="[$style['main-results-div'], 'pa-0', 'white']">
-    <v-row v-if="searched" no-gutters :class="[$style['result-info'], 'pl-5', 'pt-8']">
-      <v-row v-if="totalResultsLength !== 0" no-gutters>
-        <v-col>
-          <v-row no-gutters>
-            <span :class="[$style['divider'], 'pr-3']"><b>{{ totalResultsLength }}</b> registrations found</span>
-            <span class="pl-3"><b>{{ exactMatchesLength }}</b> exact matches </span>
-          </v-row>
-          <v-row no-gutters class="pt-2">
-            <span> Added to search results report: <b>{{ selectedLength }}</b></span>
-          </v-row>
-        </v-col>
-      </v-row>
+  <v-container class="main-results-div pa-0 white">
+    <v-row v-if="searched" class="result-info pl-5 pt-30px" align="center" no-gutters>
+      <v-col style="padding-right: 30px;" cols="auto">
+        <v-row no-gutters>
+          <v-col class="divider pr-3 mr-3" cols="auto">
+            <b>{{ totalResultsLength }}</b> registrations found
+          </v-col>
+          <v-col class="divider pr-3 mr-3" cols="auto">
+            <b>{{ exactMatchesLength }}</b> exact matches
+          </v-col>
+          <v-col v-if="totalResultsLength !== 0" cols="auto">
+            Registrations added to search result report: <b>{{ selectedLength }}</b>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col align-self="end" style="padding-right: 30px; width: 320px;">
+        <v-btn class="float-right" color="primary" depressed plain @click="console.log('submit')">
+          <img class="pr-1" src="@/assets/svgs/pdf-icon-white.svg">
+          Generate Search Result Report
+        </v-btn>
+      </v-col>
     </v-row>
-    <v-row v-if="totalResultsLength !== 0" no-gutters class="pt-4">
+    <v-row v-if="totalResultsLength !== 0" class="pt-3" no-gutters>
       <v-col cols="12">
-        <v-data-table v-if="results"
-                      id="search-results-table"
-                      :class="$style['results-table']"
-                      fixed
-                      fixed-header
-                      :headers="headers"
-                      height="20rem"
-                      hide-default-footer
-                      :items="results"
-                      :item-class="getClass"
-                      item-key="id"
-                      :items-per-page="-1"
-                      multi-sort
-                      return-object
-                      show-select
-                      @toggle-select-all="selectAll"
-                      v-model="selected">
+        <v-data-table
+          v-if="results"
+          id="search-results-table"
+          class="results-table"
+          disable-sort
+          fixed
+          fixed-header
+          :headers="headers"
+          hide-default-footer
+          :items="results"
+          :item-class="getClass"
+          item-key="id"
+          mobile-breakpoint="0"
+          return-object
+          show-select
+          @toggle-select-all="selectAll"
+          v-model="selected"
+        >
           <template v-slot:[`item.data-table-select`]="{ item, isSelected, select }">
-            <td v-if="isSelected && item.matchType === 'EXACT'" :class="$style['checkbox-info']">
+            <td v-if="isSelected && item.matchType === 'EXACT'" class="checkbox-info">
               <v-row no-gutters>
                 <v-col cols="2">
                   <v-simple-checkbox readonly :ripple="false" :value="isSelected"/>
@@ -43,7 +52,7 @@
                 </v-col>
               </v-row>
             </td>
-            <td v-else :class="$style['checkbox-info']">
+            <td v-else class="checkbox-info">
               <v-row no-gutters>
                 <v-col cols="2">
                   <v-simple-checkbox :ripple="false" :value="isSelected" @click="select(!isSelected)"/>
@@ -81,9 +90,9 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row v-else no-gutters id="search-no-results-info" justify="center" :class="[$style['no-results-info'], 'pt-3']">
+    <v-row v-else id="search-no-results-info" class="no-results-info pt-3" justify="center" no-gutters>
       <v-col cols="auto">
-        <v-row no-gutters justify="center" :class="[$style['no-results-title'], 'pt-10']">
+        <v-row class="no-results-title pt-10" justify="center" no-gutters>
           <b>Nil Result</b>
         </v-row>
         <v-row no-gutters justify="center" class="pt-3 pb-10">
@@ -97,7 +106,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, useCssModule, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
 import { searchTableHeaders } from '@/resources'
@@ -118,7 +127,6 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const style = useCssModule()
     const { getSearchResults } = useGetters<any>(['getSearchResults'])
     const localState = reactive({
       searched: false,
@@ -165,10 +173,8 @@ export default defineComponent({
       return convertDate(date, false, false)
     }
     const getClass = (item:SearchResultIF):string => {
-      if (item.matchType === MatchTypes.EXACT) {
-        return style['exact-match']
-      }
-      return style['normal-match']
+      if (item.matchType === MatchTypes.EXACT) return 'exact-match'
+      return 'normal-match'
     }
     const selectAll = (props: { items:Array<SearchResultIF>, value:boolean }):void => {
       // ensures exact matches are never deselected
@@ -207,23 +213,24 @@ export default defineComponent({
       ...toRefs(localState),
       displayDate,
       getClass,
-      selectAll,
-      style
+      selectAll
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-th {
-  font-size: 0.875rem !important;
-  color: $gray9 !important;
+button {
+  font-weight: normal !important;
 }
 td {
   font-size: 0.875rem !important;
   color: $gray7 !important;
-  min-width: 9rem;
+}
+th {
+  font-size: 0.875rem !important;
+  color: $gray9 !important;
 }
 .checkbox-info {
   font-size: 0.725rem !important;
@@ -231,7 +238,7 @@ td {
   text-align: center;
 }
 .divider {
-  border-right:1px solid $gray3;
+  border-right: 1px solid $gray3;
 }
 .exact-match td {
   background-color: $blueSelected;
@@ -244,15 +251,36 @@ td {
 .main-results-div {
   width: 100%;
 }
-.result-info {
-  color: $gray7 !important;
-  font-size: 1rem;
-}
 .no-results-info {
   color: $gray9 !important;
   font-size: 0.825rem;
 }
 .no-results-title {
   font-size: 1rem;
+}
+.result-info {
+  color: $gray7 !important;
+  font-size: 1rem;
+}
+::v-deep .results-table .v-data-table__wrapper {
+  max-height: 550px;
+}
+::v-deep .results-table .v-data-table__wrapper table tbody {
+  tr {
+    height: 54px;
+  }
+
+  tr:not(.v-data-table__selected)::before,
+  tr:not(.v-data-table__selected)::after,
+  tr:not(.v-data-table__selected):hover {
+    // $gray1 at 75%
+    background-color: #f1f3f5BF !important;
+  }
+
+  tr.v-data-table__selected::before,
+  tr.v-data-table__selected::after,
+  tr.v-data-table__selected:hover {
+    background-color: #E4EDF7 !important;
+  }
 }
 </style>

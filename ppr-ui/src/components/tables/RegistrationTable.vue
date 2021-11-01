@@ -26,6 +26,7 @@
       hide-default-header
       :items="tableData"
       item-key="baseRegistrationNumber"
+      mobile-breakpoint="0"
       :no-data-text="tableFiltersActive ? 'No registrations found.' : 'No registrations created yet.'"
       :sort-desc="[false, true]"
     >
