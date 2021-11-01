@@ -61,6 +61,11 @@
             :setShowErrors="showErrors"
             @valid="validConfirm = $event"
           />
+          <certify-information
+            @certifyValid="validCertify = $event"
+            :setShowErrors="showErrors"
+            class="pt-10"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -95,6 +100,7 @@ import {
   CautionBox,
   DischargeConfirmSummary,
   FolioNumberSummary,
+  CertifyInformation,
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -123,6 +129,7 @@ import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } fro
     DischargeConfirmSummary,
     FolioNumberSummary,
     RegisteringPartySummary,
+    CertifyInformation,
     StickyContainer
   }
 })
@@ -158,6 +165,7 @@ export default class ConfirmDischarge extends Vue {
     'can be changed by updating your BC Registries account information.'
   private validConfirm = false // eslint-disable-line lines-between-class-members
   private validFolio = true
+  private validCertify = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -275,7 +283,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submitDischarge (): Promise<void> {
-    if (!this.validConfirm || !this.validFolio) {
+    if ((!this.validConfirm) || (!this.validFolio) || (!this.validCertify)) {
       this.showErrors = true
       return
     }

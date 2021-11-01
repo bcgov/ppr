@@ -49,6 +49,11 @@
             :setShowErrors="showErrors"
             class="pt-10"
           />
+          <certify-information
+            @certifyValid="validCertify = $event"
+            :setShowErrors="showErrors"
+            class="pt-10"
+          />
         </v-col>
         <v-col class="pl-6" cols="3">
           <sticky-container
@@ -82,6 +87,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
   FolioNumberSummary,
+  CertifyInformation,
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -113,6 +119,7 @@ import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from 
     FolioNumberSummary,
     RegisteringPartySummary,
     RegistrationLengthTrustSummary,
+    CertifyInformation,
     StickyContainer
   }
 })
@@ -147,6 +154,7 @@ export default class ConfirmDischarge extends Vue {
     'can be changed by updating your BC Registries account information.'
 
   private validFolio = true
+  private validCertify = false
   private feeType = FeeSummaryTypes.RENEW
 
   private get asOfDateTime (): string {
@@ -272,7 +280,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submitRenewal (): Promise<void> {
-    if (!this.validFolio) {
+    if ((!this.validFolio) || (!this.validCertify)) {
       this.showErrors = true
       return
     }

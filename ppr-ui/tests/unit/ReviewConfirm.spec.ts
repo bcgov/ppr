@@ -8,7 +8,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
 // Local Components
-import { ButtonFooter, FolioNumberSummary, Stepper, StickyContainer } from '@/components/common'
+import { ButtonFooter, FolioNumberSummary, Stepper, StickyContainer, CertifyInformation } from '@/components/common'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
@@ -67,6 +67,11 @@ function createComponent (): Wrapper<any> {
 describe('Review Confirm new registration component', () => {
   let wrapper: any
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', null)
@@ -112,6 +117,7 @@ describe('Review Confirm new registration component', () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(Collateral).vm.$props.isSummary).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
     expect(wrapper.find(header).exists()).toBe(true)
     expect(wrapper.find(title).exists()).toBe(true)
     expect(wrapper.find(titleInfo).exists()).toBe(true)

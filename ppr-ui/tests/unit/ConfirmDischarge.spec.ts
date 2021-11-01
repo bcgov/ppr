@@ -12,6 +12,7 @@ import {
   CautionBox,
   DischargeConfirmSummary,
   FolioNumberSummary,
+  CertifyInformation,
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -107,6 +108,8 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     // dialog
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    // certify
+    expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
   })
 
   it('processes back button action', async () => {
@@ -137,6 +140,12 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.vm.$data.validConfirm).toBe(true)
   })
 
+  it('updates validity from certify', async () => {
+    expect(wrapper.vm.$data.validCertify).toBe(false)
+    await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
+    expect(wrapper.vm.$data.validCertify).toBe(true)
+  })
+
   it('shows validation errors when needed when submitting', async () => {
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
@@ -159,6 +168,7 @@ describe('ConfirmDischarge registration view', () => {
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
 
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
+    await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)

@@ -10,7 +10,7 @@ import { mockedFinancingStatementAll, mockedDebtorNames, mockedRenewalResponse }
 
 // Components
 import { ConfirmRenewal } from '@/views'
-import { FolioNumberSummary, StickyContainer } from '@/components/common'
+import { FolioNumberSummary, StickyContainer, CertifyInformation } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 
@@ -96,6 +96,8 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // dialog
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    // certify
+    expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
   })
 
   it('allows back to previous page', async () => {
@@ -127,7 +129,11 @@ describe('Confirm Renewal new registration component', () => {
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
+    
+    await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
+    await Vue.nextTick()
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    await Vue.nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })

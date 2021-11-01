@@ -93,6 +93,10 @@ export default defineComponent({
     currentStepName: {
       type: String,
       default: 'length-trust'
+    },
+    certifyValid: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -103,6 +107,9 @@ export default defineComponent({
     const localState = reactive({
       statementType: props.currentStatementType,
       stepName: props.currentStepName,
+      isCertifyValid: computed((): boolean => {
+        return props.certifyValid
+      }),
       buttonConfig: computed(
         (): ButtonConfigIF => {
           if (
@@ -184,7 +191,8 @@ export default defineComponent({
       if (
         stateModel.registration.lengthTrust.valid &&
         stateModel.registration.parties.valid &&
-        stateModel.registration.collateral.valid
+        stateModel.registration.collateral.valid &&
+        localState.isCertifyValid
       ) {
         // API call here
         const apiResponse: FinancingStatementIF = await saveFinancingStatement(stateModel)
