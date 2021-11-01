@@ -133,6 +133,7 @@ export default defineComponent({
     const getRegisteringParty = async () => {
       var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
       const regParty = await getRegisteringPartyFromAuth()
+      console.log(regParty)
       parties.registeringParty = regParty
       setAddSecuredPartiesAndDebtors(parties)
       localState.registeringParty = [regParty]

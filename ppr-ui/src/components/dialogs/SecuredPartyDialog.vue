@@ -37,7 +37,7 @@
         </p>
       </div>
       <div :class="$style['partyWindow']">
-        <div class="text-md-center generic-label">
+        <div class="text-md-center generic-label" id="create-new-party">
           Use my information and create a new {{ partyWord }} Party:
         </div>
 

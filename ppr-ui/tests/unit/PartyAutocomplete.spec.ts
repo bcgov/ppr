@@ -77,3 +77,24 @@ describe('Secured Party search autocomplete tests', () => {
     expect(wrapper.emitted().selectItem).toBeTruthy()
   })
 })
+
+
+describe('Registering Party search autocomplete tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    wrapper = createComponent([])
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('shows the auto complete drop down when searching for a party', async () => {
+    wrapper.vm.$props.setIsRegisteringParty = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#no-party-matches').text()).toContain('No matches found')
+    expect(wrapper.find('#no-party-matches').text()).toContain('Registering party')
+  })
+
+})

@@ -55,7 +55,7 @@
               <v-list-item-content class="pt-2 pb-2">
                 <v-list-item-subtitle>
                   <v-row :class="$style['auto-complete-row']">
-                    <v-col cols="12" :class="$style['title-size']">
+                    <v-col cols="12" :class="$style['title-size']" id="no-party-matches">
                       No matches found. Check your name or number, or add a
                       {{ partyWord }} party
                       that doesn't have a code.

@@ -5,7 +5,7 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import { mockedSecuredParties1, mockedSecuredParties2 } from './test-data'
+import { mockedRegisteringParty1, mockedSecuredParties1, mockedSecuredParties2 } from './test-data'
 import { axios as pprAxios } from '@/utils/axios-ppr'
 import sinon from 'sinon'
 
@@ -177,4 +177,29 @@ describe('Secured Party edit individual tests', () => {
     await Vue.nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
   })
+})
+
+
+describe('Registering party test', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: mockedRegisteringParty1
+    })
+    wrapper = createComponent(-1, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders registering party when editing', async () => {
+    expect(wrapper.findComponent(EditParty).exists()).toBe(true)
+    wrapper.vm.$props.setIsRegisteringParty = true
+    await Vue.nextTick()
+    expect(wrapper.find('.add-party-header').text()).toContain('Registering')
+
+  })
+
+ 
 })
