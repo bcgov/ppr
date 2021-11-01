@@ -381,12 +381,15 @@ export default class ConfirmAmendment extends Vue {
 
   private get courtOrderValid (): boolean {
     const courtOrder: CourtOrderIF = this.getCourtOrderInformation
-    return (!courtOrder ||
-            (courtOrder.courtName.length > 0 &&
-            courtOrder.courtRegistry.length > 0 &&
-            courtOrder.fileNumber.length > 0 &&
-            courtOrder.orderDate.length > 0 &&
-            courtOrder.effectOfOrder.length > 0))
+    if ((courtOrder.courtName) || (courtOrder.courtRegistry) ||
+          (courtOrder.fileNumber) || (courtOrder.orderDate) || (courtOrder.effectOfOrder)) {
+      return ((courtOrder.courtName.length > 0 &&
+              courtOrder.courtRegistry.length > 0 &&
+              courtOrder.fileNumber.length > 0 &&
+              courtOrder.orderDate.length > 0 &&
+              courtOrder.effectOfOrder.length > 0))
+    }
+    return true
   }
 
   private get certifyInformationValid (): boolean {
