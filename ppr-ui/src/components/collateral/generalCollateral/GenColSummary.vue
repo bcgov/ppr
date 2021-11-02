@@ -1,5 +1,10 @@
 <template>
   <v-container class="pa-0">
+    <v-row no-gutters v-if="showConfirm">
+      <v-col cols="10">
+        <h3 style="line-height: 1rem;">General Collateral</h3>
+      </v-col>
+    </v-row>
     <v-row no-gutters v-if="showAmendLink">
       <v-col cols="10">
         <h3 style="line-height: 1rem;">General Collateral</h3>
@@ -73,7 +78,7 @@
     </v-row>
     <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
               && lastGeneralCollateral
-              && showAmendLink
+              && (!showAmendLink || showConfirm)
               && !lastGeneralCollateral.addedDateTime"
               class="pa-0"
               :class="{'ps-6': !showViewLink}">
@@ -181,6 +186,10 @@ export default defineComponent({
     setShowViewLink: {
       type: Boolean,
       default: true
+    },
+    setShowConfirm: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -234,6 +243,9 @@ export default defineComponent({
       }),
       showViewLink: computed((): boolean => {
         return props.setShowViewLink
+      }),
+      showConfirm: computed((): boolean => {
+        return props.setShowConfirm
       })
     })
 
