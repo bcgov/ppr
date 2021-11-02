@@ -28,7 +28,7 @@
           </v-btn>
         </v-col>
         <v-col style="padding-top: 2px;">
-          <p v-if="isDraft(item)" class="ma-0 pl-9">Pending</p>
+          <p v-if="isDraft(item)" :class="{ 'ma-0': true, 'pl-9': isChild }">Pending</p>
           <div v-else-if="isChild" class="pl-9">
             <p class="ma-0">{{ item.registrationNumber }}</p>
             <p class="ma-0" style="font-size: 0.75rem !important;">
@@ -176,7 +176,7 @@
           </v-btn>
         </v-col>
         <v-col class="actions__more pa-0">
-          <v-menu offset-y left nudge-bottom="4">
+          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
             <template v-slot:activator="{ on: onMenu }">
               <v-btn
                 small
@@ -276,7 +276,7 @@ export default defineComponent({
     setIsExpanded: { default: false },
     setItem: { default: {} as (RegistrationSummaryIF | DraftResultIF) }
   },
-  emits: ['action', 'error', 'toggleExpand'],
+  emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
     const {
       getFormattedDate,
@@ -374,6 +374,10 @@ export default defineComponent({
       return Math.floor(diff / oneDay)
     }
 
+    const freezeScrolling = (isMenuOpen: boolean) => {
+      emit('freezeScroll', isMenuOpen)
+    }
+
     const handleAction = (item: RegistrationSummaryIF, action: TableActions): void => {
       emit('action', { action: action, regNum: item.baseRegistrationNumber })
     }
@@ -401,7 +405,7 @@ export default defineComponent({
 
     const showExpireDays = (item: RegistrationSummaryIF): string => {
       if (localState.isChild) return ''
-      if (isExpired(item) || isDischarged(item)) return '&nbsp;-'
+      if (isExpired(item) || isDischarged(item)) return '—'
 
       const days = item.expireDays
       if (!days) {
@@ -466,6 +470,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      freezeScrolling,
       getFormattedDate,
       getRegistrationType,
       getStatusDescription,

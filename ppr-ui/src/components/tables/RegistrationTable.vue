@@ -11,19 +11,22 @@
     <v-data-table
       v-if="!loadingData"
       id="registration-table"
-      class="registration-table"
-      :class="{ 'full-width': headers.length <= 1 }"
+      :class="{
+        'freeze-scroll': freezeTableScroll,
+        'full-width': headers.length <= 1,
+        'registration-table': true
+      }"
       disable-pagination
       disable-sort
       :expanded.sync="expanded"
       fixed-header
       :headers="headers"
-      height="620px"
+      height="100%"
       hide-default-footer
       hide-default-header
       :items="tableData"
       item-key="baseRegistrationNumber"
-      no-data-text="No registrations created yet."
+      :no-data-text="tableFiltersActive ? 'No registrations found.' : 'No registrations created yet.'"
       :sort-desc="[false, true]"
     >
       <template v-slot:header="{ props }">
@@ -166,7 +169,7 @@
                     dense
                   />
                   <v-btn
-                    v-if="header.value === 'actions' && headers.length > 1 && showClearBtn"
+                    v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
                     :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pl-6', 'pt-4']"
                     color="primary"
                     text
@@ -196,6 +199,7 @@
           :setIsExpanded="isExpanded"
           :setItem="item"
           @action="emitRowAction($event)"
+          @freezeScroll="freezeTableScroll = $event"
           @toggleExpand="item.expand = !isExpanded, expand(!isExpanded)"
         />
       </template>
@@ -207,6 +211,7 @@
           :setHeaders="headers"
           :setItem="change"
           @action="emitRowAction($event)"
+          @freezeScroll="freezeTableScroll"
         />
       </template>
     </v-data-table>
@@ -319,6 +324,7 @@ export default defineComponent({
     const localState = reactive({
       currentOrder: 'asc',
       expanded: [],
+      freezeTableScroll: false,
       loadingPDF: '',
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       selectedSort: 'createDateTime',
@@ -341,7 +347,7 @@ export default defineComponent({
       }),
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
-      showClearBtn: computed((): boolean => {
+      tableFiltersActive: computed((): boolean => {
         if (
           dateTxt.value || registrationNumber.value || registrationType.value ||
           status.value || registeredBy.value || registeringParty.value ||
@@ -465,21 +471,6 @@ export default defineComponent({
   background-color: transparent !important;
   height: 1rem !important;
   min-width: 0 !important;
-}
-.date-selection {
-  border-radius: 5px;
-  z-index: 10;
-  left: 50%;
-  margin-top: 140px;
-  overflow: auto;
-  padding: 24px 34px 24px 34px;
-  position: absolute;
-  transform: translate(-50%, 0);
-  background-color: white;
-  width: 700px;
-  td {
-    padding: 0;
-  }
 }
 .pdf-btn {
   background-color: transparent !important;

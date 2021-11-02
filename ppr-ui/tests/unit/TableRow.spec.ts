@@ -145,7 +145,7 @@ describe('TableRow tests', () => {
           expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
           // expire days
           if ([APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
-            expect(rowData.at(8).text()).toContain('-')
+            expect(rowData.at(8).text()).toContain('—')
           } else {
             expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays(baseReg))
           }

@@ -530,6 +530,10 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   background-color: #f1f3f5;
 }
 
+#registration-table.freeze-scroll .v-data-table__wrapper {
+  overflow-y: hidden;
+}
+
 #registration-table.v-data-table > .v-data-table__wrapper div.registrationTypeAhead {
   font-size: 0.875rem;
   .v-input__slot {

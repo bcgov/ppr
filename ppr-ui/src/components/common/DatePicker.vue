@@ -20,14 +20,14 @@
       <v-col cols="6">
         <v-date-picker
           color="primary"
-          :max="endDate"
+          :max="endDate ? endDate : today"
           v-model="startDate"
         />
       </v-col>
       <v-col cols="6">
         <v-date-picker
           color="primary"
-          :min="startDate"
+          :min="startDate ? startDate : null"
           :max="today"
           v-model="endDate"
         />
@@ -79,20 +79,37 @@ export default defineComponent({
       datePickerErr: false,
       endDate: null,
       startDate: null,
+      defaultMonth: computed(() => {
+        const todayDate = new Date()
+        return todayDate.toISOString().substring(0, 8)
+      }),
       today: computed(() => {
         const todayDate = new Date()
         return todayDate.toISOString().substring(0, 10)
       })
     })
     const emitDateRange = (): void => {
-      emit(
-        'submit',
-        { endDate: localState.endDate, startDate: localState.startDate }
-      )
+      if (
+        localState.startDate === localState.defaultMonth ||
+        localState.endDate === localState.defaultMonth
+      ) {
+        emit('submit', { endDate: null, startDate: null })
+      } else {
+        emit(
+          'submit',
+          { endDate: localState.endDate, startDate: localState.startDate }
+        )
+      }
     }
     const resetDateRange = (): void => {
-      localState.endDate = null
-      localState.startDate = null
+      // reset dates by setting year/month with no day (defaults back to current month)
+      localState.endDate = localState.defaultMonth
+      localState.startDate = localState.defaultMonth
+      // set to null after to clear
+      setTimeout(() => {
+        localState.endDate = null
+        localState.startDate = null
+      }, 10)
       localState.datePickerErr = false
       emitDateRange()
     }
@@ -106,10 +123,20 @@ export default defineComponent({
     }
 
     watch(() => props.setEndDate, (val) => {
-      localState.endDate = val
+      if (!val) {
+        localState.endDate = localState.defaultMonth
+        setTimeout(() => {
+          localState.endDate = null
+        }, 10)
+      } else localState.endDate = val
     })
     watch(() => props.setStartDate, (val) => {
-      localState.startDate = val
+      if (!val) {
+        localState.startDate = localState.defaultMonth
+        setTimeout(() => {
+          localState.startDate = null
+        }, 10)
+      } else localState.startDate = val
     })
 
     return {
@@ -128,7 +155,7 @@ export default defineComponent({
   border-radius: 5px;
   z-index: 10;
   left: 50%;
-  margin-top: 140px;
+  margin-top: 120px;
   overflow: auto;
   padding: 24px 34px 24px 34px;
   position: absolute;
