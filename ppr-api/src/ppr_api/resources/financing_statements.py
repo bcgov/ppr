@@ -149,7 +149,8 @@ class GetFinancingResource(Resource):
                                                                        account_id,
                                                                        is_staff(jwt))
             # Extra check account name matches either registering party or a secured party name.
-            resource_utils.check_access_financing(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
+            if resource_utils.is_pdf(request):
+                resource_utils.check_access_financing(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
 
             # Set to false to exclude change history.
             statement.include_changes_json = False
@@ -273,9 +274,11 @@ class GetAmendmentResource(Resource):
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
-            # Extra check account name matches either registering party or a secured party name.
-            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
-
+            # If requesting a verification statement report, check the account name matches either
+            # the registering party or a secured party name.
+            if resource_utils.is_pdf(request):
+                resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id,
+                                                         statement)
             response_json = statement.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
@@ -383,9 +386,11 @@ class GetChangeResource(Resource):
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
-            # Extra check account name matches either registering party or a secured party name.
-            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
-
+            # If requesting a verification statement report, check the account name matches either
+            # the registering party or a secured party name.
+            if resource_utils.is_pdf(request):
+                resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id,
+                                                         statement)
             response_json = statement.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
@@ -490,9 +495,11 @@ class GetRenewalResource(Resource):
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
-            # Extra check account name matches either registering party or a secured party name.
-            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
-
+            # If requesting a verification statement report, check the account name matches either
+            # the registering party or a secured party name.
+            if resource_utils.is_pdf(request):
+                resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id,
+                                                         statement)
             response_json = statement.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
@@ -599,9 +606,11 @@ class GetDischargeResource(Resource):
                                                                  account_id,
                                                                  is_staff(jwt),
                                                                  registration_num)
-            # Extra check account name matches either registering party or a secured party name.
-            resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id, statement)
-
+            # If requesting a verification statement report, check the account name matches either
+            # the registering party or a secured party name.
+            if resource_utils.is_pdf(request):
+                resource_utils.check_access_registration(jwt.get_token_auth_header(), is_staff(jwt), account_id,
+                                                         statement)
             response_json = statement.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.

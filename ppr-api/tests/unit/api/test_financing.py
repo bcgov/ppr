@@ -27,7 +27,7 @@ from ppr_api.resources.financing_statements import get_payment_details, get_paym
      get_payment_type_financing
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
 from ppr_api.services.payment.payment import TransactionTypes
-from tests.unit.services.utils import create_header, create_header_account
+from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
@@ -334,7 +334,8 @@ TEST_GET_STATEMENT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0001'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021'),
-    ('Unauthorized Request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019'),
+    ('Valid Request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019'),
+    ('Report unauthorized request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX'),
     ('Invalid expired non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0013'),
     ('Invalid discharged non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0014'),
@@ -527,7 +528,9 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
-    if has_account:
+    if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
+        headers = create_header_account_report(jwt, roles)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)

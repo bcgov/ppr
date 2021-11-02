@@ -24,7 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
-from tests.unit.services.utils import create_header, create_header_account
+from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
@@ -164,7 +164,8 @@ TEST_GET_STATEMENT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0D14', 'TEST0014'),
     ('Valid Request', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021DC', 'TEST0021'),
-    ('Unauthorized Request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019DC', 'TEST0019'),
+    ('Valid Request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019DC', 'TEST0019'),
+    ('Report unauthorized request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019DC', 'TEST0019'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0014'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0D14', 'TEST0001'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0001'),
@@ -198,7 +199,9 @@ def test_get_discharge(session, client, jwt, desc, roles, status, has_account, r
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
-    if has_account:
+    if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
+        headers = create_header_account_report(jwt, roles)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
