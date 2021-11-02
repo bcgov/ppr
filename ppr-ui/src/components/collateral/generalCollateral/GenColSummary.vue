@@ -78,7 +78,7 @@
     </v-row>
     <div v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
               && lastGeneralCollateral
-              && (!showAmendLink || showConfirm)
+              && (showAmendLink || showConfirm)
               && !lastGeneralCollateral.addedDateTime"
               class="pa-0"
               :class="{'ps-6': !showViewLink}">
