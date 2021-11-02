@@ -375,7 +375,6 @@ export default defineComponent({
     }
 
     const freezeScrolling = (isMenuOpen: boolean) => {
-      console.log(isMenuOpen)
       emit('freezeScroll', isMenuOpen)
     }
 
