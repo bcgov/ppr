@@ -48,6 +48,13 @@ def create_header(jwt_manager, roles: List[str] = [], username: str = 'test-user
     return headers
 
 
+def create_header_report(jwt_manager, roles: List[str] = [], username: str = 'test-user', **kwargs):
+    """Return a header containing a JWT bearer token."""
+    token = helper_create_jwt(jwt_manager, roles=roles, username=username)
+    headers = {**kwargs, **{'Authorization': 'Bearer ' + token}, **{'Accept': 'application/pdf'}}
+    return headers
+
+
 def create_header_account(jwt_manager,
                           roles: List[str] = [],
                           username: str = 'test-user',
@@ -55,4 +62,15 @@ def create_header_account(jwt_manager,
     """Return a header containing a JWT bearer token and an account ID."""
     token = helper_create_jwt(jwt_manager, roles=roles, username=username)
     headers = {**kwargs, **{'Authorization': 'Bearer ' + token}, **{'Account-Id': account_id}}
+    return headers
+
+
+def create_header_account_report(jwt_manager,
+                                 roles: List[str] = [],
+                                 username: str = 'test-user',
+                                 account_id: str = 'PS12345', **kwargs):
+    """Return a header containing a JWT bearer token and an account ID."""
+    token = helper_create_jwt(jwt_manager, roles=roles, username=username)
+    headers = {**kwargs, **{'Authorization': 'Bearer ' + token},
+               **{'Account-Id': account_id}, **{'Accept': 'application/pdf'}}
     return headers

@@ -245,7 +245,12 @@ def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_
         assert statement['statusType']
         assert statement['createDateTime']
         assert statement['lastUpdateDateTime']
-        assert statement['registeringName']
+        if statement['registrationNumber'] == ('TEST0016'):
+            assert statement['registeringName'] == ''
+            assert statement['clientReferenceId'] == ''
+        else:
+            assert statement['registeringName']
+            assert statement['clientReferenceId']
         if statement['registrationNumber'] in ('TEST0019'):
             assert not statement['path']
         elif 'baseRegistrationNumber' in statement and statement['baseRegistrationNumber'] == 'TEST0019':

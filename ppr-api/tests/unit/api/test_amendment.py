@@ -25,7 +25,7 @@ from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, FINANCING_STA
 
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
 from ppr_api.models import utils as model_utils
-from tests.unit.services.utils import create_header, create_header_account
+from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
@@ -257,7 +257,8 @@ TEST_GET_STATEMENT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0007', 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021AM', 'TEST0021'),
-    ('Unauthorized Request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019AM', 'TEST0019'),
+    ('Valid Request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019AM', 'TEST0019'),
+    ('Report unauthorized request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019AM', 'TEST0019'),
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0001'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0007', 'TEST0002'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0002'),
@@ -301,7 +302,9 @@ def test_get_amendment(session, client, jwt, desc, roles, status, has_account, r
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
-    if has_account:
+    if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
+        headers = create_header_account_report(jwt, roles)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)

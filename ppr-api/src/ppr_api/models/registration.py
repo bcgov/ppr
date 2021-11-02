@@ -453,6 +453,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         # Set if user can access verification statement.
                         if not Registration.can_access_report(account_id, account_name, result):
                             result['path'] = ''
+                        result = Registration.__update_summary_optional(result)
 
                         if collapse and not model_utils.is_financing(reg_class):
                             registrations_json.append(result)
@@ -479,9 +480,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                 reg_num = str(mapping['registration_number'])
                 base_reg_num = str(mapping['base_reg_number'])
-                registering_name = str(mapping['registering_name'])
-                if not registering_name:
-                    registering_name = ''
                 reg_class = str(mapping['registration_type_cl'])
                 result = {
                     'registrationNumber': reg_num,
@@ -493,7 +491,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     'registeringParty': str(mapping['registering_party']),
                     'securedParties': str(mapping['secured_party']),
                     'clientReferenceId': str(mapping['client_reference_id']),
-                    'registeringName': registering_name
+                    'registeringName': str(mapping['registering_name'])
                 }
                 if model_utils.is_financing(reg_class):
                     result['baseRegistrationNumber'] = reg_num
@@ -524,6 +522,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                     result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
+                result = Registration.__update_summary_optional(result)
                 if not model_utils.is_financing(reg_class):
                     changes.append(result)
         if result and changes:
@@ -544,6 +543,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             if sp_names and account_name in sp_names:
                 return True
         return False
+
+    @staticmethod
+    def __update_summary_optional(reg_json):
+        """Single summary result replace optional property 'None' with ''."""
+        if not reg_json['registeringName'] or reg_json['registeringName'].lower() == 'none':
+            reg_json['registeringName'] = ''
+        if not reg_json['clientReferenceId'] or reg_json['clientReferenceId'].lower() == 'none':
+            reg_json['clientReferenceId'] = ''
+        return reg_json
 
     @staticmethod
     def __build_account_collapsed_json(financing_json, registrations_json):

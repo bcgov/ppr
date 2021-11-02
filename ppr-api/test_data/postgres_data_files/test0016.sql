@@ -9,10 +9,10 @@ INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, 
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
-                         surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
+                         surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path, user_id)
     VALUES(200000018, 200000010, 'TEST0016', null, 'SA', 'PPSALIEN', 
            timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 200000021, 5,
-           null, null, 'PS12345', 'TEST-SA-0016', null, null)
+           null, null, 'PS12345', null, null, null, 'INVALID')
 ;
 INSERT INTO trust_indentures(id, registration_id, financing_id, trust_indenture, registration_id_end)
   VALUES(200000008, 200000018, 200000010, 'Y', null)
