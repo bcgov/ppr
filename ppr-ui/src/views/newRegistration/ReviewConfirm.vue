@@ -59,6 +59,19 @@
                 </v-row>
               </v-container>
             </v-row>
+            <v-row no-gutters>
+              <v-container fluid class="ps-1 pt-8">
+                <v-row no-gutters class='pt-1'>
+                  <v-col>
+                    <certify-information
+                      @certifyValid="validCertify = $event"
+                      :setShowErrors="showStepErrors"
+                      class="pt-10"
+                    />
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <sticky-container
@@ -76,6 +89,7 @@
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
                        :router="this.$router"
+                       :certifyValid="validCertify"
                        @draft-save-error="saveDraftError"
                        @registration-incomplete="registrationIncomplete"
                        @error="emitError" />
@@ -100,7 +114,7 @@ import {
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { getFeatureFlag } from '@/utils'
 // local components
-import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
+import { ButtonFooter, Stepper, StickyContainer, CertifyInformation } from '@/components/common'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
@@ -114,6 +128,7 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
     Parties,
     RegistrationLengthTrustSummary,
     Stepper,
+    CertifyInformation,
     StickyContainer
   }
 })
@@ -142,6 +157,7 @@ export default class ReviewConfirm extends Vue {
   private showStepErrors: boolean = false
   private statementType = StatementTypes.FINANCING_STATEMENT
   private stepName = RouteNames.REVIEW_CONFIRM
+  private validCertify = false
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
