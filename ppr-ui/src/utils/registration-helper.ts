@@ -152,6 +152,9 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
       courtOrder.fileNumber !== '' && courtOrder.effectOfOrder !== '' && courtOrder.orderDate !== '') {
     statement.changeType = APIAmendmentTypes.COURT_ORDER
     statement.courtOrderInformation = stateModel.registration.courtOrderInformation
+    if (statement.courtOrderInformation.orderDate.length === 10) {
+      statement.courtOrderInformation.orderDate += 'T00:00:00-08:00'
+    }
   } else {
     statement.changeType = APIAmendmentTypes.AMENDMENT
     delete statement.courtOrderInformation
@@ -197,7 +200,8 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
   if (collateral.generalCollateral && collateral.generalCollateral.length > 0) {
     for (let i = 0; i < collateral.generalCollateral.length; i++) {
       if (collateral.generalCollateral[i].descriptionAdd &&
-          collateral.generalCollateral[i].descriptionAdd.trim().length > 0) {
+          collateral.generalCollateral[i].descriptionAdd.trim().length > 0 &&
+          (!collateral.generalCollateral[i].collateralId || collateral.generalCollateral[i].collateralId < 1)) {
         const gc:GeneralCollateralIF = {
           description: collateral.generalCollateral[i].descriptionAdd
         }

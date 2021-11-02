@@ -61,7 +61,7 @@ export const mockedGeneralCollateralDelete: GeneralCollateralIF[] = [
 ]
 export const mockedGeneralCollateralEdit: GeneralCollateralIF[] = [
   {
-    collateralId: 100000,
+    collateralId: 0,
     addedDateTime: '2021-09-16T05:56:20Z',
     descriptionAdd: 'ADD TEST GENERAL COLLATERAL',
     descriptionDelete: 'DELETE TEST GENERAL COLLATERAL'
