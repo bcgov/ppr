@@ -545,24 +545,33 @@ tr.registration-row.draft-registration-row td.actions-cell,
   background: #f8f9fa !important;
 }
 
+#registration-table.v-data-table tr.v-data-table__empty-wrapper td {
+  text-align: left;
+}
+
 .min-column-lg {
   min-width: 15.5rem;
+  width: 5%;
 }
 
 .min-column-md {
   min-width: 10.5rem;
+  width: 3%;
 }
 
 .min-column-mdl {
   min-width: 13rem;
+  width: 4%;
 }
 
 .min-column-mds {
   min-width: 8rem;
+  width: 2%;
 }
 
 .min-column-sm {
   min-width: 6rem;
+  width: 1%;
 }
 
 .picker-title {

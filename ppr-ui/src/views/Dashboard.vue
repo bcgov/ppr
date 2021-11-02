@@ -184,7 +184,7 @@
               </v-row>
             </v-col>
           </v-row>
-          <v-row no-gutters class="white" style="min-height:300px">
+          <v-row no-gutters class="white">
             <v-col cols="12">
               <registration-table
                 :setHeaders="myRegHeaders"

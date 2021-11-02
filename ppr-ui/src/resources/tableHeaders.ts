@@ -364,11 +364,10 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'registration-action',
+    class: 'registration-action min-column-sm',
     sortable: false,
     text: 'Actions',
     value: 'actions',
-    display: true,
-    fixed: true
+    display: true
   }
 ]
