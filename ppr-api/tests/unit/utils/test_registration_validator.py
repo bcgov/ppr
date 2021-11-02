@@ -25,6 +25,7 @@ AMENDMENT_VALID = {
   'baseDebtor': {
       'businessName': 'DEBTOR 1 INC.'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'code': '200000001',
       'businessName': 'ABC SEARCHING COMPANY',
@@ -125,6 +126,7 @@ AMENDMENT_INVALID = {
   'baseDebtor': {
       'businessName': 'DEBTOR 1 INC.'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'code': '300000001',
       'businessName': 'ABC SEARCHING COMPANY',
@@ -217,11 +219,18 @@ AMENDMENT_INVALID = {
   ]
 }
 
+DESC_MISSING_AC = 'Missing authorizaton received'
+DESC_INVALID_AC = 'Invalid authorizaton received'
 
 # testdata pattern is ({description}, {registration data}, {valid}, {message contents})
 TEST_COLLATERAL_IDS_DATA = [
     ('Valid collateral IDs', AMENDMENT_VALID, True, None),
     ('Missing delete vehicle id', AMENDMENT_INVALID, False, validator.DELETE_MISSING_ID_VEHICLE)
+]
+# testdata pattern is ({description}, {valid}, {message content})
+TEST_AUTHORIZATION_DATA = [
+    (DESC_MISSING_AC, False, validator.AUTHORIZATION_INVALID),
+    (DESC_INVALID_AC, False, validator.AUTHORIZATION_INVALID)
 ]
 
 
@@ -249,3 +258,22 @@ def test_actual_collateral_ids(session):
     if error_msg != '':
         print(error_msg)
     assert error_msg == ''
+
+
+@pytest.mark.parametrize('desc,valid,message_content', TEST_AUTHORIZATION_DATA)
+def test_validate_authorization(session, desc, valid, message_content):
+    """Assert that financing statement authorization received validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    if desc == DESC_MISSING_AC:
+        del json_data['authorizationReceived']
+    elif desc == DESC_INVALID_AC:
+        json_data['authorizationReceived'] = False
+
+    # test
+    error_msg = validator.validate_registration(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1

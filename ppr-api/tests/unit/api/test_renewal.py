@@ -34,6 +34,7 @@ MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth
 STATEMENT_VALID = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
@@ -57,6 +58,7 @@ STATEMENT_VALID = {
 MISSING_BASE_DEBTOR = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'registeringParty': {
         'businessName': 'ABC SEARCHING COMPANY',
         'address': {
@@ -77,6 +79,7 @@ MISSING_BASE_DEBTOR = {
 INVALID_BASE_DEBTOR = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'debtorName': {
         'businessName': 'XEST BUS 3 DEBTOR'
     },
@@ -100,6 +103,7 @@ INVALID_BASE_DEBTOR = {
 INVALID_REG_NUM = {
     'baseRegistrationNumber': 'TESTXXX1',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
@@ -123,6 +127,7 @@ INVALID_REG_NUM = {
 INVALID_HISTORICAL = {
     'baseRegistrationNumber': 'TEST0003',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
@@ -146,6 +151,7 @@ INVALID_HISTORICAL = {
 INVALID_CODE = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },
@@ -161,6 +167,7 @@ INVALID_CODE = {
 INVALID_ADDRESS = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'debtorName': {
         'businessName': 'TEST BUS 2 DEBTOR'
     },

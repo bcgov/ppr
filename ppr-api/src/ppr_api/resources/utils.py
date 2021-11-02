@@ -159,8 +159,7 @@ def validate_financing(json_data):
 def validate_registration(json_data):
     """Perform non-schema extra validation on a non-financing registrations."""
     error_msg = party_validator.validate_registration_parties(json_data)
-    error_msg += registration_validator.validate_collateral_ids(json_data)
-
+    error_msg += registration_validator.validate_registration(json_data)
     return error_msg
 
 
@@ -179,7 +178,7 @@ def get_account_name(token: str, account_id: str = None):
     """Lookup the account organization name from the user token with an auth api call."""
     orgs = user_orgs(token)
     if orgs and 'orgs' in orgs:
-        if (len(orgs['orgs']) == 1 or not account_id):
+        if (len(orgs['orgs']) == 1 or not account_id or not account_id.isdigit()):
             return orgs['orgs'][0]['name']
         for org in orgs['orgs']:
             if org['id'] == int(account_id):
