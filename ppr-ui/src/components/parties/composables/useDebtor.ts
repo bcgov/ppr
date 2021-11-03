@@ -95,12 +95,7 @@ export const useDebtor = (props, context) => {
     if (localState.currentDebtor.businessName === undefined) {
       delete localState.currentDebtor.businessName
     }
-    // if they didn't change anything, just exit
-    if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
-    isEqual(localState.currentDebtor, localState.originalDebtor)) {
-      resetFormAndData(true)
-      return
-    }
+
     if (!localState.currentIsBusiness) {
       const dateOfBirth = new Date()
       // @ts-ignore - returned by toRef
@@ -114,6 +109,13 @@ export const useDebtor = (props, context) => {
       } else {
         localState.currentDebtor.birthDate = null
       }
+    }
+
+    // if they didn't change anything, just exit
+    if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
+    isEqual(localState.currentDebtor, localState.originalDebtor)) {
+      resetFormAndData(true)
+      return
     }
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.debtors // eslint-disable-line

@@ -31,7 +31,7 @@
             filled
             label="Enter the General Collateral to be deleted from this registration."
             class="white pt-2 text-input-field"
-            :error-messages="valid ? '' : 'Maximum 4000 characters'"
+            :error-messages="validDel ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
@@ -50,7 +50,7 @@
             filled
             label="Enter the General Collateral to be added to this registration."
             class="white pt-2 text-input-field"
-            :error-messages="valid ? '' : 'Maximum 4000 characters'"
+            :error-messages="validAdd ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
@@ -118,8 +118,11 @@ export default defineComponent({
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
       }),
-      valid: computed((): boolean => {
+      validDel: computed((): boolean => {
         return (localState.delDesc?.length || 0) <= 4000
+      }),
+      validAdd: computed((): boolean => {
+        return (localState.addDesc?.length || 0) <= 4000
       })
     })
 
@@ -129,7 +132,7 @@ export default defineComponent({
         descriptionAdd: localState.addDesc,
         descriptionDelete: localState.delDesc
       }
-      if (localState.addDesc || localState.delDesc) {
+      if ((localState.addDesc || localState.delDesc) && (localState.validDel) && (localState.validAdd)) {
         if (newGeneralCollateral.length > 0) {
           // if there is no general collateral at the end of the array with a blank date time,
           // we know we are adding
@@ -146,7 +149,9 @@ export default defineComponent({
         }
         setGeneralCollateral(newGeneralCollateral)
       }
-      emit('closeGenColAmend', true)
+      if ((localState.validDel) && (localState.validAdd)) {
+        emit('closeGenColAmend', true)
+      }
     }
 
     const resetFormAndData = () => {
