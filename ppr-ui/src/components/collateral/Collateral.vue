@@ -11,7 +11,7 @@
         </v-col>
       </v-row>
       <v-container
-        v-if="!valid"
+        v-if="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT"
         :class="{ 'invalid-message': !valid }"
       >
         <v-row no-gutters class="pa-6">
@@ -30,10 +30,10 @@
       <vehicle-collateral
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :isSummary="summaryView"
-        :showInvalid="showInvalid"
+        :showInvalid="collateral.showInvalid"
       />
       <general-collateral
-        v-if="generalCollateralLength > 0 || !summaryView"
+        v-if="showGeneralCollateral"
         :isSummary="summaryView"
       />
     </v-card>
@@ -57,7 +57,7 @@
         </span>
       </v-col>
     </v-row>
-    <vehicle-collateral :isSummary="false" :showInvalid="showInvalid && !valid" />
+    <vehicle-collateral :isSummary="false" :showInvalid="collateral.showInvalid && !valid" />
     <general-collateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
@@ -81,7 +81,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { GeneralCollateral } from './generalCollateral'
 import { VehicleCollateral } from './vehicleCollateral'
 // local types/resources/etc.
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
+import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   AddCollateralIF, // eslint-disable-line no-unused-vars
   GeneralCollateralIF, // eslint-disable-line no-unused-vars
@@ -139,8 +139,9 @@ export default defineComponent({
       generalCollateralLength: computed((): number => {
         return localState.collateral.generalCollateral?.length || 0
       }),
-      showInvalid: computed((): boolean => {
-        return localState.collateral.showInvalid
+      showGeneralCollateral: computed((): boolean => {
+        return ((localState.generalCollateralLength > 0 || !localState.summaryView) &&
+          (hasGeneralCollateral(registrationType)))
       }),
       valid: computed((): boolean => {
         return localState.collateral.valid
@@ -189,32 +190,48 @@ export default defineComponent({
       router.push({ path: '/new-registration/add-collateral' })
     }
 
+    const setCollateralValidAndEmit = (valid): void => {
+      setCollateralValid(valid)
+      context.emit('setCollateralValid', valid)
+    }
+
+    const vehiclesValid = (): boolean => {
+      let validity = false
+      for (let i = 0; i < localState.collateral.vehicleCollateral.length; i++) {
+        // is valid if there is at least one vehicle
+        if (localState.collateral.vehicleCollateral[i].action !== ActionTypes.REMOVED) {
+          validity = true
+        }
+      }
+      return validity
+    }
+
     watch(() => props.isSummary, (val: boolean) => {
       localState.summaryView = val
     })
 
     watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
       if (
-        val?.length > 0 ||
+        vehiclesValid() ||
         (localState.collateral?.generalCollateral?.length > 0 &&
           localState.generalCollateralValid)
       ) {
-        setCollateralValid(true)
+        setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {
-        setCollateralValid(false)
+        setCollateralValidAndEmit(false)
       }
     }, { deep: true, immediate: true })
 
     watch(() => localState.collateral.generalCollateral, (val: GeneralCollateralIF[]) => {
       if (
         (val?.length > 0 && localState.generalCollateralValid) ||
-        localState.collateral?.vehicleCollateral?.length > 0
+        vehiclesValid()
       ) {
-        setCollateralValid(true)
+        setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {
-        setCollateralValid(false)
+        setCollateralValidAndEmit(false)
       }
     }, { deep: true, immediate: true })
 

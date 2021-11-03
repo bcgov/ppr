@@ -157,6 +157,7 @@ export default class AmendRegistration extends Vue {
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
   @Action setCertifyInformation: ActionBindingIF
+  @Action setCollateralShowInvalid: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -331,6 +332,9 @@ export default class AmendRegistration extends Vue {
     } else {
       this.showInvalid = true
       this.showCourtInvalid = true
+      if (!this.collateralValid) {
+        this.setCollateralShowInvalid(true)
+      }
     }
   }
 
