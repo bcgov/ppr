@@ -70,6 +70,7 @@
                   :setShowAmendLink="false"
                   :setShowHistory="false"
                   :setShowViewLink="false"
+                  :setShowConfirm="true"
                 />
               </div>
             </div>
