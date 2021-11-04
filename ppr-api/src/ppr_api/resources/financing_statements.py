@@ -416,23 +416,18 @@ class RenewalResource(Resource):
         try:
             if registration_num is None:
                 return resource_utils.path_param_error_response('registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'renewalStatement', 'ppr')
-            extra_validation_msg = resource_utils.validate_registration(request_json)
-            if not valid_format or extra_validation_msg != '':
-                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
-
+            if not valid_format:
+                return resource_utils.validation_error_response(errors, VAL_ERROR)
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
                 return resource_utils.path_data_mismatch_error_response(registration_num,
@@ -442,7 +437,9 @@ class RenewalResource(Resource):
             # Fetch base registration information: business exception thrown if not
             # found or historical.
             statement = FinancingStatement.find_by_registration_number(registration_num, False)
-
+            extra_validation_msg = resource_utils.validate_renewal(request_json, statement)
+            if extra_validation_msg != '':
+                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
                 return resource_utils.base_debtor_invalid_response()

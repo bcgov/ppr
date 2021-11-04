@@ -218,6 +218,126 @@ AMENDMENT_INVALID = {
     }
   ]
 }
+RENEWAL_SA_VALID = {
+    'baseRegistrationNumber': 'TEST0001',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeYears': 5
+}
+RENEWAL_SA_INVALID = {
+    'baseRegistrationNumber': 'TEST0001',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeYears': 5,
+    'courtOrderInformation': {
+      'courtName': 'Supreme Court of British Columbia.',
+      'courtRegistry': 'VICTORIA',
+      'fileNumber': 'BC123495',
+      'orderDate': '2021-09-05T07:01:00+00:00',
+      'effectOfOrder': 'Court Order to renew Repairers Lien.'
+    }
+}
+RENEWAL_RL_VALID = {
+    'baseRegistrationNumber': 'TEST0017',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'courtOrderInformation': {
+      'courtName': 'Supreme Court of British Columbia.',
+      'courtRegistry': 'VICTORIA',
+      'fileNumber': 'BC123495',
+      'orderDate': '2021-09-05T07:01:00+00:00',
+      'effectOfOrder': 'Court Order to renew Repairers Lien.'
+    }
+}
+RENEWAL_RL_MISSING = {
+    'baseRegistrationNumber': 'TEST0017',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    }
+}
+RENEWAL_RL_INVALID_DATE = {
+    'baseRegistrationNumber': 'TEST0017',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeYears': 5,
+    'courtOrderInformation': {
+      'courtName': 'Supreme Court of British Columbia.',
+      'courtRegistry': 'VICTORIA',
+      'fileNumber': 'BC123495',
+      'orderDate': '2021-08-05T07:01:00+00:00',
+      'effectOfOrder': 'Court Order to renew Repairers Lien.'
+    }
+}
+
 
 DESC_MISSING_AC = 'Missing authorizaton received'
 DESC_INVALID_AC = 'Invalid authorizaton received'
@@ -231,6 +351,14 @@ TEST_COLLATERAL_IDS_DATA = [
 TEST_AUTHORIZATION_DATA = [
     (DESC_MISSING_AC, False, validator.AUTHORIZATION_INVALID),
     (DESC_INVALID_AC, False, validator.AUTHORIZATION_INVALID)
+]
+# testdata pattern is ({base_reg_num}, {json_data}, {valid}, {message content})
+TEST_RENEWAL_DATA = [
+    ('TEST0001', RENEWAL_SA_VALID, True, None),
+    ('TEST0017', RENEWAL_RL_VALID, True, None),
+    ('TEST0001', RENEWAL_SA_INVALID, False, 'CourtOrderInformation is not allowed'),
+    ('TEST0017', RENEWAL_RL_MISSING, False, validator.COURT_ORDER_MISSING),
+    ('TEST0017', RENEWAL_RL_INVALID_DATE, False, validator.COURT_ORDER_INVALID_DATE)
 ]
 
 
@@ -272,6 +400,22 @@ def test_validate_authorization(session, desc, valid, message_content):
 
     # test
     error_msg = validator.validate_registration(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
+
+
+# testdata pattern is ({base_reg_num}, {json_data}, {valid}, {message content})
+@pytest.mark.parametrize('base_reg_num,json_data,valid,message_content', TEST_RENEWAL_DATA)
+def test_validate_renewal(session, base_reg_num, json_data, valid, message_content):
+    """Assert that renewal registration extra validation works as expected."""
+    # setup
+    statement = FinancingStatement.find_by_registration_number(base_reg_num, 'PS12345')
+
+    # test
+    error_msg = validator.validate_renewal(json_data, statement)
     if valid:
         assert error_msg == ''
     elif message_content:
