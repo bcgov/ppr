@@ -82,6 +82,14 @@ TEST_DATA_LOCAL_TIMEZONE = [
     ('Daylight savings', '2021-09-01T06:59:59-00:00', '2021-08-31T23:59:59-07:00'),
     ('No daylight savings', '2021-02-01T07:59:59-00:00', '2021-01-31T23:59:59-08:00')
 ]
+# testdata pattern is ({financing_ts}, {renewal_ts}, today_offset, valid)
+TEST_DATA_COURT_ORDER_DATE = [
+    ('2021-08-31T00:00:01-07:00', '2021-08-31T00:00:01-07:00', 0, True),
+    ('2021-08-31T00:00:01-07:00', '2021-08-30T00:00:01-07:00', 0, False),
+    ('2021-08-31T00:00:01-07:00', None, -1, True),
+    ('2021-08-31T00:00:01-07:00', None, 0, True),
+    ('2021-08-31T00:00:01-07:00', None, 1, False),
+]
 # testdata pattern is ({change_type}, {is_general_collateral})
 TEST_DATA_AMENDMENT_CHANGE_TYPE = [
     (model_utils.REG_TYPE_AMEND, False),
@@ -363,3 +371,16 @@ def test_cleanup_amendment():
     assert 'deleteSecuredParties' not in json_data
     assert 'addDebtors' not in json_data
     assert 'deleteDebtors' not in json_data
+
+
+@pytest.mark.parametrize('financing_ts,renewal_ts,today_offset,valid', TEST_DATA_COURT_ORDER_DATE)
+def test_valid_court_order_date(session, financing_ts, renewal_ts, today_offset, valid):
+    """Assert that checking a RL renewal court order date works as expected."""
+    reg_ts = model_utils.ts_from_iso_format(financing_ts)
+    test_renew_ts = renewal_ts
+    if not test_renew_ts:
+        now_offset = model_utils.now_ts_offset(today_offset, True)
+        test_renew_ts = model_utils.format_ts(now_offset)
+    test_valid = model_utils.valid_court_order_date(reg_ts, test_renew_ts)
+    # print(financing_ts + ' ' + test_renew_ts)
+    assert test_valid == valid

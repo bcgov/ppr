@@ -55,6 +55,32 @@ STATEMENT_VALID = {
         'invoiceId': '2199700'
     }
 }
+STATEMENT_RL_VALID = {
+    'baseRegistrationNumber': 'TEST0017',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'courtOrderInformation': {
+      'courtName': 'Supreme Court of British Columbia.',
+      'courtRegistry': 'VICTORIA',
+      'fileNumber': 'BC123495',
+      'orderDate': '2021-09-05T07:01:00+00:00',
+      'effectOfOrder': 'Court Order to renew Repairers Lien.'
+    }
+}
 MISSING_BASE_DEBTOR = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
@@ -187,6 +213,33 @@ INVALID_ADDRESS = {
         'invoiceId': '2199700'
     }
 }
+RL_INVALID_DATE = {
+    'baseRegistrationNumber': 'TEST0017',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeYears': 5,
+    'courtOrderInformation': {
+      'courtName': 'Supreme Court of British Columbia.',
+      'courtRegistry': 'VICTORIA',
+      'fileNumber': 'BC123495',
+      'orderDate': '2021-08-05T07:01:00+00:00',
+      'effectOfOrder': 'Court Order to renew Repairers Lien.'
+    }
+}
 
 # testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account}, {reg_num})
 TEST_CREATE_DATA = [
@@ -196,8 +249,10 @@ TEST_CREATE_DATA = [
     ('Invalid historical', INVALID_HISTORICAL, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0013'),
     ('Invalid party code extra validation', INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
+    ('Invalid RL CO date extra validation', RL_INVALID_DATE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0017'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
-    ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
+    ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
+    ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False, 'TEST0017')
 ]
 
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num}, {base_reg_num})
@@ -286,34 +341,6 @@ def test_renewal_sa_success(session, client, jwt):
     # check
     assert rv.status_code == HTTPStatus.CREATED
     # basic verification statement data check
-    json_data = rv.json
-    assert 'renewalRegistrationNumber' in json_data
-    assert len(json_data['changes']) >= 1
-    assert 'renewalRegistrationNumber' in json_data['changes'][0]
-    assert json_data['baseRegistrationNumber'] == base_reg_num
-    assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
-
-
-def test_renewal_rl_success(session, client, jwt):
-    """Assert that a valid repairer's lien create statement returns a 200 status."""
-    # setup
-    rv1 = create_financing_test(session, client, jwt, 'RL')
-    assert rv1.status_code == HTTPStatus.CREATED
-    assert rv1.json['baseRegistrationNumber']
-    base_reg_num = rv1.json['baseRegistrationNumber']
-
-    json_data = copy.deepcopy(STATEMENT_VALID)
-    json_data['baseRegistrationNumber'] = base_reg_num
-    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
-    del json_data['payment']
-
-    # test
-    rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/renewals',
-                     json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                     content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.CREATED
     json_data = rv.json
     assert 'renewalRegistrationNumber' in json_data
     assert len(json_data['changes']) >= 1

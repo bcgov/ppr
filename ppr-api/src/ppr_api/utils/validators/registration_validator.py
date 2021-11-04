@@ -15,8 +15,13 @@
 
 Validation includes verifying delete collateral ID's and timestamps.
 """
+from ppr_api.models import utils as model_utils
 
 
+COURT_ORDER_INVALID = 'CourtOrderInformation is not allowed with a base registration type of {}.\n'
+COURT_ORDER_MISSING = 'Required courtOrderInformation is missing.\n'
+COURT_ORDER_INVALID_DATE = 'Invalid courtOrderInformation.orderDate: the value must be between the base ' + \
+                           'registration date and the current system date.\n'
 AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration.\n'
 DELETE_MISSING_ID_VEHICLE = 'Required vehicleId missing in delete Vehicle Collateral.\n'
 DELETE_MISSING_ID_GENERAL = 'Required collateralId missing in delete General Collateral.\n'
@@ -30,6 +35,30 @@ def validate_registration(json_data, financing_statement=None):
     if 'authorizationReceived' not in json_data or not json_data['authorizationReceived']:
         error_msg += AUTHORIZATION_INVALID
     error_msg += validate_collateral_ids(json_data, financing_statement)
+
+    return error_msg
+
+
+def validate_renewal(json_data, financing_statement):
+    """Perform all renewal registration data validation checks not covered by schema validation."""
+    error_msg = ''
+    if 'authorizationReceived' not in json_data or not json_data['authorizationReceived']:
+        error_msg += AUTHORIZATION_INVALID
+
+    if not financing_statement:
+        return error_msg
+
+    if model_utils.REG_TYPE_REPAIRER_LIEN == financing_statement.registration[0].registration_type:
+        if 'courtOrderInformation' not in json_data:
+            error_msg += COURT_ORDER_MISSING
+        elif 'orderDate' in json_data['courtOrderInformation'] and \
+                len(json_data['courtOrderInformation']['orderDate']) >= 10:
+            co_date = json_data['courtOrderInformation']['orderDate']
+            # order date must be between base registration date and current date.
+            if not model_utils.valid_court_order_date(financing_statement.registration[0].registration_ts, co_date):
+                error_msg += COURT_ORDER_INVALID_DATE
+    elif 'courtOrderInformation' in json_data:
+        error_msg += COURT_ORDER_INVALID.format(financing_statement.registration[0].registration_type)
     return error_msg
 
 

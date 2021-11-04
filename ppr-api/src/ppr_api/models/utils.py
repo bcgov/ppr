@@ -652,3 +652,15 @@ def amendment_change_type(json_data):
             change_type = REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL
 
     return change_type
+
+
+def valid_court_order_date(financing_ts, order_ts: str):
+    """Verify requuest court order date is between the financing statement date and the current date."""
+    if not financing_ts or not order_ts:
+        return False
+    financing_date = date(financing_ts.year, financing_ts.month, financing_ts.day)
+    order_date = date.fromisoformat(order_ts[:10])
+    # Naive date
+    now = now_ts()
+    today_date = date(now.year, now.month, now.day)
+    return financing_date <= order_date <= today_date

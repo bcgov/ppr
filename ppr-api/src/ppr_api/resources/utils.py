@@ -163,6 +163,13 @@ def validate_registration(json_data):
     return error_msg
 
 
+def validate_renewal(json_data, financing_statement):
+    """Perform non-schema extra validation on a renewal registrations."""
+    error_msg = party_validator.validate_registration_parties(json_data)
+    error_msg += registration_validator.validate_renewal(json_data, financing_statement)
+    return error_msg
+
+
 def validate_delete_ids(json_data, financing_statement):
     """Perform non-schema extra validation on a change amendment delete party, collateral ID's."""
     error_msg = party_validator.validate_party_ids(json_data, financing_statement)
