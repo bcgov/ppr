@@ -93,9 +93,7 @@ export default defineComponent({
 
     watch(() => localState.detailDescription, (val: string) => {
       emit('valid', localState.valid)
-      if (val) {
-        setAmendmentDescription(val)
-      }
+      setAmendmentDescription(val)
     })
 
     return {
