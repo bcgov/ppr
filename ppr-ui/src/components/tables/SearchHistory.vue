@@ -2,19 +2,22 @@
   <v-container :class="[$style['main-results-div'], 'pa-0', 'white']">
     <v-row v-if="historyLength !== 0" no-gutters class="pt-4">
       <v-col cols="12">
-        <v-data-table v-if="searchHistory"
-                      id="search-history-table"
-                      hide-default-footer
-                      fixed
-                      fixed-header
-                      :headers="headers"
-                      height="20rem"
-                      :items="searchHistory"
-                      item-key="searchId"
-                      :items-per-page="-1"
-                      sort-by="searchDateTime"
-                      sort-desc
-                      return-object>
+        <v-data-table
+          v-if="searchHistory"
+          id="search-history-table"
+          hide-default-footer
+          fixed
+          fixed-header
+          :headers="headers"
+          height="20rem"
+          :items="searchHistory"
+          item-key="searchId"
+          :items-per-page="-1"
+          mobile-breakpoint="0"
+          sort-by="searchDateTime"
+          sort-desc
+          return-object
+        >
           <template v-slot:[`item.searchQuery.criteria.value`]="{ item }">
             {{ displaySearchValue(item.searchQuery) }}
           </template>
@@ -26,15 +29,31 @@
           </template>
           <template v-slot:[`item.pdf`]="{ item }">
             <v-btn
+              v-if="item.selectedResultsSize < 76"
               :id="`pdf-btn-${item.searchId}`"
               class="pdf-btn px-0 mt-n3"
               depressed
               :loading="item.searchId === loadingPDF"
               @click="downloadPDF(item.searchId)"
             >
-              <img src="@/assets/svgs/custom-pdf-icon.svg">
+              <img src="@/assets/svgs/pdf-icon-blue.svg">
               <span class="pl-1">PDF</span>
             </v-btn>
+            <v-tooltip
+              v-else
+              class="pa-2"
+              content-class="top-tooltip"
+              nudge-right="2"
+              top
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              </template>
+              <div class="pt-2 pb-2">
+                {{ tooltipTxtPdf }}
+              </div>
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-col>
@@ -61,6 +80,9 @@ export default defineComponent({
   setup (props, { emit }) {
     const style = useCssModule()
     const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
+    const tooltipTxtPdf = 'We were unable to save a PDF search result report because it ' +
+      'exceeded the maximum limit of 75 results per report. Please contact us if you ' +
+      'require assistance.'
     const localState = reactive({
       loadingPDF: '',
       headers: searchHistroyTableHeaders,
@@ -137,7 +159,8 @@ export default defineComponent({
       displaySearchValue,
       displayType,
       downloadPDF,
-      style
+      style,
+      tooltipTxtPdf
     }
   }
 })

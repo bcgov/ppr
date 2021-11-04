@@ -55,14 +55,12 @@ describe('Search component', () => {
 
   it('renders Search View with base components', () => {
     expect(wrapper.findComponent(Search).exists()).toBe(true)
-    expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     // doesn't render unless there are results
     expect(wrapper.vm.getSearchResults).toBeNull()
     expect(wrapper.find(searchMeta).exists()).toBe(false)
     expect(wrapper.find(resultsInfo).exists()).toBe(false)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     expect(wrapper.find(folioHeader).exists()).toBe(false)
-    expect(wrapper.find(doneButton).exists()).toBe(false)
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
@@ -88,7 +86,6 @@ describe('Search component', () => {
     expect(folioDisplay.length).toBe(1)
     expect(folioDisplay.at(0).text()).toContain(wrapper.vm.folioNumber)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
-    expect(wrapper.find(doneButton).exists()).toBe(true)
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
   })
   it('renders the Results component and displays search data elements with empty result set.', async () => {
@@ -119,7 +116,6 @@ describe('Search component', () => {
     const folioDisplay = wrapper.findAll(folioHeader)
     expect(folioDisplay.length).toBe(1)
     expect(folioDisplay.at(0).text()).toContain(wrapper.vm.folioNumber)
-    expect(wrapper.find(doneButton).exists()).toBe(true)
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(true)
   })
 })

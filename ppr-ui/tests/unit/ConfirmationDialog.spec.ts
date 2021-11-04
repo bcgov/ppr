@@ -1,15 +1,18 @@
 import sinon from 'sinon'
 import Vue from 'vue'
 import Vuetify from 'vuetify'
+import CompositionApi from '@vue/composition-api'
 import { getVuexStore } from '@/store'
-import { mount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 // local
-import { ConfirmationDialog } from '@/components/dialogs'
+import { BaseDialog, ConfirmationDialog } from '@/components/dialogs'
+import { DialogContent } from '@/components/dialogs/common'
 import { SettingOptions } from '@/enums'
 import { paymentConfirmaionDialog, selectionConfirmaionDialog } from '@/resources/dialogOptions'
 import { axios } from '@/utils/axios-ppr'
 import { mockedDefaultUserSettingsResponse, mockedDisablePayUserSettingsResponse } from './test-data'
 import { getLastEvent } from './utils'
+import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -17,14 +20,10 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // emitted events
-const proceed: string = 'proceed'
+const proceed = 'proceed'
 
 // Input field selectors / buttons
-const accept: string = '#accept-btn'
-const cancel: string = '#cancel-btn'
-const checkbox: string = '.dialog-checkbox'
-const text: string = '.dialog-text'
-const title: string = '.dialog-title'
+const checkbox = '.dialog-checkbox'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -45,23 +44,27 @@ describe('Confirmation Dialog', () => {
       username: 'user',
       settings: mockedDefaultUserSettingsResponse
     })
+
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
     wrapper = mount(ConfirmationDialog,
       {
+        localVue,
         vuetify,
         store,
         propsData: {
-          attach: '',
-          display: false,
-          options: {
+          setDisplay: false,
+          setOptions: {
             acceptText: '',
             cancelText: '',
             text: '',
             title: ''
           },
-          settingOptions: ''
+          setSettingOption: null
         }
       })
-    await Vue.nextTick()
+    await flushPromises()
   })
   afterEach(() => {
     sandbox.restore()
@@ -75,34 +78,27 @@ describe('Confirmation Dialog', () => {
       const options = confirmationOptions[i]
       const settingOption = settingOptions[i]
       wrapper.setProps({
-        attach: '',
-        display: true,
-        options: options,
-        settingOption: settingOption
+        setDisplay: true,
+        setOptions: options,
+        setSettingOption: settingOption
       })
-      await Vue.nextTick()
+      await flushPromises()
 
       expect(wrapper.findComponent(ConfirmationDialog).exists()).toBe(true)
+      expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+      expect(wrapper.findComponent(DialogContent).exists()).toBe(true)
       expect(wrapper.isVisible()).toBe(true)
-      expect(wrapper.find(title).text()).toBe(options.title)
-      expect(wrapper.find(text).text()).toContain(options.text.replace('<i>', '').replace('</i>', ''))
+      expect(wrapper.findComponent(BaseDialog).text()).toContain(options.title)
+      expect(wrapper.findComponent(DialogContent).text()).toContain(options.text)
       expect(wrapper.find(checkbox).exists()).toBe(true)
-      if (options.acceptText) {
-        expect(wrapper.find(accept).exists()).toBe(true)
-        wrapper.find(accept).trigger('click')
-        await Vue.nextTick()
-        expect(getLastEvent(wrapper, proceed)).toEqual(true)
-      } else {
-        expect(wrapper.find(accept).exists()).toBe(false)
-      }
-      if (options.cancelText) {
-        expect(wrapper.find(cancel).exists()).toBe(true)
-        wrapper.find(cancel).trigger('click')
-        await Vue.nextTick()
-        expect(getLastEvent(wrapper, proceed)).toEqual(false)
-      } else {
-        expect(wrapper.find(cancel).exists()).toBe(false)
-      }
+
+      wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
+      await flushPromises()
+      expect(getLastEvent(wrapper, proceed)).toEqual(true)
+
+      wrapper.findComponent(BaseDialog).vm.$emit(proceed, false)
+      await flushPromises()
+      expect(getLastEvent(wrapper, proceed)).toEqual(false)
     }
   })
 
@@ -113,13 +109,11 @@ describe('Confirmation Dialog', () => {
       options: paymentConfirmaionDialog,
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG
     })
-    await Vue.nextTick()
+    await flushPromises()
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
     expect(wrapper.vm.preventDialog).toBe(false)
     wrapper.vm.preventDialog = true
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await flushPromises()
     expect(wrapper.vm.updateFailed).toBe(false)
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
   })

@@ -39,6 +39,7 @@ export interface StateModelIF {
   search: {
     searchDebtorName: IndividualNameIF
     searchHistory: Array<SearchResponseIF>
+    searchHistoryLength: Number
     searchResults: SearchResponseIF
     searchedType: SearchTypeIF
     searchedValue: string

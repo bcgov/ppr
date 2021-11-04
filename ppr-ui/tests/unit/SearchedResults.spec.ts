@@ -35,8 +35,9 @@ const noResults: SearchResponseIF = {
 }
 
 // Input field selectors / buttons
-const resultsTable: string = '#search-results-table'
-const noResultsDiv: string = '#search-no-results-info'
+const resultsTable = '#search-results-table'
+const noResultsDiv = '#search-no-results-info'
+const generateResult = '#btn-generate-result'
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -74,7 +75,9 @@ describe('Test result table with no results', () => {
     expect(datatable.length).toBe(0)
     const noResultsInfo = wrapper.findAll(noResultsDiv)
     expect(noResultsInfo.length).toBe(1)
-    expect(noResultsInfo.at(0).text()).toContain('Nil Result 0 registrations | 0 exact matches')
+    expect(noResultsInfo.at(0).text()).toContain('Nil Result')
+    expect(noResultsInfo.at(0).text()).toContain('No registered liens or encumbrances')
+    expect(wrapper.findAll(generateResult).length).toBe(1)
   })
 })
 
@@ -97,6 +100,7 @@ describe('Serial number results', () => {
     expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.SERIAL_NUMBER)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.findAll(generateResult).length).toBe(1)
   })
 
   it('preselects exact results', () => {

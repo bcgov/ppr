@@ -159,6 +159,10 @@ export const getSearchHistory = (state: StateIF): Array<SearchResponseIF> => {
   return state.stateModel.search.searchHistory
 }
 
+export const getSearchHistoryLength = (state: StateIF): Number => {
+  return state.stateModel.search.searchHistoryLength
+}
+
 /** Convenient when there is a need to access several properties. */
 export const getStateModel = (state: StateIF): StateModelIF => {
   return state.stateModel

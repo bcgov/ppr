@@ -1,3 +1,4 @@
+export { default as BaseSnackbar } from './BaseSnackbar.vue'
 export { default as Breadcrumb } from './Breadcrumb.vue'
 export { default as ButtonFooter } from './ButtonFooter.vue'
 export { default as ButtonsStacked } from './ButtonsStacked.vue'

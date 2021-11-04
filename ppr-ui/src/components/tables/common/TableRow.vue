@@ -124,7 +124,7 @@
         :loading="item.path === loadingPDF"
         @click="downloadPDF(item.path)"
       >
-        <img src="@/assets/svgs/custom-pdf-icon.svg">
+        <img src="@/assets/svgs/pdf-icon-blue.svg">
         <span class="pl-1">PDF</span>
       </v-btn>
       <v-tooltip
