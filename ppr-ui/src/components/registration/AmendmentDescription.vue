@@ -45,7 +45,7 @@
         Details Description
       </v-col>
       <v-col cols="9" class="summary-text pr-4">
-        {{ detailDescription }}
+        <span style="white-space: pre;">{{ detailDescription }}</span>
       </v-col>
     </v-row>
   </v-container>
@@ -93,9 +93,7 @@ export default defineComponent({
 
     watch(() => localState.detailDescription, (val: string) => {
       emit('valid', localState.valid)
-      if (val) {
-        setAmendmentDescription(val)
-      }
+      setAmendmentDescription(val)
     })
 
     return {

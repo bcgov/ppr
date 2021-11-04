@@ -38,8 +38,13 @@
             </v-col>
           </v-row>
           <div class="white ma-0">
+            <div v-if="showLengthTrustIndenture">
+              <registration-length-trust-amendment class="pt-14" :isSummary="true" />
+            </div>
+
             <div v-if="showSecuredParties" class="pa-4">
-              <h3>Secured Parties</h3>
+              <v-divider v-if="showLengthTrustIndenture"></v-divider>
+              <h3 class="pt-6">Secured Parties</h3>
               <secured-party-summary
                 class="secured-party-summary"
                 :setEnableNoDataAction="true"
@@ -47,8 +52,8 @@
             </div>
 
             <div v-if="showDebtors" class="pa-4">
-              <v-divider v-if="showSecuredParties"></v-divider>
-              <h3>Debtors</h3>
+              <v-divider v-if="showSecuredParties || showLengthTrustIndenture"></v-divider>
+              <h3 class="pt-6">Debtors</h3>
               <debtor-summary
                 class="debtor-summary"
                 :setEnableNoDataAction="true"
@@ -58,15 +63,16 @@
             <div v-if="showVehicleCollateral || showGeneralCollateral">
               <!-- To do: add amended collateral -->
               <div v-if="showVehicleCollateral">
-                <v-divider v-if="showSecuredParties || showDebtors"></v-divider>
+                <v-divider v-if="showSecuredParties || showDebtors || showLengthTrustIndenture"></v-divider>
                 <vehicle-collateral
                   :isSummary="true"
                   :showInvalid="false"
                 />
               </div>
               <div v-if="showGeneralCollateral" class="pt-4">
-                <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral"></v-divider>
-                <gen-col-summary class="pa-4"
+                <v-divider v-if="showSecuredParties || showDebtors ||
+                          showVehicleCollateral || showLengthTrustIndenture"></v-divider>
+                <gen-col-summary class="pa-4 pt-6"
                   :setShowAmendLink="false"
                   :setShowHistory="false"
                   :setShowViewLink="false"
@@ -75,20 +81,16 @@
               </div>
             </div>
 
-            <div class="pb-4">
+            <div class="pb-4" v-if="showDescription">
               <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
-                               showGeneralCollateral"></v-divider>
+                               showGeneralCollateral || showLengthTrustIndenture"></v-divider>
               <amendment-description class="pt-14" :isSummary="true" />
             </div>
 
             <div v-if="showCourtOrder">
-              <v-divider></v-divider>
+              <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
+                              showGeneralCollateral || showDescription || showLengthTrustIndenture"></v-divider>
               <court-order :setSummary="true" />
-            </div>
-
-            <div v-if="showLengthTrustIndenture">
-              <v-divider></v-divider>
-              <registration-length-trust-amendment class="pt-14" :isSummary="true" />
             </div>
 
           </div>
@@ -295,8 +297,11 @@ export default class ConfirmAmendment extends Vue {
     }
   }
 
-  private get detailDescription (): string {
-    return this.getAmendmentDescription || ''
+  private get showDescription (): boolean {
+    if (this.getAmendmentDescription) {
+      return true
+    }
+    return false
   }
 
   private get currentRegNumber (): string {

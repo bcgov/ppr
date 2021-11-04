@@ -26,7 +26,7 @@
     </v-row>
     <v-row no-gutters style="padding: 15px 30px;">
           <v-col cols="3" class="generic-label">Effect of Order</v-col>
-          <v-col cols="9" id="effect-display">{{ effectOfOrder }}</v-col>
+          <v-col cols="9" id="effect-display"><span style="white-space: pre;">{{ effectOfOrder }}</span></v-col>
     </v-row>
 
   </v-container>
