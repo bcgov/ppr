@@ -467,7 +467,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def find_summary_by_reg_num(cls, account_id: str, registration_num: str):
         """Return a single registration summary by registration_number."""
-        result = None
+        result = {}
         changes = []
         if account_id is None or registration_num is None:
             return result
@@ -525,6 +525,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 result = Registration.__update_summary_optional(result)
                 if not model_utils.is_financing(reg_class):
                     changes.append(result)
+        if not result:
+            return None
         if result and changes:
             result['changes'] = changes
         return result

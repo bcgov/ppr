@@ -37,6 +37,7 @@ FINANCING_VALID = {
     'type': 'SA',
     'clientReferenceId': 'A-00000402',
     'documentId': '1234567',
+    'authorizationReceived': True,
     'registeringParty': {
         'businessName': 'ABC SEARCHING COMPANY',
         'address': {
@@ -100,6 +101,7 @@ FINANCING_INVALID_TYPE = {
     'type': 'XX',
     'clientReferenceId': 'A-00000402',
     'documentId': '1234567',
+    'authorizationReceived': True,
     'registeringParty': {
         'businessName': 'ABC SEARCHING COMPANY',
         'address': {
@@ -162,6 +164,7 @@ FINANCING_INVALID_TYPE = {
 FINANCING_INVALID_CODE = {
     'type': 'SA',
     'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
     'registeringParty': {
         'code': '300000000'
     },

@@ -17,10 +17,20 @@ Validation includes verifying delete collateral ID's and timestamps.
 """
 
 
+AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration.\n'
 DELETE_MISSING_ID_VEHICLE = 'Required vehicleId missing in delete Vehicle Collateral.\n'
 DELETE_MISSING_ID_GENERAL = 'Required collateralId missing in delete General Collateral.\n'
 DELETE_INVALID_ID_VEHICLE = 'Invalid vehicleId {} in delete Vehicle Collateral.\n'
 DELETE_INVALID_ID_GENERAL = 'Invalid collateralId {} in delete General Collateral.\n'
+
+
+def validate_registration(json_data, financing_statement=None):
+    """Perform all registration data validation checks not covered by schema validation."""
+    error_msg = ''
+    if 'authorizationReceived' not in json_data or not json_data['authorizationReceived']:
+        error_msg += AUTHORIZATION_INVALID
+    error_msg += validate_collateral_ids(json_data, financing_statement)
+    return error_msg
 
 
 def validate_collateral_ids(json_data, financing_statement=None):

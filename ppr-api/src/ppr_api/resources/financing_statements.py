@@ -203,7 +203,7 @@ class AmendmentResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
-            extra_validation_msg = resource_utils.validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_registration(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -317,7 +317,7 @@ class ChangeResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'changeStatement', 'ppr')
-            extra_validation_msg = resource_utils.validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_registration(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -429,7 +429,7 @@ class RenewalResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'renewalStatement', 'ppr')
-            extra_validation_msg = resource_utils.validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_registration(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 
@@ -538,7 +538,7 @@ class DischargeResource(Resource):
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
-            extra_validation_msg = resource_utils.validate_financing(request_json)
+            extra_validation_msg = resource_utils.validate_registration(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
 

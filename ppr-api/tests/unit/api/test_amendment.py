@@ -36,6 +36,7 @@ STATEMENT_VALID = {
   'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
       'address': {
@@ -67,6 +68,7 @@ INVALID_REG_NUM = {
   'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
       'address': {
@@ -95,6 +97,7 @@ INVALID_REG_NUM = {
 }
 MISSING_BASE_DEBTOR = {
   'baseRegistrationNumber': 'TEST0001',
+  'authorizationReceived': True,
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
       'address': {
@@ -126,6 +129,7 @@ INVALID_BASE_DEBTOR = {
   'debtorName': {
       'businessName': 'XXXX BUS 3 DEBTOR'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
       'address': {
@@ -157,6 +161,7 @@ INVALID_HISTORICAL = {
   'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
       'address': {
@@ -188,6 +193,7 @@ INVALID_CODE = {
   'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'code': '300000000'
   },
@@ -211,6 +217,7 @@ INVALID_ADDRESS = {
   'debtorName': {
       'businessName': 'TEST BUS 2 DEBTOR'
   },
+  'authorizationReceived': True,
   'registeringParty': {
       'businessName': 'ABC SEARCHING COMPANY',
       'address': {

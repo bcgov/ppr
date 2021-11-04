@@ -16,12 +16,16 @@
 
 Test-Suite to ensure that the /party-codes endpoint is working as expected.
 """
+import copy
+
 import pytest
 from flask import current_app
 
-from ppr_api.resources.utils import get_account_name
+from ppr_api.resources.utils import get_account_name, validate_financing, validate_registration
 from ppr_api.services.authz import PPR_ROLE
 from tests.unit.services.utils import helper_create_jwt
+from tests.unit.utils.test_financing_validator import FINANCING
+from tests.unit.utils.test_registration_validator import AMENDMENT_VALID
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
@@ -30,6 +34,16 @@ TEST_USER_ORGS_DATA_JSON = [
     ('Valid no account', None, True),
     ('Valid account', '2617', True),
     ('No token', '2617', False),
+]
+# testdata pattern is ({description}, {valid data})
+TEST_VALIDATE_REGISTRATION_DATA = [
+    ('Valid amendment', True),
+    ('Invalid amendment', False)
+]
+# testdata pattern is ({description}, {valid data})
+TEST_VALIDATE_FINANCING_DATA = [
+    ('Valid financing statement registration', True),
+    ('Invalid financing statement registration', False)
 ]
 
 
@@ -48,3 +62,35 @@ def test_get_account_name(session, client, jwt, desc, account_id, has_name):
         assert name
     else:
         assert not name
+
+
+@pytest.mark.parametrize('desc, valid', TEST_VALIDATE_FINANCING_DATA)
+def test_validate_financing(session, client, jwt, desc, valid):
+    """Assert that validate a financing statement registration works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING)
+    if not valid:
+        del json_data['authorizationReceived']
+
+    # test
+    error_msg = validate_financing(json_data)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+
+
+@pytest.mark.parametrize('desc, valid', TEST_VALIDATE_REGISTRATION_DATA)
+def test_validate_registration(session, client, jwt, desc, valid):
+    """Assert that validate a registration works as expected."""
+    # setup
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    if not valid:
+        del json_data['authorizationReceived']
+
+    # test
+    error_msg = validate_registration(json_data)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''

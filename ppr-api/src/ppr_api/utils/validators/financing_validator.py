@@ -23,6 +23,7 @@ from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
 
 
 # Error messages
+AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration.\n'
 TYPE_NOT_ALLOWED = 'A new Financing Statement cannot be created with the submitted registration type.\n'
 GC_NOT_ALLOWED = 'General Collateral is not allowed with this registration type.\n'
 GC_REQUIRED = 'General Collateral is required with this registration type.\n'
@@ -85,6 +86,8 @@ def validate(json_data):
         if reg_class is None:
             return error_msg
 
+        if 'authorizationReceived' not in json_data or not json_data['authorizationReceived']:
+            error_msg += AUTHORIZATION_INVALID
         error_msg += validate_life(json_data, reg_type, reg_class)
         error_msg += validate_vehicle_collateral(json_data, reg_type, reg_class)
         error_msg += validate_general_collateral(json_data, reg_type, reg_class)
