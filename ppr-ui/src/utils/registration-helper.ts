@@ -142,7 +142,8 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
       baseRegistrationNumber: stateModel.registration.registrationNumber,
       description: stateModel.registration.amendmentDescription,
       registeringParty: stateModel.registration.parties.registeringParty,
-      debtorName: stateModel.registration.confirmDebtorName
+      debtorName: stateModel.registration.confirmDebtorName,
+      authorizationReceived: true
     }
   } else {
     statement.description = stateModel.registration.amendmentDescription
@@ -373,7 +374,8 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
     debtors: parties.debtors,
     vehicleCollateral: collateral.vehicleCollateral,
     generalCollateral: collateral.generalCollateral,
-    clientReferenceId: stateModel.folioOrReferenceNumber
+    clientReferenceId: stateModel.folioOrReferenceNumber,
+    authorizationReceived: true
   }
   if (!trustLength.lifeInfinite) {
     statement.lifeYears = trustLength.lifeYears
@@ -429,7 +431,8 @@ export async function saveDischarge (stateModel:StateModelIF): Promise<Discharge
     baseRegistrationNumber: stateModel.registration.registrationNumber,
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,
-    clientReferenceId: stateModel.folioOrReferenceNumber
+    clientReferenceId: stateModel.folioOrReferenceNumber,
+    authorizationReceived: true
   }
   if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
     delete registration.clientReferenceId
@@ -625,7 +628,8 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
     baseRegistrationNumber: stateModel.registration.registrationNumber,
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,
-    clientReferenceId: stateModel.folioOrReferenceNumber
+    clientReferenceId: stateModel.folioOrReferenceNumber,
+    authorizationReceived: true
   }
   if (registration.clientReferenceId === null || registration.clientReferenceId.trim().length < 1) {
     delete registration.clientReferenceId
