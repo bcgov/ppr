@@ -169,6 +169,9 @@ export default defineComponent({
         if (localState.searchValue.length >= 3) {
           updateAutoCompleteResults(val)
         }
+        if (localState.searchValue.length === 0) {
+          localState.setAutoCompleteActive = false
+        }
       }
     )
     watch(
