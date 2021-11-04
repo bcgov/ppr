@@ -25,5 +25,16 @@ export const saveSearchError: DialogOptionsIF = {
   acceptText: '',
   cancelText: 'Okay',
   title: 'Search Error',
-  text: 'We are unable to complete this search. Please try again later.'
+  text: 'We were unable to complete this search. Please try again later.'
+}
+
+export const searchReportError: DialogOptionsIF = {
+  acceptText: 'Return to Search Results',
+  cancelText: 'Return to My PPR Dashboard',
+  hasContactInfo: true,
+  title: 'Unable to generate a search result report',
+  text: 'We were unable to save a PDF search result report because it exceeded ' +
+    'the maximum limit of 75 results per report. We are working on removing this ' +
+    'limitation so that large PDF reports can be generated. If you require ' +
+    'assistance, please contact us.'
 }

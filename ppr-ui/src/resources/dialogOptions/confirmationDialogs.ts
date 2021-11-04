@@ -9,13 +9,13 @@ export const paymentConfirmaionDialog: DialogOptionsIF = {
     'Your account will be debited $8.50 for this transaction.'
 }
 
-export const selectionConfirmaionDialog = {
-  acceptText: 'Accept',
+export const selectionConfirmaionDialog: DialogOptionsIF = {
+  acceptText: 'Generate Report Now',
   cancelText: 'Change Selected Registrations',
-  title: 'Confirm Selections',
+  title: 'Confirm selections and generate report',
   text: 'registrations will be included in your PDF search results report ' +
-    'along with an overview of the search results. Click the <i>Change ' +
-    'Selected Registrations</i> button if you would like to edit your ' +
+    'along with an overview of the search results. Click the "Change ' +
+    'Selected Registrations" button if you would like to edit your ' +
     'selection before returning to the dashboard.'
 }
 

@@ -11,13 +11,14 @@ import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 // local components
 import { Dashboard } from '@/views'
+import { BaseSnackbar } from '@/components/common'
 import { RegistrationConfirmation } from '@/components/dialogs'
 import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
 import { RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, StateIF, StateModelIF } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   amendConfirmationDialog,
@@ -41,8 +42,7 @@ import {
   mockedDebtorNames,
   mockedDraftAmend,
   mockedRegistration2,
-  mockedUpdateRegTableUserSettingsResponse,
-  mockedErrorUserSettingsResponse
+  mockedUpdateRegTableUserSettingsResponse
 } from './test-data'
 
 Vue.use(Vuetify)
@@ -131,6 +131,8 @@ describe('Dashboard component', () => {
     expect(wrapper.find(myRegDeleteDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(false)
+    expect(wrapper.findComponent(BaseSnackbar).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(false)
   })
 
   it('displays the search header', () => {
@@ -148,13 +150,21 @@ describe('Dashboard component', () => {
   })
 
   it('updates the search history header based on history data', async () => {
+    expect(wrapper.vm.getSearchHistoryLength).toBe(0)
     wrapper.vm.setSearchHistory(mockedSearchHistory.searches)
     await flushPromises()
     expect(wrapper.vm.getSearchHistory?.length).toBe(6)
+    expect(wrapper.vm.getSearchHistoryLength).toBe(6)
     expect(wrapper.vm.searchHistoryLength).toBe(6)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('My Searches (6)')
+    // snackbar should trigger
+    expect(wrapper.findComponent(BaseSnackbar).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(true)
+    expect(wrapper.findComponent(BaseSnackbar).vm.$props.setMessage).toBe(
+      'Search Result was successfully added to your table.'
+    )
   })
 
   it('routes to search after getting a search response', async () => {
@@ -525,5 +535,11 @@ describe('Dashboard add registration tests', () => {
     expect(wrapper.vm.myRegDataHistory).toEqual([myRegAdd, mockedRegistration2])
     expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.myRegAdd).toBe('')
+    // see snackbar
+    expect(wrapper.findComponent(BaseSnackbar).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(true)
+    expect(wrapper.findComponent(BaseSnackbar).vm.$props.setMessage).toBe(
+      'Registration was successfully added to your table.'
+    )
   })
 })

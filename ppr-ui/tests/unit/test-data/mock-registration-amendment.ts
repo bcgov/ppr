@@ -506,6 +506,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   search: {
     searchDebtorName: null,
     searchHistory: null,
+    searchHistoryLength: null,
     searchResults: null,
     searchedType: null,
     searchedValue: '',
@@ -602,6 +603,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   search: {
     searchDebtorName: null,
     searchHistory: null,
+    searchHistoryLength: null,
     searchResults: null,
     searchedType: null,
     searchedValue: '',
@@ -699,6 +701,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   search: {
     searchDebtorName: null,
     searchHistory: null,
+    searchHistoryLength: null,
     searchResults: null,
     searchedType: null,
     searchedValue: '',
@@ -795,6 +798,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
   search: {
     searchDebtorName: null,
     searchHistory: null,
+    searchHistoryLength: null,
     searchResults: null,
     searchedType: null,
     searchedValue: '',

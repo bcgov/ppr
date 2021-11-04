@@ -105,10 +105,10 @@ export const mockedSearchResponse: mockedSearchResponse = {
   [UISearchTypes.REGISTRATION_NUMBER]: {
     searchId: '12239',
     searchDateTime: '2020-05-13T21:08:32Z',
-    exactResultsSize: 1,
-    selectedResultsSize: 1,
-    returnedResultsSize: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER].length,
-    totalResultsSize: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER].length,
+    exactResultsSize: 12,
+    selectedResultsSize: 76,
+    returnedResultsSize: 76,
+    totalResultsSize: 76,
     maxResultsSize: 1000,
     searchQuery: {
       type: APISearchTypes.REGISTRATION_NUMBER,

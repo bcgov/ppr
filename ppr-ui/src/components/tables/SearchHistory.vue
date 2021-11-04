@@ -29,6 +29,7 @@
           </template>
           <template v-slot:[`item.pdf`]="{ item }">
             <v-btn
+              v-if="item.selectedResultsSize < 76"
               :id="`pdf-btn-${item.searchId}`"
               class="pdf-btn px-0 mt-n3"
               depressed
@@ -38,6 +39,21 @@
               <img src="@/assets/svgs/pdf-icon-blue.svg">
               <span class="pl-1">PDF</span>
             </v-btn>
+            <v-tooltip
+              v-else
+              class="pa-2"
+              content-class="top-tooltip"
+              nudge-right="2"
+              top
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              </template>
+              <div class="pt-2 pb-2">
+                {{ tooltipTxtPdf }}
+              </div>
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-col>
@@ -64,6 +80,9 @@ export default defineComponent({
   setup (props, { emit }) {
     const style = useCssModule()
     const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
+    const tooltipTxtPdf = 'We were unable to save a PDF search result report because it ' +
+      'exceeded the maximum limit of 75 results per report. Please contact us if you ' +
+      'require assistance.'
     const localState = reactive({
       loadingPDF: '',
       headers: searchHistroyTableHeaders,
@@ -140,7 +159,8 @@ export default defineComponent({
       displaySearchValue,
       displayType,
       downloadPDF,
-      style
+      style,
+      tooltipTxtPdf
     }
   }
 })

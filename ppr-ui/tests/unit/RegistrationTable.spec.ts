@@ -304,26 +304,4 @@ describe('Test registration table with results', () => {
       }
     )
   })
-
-  it('shows the snackbar when toggled', async () => {
-    // toggle show snackbar
-    await wrapper.setProps({ toggleSnackBar: true })
-    expect(wrapper.find('.v-snack__wrapper').exists()).toBe(true)
-    expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(true)
-    expect(wrapper.find('.v-snack__wrapper').text()).toContain(
-      'Registration was successfully added to your table'
-    )
-    // close snackbar
-    expect(wrapper.find('.snackbar-btn-close').exists()).toBe(true)
-    await wrapper.find('.snackbar-btn-close').trigger('click')
-    expect(wrapper.vm.$data.showSnackbar).toBe(false)
-    expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(false)
-    // verify toggle works again after the first time
-    await wrapper.setProps({ toggleSnackBar: false })
-    expect(wrapper.vm.$data.showSnackbar).toBe(true)
-    expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(true)
-    expect(wrapper.find('.v-snack__wrapper').text()).toContain(
-      'Registration was successfully added to your table'
-    )
-  })
 })

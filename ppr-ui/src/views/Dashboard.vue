@@ -24,6 +24,7 @@
       :registrationNumber="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
+    <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
     <div class="container pa-0">
       <v-row no-gutters>
         <v-col>
@@ -190,7 +191,6 @@
                 :setHeaders="myRegHeaders"
                 :setRegistrationHistory="myRegistrations"
                 :setSearch="myRegFilter"
-                :toggleSnackBar="myRegSnackBar"
                 @action="myRegActionHandler($event)"
                 @error="emitError($event)"
               />
@@ -255,6 +255,7 @@ import {
   updateUserSettings
 } from '@/utils'
 // local components
+import { BaseSnackbar } from '@/components/common'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
@@ -264,6 +265,7 @@ import { RegistrationBar } from '@/components/registration'
 @Component({
   components: {
     BaseDialog,
+    BaseSnackbar,
     RegistrationBar,
     RegistrationConfirmation,
     SearchHistory,
@@ -274,6 +276,7 @@ import { RegistrationBar } from '@/components/registration'
 })
 export default class Dashboard extends Vue {
   @Getter getSearchHistory: Array<SearchResponseIF>
+  @Getter getSearchHistoryLength: Number
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
@@ -283,6 +286,7 @@ export default class Dashboard extends Vue {
   @Action setSearchDebtorName: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
+  @Action setSearchHistoryLength: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
@@ -321,7 +325,8 @@ export default class Dashboard extends Vue {
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
   private myRegHeadersSelected = [...registrationTableHeaders]
-  private myRegSnackBar = false
+  private snackbarMsg = ''
+  private toggleSnackbar = false
   private tooltipTxtRegSrch = 'Retrieve existing registrations you would like to ' +
     'renew, discharge or amend that are not already in your registrations table.'
 
@@ -364,7 +369,8 @@ export default class Dashboard extends Vue {
     if (!addReg.error) {
       // add to my registrations list
       this.myRegDataHistory.unshift(addReg)
-      this.myRegSnackBar = !this.myRegSnackBar
+      this.snackbarMsg = 'Registration was successfully added to your table.'
+      this.toggleSnackbar = !this.toggleSnackbar
     } else {
       this.myRegAddErrSetDialog(addReg.error)
     }
@@ -673,8 +679,18 @@ export default class Dashboard extends Vue {
       }
       this.myRegHeadersSelected = headers
     }
+
     // tell App that we're finished loading
     this.emitHaveData(true)
+  }
+
+  @Watch('getSearchHistoryLength')
+  private handleSearchHistoryUpdate (newVal: number, oldVal: number): void {
+    // show snackbar if oldVal was not null
+    if (oldVal !== null) {
+      this.snackbarMsg = 'Search Result was successfully added to your table.'
+      this.toggleSnackbar = !this.toggleSnackbar
+    }
   }
 
   @Watch('getSearchResults')

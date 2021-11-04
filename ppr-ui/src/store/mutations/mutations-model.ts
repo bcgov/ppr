@@ -170,6 +170,7 @@ export const mutateSearching = (state: StateIF, searching: boolean) => {
 
 export const mutateSearchHistory = (state: StateIF, searchHistory: Array<SearchResponseIF>) => {
   state.stateModel.search.searchHistory = searchHistory
+  state.stateModel.search.searchHistoryLength = searchHistory?.length || 0
 }
 
 export const mutateSearchResults = (state: StateIF, searchResults: SearchResponseIF) => {

@@ -82,6 +82,7 @@ export const stateModel: StateModelIF = {
   search: {
     searchDebtorName: null,
     searchHistory: null,
+    searchHistoryLength: null,
     searchResults: null,
     searchedType: null,
     searchedValue: '',

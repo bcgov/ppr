@@ -216,28 +216,6 @@
         />
       </template>
     </v-data-table>
-    <v-snackbar
-      class="my-reg-snackbar"
-      timeout="4000"
-      v-model="showSnackbar"
-    >
-      <v-row no-gutters>
-        <v-col cols="11">
-          Registration was successfully added to your table.
-        </v-col>
-        <v-col cols="1">
-          <v-btn
-            class="snackbar-btn-close float-right ma-0 mr-n2 pa-0"
-            icon
-            :ripple="false"
-            small
-            @click="showSnackbar = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -291,9 +269,6 @@ export default defineComponent({
     },
     setRegistrationHistory: {
       default: [] as (RegistrationSummaryIF | DraftResultIF)[]
-    },
-    toggleSnackBar: {
-      default: false
     }
   },
   setup (props, { emit }) {
@@ -331,7 +306,6 @@ export default defineComponent({
       selectedSort: 'createDateTime',
       showDatePicker: false,
       statusTypes: [...StatusTypes],
-      showSnackbar: false,
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
@@ -429,10 +403,6 @@ export default defineComponent({
           datePicker.value.$el.scrollIntoView({ behavior: 'smooth' })
         }
       }
-    })
-
-    watch(() => props.toggleSnackBar, () => {
-      localState.showSnackbar = true
     })
 
     return {

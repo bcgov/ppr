@@ -6,7 +6,7 @@
           <v-col class="divider pr-3 mr-3" cols="auto">
             <b>{{ totalResultsLength }}</b> registrations found
           </v-col>
-          <v-col class="divider pr-3 mr-3" cols="auto">
+          <v-col :class="totalResultsLength !== 0 ? 'divider pr-3 mr-3' : ''" cols="auto">
             <b>{{ exactMatchesLength }}</b> exact matches
           </v-col>
           <v-col v-if="totalResultsLength !== 0" cols="auto">
@@ -15,7 +15,7 @@
         </v-row>
       </v-col>
       <v-col align-self="end" style="padding-right: 30px; width: 320px;">
-        <v-btn class="float-right" color="primary" depressed plain @click="console.log('submit')">
+        <v-btn id="btn-generate-result" class="float-right" color="primary" depressed plain @click="emit('submit')">
           <img class="pr-1" src="@/assets/svgs/pdf-icon-white.svg">
           Generate Search Result Report
         </v-btn>
@@ -35,12 +35,24 @@
           :items="results"
           :item-class="getClass"
           item-key="id"
+          :items-per-page="-1"
           mobile-breakpoint="0"
           return-object
           show-select
-          @toggle-select-all="selectAll"
+          @toggle-select-all="selectAll($event)"
           v-model="selected"
         >
+          <template v-slot:[`header.data-table-select`]="{ props, on }">
+            <v-checkbox
+              class="header-checkbox ma-0 pa-0"
+              color="primary"
+              hide-details
+              :indeterminate="props.indeterminate"
+              label="Select All"
+              :value="props.value"
+              @click="on.input(!props.value)"
+            />
+          </template>
           <template v-slot:[`item.data-table-select`]="{ item, isSelected, select }">
             <td v-if="isSelected && item.matchType === 'EXACT'" class="checkbox-info">
               <v-row no-gutters>
@@ -90,16 +102,13 @@
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row v-else id="search-no-results-info" class="no-results-info pt-3" justify="center" no-gutters>
-      <v-col cols="auto">
-        <v-row class="no-results-title pt-10" justify="center" no-gutters>
-          <b>Nil Result</b>
-        </v-row>
-        <v-row no-gutters justify="center" class="pt-3 pb-10">
-          <v-col>
-            <b>0</b> registrations | <b>0</b> exact matches
-          </v-col>
-        </v-row>
+    <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center" no-gutters>
+      <v-col cols="8">
+        <p class="no-results-title ma-0 pt-10"><b>Nil Result</b></p>
+        <p class="ma-0 pt-2">
+          No registered liens or encumbrances have been found on file that match EXACTLY to the
+          search criteria above and no similar matches to the criteria have been found.
+        </p>
       </v-col>
     </v-row>
   </v-container>
@@ -126,6 +135,7 @@ export default defineComponent({
       type: Array as () => Array<SearchResultIF>
     }
   },
+  emits: ['selected-matches', 'submit'],
   setup (props, { emit }) {
     const { getSearchResults } = useGetters<any>(['getSearchResults'])
     const localState = reactive({
@@ -212,6 +222,7 @@ export default defineComponent({
     return {
       ...toRefs(localState),
       displayDate,
+      emit,
       getClass,
       selectAll
     }
@@ -252,15 +263,28 @@ th {
   width: 100%;
 }
 .no-results-info {
-  color: $gray9 !important;
-  font-size: 0.825rem;
+  color: $gray7 !important;
+  font-size: 1rem;
+  text-align: center;
 }
 .no-results-title {
-  font-size: 1rem;
+  font-size: 1.125rem;
 }
 .result-info {
   color: $gray7 !important;
   font-size: 1rem;
+}
+::v-deep .header-checkbox .v-input__control .v-input__slot .v-label {
+  color: $primary-blue !important;
+  font-size: 0.875rem !important;
+  font-weight: normal;
+}
+::v-deep .header-checkbox .v-input__control .v-input--selection-controls__input i,
+::v-deep .header-checkbox .v-input__control .v-input--selection-controls__ripple,
+::v-deep .header-checkbox .v-input__control .mdi-checkbox-blank-outline,
+::v-deep .checkbox-info .row .col .v-simple-checkbox .v-input--selection-controls__ripple,
+::v-deep .checkbox-info .row .col .v-simple-checkbox .mdi-checkbox-blank-outline {
+  color: $primary-blue !important;
 }
 ::v-deep .results-table .v-data-table__wrapper {
   max-height: 550px;

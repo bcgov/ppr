@@ -1,11 +1,10 @@
 <template>
   <v-container fluid no-gutters class="white pa-6">
     <confirmation-dialog
-      :attach="attachDialog"
-      :options="paymentConfirmaionDialog"
-      :display="confirmationDialog"
-      :setting-option="settingOption"
-      @proceed="searchAction"
+      :setDisplay="confirmationDialog"
+      :setOptions="paymentConfirmaionDialog"
+      :setSettingOption="settingOption"
+      @proceed="searchAction($event)"
     />
     <v-row no-gutters class="pt-2">
       <v-col v-if="searchTitle" :class="$style['search-title']">
@@ -168,10 +167,6 @@ export default defineComponent({
     FolioNumber
   },
   props: {
-    attachDialog: {
-      type: String,
-      default: '#app'
-    },
     defaultDebtor: {
       type: Object as () => IndividualNameIF
     },

@@ -1,11 +1,14 @@
 <template>
   <v-container fluid class="view-container pa-15">
+    <v-overlay v-model="loading">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
+    <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
     <confirmation-dialog
-      :attach="attachDialog"
-      :options="options"
-      :display="confirmationDialog"
-      :settingOption="settingOption"
-      @proceed="submit"
+      :setDisplay="confirmationDialog"
+      :setOptions="confirmOptions"
+      :setSettingOption="settingOption"
+      @proceed="submit($event)"
     />
     <v-container class="container">
       <b :class="$style['search-title']">Search Results</b>
@@ -17,7 +20,7 @@
           <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
           <span :class="$style['search-info']">{{ searchTime }}</span>
         </p>
-        <p v-if="folioNumber" class="ma-0" style="padding-top: 22px;">
+        <p v-if="folioNumber" id="results-folio-header" class="ma-0" style="padding-top: 22px;">
           <b :class="$style['search-table-title']">Folio Number: </b>
           <span :class="$style['search-info']">{{ folioNumber }}</span>
         </p>
@@ -47,7 +50,7 @@
         </v-row>
       </div>
       <v-row v-if="getSearchResults" no-gutters style="padding-top: 38px;">
-        <searched-result class="soft-corners" @selected-matches="updateSelectedMatches"/>
+        <searched-result class="soft-corners" @selected-matches="updateSelectedMatches" @submit="submitCheck()" />
       </v-row>
     </v-container>
   </v-container>
@@ -59,21 +62,22 @@ import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+// local components
+import { BaseDialog, ConfirmationDialog } from '@/components/dialogs'
+import { SearchedResult } from '@/components/tables'
+import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
 import { RouteNames, SettingOptions } from '@/enums'
 import {
-  ActionBindingIF, DialogOptionsIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { selectionConfirmaionDialog } from '@/resources/dialogOptions'
+import { searchReportError, selectionConfirmaionDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
-// local components
-import { ConfirmationDialog } from '@/components/dialogs'
-import { SearchedResult } from '@/components/tables'
-import { SearchBar } from '@/components/search'
 
 @Component({
   components: {
+    BaseDialog,
     ConfirmationDialog,
     SearchBar,
     SearchedResult
@@ -104,13 +108,13 @@ export default class Search extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private confirmationDialog: boolean = false
-
-  private options: DialogOptionsIF = selectionConfirmaionDialog
-
+  private confirmationDialog = false
+  private confirmOptions = selectionConfirmaionDialog
+  private errorDialog = false
+  private errorOptions = searchReportError
+  private loading = false
   private selectedMatches: Array<SearchResultIF> = []
-
-  private settingOption: string = SettingOptions.SELECT_CONFIRMATION_DIALOG
+  private settingOption = SettingOptions.SELECT_CONFIRMATION_DIALOG
 
   private get folioNumber (): string {
     return this.getSearchResults?.searchQuery?.clientReferenceId || ''
@@ -175,16 +179,26 @@ export default class Search extends Vue {
     return similarCount
   }
 
+  private handleReportError (stayOnSearchResults: boolean): void {
+    this.errorDialog = false
+    if (!stayOnSearchResults) {
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
+  }
+
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
   }
 
   private submitCheck (): void {
-    if (this.getUserSettings?.selectConfirmationDialog && this.totalResultsLength > 0 &&
-                             this.similarResultsLength > 0) {
-      this.options = { ...selectionConfirmaionDialog }
-      this.options.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
+    if (
+      this.getUserSettings?.selectConfirmationDialog &&
+      this.totalResultsLength > 0 &&
+      this.similarResultsLength > 0
+    ) {
+      this.confirmOptions = { ...selectionConfirmaionDialog }
+      this.confirmOptions.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
       this.confirmationDialog = true
     } else {
       this.submit(true)
@@ -194,11 +208,20 @@ export default class Search extends Vue {
   private async submit (proceed: boolean): Promise<void> {
     this.confirmationDialog = false
     if (proceed) {
-      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
-      if (!successfulPPRResponses.includes(statusCode)) {
-        this.emitError({ statusCode: statusCode })
+      if (this.selectedMatches?.length < 76) {
+        this.loading = true
+        const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+        this.loading = false
+        if (!successfulPPRResponses.includes(statusCode)) {
+          this.emitError({ statusCode: statusCode })
+        } else {
+          // FUTURE: design error flow for this case (might need api flow changes for how a search is saved)
+          // submit the results, but don't wait for the response or check for any error
+          submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+          this.$router.push({ name: RouteNames.DASHBOARD })
+        }
       } else {
-        this.$router.push({ name: RouteNames.DASHBOARD })
+        this.errorDialog = true
       }
     }
   }
