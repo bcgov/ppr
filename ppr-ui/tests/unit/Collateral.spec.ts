@@ -9,7 +9,8 @@ import {
   mockedVehicleCollateral1,
   mockedSelectSecurityAgreement,
   mockedOtherCarbon,
-  mockedLienUnpaid
+  mockedLienUnpaid,
+  mockedRepairersLien
 } from './test-data'
 
 // Components
@@ -386,6 +387,41 @@ describe('Collateral SA tests for amendments', () => {
     //should still render for amendments
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
+
+    expect(wrapper.findAll(collateralSummary).length).toBe(1)
+    expect(wrapper.findAll(collateralEdit).length).toBe(0)
+   
+  })
+
+  
+})
+
+describe('Collateral RL tests for amendments', () => {
+  let wrapper: Wrapper<any>
+  const registrationType = mockedRepairersLien()
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+
+    wrapper = createComponent(false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('vehicle collateral and general collateral properly for amendments', async () => {
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    //should still render for amendments
+    expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
+    //should not render for repairers lien
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
 
     expect(wrapper.findAll(collateralSummary).length).toBe(1)
     expect(wrapper.findAll(collateralEdit).length).toBe(0)

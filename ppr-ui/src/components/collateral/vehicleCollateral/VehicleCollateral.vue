@@ -278,8 +278,7 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs,
-  watch
+  toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local components
@@ -323,7 +322,9 @@ export default defineComponent({
       invalidSection: false,
       showAddVehicle: false,
       showEditVehicle: [false],
-      showErrorComponent: props.showInvalid,
+      showErrorComponent: computed((): boolean => {
+        return props.showInvalid
+      }),
       summaryView: props.isSummary,
       getMH: computed(function () {
         const vc = getVehicleCollateral.value as VehicleCollateralIF[]
@@ -432,13 +433,6 @@ export default defineComponent({
       setVehicleCollateral(newVCollateral)
       // getDebtorValidity()
     }
-
-    watch(
-      () => props.showInvalid,
-      (val: boolean) => {
-        localState.showErrorComponent = val
-      }
-    )
 
     return {
       removeVehicle,
