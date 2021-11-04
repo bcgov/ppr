@@ -93,7 +93,6 @@
               <court-order :setSummary="true" />
             </div>
 
-
           </div>
 
           <h2 class="pt-14">
