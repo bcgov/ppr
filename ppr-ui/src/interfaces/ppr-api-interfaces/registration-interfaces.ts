@@ -30,7 +30,8 @@ export interface FinancingStatementIF {
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
   otherTypeDescription?: string, // Included if type is Other
-  error?: ErrorIF
+  error?: ErrorIF,
+  authorizationReceived?: boolean // Always true for the UI: API requirement.
 }
 
 // Draft interface. Change statement draft is out of scope.
@@ -89,7 +90,8 @@ export interface DischargeRegistrationIF {
   dischargeRegistrationNumber?: string, // Included on success, the identifier for the discharge registration.
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
-  error?: ErrorIF // Not null if the API call is unsuccessful.
+  error?: ErrorIF, // Not null if the API call is unsuccessful.
+  authorizationReceived?: boolean // Always true for the UI: API requirement.
 }
 
 // Renew registration interface. Slightly guessing on the fields here
@@ -104,7 +106,8 @@ export interface RenewRegistrationIF {
   renewalRegistrationNumber?: string,
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
-  error?: ErrorIF
+  error?: ErrorIF,
+  authorizationReceived?: boolean // Always true for the UI: API requirement.
 }
 
 // Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
@@ -130,5 +133,6 @@ export interface AmendmentStatementIF {
   createDateTime?: string, // Included in a successful response.
   amendmentRegistrationNumber?: string, // Included in a successful response. The unique identifier of the registration.
   payment?: PaymentIF, // Included in a successful response.
-  error?: ErrorIF
+  error?: ErrorIF,
+  authorizationReceived?: boolean // Always true for the UI: API requirement.
 }
