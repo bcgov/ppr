@@ -514,7 +514,7 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
   }
   const vcValid = stateModel.registration.collateral.vehicleCollateral?.length !== 0
   const gcValid = stateModel.registration.collateral.generalCollateral?.length !== 0
-  stateModel.registration.collateral.valid = vcValid && gcValid
+  stateModel.registration.collateral.valid = vcValid || gcValid
 
   if (draft.financingStatement.clientReferenceId) {
     stateModel.folioOrReferenceNumber = draft.financingStatement.clientReferenceId
