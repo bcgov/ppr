@@ -516,6 +516,7 @@ tr.registration-row td.actions-cell,
 .registration-row {
   // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
   background-color: #f2f6fb !important;
+  min-width: 164px;
   z-index: 3;
 }
 .registration-row td {
