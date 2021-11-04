@@ -284,6 +284,8 @@ export default defineComponent({
             localState.lifeYearsMessage =
               'Registration length must be between 1 and ' + localState.maxYears
             lt.valid = false
+            lt.lifeYears = 0
+            setLengthTrust(lt)
           } else {
             lt.lifeYears = life
             lt.valid = true
