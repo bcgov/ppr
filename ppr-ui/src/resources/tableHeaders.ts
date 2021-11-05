@@ -274,7 +274,7 @@ export const registeringTableHeaders: Array<BaseHeaderIF> = [
     value: 'emailAddress'
   },
   {
-    class: 'column-mds py-4',
+    class: 'column-mds py-4 text-no-wrap',
     sortable: false,
     text: 'Registering Party Code',
     value: 'code'
