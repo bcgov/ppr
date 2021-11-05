@@ -2,14 +2,18 @@
   <v-container v-if="isSummary" class="pb-0">
     <v-row
       no-gutters
-      :class="registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''"
+      :class="
+        registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''
+      "
       v-if="vehicleCollateral && vehicleCollateral.length > 0"
     >
       <v-col cols="3" class="pt-4 generic-label">
         Vehicle Collateral
       </v-col>
       <v-col
-        :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'ps-4' : ''"
+        :class="
+          registrationFlowType === RegistrationFlowType.AMENDMENT ? 'ps-4' : ''
+        "
         class="pt-6 pb-0"
       >
         <v-data-table
@@ -25,8 +29,12 @@
           <template v-slot:item="row" class="vehicle-data-table">
             <tr :key="row.item.id" :class="rowClass(row.item.action)">
               <td class="summary-cell pl-0">
-                <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
-                {{ getVehicleDescription(row.item.type) }}
+                <div
+                  :class="{
+                    'disabled-text': row.item.action === ActionTypes.REMOVED,
+                  }"
+                >
+                  {{ getVehicleDescription(row.item.type) }}
                 </div>
                 <div
                   v-if="
@@ -42,10 +50,20 @@
               <td>{{ row.item.year }}</td>
               <td>{{ row.item.make }}</td>
               <td>{{ row.item.model }}</td>
-              <td  :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}" class="vehicle-cell">
+              <td
+                :class="{
+                  'disabled-text': row.item.action === ActionTypes.REMOVED,
+                }"
+                class="vehicle-cell"
+              >
                 {{ row.item.serialNumber }}
               </td>
-              <td v-if="getMH" :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
+              <td
+                v-if="getMH"
+                :class="{
+                  'disabled-text': row.item.action === ActionTypes.REMOVED,
+                }"
+              >
                 {{ row.item.manufacturedHomeRegistrationNumber }}
               </td>
             </tr>
@@ -54,13 +72,21 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-container v-else
-    :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'"
-    fluid no-gutters
+  <v-container
+    v-else
+    :class="
+      registrationFlowType === RegistrationFlowType.AMENDMENT
+        ? 'px-6 py-0'
+        : 'pa-0'
+    "
+    fluid
+    no-gutters
   >
-    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral() &&
-              (registrationFlowType === RegistrationFlowType.NEW ||
-               registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)">
+    <v-row
+      no-gutters
+      class="pb-4 pt-10"
+      v-if="hasVehicleCollateral() && !isRepairersLienAmendment"
+    >
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -109,10 +135,19 @@
               :class="rowClass(row.item.action)"
             >
               <td class="pl-4">
-                <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
+                <div
+                  :class="{
+                    'disabled-text': row.item.action === ActionTypes.REMOVED,
+                  }"
+                >
                   {{ getVehicleDescription(row.item.type) }}
                 </div>
-                <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
+                <div
+                  v-if="
+                    row.item.action &&
+                      registrationFlowType === RegistrationFlowType.AMENDMENT
+                  "
+                >
                   <v-chip x-small label color="#1669BB" text-color="white">
                     {{ row.item.action }}
                   </v-chip>
@@ -133,25 +168,37 @@
               <!-- Action Btns -->
               <td class="actions-width actions-cell px-0 py-2">
                 <div class="actions actions-up float-right">
-                  <span v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT &&
-               registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !row.item.action)">
-                    <v-btn
-                      text
-                      color="primary"
-                      class="smaller-button dlt-btn"
-                      :id="'class-' + row.index + '-dlt-btn'"
-                      @click="removeVehicle(row.index)"
-                      :disabled="addEditInProgress"
+                  <span v-if="isRepairersLienAmendment && !row.item.action">
+                    <v-tooltip
+                      top
+                      content-class="top-tooltip pa-2 mr-2"
+                      transition="fade-transition"
+                      :disabled="!isLastDelete"
                     >
-                      <v-icon small>mdi-delete</v-icon>
-                      <span>Delete</span>
-                    </v-btn>
+                      <template v-slot:activator="{ on: onTooltip }">
+                        <div v-on="onTooltip">
+                          <v-btn
+                            text
+                            color="primary"
+                            class="smaller-button dlt-btn"
+                            :id="'class-' + row.index + '-dlt-btn'"
+                            @click="removeVehicle(row.index)"
+                            :disabled="isLastDelete"
+                          >
+                            <v-icon small>mdi-delete</v-icon>
+                            <span>Delete</span>
+                          </v-btn>
+                        </div>
+                      </template>
+                      An amendment cannot remove all vehicle collateral.
+                      This would require a Total Discharge.
+                    </v-tooltip>
                   </span>
                   <span
-                    v-else-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                    || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
-                    (row.item.action === ActionTypes.ADDED) || !row.item.action)"
-                  >
+                    v-else-if="registrationFlowType !== RegistrationFlowType.AMENDMENT ||
+                        (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                          row.item.action === ActionTypes.ADDED) ||
+                          !row.item.action">
                     <v-btn
                       text
                       color="primary"
@@ -162,8 +209,11 @@
                     >
                       <v-icon small>mdi-pencil</v-icon>
                       <span
-                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && row.item.action !== ActionTypes.ADDED"
+                        v-if="
+                          registrationFlowType ===
+                            RegistrationFlowType.AMENDMENT &&
+                            row.item.action !== ActionTypes.ADDED
+                        "
                       >
                         Amend
                       </span>
@@ -171,10 +221,17 @@
                     </v-btn>
                   </span>
 
-                  <span class="actions-border actions__more"
-                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                    || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!row.item.action ||
-                    row.item.action === ActionTypes.ADDED) && registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)"
+                  <span
+                    class="actions-border actions__more"
+                    v-if="
+                      registrationFlowType !== RegistrationFlowType.AMENDMENT ||
+                        (registrationFlowType ===
+                          RegistrationFlowType.AMENDMENT &&
+                          (!row.item.action ||
+                            row.item.action === ActionTypes.ADDED) &&
+                          registrationType !==
+                            APIRegistrationTypes.REPAIRERS_LIEN)
+                    "
                   >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
@@ -195,8 +252,11 @@
                           <v-list-item-subtitle>
                             <v-icon small>mdi-delete</v-icon>
                             <span
-                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && row.item.action !== ActionTypes.ADDED"
+                              v-if="
+                                registrationFlowType ===
+                                  RegistrationFlowType.AMENDMENT &&
+                                  row.item.action !== ActionTypes.ADDED
+                              "
                             >
                               Delete
                             </span>
@@ -207,8 +267,11 @@
                     </v-menu>
                   </span>
                   <span
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
+                    v-if="
+                      registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                        (row.item.action === ActionTypes.REMOVED ||
+                          row.item.action === ActionTypes.EDITED)
+                    "
                     class="edit-button"
                   >
                     <v-btn
@@ -224,9 +287,12 @@
                     </v-btn>
                   </span>
 
-                  <span class="actions-border actions__more"
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && row.item.action === ActionTypes.EDITED"
+                  <span
+                    class="actions-border actions__more"
+                    v-if="
+                      registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                        row.item.action === ActionTypes.EDITED
+                    "
                   >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
@@ -252,8 +318,11 @@
                           <v-list-item-subtitle>
                             <v-icon small>mdi-delete</v-icon>
                             <span
-                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && row.item.action !== ActionTypes.ADDED"
+                              v-if="
+                                registrationFlowType ===
+                                  RegistrationFlowType.AMENDMENT &&
+                                  row.item.action !== ActionTypes.ADDED
+                              "
                             >
                               Delete
                             </span>
@@ -300,7 +369,12 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local components
 import { EditCollateral } from '.'
 // local types/etc.
-import { ActionTypes, APIVehicleTypes, RegistrationFlowType, APIRegistrationTypes } from '@/enums'
+import {
+  ActionTypes,
+  APIVehicleTypes,
+  RegistrationFlowType,
+  APIRegistrationTypes
+} from '@/enums'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
@@ -345,6 +419,21 @@ export default defineComponent({
       invalidSection: false,
       showAddVehicle: false,
       showEditVehicle: [false],
+      isLastDelete: computed((): boolean => {
+        if (localState.isRepairersLienAmendment) {
+          let ctr = 0
+          for (let i = 0; i < getVehicleCollateral.value.length; i++) {
+            // is valid if there is at least one vehicle
+            if (getVehicleCollateral.value[i].action !== ActionTypes.REMOVED) {
+              ctr++
+            }
+          }
+          if (ctr <= 1) {
+            return true
+          }
+        }
+        return false
+      }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
       }),
@@ -382,8 +471,12 @@ export default defineComponent({
         return headersToShow
       }),
       vehicleCollateral: computed((): VehicleCollateralIF[] => {
-        const vehicles = getVehicleCollateral.value as VehicleCollateralIF[] || []
-        if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (localState.summaryView)) {
+        const vehicles =
+          (getVehicleCollateral.value as VehicleCollateralIF[]) || []
+        if (
+          registrationFlowType === RegistrationFlowType.AMENDMENT &&
+          localState.summaryView
+        ) {
           const displayArray = []
           for (let i = 0; i < vehicles.length; i++) {
             if (vehicles[i].action) {
@@ -394,6 +487,15 @@ export default defineComponent({
         } else {
           return vehicles
         }
+      }),
+      isRepairersLienAmendment: computed((): boolean => {
+        if (
+          registrationFlowType === RegistrationFlowType.AMENDMENT &&
+          registrationType === APIRegistrationTypes.REPAIRERS_LIEN
+        ) {
+          return true
+        }
+        return false
       })
     })
 
@@ -452,7 +554,11 @@ export default defineComponent({
     const undo = (index: number): void => {
       const newVCollateral = [...localState.vehicleCollateral]
       const originalCollateral = getOriginalAddCollateral.value
-      newVCollateral.splice(index, 1, cloneDeep(originalCollateral.vehicleCollateral[index]))
+      newVCollateral.splice(
+        index,
+        1,
+        cloneDeep(originalCollateral.vehicleCollateral[index])
+      )
       setVehicleCollateral(newVCollateral)
       // getDebtorValidity()
     }
