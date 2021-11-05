@@ -12,17 +12,37 @@
             <td class="section-sub-title">Registration Number:</td>
             <td>{{change.amendmentRegistrationNumber}}</td>
         </tr>
-        <tr>
-            <td class="section-sub-title">Description:</td>
-            <td>{{change.description}}</td>
-        </tr>
     </table>
 </div>
 
+{% if change.addTrustIndenture is defined or change.removeTrustIndenture is defined %}
+<div class="no-page-break container pt-4">
+    <div class="section-title mt-3">Trust Indenture</div>
+    <table class="section-data section-data-table mt-4" role="presentation">
+        <tr>
+            <td class="col-33">
+                <div class="section-sub-title">Trust Indenture</div>
+                <div class="pt-1"><span class="label">AMENDED</span></div>
+            </td>
+            <td class="col-33">
+                <div>{% if change.addTrustIndenture %}Yes{% else %}No{% endif %}</div>
+            </td>
+            <td class="col-33">                
+            </td>
+        </tr>
+    </table>
+</div>
+{% endif %}
 
-{% if change.courtOrderInformation is defined %}
+{% if change.addSecuredParties is defined or change.deleteSecuredParties is defined %}
 <div class="container pt-4">
-    [[registration/courtOrderInformation.html]]
+    [[registration/securedParties.html]]
+</div>
+{% endif %}
+
+{% if change.addDebtors is defined or change.deleteDebtors is defined %}
+<div class="container pt-4">
+    [[registration/debtors.html]]
 </div>
 {% endif %}
 
@@ -38,15 +58,33 @@
 </div>
 {% endif %}
 
-{% if change.addDebtors is defined or change.deleteDebtors is defined %}
+{% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined or 
+      change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
 <div class="container pt-4">
-    [[registration/debtors.html]]
+    <span class="section-data">
+        Only registration information that has been changed is displayed for this amendment. View the 
+        Current Registration Information at the beginning of this report for complete registration details.
+    </span>
 </div>
 {% endif %}
 
-{% if change.addSecuredParties is defined or change.deleteSecuredParties is defined %}
+{% if change.description is defined and description != "" %}
+<div class="no-page-break container pt-4">
+    <div class="section-title mt-3">Details Description</div>
+    <table class="section-data section-data-table mt-4" role="presentation">
+        <tr>
+            <td class="col-33">
+                <div class="section-sub-title">Details Description</div>
+            </td>
+            <td class="col-67">{{change.description}}</td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+
+{% if change.courtOrderInformation is defined %}
 <div class="container pt-4">
-    [[registration/securedParties.html]]
+    [[registration/courtOrderInformation.html]]
 </div>
 {% endif %}
 

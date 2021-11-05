@@ -1,191 +1,434 @@
 {
-  "amendmentRegistrationNumber": "TEST0018A3", 
-  "baseRegistrationNumber": "TEST0018", 
+  "amendmentRegistrationNumber": "100293B",
+  "baseRegistrationNumber": "100278B",
   "changes": [
     {
+      "addSecuredParties": [
+        {
+          "address": {
+            "city": "Victoria",
+            "country": "CA",
+            "postalCode": "V8W2C5",
+            "region": "BC",
+            "street": "1079 Douglas St"
+          },
+          "businessName": "RBC ROYAL BANK",
+          "code": "99990001",
+          "emailAddress": "test-1@test-rbc.com",
+          "former_name": "REGISTRAR, PERSONAL PROPERTY REGISTRY",
+          "partyId": 5816185,
+          "reg_id": 1867158
+        }
+      ],
+      "amendmentRegistrationNumber": "100293B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AS",
+      "clientReferenceId": "UT-AM-AS",
+      "createDateTime": "2021-10-29T21:04:50+00:00",
+      "deleteSecuredParties": [
+        {
+          "address": {
+            "city": "VICTORIA",
+            "country": "CA",
+            "postalCode": "V8W3E6",
+            "region": "BC",
+            "street": "2ND FLOOR, 940 BLANSHARD ST"
+          },
+          "businessName": "REGISTRAR, PERSONAL PROPERTY REGISTRY",
+          "code": "99990008",
+          "partyId": 5816150,
+          "reg_id": 1867158
+        }
+      ],
+      "description": "test secured party transfer amendment",
+      "payment": {
+        "invoiceId": "13608",
+        "receipt": "/api/v1/payment-requests/13608/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
+      "amendmentRegistrationNumber": "100292B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AP",
+      "clientReferenceId": "UT-AM-AP-VC",
+      "createDateTime": "2021-10-29T21:01:51+00:00",
+      "deleteVehicleCollateral": [
+        {
+          "make": "TESLA",
+          "model": "MODEL X",
+          "reg_id": 1867157,
+          "serialNumber": "TESLASFSFSF987666",
+          "type": "MV",
+          "vehicleId": 1311670,
+          "year": 2018
+        }
+      ],
+      "description": "test partial discharge vc",
+      "payment": {
+        "invoiceId": "13607",
+        "receipt": "/api/v1/payment-requests/13607/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
+      "amendmentRegistrationNumber": "100291B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AR",
+      "clientReferenceId": "UT-AM-AR",
+      "createDateTime": "2021-10-29T20:53:58+00:00",
+      "deleteDebtors": [
+        {
+          "address": {
+            "city": "VICTORIA",
+            "country": "CA",
+            "postalCode": "V8S 1V1",
+            "region": "BC",
+            "street": "500 FORT ST"
+          },
+          "businessName": "TEST DETBOR TRANSFER ADD LTD.",
+          "partyId": 5816180,
+          "reg_id": 1867156
+        }
+      ],
+      "description": "test debtor release amendment",
+      "payment": {
+        "invoiceId": "13605",
+        "receipt": "/api/v1/payment-requests/13605/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
+      "addVehicleCollateral": [
+        {
+          "make": "TESLA",
+          "model": "MODEL X",
+          "reg_id": 1867155,
+          "serialNumber": "TESLASFSFSF987666",
+          "type": "MV",
+          "vehicleId": 1311670,
+          "year": 2018
+        }
+      ],
+      "amendmentRegistrationNumber": "100290B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AU",
+      "clientReferenceId": "UT-AM-SU-VC2",
+      "createDateTime": "2021-10-29T20:49:09+00:00",
+      "deleteVehicleCollateral": [
+        {
+          "make": "TESLA",
+          "model": "MODEL 3",
+          "reg_id": 1867155,
+          "serialNumber": "TESLASFSFSF987777",
+          "type": "MV",
+          "vehicleId": 1311669,
+          "year": 2017
+        }
+      ],
+      "description": "TEST VC substitution",
+      "payment": {
+        "invoiceId": "13604",
+        "receipt": "/api/v1/payment-requests/13604/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
+      "addDebtors": [
+        {
+          "address": {
+            "city": "VICTORIA",
+            "country": "CA",
+            "postalCode": "V8S 1V1",
+            "region": "BC",
+            "street": "500 FORT ST"
+          },
+          "businessName": "TEST DETBOR TRANSFER ADD LTD.",
+          "former_name": "TEST ADD DEBTOR AMEND LTD.",
+          "partyId": 5816180,
+          "reg_id": 1867154
+        }
+      ],
+      "amendmentRegistrationNumber": "100289B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AD",
+      "clientReferenceId": "UT-AM-AD",
+      "createDateTime": "2021-10-29T20:39:58+00:00",
+      "deleteDebtors": [
+        {
+          "address": {
+            "city": "VICTORIA",
+            "country": "CA",
+            "postalCode": "V8S 1V1",
+            "region": "BC",
+            "street": "500 FORT ST"
+          },
+          "businessName": "TEST ADD DEBTOR AMEND LTD.",
+          "partyId": 5816178,
+          "reg_id": 1867154
+        }
+      ],
+      "description": "test debtor transfer amendment",
+      "payment": {
+        "invoiceId": "13602",
+        "receipt": "/api/v1/payment-requests/13602/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
+      "addDebtors": [
+        {
+          "address": {
+            "city": "VICTORIA",
+            "country": "CA",
+            "postalCode": "V8S 1V1",
+            "region": "BC",
+            "street": "500 FORT ST"
+          },
+          "businessName": "TEST ADD DEBTOR AMEND LTD.",
+          "former_name": "",
+          "partyId": 5816178,
+          "reg_id": 1867153
+        }
+      ],
+      "addTrustIndenture": true,
+      "amendmentRegistrationNumber": "100288B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AM",
+      "clientReferenceId": "UT-AM-TI-DEBTOR",
+      "createDateTime": "2021-10-29T20:35:15+00:00",
+      "description": "TEST add debtor change trust",
+      "payment": {
+        "invoiceId": "13601",
+        "receipt": "/api/v1/payment-requests/13601/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "removeTrustIndenture": true,
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
+      "addVehicleCollateral": [
+        {
+          "make": "Jaguar",
+          "model": "E-Type",
+          "reg_id": 1867151,
+          "serialNumber": "JAGETYPE123336",
+          "type": "MV",
+          "vehicleId": 1311668,
+          "year": 1966
+        }
+      ],
+      "amendmentRegistrationNumber": "100286B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AA",
+      "clientReferenceId": "UT-AM-VC-AC",
+      "createDateTime": "2021-10-29T19:18:43+00:00",
+      "description": "TEST VC add amendment",
+      "payment": {
+        "invoiceId": "13599",
+        "receipt": "/api/v1/payment-requests/13599/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
+    },
+    {
       "addGeneralCollateral": [
         {
-          "addedDateTime": "2021-09-03T22:00:00+00:00", 
-          "collateralId": 200000009, 
-          "description": "ADDING TEST0018 GC 5"
+          "addedDateTime": "2021-10-29T19:12:19+00:00",
+          "collateralId": 26,
+          "description": "ADD GC TEST AMENDMENT"
         }
-      ], 
-      "amendmentRegistrationNumber": "TEST0018A3", 
-      "baseRegistrationNumber": "TEST0018", 
-      "changeType": "AM", 
-      "clientReferenceId": "TEST-AM-0018-3", 
-      "createDateTime": "2021-09-03T22:00:00+00:00", 
-      "deleteGeneralCollateral": [
-        {
-          "addedDateTime": "2021-09-03T22:00:00+00:00", 
-          "collateralId": 200000010, 
-          "description": "DELETING TEST0018 GC 2"
-        }
-      ], 
-      "description": "TEST remove gc legacy 2, add gc 5", 
+      ],
+      "amendmentRegistrationNumber": "100285B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "AA",
+      "clientReferenceId": "UT-AM-AC-GC",
+      "createDateTime": "2021-10-29T19:12:19+00:00",
+      "description": "test add GC",
+      "payment": {
+        "invoiceId": "13598",
+        "receipt": "/api/v1/payment-requests/13598/receipts"
+      },
       "registeringParty": {
         "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST-0018-AM3", 
-          "streetAdditional": "line 2"
-        }, 
-        "personName": {
-          "first": "TEST-0018-AM", 
-          "last": "REGISTERING", 
-          "middle": "18-3"
-        }
-      }, 
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
       "statementType": "AMENDMENT_STATEMENT"
-    }, 
+    },
     {
-      "amendmentRegistrationNumber": "TEST0018A2", 
-      "baseRegistrationNumber": "TEST0018", 
-      "changeType": "AM", 
-      "clientReferenceId": "TEST-AM-0018-2", 
-      "createDateTime": "2021-09-03T21:00:00+00:00", 
-      "deleteGeneralCollateral": [
-        {
-          "addedDateTime": "2021-09-03T21:00:00+00:00", 
-          "collateralId": 200000008, 
-          "description": "*** DELETED *** TEST0018 GC 1 *** DELETED *** "
-        }
-      ], 
-      "description": "TEST remove gc legacy", 
+      "amendmentRegistrationNumber": "100283B",
+      "baseRegistrationNumber": "100278B",
+      "changeType": "CO",
+      "clientReferenceId": "UT-AM-COURT",
+      "courtOrderInformation": {
+        "courtName": "court name",
+        "courtRegistry": "court registry",
+        "effectOfOrder": "effect",
+        "fileNumber": "file num",
+        "orderDate": "2021-10-25T08:00:00+00:00"
+      },
+      "createDateTime": "2021-10-29T18:45:23+00:00",
+      "description": "test court order",
+      "payment": {
+        "invoiceId": "13596",
+        "receipt": "/api/v1/payment-requests/13596/receipts"
+      },
       "registeringParty": {
         "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST-0018-AM2", 
-          "streetAdditional": "line 2"
-        }, 
-        "personName": {
-          "first": "TEST-0018-AM", 
-          "last": "REGISTERING", 
-          "middle": "18-2"
-        }
-      }, 
-      "statementType": "AMENDMENT_STATEMENT"
-    }, 
-    {
-      "addGeneralCollateral": [
-        {
-          "addedDateTime": "2021-09-03T20:00:00+00:00", 
-          "collateralId": 200000007, 
-          "description": "TEST0018 GC 4 AMEND ADD"
-        }
-      ], 
-      "amendmentRegistrationNumber": "TEST0018A1", 
-      "baseRegistrationNumber": "TEST0018", 
-      "changeType": "AM", 
-      "clientReferenceId": "TEST-AM-0018-1", 
-      "createDateTime": "2021-09-03T20:00:00+00:00", 
-      "description": "TEST add gc legacy", 
-      "registeringParty": {
-        "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST-0018-AM1", 
-          "streetAdditional": "line 2"
-        }, 
-        "personName": {
-          "first": "TEST-0018-AM", 
-          "last": "REGISTERING", 
-          "middle": "18-1"
-        }
-      }, 
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
       "statementType": "AMENDMENT_STATEMENT"
     }
-  ], 
-  "clientReferenceId": "TEST-SA-0018", 
-  "createDateTime": "2021-09-03T19:00:00+00:00", 
+  ],
+  "clientReferenceId": "UT-SA-0014",
+  "courtOrderInformation": {
+    "courtName": "court name",
+    "courtRegistry": "court registry",
+    "effectOfOrder": "effect",
+    "fileNumber": "file num",
+    "orderDate": "2021-10-25T08:00:00+00:00"
+  },
+  "createDateTime": "2021-10-28T18:22:11+00:00",
   "debtors": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0018", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST 18 DEBTOR INC.", 
-      "partyId": 200000058
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V8S 1V1",
+        "region": "BC",
+        "street": "500 FORT ST"
+      },
+      "businessName": "TEST DEBTOR 5 LTD.",
+      "partyId": 5816151
     }
-  ], 
-  "expiryDate": "2026-09-04T06:59:59+00:00", 
+  ],
+  "expiryDate": "2026-10-29T06:59:59+00:00",
   "generalCollateral": [
     {
-      "addedDateTime": "2021-09-03T22:00:00+00:00", 
-      "collateralId": 200000009, 
-      "descriptionAdd": "ADDING TEST0018 GC 5", 
-      "descriptionDelete": "DELETING TEST0018 GC 2"
-    }, 
+      "addedDateTime": "2021-10-29T19:12:19+00:00",
+      "collateralId": 26,
+      "descriptionAdd": "ADD GC TEST AMENDMENT"
+    },
     {
-      "addedDateTime": "2021-09-03T21:00:00+00:00", 
-      "collateralId": 200000008, 
-      "descriptionDelete": "*** DELETED *** TEST0018 GC 1 *** DELETED *** "
-    }, 
-    {
-      "addedDateTime": "2021-09-03T20:00:00+00:00", 
-      "collateralId": 200000007, 
-      "descriptionAdd": "TEST0018 GC 4 AMEND ADD"
-    }, 
-    {
-      "addedDateTime": "2021-09-03T19:00:00+00:00", 
-      "collateralId": 200000006, 
-      "description": "TEST0018 GC 3"
-    }, 
-    {
-      "addedDateTime": "2021-09-03T19:00:00+00:00", 
-      "collateralId": 200000005, 
-      "description": "TEST0018 GC 2"
-    }, 
-    {
-      "addedDateTime": "2021-09-03T19:00:00+00:00", 
-      "collateralId": 200000004, 
-      "description": "TEST0018 GC 1"
+      "addedDateTime": "2021-10-28T18:22:11+00:00",
+      "collateralId": 23,
+      "description": "test gen collateral"
     }
-  ], 
-  "lifeYears": 5, 
+  ],
+  "lifeYears": 5,
+  "payment": {
+    "invoiceId": "13544",
+    "receipt": "/api/v1/payment-requests/13544/receipts"
+  },
   "registeringParty": {
     "address": {
-      "city": "city", 
-      "country": "CA", 
-      "postalCode": "V8R3A5", 
-      "region": "BC", 
-      "street": "TEST-0018", 
-      "streetAdditional": "line 2"
-    }, 
-    "personName": {
-      "first": "TEST", 
-      "last": "REGISTERING", 
-      "middle": "18"
-    }
-  }, 
-  "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
-  "registrationDescription": "PPSA SECURITY AGREEMENT", 
+      "city": "SASKATOON",
+      "country": "CA",
+      "postalCode": "S7J 4J4",
+      "region": "SK",
+      "street": "112-811 WOLLASTON CRES"
+    },
+    "businessName": "PPR 2"
+  },
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+  "registrationDescription": "PPSA SECURITY AGREEMENT",
   "securedParties": [
     {
+      "added": true,
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0018", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST 18 SECURED PARTY", 
-      "partyId": 200000059
+        "city": "Victoria",
+        "country": "CA",
+        "postalCode": "V8W2C5",
+        "region": "BC",
+        "street": "1079 Douglas St"
+      },
+      "businessName": "RBC ROYAL BANK",
+      "code": "99990001",
+      "emailAddress": "test-1@test-rbc.com",
+      "partyId": 5816185
     }
-  ], 
-  "statusType": "ACT", 
-  "trustIndenture": true, 
+  ],
+  "statusType": "ACT",
+  "trustIndenture": true,
   "type": "SA"
 }

@@ -1,113 +1,60 @@
 {
-  "baseRegistrationNumber": "TEST0001", 
-  "clientReferenceId": "TEST-SA-0001", 
-  "createDateTime": "2021-07-15T15:41:58+00:00", 
+  "baseRegistrationNumber": "100278B",
+  "clientReferenceId": "UT-SA-0014",
+  "createDateTime": "2021-10-28T18:22:11+00:00",
   "debtors": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0001", 
-        "streetAdditional": "line 2"
-      }, 
-      "partyId": 200000001, 
-      "personName": {
-        "first": "TEST IND", 
-        "last": "DEBTOR", 
-        "middle": "1"
-      }
-    }, 
-    {
-      "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0001", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST BUS 2 DEBTOR", 
-      "partyId": 200000002
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V8S 1V1",
+        "region": "BC",
+        "street": "500 FORT ST"
+      },
+      "businessName": "TEST DEBTOR 5 LTD.",
+      "partyId": 5816151
     }
-  ], 
-  "expiryDate": "2023-07-15T15:41:58+00:00", 
+  ],
+  "expiryDate": "2026-10-29T06:59:59+00:00",
   "generalCollateral": [
     {
-      "collateralId": 200000000, 
-      "description": "TEST0001 GC 1"
-    }, 
-    {
-      "collateralId": 200000001, 
-      "description": "TEST0001 GC 2"
+      "addedDateTime": "2021-10-28T18:22:11+00:00",
+      "collateralId": 23,
+      "description": "test gen collateral"
     }
-  ], 
-  "lifeYears": 2, 
+  ],
+  "lifeYears": 5,
+  "payment": {
+    "invoiceId": "13544",
+    "receipt": "/api/v1/payment-requests/13544/receipts"
+  },
   "registeringParty": {
     "address": {
-      "city": "city", 
-      "country": "CA", 
-      "postalCode": "V8R3A5", 
-      "region": "BC", 
-      "street": "TEST-0001", 
-      "streetAdditional": "line 2"
-    }, 
-    "personName": {
-      "first": "TEST", 
-      "last": "REGISTERING", 
-      "middle": "1"
-    }
-  }, 
-  "registrationAct": "PPSA SECURITY ACT", 
-  "registrationDescription": "PPSA SECURITY AGREEMENT", 
+      "city": "SASKATOON",
+      "country": "CA",
+      "postalCode": "S7J 4J4",
+      "region": "SK",
+      "street": "112-811 WOLLASTON CRES"
+    },
+    "businessName": "PPR 2"
+  },
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+  "registrationDescription": "PPSA SECURITY AGREEMENT",
   "securedParties": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0001", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST 1 SECURED PARTY", 
-      "partyId": 200000003
-    }, 
-    {
-      "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST 200000000", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST PARTY CODE 1", 
-      "code": "200000000", 
-      "emailAddress": "test-sp-client@gmail.com", 
-      "partyId": 200000004
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V8W3E6",
+        "region": "BC",
+        "street": "2ND FLOOR, 940 BLANSHARD ST"
+      },
+      "businessName": "REGISTRAR, PERSONAL PROPERTY REGISTRY",
+      "code": "99990008",
+      "partyId": 5816150
     }
-  ], 
-  "statusType": "ACT", 
-  "trustIndenture": true, 
-  "type": "SA", 
-  "vehicleCollateral": [
-    {
-      "make": "HYUNDAI", 
-      "model": "TUSCON", 
-      "serialNumber": "KM8J3CA46JU622994", 
-      "type": "MV", 
-      "vehicleId": 200000000, 
-      "year": 2018
-    }, 
-    {
-      "make": "HOMCO IND. LTD DIPLOMAT", 
-      "manufacturedHomeRegistrationNumber": "021324", 
-      "serialNumber": "9407", 
-      "type": "MH", 
-      "vehicleId": 200000001, 
-      "year": 2001
-    }
-  ]
+  ],
+  "statusType": "ACT",
+  "trustIndenture": true,
+  "type": "SA"
 }

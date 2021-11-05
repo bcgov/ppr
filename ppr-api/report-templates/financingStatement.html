@@ -31,7 +31,11 @@
         <tr>
           <td>Base Registration Number: {{ baseRegistrationNumber }}</td>
           <td style="padding-bottom: 2px;">
-            {% if statusType == 'HDC' %} 
+            {% if changes and changes[0].statementType == 'AMENDMENT_STATEMENT' %} 
+              <span class="badge-gold">AMENDED</span>
+            {% elif changes and changes[0].statementType == 'RENEWAL_STATEMENT' %} 
+              <span class="badge-gold">RENEWED</span>
+            {% elif statusType == 'HDC' %} 
               <span class="badge-gold">DISCHARGED</span>
             {% elif statusType == 'HEX' %} 
               <span class="badge-gold">EXPIRED</span>
@@ -51,10 +55,34 @@
           <td>Base Registration Date and Time:</td>
           <td>{{createDateTime}}</td>
         </tr>
-        {% if dischargedDateTime is defined %}
+        {% if changes is not defined %}
+        <tr>
+          <td class="section-sub-title">Registration Length:</td>
+          <td>
+              {% if lifeInfinite is defined and lifeInfinite %}
+                  Infinite
+              {% elif lifeYears is not defined or lifeYears == 0 %}
+                  180 Days
+              {% elif lifeYears is defined %}
+                  {{lifeYears}} {% if lifeYears != 1 %} Years {% else %} Year {% endif %}
+              {% endif %}
+          </td>
+        </tr>
+        {% endif %}
+        {% if dischargedDateTime is defined and changes and changes[0].statementType == 'DISCHARGE_STATEMENT' %}
         <tr>
           <td>Discharge Date and Time:</td>
           <td>{{dischargedDateTime}}</td>
+        </tr>
+        {% elif changes and changes[0].statementType == 'RENEWAL_STATEMENT' %}
+        <tr>
+          <td>Renewal Date and Time:</td>
+          <td>{{changes[0].createDateTime}}</td>
+        </tr>
+        {% elif changes and changes[0].statementType == 'AMENDMENT_STATEMENT' %}
+        <tr>
+          <td>Amendment Date and Time:</td>
+          <td>{{changes[0].createDateTime}}</td>
         </tr>
         {% endif %}
         <tr>
