@@ -58,7 +58,9 @@
     :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'"
     fluid no-gutters
   >
-    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral()">
+    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral() &&
+              (registrationFlowType === RegistrationFlowType.NEW ||
+               registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)">
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -131,8 +133,22 @@
               <!-- Action Btns -->
               <td class="actions-width actions-cell px-0 py-2">
                 <div class="actions actions-up float-right">
+                  <span v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT &&
+               registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !row.item.action)">
+                    <v-btn
+                      text
+                      color="primary"
+                      class="smaller-button dlt-btn"
+                      :id="'class-' + row.index + '-dlt-btn'"
+                      @click="removeVehicle(row.index)"
+                      :disabled="addEditInProgress"
+                    >
+                      <v-icon small>mdi-delete</v-icon>
+                      <span>Delete</span>
+                    </v-btn>
+                  </span>
                   <span
-                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                    v-else-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                     || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
                     (row.item.action === ActionTypes.ADDED) || !row.item.action)"
                   >
@@ -158,7 +174,7 @@
                   <span class="actions-border actions__more"
                     v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                     || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!row.item.action ||
-                    row.item.action === ActionTypes.ADDED))"
+                    row.item.action === ActionTypes.ADDED) && registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)"
                   >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
@@ -284,7 +300,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local components
 import { EditCollateral } from '.'
 // local types/etc.
-import { ActionTypes, APIVehicleTypes, RegistrationFlowType } from '@/enums'
+import { ActionTypes, APIVehicleTypes, RegistrationFlowType, APIRegistrationTypes } from '@/enums'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
@@ -305,16 +321,23 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getVehicleCollateral, getRegistrationFlowType, getOriginalAddCollateral } = useGetters<any>([
+    const {
+      getVehicleCollateral,
+      getRegistrationFlowType,
+      getOriginalAddCollateral,
+      getRegistrationType
+    } = useGetters<any>([
       'getVehicleCollateral',
       'getRegistrationFlowType',
-      'getOriginalAddCollateral'
+      'getOriginalAddCollateral',
+      'getRegistrationType'
     ])
     const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
 
     const { hasVehicleCollateral } = useVehicle(props, context)
 
     const registrationFlowType = getRegistrationFlowType.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const localState = reactive({
       activeIndex: -1,
@@ -444,6 +467,8 @@ export default defineComponent({
       registrationFlowType,
       RegistrationFlowType,
       ActionTypes,
+      registrationType,
+      APIRegistrationTypes,
       undo,
       rowClass,
       ...toRefs(localState)

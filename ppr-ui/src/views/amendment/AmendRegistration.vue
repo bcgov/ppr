@@ -38,13 +38,25 @@
           />
           <h3 class="pt-6 px-1">Secured Parties</h3>
           <secured-parties
+            v-if="registrationType !== registrationTypeRL"
             @setSecuredPartiesValid="securedPartiesValid = $event"
             :setShowInvalid="showInvalid" class="pt-4"
           />
+          <secured-party-summary
+            v-else
+            class="secured-party-summary"
+            :setEnableNoDataAction="false"
+          />
           <h3 class="pt-6 px-1">Debtors</h3>
           <debtors
+            v-if="registrationType !== registrationTypeRL"
             @setDebtorValid="debtorValid = $event"
             :setShowInvalid="showInvalid"
+          />
+          <debtor-summary
+            v-else
+            class="debtor-summary"
+            :setEnableNoDataAction="false"
           />
           <collateral
             @setCollateralValid="collateralValid = $event"
@@ -90,7 +102,7 @@ import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { Debtors, SecuredParties } from '@/components/parties'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
-import { RegisteringPartySummary } from '@/components/parties/summaries'
+import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import {
   APIRegistrationTypes, // eslint-disable-line no-unused-vars
@@ -132,6 +144,8 @@ import { StatusCodes } from 'http-status-codes'
     RegistrationLengthTrustAmendment,
     RegisteringPartySummary,
     SecuredParties,
+    SecuredPartySummary,
+    DebtorSummary,
     StickyContainer
   }
 })
@@ -215,6 +229,10 @@ export default class AmendRegistration extends Vue {
 
   private get registrationType (): APIRegistrationTypes {
     return this.getRegistrationType?.registrationTypeAPI || null
+  }
+
+  private get registrationTypeRL (): string {
+    return APIRegistrationTypes.REPAIRERS_LIEN
   }
 
   private async loadRegistration (): Promise<void> {
