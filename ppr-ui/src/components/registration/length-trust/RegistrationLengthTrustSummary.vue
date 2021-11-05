@@ -29,7 +29,7 @@
         :class="{ 'invalid-message': showErrorSummary }"
         style="padding: 40px 30px;"
       >
-        <v-row no-gutters v-if="showErrorSummary" class="pa-6">
+        <v-row no-gutters v-if="showErrorSummary" class="pb-6">
           <v-col cols="auto">
             <span :class="{ 'invalid-message': showErrorSummary }">
               <v-icon color="error">mdi-information-outline</v-icon>

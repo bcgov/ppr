@@ -36,7 +36,7 @@
                 <td>{{ row.item.code }}</td>
                 <td class="actions-cell actions-width px-0" v-if="registrationFlowType === RegistrationFlowType.NEW">
                 <div class="actions float-right actions-up">
-                  <v-list class="actions__more-actions">
+                  <v-list class="actions__more-actions pr-5">
                     <v-list-item class="v-remove" v-if="!row.item.action" @click="changeRegisteringParty()">
                       <v-list-item-subtitle>
                         <v-icon small>mdi-pencil</v-icon>
