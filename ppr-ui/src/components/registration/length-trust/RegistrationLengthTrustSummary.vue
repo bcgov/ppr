@@ -106,6 +106,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
 import { APIRegistrationTypes, RouteNames } from '@/enums'
+import { getFinancingFee } from '@/composables/fees/factories'
 
 export default defineComponent({
   props: {
@@ -121,6 +122,7 @@ export default defineComponent({
       'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
+    const feeInfoYears = getFinancingFee(false)
     const router = context.root.$router
     const route = context.root.$route
 
@@ -178,6 +180,10 @@ export default defineComponent({
         }
         if (!getLengthTrust.value.lifeInfinite && getLengthTrust.value.lifeYears < 1) {
           return 'Not entered'
+        }
+        if (!getLengthTrust.value.lifeInfinite && (isNaN(getLengthTrust.value.lifeYears) ||
+          getLengthTrust.value.lifeYears < 1 || getLengthTrust.value.lifeYears > feeInfoYears.quantityMax)) {
+          return 'Not valid'
         }
         if (getLengthTrust.value.lifeInfinite) {
           return 'Infinite'
