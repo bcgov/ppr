@@ -8,7 +8,8 @@ import {
   mockedSecuredParties1,
   mockedDebtors1,
   mockedRegisteringParty1,
-  mockedSecuredPartiesAmendment
+  mockedSecuredPartiesAmendment,
+  mockedSelectSecurityAgreement
 } from './test-data'
 
 // Components
@@ -47,6 +48,8 @@ describe('Party Summary SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    const registrationType = mockedSelectSecurityAgreement()
+    await store.dispatch('setRegistrationType', registrationType)
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent(partyTableHeaders, mockedSecuredParties1, {
       enableNoDataAction: false,
