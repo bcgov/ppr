@@ -87,7 +87,7 @@
           <b>DELETED</b>
         </v-chip>
         <p class="pt-3 ma-0">
-          <span style="white-space: pre;">{{ lastGeneralCollateral.descriptionDelete }}</span>
+          <span style="white-space: pre-wrap;">{{ lastGeneralCollateral.descriptionDelete }}</span>
         </p>
       </div>
       <div v-if="lastGeneralCollateral.descriptionAdd" class="gc-description-add pt-5">
@@ -95,7 +95,7 @@
           <b>ADDED</b>
         </v-chip>
         <p class="pt-3 ma-0">
-          <span style="white-space: pre;">{{ lastGeneralCollateral.descriptionAdd }}</span>
+          <span style="white-space: pre-wrap;">{{ lastGeneralCollateral.descriptionAdd }}</span>
         </p>
       </div>
     </div>
@@ -128,7 +128,7 @@
                 <b>DELETED</b>
               </v-chip>
               <p class="pt-3 ma-0">
-                <span style="white-space: pre;">{{ item.descriptionDelete }}</span>
+                <span style="white-space: pre-wrap;">{{ item.descriptionDelete }}</span>
               </p>
             </div>
             <div v-if="item.descriptionAdd" class="gc-description-add pt-5">
@@ -136,7 +136,7 @@
                 <b>ADDED</b>
               </v-chip>
               <p class="pt-3 ma-0">
-                <span style="white-space: pre;">{{ item.descriptionAdd }}</span>
+                <span style="white-space: pre-wrap;">{{ item.descriptionAdd }}</span>
               </p>
             </div>
             <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description pt-5">
@@ -144,7 +144,7 @@
                 Base Registration General Collateral:
               </b>
               <p v-if="item.description" class="pt-5 ma-0">
-                <span style="white-space: pre;">{{ item.description }}</span>
+                <span style="white-space: pre-wrap;">{{ item.description }}</span>
               </p>
             </div>
           </v-col>
@@ -153,7 +153,7 @@
     </div>
     <div v-else class="general-collateral-summary pt-5">
       <p v-if="generalCollateral.length > 0" class="ma-0">
-        <span style="white-space: pre;">{{ generalCollateral[0].description }}</span>
+        <span style="white-space: pre-wrap;">{{ generalCollateral[0].description }}</span>
       </p>
     </div>
   </v-container>

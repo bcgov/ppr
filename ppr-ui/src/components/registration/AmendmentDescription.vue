@@ -45,7 +45,7 @@
         Details Description
       </v-col>
       <v-col cols="9" class="summary-text pr-4">
-        <span style="white-space: pre;">{{ detailDescription }}</span>
+        <span style="white-space: pre-wrap">{{ detailDescription }}</span>
       </v-col>
     </v-row>
   </v-container>
