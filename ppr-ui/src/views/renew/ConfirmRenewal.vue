@@ -44,6 +44,10 @@
           />
           <registration-length-trust-summary class="mt-10" :isRenewal="true"
           />
+          <div v-if="showCourtOrderInfo">
+            <court-order :setSummary="true" :isRenewal="true" class="pt-10" />
+          </div>
+
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -88,6 +92,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   FolioNumberSummary,
   CertifyInformation,
+  CourtOrder,
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -116,6 +121,7 @@ import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from 
 @Component({
   components: {
     BaseDialog,
+    CourtOrder,
     FolioNumberSummary,
     RegisteringPartySummary,
     RegistrationLengthTrustSummary,
@@ -194,6 +200,10 @@ export default class ConfirmDischarge extends Vue {
       return '< Please complete required information'
     }
     return ''
+  }
+
+  private get showCourtOrderInfo (): boolean {
+    return (this.registrationType && this.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
   }
 
   private cancel (val: boolean): void {
