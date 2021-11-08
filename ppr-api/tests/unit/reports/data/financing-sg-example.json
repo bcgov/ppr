@@ -1,0 +1,103 @@
+{
+  "baseRegistrationNumber": "100282B",
+  "clientReferenceId": "123456",
+  "createDateTime": "2021-10-29T00:11:42+00:00",
+  "debtors": [
+    {
+      "address": {
+        "city": "RICHMOND",
+        "country": "CA",
+        "postalCode": "V6V 1Z6",
+        "region": "BC",
+        "street": "3320 JACOMBS RD"
+      },
+      "birthDate": "1965-04-21T08:00:00+00:00",
+      "emailAddress": "email@email.com",
+      "partyId": 5816168,
+      "personName": {
+        "first": "JOHN",
+        "last": "TEST",
+        "middle": "AUTOMATION"
+      }
+    },
+    {
+      "address": {
+        "city": "COQUITLAM",
+        "country": "CA",
+        "postalCode": "V3K 3V9",
+        "region": "BC",
+        "street": "BC-435 NORTH RD"
+      },
+      "businessName": "PARTY FAVOUR PARTY SERVICE",
+      "emailAddress": "email@test.com",
+      "partyId": 5816169
+    }
+  ],
+  "generalCollateral": [
+    {
+      "addedDateTime": "2021-10-29T00:11:42+00:00",
+      "collateralId": 24,
+      "description": "General Collateral Automation Test."
+    }
+  ],
+  "lifeInfinite": true,
+  "payment": {
+    "invoiceId": "13581",
+    "receipt": "/api/v1/payment-requests/13581/receipts"
+  },
+  "registeringParty": {
+    "address": {
+      "city": "VICTORIA",
+      "country": "CA",
+      "postalCode": "V9B 6A2",
+      "region": "BC",
+      "street": "799 MCCALLUM RD"
+    },
+    "businessName": "DIVYA DEV PAD"
+  },
+  "registrationAct": "SALE OF GOODS ACT, S.30",
+  "registrationDescription": "POSSESSION UNDER S.30 OF THE SALE OF GOODS ACT",
+  "securedParties": [
+    {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V9B 6A2",
+        "region": "BC",
+        "street": "799 MCCALLUM RD"
+      },
+      "emailAddress": "email@email.com",
+      "partyId": 5816166,
+      "personName": {
+        "first": "JAMES",
+        "last": "TEST",
+        "middle": "AUTOMATION"
+      }
+    },
+    {
+      "address": {
+        "city": "VANCOUVER",
+        "country": "CA",
+        "postalCode": "V5Z 3B2",
+        "region": "BC",
+        "street": "B-6437 CAMBIE ST"
+      },
+      "businessName": "HYUNDAI MOTOR FINANCE",
+      "emailAddress": "email@test.com",
+      "partyId": 5816167
+    }
+  ],
+  "statusType": "ACT",
+  "trustIndenture": false,
+  "type": "SG",
+  "vehicleCollateral": [
+    {
+      "make": "UTILITY",
+      "model": "V/D 53 T/A AIR",
+      "serialNumber": "1KDGWUGWK9237649",
+      "type": "TR",
+      "vehicleId": 1311667,
+      "year": 2015
+    }
+  ]
+}

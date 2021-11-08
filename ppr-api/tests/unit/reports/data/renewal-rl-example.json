@@ -1,109 +1,126 @@
 {
-  "baseRegistrationNumber": "TEST0002", 
+  "baseRegistrationNumber": "100320B",
   "changes": [
     {
-      "baseRegistrationNumber": "TEST0002", 
-      "clientReferenceId": "TEST-REN-0006", 
+      "baseRegistrationNumber": "100320B",
+      "clientReferenceId": "T-RS-RL-00320B-1",
       "courtOrderInformation": {
-        "courtName": "Supreme Court of British Columbia", 
-        "courtRegistry": "Victoria", 
-        "effectOfOrder": "Court Order to renew Repairer's Lien.", 
-        "fileNumber": "BC123495", 
-        "orderDate": "2022-04-11T01:04:58+00:00"
-      }, 
-      "createDateTime": "2021-09-23T01:09:58+00:00", 
-      "expiryDate": "2022-09-18T06:59:59+00:00", 
-      "lifeYears": 0, 
+        "courtName": "Supreme Court of British Columbia.",
+        "courtRegistry": "VICTORIA",
+        "effectOfOrder": "Court Order to renew Repairers Lien.",
+        "fileNumber": "BC123495",
+        "orderDate": "2021-11-04T08:01:00+00:00"
+      },
+      "createDateTime": "2021-11-04T22:43:54+00:00",
+      "expiryDate": "2022-11-01T06:59:59+00:00",
+      "lifeYears": 0,
+      "payment": {
+        "invoiceId": "13810",
+        "receipt": "/api/v1/payment-requests/13810/receipts"
+      },
       "registeringParty": {
         "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST-00R6", 
-          "streetAdditional": "line 2"
-        }, 
-        "personName": {
-          "first": "TEST-RENEWAL-RL", 
-          "last": "REGISTERING", 
-          "middle": "6"
-        }
-      }, 
-      "renewalRegistrationNumber": "TEST00R6", 
+          "city": "VICTORIA",
+          "country": "CA",
+          "postalCode": "V8W 2V8",
+          "region": "BC",
+          "street": "222 SUMMER STREET"
+        },
+        "businessName": "ABC SEARCHING COMPANY"
+      },
+      "renewalRegistrationNumber": "100321B",
       "statementType": "RENEWAL_STATEMENT"
     }
-  ], 
-  "clientReferenceId": "TEST-RL-0001", 
+  ],
+  "clientReferenceId": "T-FS-RL-0008",
   "courtOrderInformation": {
-    "courtName": "Supreme Court of British Columbia", 
-    "courtRegistry": "Victoria", 
-    "effectOfOrder": "Court Order to renew Repairer's Lien.", 
-    "fileNumber": "BC123495", 
-    "orderDate": "2022-04-11T01:04:58+00:00"
-  }, 
-  "createDateTime": "2021-09-23T01:04:58+00:00", 
+    "courtName": "Supreme Court of British Columbia.",
+    "courtRegistry": "VICTORIA",
+    "effectOfOrder": "Court Order to renew Repairers Lien.",
+    "fileNumber": "BC123495",
+    "orderDate": "2021-11-04T08:01:00+00:00"
+  },
+  "createDateTime": "2021-11-04T22:40:07+00:00",
   "debtors": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0002", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST BUS 2 DEBTOR", 
-      "partyId": 200000006
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "A1A 1A1",
+        "region": "BC",
+        "street": "721 DEBTOR AVE"
+      },
+      "birthDate": "1990-06-15T07:00:00+00:00",
+      "businessName": "DEBTOR TEST RL1 INC.",
+      "partyId": 5816253
+    },
+    {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "A1A 1A1",
+        "region": "BC",
+        "street": "721 DEBTOR AVE"
+      },
+      "businessName": "DEBTOR TEST RL2 INC.",
+      "partyId": 5816254
+    },
+    {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "A1A 1A1",
+        "region": "BC",
+        "street": "721 DEBTOR AVE"
+      },
+      "businessName": "DEBTOR TEST RL3 INC.",
+      "partyId": 5816255
     }
-  ], 
-  "expiryDate": "2021-12-22T01:04:58+00:00", 
-  "lienAmount": "2000.00", 
+  ],
+  "expiryDate": "2022-11-01T06:59:59+00:00",
+  "lienAmount": "10,000.00",
+  "payment": {
+    "invoiceId": "13809",
+    "receipt": "/api/v1/payment-requests/13809/receipts"
+  },
   "registeringParty": {
     "address": {
-      "city": "city", 
-      "country": "CA", 
-      "postalCode": "V8R3A5", 
-      "region": "BC", 
-      "street": "TEST-0002", 
-      "streetAdditional": "line 2"
-    }, 
-    "personName": {
-      "first": "TEST", 
-      "last": "REGISTERING", 
-      "middle": "2"
-    }
-  }, 
-  "registrationAct": "REPAIRERS LIEN ACT", 
-  "registrationDescription": "REPAIRERS LIEN", 
-  "renewalRegistrationNumber": "TEST00R6", 
+      "city": "VICTORIA",
+      "country": "CA",
+      "postalCode": "V8W 2V8",
+      "region": "BC",
+      "street": "222 SUMMER STREET"
+    },
+    "businessName": "ABC SEARCHING COMPANY"
+  },
+  "registrationAct": "REPAIRERS LIEN ACT",
+  "registrationDescription": "REPAIRERS LIEN",
+  "renewalRegistrationNumber": "100321B",
   "securedParties": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST 200000000", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST PARTY CODE 1", 
-      "code": "200000000", 
-      "emailAddress": "test-sp-client@gmail.com", 
-      "partyId": 200000007
+        "city": "SIDNEY",
+        "country": "CA",
+        "postalCode": "V7R 1R7",
+        "region": "BC",
+        "street": "3721 BEACON AVENUE"
+      },
+      "businessName": "BANK OF BRITISH COLUMBIA",
+      "partyId": 5816252
     }
-  ], 
-  "statusType": "ACT", 
-  "surrenderDate": "2021-12-22T01:04:58+00:00", 
-  "trustIndenture": false, 
-  "type": "RL", 
+  ],
+  "statusType": "ACT",
+  "surrenderDate": "2021-11-03T07:00:00+00:00",
+  "trustIndenture": false,
+  "type": "RL",
   "vehicleCollateral": [
     {
-      "make": "HYUNDAI", 
-      "model": "TUSCON", 
-      "serialNumber": "KX8J3CA46JU622994", 
-      "type": "MV", 
-      "vehicleId": 200000002, 
-      "year": 2014
+      "make": "HYUNDAI",
+      "model": "TUCSON",
+      "serialNumber": "KM8J3CA46JU622994",
+      "type": "MV",
+      "vehicleId": 1311679,
+      "year": 2018
     }
   ]
 }

@@ -35,7 +35,7 @@
     </div>
 
     <div class="footer-reg-num">
-      {% if environment != '' %}TEST DATA |  {% endif %}Amendment Registration #{{ amendmentRegistrationNumber }}:
+      {% if environment != '' %}TEST DATA |  {% endif %}Amendment Registration #{{ amendmentRegistrationNumber }} | Page
     </div>
 
     <div class="registration-details-container">  
@@ -48,16 +48,6 @@
             <td>Base Registration Number:</td>
             <td>{{baseRegistrationNumber}}</td>
         </tr>
-        <tr>
-            <td>Description:</td>
-            <td>
-              {% if description is defined and description != "" %}
-                {{description}}
-              {% else %}
-                Not available.
-              {% endif %}              
-            </td>
-        </tr>
       </table>          
     </div>      
   
@@ -65,13 +55,19 @@
       <div class="statement-title">{{changeType}}</div>
       <div class="separator-statement mt-1"></div>
     </div>
-
-    {% if courtOrderInformation is defined %}
+               
+    {% if addSecuredParties is defined or deleteSecuredParties is defined %}
         <div class="container pt-4">
-            [[registration/courtOrderInformation.html]]
+            [[registration/securedParties.html]]    
         </div>
     {% endif %}
-        
+    
+    {% if addDebtors is defined or deleteDebtors is defined %}
+        <div class="container pt-4">
+            [[registration/debtors.html]]
+        </div>
+    {% endif %}
+
     {% if addVehicleCollateral is defined or deleteVehicleCollateral is defined %}
         <div class="container pt-4">    
             [[registration/vehicleCollateral.html]]
@@ -83,19 +79,21 @@
             [[registration/generalCollateral.html]]
         </div>
     {% endif %}
-    
-    {% if addDebtors is defined or deleteDebtors is defined %}
-        <div class="container pt-4">
-            [[registration/debtors.html]]
-        </div>
+
+    {% if description is defined and description != "" %}
+    <div class="container pt-4">
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-3">Details Description</div>
+        <span class="section-data">{{description}}</span> 
+    </div>
     {% endif %}
         
-    {% if addSecuredParties is defined or deleteSecuredParties is defined %}
+    {% if courtOrderInformation is defined %}
         <div class="container pt-4">
-            [[registration/securedParties.html]]    
+            [[registration/courtOrderInformation.html]]
         </div>
     {% endif %}
-    
+
     <div class="container pt-4">    
       [[registration/registeringParty.html]]
     </div>

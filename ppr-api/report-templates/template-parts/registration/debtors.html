@@ -2,7 +2,13 @@
     {% if debtors is defined and change is not defined %}
         <div class="separator mt-5"></div>
     {% endif %}
-        <div class="section-title mt-3">Debtor Information</div>
+        <div class="section-title mt-3">
+            {% if debtors is defined and change is not defined and type == 'SG' %}
+                Debtor (Seller) Information
+            {% else %}
+                Debtor Information
+            {% endif %}
+        </div>
     {% if debtors is defined and change is not defined %}
         <table class="section-data section-data-table mt-4" role="presentation">
         {% for party in debtors %}
@@ -89,7 +95,7 @@
                                 {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
                             {% endif %}
                         </div>
-                        <div><span class="label">DELETED</span></div>
+                        <div><span class="label">REMOVED</span></div>
                     </td>
                     <td class="col-33">
                         <div class="section-sub-title">Address</div>
@@ -164,7 +170,7 @@
                                 {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
                             {% endif %}
                         </div>
-                        <div><span class="label">DELETED</span></div>
+                        <div><span class="label">REMOVED</span></div>
                     </td>
                     <td class="col-33">
                         <div class="section-sub-title">Address</div>

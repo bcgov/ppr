@@ -1,96 +1,133 @@
 {
-  "baseRegistrationNumber": "TEST0005", 
+  "baseRegistrationNumber": "100311B",
   "changes": [
     {
-      "baseRegistrationNumber": "TEST0005", 
-      "clientReferenceId": "TEST-REN-0005", 
-      "createDateTime": "2021-09-23T01:09:58+00:00", 
-      "expiryDate": "2024-09-23T06:59:59+00:00", 
-      "lifeYears": 2, 
+      "baseRegistrationNumber": "100311B",
+      "clientReferenceId": "UT-AM-AC-GC",
+      "createDateTime": "2021-11-04T16:40:45+00:00",
+      "expiryDate": "2036-11-05T07:59:59+00:00",
+      "lifeYears": 10,
+      "payment": {
+        "invoiceId": "13784",
+        "receipt": "/api/v1/payment-requests/13784/receipts"
+      },
       "registeringParty": {
         "address": {
-          "city": "city", 
-          "country": "CA", 
-          "postalCode": "V8R3A5", 
-          "region": "BC", 
-          "street": "TEST-00R5", 
-          "streetAdditional": "line 2"
-        }, 
-        "personName": {
-          "first": "TEST-RENEWAL", 
-          "last": "REGISTERING", 
-          "middle": "5"
-        }
-      }, 
-      "renewalRegistrationNumber": "TEST00R5", 
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "renewalRegistrationNumber": "100313B",
       "statementType": "RENEWAL_STATEMENT"
+    },
+    {
+      "addVehicleCollateral": [
+        {
+          "make": "Jaguar",
+          "model": "E-Type",
+          "reg_id": 1867177,
+          "serialNumber": "JAGETYPE823456",
+          "type": "MV",
+          "vehicleId": 1311677,
+          "year": 1966
+        }
+      ],
+      "amendmentRegistrationNumber": "100312B",
+      "baseRegistrationNumber": "100311B",
+      "changeType": "AA",
+      "clientReferenceId": "UT-AM-AC-GC",
+      "createDateTime": "2021-11-04T16:40:12+00:00",
+      "description": "test amend",
+      "payment": {
+        "invoiceId": "13783",
+        "receipt": "/api/v1/payment-requests/13783/receipts"
+      },
+      "registeringParty": {
+        "address": {
+          "city": "SASKATOON",
+          "country": "CA",
+          "postalCode": "S7J 4J4",
+          "region": "SK",
+          "street": "112-811 WOLLASTON CRES"
+        },
+        "businessName": "PPR 2"
+      },
+      "statementType": "AMENDMENT_STATEMENT"
     }
-  ], 
-  "clientReferenceId": "TEST-SA-0005", 
-  "createDateTime": "2021-09-23T01:04:58+00:00", 
+  ],
+  "clientReferenceId": "UT-SA-0015",
+  "createDateTime": "2021-11-04T16:39:01+00:00",
   "debtors": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0005", 
-        "streetAdditional": "line 2"
-      }, 
-      "partyId": 200000016, 
-      "personName": {
-        "first": "TEST IND", 
-        "last": "DEBTOR", 
-        "middle": "5"
-      }
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V8S 1V1",
+        "region": "BC",
+        "street": "500 FORT ST"
+      },
+      "businessName": "TEST DEBTOR 4 INC.",
+      "partyId": 5816226
     }
-  ], 
-  "expiryDate": "2023-09-23T01:04:58+00:00", 
-  "lifeYears": 2, 
+  ],
+  "dischargedDateTime": "2021-11-04T16:41:30+00:00",
+  "expiryDate": "2036-11-05T07:59:59+00:00",
+  "generalCollateral": [
+    {
+      "addedDateTime": "2021-11-04T16:39:01+00:00",
+      "collateralId": 41,
+      "description": "TEST GC SA again."
+    }
+  ],
+  "lifeYears": 15,
+  "payment": {
+    "invoiceId": "13782",
+    "receipt": "/api/v1/payment-requests/13782/receipts"
+  },
   "registeringParty": {
     "address": {
-      "city": "city", 
-      "country": "CA", 
-      "postalCode": "V8R3A5", 
-      "region": "BC", 
-      "street": "TEST-0005", 
-      "streetAdditional": "line 2"
-    }, 
-    "personName": {
-      "first": "TEST", 
-      "last": "REGISTERING", 
-      "middle": "5"
-    }
-  }, 
-  "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
-  "registrationDescription": "PPSA SECURITY AGREEMENT", 
-  "renewalRegistrationNumber": "TEST00R5", 
+      "city": "SASKATOON",
+      "country": "CA",
+      "postalCode": "S7J 4J4",
+      "region": "SK",
+      "street": "112-811 WOLLASTON CRES"
+    },
+    "businessName": "PPR 2"
+  },
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+  "registrationDescription": "PPSA SECURITY AGREEMENT",
+  "renewalRegistrationNumber": "100313B",
   "securedParties": [
     {
       "address": {
-        "city": "city", 
-        "country": "CA", 
-        "postalCode": "V8R3A5", 
-        "region": "BC", 
-        "street": "TEST-0005", 
-        "streetAdditional": "line 2"
-      }, 
-      "businessName": "TEST 5 SECURED PARTY", 
-      "partyId": 200000017
+        "city": "Victoria",
+        "country": "CA",
+        "postalCode": "V8T2C3",
+        "region": "BC",
+        "street": "1625 Hillside Ave"
+      },
+      "businessName": "RBC ROYAL BANK",
+      "code": "99990002",
+      "emailAddress": "test-2@test-rbc.com",
+      "partyId": 5816225
     }
-  ], 
-  "statusType": "ACT", 
-  "trustIndenture": false, 
-  "type": "SA", 
+  ],
+  "statusType": "HDC",
+  "trustIndenture": true,
+  "type": "SA",
   "vehicleCollateral": [
     {
-      "make": "TESLA", 
-      "model": "MODEL 3", 
-      "serialNumber": "YJ46JU622994", 
-      "type": "MV", 
-      "vehicleId": 200000005, 
-      "year": 2018
+      "added": true,
+      "make": "Jaguar",
+      "model": "E-Type",
+      "serialNumber": "JAGETYPE823456",
+      "type": "MV",
+      "vehicleId": 1311677,
+      "year": 1966
     }
   ]
 }
