@@ -7,7 +7,8 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
   mockedDebtors1,
-  mockedRegisteringParty1
+  mockedRegisteringParty1,
+  mockedSelectSecurityAgreement
 } from './test-data'
 
 // Components
@@ -41,6 +42,8 @@ describe('Party Summary SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    const registrationType = mockedSelectSecurityAgreement()
+    await store.dispatch('setRegistrationType', registrationType)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -57,6 +60,8 @@ describe('Secured Party list tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    const registrationType = mockedSelectSecurityAgreement()
+    await store.dispatch('setRegistrationType', registrationType)
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
@@ -91,6 +96,9 @@ describe('Debtor list tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    const registrationType = mockedSelectSecurityAgreement()
+    await store.dispatch('setRegistrationType', registrationType)
+    
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
       debtors: mockedDebtors1,
       registeringParty: mockedRegisteringParty1
