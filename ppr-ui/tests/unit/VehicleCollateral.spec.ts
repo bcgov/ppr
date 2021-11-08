@@ -7,7 +7,9 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedVehicleCollateral1,
   mockedSelectSecurityAgreement,
-  mockedVehicleCollateralAmendment
+  mockedVehicleCollateralAmendment,
+  mockedRepairersLien,
+  mockedVehicleCollateralAmendment2
 } from './test-data'
 
 // Components
@@ -208,3 +210,34 @@ describe('Vehicle Collateral summary amendment tests', () => {
   
 })
 
+describe('Vehicle Collateral repairers lien amendment tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment2)
+    await store.dispatch('setRegistrationType', mockedRepairersLien())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent(false, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct vehicle rows when data is present', () => {
+    const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row').length
+    expect(vehicleRowCount).toEqual(2)
+  })
+
+  it('displays the correct chips in the table rows', () => {
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[1]
+    expect(item2.querySelectorAll('td')[0].textContent).toContain('DELETED')
+  })
+
+  it('displays the correct actions in the table rows', async () => {
+    const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[0]
+    const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[1]
+    expect(item1.querySelectorAll('td')[5].textContent).toContain('Delete')
+    expect(item2.querySelectorAll('td')[5].textContent).toContain('Undo')
+  })
+  
+})

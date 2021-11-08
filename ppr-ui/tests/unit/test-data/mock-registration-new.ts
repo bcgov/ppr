@@ -149,6 +149,27 @@ export const mockedVehicleCollateralAmendment: VehicleCollateralIF[] = [
 
 ]
 
+
+export const mockedVehicleCollateralAmendment2: VehicleCollateralIF[] = [
+  {
+    id: 1,
+    type: APIVehicleTypes.MOTOR_VEHICLE,
+    serialNumber: 'KM8J3CA46JU622994',
+    year: 2018,
+    make: 'HYUNDAI',
+    model: 'TUSCON'
+  },
+  {
+    id: 2,
+    type: APIVehicleTypes.BOAT,
+    serialNumber: '123456789',
+    year: 2010,
+    make: 'CREST LINER',
+    model: '1700 VISION',
+    action: ActionTypes.REMOVED
+  }
+]
+
 export const generalCollateralText: string = 'All the debtor’s present and after acquired personal property, ' +
 'including but not restricted to machinery, equipment, furniture, fixtures and receivables.'
 
@@ -405,7 +426,7 @@ export const mockedFinancingStatementRepairers: FinancingStatementIF = {
   securedParties: mockedSecuredParties1,
   debtors: mockedDebtors1,
   vehicleCollateral: mockedVehicleCollateral1,
-  generalCollateral: mockedGeneralCollateral2,
+  generalCollateral: null,
   lifeYears: 1,
   trustIndenture: false,
   lifeInfinite: false
