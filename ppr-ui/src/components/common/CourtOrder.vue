@@ -206,7 +206,7 @@
 <script lang="ts">
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { convertDate, tzOffsetMinutes } from '@/utils'
 import {
   defineComponent,
   reactive,
@@ -288,14 +288,19 @@ export default defineComponent({
       }),
       minCourtDate: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
-          var minDate = new Date(getRegistrationCreationDate.value)
+          const minDate = new Date(getRegistrationCreationDate.value)
           return minDate.toISOString()
         } else {
           return '0'
         }
       }),
       maxCourtDate: computed((): string => {
-        var maxDate = new Date()
+        const maxDate = new Date()
+        const offset = tzOffsetMinutes(maxDate)
+        maxDate.setHours(23)
+        maxDate.setMinutes(59)
+        maxDate.setSeconds(59)
+        maxDate.setTime(maxDate.getTime() - (offset * 60 * 1000)) // Subtract to get locale as Pacific
         return maxDate.toISOString()
       })
     })
