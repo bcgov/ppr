@@ -122,6 +122,7 @@ export const mutateNewRegistration = (state: StateIF) => {
     certified: false,
     legalName: ''
   }
+  state.stateModel.folioOrReferenceNumber = ''
 }
 
 export const mutateRegistrationConfirmDebtorName = (state: StateIF, debtorName: DebtorNameIF) => {

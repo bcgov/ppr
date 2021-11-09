@@ -101,6 +101,7 @@ import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   AddPartiesIF, // eslint-disable-line no-unused-vars
+  CertifyIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   AddCollateralIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
@@ -143,6 +144,8 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
   @Action setCourtOrderInformation: ActionBindingIF
+  @Action setCertifyInformation: ActionBindingIF
+  @Action setFolioOrReferenceNumber: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -254,6 +257,12 @@ export default class ReviewRegistration extends Vue {
           effectOfOrder: '',
           orderDate: ''
         }
+        const certifyInfo: CertifyIF = {
+          valid: false,
+          certified: false,
+          legalName: '',
+          registeringParty: null
+        }
         this.setCourtOrderInformation(courtOrder)
         this.setRegistrationCreationDate(financingStatement.createDateTime)
         this.setRegistrationExpiryDate(financingStatement.expiryDate)
@@ -263,6 +272,8 @@ export default class ReviewRegistration extends Vue {
         this.setLengthTrust(lengthTrust)
         this.setAddSecuredPartiesAndDebtors(parties)
         this.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
+        this.setFolioOrReferenceNumber('')
+        this.setCertifyInformation(certifyInfo)
       }
     }
   }

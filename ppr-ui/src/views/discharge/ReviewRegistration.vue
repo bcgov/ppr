@@ -72,6 +72,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF, // eslint-disable-line no-unused-vars
+  CertifyIF, // eslint-disable-line no-unused-vars
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
@@ -101,6 +102,8 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegistrationFlowType: ActionBindingIF
+  @Action setCertifyInformation: ActionBindingIF
+  @Action setFolioOrReferenceNumber: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -183,6 +186,12 @@ export default class ReviewRegistration extends Vue {
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
+      const certifyInfo: CertifyIF = {
+        valid: false,
+        certified: false,
+        legalName: '',
+        registeringParty: null
+      }
       this.setRegistrationCreationDate(financingStatement.createDateTime)
       this.setRegistrationExpiryDate(financingStatement.expiryDate)
       this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
@@ -191,6 +200,8 @@ export default class ReviewRegistration extends Vue {
       this.setLengthTrust(lengthTrust)
       this.setAddSecuredPartiesAndDebtors(parties)
       this.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
+      this.setFolioOrReferenceNumber('')
+      this.setCertifyInformation(certifyInfo)
     }
   }
 
