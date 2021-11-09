@@ -25,6 +25,7 @@ import {
   updateDraft
 } from '@/utils'
 import { RegistrationTypes } from '@/resources'
+import { RegistrationConfirmation } from '@/components/dialogs'
 
 /** Set the amendment add/delete lists depending on the registration list actions */
 function setAmendmentList (baseList:Array<any>, addList:Array<any>, deleteList:Array<any>) {
@@ -636,7 +637,15 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   }
   registration.registeringParty = cleanupParty(registration.registeringParty)
 
-  if (!trustLength.lifeInfinite) {
+  // No lifeYears, lifeInfinite for RL renewal
+  if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+    registration.courtOrderInformation = stateModel.registration.courtOrderInformation
+    if (registration.courtOrderInformation.orderDate.length === 10) {
+      registration.courtOrderInformation.orderDate += 'T00:00:00-08:00'
+    }
+  } else if (trustLength.lifeInfinite) {
+    registration.lifeInfinite = trustLength.lifeInfinite
+  } else {
     registration.lifeYears = trustLength.lifeYears
   }
 
