@@ -1,5 +1,31 @@
 <template>
-  <v-container v-if="isSummary">
+  <v-container v-if="renewalView && isSummary" class="pa-0">
+    <h2 class="pt-2 pb-5">Court Order</h2>
+    <v-container class="white" style="padding: 40px 30px;">
+      <v-row no-gutters class="pb-7">
+            <v-col cols="3" class="generic-label">Court Name</v-col>
+            <v-col cols="9" id="court-name-display">{{ courtName }}</v-col>
+      </v-row>
+      <v-row no-gutters class="pb-7">
+            <v-col cols="3" class="generic-label">Court Registry</v-col>
+            <v-col cols="9" id="court-registry-display">{{ courtRegistry }}</v-col>
+      </v-row>
+      <v-row no-gutters class="pb-7">
+            <v-col cols="3" class="generic-label">Court File Number</v-col>
+            <v-col cols="9" id="file-number-display"> {{ fileNumber }}
+            </v-col>
+      </v-row>
+      <v-row no-gutters class="pb-7">
+            <v-col cols="3" class="generic-label">Date of Order</v-col>
+            <v-col cols="9" id="date-display">{{ computedDateFormatted }}</v-col>
+      </v-row>
+      <v-row no-gutters>
+            <v-col cols="3" class="generic-label">Effect of Order</v-col>
+            <v-col cols="9" id="effect-display"><span style="white-space: pre-wrap">{{ effectOfOrder }}</span></v-col>
+      </v-row>
+    </v-container>
+  </v-container>
+  <v-container v-else-if="isSummary">
     <v-row no-gutters class="pa-2">
       <v-col cols="auto">
         <label>
@@ -28,7 +54,6 @@
           <v-col cols="3" class="generic-label">Effect of Order</v-col>
           <v-col cols="9" id="effect-display"><span style="white-space: pre-wrap">{{ effectOfOrder }}</span></v-col>
     </v-row>
-
   </v-container>
   <v-container v-else fluid no-gutters class="pb-6  px-0 rounded">
     <v-row no-gutters class="summary-header pa-2 mb-8">
@@ -40,7 +65,12 @@
       </v-col>
     </v-row>
     <v-row no-gutters class="pb-6">
-      <v-col>
+      <v-col v-if="requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
+        A court order is required to renew a Repairer's Lien. Enter the court
+        order information below. A default Effect of Order is provided; you can
+        modify this default text if you wish.
+      </v-col>
+      <v-col v-else>
         If this registration is pursuant to a court order, enter the court order
         information below, otherwise leave the Court Order information empty.
       </v-col>
@@ -176,7 +206,7 @@
 <script lang="ts">
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { convertDate, tzOffsetMinutes } from '@/utils'
 import {
   defineComponent,
   reactive,
@@ -198,6 +228,10 @@ export default defineComponent({
     },
     setSummary: {
       default: false
+    },
+    isRenewal: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -217,6 +251,7 @@ export default defineComponent({
     const modal = false
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const localState = reactive({
+      renewalView: props.isRenewal,
       courtName: '',
       courtRegistry: '',
       fileNumber: '',
@@ -253,14 +288,19 @@ export default defineComponent({
       }),
       minCourtDate: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
-          var minDate = new Date(getRegistrationCreationDate.value)
+          const minDate = new Date(getRegistrationCreationDate.value)
           return minDate.toISOString()
         } else {
           return '0'
         }
       }),
       maxCourtDate: computed((): string => {
-        var maxDate = new Date()
+        const maxDate = new Date()
+        const offset = tzOffsetMinutes(maxDate)
+        maxDate.setHours(23)
+        maxDate.setMinutes(59)
+        maxDate.setSeconds(59)
+        maxDate.setTime(maxDate.getTime() - (offset * 60 * 1000)) // Subtract to get locale as Pacific
         return maxDate.toISOString()
       })
     })
@@ -346,9 +386,9 @@ export default defineComponent({
           courtRegistry: '',
           fileNumber: ''
         }
-        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
+        if (localState.requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           localState.effectOfOrder = 'Order directs the effective life of the Repairer\'s Lien be extended' +
-                                      ' an additional 180 days'
+                                      ' an additional 180 days.'
         }
         setCourtOrderInformation(newCourtOrderInfo)
       } else {
@@ -357,6 +397,16 @@ export default defineComponent({
         localState.courtName = localState.courtOrderInfo.courtName
         localState.courtRegistry = localState.courtOrderInfo.courtRegistry
         localState.fileNumber = localState.courtOrderInfo.fileNumber
+        if (localState.requireCourtOrder &&
+            registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
+            localState.orderDate === '' &&
+            localState.effectOfOrder === '' &&
+            localState.courtName === '' &&
+            localState.courtRegistry === '' &&
+            localState.fileNumber === '') {
+          localState.effectOfOrder = 'Order directs the effective life of the Repairer\'s Lien be extended' +
+                                      ' an additional 180 days.'
+        }
       }
     })
 
@@ -364,6 +414,8 @@ export default defineComponent({
       modal,
       errors,
       valid,
+      registrationType,
+      APIRegistrationTypes,
       ...toRefs(localState)
     }
   }

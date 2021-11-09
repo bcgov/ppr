@@ -29,3 +29,11 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
   if (includeTz) return moment(date).format('MMMM D, Y') + ` at ${datetime} ${timezone}`
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
+
+export function tzOffsetMinutes (date: Date): number {
+  let offset = 8 * 60
+  if (moment(date).isDST()) {
+    offset = 7 * 60
+  }
+  return offset
+}

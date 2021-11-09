@@ -94,7 +94,8 @@ export const mockedGeneralCollateral2: GeneralCollateralIF[] = [
   },
   {
     addedDateTime: '2021-09-17T18:56:20Z',
-    description: 'test base reg description'
+    description: 'test base reg description',
+    collateralId: 12343
   }
 ]
 

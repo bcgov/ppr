@@ -6,11 +6,16 @@ import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
-import { mockedFinancingStatementAll, mockedDebtorNames, mockedRenewalResponse } from './test-data'
+import {
+  mockedFinancingStatementAll,
+  mockedDebtorNames,
+  mockedRenewalResponse,
+  mockedFinancingStatementRepairers
+} from './test-data'
 
 // Components
 import { ConfirmRenewal } from '@/views'
-import { FolioNumberSummary, StickyContainer, CertifyInformation } from '@/components/common'
+import { FolioNumberSummary, StickyContainer, CertifyInformation, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 
@@ -98,6 +103,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     // certify
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
+    expect(wrapper.findComponent(CourtOrder).exists()).toBe(false)
   })
 
   it('allows back to previous page', async () => {
@@ -129,12 +135,62 @@ describe('Confirm Renewal new registration component', () => {
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
-    
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
     await Vue.nextTick()
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await Vue.nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
+})
+
+describe('Confirm Renewal new RL registration component', () => {
+  let wrapper: any
+  let sandbox
+  const { assign } = window.location
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+
+  beforeEach(async () => {
+    // mock the window.location.assign function
+    delete window.location
+    window.location = { assign: jest.fn() } as any
+    // store setup
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    // stub api call
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    get.returns(new Promise(resolve => resolve({
+      data: { ...mockedFinancingStatementRepairers }
+    })))
+
+    const post = sandbox.stub(axios, 'post')
+    post.returns(new Promise(resolve => resolve({
+      data: { ...mockedRenewalResponse }
+    })))
+
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = mockRouter.mock()
+    await router.push({
+      name: RouteNames.CONFIRM_RENEWAL,
+      query: { 'reg-num': '123456B' }
+    })
+    wrapper = shallowMount(ConfirmRenewal, { localVue, store, router, vuetify })
+    wrapper.setProps({ appReady: true })
+    await flushPromises()
+  })
+
+  afterEach(() => {
+    window.location.assign = assign
+    wrapper.destroy()
+    sandbox.restore()
+  })
+
+  it('renders Review Confirm View with child components including court order', () => {
+    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
+    expect(wrapper.vm.appReady).toBe(true)
+    expect(wrapper.vm.dataLoaded).toBe(true)
+    expect(wrapper.findComponent(CourtOrder).exists()).toBe(true)
   })
 })

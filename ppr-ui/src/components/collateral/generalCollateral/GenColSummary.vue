@@ -120,9 +120,12 @@
       </v-btn>
       <div v-if="showingHistory" class="general-collateral-summary">
         <v-row v-for="(item, index) in generalCollateral" :key="index" no-gutters>
-          <v-col v-if="item.addedDateTime" :class="[{ 'border-btm': index !== baseGenCollateralIndex,
-            'pb-30px': index !== baseGenCollateralIndex }, 'pt-30px']">
-            <b>{{ asOfDateTime(item.addedDateTime) }}</b>
+          <v-col v-if="item.addedDateTime"
+                 :class="[{ 'border-btm': index !== baseGenCollateralIndex, 'pb-30px':
+                                          index !== baseGenCollateralIndex }, 'pt-30px']">
+            <div v-if="!item.description || registrationFlowType === RegistrationFlowType.NEW">
+              <b>{{ asOfDateTime(item.addedDateTime) }}</b>
+            </div>
             <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
               <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
                 <b>DELETED</b>
@@ -139,11 +142,16 @@
                 <span style="white-space: pre-wrap;">{{ item.descriptionAdd }}</span>
               </p>
             </div>
-            <div v-if="item.description && index === baseGenCollateralIndex" class="gc-description pt-5">
-              <b v-if="registrationFlowType !== RegistrationFlowType.NEW">
-                Base Registration General Collateral:
-              </b>
-              <p v-if="item.description" class="pt-5 ma-0">
+            <div v-if="item.description" class="gc-description">
+              <div v-if="registrationFlowType !== RegistrationFlowType.NEW && index === firstBaseGenCollateralIndex"
+                   class="pb-5">
+                <b>{{ asOfDateTime(item.addedDateTime) }}</b>
+              </div>
+              <div v-if="registrationFlowType !== RegistrationFlowType.NEW && index === firstBaseGenCollateralIndex"
+                   class="pb-5">
+                <b>Base Registration General Collateral:</b>
+              </div>
+              <p v-if="item.description" class="ma-0">
                 <span style="white-space: pre-wrap;">{{ item.description }}</span>
               </p>
             </div>
@@ -215,6 +223,15 @@ export default defineComponent({
           }
         }
         return curIndex
+      }),
+      firstBaseGenCollateralIndex: computed(() => {
+        // find the index of the first base registration general collateral record to display label once.
+        for (var i = 0; i < localState.generalCollateral.length; i++) {
+          if (localState.generalCollateral[i].description && localState.generalCollateral[i].collateralId) {
+            return i
+          }
+        }
+        return -1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
