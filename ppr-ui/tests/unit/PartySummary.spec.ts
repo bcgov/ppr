@@ -44,6 +44,10 @@ describe('Party Summary SA tests', () => {
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
     await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      securedParties: mockedSecuredParties1,
+      registeringParty: mockedRegisteringParty1
+    })
     wrapper = createComponent()
   })
   afterEach(() => {
