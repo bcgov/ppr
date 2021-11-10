@@ -129,7 +129,7 @@ export default defineComponent({
         return !parties.valid
       }),
       shouldShowHint: computed((): boolean => {
-        if (parties.registeringParty.action) {
+        if ((parties.registeringParty) && (parties.registeringParty.action)) {
           return true
         }
         return false
