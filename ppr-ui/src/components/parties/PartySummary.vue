@@ -12,7 +12,22 @@
     </v-row>
     <v-container class="pa-0">
       <v-row class="pt-6 px-1">
-        <v-col class="generic-label">Registering Party</v-col>
+        <v-col class="generic-label">Registering Party
+          <span v-if="shouldShowHint">
+            <v-tooltip
+              class="pa-2"
+              content-class="top-tooltip"
+              top
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              </template>
+              <div class="pt-2 pb-2">
+                The Registering Party has been changed from the logged in account user.
+              </div>
+            </v-tooltip>
+          </span></v-col>
       </v-row>
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
@@ -112,6 +127,12 @@ export default defineComponent({
       registeringHeaders: registeringTableHeaders,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
+      }),
+      shouldShowHint: computed((): boolean => {
+        if ((parties.registeringParty) && (parties.registeringParty.action)) {
+          return true
+        }
+        return false
       })
     })
 
