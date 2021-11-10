@@ -286,6 +286,109 @@ export const RegistrationTypesStandard: Array<RegistrationTypeIF> = [
     text: `${UIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN} (${APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN})`
   }
 ]
+
+export const LegacyRegistrationTypes: Array<RegistrationTypeIF> = [
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.MISC_MINERAL_RESOURCE,
+    registrationTypeAPI: APIRegistrationTypes.MISC_MINERAL_RESOURCE,
+    text: `${UIRegistrationTypes.MISC_MINERAL_RESOURCE}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.CROWN_MINING_TAX,
+    registrationTypeAPI: APIRegistrationTypes.CROWN_MINING_TAX,
+    text: `${UIRegistrationTypes.CROWN_MINING_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
+    registrationTypeAPI: APIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
+    text: `${UIRegistrationTypes.CROWN_CORP_CAPITAL_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
+    registrationTypeAPI: APIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
+    text: `${UIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
+    registrationTypeAPI: APIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
+    text: `${UIRegistrationTypes.CROWN_HOTEL_ROOM_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+    registrationTypeAPI: APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+    text: `${UIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT,
+    registrationTypeAPI: APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT,
+    text: `${UIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.TRANSITION_FINANCING_STATEMENT,
+    registrationTypeAPI: APIRegistrationTypes.TRANSITION_FINANCING_STATEMENT,
+    text: `${UIRegistrationTypes.TRANSITION_FINANCING_STATEMENT}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.TRANSITION_SALE_OF_GOODS,
+    registrationTypeAPI: APIRegistrationTypes.TRANSITION_SALE_OF_GOODS,
+    text: `${UIRegistrationTypes.TRANSITION_SALE_OF_GOODS}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.TRANSITION_TAX_LIEN,
+    registrationTypeAPI: APIRegistrationTypes.TRANSITION_TAX_LIEN,
+    text: `${UIRegistrationTypes.TRANSITION_TAX_LIEN}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 4,
+    registrationTypeUI: UIRegistrationTypes.TRANSITION_MH,
+    registrationTypeAPI: APIRegistrationTypes.TRANSITION_MH,
+    text: `${UIRegistrationTypes.TRANSITION_MH}`
+  }
+]
+
 export const RegistrationTypes: Array<RegistrationTypeIF> = [
   ...RegistrationTypesMiscellaneousCC,
   {
@@ -308,4 +411,12 @@ export const RegistrationTypes: Array<RegistrationTypeIF> = [
     text: 'divider2'
   },
   ...RegistrationTypesStandard
+]
+
+// Use this when displaying reg type information?
+export const AllRegistrationTypes: Array<RegistrationTypeIF> = [
+  ...RegistrationTypesMiscellaneousCC,
+  ...RegistrationTypesMiscellaneousOT,
+  ...RegistrationTypesStandard,
+  ...LegacyRegistrationTypes
 ]

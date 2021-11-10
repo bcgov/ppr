@@ -226,7 +226,7 @@ import {
 } from '@/interfaces'
 import {
   registrationTableHeaders,
-  RegistrationTypes,
+  AllRegistrationTypes,
   tombstoneBreadcrumbDashboard
 } from '@/resources'
 import {
@@ -520,12 +520,17 @@ export default class Dashboard extends Vue {
     } else {
       this.myRegAddDialog.textExtra[1] += 'N/A'
     }
-    const regType = RegistrationTypes.find((regType: RegistrationTypeIF) => {
+    const regType = AllRegistrationTypes.find((regType: RegistrationTypeIF) => {
       if (regType.registrationTypeAPI === reg.registrationType) {
         return true
       }
     })
-    this.myRegAddDialog.textExtra[2] += regType.registrationTypeUI
+    if (regType) {
+      this.myRegAddDialog.textExtra[2] += regType.registrationTypeUI
+    } else {
+      // Just in case some type gets added/changed and is not picked up by the UI.
+      this.myRegAddDialog.textExtra[2] += 'Legacy'
+    }
     this.myRegAddDialog.textExtra[3] += reg.registeringParty
     this.myRegAddDialogDisplay = true
   }

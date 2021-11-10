@@ -107,7 +107,8 @@ export interface RenewRegistrationIF {
   createDateTime?: string, // Included in a successful response.
   payment?: PaymentIF, // Included in a successful response.
   error?: ErrorIF,
-  authorizationReceived?: boolean // Always true for the UI: API requirement.
+  authorizationReceived?: boolean, // Always true for the UI: API requirement.
+  courtOrderInformation?: CourtOrderIF // Only populated if RL renewal and all court order elements present.
 }
 
 // Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.

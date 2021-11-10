@@ -29,20 +29,20 @@ export enum APIRegistrationTypes {
     HERITAGE_CONSERVATION_NOTICE = 'HN',
     MANUFACTURED_HOME_NOTICE = 'MN',
     MAINTENANCE_LIEN = 'ML',
-    PROCEEDS_CRIME_NOTICE = 'PN'
+    PROCEEDS_CRIME_NOTICE = 'PN',
+    // Existing legacy registrations types that can no longer be created.
+    MISC_MINERAL_RESOURCE = 'MR',
+    CROWN_MINING_TAX = 'MI',
+    CROWN_CORP_CAPITAL_TAX = 'CC',
+    CROWN_CONSUMPTION_TRANSITION_TAX = 'DP',
+    CROWN_HOTEL_ROOM_TAX = 'HR',
+    CROWN_SOCIAL_SERVICE_TAX = 'SS',
+    TRANSITION_SECURITY_AGREEMENT = 'TA',
+    TRANSITION_FINANCING_STATEMENT = 'TF',
+    TRANSITION_SALE_OF_GOODS = 'TG',
+    TRANSITION_TAX_LIEN = 'TL',
+    TRANSITION_MH = 'TM'
 }
-
-// Will need to add these later for existing registrations (no longer able to create new ones though)
-// MR - MISCELLANEOUS REGULATIONS ACT
-// CC - CROWN CHARGE FILED PURSUANT TO CORPORATION CAPITAL TAX
-// DP - CROWN CHARGE FILED PURSUANT TO CONSUMPTION, TRANSITION TAX
-// HR - CROWN CHARGE FILED PURSUANT TO HOTEL ROOM TAX
-// SS - CROWN CHARGE FILED PURSUANT TO SOCIAL SERVICE TAX
-// TA - SECURITY AGREEMENT TRANSITION FINANCING STATEMENT
-// TF - PPSA TRANSITION FINANCING STATEMENT
-// TG - SALES OF GOODS TRANSITION FINANCING STATEMENT
-// TL - TAX LIEN UNDER SOCIAL SERVICE OR HOTEL ROOM TAX ACTS
-// TM - M.H. TRANSITION FINANCING STATEMENT
 
 export enum UIRegistrationTypes {
     // standard
@@ -75,7 +75,19 @@ export enum UIRegistrationTypes {
     HERITAGE_CONSERVATION_NOTICE = 'Heritage Conservation Notice',
     MANUFACTURED_HOME_NOTICE = 'Manufactured Home Notice',
     MAINTENANCE_LIEN = 'Maintenance Lien',
-    PROCEEDS_CRIME_NOTICE = 'Proceeds of Crime Notice'
+    PROCEEDS_CRIME_NOTICE = 'Proceeds of Crime Notice',
+    // Existing legacy registrations types that can no longer be created.
+    MISC_MINERAL_RESOURCE = 'Mineral Resource Tax Act',
+    CROWN_MINING_TAX = 'Mining Tax Act',
+    CROWN_CORP_CAPITAL_TAX = 'Corporation Capital Tax Act',
+    CROWN_CONSUMPTION_TRANSITION_TAX = 'Consumption, Transition Tax Act',
+    CROWN_HOTEL_ROOM_TAX = 'Hotel Room Tax Act',
+    CROWN_SOCIAL_SERVICE_TAX = 'Social Service Tax Act',
+    TRANSITION_SECURITY_AGREEMENT = 'Security Agreement Transition',
+    TRANSITION_FINANCING_STATEMENT = 'PPSA Transition',
+    TRANSITION_SALE_OF_GOODS = 'Sales of Goods Transition',
+    TRANSITION_TAX_LIEN = 'Tax Lien Transition Social Service/Hotel Room',
+    TRANSITION_MH = 'M.H. Transition'
 }
 
 export enum StatementTypes {
