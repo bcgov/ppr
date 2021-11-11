@@ -65,17 +65,18 @@
       <v-col v-if="!openChangeScreen">
         <registering-party
           @changeRegisteringParty="changeRegisteringParty"
-          @setRegisteringParty="setRegisteringParty"
         />
       </v-col>
       <v-col v-else>
-        <v-card flat class="add-party-container">
-          <div class="px-6 pt-5">
+        <v-card flat class="add-party-container mt-4">
+          <div class="px-6 pt-8">
             <h3 class="pb-2">Change Registering Party</h3>
+            <span class="body-text">
             Change the Registering Party by entering the registering party code
             or their name (business or person), or if the Registering Party you
             want to include is new (i.e., they do not have a registering party
-            code), you can add their information manually.
+            code) you can add their information manually.
+            </span>
           </div>
           <party-search
             :isAutoCompleteDisabled="addEditInProgress"
@@ -86,7 +87,7 @@
           <div v-if="showAddRegisteringParty">
             <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
           </div>
-          <div v-if="!showAddRegisteringParty" class="pa-5" style="height:80px">
+          <div v-if="!showAddRegisteringParty" class="px-5 pt-0 pb-8" style="height:80px">
             <v-btn
               id="cancel-btn-chg-reg-party"
               large
@@ -99,6 +100,11 @@
             </v-btn>
           </div>
         </v-card>
+      </v-col>
+    </v-row>
+    <v-row no-gutters v-if="registeringParty && registeringParty.action">
+      <v-col>
+        <caution-box class="mx-4" :setMsg="cautionTxt" />
       </v-col>
     </v-row>
     <v-row no-gutters class="py-4">
@@ -132,6 +138,8 @@ import { useSecuredParty } from './composables/useSecuredParty'
 import { useGetters } from 'vuex-composition-helpers'
 import EditParty from './EditParty.vue'
 import PartySearch from './PartySearch.vue'
+import { CautionBox } from '@/components/common'
+import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   components: {
@@ -140,6 +148,7 @@ export default defineComponent({
     PartySummary,
     PartySearch,
     EditParty,
+    CautionBox,
     RegisteringParty
   },
   props: {
@@ -156,12 +165,18 @@ export default defineComponent({
     const registrationType = getRegistrationType.value.registrationTypeAPI
     const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
     const localState = reactive({
-      registeringParty: getAddSecuredPartiesAndDebtors.value.registeringParty,
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       openChangeScreen: false,
       showAddRegisteringParty: false,
       addEditInProgress: false,
+      cautionTxt: 'Verification statements are only sent to the Submitting' +
+      ' Party (logged in account user) and the Secured Parties. The Registering Party' +
+      ' for this registration must conduct a seperate search to obtain the details for this' +
+      ' registration.',
+      registeringParty: computed((): PartyIF => {
+        return getAddSecuredPartiesAndDebtors.value.registeringParty
+      }),
       securedPartyText: computed((): string => {
         if (isSecuredPartyRestrictedList(registrationType)) {
           return 'The Secured Party'
@@ -178,11 +193,6 @@ export default defineComponent({
       })
     })
     const summaryView = toRefs(props).isSummary
-
-    const setRegisteringParty = () => {
-      localState.registeringParty =
-        getAddSecuredPartiesAndDebtors.value.registeringParty
-    }
 
     const changeRegisteringParty = () => {
       localState.openChangeScreen = true
@@ -201,7 +211,6 @@ export default defineComponent({
 
     return {
       summaryView,
-      setRegisteringParty,
       changeRegisteringParty,
       initAdd,
       resetData,
@@ -211,4 +220,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module></style>
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+  .body-text {
+    color: $gray9;
+  }
+</style>

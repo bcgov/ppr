@@ -8,7 +8,7 @@
           id="txt-code"
           v-model="searchValue"
           persistent-hint
-          hint="Enter at least the first 3 characters."
+          hint="Enter at least the first 3 characters"
           :disabled="autoCompleteDisabled"
         />
       </v-col>
@@ -16,7 +16,7 @@
         or
         <a
           id="add-party"
-          class="generic-link"
+          class="generic-link pl-2"
           :class="{ 'disabled-text': autoCompleteDisabled }"
           @click="goToAddSecuredParty"
           :disabled="autoCompleteDisabled"
