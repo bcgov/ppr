@@ -33,6 +33,33 @@ export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
   return hfArray.includes(val) || !Object.values(UIRegistrationTypes).includes(val)
 }
 
+export const hasNoChargeAmendment = (val: UIRegistrationTypes): boolean => {
+  const hfArray = [
+    UIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+    UIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+    UIRegistrationTypes.FOREST,
+    UIRegistrationTypes.LOGGING_TAX,
+    UIRegistrationTypes.CARBON_TAX,
+    UIRegistrationTypes.RURAL_PROPERTY_TAX,
+    UIRegistrationTypes.PROVINCIAL_SALES_TAX,
+    UIRegistrationTypes.INCOME_TAX,
+    UIRegistrationTypes.MOTOR_FUEL_TAX,
+    UIRegistrationTypes.EXCISE_TAX,
+    UIRegistrationTypes.MINERAL_LAND_TAX,
+    UIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+    UIRegistrationTypes.OTHER,
+    UIRegistrationTypes.SCHOOL_ACT,
+    UIRegistrationTypes.LIEN_UNPAID_WAGES,
+    UIRegistrationTypes.LAND_TAX_LIEN,
+    UIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+    UIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+    UIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+    UIRegistrationTypes.MAINTENANCE_LIEN
+  ]
+  // it will not be in the UIRegistrationTypes enum list if 'Other' was selected
+  return hfArray.includes(val) || !Object.values(UIRegistrationTypes).includes(val)
+}
+
 export function getFeeSummary (
   feeType: FeeSummaryTypes,
   registrationType: UIRegistrationTypes,
@@ -42,6 +69,9 @@ export function getFeeSummary (
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }
   if (feeType === FeeSummaryTypes.AMEND) {
+    if (hasNoChargeAmendment(registrationType)) {
+      return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
+    }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.AMEND] }
   }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {

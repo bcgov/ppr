@@ -120,6 +120,7 @@ import {
   AddCollateralIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
+  DebtorNameIF, // eslint-disable-line no-unused-vars
   DraftIF, // eslint-disable-line no-unused-vars
   CourtOrderIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
@@ -155,6 +156,7 @@ export default class AmendRegistration extends Vue {
   @Getter getStateModel: StateModelIF
   @Getter getLengthTrust: LengthTrustIF
   @Getter getAmendmentDescription: string
+  @Getter getConfirmDebtorName: DebtorNameIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
@@ -236,8 +238,12 @@ export default class AmendRegistration extends Vue {
   }
 
   private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber) {
-      console.error('No registration number given to amend. Redirecting to dashboard...')
+    if (!this.registrationNumber || !this.getConfirmDebtorName) {
+      if (!this.registrationNumber) {
+        console.error('No registration number given to amend. Redirecting to dashboard...')
+      } else {
+        console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
+      }
       this.$router.push({
         name: RouteNames.DASHBOARD
       })

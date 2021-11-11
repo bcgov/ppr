@@ -92,7 +92,7 @@
               hint="For example: Supreme Court of British Columbia"
               persistent-hint
               :error-messages="
-                errors.courtName.message ? errors.courtName.message : ''
+                errors.courtName.message ? errors.courtName.message : courtNameMessage
               "
             />
           </v-col>
@@ -108,7 +108,7 @@
               hint="The location (city) of the court. For example: Richmond"
               persistent-hint
               :error-messages="
-                errors.courtRegistry.message ? errors.courtRegistry.message : ''
+                errors.courtRegistry.message ? errors.courtRegistry.message : courtRegistryMessage
               "
             />
           </v-col>
@@ -123,7 +123,7 @@
               v-model="fileNumber"
               persistent-hint
               :error-messages="
-                errors.fileNumber.message ? errors.fileNumber.message : ''
+                errors.fileNumber.message ? errors.fileNumber.message : fileNumberMessage
               "
             />
           </v-col>
@@ -193,7 +193,7 @@
               label="Enter the effect of order"
               class="white pt-2 text-input-field"
               :error-messages="
-                errors.effectOfOrder.message ? errors.effectOfOrder.message : ''
+                errors.effectOfOrder.message ? errors.effectOfOrder.message : effectOfOrderMessage
               "
             />
           </v-col>
@@ -302,6 +302,30 @@ export default defineComponent({
         maxDate.setSeconds(59)
         maxDate.setTime(maxDate.getTime() - (offset * 60 * 1000)) // Subtract to get locale as Pacific
         return maxDate.toISOString()
+      }),
+      fileNumberMessage: computed((): string => {
+        if (localState.fileNumber.length > 20) {
+          return 'Maximum 20 characters'
+        }
+        return ''
+      }),
+      courtNameMessage: computed((): string => {
+        if (localState.courtName.length > 256) {
+          return 'Maximum 256 characters'
+        }
+        return ''
+      }),
+      courtRegistryMessage: computed((): string => {
+        if (localState.courtRegistry.length > 64) {
+          return 'Maximum 64 characters'
+        }
+        return ''
+      }),
+      effectOfOrderMessage: computed((): string => {
+        if (localState.effectOfOrder.length > 512) {
+          return 'Maximum 512 characters'
+        }
+        return ''
       })
     })
 
@@ -387,7 +411,7 @@ export default defineComponent({
           fileNumber: ''
         }
         if (localState.requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
-          localState.effectOfOrder = 'Order directs the effective life of the Repairer\'s Lien be extended' +
+          localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
                                       ' an additional 180 days.'
         }
         setCourtOrderInformation(newCourtOrderInfo)
@@ -404,7 +428,7 @@ export default defineComponent({
             localState.courtName === '' &&
             localState.courtRegistry === '' &&
             localState.fileNumber === '') {
-          localState.effectOfOrder = 'Order directs the effective life of the Repairer\'s Lien be extended' +
+          localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
                                       ' an additional 180 days.'
         }
       }

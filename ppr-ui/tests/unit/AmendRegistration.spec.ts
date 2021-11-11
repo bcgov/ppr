@@ -18,7 +18,12 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedDraftAmendmentStatement, mockedFinancingStatementAll, mockedFinancingStatementRepairers } from './test-data'
+import {
+  mockedDebtorNames,
+  mockedDraftAmendmentStatement,
+  mockedFinancingStatementAll,
+  mockedFinancingStatementRepairers
+} from './test-data'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 
@@ -41,6 +46,8 @@ describe('Amendment registration component', () => {
   beforeEach(async () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
+    // store setup
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -171,7 +178,6 @@ describe('Amendment registration component', () => {
   })
 })
 
-
 describe('Amendment for repairers lien component', () => {
   let wrapper: any
   let sandbox
@@ -247,5 +253,4 @@ describe('Amendment for repairers lien component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Review and Complete')
   })
-
 })
