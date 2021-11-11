@@ -74,14 +74,34 @@ describe('Court Order component', () => {
 
     await flushPromises()
     expect(getLastEvent(wrapper, 'setCourtOrderValid')).toBe(true)
-    
+  })
+
+  it('sets the individual properties to invalid lengths', async () => {
+    let invalidLengthTxt = 'x'.repeat(257)
+    wrapper.find('#txt-court-name').setValue(invalidLengthTxt)
+    invalidLengthTxt = 'x'.repeat(65)
+    wrapper.find('#txt-court-registry').setValue(invalidLengthTxt)
+    invalidLengthTxt = 'x'.repeat(21)
+    wrapper.find('#txt-court-file-number').setValue(invalidLengthTxt)
+    wrapper.vm.$data.orderDate = 'October 7, 2021'
+    invalidLengthTxt = 'x'.repeat(513)
+    wrapper.find('#effect-of-order').setValue(invalidLengthTxt)
+    await Vue.nextTick()
+    await Vue.nextTick()
+    await Vue.nextTick()
+    const messages = wrapper.findAll('.v-messages__message')
+    console.log(messages)
+    expect(messages.length).toBe(4)
+    expect(messages.at(0).text()).toBe('Maximum 256 characters')
+    expect(messages.at(1).text()).toBe('Maximum 64 characters')
+    expect(messages.at(2).text()).toBe('Maximum 20 characters')
+    expect(messages.at(3).text()).toBe('Maximum 512 characters')
   })
 
   it('sets the validity to false for blank fields', async () => {
     wrapper.vm.$data.courtName = ' '
     await flushPromises()
     expect(getLastEvent(wrapper, 'setCourtOrderValid')).toBe(false)
-    
   })
 })
 

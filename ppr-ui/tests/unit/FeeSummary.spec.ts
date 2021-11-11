@@ -298,22 +298,51 @@ describe('FeeSummary component tests', () => {
     }
   })
 
-  it('renders with correct values for amendments', async () => {
+  it('renders with correct values for amendment fee', async () => {
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    for (let i = 0; i < newRegistrationTypes.length; i++) {
+    for (let i = 0; i < newRegStandard.length; i++) {
       await wrapper.setProps({
         setFeeType: FeeSummaryTypes.AMEND,
         setRegistrationLength: null,
-        setRegistrationType: newRegistrationTypes[i]
+        setRegistrationType: newRegStandard[i]
       })
       expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.AMEND)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegistrationTypes[i])
+      expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
       expect(wrapper.vm.$data.feeLabel).toBe('Registration Amendment')
-      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+      if (UIRegistrationTypes.LAND_TAX_LIEN !== newRegStandard[i]) {
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.$data.totalFees).toBe(10)
+        expect(wrapper.vm.$data.totalAmount).toBe(11.5)
+      } else {
+        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
+        expect(wrapper.vm.$data.totalFees).toBe(0)
+        expect(wrapper.vm.$data.totalAmount).toBe(0)
+      }
+      expect(wrapper.vm.$data.isComplete).toBe(true)
+      expect(wrapper.vm.$data.hintFee).toBe('')
+    }
+  })
+
+  it('renders with correct values for amendment no fee', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    for (let i = 0; i < newRegMisc.length; i++) {
+      await wrapper.setProps({
+        setFeeType: FeeSummaryTypes.AMEND,
+        setRegistrationLength: null,
+        setRegistrationType: newRegMisc[i]
+      })
+      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.AMEND)
+      expect(wrapper.vm.$data.registrationType).toBe(newRegMisc[i])
+      expect(wrapper.vm.$data.feeLabel).toBe('Registration Amendment')
+      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
       expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-      expect(wrapper.vm.$data.totalFees).toBe(10)
-      expect(wrapper.vm.$data.totalAmount).toBe(11.5)
+      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
+      expect(wrapper.vm.$data.totalFees).toBe(0)
+      expect(wrapper.vm.$data.totalAmount).toBe(0)
       expect(wrapper.vm.$data.isComplete).toBe(true)
       expect(wrapper.vm.$data.hintFee).toBe('')
     }
