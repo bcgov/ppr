@@ -94,7 +94,6 @@ describe('Registering Party search autocomplete tests', () => {
     await Vue.nextTick()
 
     expect(wrapper.find('#no-party-matches').text()).toContain('No matches found')
-    expect(wrapper.find('#no-party-matches').text()).toContain('Registering party')
+    expect(wrapper.find('#no-party-matches').text()).toContain('Registering Party')
   })
-
 })

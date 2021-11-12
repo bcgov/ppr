@@ -57,9 +57,18 @@ export const useSecuredPartyValidation = () => {
     }
   }
 
-  const validateSecuredPartyForm = (partyBusiness, currentParty): boolean => {
+  const validateSecuredPartyForm = (partyBusiness, currentParty, isRegisteringParty): boolean => {
     const currentIsBusiness = partyBusiness === 'B'
     validateName(currentIsBusiness, currentParty.value)
+    if (isRegisteringParty) {
+      if (currentParty.value.emailAddress.length === 0) {
+        errors.value.emailAddress = {
+          type: 'EMAIL',
+          succeeded: false,
+          message: 'Email address is required'
+        }
+      }
+    }
     if (currentIsBusiness === true) {
       return (
         errors.value.businessName.succeeded &&

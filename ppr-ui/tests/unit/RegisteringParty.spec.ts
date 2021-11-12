@@ -119,7 +119,6 @@ describe('RegisteringParty store undo test', () => {
       }
     })
 
-
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
     get.returns(
@@ -151,7 +150,7 @@ describe('RegisteringParty store undo test', () => {
   })
 
   it('displays the correct data in the table rows', async () => {
-    let dropButtons = wrapper.findAll('.actions__more-actions .v-remove')
+    let dropButtons = wrapper.findAll('.edit-btn')
     expect(dropButtons.length).toBe(1)
     dropButtons.at(0).trigger('click')
     await flushPromises()

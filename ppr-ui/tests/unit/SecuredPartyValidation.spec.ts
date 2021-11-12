@@ -112,7 +112,8 @@ describe('Secured Party validation tests - individual', () => {
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
-    expect(messages.at(0).text()).toBe('Please enter a valid email address.')
+    expect(messages.at(0).text()).toBe('Please enter a valid email address')
     expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
   })
+
 })

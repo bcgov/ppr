@@ -16,7 +16,7 @@
             class="add-party-header generic-label ml"
             :class="{ 'error-text': invalidSection }"
           >
-            <span v-if="activeIndex === -1" class="">Add</span>
+            <span v-if="activeIndex === -1 && !currentSecuredParty.action" class="">Add</span>
             <span v-else>
               <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                         && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
@@ -146,7 +146,7 @@
                     <v-text-field
                       filled
                       id="txt-email-party"
-                      label="Email Address (Optional)"
+                      :label="isRegisteringParty? 'Email Address' : 'Email Address (Optional)'"
                       v-model="currentSecuredParty.emailAddress"
                       :error-messages="
                         errors.emailAddress.message
@@ -329,7 +329,8 @@ export default defineComponent({
       if (
         validateSecuredPartyForm(
           partyBusiness.value,
-          currentSecuredParty
+          currentSecuredParty,
+          localState.isRegisteringParty
         ) === true
       ) {
         if (partyBusiness.value === 'I') {
@@ -392,7 +393,7 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      getSecuredParty()
+      getSecuredParty(localState.isRegisteringParty)
       setSearchValue(currentSecuredParty.value.businessName)
     })
 

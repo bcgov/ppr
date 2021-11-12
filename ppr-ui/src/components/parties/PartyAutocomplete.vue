@@ -16,13 +16,16 @@
               :key="i"
               :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]"
             >
-              <v-list-item-content class="pt-2 pb-2">
+              <v-list-item-content
+                :class="[$style['auto-complete-item'], 'pt-2', 'pb-2']"
+                @click="addResult(result, i)"
+              >
                 <v-list-item-subtitle>
                   <v-row :class="$style['auto-complete-row']">
-                    <v-col cols="2" :class="$style['title-size']" @click="addResult(result, i)">
+                    <v-col cols="2" :class="$style['title-size']">
                       {{ result.code }}
                     </v-col>
-                    <v-col cols="9" @click="addResult(result, i)"
+                    <v-col cols="9"
                       ><span :class="$style['title-size']">{{ result.businessName }}</span>
                       <div class="mt-2">
                       {{ result.address.street }},
@@ -57,7 +60,7 @@
                   <v-row :class="$style['auto-complete-row']">
                     <v-col cols="12" :class="$style['title-size']" id="no-party-matches">
                       No matches found. Check your name or number, or add a
-                      {{ partyWord }} party
+                      {{ partyWord }} Party
                       that doesn't have a code.
                     </v-col>
                   </v-row>

@@ -36,23 +36,69 @@
                 <td>{{ row.item.code }}</td>
                 <td class="actions-cell actions-width px-0" v-if="registrationFlowType === RegistrationFlowType.NEW">
                 <div class="actions float-right actions-up">
-                  <v-list class="actions__more-actions pr-5">
-                    <v-list-item class="v-remove" v-if="!row.item.action" @click="changeRegisteringParty()">
-                      <v-list-item-subtitle>
+
+                  <v-btn
+                      text
+                      color="primary"
+                      class="smaller-button edit-btn pr-5"
+                      v-if="!row.item.action"
+                      @click="changeRegisteringParty()"
+                  >
                         <v-icon small>mdi-pencil</v-icon>
                         <span class="ml-1">Change</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item class="v-remove" v-else @click="undo()">
-                      <v-list-item-subtitle>
+                  </v-btn>
+                  <v-btn
+                      text
+                      color="primary"
+                      class="smaller-button edit-btn pr-5"
+                      :disabled="addEditInProgress"
+                      v-else
+                      @click="undo()"
+                  >
                         <v-icon small>mdi-undo</v-icon>
                         <span class="ml-1">Undo</span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
+                  </v-btn>
+                  <span class="actions-border actions__more"
+                    v-if="row.item.action && !row.item.code"
+                  >
+                    <v-menu offset-y left nudge-bottom="4">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          text
+                          small
+                          v-on="on"
+                          color="primary"
+                          :disabled="addEditInProgress"
+                          class="smaller-actions actions__more-actions__btn"
+                        >
+                          <v-icon>mdi-menu-down</v-icon>
+                        </v-btn>
+                      </template>
+                      <v-list class="actions__more-actions">
+                        <v-list-item @click="editRegisteringParty()">
+                          <v-list-item-subtitle>
+                            <v-icon small>mdi-pencil</v-icon>
+                            <span class="ml-1">Edit</span>
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </span>
                 </div>
                 </td>
               </tr>
+              <tr v-if="showEditParty">
+              <td
+                colspan="5"
+                class="pa-0"
+              >
+                <v-expand-transition>
+                  <div class="edit-Party-container pa-0 col-12">
+                    <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
+                  </div>
+                </v-expand-transition>
+              </td>
+            </tr>
             </template>
           </v-data-table>
         </v-col>
@@ -76,15 +122,17 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'
+import EditParty from './EditParty.vue'
 
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { getRegisteringPartyFromAuth } from '@/utils'
 import { PartyAddressSchema } from '@/schemas'
-import { RegistrationFlowType } from '@/enums'
+import { RegistrationFlowType, ActionTypes } from '@/enums'
 
 export default defineComponent({
   components: {
-    BaseAddress
+    BaseAddress,
+    EditParty
   },
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
@@ -103,16 +151,20 @@ export default defineComponent({
         try {
           getRegisteringParty()
         } catch (e) {
-          localState.registeringParty = null
           console.error('RegisteringParty.vue onMounted error: ' + ((e as Error).message))
         }
-      } else {
-        localState.registeringParty = [parties.registeringParty]
       }
     })
     const { getName, isBusiness } = useParty()
     const localState = reactive({
-      registeringParty: null,
+      addEditInProgress: false,
+      showEditParty: false,
+      registeringParty: computed((): Array<PartyIF> => {
+        if (parties.registeringParty !== null) {
+          return [parties.registeringParty]
+        }
+        return []
+      }),
       partyHeaders: computed((): Array<any> => {
         if (registrationFlowType === RegistrationFlowType.NEW) {
           return [...registeringTableHeaders, ...editTableHeaders]
@@ -126,8 +178,17 @@ export default defineComponent({
       context.emit('changeRegisteringParty')
     }
 
+    const editRegisteringParty = () => {
+      localState.showEditParty = true
+    }
+
     const undo = async () => {
       getRegisteringParty()
+    }
+
+    const resetData = () => {
+      localState.addEditInProgress = false
+      localState.showEditParty = false
     }
 
     const getRegisteringParty = async () => {
@@ -135,8 +196,6 @@ export default defineComponent({
       const regParty = await getRegisteringPartyFromAuth()
       parties.registeringParty = regParty
       setAddSecuredPartiesAndDebtors(parties)
-      localState.registeringParty = [regParty]
-      context.emit('setRegisteringParty')
     }
 
     return {
@@ -144,7 +203,10 @@ export default defineComponent({
       isBusiness,
       registrationFlowType,
       changeRegisteringParty,
+      editRegisteringParty,
+      resetData,
       RegistrationFlowType,
+      ActionTypes,
       addressSchema,
       undo,
       ...toRefs(localState)

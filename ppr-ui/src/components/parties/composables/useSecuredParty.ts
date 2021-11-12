@@ -37,10 +37,22 @@ export const useSecuredParty = (props, context) => {
     originalSecuredParty: null
   })
 
-  const getSecuredParty = () => {
+  const getSecuredParty = (isRegisteringParty) => {
     const securedParties: PartyIF[] =
       getAddSecuredPartiesAndDebtors.value.securedParties
-    if (props.activeIndex >= 0) {
+    const registeringParty: PartyIF = getAddSecuredPartiesAndDebtors.value.registeringParty
+    if (isRegisteringParty && registeringParty.action && !registeringParty.code) {
+      // copy the existing registering party
+      localState.currentSecuredParty = JSON.parse(JSON.stringify(registeringParty))
+      localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
+      localState.currentIsBusiness = false
+      localState.partyBusiness = 'I'
+      if (localState.currentSecuredParty.businessName) {
+        localState.currentIsBusiness = true
+        localState.partyBusiness = 'B'
+        localState.currentSecuredParty.personName = Object.assign({}, initPerson)
+      }
+    } else if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[props.activeIndex]))
       localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
