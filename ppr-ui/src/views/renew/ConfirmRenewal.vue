@@ -203,7 +203,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private get showCourtOrderInfo (): boolean {
-    return (this.registrationType && this.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+    return (this.getRegistrationType && this.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
   }
 
   private cancel (val: boolean): void {

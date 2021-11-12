@@ -158,6 +158,16 @@
             <span>Edit</span>
           </v-btn>
           <v-btn
+            v-else-if="isRepairersLien(item)"
+            :class="$style['edit-btn']"
+            style="flex:0"
+            color="primary"
+            elevation="0"
+            @click="handleAction(item, TableActions.DISCHARGE)"
+          >
+            <span class="text-wrap">Total Discharge</span>
+          </v-btn>
+          <v-btn
             v-else-if="!isExpired(item) && !isDischarged(item)"
             :class="$style['edit-btn']"
             color="primary"
@@ -200,8 +210,14 @@
               </v-list-item>
             </v-list>
             <v-list v-else class="actions__more-actions registration-actions">
+               <v-list-item v-if="isRepairersLien" @click="handleAction(item, TableActions.AMEND)">
+                <v-list-item-subtitle>
+                  <v-icon small>mdi-pencil</v-icon>
+                  <span class="ml-1">Amend</span>
+                </v-list-item-subtitle>
+              </v-list-item>
               <v-list-item
-                v-if="isActive(item) && !isExpired(item) && !isDischarged(item)"
+                v-if="isActive(item) && !isExpired(item) && !isDischarged(item) && !isRepairersLien(item)"
                 @click="handleAction(item, TableActions.DISCHARGE)"
               >
                 <v-list-item-subtitle>
@@ -213,13 +229,13 @@
                 left
                 content-class="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
-                :disabled="item.expireDays !== -99"
+                :disabled="!isRenewalDisabled(item)"
               >
                 <template v-slot:activator="{ on: onTooltip }">
                   <div v-on="onTooltip">
                     <v-list-item
                       v-if="isActive(item) && !isExpired(item) && !isDischarged(item)"
-                      :disabled="item.expireDays === -99"
+                      :disabled="isRenewalDisabled(item)"
                       @click="handleAction(item, TableActions.RENEW)"
                     >
                       <v-list-item-subtitle>
@@ -229,7 +245,12 @@
                     </v-list-item>
                   </div>
                 </template>
-                Infinite registrations cannot be renewed.
+                <span v-if="item.expireDays === -99">
+                  Infinite registrations cannot be renewed.
+                </span>
+                <span v-else>
+                  This lien has already been renewed and cannot be renewed again.
+                </span>
               </v-tooltip>
               <v-list-item @click="handleAction(item, TableActions.REMOVE)">
                 <v-list-item-subtitle>
@@ -262,6 +283,7 @@ import {
   DraftResultIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
+  APIRegistrationTypes,
   APIStatusTypes, // eslint-disable-line no-unused-vars
   DraftTypes, // eslint-disable-line no-unused-vars
   TableActions // eslint-disable-line no-unused-vars
@@ -284,6 +306,7 @@ export default defineComponent({
       getStatusDescription,
       registrationNumber,
       registeringParty,
+      hasRenewal,
       securedParties
     } = useRegistration()
 
@@ -394,6 +417,11 @@ export default defineComponent({
       return item.statusType === APIStatusTypes.DISCHARGED
     }
 
+    const isRenewalDisabled = (item: RegistrationSummaryIF): boolean => {
+      return (item.expireDays === -99 ||
+        (isRepairersLien(item) && hasRenewal(item)))
+    }
+
     const isDraft = (item: any): boolean => {
       // RegistrationSummaryIF | DraftResultIF
       return item.type !== undefined
@@ -401,6 +429,10 @@ export default defineComponent({
 
     const isExpired = (item: RegistrationSummaryIF): boolean => {
       return item.statusType === APIStatusTypes.EXPIRED
+    }
+
+    const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
+      return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
     }
 
     const showExpireDays = (item: RegistrationSummaryIF): string => {
@@ -485,6 +517,9 @@ export default defineComponent({
       isDischarged,
       isDraft,
       isExpired,
+      isRepairersLien,
+      isRenewalDisabled,
+      hasRenewal,
       downloadPDF,
       inSelectedHeaders,
       TableActions,

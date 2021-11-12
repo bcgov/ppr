@@ -108,6 +108,18 @@ export const useRegistration = () => {
     return false
   }
 
+  const hasRenewal = (
+    item: RegistrationSummaryIF
+  ): boolean => {
+    // check each child
+    for (let i = 0; i < item.changes?.length || 0; i++) {
+      if ((item.changes[i] as any)?.registrationClass) {
+        return true
+      }
+    }
+    return false
+  }
+
   const filterResults = (originalData: RegistrationSummaryIF[]): any[] => {
     const newTableData = [] // filtered list of base registrations
     for (let i = 0; i < originalData.length; i++) {
@@ -224,7 +236,7 @@ export const useRegistration = () => {
   }
 
   // filter watchers
-  watch(() => localState.registeringParty, (val) => {
+  watch(() => localState.registeringParty, () => {
     localState.tableData = filterResults(localState.originalData)
   })
 
@@ -267,6 +279,7 @@ export const useRegistration = () => {
     getRegistrationType,
     filterResults,
     clearFilters,
+    hasRenewal,
     ...toRefs(localState)
   }
 }
