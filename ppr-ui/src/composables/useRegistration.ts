@@ -113,7 +113,7 @@ export const useRegistration = () => {
   ): boolean => {
     // check each child
     for (let i = 0; i < item.changes?.length || 0; i++) {
-      if ((item.changes[i] as any)?.registrationClass) {
+      if ((item.changes[i] as any)?.registrationClass === "RENEWAL") {
         return true
       }
     }
