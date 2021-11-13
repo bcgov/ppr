@@ -210,7 +210,7 @@
               </v-list-item>
             </v-list>
             <v-list v-else class="actions__more-actions registration-actions">
-               <v-list-item v-if="isRepairersLien" @click="handleAction(item, TableActions.AMEND)">
+               <v-list-item v-if="isRepairersLien(item)" @click="handleAction(item, TableActions.AMEND)">
                 <v-list-item-subtitle>
                   <v-icon small>mdi-pencil</v-icon>
                   <span class="ml-1">Amend</span>
