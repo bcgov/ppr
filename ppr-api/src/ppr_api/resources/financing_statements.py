@@ -215,7 +215,7 @@ class AmendmentResource(Resource):
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registration_num, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, account_id, False, True)
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
@@ -329,7 +329,7 @@ class ChangeResource(Resource):
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registration_num, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, account_id, False, True)
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
@@ -436,7 +436,7 @@ class RenewalResource(Resource):
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registration_num, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, account_id, False, True)
             extra_validation_msg = resource_utils.validate_renewal(request_json, statement)
             if extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
@@ -547,7 +547,7 @@ class DischargeResource(Resource):
 
             # Fetch base registration information: business exception thrown if not
             # found or historical.
-            statement = FinancingStatement.find_by_registration_number(registration_num, False)
+            statement = FinancingStatement.find_by_registration_number(registration_num, account_id, False, True)
 
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff(jwt)):
@@ -845,6 +845,8 @@ def pay_and_save(request_json, registration_class, financing_statement, registra
         fee_quantity = 1
         if registration_class == model_utils.REG_CLASS_AMEND:
             pay_trans_type = TransactionTypes.AMENDMENT.value
+            if resource_utils.no_fee_amendment(financing_statement.registration[0].registration_type):
+                pay_trans_type = TransactionTypes.AMENDMENT_NO_FEE.value
         elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
             pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
         elif registration_class == model_utils.REG_CLASS_RENEWAL:

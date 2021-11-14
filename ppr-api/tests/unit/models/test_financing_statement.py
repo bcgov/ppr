@@ -34,17 +34,19 @@ TEST_REGISTRATION_DATA = [
     ('OT', 'PS12345', False),
     ('SA', None, False)
 ]
-# testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff})
+# testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {is create})
 TEST_REGISTRATION_NUMBER_DATA = [
-    ('Valid', 'TEST0001', 'PS12345', HTTPStatus.OK, False),
-    ('Valid added from another account', 'TEST0019', 'PS12345', HTTPStatus.OK, False),
-    ('Invalid reg num', 'TESTXXXX', 'PS12345', HTTPStatus.NOT_FOUND, False),
-    ('Mismatch account id non-staff', 'TEST0001', 'PS1234X', HTTPStatus.UNAUTHORIZED, False),
-    ('Expired non-staff', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, False),
-    ('Discharged non-staff', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, False),
-    ('Mismatch staff', 'TEST0001', 'PS1234X', HTTPStatus.OK, True),
-    ('Expired staff', 'TEST0013', 'PS12345', HTTPStatus.OK, True),
-    ('Discharged staff', 'TEST0014', 'PS12345', HTTPStatus.OK, True)
+    ('Valid', 'TEST0001', 'PS12345', HTTPStatus.OK, False, True),
+    ('Valid added from another account', 'TEST0019', 'PS12345', HTTPStatus.OK, False, True),
+    ('Invalid reg num', 'TESTXXXX', 'PS12345', HTTPStatus.NOT_FOUND, False, True),
+    ('Mismatch account id non-staff', 'TEST0001', 'PS1234X', HTTPStatus.UNAUTHORIZED, False, True),
+    ('Expired non-staff', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, False, True),
+    ('Discharged non-staff', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, False, True),
+    ('Mismatch staff', 'TEST0001', 'PS1234X', HTTPStatus.OK, True, True),
+    ('Expired staff not create', 'TEST0013', 'PS12345', HTTPStatus.OK, True, False),
+    ('Expired staff create', 'TEST0013', 'PS12345', HTTPStatus.BAD_REQUEST, True, True),
+    ('Discharged staff not create', 'TEST0014', 'PS12345', HTTPStatus.OK, True, False),
+    ('Discharged staff create', 'TEST0014', 'PS12345', HTTPStatus.BAD_REQUEST, True, True),
 ]
 # testdata pattern is ({description}, {registration number}, {type}, {debtor name}, {is valid})
 TEST_DEBTOR_NAME_DATA = [
@@ -190,11 +192,11 @@ def test_find_by_financing_id(session):
         assert json_data['trustIndenture']
 
 
-@pytest.mark.parametrize('desc,reg_number,account_id,status,staff', TEST_REGISTRATION_NUMBER_DATA)
-def test_find_by_registration_number(session, desc, reg_number, account_id, status, staff):
+@pytest.mark.parametrize('desc,reg_number,account_id,status,staff,create', TEST_REGISTRATION_NUMBER_DATA)
+def test_find_by_registration_number(session, desc, reg_number, account_id, status, staff, create):
     """Assert that a fetch financing statement by registration number works as expected."""
     if status == HTTPStatus.OK:
-        statement = FinancingStatement.find_by_registration_number(reg_number, account_id, staff)
+        statement = FinancingStatement.find_by_registration_number(reg_number, account_id, staff, create)
         assert statement
         result = statement.json
         assert result['type'] == 'SA'
@@ -214,7 +216,7 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
             assert result['courtOrderInformation']
     else:
         with pytest.raises(BusinessException) as request_err:
-            FinancingStatement.find_by_registration_number(reg_number, account_id, staff)
+            FinancingStatement.find_by_registration_number(reg_number, account_id, staff, create)
 
         # check
         assert request_err

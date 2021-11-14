@@ -186,7 +186,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     if statement['financingStatement']['baseRegistrationNumber'] == reg_num:
                         found = True
             if not found:  # No duplicates.
-                financing = FinancingStatement.find_by_registration_number(reg_num, account_id=None, staff=False)
+                # Set to staff for small performance gain: skip account id/historical checks.
+                financing = FinancingStatement.find_by_registration_number(reg_num, None, True, False)
                 financing.mark_update_json = mark_added  # Added for PDF, indicate if party or collateral was added.
                 # Set to true to include change history.
                 financing.include_changes_json = True
@@ -212,7 +213,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         detail_results = []
         for result in search_json:
             reg_num = result['baseRegistrationNumber']
-            financing = FinancingStatement.find_by_registration_number(reg_num, account_id=None, staff=False)
+            # Set to staff for small performance gain: skip account id/historical checks.
+            financing = FinancingStatement.find_by_registration_number(reg_num, None, True, False)
             # Set to true to include change history.
             financing.include_changes_json = True
             financing_json = {

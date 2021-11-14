@@ -563,11 +563,17 @@ def to_local_timestamp(utc_ts):
     return utc_ts.astimezone(LOCAL_TZ)
 
 
-def is_historical(financing_statement):
+def is_historical(financing_statement, create: bool):
     """Check if a financing statement is in a historical, non-viewable state."""
+    if financing_statement.state_type == STATE_ACTIVE and financing_statement.expire_date and \
+            financing_statement.expire_date < _datetime.utcnow():
+        financing_statement.state_type = STATE_EXPIRED
     if financing_statement.state_type == STATE_ACTIVE:
         return False
-
+    # Creating a registration is not allowed immediately after the financing statement has expired or been discharged.
+    if create:
+        return True
+    # Offset matches account registrations/search window: need to check to be consistent.
     historical_ts = now_ts_offset(30).timestamp()
     if financing_statement.state_type == STATE_DISCHARGED and financing_statement.registration:
         for reg in reversed(financing_statement.registration):

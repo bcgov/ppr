@@ -30,6 +30,7 @@ MSG_INVALID_HTTP_VERB = 'Invalid HTTP verb'
 # Mapping from PPR transaction to Pay API filing type
 TRANSACTION_TO_FILING_TYPE = {
     'AMENDMENT': 'FSCHG',
+    'AMENDMENT_NO_FEE': 'NCCHG',
     'CHANGE': 'FSCHG',
     'DISCHARGE': 'FSDIS',  # No charge fee.
     'FINANCING_FR': 'FLREG',  # Special flat rate fee for the FR registration type.

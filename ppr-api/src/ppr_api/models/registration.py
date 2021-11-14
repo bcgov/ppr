@@ -50,12 +50,15 @@ class CrownChargeTypes(str, Enum):
     INSURANCE_TAX = 'IP'
     INCOME_TAX = 'IT'
     LOGGING_TAX = 'LO'
+    MINERAL_LAND_TAX = 'MD'
     MINING_TAX = 'MI'
     MINERAL_TAX = 'MR'
     OTHER = 'OT'
     PETROLEUM_TAX = 'PG'
     PROV_SALES_TAX = 'PS'
+    PROPERTY_TRANSFER_TAX = 'PT'
     RURAL_TAX = 'RA'
+    SCHOOL_ACT = 'SC'
     SOCIAL_TAX = 'SS'
     TAX_LIEN = 'TL'
 
@@ -379,7 +382,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
 
-        if not staff and model_utils.is_historical(registration.financing_statement):
+        if not staff and model_utils.is_historical(registration.financing_statement, False):
             raise BusinessException(
                 error=model_utils.ERR_FINANCING_HISTORICAL.format(registration_num=registration_num),
                 status_code=HTTPStatus.BAD_REQUEST
