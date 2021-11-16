@@ -68,7 +68,7 @@
         />
       </v-col>
       <v-col v-else>
-        <v-card flat class="add-party-container mt-4">
+        <v-card flat class="add-party-container mt-2 mb-8">
           <div class="px-6 pt-8">
             <h3 class="pb-2">Change Registering Party</h3>
             <span class="body-text">
@@ -104,7 +104,7 @@
     </v-row>
     <v-row no-gutters v-if="registeringParty && registeringParty.action">
       <v-col>
-        <caution-box class="mx-4" :setMsg="cautionTxt" />
+        <caution-box class="mt-4 mb-8" :setMsg="cautionTxt" :setImportantWord="'Note'" />
       </v-col>
     </v-row>
     <v-row no-gutters class="py-4">
@@ -170,10 +170,8 @@ export default defineComponent({
       openChangeScreen: false,
       showAddRegisteringParty: false,
       addEditInProgress: false,
-      cautionTxt: 'Verification statements are only sent to the Submitting' +
-      ' Party (logged in account user) and the Secured Parties. The Registering Party' +
-      ' for this registration must conduct a seperate search to obtain the details for this' +
-      ' registration.',
+      cautionTxt: 'The Registry will not send the verification statement for this registration ' +
+        'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
         return getAddSecuredPartiesAndDebtors.value.registeringParty
       }),
@@ -223,6 +221,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
   .body-text {
-    color: $gray9;
+    color: $gray7;
   }
 </style>
