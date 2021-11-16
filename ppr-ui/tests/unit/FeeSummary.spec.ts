@@ -97,6 +97,15 @@ describe('FeeSummary component tests', () => {
     lifeYears: 0
   }
   beforeEach(async () => {
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 3,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
     // these props will be changed in each test
     wrapper = createComponent(
       FeeSummaryTypes.NEW,
