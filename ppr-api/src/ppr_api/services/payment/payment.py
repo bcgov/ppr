@@ -25,6 +25,7 @@ class TransactionTypes(Enum):
     """Derive payment request filing type from transaction type."""
 
     AMENDMENT = 'AMENDMENT'
+    AMENDMENT_NO_FEE = 'AMENDMENT_NO_FEE'
     CHANGE = 'CHANGE'
     DISCHARGE = 'DISCHARGE'
     FINANCING_FR = 'FINANCING_FR'  # Special flat rate fee for FR registration type.

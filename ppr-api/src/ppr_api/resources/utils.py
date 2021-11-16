@@ -18,6 +18,7 @@ from http import HTTPStatus
 from flask import jsonify, current_app
 
 from ppr_api.exceptions import BusinessException
+from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
@@ -237,3 +238,22 @@ def check_access_registration(token: str, staff: bool, account_id: str, statemen
             error=ACCOUNT_ACCESS.format(account_id=account_id, registration_num=reg_num),
             status_code=HTTPStatus.UNAUTHORIZED
         )
+
+
+def no_fee_amendment(registration_type: str) -> bool:
+    """Amendment registration check if no fee registration type."""
+    if registration_type == PPSATypes.LAND_TAX.value:
+        return True
+    for reg_type in MiscellaneousTypes:
+        if reg_type.value == registration_type:
+            return True
+    for reg_type in CrownChargeTypes:
+        if reg_type.value == registration_type and \
+                registration_type not in (CrownChargeTypes.CORP_TAX.value,
+                                          CrownChargeTypes.CONSUMPTION_TAX.value,
+                                          CrownChargeTypes.MINERAL_TAX.value,
+                                          CrownChargeTypes.SOCIAL_TAX.value,
+                                          CrownChargeTypes.HOTEL_TAX.value,
+                                          CrownChargeTypes.MINING_TAX.value):
+            return True
+    return False

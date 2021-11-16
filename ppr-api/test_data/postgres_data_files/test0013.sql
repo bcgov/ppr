@@ -4,7 +4,7 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
                   registration_number, update_ts, draft)
   VALUES(200000017, 'D-T-0013', 'PS12345', CURRENT_TIMESTAMP, 'PPSALIEN', 'SA', 'TEST0013', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000007, 'HEX', CURRENT_TIMESTAMP - interval '100 days', 1, null , null)
+  VALUES(200000007, 'ACT', CURRENT_TIMESTAMP - interval '100 days', 1, null , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,

@@ -78,7 +78,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                          order_by='asc(GeneralCollateral.id)',
                                          back_populates='financing_statement')
     general_collateral_legacy = db.relationship('GeneralCollateralLegacy',
-                                                order_by='asc(GeneralCollateralLegacy.id)',
+                                                order_by='asc(GeneralCollateralLegacy.registration_id)',
                                                 back_populates='financing_statement')
     trust_indenture = db.relationship('TrustIndenture', back_populates='financing_statement')
     previous_statement = db.relationship('PreviousFinancingStatement', back_populates='financing_statement')
@@ -238,47 +238,46 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Build general collateral JSON: current_view_json determines if current or original data is included."""
         if not self.general_collateral and not self.general_collateral_legacy:
             return None
+        collateral_json = []
+        collateral_json = self.__build_general_collateral_json(registration_id, collateral_json, False)
+        collateral_json = self.__build_general_collateral_json(registration_id, collateral_json, True)
+        return collateral_json
 
-        collateral_list = []
-        for collateral in reversed(self.general_collateral):
-            collateral_json = None
-            if collateral.registration_id == registration_id:
-                collateral_json = collateral.json
-                collateral_list.append(collateral_json)
-            elif self.current_view_json and \
-                    (self.verification_reg_id < 1 or self.verification_reg_id >= collateral.registration_id):
-                collateral_json = collateral.current_json
-                # Either adding gc only or deleting gc description only.
-                if len(collateral.registration.general_collateral) == 1:
-                    collateral_list.append(collateral_json)
-                elif collateral.status and collateral.status == GeneralCollateralLegacy.StatusTypes.ADDED:
-                    # Combine add and delete as one item.
-                    delete_gc = collateral.registration.general_collateral[0]
-                    if delete_gc.status and delete_gc.status == GeneralCollateralLegacy.StatusTypes.ADDED:
-                        delete_gc = collateral.registration.general_collateral[1]
-                    collateral_json['descriptionDelete'] = delete_gc.description
-                    collateral_list.append(collateral_json)
+    def __build_general_collateral_json(self, registration_id, collateral_json, legacy: bool):
+        """Build general collateral JSON for a financing statement from either the API or legacy table."""
+        collateral_list = None
+        if (not legacy and not self.general_collateral) or (legacy and not self.general_collateral_legacy):
+            return collateral_json
+        if not legacy:
+            collateral_list = reversed(self.general_collateral)
+        else:
+            collateral_list = reversed(self.general_collateral_legacy)
 
-        for collateral in reversed(self.general_collateral_legacy):
-            collateral_json = None
+        for collateral in collateral_list:
             if collateral.registration_id == registration_id or not collateral.status:
-                collateral_json = collateral.json
-                collateral_list.append(collateral_json)
-            # Add only solution for legacy records identical to new records.
+                gc_json = collateral.json
+                collateral_json.append(gc_json)
+            # Add only solution for legacy records: current view shows all records including deleted.
             elif self.current_view_json and \
                     (self.verification_reg_id < 1 or self.verification_reg_id >= collateral.registration_id):
-                collateral_json = collateral.current_json
-                # Either adding gc only or deleting gc description only.
-                if len(collateral.registration.general_collateral_legacy) == 1:
-                    collateral_list.append(collateral_json)
-                elif collateral.status and collateral.status == GeneralCollateralLegacy.StatusTypes.ADDED:
-                    # Combine add and delete as one item.
-                    delete_gc = collateral.registration.general_collateral_legacy[0]
-                    if delete_gc.status and delete_gc.status == GeneralCollateralLegacy.StatusTypes.ADDED:
-                        delete_gc = collateral.registration.general_collateral_legacy[1]
-                    collateral_json['descriptionDelete'] = delete_gc.description
-                    collateral_list.append(collateral_json)
-        return collateral_list
+                gc_json = collateral.current_json
+                # If amendment/change registration is 1 add, 1 remove then combine them.
+                exists = False
+                for exists_collateral in collateral_json:
+                    if exists_collateral['addedDateTime'] == gc_json['addedDateTime']:
+                        if 'descriptionAdd' in exists_collateral and \
+                                'descriptionDelete' not in exists_collateral and \
+                                    'descriptionDelete' in gc_json:
+                            exists = True
+                            exists_collateral['descriptionDelete'] = gc_json['descriptionDelete']
+                        elif 'descriptionDelete' in exists_collateral and \
+                                'descriptionAdd' not in exists_collateral and \
+                                    'descriptionAdd' in gc_json:
+                            exists = True
+                            exists_collateral['descriptionAdd'] = gc_json['descriptionAdd']
+                if not exists:
+                    collateral_json.append(gc_json)
+        return collateral_json
 
     def vehicle_collateral_json(self, registration_id):
         """Build vehicle collateral JSON: current_view_json determines if current or original data is included."""
@@ -391,7 +390,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
     @classmethod
     def find_by_registration_number(cls, registration_num: str,
                                     account_id: str,
-                                    staff: bool = False):
+                                    staff: bool = False,
+                                    create: bool = False):
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
@@ -417,8 +417,10 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                                                       registration_num=registration_num),
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
-
-        if not staff and model_utils.is_historical(statement):
+        # Skip historical check if staff and not creating
+        if staff and not create:
+            return statement
+        if model_utils.is_historical(statement, create):  # and (not staff or create):
             raise BusinessException(
                 error=model_utils.ERR_FINANCING_HISTORICAL.format(registration_num=registration_num),
                 status_code=HTTPStatus.BAD_REQUEST

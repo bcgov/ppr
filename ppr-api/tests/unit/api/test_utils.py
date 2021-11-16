@@ -21,7 +21,7 @@ import copy
 import pytest
 from flask import current_app
 
-from ppr_api.resources.utils import get_account_name, validate_financing, validate_registration
+from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import PPR_ROLE
 from tests.unit.services.utils import helper_create_jwt
 from tests.unit.utils.test_financing_validator import FINANCING
@@ -45,6 +45,44 @@ TEST_VALIDATE_FINANCING_DATA = [
     ('Valid financing statement registration', True),
     ('Invalid financing statement registration', False)
 ]
+# testdata pattern is ({reg type}, {no fee})
+TEST_NO_FEE_AMENDMENT_DATA = [
+    ('SA', False),
+    ('SG', False),
+    ('RL', False),
+    ('FA', False),
+    ('FR', False),
+    ('FS', False),
+    ('FL', False),
+    ('MH', False),
+    ('CC', False),
+    ('DP', False),
+    ('HR', False),
+    ('MI', False),
+    ('MR', False),
+    ('SS', False),
+    ('CT', True),
+    ('ET', True),
+    ('FO', True),
+    ('FT', True),
+    ('IP', True),
+    ('IP', True),
+    ('LO', True),
+    ('MD', True),
+    ('OT', True),
+    ('PG', True),
+    ('PS', True),
+    ('PT', True),
+    ('RA', True),
+    ('SC', True),
+    ('TL', True),
+    ('HN', True),
+    ('ML', True),
+    ('MN', True),
+    ('PN', True),
+    ('WL', True),
+    ('LT', True)
+]
 
 
 @pytest.mark.parametrize('desc, account_id, has_name', TEST_USER_ORGS_DATA_JSON)
@@ -55,7 +93,7 @@ def test_get_account_name(session, client, jwt, desc, account_id, has_name):
     token = helper_create_jwt(jwt, [PPR_ROLE]) if has_name else None
 
     # test
-    name = get_account_name(token, account_id)
+    name = resource_utils.get_account_name(token, account_id)
 
     # check
     if has_name:
@@ -73,7 +111,7 @@ def test_validate_financing(session, client, jwt, desc, valid):
         del json_data['authorizationReceived']
 
     # test
-    error_msg = validate_financing(json_data)
+    error_msg = resource_utils.validate_financing(json_data)
     if valid:
         assert error_msg == ''
     else:
@@ -89,8 +127,18 @@ def test_validate_registration(session, client, jwt, desc, valid):
         del json_data['authorizationReceived']
 
     # test
-    error_msg = validate_registration(json_data)
+    error_msg = resource_utils.validate_registration(json_data)
     if valid:
         assert error_msg == ''
     else:
         assert error_msg != ''
+
+
+@pytest.mark.parametrize('reg_type, no_fee', TEST_NO_FEE_AMENDMENT_DATA)
+def test_no_fee_amendment(session, client, jwt, reg_type, no_fee):
+    """Assert that amendment no fee by registration type works as expected."""
+    # setup
+
+    # test
+    result = resource_utils.no_fee_amendment(reg_type)
+    assert result == no_fee
