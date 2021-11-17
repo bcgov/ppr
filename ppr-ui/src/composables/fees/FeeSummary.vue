@@ -75,6 +75,7 @@ import {
   toRefs,
   watch
 } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 // local
 import { UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from './enums' // eslint-disable-line no-unused-vars
@@ -95,10 +96,17 @@ export default defineComponent({
     }
   },
   setup (props) {
+    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
-      registrationLength: props.setRegistrationLength,
+      registrationLength: computed((): RegistrationLengthI => {
+        if ((localState.isValid !== true) && (props.setRegistrationLength)) {
+          props.setRegistrationLength.lifeYears = 0
+        }
+        return props.setRegistrationLength
+      }),
+      isValid: computed((): boolean => { return getLengthTrust.value.valid }),
       feeLabel: computed((): string => {
         if (localState.feeType === FeeSummaryTypes.DISCHARGE) {
           return 'Total Discharge'
@@ -125,7 +133,7 @@ export default defineComponent({
         )
       }),
       isComplete: computed((): boolean => {
-        return localState.feeSummary.quantity > 0
+        return localState.feeSummary.quantity > 0 && localState.isValid
       }),
       totalAmount: computed((): number => {
         return (
