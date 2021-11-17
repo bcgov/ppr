@@ -33,17 +33,21 @@
           <collateral class="mt-15" :isSummary="true" />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <sticky-container
-            :setRightOffset="true"
-            :setShowButtons="true"
-            :setShowFeeSummary="true"
-            :setFeeType="feeType"
-            :setRegistrationType="registrationTypeUI"
-            :setCancelBtn="'Cancel'"
-            :setSubmitBtn="'Confirm and Complete'"
-            @cancel="goToDashboard()"
-            @submit="confirmDischarge()"
-          />
+          <aside>
+            <affix relative-element-selector=".col-9" :offset="{ top: 100, bottom: -100 }">
+              <sticky-container
+                :setRightOffset="true"
+                :setShowButtons="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationType="registrationTypeUI"
+                :setCancelBtn="'Cancel'"
+                :setSubmitBtn="'Confirm and Complete'"
+                @cancel="goToDashboard()"
+                @submit="confirmDischarge()"
+              />
+            </affix>
+          </aside>
         </v-col>
       </v-row>
     </div>

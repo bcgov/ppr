@@ -72,19 +72,23 @@
           />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <sticky-container
-            :setRightOffset="true"
-            :setShowButtons="true"
-            :setShowFeeSummary="true"
-            :setFeeType="feeType"
-            :setRegistrationType="registrationTypeUI"
-            :setCancelBtn="'Cancel'"
-            :setBackBtn="'Save and Resume Later'"
-            :setSubmitBtn="'Review and Complete'"
-            @cancel="goToDashboard()"
-            @submit="confirmAmendment()"
-            @back="saveDraft()"
-          />
+          <aside>
+            <affix relative-element-selector=".col-9" :offset="{ top: 100, bottom: -100 }">
+              <sticky-container
+                :setRightOffset="true"
+                :setShowButtons="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationType="registrationTypeUI"
+                :setCancelBtn="'Cancel'"
+                :setBackBtn="'Save and Resume Later'"
+                :setSubmitBtn="'Review and Complete'"
+                @cancel="goToDashboard()"
+                @submit="confirmAmendment()"
+                @back="saveDraft()"
+              />
+            </affix>
+          </aside>
         </v-col>
       </v-row>
     </div>

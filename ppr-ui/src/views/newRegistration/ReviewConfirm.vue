@@ -74,13 +74,17 @@
             </v-row>
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
-            <sticky-container
-              :setRightOffset="true"
-              :setShowFeeSummary="true"
-              :setFeeType="feeType"
-              :setRegistrationLength="registrationLength"
-              :setRegistrationType="registrationTypeUI"
-            />
+            <aside>
+              <affix relative-element-selector=".col-9" :offset="{ top: 100, bottom: -100 }">
+                <sticky-container
+                  :setRightOffset="true"
+                  :setShowFeeSummary="true"
+                  :setFeeType="feeType"
+                  :setRegistrationLength="registrationLength"
+                  :setRegistrationType="registrationTypeUI"
+                />
+              </affix>
+            </aside>
           </v-col>
         </v-row>
       </div>

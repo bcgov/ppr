@@ -198,7 +198,7 @@ export default defineComponent({
 
     const vehiclesValid = (): boolean => {
       let validity = false
-      for (let i = 0; i < localState.collateral.vehicleCollateral.length; i++) {
+      for (let i = 0; i < localState.collateral.vehicleCollateral?.length; i++) {
         // is valid if there is at least one vehicle
         if (localState.collateral.vehicleCollateral[i].action !== ActionTypes.REMOVED) {
           validity = true

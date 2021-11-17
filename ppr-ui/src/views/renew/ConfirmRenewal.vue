@@ -60,21 +60,25 @@
           />
         </v-col>
         <v-col class="pl-6" cols="3">
-          <sticky-container
-            :setErrMsg="stickyComponentErrMsg"
-            :setRightOffset="true"
-            :setShowButtons="true"
-            :setShowFeeSummary="true"
-            :setFeeType="feeType"
-            :setRegistrationLength="registrationLength"
-            :setRegistrationType="registrationTypeUI"
-            :setBackBtn="'Back'"
-            :setCancelBtn="'Cancel'"
-            :setSubmitBtn="'Submit Renewal'"
-            @back="goToReviewRenewal()"
-            @cancel="showDialog()"
-            @submit="submitRenewal()"
-          />
+          <aside>
+            <affix relative-element-selector=".col-9" :offset="{ top: 100, bottom: -100 }">
+              <sticky-container
+                :setErrMsg="stickyComponentErrMsg"
+                :setRightOffset="true"
+                :setShowButtons="true"
+                :setShowFeeSummary="true"
+                :setFeeType="feeType"
+                :setRegistrationLength="registrationLength"
+                :setRegistrationType="registrationTypeUI"
+                :setBackBtn="'Back'"
+                :setCancelBtn="'Cancel'"
+                :setSubmitBtn="'Submit Renewal'"
+                @back="goToReviewRenewal()"
+                @cancel="showDialog()"
+                @submit="submitRenewal()"
+              />
+            </affix>
+          </aside>
         </v-col>
       </v-row>
     </div>

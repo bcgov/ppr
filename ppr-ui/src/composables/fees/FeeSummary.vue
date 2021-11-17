@@ -153,9 +153,6 @@ export default defineComponent({
     watch(() => props.setRegistrationType, (val: UIRegistrationTypes) => {
       localState.registrationType = val
     })
-    watch(() => props.setRegistrationLength, (val: RegistrationLengthI) => {
-      localState.registrationLength = val
-    }, { deep: true, immediate: true })
 
     return {
       UIRegistrationTypes,
