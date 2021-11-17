@@ -101,7 +101,7 @@ export default defineComponent({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
       registrationLength: computed((): RegistrationLengthI => {
-        if (localState.isValid !== true) {
+        if ((localState.isValid !== true) && (props.setRegistrationLength)) {
           props.setRegistrationLength.lifeYears = 0
         }
         return props.setRegistrationLength
