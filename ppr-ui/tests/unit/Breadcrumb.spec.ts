@@ -233,4 +233,15 @@ describe('Breadcrumb component tests', () => {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
     }
   })
+
+  it('renders staff dashboard with breadcrumb', () => {
+    wrapper.vm.$store.state.stateModel.authorization.keycloakRoles = ['staff']
+    wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
+    expect(breadcrumbs.at(1).text()).toContain('Staff')
+    
+  })
+  
 })
