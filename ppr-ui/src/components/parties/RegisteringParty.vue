@@ -1,7 +1,7 @@
 <template>
   <v-container flat class="pa-0">
     <v-container class="pa-0">
-      <v-row v-if="registeringParty" no-gutters class="pb-6 pt-4">
+      <v-row v-if="registeringParty" no-gutters class="pb-8 pt-2">
         <v-col>
           <v-data-table
             class="registering-table"
