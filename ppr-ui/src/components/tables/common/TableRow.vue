@@ -248,9 +248,6 @@
                 <span v-if="item.expireDays === -99">
                   Infinite registrations cannot be renewed.
                 </span>
-                <span v-else>
-                  This lien has already been renewed and cannot be renewed again.
-                </span>
               </v-tooltip>
               <v-list-item @click="handleAction(item, TableActions.REMOVE)">
                 <v-list-item-subtitle>
