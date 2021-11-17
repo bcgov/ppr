@@ -18,9 +18,9 @@
           <v-breadcrumbs class="pa-0" :items="breadcrumbs">
             <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="item.href">
               <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
-                {{ item.text }}
+                {{ handleStaff(item.text) }}
               </span>
-              <span v-else :class="$style['breadcrumb-text']">{{ item.text }}</span>
+              <span v-else :class="$style['breadcrumb-text']">{{ handleStaff(item.text) }}</span>
             </v-breadcrumbs-item>
             <v-breadcrumbs-divider class="px-1" slot="divider">
               <v-icon color="white">mdi-chevron-right</v-icon>
@@ -56,10 +56,12 @@ export default defineComponent({
   setup (props) {
     const {
       getRegistrationNumber,
-      getRegistrationType
-    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType'])
+      getRegistrationType,
+      isRoleStaff
+    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType', 'isRoleStaff'])
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
+    const isStaff = isRoleStaff.value
     const localState = reactive({
       backUrl: computed((): string => {
         const length = localState.breadcrumbs?.length || 0
@@ -95,7 +97,16 @@ export default defineComponent({
         }
       })
     })
+
+    const handleStaff = (breadcrumbText): string => {
+      if (isStaff) {
+        breadcrumbText = breadcrumbText.replace('My', 'Staff')
+      }
+      return breadcrumbText
+    }
+
     return {
+      handleStaff,
       ...toRefs(localState)
     }
   }

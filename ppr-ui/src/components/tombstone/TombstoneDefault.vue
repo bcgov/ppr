@@ -1,30 +1,45 @@
 <template>
-  <div class="ma-0 pa-0">
-    <span class="tombstone-header">
-      <b>{{ header }}</b>
-    </span>
-    <v-row id="tombstone-user-info" class="tombstone-sub-header" no-gutters>
-      <v-col cols="10">
-        <v-row no-gutters>
-          <v-col cols="auto" class="pr-3" style="border-right: thin solid #dee2e6">
-            {{ userName }}
+  <v-row no-gutters>
+    <v-col v-if="isStaff" class="staff-header" cols="1"></v-col>
+    <v-col :cols="isStaff? '11' : '12'" :class="isStaff? 'pl-4' : ''">
+      <div class="ma-0 pa-0">
+        <span class="tombstone-header">
+          <b>{{ header }}</b>
+        </span>
+        <v-row id="tombstone-user-info" class="tombstone-sub-header" no-gutters>
+          <v-col cols="10">
+            <v-row no-gutters>
+              <v-col
+                cols="auto"
+                class="pr-3"
+                style="border-right: thin solid #dee2e6"
+              >
+                {{ userName }}
+              </v-col>
+              <v-col cols="auto" class="pl-3">
+                {{ accountName }}
+              </v-col>
+            </v-row>
           </v-col>
-          <v-col cols="auto" class="pl-3">
-            {{ accountName }}
+          <v-col cols="2">
+            <v-row no-gutters justify="end">
+              {{ date }}
+            </v-row>
           </v-col>
         </v-row>
-      </v-col>
-      <v-col cols="2">
-        <v-row no-gutters justify="end">
-          {{ date }}
-        </v-row>
-      </v-col>
-    </v-row>
-  </div>
+      </div>
+    </v-col>
+  </v-row>
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  toRefs
+} from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { convertDate } from '@/utils'
@@ -32,14 +47,31 @@ import { convertDate } from '@/utils'
 export default defineComponent({
   name: 'TombstoneDefault',
   setup (props, { root }) {
-    const { getAccountLabel, getUserFirstName, getUserLastName } =
-      useGetters<any>(['getAccountLabel', 'getUserFirstName', 'getUserLastName'])
+    const {
+      getAccountLabel,
+      getUserFirstName,
+      getUserLastName,
+      isRoleStaff
+    } = useGetters<any>([
+      'getAccountLabel',
+      'getUserFirstName',
+      'getUserLastName',
+      'isRoleStaff'
+    ])
     const localState = reactive({
       userName: computed((): string => {
         return `${getUserFirstName.value} ${getUserLastName.value}`
       }),
       date: '',
-      header: 'My Personal Property Registry',
+      header: computed((): string => {
+        if (isRoleStaff.value) {
+          return 'Staff Personal Property Registry'
+        }
+        return 'My Personal Property Registry'
+      }),
+      isStaff: computed((): boolean => {
+        return isRoleStaff.value
+      }),
       accountName: computed((): string => {
         return getAccountLabel.value
       })
@@ -56,6 +88,6 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 </style>
