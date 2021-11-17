@@ -24,7 +24,7 @@
                 <v-icon class="ml-1" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
               </template>
               <div class="pt-2 pb-2">
-                The Registering Party has been changed from the logged in account user.
+                This Registering Party has been changed from the logged in account user.
               </div>
             </v-tooltip>
           </span></v-col>

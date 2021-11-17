@@ -637,5 +637,9 @@ tr.registration-row.draft-registration-row td.actions-cell,
   background-size: 100%;
   background-repeat: no-repeat;
   width: 150px;
-  
+}  
+
+.disabled-custom .v-label--is-disabled, .disabled-custom .v-input__slot {
+  opacity: 0.4;
+  pointer-events: none;
 }

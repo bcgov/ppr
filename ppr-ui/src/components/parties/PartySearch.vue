@@ -9,6 +9,7 @@
           v-model="searchValue"
           persistent-hint
           hint="Enter at least the first 3 characters"
+          :class="autoCompleteDisabled ? 'disabled-custom' : ''"
           :disabled="autoCompleteDisabled"
         />
       </v-col>

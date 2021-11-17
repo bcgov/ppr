@@ -1,7 +1,7 @@
 <template>
   <div :class="$style['caution-box']" class="caution-box">
     <p class="ma-0 pa-4">
-      <b>Important:</b> {{ msg }}
+      <b>{{ importantWord }}:</b> {{ msg }}
     </p>
   </div>
 </template>
@@ -17,11 +17,16 @@ import {
 export default defineComponent({
   name: 'CautionBox',
   props: {
-    setMsg: String
+    setMsg: String,
+    setImportantWord: {
+      type: String,
+      default: 'Important'
+    }
   },
   setup (props) {
     const localState = reactive({
-      msg: props.setMsg
+      msg: props.setMsg,
+      importantWord: props.setImportantWord
     })
 
     return {
