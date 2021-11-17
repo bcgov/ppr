@@ -165,7 +165,7 @@
             elevation="0"
             @click="handleAction(item, TableActions.DISCHARGE)"
           >
-            <span class="text-wrap">Total Discharge</span>
+            <span :class="[$style['discharge-btn'], 'text-wrap']">Total Discharge</span>
           </v-btn>
           <v-btn
             v-else-if="!isExpired(item) && !isDischarged(item)"
@@ -559,5 +559,9 @@ export default defineComponent({
   font-weight: normal !important;
   height: 35px !important;
   width: 100px;
+}
+.discharge-btn {
+  line-height: 14px;
+  width: 90px;
 }
 </style>
