@@ -418,8 +418,7 @@ export default defineComponent({
     }
 
     const isRenewalDisabled = (item: RegistrationSummaryIF): boolean => {
-      return (item.expireDays === -99 ||
-        (isRepairersLien(item) && hasRenewal(item)))
+      return (item.expireDays === -99)
     }
 
     const isDraft = (item: any): boolean => {
