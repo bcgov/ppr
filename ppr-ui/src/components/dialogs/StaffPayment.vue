@@ -44,8 +44,8 @@ import { Action, Getter } from 'vuex-class'
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 
 // Interfaces and Enums
-import { ActionBindingIF } from '@/interfaces'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { ActionBindingIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 
 @Component({
@@ -55,24 +55,22 @@ import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 })
 export default class StaffPayment extends Vue {
   // Global getters
-  @Getter getAppValidate!: boolean
   @Getter getStaffPayment!: StaffPaymentIF
 
   // Global actions
   @Action setStaffPayment!: ActionBindingIF
-  @Action setStaffPaymentValidity!: ActionBindingIF
 
   /** Prop to provide section number. */
   @Prop({ default: '' }) readonly sectionNumber: string
 
   /** Check validity state, only when prompted by app. */
   private get invalidStaffPayment (): boolean {
-    return this.getAppValidate
+    return false
   }
 
   /** Is true when prompted by the app AND the user has selected an option. */
   private get validateStaffPayment (): boolean {
-    return this.getAppValidate && !!this.getStaffPayment?.option
+    return !!this.getStaffPayment?.option
   }
 
   onStaffPaymentDataUpdate (event: any) {

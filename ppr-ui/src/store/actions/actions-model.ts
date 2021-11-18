@@ -19,6 +19,7 @@ import {
   VehicleCollateralIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
 export const resetNewRegistration: ActionIF = ({ commit }): void => {
   commit('mutateNewRegistration')
@@ -61,6 +62,10 @@ export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): vo
 
 export const setCertifyInformation: ActionIF = ({ commit }, certifyInformation: CertifyIF): void => {
   commit('mutateCertifyInformation', certifyInformation)
+}
+
+export const setStaffPayment: ActionIF = ({ commit }, staffPayment: StaffPaymentIF): void => {
+  commit('mutateStaffPayment', staffPayment)
 }
 
 export const setCollateralShowInvalid = ({ commit }, show: boolean): void => {

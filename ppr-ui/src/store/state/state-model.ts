@@ -100,5 +100,6 @@ export const stateModel: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
-  folioOrReferenceNumber: ''
+  folioOrReferenceNumber: '',
+  staffPayment: null
 }

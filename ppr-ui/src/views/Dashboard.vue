@@ -276,6 +276,7 @@ import { RegistrationBar } from '@/components/registration'
     SearchHistory,
     SearchBar,
     Tombstone,
+    StaffPayment,
     RegistrationTable
   }
 })
