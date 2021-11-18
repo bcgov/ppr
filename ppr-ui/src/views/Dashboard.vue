@@ -24,6 +24,11 @@
       :registrationNumber="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
+    <StaffPayment
+      attach=""
+      class="mt-10"
+      @haveChanges="onStaffPaymentChanges()"
+    />
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
     <div class="container pa-0">
       <v-row no-gutters>
@@ -256,7 +261,7 @@ import {
 } from '@/utils'
 // local components
 import { BaseSnackbar } from '@/components/common'
-import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
+import { BaseDialog, RegistrationConfirmation, StaffPayment } from '@/components/dialogs'
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
