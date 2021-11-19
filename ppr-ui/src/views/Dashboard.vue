@@ -27,7 +27,8 @@
     <StaffPayment
       attach=""
       class="mt-10"
-      @haveChanges="onStaffPaymentChanges()"
+      :setDisplay="staffPaymentDialogDisplay"
+      @proceed="onStaffPaymentChanges()"
     />
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
     <div class="container pa-0">
@@ -47,6 +48,7 @@
                         @searched-type="setSearchedType"
                         @searched-value="setSearchedValue"
                         @search-data="setSearchResults"
+                        @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
                         @search-error="emitError"/>
           </v-row>
         </v-col>
@@ -327,6 +329,7 @@ export default class Dashboard extends Vue {
   private myRegDataHistory: RegistrationSummaryIF[] = []
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
+  private staffPaymentDialogDisplay = false
   private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
@@ -568,6 +571,10 @@ export default class Dashboard extends Vue {
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
+  }
+
+  private onStaffPaymentChanges (): void {
+    this.staffPaymentDialogDisplay = false
   }
 
   private async removeDraft (regNum: string, docId: string): Promise<void> {

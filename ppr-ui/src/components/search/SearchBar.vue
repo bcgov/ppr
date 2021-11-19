@@ -121,10 +121,10 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="1" class="pl-3 pt-2">
+      <v-col class="pl-3 pt-2" style="width: 250px;">
         <v-row no-gutters>
           <v-btn :id="$style['search-btn']"
-                 class="search-bar-btn primary"
+                 class="search-bar-btn primary mr-2"
                  :loading="searching"
                  @click="searchCheck">
             <v-icon>mdi-magnify</v-icon>
@@ -132,7 +132,7 @@
 
           <v-menu offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :id="$style['client-search']" class="search-bar-btn primary pl-2">
+              <v-btn v-on="on" :id="$style['client-search']" class="search-bar-btn primary">
                 <v-icon>mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -346,7 +346,7 @@ export default defineComponent({
     }
 
     const clientSearch = () => {
-
+      emit('toggleStaffPaymentDialog', true)
     }
 
     watch(() => localState.searchValue, (val: string) => {

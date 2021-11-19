@@ -11,7 +11,7 @@
     "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --testPathPattern --no-cache --watch --runInBand"
   },
   "dependencies": {
-    "@bcrs-shared-components/staff-payment": "1.0.22",
+    "@bcrs-shared-components/staff-payment": "1.0.29",
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-range-number-validator": "^1.1.0",
     "@sentry/browser": "^6.0.4",
