@@ -222,8 +222,7 @@ export const isPremiumAccount = (state: StateIF): boolean => {
 
 /** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: StateIF): boolean => {
-  return true
-  // return state.stateModel.authorization?.keycloakRoles.includes('staff')
+  return state.stateModel.authorization?.keycloakRoles.includes('staff')
 }
 
 /** Whether the app is processing a search request or not. */
