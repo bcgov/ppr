@@ -178,12 +178,12 @@ export default defineComponent({
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
-        if (!getLengthTrust.value.lifeInfinite && getLengthTrust.value.lifeYears < 1) {
-          return 'Not entered'
-        }
         if (!getLengthTrust.value.lifeInfinite && (isNaN(getLengthTrust.value.lifeYears) ||
           getLengthTrust.value.lifeYears < 1 || getLengthTrust.value.lifeYears > feeInfoYears.quantityMax)) {
           return 'Not valid'
+        }
+        if (!getLengthTrust.value.lifeInfinite && getLengthTrust.value.lifeYears < 1) {
+          return 'Not entered'
         }
         if (getLengthTrust.value.lifeInfinite) {
           return 'Infinite'
