@@ -476,7 +476,7 @@ class Report:  # pylint: disable=too-few-public-methods
             order_date = Report._to_report_datetime(statement['courtOrderInformation']['orderDate'], False)
             statement['courtOrderInformation']['orderDate'] = order_date
         if 'changeType' in statement:
-            statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']]
+            statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
         if 'expiryDate' in statement:
             statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
         if 'surrenderDate' in statement:

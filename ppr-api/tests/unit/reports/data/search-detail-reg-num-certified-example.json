@@ -1,0 +1,222 @@
+{
+  "details": [
+    {
+      "financingStatement": {
+        "baseRegistrationNumber": "TEST0018", 
+        "changes": [
+          {
+            "addGeneralCollateral": [
+              {
+                "addedDateTime": "2021-09-03T22:00:00+00:00", 
+                "collateralId": 200000009, 
+                "description": "ADDING TEST0018 GC 5"
+              }
+            ], 
+            "amendmentRegistrationNumber": "TEST0018A3", 
+            "baseRegistrationNumber": "TEST0018", 
+            "changeType": "AM", 
+            "clientReferenceId": "TEST-AM-0018-3", 
+            "createDateTime": "2021-09-03T22:00:00+00:00", 
+            "deleteGeneralCollateral": [
+              {
+                "addedDateTime": "2021-09-03T22:00:00+00:00", 
+                "collateralId": 200000010, 
+                "description": "DELETING TEST0018 GC 2"
+              }
+            ], 
+            "description": "TEST remove gc legacy 2, add gc 5", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-0018-AM3", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-0018-AM", 
+                "last": "REGISTERING", 
+                "middle": "18-3"
+              }
+            }, 
+            "statementType": "AMENDMENT_STATEMENT"
+          }, 
+          {
+            "amendmentRegistrationNumber": "TEST0018A2", 
+            "baseRegistrationNumber": "TEST0018", 
+            "changeType": "AM", 
+            "clientReferenceId": "TEST-AM-0018-2", 
+            "createDateTime": "2021-09-03T21:00:00+00:00", 
+            "deleteGeneralCollateral": [
+              {
+                "addedDateTime": "2021-09-03T21:00:00+00:00", 
+                "collateralId": 200000008, 
+                "description": "*** DELETED *** TEST0018 GC 1 *** DELETED *** "
+              }
+            ], 
+            "description": "TEST remove gc legacy", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-0018-AM2", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-0018-AM", 
+                "last": "REGISTERING", 
+                "middle": "18-2"
+              }
+            }, 
+            "statementType": "AMENDMENT_STATEMENT"
+          }, 
+          {
+            "addGeneralCollateral": [
+              {
+                "addedDateTime": "2021-09-03T20:00:00+00:00", 
+                "collateralId": 200000007, 
+                "description": "TEST0018 GC 4 AMEND ADD"
+              }
+            ], 
+            "amendmentRegistrationNumber": "TEST0018A1", 
+            "baseRegistrationNumber": "TEST0018", 
+            "changeType": "AM", 
+            "clientReferenceId": "TEST-AM-0018-1", 
+            "createDateTime": "2021-09-03T20:00:00+00:00", 
+            "description": "TEST add gc legacy", 
+            "registeringParty": {
+              "address": {
+                "city": "city", 
+                "country": "CA", 
+                "postalCode": "V8R3A5", 
+                "region": "BC", 
+                "street": "TEST-0018-AM1", 
+                "streetAdditional": "line 2"
+              }, 
+              "personName": {
+                "first": "TEST-0018-AM", 
+                "last": "REGISTERING", 
+                "middle": "18-1"
+              }
+            }, 
+            "statementType": "AMENDMENT_STATEMENT"
+          }
+        ], 
+        "clientReferenceId": "TEST-SA-0018", 
+        "createDateTime": "2021-09-03T19:00:00+00:00", 
+        "debtors": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0018", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 18 DEBTOR INC.", 
+            "partyId": 200000058
+          }
+        ], 
+        "expiryDate": "2026-09-04T06:59:59+00:00", 
+        "generalCollateral": [
+          {
+            "addedDateTime": "2021-09-03T22:00:00+00:00", 
+            "collateralId": 200000009, 
+            "descriptionAdd": "ADDING TEST0018 GC 5", 
+            "descriptionDelete": "DELETING TEST0018 GC 2"
+          }, 
+          {
+            "addedDateTime": "2021-09-03T21:00:00+00:00", 
+            "collateralId": 200000008, 
+            "descriptionDelete": "*** DELETED *** TEST0018 GC 1 *** DELETED *** "
+          }, 
+          {
+            "addedDateTime": "2021-09-03T20:00:00+00:00", 
+            "collateralId": 200000007, 
+            "descriptionAdd": "TEST0018 GC 4 AMEND ADD"
+          }, 
+          {
+            "addedDateTime": "2021-09-03T19:00:00+00:00", 
+            "collateralId": 200000006, 
+            "description": "TEST0018 GC 3"
+          }, 
+          {
+            "addedDateTime": "2021-09-03T19:00:00+00:00", 
+            "collateralId": 200000005, 
+            "description": "TEST0018 GC 2"
+          }, 
+          {
+            "addedDateTime": "2021-09-03T19:00:00+00:00", 
+            "collateralId": 200000004, 
+            "description": "TEST0018 GC 1"
+          }
+        ], 
+        "lifeYears": 5, 
+        "registeringParty": {
+          "address": {
+            "city": "city", 
+            "country": "CA", 
+            "postalCode": "V8R3A5", 
+            "region": "BC", 
+            "street": "TEST-0018", 
+            "streetAdditional": "line 2"
+          }, 
+          "personName": {
+            "first": "TEST", 
+            "last": "REGISTERING", 
+            "middle": "18"
+          }
+        }, 
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        "securedParties": [
+          {
+            "address": {
+              "city": "city", 
+              "country": "CA", 
+              "postalCode": "V8R3A5", 
+              "region": "BC", 
+              "street": "TEST-0018", 
+              "streetAdditional": "line 2"
+            }, 
+            "businessName": "TEST 18 SECURED PARTY", 
+            "partyId": 200000059
+          }
+        ], 
+        "statusType": "ACT", 
+        "trustIndenture": true, 
+        "type": "SA"
+      }, 
+      "matchType": "EXACT"
+    }
+  ], 
+  "exactResultsSize": 1, 
+  "payment": {
+    "invoiceId": "12512", 
+    "receipt": "/api/v1/payment-requests/12512/receipts"
+  }, 
+  "searchDateTime": "2021-09-20T17:17:13+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "T-S-RN-0018-1",
+    "certified": true, 
+    "criteria": {
+      "value": "TEST0018"
+    }, 
+    "type": "REGISTRATION_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseRegistrationNumber": "TEST0018", 
+      "createDateTime": "2021-07-27T22:51:02+00:00", 
+      "matchType": "EXACT", 
+      "registrationNumber": "TEST0018", 
+      "registrationType": "SA"
+    }
+  ], 
+  "similarResultsSize": 0, 
+  "totalResultsSize": 1
+}

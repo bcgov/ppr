@@ -97,10 +97,23 @@ def test_search_valid(session, client, jwt, search_type, json_data):
     """Assert that valid search criteria returns a 201 status."""
     rv = client.post('/api/v1/searches',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
+    assert 'certified' not in rv.json['searchQuery']
+
+
+@pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
+def test_staff_search_certified(session, client, jwt, search_type, json_data):
+    """Assert that valid staff certified search criteria returns a 201 status."""
+    rv = client.post('/api/v1/searches?certified=true',
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
+                     content_type='application/json')
+    # check
+    assert rv.status_code == HTTPStatus.CREATED
+    assert rv.json['searchQuery']['certified']
 
 
 def test_search_query_invalid_type_400(session, client, jwt):
@@ -116,7 +129,7 @@ def test_search_query_invalid_type_400(session, client, jwt):
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
-    print(rv.json)
+    # print(rv.json)
 
 
 def test_search_query_nonstaff_missing_account_400(session, client, jwt):
@@ -136,7 +149,7 @@ def test_search_query_nonstaff_missing_account_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_search_query_staff_missing_account_201(session, client, jwt):
+def test_search_query_staff_missing_account_400(session, client, jwt):
     """Assert that a search request with a staff jwt and no account ID returns a 201 status."""
     # setup
     json_data = {
@@ -154,7 +167,7 @@ def test_search_query_staff_missing_account_201(session, client, jwt):
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.CREATED
+    assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_search_query_no_result_200(session, client, jwt):
@@ -171,7 +184,7 @@ def test_search_query_no_result_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/searches',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                      content_type='application/json')
 
     # check
@@ -261,11 +274,10 @@ def test_search_selection_update_valid(session, client, jwt):
         json_data[2]['selected'] = False
     else:
         json_data[2]['selected'] = True
-
     # test
     rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                     content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.ACCEPTED
@@ -290,7 +302,7 @@ def test_search_selection_update_invalid_400(session, client, jwt):
     # test
     rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                     content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -315,7 +327,7 @@ def test_search_selection_update_unauthorized_404(session, client, jwt):
     # test
     rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header_account(jwt, [COLIN_ROLE]),
+                    headers=create_header_account(jwt, [COLIN_ROLE], 'test-user', COLIN_ROLE),
                     content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED

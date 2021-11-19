@@ -26,6 +26,9 @@ from ppr_api.reports import Report, ReportTypes
 SEARCH_RESULT_RG_DATAFILE = 'tests/unit/reports/data/search-detail-reg-num-example.json'
 SEARCH_RESULT_RG_REQUESTFILE = 'tests/unit/reports/data/search-detail-reg-num-request.json'
 
+SEARCH_RESULT_RG_CERTIFIED_DATAFILE = 'tests/unit/reports/data/search-detail-reg-num-certified-example.json'
+SEARCH_RESULT_RG_CERTIFIED_REQUESTFILE = 'tests/unit/reports/data/search-detail-reg-num-certified-request.json'
+
 SEARCH_RESULT_SS_DATAFILE = 'tests/unit/reports/data/search-detail-serial-num-example.json'
 SEARCH_RESULT_SS_REQUESTFILE = 'tests/unit/reports/data/search-detail-serial-num-request.json'
 
@@ -52,6 +55,7 @@ SEARCH_RESULT_NO_RESULTS_REQUESTFILE = 'tests/unit/reports/data/search-detail-no
 
 TEST_REPORT_DATA = [
     ('RG', SEARCH_RESULT_RG_DATAFILE, SEARCH_RESULT_RG_REQUESTFILE),
+    ('RG', SEARCH_RESULT_RG_CERTIFIED_DATAFILE, SEARCH_RESULT_RG_CERTIFIED_REQUESTFILE),
     ('AC', SEARCH_RESULT_AC_DATAFILE, SEARCH_RESULT_AC_REQUESTFILE),
     ('MH', SEARCH_RESULT_MH_DATAFILE, SEARCH_RESULT_MH_REQUESTFILE),
     ('SS', SEARCH_RESULT_SS_DATAFILE, SEARCH_RESULT_SS_REQUESTFILE),
@@ -63,7 +67,7 @@ TEST_REPORT_DATA = [
 ]
 
 TEST_DATETIME_DATA = [
-    ('2021-03-12T01:53:54+00:00', 'March 11, 2021 5:53:54 pm Pacific Time', True),
+    ('2021-03-12T01:53:54+00:00', 'March 11, 2021 at 5:53:54 pm Pacific time', True),
     ('2021-03-12T01:53:54+00:00', 'March 11, 2021', False)
 ]
 
@@ -93,7 +97,7 @@ def test_search_result_config(client, jwt, type, json_data_file, report_data_fil
     assert report_data['meta_title']
     assert report_data['meta_account_id']
     assert report_data['environment']
-    assert report_data['searchDateTime'].endswith('Pacific Time')
+    assert report_data['searchDateTime'].endswith('Pacific time')
     if type != 'NO_RESULTS':
         financing = report_data['details'][0]['financingStatement']
         assert financing['registeringParty']['address']['country'] == 'Canada'

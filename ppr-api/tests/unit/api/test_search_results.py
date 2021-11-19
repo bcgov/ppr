@@ -45,7 +45,7 @@ def test_search_detail_valid_200(session, client, jwt):
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                      headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                       content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []
@@ -106,8 +106,8 @@ def test_search_detail_nonstaff_missing_account_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_search_detail_staff_missing_account_200(session, client, jwt):
-    """Assert that a search detail request with a staff jwt and no account ID returns a 201 status."""
+def test_search_detail_staff_missing_account_400(session, client, jwt):
+    """Assert that a search detail request with a staff jwt and no account ID returns a 400 status."""
     # setup
     json_data = {
         'type': 'REGISTRATION_NUMBER',
@@ -120,7 +120,7 @@ def test_search_detail_staff_missing_account_200(session, client, jwt):
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                      headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                       content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
 
@@ -130,11 +130,11 @@ def test_search_detail_staff_missing_account_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/search-results/' + search_id,
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_search_detail_nonstaff_unauthorized_401(session, client, jwt):
@@ -168,7 +168,7 @@ def test_search_detail_no_duplicates_200(session, client, jwt):
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                      headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                       content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []

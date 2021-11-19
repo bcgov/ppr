@@ -105,8 +105,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 found = False
                 reg_num = result['financingStatement']['baseRegistrationNumber']
                 for select in search_select:
+                    # Verified: have to explicitly select a similar result to include.
                     if select['baseRegistrationNumber'] == reg_num and \
-                       ('selected' not in select or select['selected']):
+                       ('selected' in select and select['selected']):
                         found = True
                         similar_count += 1
                 if found:

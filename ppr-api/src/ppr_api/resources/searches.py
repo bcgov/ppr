@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """API endpoints for executing PPR searches."""
-
 # pylint: disable=too-many-return-statements
 
 from http import HTTPStatus
@@ -24,7 +23,7 @@ from registry_schemas import utils as schema_utils
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
-from ppr_api.services.authz import is_staff, authorized
+from ppr_api.services.authz import is_staff_account, is_reg_staff_account, authorized
 from ppr_api.models import SearchRequest, SearchResult
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
@@ -45,6 +44,7 @@ TO_SEARCH_TYPE_DESCRIPTION = {
     'REGISTRATION_NUMBER': 'Registration Number:',
     'SERIAL_NUMBER': 'Serial/VIN Number:'
 }
+CERTIFIED_PARAM = 'certified'
 
 
 @cors_preflight('POST,OPTIONS')
@@ -56,13 +56,13 @@ class SearchResource(Resource):
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def post():
+    def post():  # pylint: disable=too-many-branches
         """Execute a new search request using criteria in the request body."""
         try:
 
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
-            if not is_staff(jwt) and account_id is None:
+            if not account_id:
                 return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
@@ -76,12 +76,21 @@ class SearchResource(Resource):
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
             # Perform any extra data validation such as start and end dates here
             SearchRequest.validate_query(request_json)
-            token: dict = g.jwt_oidc_token_info
-            query = SearchRequest.create_from_json(request_json, account_id, token.get('username', None))
+            # Staff could be certified search.
+            if is_staff_account(account_id):
+                certified_param = request.args.get(CERTIFIED_PARAM)
+                if certified_param is not None and isinstance(certified_param, bool) and certified_param:
+                    request_json['certified'] = True
+                elif certified_param is not None and isinstance(certified_param, str) and \
+                        certified_param.lower() in ['true', '1', 'y', 'yes']:
+                    request_json['certified'] = True
+
+            query = SearchRequest.create_from_json(request_json, account_id,
+                                                   g.jwt_oidc_token_info.get('username', None))
 
             # Charge a search fee.
             invoice_id = None
-            if account_id:
+            if account_id and not is_reg_staff_account(account_id):
                 payment = Payment(jwt=jwt.get_token_auth_header(),
                                   account_id=account_id,
                                   details=get_payment_details(query, request_json['type']))
@@ -93,8 +102,6 @@ class SearchResource(Resource):
             # Execute the search query: treat no results as a success.
             try:
                 query.search()
-                # if not query.search_response or query.returned_results_size == 0:
-                #   return resource_utils.unprocessable_error_response('search query')
 
                 # Now save the initial detail results in the search_result table with no
                 # search selection criteria (the absence indicates an incomplete search).
@@ -140,7 +147,7 @@ class SearchDetailResource(Resource):
 
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
-            if not is_staff(jwt) and account_id is None:
+            if account_id is None:
                 return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
@@ -159,7 +166,7 @@ class SearchDetailResource(Resource):
 
             # Save the updated search selection.
             search_request.update_search_selection(request_json)
-            return jsonify(search_request.search_response), HTTPStatus.ACCEPTED
+            return jsonify(search_request.updated_selection), HTTPStatus.ACCEPTED
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)

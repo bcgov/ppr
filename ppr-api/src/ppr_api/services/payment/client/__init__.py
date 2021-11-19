@@ -39,7 +39,9 @@ TRANSACTION_TO_FILING_TYPE = {
     'FINANCING_INFINITE': 'INFRG',
     'RENEWAL_LIFE_YEAR': 'FSREN',
     'RENEWAL_INFINITE': 'INFRN',
-    'SEARCH': 'SERCH'
+    'SEARCH': 'SERCH',
+    'SEARCH_STAFF': 'SSRCH',
+    'SEARCH_CERTIFIED': 'PPRCD'
 }
 
 PAYMENT_REQUEST_TEMPLATE = {
@@ -49,6 +51,36 @@ PAYMENT_REQUEST_TEMPLATE = {
         'filingTypes': [
             {
                 'filingTypeCode': '',
+                'priority': False,
+                'futureEffective': False,
+                'quantity': 1
+            }
+        ]
+    },
+    'businessInfo': {
+        'corpType': 'PPR'
+    },
+    'details': [
+        {
+            'label': '',
+            'value': ''
+        }
+    ]
+}
+
+PAYMENT_CERRIFIED_SEARCH_REQUEST_TEMPLATE = {
+    'filingInfo': {
+        'filingIdentifier': '',
+        'folioNumber': '',
+        'filingTypes': [
+            {
+                'filingTypeCode': 'SSRCH',
+                'priority': False,
+                'futureEffective': False,
+                'quantity': 1
+            },
+            {
+                'filingTypeCode': 'PPRCD',
                 'priority': False,
                 'futureEffective': False,
                 'quantity': 1
