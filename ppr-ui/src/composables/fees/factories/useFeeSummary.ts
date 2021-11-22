@@ -2,6 +2,7 @@ import { UIRegistrationTypes } from '@/enums'
 import { FeeSummaryDefaults, FeeSummaryTypes } from '../enums'
 import { FeeSummaryI, RegistrationLengthI } from '../interfaces'
 import { defaultFeeSummaries } from '../resources'
+import { getFinancingFee } from '@/composables/fees/factories'
 
 export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
   const hfArray = [
@@ -112,6 +113,11 @@ export function getFeeHint (
     }
     if (registrationLength.lifeInfinite) {
       return 'Infinite Registration'
+    }
+    const feeInfoYears = getFinancingFee(false)
+    if ((registrationLength.lifeYears) && (isNaN(registrationLength.lifeYears) ||
+      registrationLength.lifeYears < 1 || registrationLength.lifeYears > feeInfoYears.quantityMax)) {
+      return 'Not valid'
     }
     if (registrationLength.lifeYears === 1) {
       return '1 Year @ $5.00/year'

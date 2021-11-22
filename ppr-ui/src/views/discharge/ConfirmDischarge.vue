@@ -266,6 +266,7 @@ export default class ConfirmDischarge extends Vue {
   private cancel (val: boolean): void {
     this.showCancelDialog = false
     if (val) {
+      this.setRegistrationNumber(null)
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
