@@ -115,8 +115,8 @@ export function getFeeHint (
       return 'Infinite Registration'
     }
     const feeInfoYears = getFinancingFee(false)
-    if ((registrationLength.lifeYears) && (isNaN(registrationLength.lifeYears) ||
-      registrationLength.lifeYears < 1 || registrationLength.lifeYears > feeInfoYears.quantityMax)) {
+    if ((registrationLength.lifeYears) && ((isNaN(registrationLength.lifeYears) ||
+      registrationLength.lifeYears < 1 || registrationLength.lifeYears > feeInfoYears.quantityMax))) {
       return 'Not valid'
     }
     if (registrationLength.lifeYears === 1) {
