@@ -136,14 +136,18 @@ export default defineComponent({
         return localState.feeSummary.quantity > 0 && localState.isValid
       }),
       totalAmount: computed((): number => {
-        return (
-          localState.feeSummary.feeAmount *
-          localState.feeSummary.quantity +
-          localState.feeSummary.serviceFee
-        )
+        if (localState.isValid) {
+          return (
+            localState.feeSummary.feeAmount *
+            localState.feeSummary.quantity +
+            localState.feeSummary.serviceFee
+          )
+        }
       }),
       totalFees: computed((): number => {
-        return localState.feeSummary.feeAmount * localState.feeSummary.quantity
+        if (localState.isValid) {
+          return localState.feeSummary.feeAmount * localState.feeSummary.quantity
+        }
       })
     })
 
