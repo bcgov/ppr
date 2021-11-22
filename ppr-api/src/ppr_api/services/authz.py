@@ -23,7 +23,7 @@ from urllib3.util.retry import Retry
 
 
 SYSTEM_ROLE = 'system'
-STAFF_ROLE = 'staff'
+STAFF_ROLE = 'ppr_staff'
 COLIN_ROLE = 'colin'
 PPR_ROLE = 'ppr'
 BASIC_USER = 'basic'
@@ -31,7 +31,7 @@ PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
 SBC_OFFICE = 'gov_account_user'
-BCOL_HELP = 'bcol_help'
+BCOL_HELP = 'helpdesk'
 
 
 #  def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool:
