@@ -23,6 +23,8 @@ from functools import wraps
 import requests
 from flask import current_app
 
+from ppr_api.services.payment import TransactionTypes
+
 
 MSG_CLIENT_CREDENTIALS_REQ_FAILED = 'Client credentials request failed'
 MSG_INVALID_HTTP_VERB = 'Invalid HTTP verb'
@@ -41,7 +43,9 @@ TRANSACTION_TO_FILING_TYPE = {
     'RENEWAL_INFINITE': 'INFRN',
     'SEARCH': 'SERCH',
     'SEARCH_STAFF': 'SSRCH',
-    'SEARCH_CERTIFIED': 'PPRCD'
+    'SEARCH_STAFF_NO_FEE': 'SSRCH',
+    'SEARCH_STAFF_CERTIFIED': 'PPRCD',
+    'SEARCH_STAFF_CERTIFIED_NO_FEE': 'PPRCD'
 }
 
 PAYMENT_REQUEST_TEMPLATE = {
@@ -67,10 +71,30 @@ PAYMENT_REQUEST_TEMPLATE = {
         }
     ]
 }
-
-PAYMENT_CERRIFIED_SEARCH_REQUEST_TEMPLATE = {
+PAYMENT_STAFF_SEARCH_REQUEST_TEMPLATE = {
     'filingInfo': {
-        'filingIdentifier': '',
+        'folioNumber': '',
+        'filingTypes': [
+            {
+                'filingTypeCode': 'SSRCH',
+                'priority': False,
+                'futureEffective': False,
+                'quantity': 1
+            }
+        ]
+    },
+    'businessInfo': {
+        'corpType': 'PPR'
+    },
+    'details': [
+        {
+            'label': '',
+            'value': ''
+        }
+    ]
+}
+PAYMENT_CERTIFIED_STAFF_SEARCH_REQUEST_TEMPLATE = {
+    'filingInfo': {
         'folioNumber': '',
         'filingTypes': [
             {
@@ -243,6 +267,40 @@ class SBCPaymentClient(BaseClient):
 
         return data
 
+    @staticmethod
+    def create_payment_staff_search_data(transaction_info, client_reference_id=None):
+        """Build the staff search payment-request body formatted as JSON."""
+        data = copy.deepcopy(PAYMENT_STAFF_SEARCH_REQUEST_TEMPLATE)
+        if 'certified' in transaction_info and transaction_info['certified']:
+            data = copy.deepcopy(PAYMENT_CERTIFIED_STAFF_SEARCH_REQUEST_TEMPLATE)
+        if transaction_info['transactionType'] in (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value,
+                                                   TransactionTypes.SEARCH_STAFF_NO_FEE.value):
+            data['filingInfo']['filingTypes'][0]['waiveFees'] = True
+            if transaction_info['transactionType'] == TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value:
+                data['filingInfo']['filingTypes'][1]['waiveFees'] = True
+
+        # set up FAS payment
+        if 'routingSlipNumber' in transaction_info:
+            account_info = {
+                'routingSlip': transaction_info['routingSlipNumber']
+            }
+            data['accountInfo'] = account_info
+        # setup BCOL account payment
+        elif 'bcolAccountNumber' in transaction_info:
+            account_info = {
+                'bcolAccountNumber': transaction_info['bcolAccountNumber']
+            }
+            if 'datNumber' in transaction_info:
+                account_info['datNumber'] = transaction_info['datNumber']
+            data['accountInfo'] = account_info
+
+        if client_reference_id:
+            data['filingInfo']['folioNumber'] = client_reference_id
+        else:
+            del data['filingInfo']['folioNumber']
+
+        return data
+
     def create_payment(self, transaction_type, quantity=1, ppr_id=None, client_reference_id=None):
         """Submit a payment request for the PPR API transaction."""
         data = SBCPaymentClient.create_payment_data(transaction_type, quantity, ppr_id, client_reference_id)
@@ -264,6 +322,19 @@ class SBCPaymentClient(BaseClient):
         }
 
         return pay_reference
+
+    def create_payment_staff_search(self, transaction_info, client_reference_id=None):
+        """Submit a staff search payment request for the PPR API transaction."""
+        data = SBCPaymentClient.create_payment_staff_search_data(transaction_info, client_reference_id)
+        if self.detail_label and self.detail_value:
+            data['details'][0]['label'] = self.detail_label
+            data['details'][0]['value'] = self.detail_value
+        else:
+            del data['details']
+        # current_app.logger.debug('create paymnent payload:')
+        # current_app.logger.debug(json.dumps(data))
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
     def cancel_payment(self, invoice_id):
         """Immediately cancel or refund the transaction payment as a state rollback."""
@@ -312,3 +383,17 @@ class SBCPaymentClient(BaseClient):
         except (ApiRequestError) as err:
             current_app.logger.error(err.message)
             raise err
+
+    @staticmethod
+    def build_pay_reference(invoice_data, api_url: str):
+        """Build a payment reference from the pay api response invoice info."""
+        invoice_id = str(invoice_data['id'])
+        receipt_path = api_url.replace('https://', '')
+        receipt_path = receipt_path[receipt_path.find('/'): None] + PATH_RECEIPT.format(invoice_id=invoice_id)
+        # Return the pay reference to include in the API response.
+        pay_reference = {
+            'invoiceId': invoice_id,
+            'receipt': receipt_path
+        }
+
+        return pay_reference

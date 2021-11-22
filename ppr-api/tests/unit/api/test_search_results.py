@@ -19,6 +19,8 @@ Test-Suite to ensure that the /searches endpoint is working as expected.
 import copy
 from http import HTTPStatus
 
+from flask import current_app
+
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_SUMMARY
 
@@ -27,11 +29,13 @@ from tests.unit.services.utils import create_header_account, create_header
 
 
 SAMPLE_JSON_SUMMARY = copy.deepcopy(SEARCH_SUMMARY)
+MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
 
 def test_search_detail_valid_200(session, client, jwt):
     """Assert that a valid search detail request returns a 200 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     json_data = {
         'type': 'BUSINESS_DEBTOR',
         'criteria': {
@@ -109,6 +113,7 @@ def test_search_detail_nonstaff_missing_account_400(session, client, jwt):
 def test_search_detail_staff_missing_account_400(session, client, jwt):
     """Assert that a search detail request with a staff jwt and no account ID returns a 400 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     json_data = {
         'type': 'REGISTRATION_NUMBER',
         'criteria': {
@@ -155,6 +160,7 @@ def test_search_detail_nonstaff_unauthorized_401(session, client, jwt):
 def test_search_detail_no_duplicates_200(session, client, jwt):
     """Assert that a selection with 2 matches on the same registration returns the expected result."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     json_data = {
         'type': 'BUSINESS_DEBTOR',
         'criteria': {

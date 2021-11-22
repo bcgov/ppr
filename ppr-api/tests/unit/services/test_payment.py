@@ -23,7 +23,8 @@ from http import HTTPStatus
 import pytest
 
 from ppr_api.services.payment.client import SBCPaymentClient, ApiRequestError
-from ppr_api.services.payment.payment import Payment, TransactionTypes
+from ppr_api.services.payment import TransactionTypes
+from ppr_api.services.payment.payment import Payment
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.authz import PPR_ROLE
 from tests.unit.services.utils import helper_create_jwt
@@ -48,6 +49,88 @@ TEST_PAY_TYPE_FILING_TYPE = [
     (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN'),
     (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN')
 ]
+# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, 'datNUmber', 'waiveFees')
+TEST_PAY_STAFF_SEARCH = [
+    (TransactionTypes.SEARCH_STAFF_NO_FEE.value, None, None, None, True),
+    (TransactionTypes.SEARCH_STAFF.value, '12345', None, None, False),
+    (TransactionTypes.SEARCH_STAFF.value, None, '62345', None, False),
+    (TransactionTypes.SEARCH_STAFF.value, None, '62345', '72345', False),
+    (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value, None, None, None, True),
+    (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, '12345', None, None, False),
+    (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, None, '62345', None, False),
+    (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, None, '62345', '72345', False)
+]
+
+
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_SEARCH)
+def test_payment_data_staff_search(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number, waive_fees):
+    """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
+    transaction_info = {
+        'transactionType': pay_trans_type
+    }
+    if pay_trans_type in (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value,
+                          TransactionTypes.SEARCH_STAFF_NO_FEE.value):
+        transaction_info['certified'] = True
+    if routing_slip:
+        transaction_info['routingSlipNumber'] = routing_slip
+    if bcol_number:
+        transaction_info['bcolAccountNumber'] = bcol_number
+    if dat_number:
+        transaction_info['datNumber'] = dat_number
+
+    # test
+    data = SBCPaymentClient.create_payment_staff_search_data(transaction_info, 'UT-PAY-0001')
+    # check
+    assert data
+    if pay_trans_type in (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value,
+                          TransactionTypes.SEARCH_STAFF_NO_FEE.value):
+        assert len(data['filingInfo']['filingTypes']) == 2
+    else:
+        assert len(data['filingInfo']['filingTypes']) == 1
+    if waive_fees:
+        assert data['filingInfo']['filingTypes'][0]['waiveFees']
+        if pay_trans_type == TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value:
+            assert data['filingInfo']['filingTypes'][1]['waiveFees']
+    else:
+        assert 'waiveFees' not in data['filingInfo']['filingTypes'][0]
+
+    if not routing_slip and not bcol_number:
+        assert 'accountInfo' not in data
+    elif routing_slip:
+        assert 'accountInfo' in data and data['accountInfo']['routingSlip'] == routing_slip
+    elif bcol_number:
+        assert 'accountInfo' in data and data['accountInfo']['bcolAccountNumber'] == bcol_number
+        if dat_number:
+            assert data['accountInfo']['datNumber'] == dat_number
+
+
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_SEARCH)
+def test_payment_staff_search_mock(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number, waive_fees):
+    """Assert that a pay-api staff search payment request works as expected with the mock service endpoint."""
+    # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_SEARCH)
+    payment.api_url = MOCK_URL_NO_KEY
+    transaction_info = {
+        'transactionType': pay_trans_type
+    }
+    if pay_trans_type in (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value,
+                          TransactionTypes.SEARCH_STAFF_NO_FEE.value):
+        transaction_info['certified'] = True
+    if routing_slip:
+        transaction_info['routingSlipNumber'] = routing_slip
+    if bcol_number:
+        transaction_info['bcolAccountNumber'] = bcol_number
+    if dat_number:
+        transaction_info['datNumber'] = dat_number
+
+    # test
+    pay_data = payment.create_payment_staff_search(transaction_info, 'UT-PAY-SEARCH-01')
+    # print(pay_data)
+    # check
+    assert pay_data
+    assert pay_data['invoiceId']
+    assert pay_data['receipt']
 
 
 @pytest.mark.parametrize('pay_trans_type,quantity,filing_type', TEST_PAY_TYPE_FILING_TYPE)
@@ -143,7 +226,7 @@ def test_client_search_mock(client, jwt):
     # test
     pay_data = pay_client.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
 
-    print(pay_data)
+    # print(pay_data)
     # check
     assert pay_data
     assert pay_data['invoiceId']
@@ -160,7 +243,7 @@ def test_client_search_pay_details_mock(client, jwt):
     # test
     pay_data = pay_client.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
 
-    print(pay_data)
+    # print(pay_data)
     # check
     assert pay_data
     assert pay_data['invoiceId']
@@ -190,7 +273,7 @@ def test_payment_search_mock(client, jwt):
 
     # test
     pay_data = payment.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
-    print(pay_data)
+    # print(pay_data)
     # check
     assert pay_data
     assert pay_data['invoiceId']
@@ -206,7 +289,7 @@ def test_payment_with_details_search_mock(client, jwt):
 
     # test
     pay_data = payment.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
-    print(pay_data)
+    # print(pay_data)
     # check
     assert pay_data
     assert pay_data['invoiceId']

@@ -24,6 +24,8 @@ from ppr_api.utils.validators import financing_validator, party_validator, regis
 
 
 ACCOUNT_REQUIRED = 'Account-Id header required.'
+STAFF_SEARCH_BCOL_FAS = 'Provide either a BCOL Account Number or a Routing Slip Number but not both.'
+SBC_SEARCH_NO_PAYMENT = 'Provide either a BCOL Account Number or a Routing Slip Number.'
 CROWN_CHARGE_FORBIDDEN = 'The account ID {account_id} is not authorized to access a Crown Charge registration.'
 ACCOUNT_ACCESS = 'The account ID {account_id} cannot access statement information for ' + \
                  'registration number {registration_num}.'
@@ -59,6 +61,16 @@ def get_apikey(req):
 def account_required_response():
     """Build account required error response."""
     return jsonify({'message': ACCOUNT_REQUIRED}), HTTPStatus.BAD_REQUEST
+
+
+def staff_payment_bcol_fas():
+    """Build staff payment info error response."""
+    return jsonify({'message': STAFF_SEARCH_BCOL_FAS}), HTTPStatus.BAD_REQUEST
+
+
+def sbc_payment_invalid():
+    """Build sbc payment info error response."""
+    return jsonify({'message': SBC_SEARCH_NO_PAYMENT}), HTTPStatus.BAD_REQUEST
 
 
 def validation_error_response(errors, cause, additional_msg: str = None):

@@ -30,7 +30,7 @@ BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
-SBC_OFFICE = 'sbc_help_user'
+SBC_OFFICE = 'gov_account_user'
 BCOL_HELP = 'bcol_help'
 
 
@@ -178,9 +178,9 @@ def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statem
     return False
 
 
-def is_bcol_help(jwt: JwtManager) -> bool:
-    """Return True if the user has the BCOL help desk role."""
-    return jwt and jwt.validate_roles([BCOL_HELP])
+def is_bcol_help(account_id: str) -> bool:
+    """Return True if the account id is a bcol help account id."""
+    return account_id is not None and account_id == BCOL_HELP
 
 
 def is_staff_account(account_id: str) -> bool:
