@@ -19,6 +19,7 @@ import {
   GeneralCollateralIF,
   VehicleCollateralIF
 } from '@/interfaces'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
 export const mutateAccountProductSubscribtion = (
   state: StateIF, productSubscriptions: AccountProductSubscriptionIF
@@ -80,6 +81,10 @@ export const mutateGeneralCollateral = (state: StateIF, generalCollateral: Gener
 
 export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>) => {
   state.stateModel.authorization.keycloakRoles = keyCloakRoles
+}
+
+export const mutateStaffPayment = (state: StateIF, staffPayment: StaffPaymentIF) => {
+  state.stateModel.staffPayment = staffPayment
 }
 
 export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) => {

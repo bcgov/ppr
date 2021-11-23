@@ -20,6 +20,7 @@ import {
   UserSettingsIF,
   VehicleCollateralIF
 } from '@/interfaces'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
 /** The current account id. */
 export const getAccountId = (state: StateIF): number => {
@@ -232,6 +233,11 @@ export const isSearching = (state: StateIF): boolean => {
 /** The folio or reference number. */
 export const getFolioOrReferenceNumber = (state: StateIF): string => {
   return state.stateModel.folioOrReferenceNumber || ''
+}
+
+/** The staff payment. */
+export const getStaffPayment = (state: StateIF): StaffPaymentIF => {
+  return state.stateModel.staffPayment
 }
 
 /** Whether the app should show the step errors */

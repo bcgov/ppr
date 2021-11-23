@@ -1,0 +1,192 @@
+<template>
+  <base-dialog :setDisplay="display" :setOptions="options" @proceed="proceed($event)">
+    <template v-slot:content>
+              <staff-payment-component
+                :staffPaymentData="staffPaymentData"
+                :validate="validate"
+                :displaySideLabel="false"
+                :displayPriorityCheckbox="false"
+                @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+                @valid="valid = $event"
+              />
+            <v-row no-gutters>
+              <v-col class="pl-2">
+                <v-checkbox
+                  class="mt-2"
+                  v-model="certify"
+                  id="certify-checkbox"
+                  label="Make this a Certified Search ($25.00)"
+                />
+              </v-col>
+            </v-row>
+          </template>
+  </base-dialog>
+</template>
+
+<script lang="ts">
+// external
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs
+} from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
+
+// Components
+import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
+import { BaseDialog } from '.'
+
+// Interfaces and Enums
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
+import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+
+export default defineComponent({
+  name: 'StaffPaymentDialog',
+  components: {
+    StaffPaymentComponent,
+    BaseDialog
+  },
+  props: {
+    setOptions: Object as () => DialogOptionsIF,
+    setDisplay: { default: false }
+  },
+  emits: ['proceed'],
+  setup (props, { emit }) {
+    const { setStaffPayment } = useActions<any>(['setStaffPayment'])
+    const { getStaffPayment } = useGetters<any>(['getStaffPayment'])
+    const localState = reactive({
+      validate: false,
+      certify: false,
+      valid: false,
+      paymentOption: StaffPaymentOptions.NONE,
+      display: computed(() => {
+        return props.setDisplay
+      }),
+      options: computed(() => {
+        return props.setOptions
+      }),
+      staffPaymentData: computed(() => {
+        let pd = getStaffPayment.value
+        if (!pd) {
+          pd = {
+            option: StaffPaymentOptions.NO_FEE,
+            routingSlipNumber: '',
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: '',
+            isPriority: false
+          }
+        }
+        return pd
+      }),
+      showStaffPaymentInvalidSection: computed(() => {
+        let option
+        if (getStaffPayment.value && getStaffPayment.value.option) {
+          option = getStaffPayment.value.option
+        } else {
+          option = StaffPaymentOptions.NONE
+        }
+        // True if no option is selected
+        return localState.validate && option === StaffPaymentOptions.NONE
+      })
+    })
+
+    const proceed = (val: boolean) => {
+      if (val === true) {
+        if (localState.valid) {
+          setStaffPayment(localState.staffPaymentData)
+          emit('proceed', val)
+        } else {
+          localState.validate = true
+        }
+      } else {
+        emit('proceed', val)
+      }
+    }
+
+    /** Called when component's staff payment data has been updated. */
+    const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
+      let staffPaymentData: StaffPaymentIF = {
+        ...getStaffPayment.value,
+        ...val
+      }
+
+      // disable validation
+      localState.validate = false
+
+      switch (staffPaymentData.option) {
+        case StaffPaymentOptions.FAS:
+          staffPaymentData = {
+            option: StaffPaymentOptions.FAS,
+            routingSlipNumber: staffPaymentData.routingSlipNumber,
+            isPriority: staffPaymentData.isPriority,
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: ''
+          }
+          break
+
+        case StaffPaymentOptions.BCOL:
+          staffPaymentData = {
+            option: StaffPaymentOptions.BCOL,
+            bcolAccountNumber: staffPaymentData.bcolAccountNumber,
+            datNumber: staffPaymentData.datNumber,
+            folioNumber: staffPaymentData.folioNumber,
+            isPriority: staffPaymentData.isPriority,
+            routingSlipNumber: ''
+          }
+          break
+
+        case StaffPaymentOptions.NO_FEE:
+          staffPaymentData = {
+            option: StaffPaymentOptions.NO_FEE,
+            routingSlipNumber: '',
+            isPriority: false,
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: ''
+          }
+          break
+
+        case StaffPaymentOptions.NONE: // should never happen
+          break
+      }
+
+      setStaffPayment(staffPaymentData)
+    }
+
+    return {
+      proceed,
+      onStaffPaymentDataUpdate,
+      ...toRefs(localState)
+    }
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+
+// override internal whitespace
+::v-deep #staff-payment-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+// override default radio input background colour
+::v-deep .v-input--radio-group__input {
+  background-color: white;
+}
+
+// remove margin below radio group
+::v-deep .v-input--radio-group > .v-input__control > .v-input__slot {
+  margin-bottom: 0 !important;
+}
+
+// hide messages below radio group
+::v-deep .v-input--radio-group > .v-input__control > .v-messages {
+  display: none;
+}
+</style>

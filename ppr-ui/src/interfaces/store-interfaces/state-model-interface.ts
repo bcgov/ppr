@@ -6,6 +6,7 @@ import {
 import { AccountProductSubscriptionIF } from '../account-interfaces'
 import { CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF } from '../ppr-api-interfaces'
 import { AddPartiesIF, AddCollateralIF, LengthTrustIF } from '../registration-interfaces'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
 // State model example
 export interface StateModelIF {
@@ -14,6 +15,7 @@ export interface StateModelIF {
   authorization: AuthorizationIF
   folioOrReferenceNumber: string
   certifyInformation: CertifyIF
+  staffPayment: StaffPaymentIF
   registration: {
     amendmentDescription: string // amendments only
     collateral: AddCollateralIF

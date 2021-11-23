@@ -121,14 +121,32 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="1" class="pl-3 pt-2">
+      <v-col class="pl-3 pt-2" style="width: 250px;">
         <v-row no-gutters>
           <v-btn :id="$style['search-btn']"
-                 class="search-bar-btn primary"
+                 class="search-bar-btn primary mr-2"
                  :loading="searching"
                  @click="searchCheck">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
+
+          <v-menu offset-y left nudge-bottom="4">
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" :id="$style['client-search']" class="search-bar-btn primary">
+                <v-icon>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list class="actions__more-actions">
+              <v-list-item @click="clientSearch()">
+                <v-list-item-subtitle>
+                  <v-icon small>mdi-magnify</v-icon>
+                  <span>
+                    Client search
+                  </span>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </v-row>
         <v-row no-gutters>
           <span :id="$style['search-btn-info']" class="pl-1 pt-2">
@@ -187,7 +205,11 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const { setSearching } = useActions<any>(['setSearching'])
-    const { getUserSettings, isSearching } = useGetters<any>(['getUserSettings', 'isSearching'])
+    const {
+      getUserSettings,
+      isSearching,
+      isRoleStaff
+    } = useGetters<any>(['getUserSettings', 'isSearching', 'isRoleStaff'])
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -204,6 +226,7 @@ export default defineComponent({
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       validations: Object as SearchValidationIF,
+      isStaff: isRoleStaff.value,
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
@@ -321,6 +344,11 @@ export default defineComponent({
     const updateFolioNumber = (folioNumber: string) => {
       localState.folioNumber = folioNumber
     }
+
+    const clientSearch = () => {
+      emit('toggleStaffPaymentDialog', true)
+    }
+
     watch(() => localState.searchValue, (val: string) => {
       if (!val) localState.validations = null
       else localState.validations = validateSearchRealTime(localState)
@@ -358,6 +386,7 @@ export default defineComponent({
       searchCheck,
       setHideDetails,
       setSearchValue,
+      clientSearch,
       togglePaymentConfirmation,
       updateFolioNumber
     }
@@ -367,12 +396,12 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-#search-btn {
+#search-btn, #client-search {
   background-color: $primary-blue;
   color: white;
   height: 2.85rem;
   min-width: 0 !important;
-  width: 3.5rem;
+  width: 3rem;
 }
 #search-btn-info {
   color: $gray8;
