@@ -169,7 +169,7 @@ export default class ReviewRegistration extends Vue {
     if (this.financingStatementDate) {
       return `${convertDate(this.financingStatementDate, true, true)}`
     }
-    return ''
+    return `${convertDate(new Date(), true, true)}`
   }
 
   private get isAuthenticated (): boolean {

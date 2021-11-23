@@ -101,9 +101,6 @@ export default defineComponent({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
       registrationLength: computed((): RegistrationLengthI => {
-        if ((localState.isValid !== true) && (props.setRegistrationLength)) {
-          props.setRegistrationLength.lifeYears = 0
-        }
         return props.setRegistrationLength
       }),
       isValid: computed((): boolean => { return getLengthTrust.value.valid }),
@@ -136,14 +133,18 @@ export default defineComponent({
         return localState.feeSummary.quantity > 0 && localState.isValid
       }),
       totalAmount: computed((): number => {
-        return (
-          localState.feeSummary.feeAmount *
-          localState.feeSummary.quantity +
-          localState.feeSummary.serviceFee
-        )
+        if (localState.isValid) {
+          return (
+            localState.feeSummary.feeAmount *
+            localState.feeSummary.quantity +
+            localState.feeSummary.serviceFee
+          )
+        }
       }),
       totalFees: computed((): number => {
-        return localState.feeSummary.feeAmount * localState.feeSummary.quantity
+        if (localState.isValid) {
+          return localState.feeSummary.feeAmount * localState.feeSummary.quantity
+        }
       })
     })
 
