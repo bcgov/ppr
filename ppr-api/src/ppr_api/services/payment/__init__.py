@@ -12,3 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module wraps the calls to external payment service used by the API."""
+
+from enum import Enum
+
+
+class TransactionTypes(Enum):
+    """Derive payment request filing type from transaction type."""
+
+    AMENDMENT = 'AMENDMENT'
+    AMENDMENT_NO_FEE = 'AMENDMENT_NO_FEE'
+    CHANGE = 'CHANGE'
+    DISCHARGE = 'DISCHARGE'
+    FINANCING_FR = 'FINANCING_FR'  # Special flat rate fee for FR registration type.
+    FINANCING_INFINITE = 'FINANCING_INFINITE'
+    FINANCING_LIFE_YEAR = 'FINANCING_LIFE_YEAR'
+    FINANCING_NO_FEE = 'FINANCING_NO_FEE'  # No Charge fee for LT, MH, MISCLIEN class, CROWNLIEN class.
+    RENEWAL_INFINITE = 'RENEWAL_INFINITE'
+    RENEWAL_LIFE_YEAR = 'RENEWAL_LIFE_YEAR'
+    SEARCH = 'SEARCH'
+    SEARCH_STAFF = 'SEARCH_STAFF'
+    SEARCH_STAFF_NO_FEE = 'SEARCH_STAFF_NO_FEE'
+    SEARCH_STAFF_CERTIFIED = 'SEARCH_STAFF_CERTIFIED'
+    SEARCH_STAFF_CERTIFIED_NO_FEE = 'SEARCH_STAFF_CERTIFIED_NO_FEE'

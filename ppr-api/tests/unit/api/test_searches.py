@@ -21,15 +21,18 @@ import copy
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_QUERY
 
 from ppr_api.models import SearchRequest
 from ppr_api.models.utils import format_ts, now_ts_offset
 from ppr_api.resources.searches import get_payment_details
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from ppr_api.services.authz import BCOL_HELP, COLIN_ROLE, PPR_ROLE, SBC_OFFICE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 
+
+MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
 # Valid test search criteria
@@ -90,17 +93,77 @@ TEST_VALID_DATA = [
     ('IS', INDIVIDUAL_DEBTOR_JSON),
     ('BS', BUSINESS_DEBTOR_JSON)
 ]
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {certified}, {status})
+TEST_STAFF_SEARCH_DATA = [
+    (STAFF_ROLE, None, None, None, False, HTTPStatus.CREATED),
+    (STAFF_ROLE, '12345', None, None, False, HTTPStatus.CREATED),
+    (STAFF_ROLE, '12345', None, None, True, HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', '111111', False, HTTPStatus.CREATED),
+    (STAFF_ROLE, None, None, None, True, HTTPStatus.CREATED),
+    (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST),
+    (BCOL_HELP, None, None, None, False, HTTPStatus.CREATED),
+    (SBC_OFFICE, '12345', None, None, False, HTTPStatus.CREATED),
+    (SBC_OFFICE, '12345', None, None, True, HTTPStatus.CREATED),
+    (SBC_OFFICE, None, '654321', '111111', False, HTTPStatus.CREATED),
+    (SBC_OFFICE, None, None, None, False, HTTPStatus.BAD_REQUEST)
+]
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
 def test_search_valid(session, client, jwt, search_type, json_data):
     """Assert that valid search criteria returns a 201 status."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     rv = client.post('/api/v1/searches',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
+    assert 'certified' not in rv.json['searchQuery']
+
+
+@pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
+def test_staff_search_certified(session, client, jwt, search_type, json_data):
+    """Assert that valid staff certified search criteria returns a 201 status."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    rv = client.post('/api/v1/searches?certified=true',
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
+                     content_type='application/json')
+    # check
+    assert rv.status_code == HTTPStatus.CREATED
+    assert rv.json['searchQuery']['certified']
+
+
+# testdata pattern is ({role}, {routing_slip}, {bcol_number}, {datNUmber}, {certified}, {status})
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,certified,status', TEST_STAFF_SEARCH_DATA)
+def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, certified, status):
+    """Assert that staff search requests returns the correct status."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    params = ''
+    if certified:
+        params = '?certified=true'
+    if routing_slip:
+        if len(params) > 0:
+            params += '&routingSlipNumber=' + str(routing_slip)
+        else:
+            params = '?routingSlipNumber=' + str(routing_slip)
+    if bcol_number:
+        if len(params) > 0:
+            params += '&bcolAccountNumber=' + str(bcol_number)
+        else:
+            params = '?bcolAccountNumber=' + str(bcol_number)
+    if dat_number:
+        if len(params) > 0:
+            params += '&datNumber=' + str(dat_number)
+    print('params=' + params)
+    rv = client.post('/api/v1/searches' + params,
+                     json=REGISTRATION_NUMBER_JSON,
+                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', role),
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
 
 
 def test_search_query_invalid_type_400(session, client, jwt):
@@ -116,7 +179,7 @@ def test_search_query_invalid_type_400(session, client, jwt):
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
-    print(rv.json)
+    # print(rv.json)
 
 
 def test_search_query_nonstaff_missing_account_400(session, client, jwt):
@@ -136,7 +199,7 @@ def test_search_query_nonstaff_missing_account_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_search_query_staff_missing_account_201(session, client, jwt):
+def test_search_query_staff_missing_account_400(session, client, jwt):
     """Assert that a search request with a staff jwt and no account ID returns a 201 status."""
     # setup
     json_data = {
@@ -154,12 +217,13 @@ def test_search_query_staff_missing_account_201(session, client, jwt):
                      content_type='application/json')
 
     # check
-    assert rv.status_code == HTTPStatus.CREATED
+    assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_search_query_no_result_200(session, client, jwt):
     """Assert that a valid search request with no results returns a 201 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     json_data = {
         'type': 'REGISTRATION_NUMBER',
         'criteria': {
@@ -171,7 +235,7 @@ def test_search_query_no_result_200(session, client, jwt):
     # test
     rv = client.post('/api/v1/searches',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -224,6 +288,7 @@ def test_search_query_invalid_start_datetime_400(session, client, jwt):
 def test_search_selection_update_valid(session, client, jwt):
     """Assert that a valid search selection update returns a 200 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     json_data = [
         {
             'baseRegistrationNumber': 'TEST0001',
@@ -261,7 +326,6 @@ def test_search_selection_update_valid(session, client, jwt):
         json_data[2]['selected'] = False
     else:
         json_data[2]['selected'] = True
-
     # test
     rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
@@ -290,7 +354,7 @@ def test_search_selection_update_invalid_400(session, client, jwt):
     # test
     rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
+                    headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
                     content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.BAD_REQUEST
@@ -315,7 +379,7 @@ def test_search_selection_update_unauthorized_404(session, client, jwt):
     # test
     rv = client.put('/api/v1/searches/200000004',
                     json=json_data,
-                    headers=create_header_account(jwt, [COLIN_ROLE]),
+                    headers=create_header_account(jwt, [COLIN_ROLE], 'test-user', COLIN_ROLE),
                     content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED

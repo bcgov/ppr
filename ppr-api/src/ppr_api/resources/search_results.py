@@ -24,7 +24,7 @@ from registry_schemas import utils as schema_utils
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
-from ppr_api.services.authz import is_staff, authorized
+from ppr_api.services.authz import authorized
 from ppr_api.models import SearchResult
 from ppr_api.resources import utils as resource_utils
 from ppr_api.reports import ReportTypes, get_pdf
@@ -50,7 +50,7 @@ class SearchResultsResource(Resource):
 
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
-            if not is_staff(jwt) and account_id is None:
+            if account_id is None:
                 return resource_utils.account_required_response()
 
             # Verify request JWT and account ID

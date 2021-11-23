@@ -57,6 +57,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     total_results_size = db.Column('total_results_size', db.Integer, nullable=True)
     returned_results_size = db.Column('returned_results_size', db.Integer, nullable=True)
     user_id = db.Column('user_id', db.String(1000), nullable=True)
+    updated_selection = db.Column('updated_selection', db.JSON, nullable=True)
 
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
@@ -82,7 +83,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             'maxResultsSize': search_utils.SEARCH_RESULTS_MAX_SIZE,
             'searchQuery': self.search_criteria
         }
-        if self.search_response:
+        if self.updated_selection:
+            result['results'] = self.updated_selection
+        elif self.search_response:
             result['results'] = self.search_response
 
         if self.pay_invoice_id and self.pay_path:
@@ -108,7 +111,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def update_search_selection(self, search_json):
         """Support UI search selection autosave: replace search response."""
-        self.search_response = search_json
+        # Audit requirement: save original search summary results (before consumer selects registrations to include).
+        # API consumers could remove results.
+        self.updated_selection = search_json
         self.save()
 
     def search_by_registration_number(self):

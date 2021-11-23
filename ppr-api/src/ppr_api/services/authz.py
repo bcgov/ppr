@@ -23,14 +23,15 @@ from urllib3.util.retry import Retry
 
 
 SYSTEM_ROLE = 'system'
-STAFF_ROLE = 'staff'
+STAFF_ROLE = 'ppr_staff'
 COLIN_ROLE = 'colin'
 PPR_ROLE = 'ppr'
-STAFF_ROLE = 'staff'
 BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
+SBC_OFFICE = 'gov_account_user'
+BCOL_HELP = 'helpdesk'
 
 
 #  def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool:
@@ -53,8 +54,10 @@ def authorized(identifier: str, jwt: JwtManager) -> bool:  # pylint: disable=too
     if identifier and identifier.strip() != '':
         return True
 
+    # Remove when all staff changes made.
     if jwt.validate_roles([STAFF_ROLE]):
         return True
+
 
 #        template_url = current_app.config.get('AUTH_SVC_URL')
 #        auth_url = template_url.format(**vars())
@@ -169,8 +172,27 @@ def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statem
     """Return True if the user has the BC Registries staff role."""
     if not jwt:
         return False
-
     if jwt.validate_roles([STAFF_ROLE]):
         return True
 
     return False
+
+
+def is_bcol_help(account_id: str) -> bool:
+    """Return True if the account id is a bcol help account id."""
+    return account_id is not None and account_id == BCOL_HELP
+
+
+def is_staff_account(account_id: str) -> bool:
+    """Return True if the account id is a registries staff or sbc office account id."""
+    return account_id is not None and account_id in (STAFF_ROLE, SBC_OFFICE)
+
+
+def is_reg_staff_account(account_id: str) -> bool:
+    """Return True if the account id is a staff registries account id."""
+    return account_id is not None and account_id == STAFF_ROLE
+
+
+def is_sbc_office_account(account_id: str) -> bool:
+    """Return True if the account id is an sbc office account id."""
+    return account_id is not None and account_id == SBC_OFFICE

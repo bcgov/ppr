@@ -382,7 +382,7 @@ def test_search_valid(session, search_type, json_data):
     """Assert that a valid search returns the expected search type result."""
     query = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
     query.search()
-
+    assert not query.updated_selection
     result = query.json
 #    print(result)
     assert query.id
@@ -658,7 +658,9 @@ def test_search_autosave(session):
     else:
         update_data[0]['matchType'] = 'EXACT'
 
+    assert not query.updated_selection
     query.update_search_selection(update_data)
+    assert query.updated_selection
     json_data = query.json
     assert json_data['results'][0]['matchType'] == update_data[0]['matchType']
 
