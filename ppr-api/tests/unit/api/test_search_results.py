@@ -20,12 +20,11 @@ import copy
 from http import HTTPStatus
 
 from flask import current_app
-
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_SUMMARY
 
-from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
-from tests.unit.services.utils import create_header_account, create_header
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from tests.unit.services.utils import create_header, create_header_account
 
 
 SAMPLE_JSON_SUMMARY = copy.deepcopy(SEARCH_SUMMARY)

@@ -23,7 +23,7 @@ from registry_schemas import utils as schema_utils
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import SearchRequest, SearchResult
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_bcol_help, is_sbc_office_account, is_staff_account
+from ppr_api.services.authz import authorized, is_bcol_help, is_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
@@ -63,7 +63,6 @@ class SearchResource(Resource):
     def post():  # pylint: disable=too-many-branches
         """Execute a new search request using criteria in the request body."""
         try:
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not account_id:
@@ -178,10 +177,8 @@ def staff_search(req: request, request_json, account_id: str):
     # bcol help is no fee; reg staff can be no fee.
     # FAS is routing slip only.
     # BCOL is dat number (optional) and BCOL account number (mandatory).
+    # All staff roles including SBC can submit no fee searches.
     if ROUTING_SLIP_PARAM in payment_info and BCOL_NUMBER_PARAM in payment_info:
-        return resource_utils.staff_payment_bcol_fas()
-    if is_sbc_office_account(account_id) and ROUTING_SLIP_PARAM not in payment_info and \
-            BCOL_NUMBER_PARAM not in payment_info:
         return resource_utils.staff_payment_bcol_fas()
 
     if CERTIFIED_PARAM in payment_info:
