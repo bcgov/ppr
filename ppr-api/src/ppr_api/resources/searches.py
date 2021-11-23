@@ -23,7 +23,7 @@ from registry_schemas import utils as schema_utils
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import SearchRequest, SearchResult
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_bcol_help, is_sbc_office_account, is_staff_account
+from ppr_api.services.authz import authorized, is_bcol_help, is_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
