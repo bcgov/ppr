@@ -115,9 +115,10 @@ export function getFeeHint (
       return 'Infinite Registration'
     }
     const feeInfoYears = getFinancingFee(false)
+    console.log(registrationLength.lifeYears)
     if ((registrationLength.lifeYears) && ((isNaN(registrationLength.lifeYears) ||
       registrationLength.lifeYears < 1 || registrationLength.lifeYears > feeInfoYears.quantityMax))) {
-      return 'Not valid'
+      return 'Select a valid registration length'
     }
     if (registrationLength.lifeYears === 1) {
       return '1 Year @ $5.00/year'
