@@ -105,7 +105,7 @@ TEST_STAFF_SEARCH_DATA = [
     (SBC_OFFICE, '12345', None, None, False, HTTPStatus.CREATED),
     (SBC_OFFICE, '12345', None, None, True, HTTPStatus.CREATED),
     (SBC_OFFICE, None, '654321', '111111', False, HTTPStatus.CREATED),
-    (SBC_OFFICE, None, None, None, False, HTTPStatus.BAD_REQUEST)
+    (SBC_OFFICE, None, None, None, False, HTTPStatus.CREATED)
 ]
 
 
