@@ -4,10 +4,11 @@ import Vuetify from 'vuetify'
 import flushPromises from 'flush-promises'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
+import CompositionApi from '@vue/composition-api'
 
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
-import { StaffPayment } from '@/components/dialogs'
+import { StaffPaymentDialog } from '@/components/dialogs'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
@@ -23,12 +24,15 @@ const proceed = 'proceed'
 // Input field selectors / buttons
 const title = '.dialog-title'
 
+
 describe('Payment component', () => {
   let wrapper: any
   
   beforeEach(async () => {
     const localVue = createLocalVue()
-    wrapper = mount(StaffPayment,
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    wrapper = mount(StaffPaymentDialog,
       {
         localVue,
         store,
@@ -48,7 +52,7 @@ describe('Payment component', () => {
   })
 
   it('renders with staff payment component', () => {
-    expect(wrapper.findComponent(StaffPayment).exists()).toBe(true)
+    expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
     expect(wrapper.findComponent(StaffPaymentComponent).exists()).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('Staff Payment')
@@ -58,17 +62,15 @@ describe('Payment component', () => {
   it('Emits the cancel action', async () => {
     expect(wrapper.find('#cancel-btn').exists()).toBe(true)
     await wrapper.find('#cancel-btn').trigger('click')
-    await Vue.nextTick()
     await flushPromises()
     expect(getLastEvent(wrapper, proceed)).toBe(false)
   })
 
   it('Emits the submit action', async () => {
-    wrapper.vm.$props.setDisplay = true
     wrapper.vm.valid = true
-    wrapper.findComponent(StaffPayment).vm.$emit(proceed, true)
+    
+    await wrapper.find('#accept-btn').trigger('click')
     await flushPromises()
     expect(getLastEvent(wrapper, proceed)).toBe(true)
-  })
-  
+  })  
 })

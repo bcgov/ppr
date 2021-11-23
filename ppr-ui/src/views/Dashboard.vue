@@ -24,7 +24,7 @@
       :registrationNumber="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
-    <StaffPayment
+    <staff-payment-dialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -263,7 +263,7 @@ import {
 } from '@/utils'
 // local components
 import { BaseSnackbar } from '@/components/common'
-import { BaseDialog, RegistrationConfirmation, StaffPayment } from '@/components/dialogs'
+import { BaseDialog, RegistrationConfirmation, StaffPaymentDialog } from '@/components/dialogs'
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
@@ -278,7 +278,7 @@ import { RegistrationBar } from '@/components/registration'
     SearchHistory,
     SearchBar,
     Tombstone,
-    StaffPayment,
+    StaffPaymentDialog,
     RegistrationTable
   }
 })
