@@ -1,4 +1,3 @@
-import { StaffPayment } from '@/components/dialogs'
 import { RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF,
