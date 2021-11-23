@@ -13,9 +13,11 @@
       <v-col v-else :class="[$style['search-info']]">
         <span>
           Select a search category and then enter a value to search.
+        </span>
+        <span v-if="isStaff">
           Each search incurs a
         </span>
-        <v-tooltip class="pa-2 pt-2"
+        <v-tooltip v-if="isStaff" class="pa-2 pt-2"
                    content-class="top-tooltip"
                    top
                    transition="fade-transition">
@@ -177,6 +179,7 @@ import { SettingOptions, UISearchTypes } from '@/enums'
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog } from '@/components/dialogs'
+import { isRoleStaff } from '@/store/getters'
 
 export default defineComponent({
   components: {
@@ -271,6 +274,10 @@ export default defineComponent({
         return localState.validations?.searchValue?.popUp || false
       }),
       showConfirmationDialog: computed((): boolean => {
+        // don't show confirmation dialog if staff
+        if (isRoleStaff.value === true) {
+          return false
+        }
         const settings: UserSettingsIF = getUserSettings.value
         return settings?.paymentConfirmationDialog
       })
