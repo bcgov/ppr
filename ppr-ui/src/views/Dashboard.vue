@@ -28,6 +28,7 @@
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialog"
       @proceed="onStaffPaymentChanges()"
     />
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
@@ -245,6 +246,7 @@ import {
   registrationNotFoundDialog,
   registrationRestrictedDialog,
   renewConfirmationDialog,
+  staffPaymentDialog,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -330,6 +332,7 @@ export default class Dashboard extends Vue {
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
   private staffPaymentDialogDisplay = false
+  private staffPaymentDialog: DialogOptionsIF = staffPaymentDialog
   private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions

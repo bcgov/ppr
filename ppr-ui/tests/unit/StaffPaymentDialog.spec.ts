@@ -8,8 +8,11 @@ import CompositionApi from '@vue/composition-api'
 
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentDialog } from '@/components/dialogs'
+import { StaffPaymentDialog, BaseDialog } from '@/components/dialogs'
 import { getLastEvent } from './utils'
+import {
+  staffPaymentDialog
+} from '@/resources/dialogOptions'
 
 Vue.use(Vuetify)
 
@@ -37,7 +40,7 @@ describe('Payment component', () => {
         localVue,
         store,
         propsData: {
-          setAttach: '',
+          setOptions: staffPaymentDialog,
           setDisplay: true
         },
         vuetify
@@ -54,22 +57,22 @@ describe('Payment component', () => {
   it('renders with staff payment component', () => {
     expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
     expect(wrapper.findComponent(StaffPaymentComponent).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('Staff Payment')
     
   })
 
   it('Emits the cancel action', async () => {
-    expect(wrapper.find('#cancel-btn').exists()).toBe(true)
-    await wrapper.find('#cancel-btn').trigger('click')
-    await flushPromises()
-    expect(getLastEvent(wrapper, proceed)).toBe(false)
+    wrapper.findComponent(BaseDialog).vm.$emit(proceed, false)
+      await flushPromises()
+      expect(getLastEvent(wrapper, proceed)).toEqual(false)
   })
 
   it('Emits the submit action', async () => {
     wrapper.vm.valid = true
     
-    await wrapper.find('#accept-btn').trigger('click')
+    wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
     expect(getLastEvent(wrapper, proceed)).toBe(true)
   })  

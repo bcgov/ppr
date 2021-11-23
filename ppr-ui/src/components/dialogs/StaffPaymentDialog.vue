@@ -1,11 +1,6 @@
 <template>
-  <v-dialog v-model="setDisplay" width="720px" persistent :attach="attach">
-    <v-card id="staff-payment-dialog" class="pl-5 pr-1 pt-5">
-      <v-row no-gutters>
-        <v-col cols="11">
-          <h3 class="dialog-title pb-6">Staff Payment</h3>
-          <div>
-            <div :class="{ invalidSection: showStaffPaymentInvalidSection }">
+  <base-dialog :setDisplay="display" :setOptions="options" @proceed="proceed($event)">
+    <template v-slot:content>
               <staff-payment-component
                 :staffPaymentData="staffPaymentData"
                 :validate="validate"
@@ -14,7 +9,6 @@
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="valid = $event"
               />
-            </div>
             <v-row no-gutters>
               <v-col class="pl-2">
                 <v-checkbox
@@ -25,43 +19,8 @@
                 />
               </v-col>
             </v-row>
-          </div>
-        </v-col>
-        <v-col cols="1">
-          <v-btn
-            class="close-btn float-right"
-            color="primary"
-            icon
-            :ripple="false"
-            @click="proceed(false)"
-          >
-            <v-icon size="32px">mdi-close</v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
-      <v-row class="pb-6" justify="center" no-gutters>
-        <v-col cols="auto">
-          <v-btn
-            id="cancel-btn"
-            class="outlined dialog-btn"
-            outlined
-            @click="proceed(false)"
-          >
-            Cancel
-          </v-btn>
-        </v-col>
-        <v-col class="pl-3" cols="auto">
-          <v-btn
-            id="accept-btn"
-            class="primary dialog-btn"
-            @click="proceed(true)"
-          >
-            Submit Search
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-dialog>
+          </template>
+  </base-dialog>
 </template>
 
 <script lang="ts">
@@ -76,18 +35,21 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
+import { BaseDialog } from '.'
 
 // Interfaces and Enums
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
 
 export default defineComponent({
   name: 'StaffPaymentDialog',
   components: {
-    StaffPaymentComponent
+    StaffPaymentComponent,
+    BaseDialog
   },
   props: {
-    setAttach: { default: '' },
+    setOptions: Object as () => DialogOptionsIF,
     setDisplay: { default: false }
   },
   emits: ['proceed'],
@@ -99,11 +61,11 @@ export default defineComponent({
       certify: false,
       valid: false,
       paymentOption: StaffPaymentOptions.NONE,
-      attach: computed(() => {
-        return props.setAttach
-      }),
       display: computed(() => {
         return props.setDisplay
+      }),
+      options: computed(() => {
+        return props.setOptions
       }),
       staffPaymentData: computed(() => {
         let pd = getStaffPayment.value
