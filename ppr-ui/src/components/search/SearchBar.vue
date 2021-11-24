@@ -7,17 +7,14 @@
       @proceed="searchAction($event)"
     />
     <v-row no-gutters class="pt-2">
-      <v-col v-if="searchTitle" :class="$style['search-title']">
-        <b>{{ searchTitle }}</b>
-      </v-col>
-      <v-col v-else :class="[$style['search-info']]">
+      <v-col :class="[$style['search-info'], 'select-search-text']">
         <span>
           Select a search category and then enter a value to search.
         </span>
-        <span v-if="isStaff">
+        <span v-if="!isStaff">
           Each search incurs a
         </span>
-        <v-tooltip v-if="isStaff" class="pa-2 pt-2"
+        <v-tooltip v-if="!isStaff" class="pa-2 pt-2"
                    content-class="top-tooltip"
                    top
                    transition="fade-transition">
@@ -132,9 +129,9 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
 
-          <v-menu offset-y left nudge-bottom="4">
+          <v-menu v-if="isStaff" offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :id="$style['client-search']" class="search-bar-btn primary">
+              <v-btn v-on="on" :id="$style['client-search']" class="down-btn primary">
                 <v-icon>mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -150,8 +147,8 @@
             </v-list>
           </v-menu>
         </v-row>
-        <v-row no-gutters>
-          <span :id="$style['search-btn-info']" class="pl-1 pt-2">
+        <v-row v-if="!isStaff" no-gutters>
+          <span :id="$style['search-btn-info']" class="pl-1 pt-2 fee-text">
             $8.50 fee
           </span>
         </v-row>
@@ -179,7 +176,6 @@ import { SettingOptions, UISearchTypes } from '@/enums'
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog } from '@/components/dialogs'
-import { isRoleStaff } from '@/store/getters'
 
 export default defineComponent({
   components: {
@@ -200,10 +196,6 @@ export default defineComponent({
     },
     defaultSearchValue: {
       type: String
-    },
-    searchTitle: {
-      type: String,
-      default: 'Search'
     }
   },
   setup (props, { emit }) {
@@ -229,7 +221,9 @@ export default defineComponent({
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       validations: Object as SearchValidationIF,
-      isStaff: isRoleStaff.value,
+      isStaff: computed((): boolean => { 
+        return isRoleStaff.value
+      }),
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),

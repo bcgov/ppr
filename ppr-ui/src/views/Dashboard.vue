@@ -44,7 +44,6 @@
           </v-row>
           <v-row no-gutters>
             <search-bar class="soft-corners-bottom"
-                        :searchTitle="''"
                         @debtor-name="setSearchDebtorName"
                         @searched-type="setSearchedType"
                         @searched-value="setSearchedValue"
