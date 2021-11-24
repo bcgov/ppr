@@ -221,7 +221,7 @@ export default defineComponent({
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       validations: Object as SearchValidationIF,
-      isStaff: computed((): boolean => { 
+      isStaff: computed((): boolean => {
         return isRoleStaff.value
       }),
       categoryMessage: computed((): string => {
