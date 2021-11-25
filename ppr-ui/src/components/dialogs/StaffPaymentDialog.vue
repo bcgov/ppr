@@ -96,6 +96,7 @@ export default defineComponent({
     const proceed = (val: boolean) => {
       if (val === true) {
         if (localState.valid) {
+          console.log(localState.staffPaymentData)
           setStaffPayment(localState.staffPaymentData)
           emit('proceed', val)
         } else {

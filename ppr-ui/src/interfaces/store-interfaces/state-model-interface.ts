@@ -46,6 +46,7 @@ export interface StateModelIF {
     searchedType: SearchTypeIF
     searchedValue: string
     searching: boolean
+    searchCertified: boolean
   }
   userInfo: UserInfoIF
 }

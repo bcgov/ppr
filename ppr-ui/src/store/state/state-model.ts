@@ -86,7 +86,8 @@ export const stateModel: StateModelIF = {
     searchResults: null,
     searchedType: null,
     searchedValue: '',
-    searching: false
+    searching: false,
+    searchCertified: false
   },
   userInfo: {
     contacts: [],

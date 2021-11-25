@@ -152,6 +152,10 @@ export const setSearching: ActionIF = ({ commit }, searching: boolean): void => 
   commit('mutateSearching', searching)
 }
 
+export const setSearchCertified: ActionIF = ({ commit }, searchCertified: boolean): void => {
+  commit('mutateSearchCertified', searchCertified)
+}
+
 export const setShowPaymentConfirmation: ActionIF = ({ commit }, showDialog: boolean): void => {
   commit('mutateShowPaymentConfirmation', showDialog)
 }

@@ -222,12 +222,18 @@ export const isPremiumAccount = (state: StateIF): boolean => {
 
 /** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: StateIF): boolean => {
+  return true
   return state.stateModel.authorization?.keycloakRoles.includes('staff')
 }
 
 /** Whether the app is processing a search request or not. */
 export const isSearching = (state: StateIF): boolean => {
   return state.stateModel.search.searching
+}
+
+/** Whether the staff certify a search. */
+export const isSearchCertified = (state: StateIF): boolean => {
+  return state.stateModel.search.searchCertified
 }
 
 /** The folio or reference number. */

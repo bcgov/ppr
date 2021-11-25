@@ -6,6 +6,13 @@
       :setSettingOption="settingOption"
       @proceed="searchAction($event)"
     />
+    <staff-payment-dialog
+      attach=""
+      class="mt-10"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialog"
+      @proceed="onStaffPaymentChanges($event)"
+    />
     <v-row no-gutters class="pt-2">
       <v-col :class="[$style['search-info'], 'select-search-text']">
         <span>
@@ -161,9 +168,9 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
-import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes } from '@/resources'
-import { paymentConfirmaionDialog } from '@/resources/dialogOptions'
+import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
   IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchCriteriaIF, // eslint-disable-line no-unused-vars
@@ -175,12 +182,13 @@ import { SettingOptions, UISearchTypes } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
-import { ConfirmationDialog } from '@/components/dialogs'
+import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
 
 export default defineComponent({
   components: {
     AutoComplete,
     ConfirmationDialog,
+    StaffPaymentDialog,
     FolioNumber
   },
   props: {
@@ -203,8 +211,10 @@ export default defineComponent({
     const {
       getUserSettings,
       isSearching,
-      isRoleStaff
-    } = useGetters<any>(['getUserSettings', 'isSearching', 'isRoleStaff'])
+      isRoleStaff,
+      isSearchCertified,
+      getStaffPayment
+    } = useGetters<any>(['getUserSettings', 'isSearching', 'isRoleStaff', 'isSearchCertified', 'getStaffPayment'])
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -220,6 +230,8 @@ export default defineComponent({
       selectedSearchType: props.defaultSelectedSearchType,
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
+      staffPaymentDialogDisplay: false,
+      staffPaymentDialog: staffPaymentDialog,
       validations: Object as SearchValidationIF,
       isStaff: computed((): boolean => {
         return isRoleStaff.value
@@ -306,7 +318,15 @@ export default defineComponent({
       if (proceed) {
         setSearching(true)
         emit('search-data', null) // clear any current results
-        const resp = await search(getSearchApiParams())
+        let resp
+        if (isRoleStaff) {
+          resp = await staffSearch(
+            getSearchApiParams(),
+            getStaffPayment.value,
+            isSearchCertified.value)
+        } else {
+          resp = await search(getSearchApiParams(), '')
+        }
         if (resp?.error) emit('search-error', resp.error)
         else {
           emit('searched-type', localState.selectedSearchType)
@@ -346,8 +366,20 @@ export default defineComponent({
       localState.folioNumber = folioNumber
     }
 
-    const clientSearch = () => {
-      emit('toggleStaffPaymentDialog', true)
+    const onStaffPaymentChanges = (search: boolean): void => {
+      if (search) {
+        searchAction(true)
+      }
+      localStorage.staffPaymentDialogDisplay = false
+    }
+
+    const clientSearch = async () => {
+      localState.validations = validateSearchAction(localState)
+      if (localState.validations) {
+        localState.autoCompleteIsActive = false
+      } else {
+        localState.staffPaymentDialogDisplay = true
+      }
     }
 
     watch(() => localState.searchValue, (val: string) => {
@@ -383,6 +415,7 @@ export default defineComponent({
       ...toRefs(localState),
       getSearchApiParams,
       paymentConfirmaionDialog,
+      onStaffPaymentChanges,
       searchAction,
       searchCheck,
       setHideDetails,

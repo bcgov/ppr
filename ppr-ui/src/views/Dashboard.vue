@@ -24,13 +24,6 @@
       :registrationNumber="myRegActionRegNum"
       @proceed="myRegActionDialogHandler($event)"
     />
-    <staff-payment-dialog
-      attach=""
-      class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialog"
-      @proceed="onStaffPaymentChanges()"
-    />
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
     <div class="container pa-0">
       <v-row no-gutters>
@@ -245,7 +238,6 @@ import {
   registrationNotFoundDialog,
   registrationRestrictedDialog,
   renewConfirmationDialog,
-  staffPaymentDialog,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -264,7 +256,7 @@ import {
 } from '@/utils'
 // local components
 import { BaseSnackbar } from '@/components/common'
-import { BaseDialog, RegistrationConfirmation, StaffPaymentDialog } from '@/components/dialogs'
+import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
@@ -279,7 +271,6 @@ import { RegistrationBar } from '@/components/registration'
     SearchHistory,
     SearchBar,
     Tombstone,
-    StaffPaymentDialog,
     RegistrationTable
   }
 })
@@ -330,8 +321,7 @@ export default class Dashboard extends Vue {
   private myRegDataHistory: RegistrationSummaryIF[] = []
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
-  private staffPaymentDialogDisplay = false
-  private staffPaymentDialog: DialogOptionsIF = staffPaymentDialog
+
   private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
@@ -573,10 +563,6 @@ export default class Dashboard extends Vue {
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
-  }
-
-  private onStaffPaymentChanges (): void {
-    this.staffPaymentDialogDisplay = false
   }
 
   private async removeDraft (regNum: string, docId: string): Promise<void> {
