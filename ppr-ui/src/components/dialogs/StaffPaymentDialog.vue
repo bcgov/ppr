@@ -54,7 +54,7 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setStaffPayment } = useActions<any>(['setStaffPayment'])
+    const { setStaffPayment, setSearchCertified } = useActions<any>(['setStaffPayment', 'setSearchCertified'])
     const { getStaffPayment } = useGetters<any>(['getStaffPayment'])
     const localState = reactive({
       validate: false,
@@ -96,7 +96,7 @@ export default defineComponent({
     const proceed = (val: boolean) => {
       if (val === true) {
         if (localState.valid) {
-          console.log(localState.staffPaymentData)
+          setSearchCertified(localState.certify)
           setStaffPayment(localState.staffPaymentData)
           emit('proceed', val)
         } else {
@@ -110,7 +110,6 @@ export default defineComponent({
     /** Called when component's staff payment data has been updated. */
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
-        ...getStaffPayment.value,
         ...val
       }
 
