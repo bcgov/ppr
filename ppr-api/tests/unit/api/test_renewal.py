@@ -25,11 +25,12 @@ from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import FinancingStatement, Registration, utils as model_utils
 from ppr_api.resources.financing_statements import get_payment_details
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 # prep sample post renewal statement data
 STATEMENT_VALID = {
     'baseRegistrationNumber': 'TEST0001',
@@ -252,6 +253,7 @@ TEST_CREATE_DATA = [
     ('Invalid RL CO date extra validation', RL_INVALID_DATE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0017'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
+    ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False, 'TEST0017')
 ]
 
@@ -275,7 +277,9 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
     """Assert that a post renewal registration statement works as expected."""
     headers = None
     # setup
-    if has_account:
+    if has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
@@ -323,6 +327,7 @@ def test_get_renewal(session, client, jwt, desc, roles, status, has_account, reg
 def test_renewal_sa_success(session, client, jwt):
     """Assert that a valid create statement returns a 201 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     rv1 = create_financing_test(session, client, jwt, 'SA')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']

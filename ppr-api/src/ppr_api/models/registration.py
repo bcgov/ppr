@@ -257,7 +257,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 registration['addVehicleCollateral'] = collateral
 
         # delete vehicle collateral
-        if self.financing_statement.general_collateral and self.is_change():
+        if self.financing_statement.vehicle_collateral and self.is_change():
             collateral = []
             for vehicle_c in self.financing_statement.vehicle_collateral:
                 if vehicle_c.registration_id_end == registration_id:
