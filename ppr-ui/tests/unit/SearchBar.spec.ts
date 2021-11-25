@@ -163,6 +163,8 @@ describe('Serial number search', () => {
   })
 
   it('searches when fields are filled', async () => {
+    expect(wrapper.find('.fee-text').exists()).toBeTruthy()
+    expect(wrapper.find('.select-search-text').text()).toContain('Each search incurs')
     expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
@@ -180,6 +182,13 @@ describe('Serial number search', () => {
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+
+  it('hides and shows things for staff', async () => {
+    wrapper.vm.$store.state.stateModel.authorization.keycloakRoles = ['staff']
+    await Vue.nextTick()
+    expect(wrapper.find('.fee-text').exists()).toBeFalsy()
+    
   })
 })
 
