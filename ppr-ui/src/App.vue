@@ -237,17 +237,6 @@ export default class App extends Mixins(AuthMixin) {
     // reset errors in case of retry
     this.resetFlags()
 
-    // get and store keycloak roles
-    try {
-      const keycloakRoles = getKeycloakRoles()
-      this.setKeycloakRoles(keycloakRoles)
-    } catch (error) {
-      console.log('Keycloak error =', error)
-      this.haveData = true
-      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
-      return
-    }
-
     // ensure user is authorized for this profile (kept this in just in case)
     try {
       await this.loadAuth()
@@ -323,9 +312,9 @@ export default class App extends Mixins(AuthMixin) {
 
   /** Fetches authorizations and verifies and stores roles. */
   private async loadAuth (): Promise<any> {
-    // NB: roles array may contain 'view', 'edit', 'staff' or nothing
-    // change this to get roles from api once built
+    // save roles from the keycloak token
     const authRoles = getKeycloakRoles()
+    console.log(authRoles)
     if (authRoles && authRoles.length > 0) {
       this.setAuthRoles(authRoles)
     } else {
@@ -343,6 +332,7 @@ export default class App extends Mixins(AuthMixin) {
       const settings: UserSettingsIF = await getPPRUserSettings()
       userInfo.settings = settings
       this.setUserInfo(userInfo)
+      console.log(userInfo)
       if (!settings || settings?.error) {
         // error popup -> user may still continue
         throw new Error('Invalid user settings')
@@ -357,6 +347,7 @@ export default class App extends Mixins(AuthMixin) {
     const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
     if (currentAccount) {
       const accountInfo = JSON.parse(currentAccount)
+      console.log(accountInfo)
       this.setAccountInformation(accountInfo)
     }
   }

@@ -28,8 +28,27 @@
             </span>
           </v-row>
         </v-tooltip>
+        <!-- <span v-if="!isStaffSbc">
+          <span>
+            Each search incurs a
+          </span>
+          <v-tooltip class="pa-2 pt-2"
+                    content-class="top-tooltip"
+                    top
+                    transition="fade-transition">
+            <template v-slot:activator="{ on, attrs }">
+              <span v-bind="attrs" v-on="on" :class="$style['fee-info']"> fee of $8.50.</span>
+            </template>
+            <v-row no-gutters class="pt-2 pb-2">
+              <span>
+                Each search will incur a fee of $8.50,
+                including searches that return no results.
+              </span>
+            </v-row>
+          </v-tooltip>
+        </span> -->
       </v-col>
-      <v-col align-self="end" cols="4">
+      <v-col v-if="!isStaffSbc" align-self="end" cols="4">
         <folio-number :defaultFolioNumber="folioNumber" @folio-number="updateFolioNumber"/>
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
@@ -203,8 +222,9 @@ export default defineComponent({
     const {
       getUserSettings,
       isSearching,
-      isRoleStaff
-    } = useGetters<any>(['getUserSettings', 'isSearching', 'isRoleStaff'])
+      isRoleStaff,
+      isRoleStaffSbc
+    } = useGetters<any>(['getUserSettings', 'isSearching', 'isRoleStaff', 'isRoleStaffSbc'])
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -221,6 +241,7 @@ export default defineComponent({
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       validations: Object as SearchValidationIF,
+      isStaffSbc: isRoleStaffSbc.value,
       isStaff: computed((): boolean => {
         return isRoleStaff.value
       }),
@@ -273,7 +294,7 @@ export default defineComponent({
           return false
         }
         const settings: UserSettingsIF = getUserSettings.value
-        return settings?.paymentConfirmationDialog
+        return settings?.paymentConfirmationDialog && !localState.isStaffSbc
       })
     })
     const getCriteria = () => {
