@@ -25,13 +25,13 @@ from flask import current_app
 from ppr_api.models import FinancingStatement, Registration
 from ppr_api.resources.financing_statements import get_payment_details, get_payment_details_financing, \
      get_payment_type_financing
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
 from ppr_api.services.payment.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-
+MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 # prep sample post financing statement data
 FINANCING_VALID = {
     'type': 'SA',
@@ -286,6 +286,7 @@ TEST_CREATE_DATA = [
     ('Invalid party address extra validation', FINANCING_INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
     ('Missing account', FINANCING_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False),
     ('Invalid role', FINANCING_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
+    ('BCOL helpdesk account', FINANCING_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True),
     ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False)
 ]
 # testdata pattern is ({description}, {roles}, {status}, {has_account})
@@ -415,9 +416,12 @@ TEST_PAY_TYPE_FINANCING = [
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
 def test_create(session, client, jwt, desc, json_data, roles, status, has_account):
     """Assert that a post financing statement works as expected."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     headers = None
     # setup
-    if has_account:
+    if has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)

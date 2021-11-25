@@ -23,12 +23,13 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, FINANCING_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
 from ppr_api.models import utils as model_utils
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 # prep sample post amendment statement data
 SAMPLE_JSON = copy.deepcopy(AMENDMENT_STATEMENT)
 STATEMENT_VALID = {
@@ -255,6 +256,7 @@ TEST_CREATE_DATA = [
     ('Invalid party code extra validation', INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
+    ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
 ]
 
@@ -286,7 +288,9 @@ def test_create_amendment(session, client, jwt, desc, json_data, roles, status, 
     """Assert that a post amendment registration statement works as expected."""
     headers = None
     # setup
-    if has_account:
+    if has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
@@ -336,6 +340,7 @@ def test_get_amendment(session, client, jwt, desc, roles, status, has_account, r
 def test_amendment_court_order_success(session, client, jwt):
     """Assert that a valid CO type amendment statement returns a 200 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     rv1 = create_financing_test(session, client, jwt)
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -381,6 +386,7 @@ def test_amendment_court_order_success(session, client, jwt):
 def test_amendment_success(session, client, jwt):
     """Assert that a valid AM type amendment statement returns a 200 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     rv1 = create_financing_test(session, client, jwt)
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -425,6 +431,7 @@ def test_amendment_success(session, client, jwt):
 @pytest.mark.parametrize('change_type, is_general_collateral', TEST_DATA_AMENDMENT_CHANGE_TYPE)
 def test_change_types(session, client, jwt, change_type, is_general_collateral):
     """Assert that setting the amendment change type from the amendment data works as expected."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     json_data = copy.deepcopy(AMENDMENT_STATEMENT)
     json_data['changeType'] = change_type
     json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'

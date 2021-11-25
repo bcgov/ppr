@@ -26,7 +26,7 @@ from ppr_api.models import AccountBcolId, FinancingStatement, Registration, User
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_staff
+from ppr_api.services.authz import authorized, is_staff, is_bcol_help
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment, TransactionTypes
 from ppr_api.utils.auth import jwt
@@ -93,9 +93,8 @@ class FinancingResource(Resource):
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
-            # Verify request JWT and account ID
-            if not authorized(account_id, jwt):
+            # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
+            if not authorized(account_id, jwt) or is_bcol_help(account_id):
                 return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
@@ -196,8 +195,8 @@ class AmendmentResource(Resource):
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
 
-            # Verify request JWT and account ID
-            if not authorized(account_id, jwt):
+            # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
+            if not authorized(account_id, jwt) or is_bcol_help(account_id):
                 return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
@@ -310,8 +309,8 @@ class ChangeResource(Resource):
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
 
-            # Verify request JWT and account ID
-            if not authorized(account_id, jwt):
+            # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
+            if not authorized(account_id, jwt) or is_bcol_help(account_id):
                 return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
@@ -420,8 +419,8 @@ class RenewalResource(Resource):
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-            # Verify request JWT and account ID
-            if not authorized(account_id, jwt):
+            # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
+            if not authorized(account_id, jwt) or is_bcol_help(account_id):
                 return resource_utils.unauthorized_error_response(account_id)
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
@@ -522,14 +521,12 @@ class DischargeResource(Resource):
         try:
             if registration_num is None:
                 return resource_utils.path_param_error_response('registration number')
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if not is_staff(jwt) and account_id is None:
                 return resource_utils.account_required_response()
-
-            # Verify request JWT and account ID
-            if not authorized(account_id, jwt):
+            # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
+            if not authorized(account_id, jwt) or is_bcol_help(account_id):
                 return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
