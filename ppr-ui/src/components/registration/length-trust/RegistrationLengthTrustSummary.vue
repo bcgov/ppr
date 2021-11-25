@@ -104,7 +104,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { convertDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
@@ -178,7 +178,7 @@ export default defineComponent({
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
-        if (!getLengthTrust.value.lifeInfinite && (isNaN(getLengthTrust.value.lifeYears) ||
+        if (!getLengthTrust.value.lifeInfinite && (!isInt(getLengthTrust.value.lifeYears) ||
           getLengthTrust.value.lifeYears < 1 || getLengthTrust.value.lifeYears > feeInfoYears.quantityMax)) {
           return 'Not valid'
         }

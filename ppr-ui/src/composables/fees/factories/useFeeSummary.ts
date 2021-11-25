@@ -2,6 +2,7 @@ import { UIRegistrationTypes } from '@/enums'
 import { FeeSummaryDefaults, FeeSummaryTypes } from '../enums'
 import { FeeSummaryI, RegistrationLengthI } from '../interfaces'
 import { defaultFeeSummaries } from '../resources'
+import { isInt } from '@/utils'
 import { getFinancingFee } from '@/composables/fees/factories'
 
 export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
@@ -116,7 +117,7 @@ export function getFeeHint (
     }
     const feeInfoYears = getFinancingFee(false)
     console.log(registrationLength.lifeYears)
-    if ((registrationLength.lifeYears) && ((isNaN(registrationLength.lifeYears) ||
+    if ((registrationLength.lifeYears) && ((!isInt(registrationLength.lifeYears) ||
       registrationLength.lifeYears < 1 || registrationLength.lifeYears > feeInfoYears.quantityMax))) {
       return 'Select a valid registration length'
     }

@@ -67,7 +67,7 @@ export default defineComponent({
           const date = new Date(getRegistrationExpiryDate.value)
           return convertDate(date, true, true)
         }
-        return 'Infinite'
+        return 'No Expiry'
       }),
       header: computed((): string => {
         const regNum = getRegistrationNumber.value || ''

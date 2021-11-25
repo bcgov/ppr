@@ -130,7 +130,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { convertDate, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
@@ -274,13 +274,13 @@ export default defineComponent({
         localState.lifeYearsMessage = ''
         const lt = localState.lengthTrust
         if (val?.length > 0) {
-          var life = parseInt(val)
-          if (isNaN(life)) {
+          var life = val
+          if (!isInt(life)) {
             localState.lifeYearsMessage =
               'Registration length must be a number between 1 and ' +
               localState.maxYears
             lt.valid = false
-          } else if (life < 1 || life > feeInfoYears.quantityMax) {
+          } else if (parseInt(life) < 1 || parseInt(life) > feeInfoYears.quantityMax) {
             localState.lifeYearsMessage =
               'Registration length must be between 1 and ' + localState.maxYears
             lt.valid = false
@@ -290,7 +290,7 @@ export default defineComponent({
             localState.lifeInfinite = 'false'
             lt.showInvalid = false
           }
-          lt.lifeYears = life
+          lt.lifeYears = Number(life)
           setLengthTrust(lt)
         } else {
           if (!lt.lifeInfinite) {
