@@ -200,14 +200,19 @@ class BaseClient:
             self.detail_label = None
             self.detail_value = None
 
-    def call_api(self, method, relative_path, data=None, token=None):
+    def call_api(self,  # pylint: disable=too-many-arguments
+                 method,
+                 relative_path,
+                 data=None,
+                 token=None,
+                 include_account: bool = True):
         """Call the Pay API."""
         try:
             headers = {
                 'Authorization': 'Bearer ' + token if token is not None else 'Bearer ' + self.jwt,
                 'Content-Type': 'application/json'
             }
-            if self.account_id:
+            if include_account and self.account_id:
                 headers['Account-Id'] = self.account_id
             if self.api_key:
                 headers['x-apikey'] = self.api_key
@@ -331,9 +336,10 @@ class SBCPaymentClient(BaseClient):
             data['details'][0]['value'] = self.detail_value
         else:
             del data['details']
-        # current_app.logger.debug('create paymnent payload:')
-        # current_app.logger.debug(json.dumps(data))
-        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
+        current_app.logger.debug('staff search create payment payload for account: ' + self.account_id)
+        current_app.logger.debug(json.dumps(data))
+        # self.account_id = None
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
     def cancel_payment(self, invoice_id):
