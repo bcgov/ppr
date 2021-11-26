@@ -185,7 +185,7 @@ describe('Serial number search', () => {
   })
 
   it('hides and shows things for staff', async () => {
-    wrapper.vm.$store.state.stateModel.authorization.keycloakRoles = ['staff']
+    wrapper.vm.$store.state.stateModel.authorization.authRoles = ['staff', 'helpdesk']
     await Vue.nextTick()
     expect(wrapper.find('.fee-text').exists()).toBeFalsy()
     
