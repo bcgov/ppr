@@ -185,10 +185,17 @@ describe('Serial number search', () => {
   })
 
   it('hides and shows things for staff', async () => {
-    wrapper.vm.$store.state.stateModel.authorization.authRoles = ['staff', 'helpdesk']
-    await Vue.nextTick()
-    expect(wrapper.find('.fee-text').exists()).toBeFalsy()
-    
+    const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
+    for (let i = 0; i < staffGroups.length; i++) {
+      await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      expect(wrapper.findComponent(FolioNumber).exists()).toBeFalsy()
+      if (staffGroups[i] === 'gov_account_user') {
+        expect(wrapper.find('.fee-text').exists()).toBeTruthy()
+        expect(wrapper.find('.fee-text').text()).toContain('10.00')
+      } else {
+        expect(wrapper.find('.fee-text').exists()).toBeFalsy()
+      }
+    }
   })
 })
 

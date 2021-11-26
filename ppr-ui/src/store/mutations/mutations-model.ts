@@ -79,10 +79,6 @@ export const mutateGeneralCollateral = (state: StateIF, generalCollateral: Gener
   state.stateModel.registration.collateral.generalCollateral = generalCollateral
 }
 
-export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>) => {
-  state.stateModel.authorization.keycloakRoles = keyCloakRoles
-}
-
 export const mutateStaffPayment = (state: StateIF, staffPayment: StaffPaymentIF) => {
   state.stateModel.staffPayment = staffPayment
 }
