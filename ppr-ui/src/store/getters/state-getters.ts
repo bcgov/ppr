@@ -235,6 +235,11 @@ export const isSearching = (state: StateIF): boolean => {
   return state.stateModel.search.searching
 }
 
+/** Whether the staff certify a search. */
+export const isSearchCertified = (state: StateIF): boolean => {
+  return state.stateModel.search.searchCertified
+}
+
 /** The folio or reference number. */
 export const getFolioOrReferenceNumber = (state: StateIF): string => {
   return state.stateModel.folioOrReferenceNumber || ''

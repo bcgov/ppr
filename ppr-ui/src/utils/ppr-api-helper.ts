@@ -1,6 +1,7 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
+import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 
 // Interfaces
 import {
@@ -21,6 +22,7 @@ import {
   BaseHeaderIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 import { SettingOptions } from '@/enums'
 
 /**
@@ -52,12 +54,13 @@ export const successfulPPRResponses = [
 
 // Submit a search query (search step 1) request.
 export async function search (
-  searchCriteria: SearchCriteriaIF
+  searchCriteria: SearchCriteriaIF,
+  extraParams: string
 ): Promise<SearchResponseIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
-    .post<SearchResponseIF>('searches', searchCriteria, config)
+    .post<SearchResponseIF>(`searches${extraParams}`, searchCriteria, config)
     .then(response => {
       const data = response?.data
       if (!data) {
@@ -87,6 +90,35 @@ export async function search (
         }
       }
     })
+}
+
+// Submit a search query (search step 1) request.
+export async function staffSearch (
+  searchCriteria: SearchCriteriaIF,
+  staffPayment: StaffPaymentIF,
+  certified: boolean
+): Promise<SearchResponseIF> {
+  let extraParams = '?'
+  // do they want a certified search
+  if (certified) {
+    extraParams = extraParams + 'certified=True'
+  }
+  // filled out staff payment parameters
+  if (staffPayment) {
+    if (extraParams.length > 0) {
+      extraParams = extraParams + '&'
+    }
+    switch (staffPayment.option) {
+      case StaffPaymentOptions.FAS:
+        extraParams = extraParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
+        break
+      case StaffPaymentOptions.BCOL:
+        extraParams = extraParams + '&bcolAccountNumber=' + staffPayment.bcolAccountNumber
+        extraParams = extraParams + '&datNumber=' + staffPayment.datNumber
+        break
+    }
+  }
+  return search(searchCriteria, extraParams)
 }
 
 // Update selected matches in search response (search step 2a)

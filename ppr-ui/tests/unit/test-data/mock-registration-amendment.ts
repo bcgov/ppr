@@ -510,7 +510,8 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     searchResults: null,
     searchedType: null,
     searchedValue: '',
-    searching: false
+    searching: false,
+    searchCertified: false
   },
   userInfo: {
     contacts: [],
@@ -607,7 +608,8 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     searchResults: null,
     searchedType: null,
     searchedValue: '',
-    searching: false
+    searching: false,
+    searchCertified: false
   },
   userInfo: {
     contacts: [],
@@ -705,7 +707,8 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     searchResults: null,
     searchedType: null,
     searchedValue: '',
-    searching: false
+    searching: false,
+    searchCertified: false
   },
   userInfo: {
     contacts: [],
@@ -802,7 +805,8 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     searchResults: null,
     searchedType: null,
     searchedValue: '',
-    searching: false
+    searching: false,
+    searchCertified: false
   },
   userInfo: {
     contacts: [],

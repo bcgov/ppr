@@ -171,6 +171,10 @@ export const mutateSearching = (state: StateIF, searching: boolean) => {
   state.stateModel.search.searching = searching
 }
 
+export const mutateSearchCertified = (state: StateIF, searchCertified: boolean) => {
+  state.stateModel.search.searchCertified = searchCertified
+}
+
 export const mutateSearchHistory = (state: StateIF, searchHistory: Array<SearchResponseIF>) => {
   state.stateModel.search.searchHistory = searchHistory
   state.stateModel.search.searchHistoryLength = searchHistory?.length || 0

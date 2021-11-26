@@ -24,6 +24,7 @@ import {
 import { UISearchTypes } from '@/enums'
 import { FolioNumber } from '@/components/common'
 import { getLastEvent } from './utils'
+import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -185,6 +186,31 @@ describe('Serial number search', () => {
   })
 
   it('hides and shows things for staff', async () => {
+    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    await store.dispatch('setStaffPayment',{
+      option: 1,
+      routingSlipNumber: '888555222',
+      isPriority: false,
+      bcolAccountNumber: '',
+      datNumber: '',
+      folioNumber: ''
+    })
+    await store.dispatch('setSearchCertified', true)
+    expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'F100'
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    await flushPromises
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+    expect(wrapper.vm.$store.state.stateModel.staffPayment).toBe(null)
+
     const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
     for (let i = 0; i < staffGroups.length; i++) {
       await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
