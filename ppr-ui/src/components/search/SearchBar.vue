@@ -343,7 +343,7 @@ export default defineComponent({
         setSearching(true)
         emit('search-data', null) // clear any current results
         let resp
-        if (isRoleStaff) {
+        if (isRoleStaffReg.value) {
           resp = await staffSearch(
             getSearchApiParams(),
             getStaffPayment.value,
