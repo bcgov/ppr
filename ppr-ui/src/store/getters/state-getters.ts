@@ -224,7 +224,10 @@ export const isRoleStaffReg = (state: StateIF): boolean => {
 }
 
 export const isRoleStaffSbc = (state: StateIF): boolean => {
-  return isRoleStaff(state) && !(isRoleStaffBcol(state) || isRoleStaffReg(state))
+  return (
+    state.stateModel.authorization?.authRoles.includes('gov_account_user') &&
+    isRoleStaff(state)
+  )
 }
 
 /** Whether the app is processing a search request or not. */

@@ -84,10 +84,11 @@ import { AuthMixin } from '@/mixins'
 import { fetchError, loginError, paymentError, saveSearchError } from '@/resources/dialogOptions'
 import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
+import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, RouteNames } from '@/enums'
 import {
-  ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
+  ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
-import { AccountProductCodes, RouteNames } from './enums'
 
 @Component({
   components: {
@@ -108,6 +109,9 @@ export default class App extends Mixins(AuthMixin) {
   @Getter getUserRoles!: string
   @Getter getUserUsername!: string
   @Getter isPremiumAccount!: boolean
+  @Getter isRoleStaff!: boolean
+  @Getter isRoleStaffBcol!: boolean
+  @Getter isRoleStaffReg!: boolean
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -347,14 +351,24 @@ export default class App extends Mixins(AuthMixin) {
     const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
     if (currentAccount) {
       const accountInfo = JSON.parse(currentAccount)
-      console.log(accountInfo)
       this.setAccountInformation(accountInfo)
     }
   }
 
   /** Gets product subscription autorizations (for now just RPPR) and stores it. */
   private async loadAccountProductSubscriptions (): Promise<any> {
-    const rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
+    let rpprSubscription = {} as AccountProductSubscriptionIF
+    if (this.isRoleStaff) {
+      rpprSubscription = {
+        [AccountProductCodes.RPPR]: {
+          membership: AccountProductMemberships.MEMBER,
+          roles: [AccountProductRoles.PAY, AccountProductRoles.SEARCH]
+        }
+      }
+      if (this.isRoleStaffBcol || this.isRoleStaffReg) {
+        rpprSubscription.RPPR.roles.push(AccountProductRoles.EDIT)
+      }
+    } else rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
     this.setAccountProductSubscribtion(rpprSubscription)
   }
 
