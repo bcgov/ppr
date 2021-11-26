@@ -186,7 +186,7 @@ describe('Serial number search', () => {
   })
 
   it('hides and shows things for staff', async () => {
-    
+    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
     await store.dispatch('setStaffPayment',{
       option: 1,
       routingSlipNumber: '888555222',
