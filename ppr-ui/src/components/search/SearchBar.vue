@@ -348,7 +348,7 @@ export default defineComponent({
             getSearchApiParams(),
             getStaffPayment.value,
             isSearchCertified.value)
-          setStaffPayment(null)  
+          setStaffPayment(null)
         } else {
           resp = await search(getSearchApiParams(), '')
         }
