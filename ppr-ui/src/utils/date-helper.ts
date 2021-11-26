@@ -37,3 +37,11 @@ export function tzOffsetMinutes (date: Date): number {
   }
   return offset
 }
+
+export function isInt (intValue) {
+  if (isNaN(intValue)) {
+    return false
+  }
+  var x = parseFloat(intValue)
+  return (x | 0) === x
+}

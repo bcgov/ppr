@@ -88,10 +88,6 @@ export const setGeneralCollateral: ActionIF = ({ commit }, generalCollateral: Ge
   commit('mutateGeneralCollateral', generalCollateral)
 }
 
-export const setKeycloakRoles: ActionIF = ({ commit }, keycloakRoles): void => {
-  commit('mutateKeycloakRoles', keycloakRoles)
-}
-
 export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
   commit('mutateLengthTrust', lengthTrust)
 }

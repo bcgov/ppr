@@ -10,7 +10,6 @@ export const stateModel: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    keycloakRoles: [],
     authRoles: []
   },
   certifyInformation: {

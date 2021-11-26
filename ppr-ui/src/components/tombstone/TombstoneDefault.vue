@@ -51,16 +51,24 @@ export default defineComponent({
       getAccountLabel,
       getUserFirstName,
       getUserLastName,
-      isRoleStaff
+      isRoleStaff,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc
     } = useGetters<any>([
       'getAccountLabel',
       'getUserFirstName',
       'getUserLastName',
-      'isRoleStaff'
+      'isRoleStaff',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'isRoleStaffSbc'
     ])
     const localState = reactive({
       userName: computed((): string => {
-        return `${getUserFirstName.value} ${getUserLastName.value}`
+        if (!localState.isStaff) return `${getUserFirstName.value} ${getUserLastName.value}`
+        if (localState.isStaffBcolReg) return 'BC Registries Staff'
+        if (localState.isStaffSbc) return 'SBC Staff'
       }),
       date: '',
       header: computed((): string => {
@@ -71,6 +79,12 @@ export default defineComponent({
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value
+      }),
+      isStaffBcolReg: computed((): boolean => {
+        return isRoleStaffBcol.value || isRoleStaffReg.value
+      }),
+      isStaffSbc: computed((): boolean => {
+        return isRoleStaffSbc.value
       }),
       accountName: computed((): string => {
         return getAccountLabel.value

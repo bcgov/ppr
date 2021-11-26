@@ -79,10 +79,6 @@ export const mutateGeneralCollateral = (state: StateIF, generalCollateral: Gener
   state.stateModel.registration.collateral.generalCollateral = generalCollateral
 }
 
-export const mutateKeycloakRoles = (state: StateIF, keyCloakRoles: Array<string>) => {
-  state.stateModel.authorization.keycloakRoles = keyCloakRoles
-}
-
 export const mutateStaffPayment = (state: StateIF, staffPayment: StaffPaymentIF) => {
   state.stateModel.staffPayment = staffPayment
 }
@@ -108,6 +104,7 @@ export const mutateNewRegistration = (state: StateIF) => {
   state.stateModel.registration.collateral.generalCollateral = []
   state.stateModel.registration.collateral.vehicleCollateral = []
   state.stateModel.registration.parties.valid = false
+  state.stateModel.registration.parties.showInvalid = false
   state.stateModel.registration.parties.registeringParty = null
   state.stateModel.registration.parties.securedParties = []
   state.stateModel.registration.parties.debtors = []

@@ -76,6 +76,16 @@ describe('RegistrationLengthTrust SA tests', () => {
     expect(wrapper.vm.lifeYearsMessage).toBe('Registration length must be a number between 1 and 25')
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     expect(state.registration.lengthTrust.valid).toBe(false)
+
+    //more tests for year validations
+    wrapper.vm.$data.lifeYearsEdit = '3.0'
+    await Vue.nextTick()
+    expect(state.registration.lengthTrust.valid).toBe(true)
+
+    wrapper.vm.$data.lifeYearsEdit = '3.5'
+    await Vue.nextTick()
+    expect(wrapper.vm.lifeYearsMessage).toBe('Registration length must be a number between 1 and 25')
+    expect(state.registration.lengthTrust.valid).toBe(false)
   })
 
   it('renders lifeInfinite', async () => {
