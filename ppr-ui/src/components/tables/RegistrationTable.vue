@@ -310,7 +310,7 @@ export default defineComponent({
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
         return (
-          productSubscriptions?.[AccountProductCodes.RPPR].roles
+          productSubscriptions?.[AccountProductCodes.RPPR]?.roles
             .includes(AccountProductRoles.EDIT) || false
         )
       }),

@@ -43,7 +43,7 @@ export default defineComponent({
     const hasRPPR = computed(() => {
       const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
       return (
-        productSubscriptions?.[AccountProductCodes.RPPR].roles.includes(AccountProductRoles.EDIT) || false
+        productSubscriptions?.[AccountProductCodes.RPPR]?.roles.includes(AccountProductRoles.EDIT) || false
       )
     })
     const newRegistration = (val: RegistrationTypeIF) => {
