@@ -207,7 +207,7 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setSearching } = useActions<any>(['setSearching'])
+    const { setSearching, setStaffPayment } = useActions<any>(['setSearching', 'setStaffPayment'])
     const {
       getUserSettings,
       isSearching,
@@ -324,6 +324,7 @@ export default defineComponent({
             getSearchApiParams(),
             getStaffPayment.value,
             isSearchCertified.value)
+          setStaffPayment(null)  
         } else {
           resp = await search(getSearchApiParams(), '')
         }

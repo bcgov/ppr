@@ -1,6 +1,7 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
+import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 
 // Interfaces
 import {
@@ -107,9 +108,13 @@ export async function staffSearch (
     if (extraParams.length > 0) {
       extraParams = extraParams + '&'
     }
-    extraParams = extraParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
-    extraParams = extraParams + '&bcolAccountNumber=' + staffPayment.bcolAccountNumber
-    extraParams = extraParams + '&datNumber=' + staffPayment.datNumber
+    switch (staffPayment.option) {
+      case StaffPaymentOptions.FAS:
+        extraParams = extraParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
+      case StaffPaymentOptions.BCOL:  
+        extraParams = extraParams + '&bcolAccountNumber=' + staffPayment.bcolAccountNumber
+        extraParams = extraParams + '&datNumber=' + staffPayment.datNumber
+    }
   }
   return search(searchCriteria, extraParams)
 }
