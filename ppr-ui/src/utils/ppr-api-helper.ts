@@ -111,9 +111,11 @@ export async function staffSearch (
     switch (staffPayment.option) {
       case StaffPaymentOptions.FAS:
         extraParams = extraParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
+        break
       case StaffPaymentOptions.BCOL:  
         extraParams = extraParams + '&bcolAccountNumber=' + staffPayment.bcolAccountNumber
         extraParams = extraParams + '&datNumber=' + staffPayment.datNumber
+        break
     }
   }
   return search(searchCriteria, extraParams)
