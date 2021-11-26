@@ -112,7 +112,7 @@ export async function staffSearch (
       case StaffPaymentOptions.FAS:
         extraParams = extraParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
         break
-      case StaffPaymentOptions.BCOL:  
+      case StaffPaymentOptions.BCOL:
         extraParams = extraParams + '&bcolAccountNumber=' + staffPayment.bcolAccountNumber
         extraParams = extraParams + '&datNumber=' + staffPayment.datNumber
         break
