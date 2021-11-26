@@ -14,5 +14,4 @@ export interface SearchCriteriaIF {
   clientReferenceId?: string, // Optional.
   startDateTime?: string, // Optional: ISO formatted date and time.
   endDateTime?: string // Optional: ISO formatted date and time.
-  certified?: boolean // Optional: if search is staff certified
 }
