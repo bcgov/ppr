@@ -2,7 +2,7 @@
   <v-container fluid no-gutters class="white pa-6">
     <confirmation-dialog
       :setDisplay="confirmationDialog"
-      :setOptions="paymentConfirmaionDialog"
+      :setOptions="dialogOptions"
       :setSettingOption="settingOption"
       @proceed="searchAction($event)"
     />
@@ -11,25 +11,29 @@
         <span>
           Select a search category and then enter a value to search.
         </span>
-        <span v-if="!isStaff">
-          Each search incurs a
+        <span v-if="!isStaffBcolReg">
+          <span>
+            Each search incurs a
+          </span>
+          <v-tooltip
+            class="pa-2 pt-2"
+            content-class="top-tooltip"
+            top
+            transition="fade-transition"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <span v-bind="attrs" v-on="on" :class="$style['fee-info']"> fee of ${{ fee }}.</span>
+            </template>
+            <v-row no-gutters class="pt-2 pb-2">
+              <span>
+                Each search will incur a fee of ${{ fee }},
+                including searches that return no results.
+              </span>
+            </v-row>
+          </v-tooltip>
         </span>
-        <v-tooltip v-if="!isStaff" class="pa-2 pt-2"
-                   content-class="top-tooltip"
-                   top
-                   transition="fade-transition">
-          <template v-slot:activator="{ on, attrs }">
-            <span v-bind="attrs" v-on="on" :class="$style['fee-info']"> fee of $8.50.</span>
-          </template>
-          <v-row no-gutters class="pt-2 pb-2">
-            <span>
-              Each search will incur a fee of $8.50,
-              including searches that return no results.
-            </span>
-          </v-row>
-        </v-tooltip>
       </v-col>
-      <v-col align-self="end" cols="4">
+      <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="4">
         <folio-number :defaultFolioNumber="folioNumber" @folio-number="updateFolioNumber"/>
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
@@ -129,7 +133,7 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
 
-          <v-menu v-if="isStaff" offset-y left nudge-bottom="4">
+          <v-menu v-if="isStaffBcolReg" offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
               <v-btn v-on="on" :id="$style['client-search']" class="down-btn primary">
                 <v-icon>mdi-menu-down</v-icon>
@@ -147,9 +151,9 @@
             </v-list>
           </v-menu>
         </v-row>
-        <v-row v-if="!isStaff" no-gutters>
+        <v-row v-if="!isStaffBcolReg" no-gutters>
           <span :id="$style['search-btn-info']" class="pl-1 pt-2 fee-text">
-            $8.50 fee
+            ${{ fee }} fee
           </span>
         </v-row>
       </v-col>
@@ -203,8 +207,17 @@ export default defineComponent({
     const {
       getUserSettings,
       isSearching,
-      isRoleStaff
-    } = useGetters<any>(['getUserSettings', 'isSearching', 'isRoleStaff'])
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc
+    } = useGetters<any>([
+      'getUserSettings',
+      'isSearching',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'isRoleStaffSbc'
+    ])
+
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -221,17 +234,24 @@ export default defineComponent({
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
       validations: Object as SearchValidationIF,
-      isStaff: computed((): boolean => {
-        return isRoleStaff.value
-      }),
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
+      }),
+      fee: computed((): string => {
+        if (isRoleStaffSbc.value) return '10.00'
+        return '8.50'
       }),
       isIndividualDebtor: computed((): boolean => {
         if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) {
           return true
         }
         return false
+      }),
+      isStaffBcolReg: computed((): boolean => {
+        return isRoleStaffBcol.value || isRoleStaffReg.value
+      }),
+      isStaffSbc: computed((): boolean => {
+        return isRoleStaffSbc.value
       }),
       searching: computed((): boolean => {
         return isSearching.value
@@ -268,14 +288,17 @@ export default defineComponent({
         return localState.validations?.searchValue?.popUp || false
       }),
       showConfirmationDialog: computed((): boolean => {
-        // don't show confirmation dialog if staff
-        if (isRoleStaff.value === true) {
-          return false
-        }
+        // don't show confirmation dialog if bcol or reg staff
+        if (localState.isStaffBcolReg) return false
+
         const settings: UserSettingsIF = getUserSettings.value
         return settings?.paymentConfirmationDialog
       })
     })
+
+    const dialogOptions = { ...paymentConfirmaionDialog }
+    dialogOptions.text = dialogOptions.text.replace('8.50', localState.fee)
+
     const getCriteria = () => {
       if (localState.isIndividualDebtor) {
         const first = localState.searchValueFirst?.trim()
@@ -382,7 +405,7 @@ export default defineComponent({
     return {
       ...toRefs(localState),
       getSearchApiParams,
-      paymentConfirmaionDialog,
+      dialogOptions,
       searchAction,
       searchCheck,
       setHideDetails,

@@ -235,7 +235,7 @@ describe('Breadcrumb component tests', () => {
   })
 
   it('renders staff dashboard with breadcrumb', () => {
-    wrapper.vm.$store.state.stateModel.authorization.keycloakRoles = ['staff']
+    wrapper.vm.$store.state.stateModel.authorization.authRoles = ['staff']
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')

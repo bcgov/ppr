@@ -205,16 +205,6 @@ export const getVehicleCollateral = (state: StateIF): VehicleCollateralIF[] => {
   return state.stateModel.registration.collateral.vehicleCollateral
 }
 
-/** Whether the user is authorized to edit. */
-export const isAuthEdit = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('edit')
-}
-
-/** Whether the user is authorized to view. */
-export const isAuthView = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('view')
-}
-
 /** Whether the current account is a premium account. */
 export const isPremiumAccount = (state: StateIF): boolean => {
   return (state.stateModel.accountInformation?.accountType === AccountTypes.PREMIUM)
@@ -222,7 +212,22 @@ export const isPremiumAccount = (state: StateIF): boolean => {
 
 /** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.keycloakRoles.includes('staff')
+  return state.stateModel.authorization?.authRoles.includes('staff')
+}
+
+export const isRoleStaffBcol = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('helpdesk')
+}
+
+export const isRoleStaffReg = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('ppr_staff')
+}
+
+export const isRoleStaffSbc = (state: StateIF): boolean => {
+  return (
+    state.stateModel.authorization?.authRoles.includes('gov_account_user') &&
+    isRoleStaff(state)
+  )
 }
 
 /** Whether the app is processing a search request or not. */

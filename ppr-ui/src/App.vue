@@ -84,10 +84,11 @@ import { AuthMixin } from '@/mixins'
 import { fetchError, loginError, paymentError, saveSearchError } from '@/resources/dialogOptions'
 import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser } from '@/utils'
 // local Enums, Constants, Interfaces
+import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, RouteNames } from '@/enums'
 import {
-  ActionBindingIF, DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
+  ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
-import { AccountProductCodes, RouteNames } from './enums'
 
 @Component({
   components: {
@@ -108,6 +109,9 @@ export default class App extends Mixins(AuthMixin) {
   @Getter getUserRoles!: string
   @Getter getUserUsername!: string
   @Getter isPremiumAccount!: boolean
+  @Getter isRoleStaff!: boolean
+  @Getter isRoleStaffBcol!: boolean
+  @Getter isRoleStaffReg!: boolean
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -237,17 +241,6 @@ export default class App extends Mixins(AuthMixin) {
     // reset errors in case of retry
     this.resetFlags()
 
-    // get and store keycloak roles
-    try {
-      const keycloakRoles = getKeycloakRoles()
-      this.setKeycloakRoles(keycloakRoles)
-    } catch (error) {
-      console.log('Keycloak error =', error)
-      this.haveData = true
-      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
-      return
-    }
-
     // ensure user is authorized for this profile (kept this in just in case)
     try {
       await this.loadAuth()
@@ -323,9 +316,9 @@ export default class App extends Mixins(AuthMixin) {
 
   /** Fetches authorizations and verifies and stores roles. */
   private async loadAuth (): Promise<any> {
-    // NB: roles array may contain 'view', 'edit', 'staff' or nothing
-    // change this to get roles from api once built
+    // save roles from the keycloak token
     const authRoles = getKeycloakRoles()
+    console.log(authRoles)
     if (authRoles && authRoles.length > 0) {
       this.setAuthRoles(authRoles)
     } else {
@@ -343,6 +336,7 @@ export default class App extends Mixins(AuthMixin) {
       const settings: UserSettingsIF = await getPPRUserSettings()
       userInfo.settings = settings
       this.setUserInfo(userInfo)
+      console.log(userInfo)
       if (!settings || settings?.error) {
         // error popup -> user may still continue
         throw new Error('Invalid user settings')
@@ -363,7 +357,18 @@ export default class App extends Mixins(AuthMixin) {
 
   /** Gets product subscription autorizations (for now just RPPR) and stores it. */
   private async loadAccountProductSubscriptions (): Promise<any> {
-    const rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
+    let rpprSubscription = {} as AccountProductSubscriptionIF
+    if (this.isRoleStaff) {
+      rpprSubscription = {
+        [AccountProductCodes.RPPR]: {
+          membership: AccountProductMemberships.MEMBER,
+          roles: [AccountProductRoles.PAY, AccountProductRoles.SEARCH]
+        }
+      }
+      if (this.isRoleStaffBcol || this.isRoleStaffReg) {
+        rpprSubscription.RPPR.roles.push(AccountProductRoles.EDIT)
+      }
+    } else rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
     this.setAccountProductSubscribtion(rpprSubscription)
   }
 
