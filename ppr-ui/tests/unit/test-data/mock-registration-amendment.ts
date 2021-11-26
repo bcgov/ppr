@@ -439,7 +439,6 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    keycloakRoles: [],
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
@@ -537,7 +536,6 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    keycloakRoles: [],
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
@@ -635,7 +633,6 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    keycloakRoles: [],
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
@@ -734,7 +731,6 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    keycloakRoles: [],
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,

@@ -104,4 +104,23 @@ describe('TombstoneDefault component tests', () => {
     expect(subHeader.at(0).text()).toContain(userInfo.lastname)
     expect(subHeader.at(0).text()).toContain(accountInfo.label)
   })
+
+  it('displays staff versions', async () => {
+    wrapper = createComponent(RouteNames.DASHBOARD)
+    const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
+    for (let i = 0; i < staffGroups.length; i++) {
+      await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      const header = wrapper.findAll(tombstoneHeader)
+      expect(header.length).toBe(1)
+      expect(header.at(0).text()).toContain('Staff Personal Property Registry')
+      const subHeader = wrapper.findAll(tombstoneSubHeader)
+      expect(subHeader.length).toBe(1)
+      if (staffGroups[i] === 'gov_account_user') {
+        expect(subHeader.at(0).text()).toContain('SBC Staff')
+      } else {
+        expect(subHeader.at(0).text()).toContain('BC Registries Staff')
+      }
+      expect(subHeader.at(0).text()).toContain(accountInfo.label)
+    }
+  })
 })

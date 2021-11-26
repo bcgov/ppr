@@ -169,6 +169,7 @@ import { search, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog } from '@/resources/dialogOptions'
 import {
+  DialogOptionsIF, // eslint-disable-line no-unused-vars
   IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchCriteriaIF, // eslint-disable-line no-unused-vars
   SearchTypeIF, // eslint-disable-line no-unused-vars
@@ -237,6 +238,11 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
+      dialogOptions: computed((): DialogOptionsIF => {
+        const options = { ...paymentConfirmaionDialog }
+        options.text = options.text.replace('8.50', localState.fee)
+        return options
+      }),
       fee: computed((): string => {
         if (isRoleStaffSbc.value) return '10.00'
         return '8.50'
@@ -295,9 +301,6 @@ export default defineComponent({
         return settings?.paymentConfirmationDialog
       })
     })
-
-    const dialogOptions = { ...paymentConfirmaionDialog }
-    dialogOptions.text = dialogOptions.text.replace('8.50', localState.fee)
 
     const getCriteria = () => {
       if (localState.isIndividualDebtor) {
@@ -405,7 +408,6 @@ export default defineComponent({
     return {
       ...toRefs(localState),
       getSearchApiParams,
-      dialogOptions,
       searchAction,
       searchCheck,
       setHideDetails,
