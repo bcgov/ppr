@@ -192,11 +192,13 @@ export default defineComponent({
     }
 
     const getRegisteringParty = async () => {
+      var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
       if (!isRoleStaffSbc.value) {
-        var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
         const regParty = await getRegisteringPartyFromAuth()
         parties.registeringParty = regParty
         setAddSecuredPartiesAndDebtors(parties)
+      } else {
+        parties.registeringParty = null
       }
     }
 

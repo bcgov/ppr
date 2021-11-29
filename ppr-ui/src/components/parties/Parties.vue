@@ -131,6 +131,7 @@ import {
   reactive,
   toRefs,
   onMounted,
+  watch,
   computed
 } from '@vue/composition-api'
 // import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -221,6 +222,12 @@ export default defineComponent({
         localState.openChangeScreen = true
       }
     }
+
+    watch(() => localState.registeringParty, (rp) => {
+      if (!rp && localState.isSbc) {
+        localState.openChangeScreen = true
+      }
+    })
 
     return {
       summaryView,

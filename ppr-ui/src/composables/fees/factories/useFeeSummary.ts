@@ -116,7 +116,6 @@ export function getFeeHint (
       return 'Infinite Registration'
     }
     const feeInfoYears = getFinancingFee(false)
-    console.log(registrationLength.lifeYears)
     if ((registrationLength.lifeYears) && ((!isInt(registrationLength.lifeYears) ||
       registrationLength.lifeYears < 1 || registrationLength.lifeYears > feeInfoYears.quantityMax))) {
       return 'Select a valid registration length'
