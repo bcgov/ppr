@@ -197,7 +197,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
+      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
         localState.openChangeScreen = true
       }
     })
