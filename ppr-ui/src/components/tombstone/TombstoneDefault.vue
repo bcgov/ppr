@@ -66,9 +66,7 @@ export default defineComponent({
     ])
     const localState = reactive({
       userName: computed((): string => {
-        if (!localState.isStaff) return `${getUserFirstName.value} ${getUserLastName.value}`
-        if (localState.isStaffBcolReg) return 'BC Registries Staff'
-        if (localState.isStaffSbc) return 'SBC Staff'
+        return `${getUserFirstName.value} ${getUserLastName.value}`
       }),
       date: '',
       header: computed((): string => {
@@ -87,6 +85,8 @@ export default defineComponent({
         return isRoleStaffSbc.value
       }),
       accountName: computed((): string => {
+        if (localState.isStaffBcolReg) return 'BC Registries Staff'
+        if (localState.isStaffSbc) return 'SBC Staff'
         return getAccountLabel.value
       })
     })
