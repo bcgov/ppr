@@ -138,8 +138,8 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType, isRoleStaffSbc } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType', 'isRoleStaffSbc'
     ])
     var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
@@ -192,10 +192,12 @@ export default defineComponent({
     }
 
     const getRegisteringParty = async () => {
-      var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-      const regParty = await getRegisteringPartyFromAuth()
-      parties.registeringParty = regParty
-      setAddSecuredPartiesAndDebtors(parties)
+      if (!isRoleStaffSbc.value) {
+        var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        const regParty = await getRegisteringPartyFromAuth()
+        parties.registeringParty = regParty
+        setAddSecuredPartiesAndDebtors(parties)
+      }
     }
 
     return {

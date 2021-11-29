@@ -224,6 +224,7 @@ export const isRoleStaffReg = (state: StateIF): boolean => {
 }
 
 export const isRoleStaffSbc = (state: StateIF): boolean => {
+  return true
   return (
     state.stateModel.authorization?.authRoles.includes('gov_account_user') &&
     isRoleStaff(state)

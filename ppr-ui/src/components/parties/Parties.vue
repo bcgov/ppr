@@ -47,6 +47,7 @@
             top
             content-class="top-tooltip pa-5"
             transition="fade-transition"
+            v-if="!isSbc"
           >
             <template v-slot:activator="{ on }">
               <v-icon class="pl-1 mt-n1" color="primary" v-on="on"
@@ -70,9 +71,10 @@
       <v-col v-else>
         <v-card flat class="add-party-container mt-2 mb-8">
           <div class="px-6 pt-8">
-            <h3 class="pb-2">Change Registering Party</h3>
+            <h3 v-if="!isSbc" class="pb-2">Change Registering Party</h3>
             <span class="body-text">
-            Change the Registering Party by entering the registering party code
+            <span v-if="!isSbc">Change</span><span v-else>Include</span> the Registering Party
+            by entering the registering party code
             or their name (business or person), or if the Registering Party you
             want to include is new (i.e., they do not have a registering party
             code) you can add their information manually.
@@ -89,6 +91,7 @@
           </div>
           <div v-if="!showAddRegisteringParty" class="px-5 pt-0 pb-8" style="height:80px">
             <v-btn
+              v-if="!isSbc"
               id="cancel-btn-chg-reg-party"
               large
               outlined
@@ -127,6 +130,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
+  onMounted,
   computed
 } from '@vue/composition-api'
 // import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -161,13 +165,14 @@ export default defineComponent({
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
     ])
-    const { getRegistrationType } = useGetters<any>(['getRegistrationType'])
+    const { getRegistrationType, isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
     const registrationType = getRegistrationType.value.registrationTypeAPI
     const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
     const localState = reactive({
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       openChangeScreen: false,
+      isSbc: isRoleStaffSbc.value,
       showAddRegisteringParty: false,
       addEditInProgress: false,
       cautionTxt: 'The Registry will not send the verification statement for this registration ' +
@@ -190,6 +195,13 @@ export default defineComponent({
         }
       })
     })
+
+    onMounted(() => {
+      if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
+        localState.openChangeScreen = true
+      }
+    })
+
     const summaryView = toRefs(props).isSummary
 
     const changeRegisteringParty = () => {
@@ -205,6 +217,9 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddRegisteringParty = false
       localState.openChangeScreen = false
+      if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
+        localState.openChangeScreen = true
+      }
     }
 
     return {
