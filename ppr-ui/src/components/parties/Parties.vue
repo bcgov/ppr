@@ -45,6 +45,7 @@
           Registering Party
           <v-tooltip
             top
+            class="registering-tooltip"
             content-class="top-tooltip pa-5"
             transition="fade-transition"
             v-if="!isSbc"
@@ -73,7 +74,7 @@
           <div class="px-6 pt-8">
             <h3 v-if="!isSbc" class="pb-2">Change Registering Party</h3>
             <span class="body-text">
-            <span v-if="!isSbc">Change</span><span v-else>Include</span> the Registering Party
+            {{ !isSbc ? 'Change' : 'Include' }} the Registering Party
             by entering the registering party code
             or their name (business or person), or if the Registering Party you
             want to include is new (i.e., they do not have a registering party

@@ -64,11 +64,21 @@ describe('Parties component tests', () => {
 
   it('does show the registering party', async () => {
     expect(wrapper.findComponent(RegisteringParty).isVisible()).toBe(true)
+    // show tooltip
+    expect(wrapper.find('.registering-tooltip').exists()).toBeTruthy()
+
+  })
+
+  it('trigger change registering party edit', async () => {
+    wrapper.vm.changeRegisteringParty()
+    await Vue.nextTick()
+    // show cancel button
+    expect(wrapper.find('#cancel-btn-chg-reg-party').exists()).toBeTruthy()
   })
 })
 
 
-describe('Parties component tests', () => {
+describe('Parties sbc user tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -97,6 +107,10 @@ describe('Parties component tests', () => {
 
   it('shows the party search screen for sbc', async () => {
     expect(wrapper.findComponent(PartySearch).isVisible()).toBe(true)
+    // no tooltip
+    expect(wrapper.find('.registering-tooltip').exists()).toBeFalsy()
+    // no cancel button
+    expect(wrapper.find('#cancel-btn-chg-reg-party').exists()).toBeFalsy()
   })
 
   
