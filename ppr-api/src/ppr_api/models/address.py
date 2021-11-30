@@ -61,15 +61,21 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
+        # Response legacy data: allow for any column to be null.
         address = {
-            'street': self.street,
-            'city': self.city,
-            'region': self.region,
-            'country': self.country,
-            'postalCode': self.postal_code
         }
+        if self.street:
+            address['street'] = self.street
         if self.street_additional:
             address['streetAdditional'] = self.street_additional
+        if self.city:
+            address['city'] = self.city
+        if self.region:
+            address['region'] = self.region
+        if self.country:
+            address['country'] = self.country
+        if self.postal_code:
+            address['postalCode'] = self.postal_code
 
         return address
 
@@ -77,12 +83,12 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_from_dict(new_info: dict):
         """Create an address object from dict/json."""
         address = Address()
-
+        # API requests everything but streetAdditional is mandatory.
         address.street = new_info.get('street')
         address.street_additional = new_info.get('streetAdditional')
         address.city = new_info.get('city')
         address.region = new_info.get('region')
-#        address.country = pycountry.countries.search_fuzzy(new_info.get('addressCountry'))[0].alpha_2
+        # address.country = pycountry.countries.search_fuzzy(new_info.get('country'))[0].alpha_2
         address.country = new_info.get('country')
         address.postal_code = new_info.get('postalCode')
 
@@ -92,7 +98,7 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_from_json(json_data):
         """Create an address object from a json Address schema object: map json to db."""
         address = Address()
-
+        # API requests everything but streetAdditional is mandatory.
         address.street = json_data['street'].strip().upper()
         if 'streetAdditional' in json_data:
             address.street_additional = json_data['streetAdditional'].strip().upper()
