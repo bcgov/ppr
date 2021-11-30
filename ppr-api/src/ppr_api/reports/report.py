@@ -533,14 +533,19 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _format_address(address):
         """Replace address country code with description."""
-        country = address['country']
-        if country == 'CA':
-            address['country'] = 'Canada'
-        elif country == 'US':
-            address['country'] = 'United States of America'
-        else:
-            country = pycountry.countries.search_fuzzy(country)[0].name
-            address['country'] = country
+        if 'country' in address and address['country']:
+            country = address['country']
+            if country == 'CA':
+                address['country'] = 'Canada'
+            elif country == 'US':
+                address['country'] = 'United States of America'
+            else:
+                try:
+                    country = pycountry.countries.search_fuzzy(country)[0].name
+                    address['country'] = country
+                except (AttributeError, TypeError):
+                    address['country'] = country
+
         return address
 
     def _set_meta_info(self):

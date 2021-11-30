@@ -26,7 +26,7 @@ class GeneralCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
     __tablename__ = 'general_collateral'
 
     id = db.Column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
-    description = db.Column('description', db.String(4000), nullable=False)
+    description = db.Column('description', db.Text, nullable=False)
     # Legacy only
     status = db.Column('status', db.String(1), nullable=True)
 

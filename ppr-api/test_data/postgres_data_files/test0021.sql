@@ -11,8 +11,9 @@ INSERT INTO registrations(id, financing_id, registration_number, base_reg_number
            timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 200000035, 5,
            null, null, 'PS00001', 'TEST-RE-0019', null, null)
 ;
+-- simulate bad legacy address
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
-  VALUES(200000034, 'TEST-0019RE', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
+  VALUES(200000034, 'TEST-0019RE', null, 'city', null, null, null)
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)

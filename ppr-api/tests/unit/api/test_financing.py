@@ -436,6 +436,30 @@ def test_create(session, client, jwt, desc, json_data, roles, status, has_accoun
     assert response.status_code == status
 
 
+def test_create_big_gc(session, client, jwt):
+    """Assert that a post financing statement works as expected with large gc description."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    json_data = copy.deepcopy(FINANCING_VALID)
+    # setup
+    line = '0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 \n'
+    max_lines = 60  # 60 * 81 characters
+    big_gc = ''
+    for add_line in range(max_lines):
+        big_gc += line
+    print('GC description length = ' + str(len(big_gc)))
+    json_data['generalCollateral'][0]['description'] = big_gc
+
+    # test
+    response = client.post('/api/v1/financing-statements',
+                           json=json_data,
+                           headers=create_header_account(jwt, [PPR_ROLE]),
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == HTTPStatus.CREATED
+    assert len(big_gc) == len(response.json['generalCollateral'][0]['description'])
+
+
 @pytest.mark.parametrize('desc,roles,status,has_account', TEST_GET_LIST)
 def test_get_account_financing_list(session, client, jwt, desc, roles, status, has_account):
     """Assert that a request to get the list of financing statements by account works as expected."""
