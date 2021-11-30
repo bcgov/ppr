@@ -345,6 +345,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   reactive,
@@ -355,20 +356,19 @@ import {
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { cloneDeep, isEqual } from 'lodash'
-import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import EditParty from './EditParty.vue'
-import PartySearch from './PartySearch.vue'
-import PartyAutocomplete from './PartyAutocomplete.vue'
-import { useParty } from '@/composables/useParty'
-import { useSecuredParty } from './composables/useSecuredParty'
-import { BaseAddress } from '@/composables/address'
+// local components
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
-
+import { EditParty, PartyAutocomplete, PartySearch } from '@/components/parties/party'
+import { BaseAddress } from '@/composables/address'
+// local helpers / types / etc.
+import { useCountriesProvinces } from '@/composables/address/factories'
+import { useParty } from '@/composables/useParty'
+import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
+import { ActionTypes, RegistrationFlowType } from '@/enums'
+import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeAccount } from '@/utils'
-import { useCountriesProvinces } from '@/composables/address/factories'
-import { ActionTypes, RegistrationFlowType } from '@/enums'
 
 export default defineComponent({
   components: {

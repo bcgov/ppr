@@ -11,7 +11,7 @@ import {
 } from './test-data'
 
 // Components
-import { EditDebtor } from '@/components/parties'
+import { EditDebtor } from '@/components/parties/debtor'
 
 Vue.use(Vuetify)
 

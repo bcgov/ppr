@@ -359,10 +359,12 @@ export default class ConfirmDischarge extends Vue {
     try {
       await this.loadRegistration()
     } catch (error) {
+      const errorMsg = error as string
+      console.error(errorMsg)
       console.error(error)
       this.emitError({
         statusCode: 500,
-        message: error
+        message: errorMsg
       })
     }
 

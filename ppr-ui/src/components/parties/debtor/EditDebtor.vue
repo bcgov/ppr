@@ -231,6 +231,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   onMounted,
@@ -239,11 +240,13 @@ import {
   reactive,
   toRefs
 } from '@vue/composition-api'
-import BaseAddress from '@/composables/address/BaseAddress.vue'
+// local components
+import { AutoComplete } from '@/components/search'
+import { BaseAddress } from '@/composables/address'
+// local helpers / types / etc.
+import { useDebtor } from '@/components/parties/composables/useDebtor'
+import { useDebtorValidation } from '@/components/parties/composables/useDebtorValidation'
 import { formatAddress } from '@/composables/address/factories'
-import { useDebtorValidation } from './composables/useDebtorValidation'
-import { useDebtor } from './composables/useDebtor'
-import AutoComplete from '@/components/search/AutoComplete.vue'
 
 export default defineComponent({
   components: {

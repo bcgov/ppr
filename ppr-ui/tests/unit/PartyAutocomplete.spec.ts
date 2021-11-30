@@ -7,7 +7,7 @@ import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { PartyAutocomplete } from '@/components/parties'
+import { PartyAutocomplete } from '@/components/parties/party'
 
 // Other
 import { SearchPartyIF } from '@/interfaces'

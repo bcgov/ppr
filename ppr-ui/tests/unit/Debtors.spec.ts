@@ -11,7 +11,7 @@ import {
 } from './test-data'
 
 // Components
-import { Debtors, EditDebtor } from '@/components/parties'
+import { Debtors, EditDebtor } from '@/components/parties/debtor'
 import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)

@@ -573,10 +573,11 @@ export default class ConfirmAmendment extends Vue {
     try {
       await this.loadRegistration()
     } catch (error) {
-      console.error(error)
+      const errorMsg = error as string
+      console.error(errorMsg)
       this.emitError({
         statusCode: 500,
-        message: error
+        message: errorMsg
       })
     }
 

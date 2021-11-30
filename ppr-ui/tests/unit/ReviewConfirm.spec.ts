@@ -157,7 +157,7 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('displays correct info based on registration type', async () => {
-    jest.setTimeout(30000)
+    jest.setTimeout(50000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
       if (

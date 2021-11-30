@@ -165,7 +165,6 @@
                 </v-row>
                 <base-address
                   ref="regMailingAddress"
-                  id="address-secured-party"
                   v-model="currentSecuredParty.address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
@@ -226,6 +225,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   onMounted,
@@ -234,14 +234,16 @@ import {
   computed,
   watch
 } from '@vue/composition-api'
-import BaseAddress from '@/composables/address/BaseAddress.vue'
+// local components
+import { SecuredPartyDialog } from '@/components/dialogs'
+import { AutoComplete } from '@/components/search'
+import { BaseAddress } from '@/composables/address'
+// local helpers / types / etc.
+import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
+import { useSecuredPartyValidation } from '@/components/parties/composables/useSecuredPartyValidation'
 import { formatAddress } from '@/composables/address/factories'
-import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
-import { useSecuredParty } from './composables/useSecuredParty'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import AutoComplete from '@/components/search/AutoComplete.vue'
-import SecuredPartyDialog from '@/components/dialogs/SecuredPartyDialog.vue'
-import { partyCodeSearch } from '@/utils'
+import { partyCodeSearch } from '@/utils' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   components: {
@@ -272,19 +274,19 @@ export default defineComponent({
       getSecuredParty,
       resetFormAndData,
       removeSecuredParty,
-      addEditSecuredParty,
+      addEditSecuredParty, // eslint-disable-line no-unused-vars
       registrationFlowType,
       RegistrationFlowType,
       updateAddress,
       ActionTypes,
-      setRegisteringParty,
+      setRegisteringParty, // eslint-disable-line no-unused-vars
       addressSchema
     } = useSecuredParty(props, context)
 
     const {
       errors,
       updateValidity,
-      validateSecuredPartyForm,
+      validateSecuredPartyForm, // eslint-disable-line no-unused-vars
       validateInput
     } = useSecuredPartyValidation()
 
@@ -310,7 +312,7 @@ export default defineComponent({
       })
     })
 
-    const showDialog = () => {
+    const showDialog = () => { // eslint-disable-line no-unused-vars
       // eslint-disable-line no-unused-vars
       localState.toggleDialog = true
     }

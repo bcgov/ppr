@@ -7,7 +7,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1 } from './test-data'
 
 // Components
-import { RegisteringParty } from '@/components/parties'
+import { RegisteringParty } from '@/components/parties/party'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'

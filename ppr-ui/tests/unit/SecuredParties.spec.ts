@@ -19,7 +19,7 @@ import {
 } from './test-data'
 
 // Components
-import { SecuredParties, EditParty, PartySearch } from '@/components/parties'
+import { SecuredParties, EditParty, PartySearch } from '@/components/parties/party'
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 import { SearchPartyIF } from '@/interfaces'
 import { ActionTypes, RegistrationFlowType } from '@/enums'

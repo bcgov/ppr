@@ -6,7 +6,7 @@ import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { PartySearch } from '@/components/parties'
+import { PartySearch } from '@/components/parties/party'
 
 Vue.use(Vuetify)
 
