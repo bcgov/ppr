@@ -65,7 +65,6 @@ export default defineComponent({
     const localState = reactive({
       backUrl: computed((): string => {
         const length = localState.breadcrumbs?.length || 0
-        console.log(length)
         if (length > 1) {
           console.log(localState.breadcrumbs[length - 2])
           return localState.breadcrumbs[length - 2].href || sessionStorage.getItem('REGISTRY_URL')
