@@ -243,7 +243,7 @@ import { useSecuredParty } from '@/components/parties/composables/useSecuredPart
 import { useSecuredPartyValidation } from '@/components/parties/composables/useSecuredPartyValidation'
 import { formatAddress } from '@/composables/address/factories'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { partyCodeSearch } from '@/utils' // eslint-disable-line no-unused-vars
+import { partyCodeSearch } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -274,19 +274,19 @@ export default defineComponent({
       getSecuredParty,
       resetFormAndData,
       removeSecuredParty,
-      addEditSecuredParty, // eslint-disable-line no-unused-vars
+      addEditSecuredParty,
       registrationFlowType,
       RegistrationFlowType,
       updateAddress,
       ActionTypes,
-      setRegisteringParty, // eslint-disable-line no-unused-vars
+      setRegisteringParty,
       addressSchema
     } = useSecuredParty(props, context)
 
     const {
       errors,
       updateValidity,
-      validateSecuredPartyForm, // eslint-disable-line no-unused-vars
+      validateSecuredPartyForm,
       validateInput
     } = useSecuredPartyValidation()
 
@@ -312,8 +312,7 @@ export default defineComponent({
       })
     })
 
-    const showDialog = () => { // eslint-disable-line no-unused-vars
-      // eslint-disable-line no-unused-vars
+    const showDialog = () => {
       localState.toggleDialog = true
     }
 
