@@ -13,7 +13,7 @@ import {
 } from './test-data'
 
 // Components
-import PartySummary from './PartySummary.vue' // need to import like this
+import PartySummary from '@/components/parties/PartySummary.vue' // need to import like this
 import { Parties } from '@/components/parties'
 import { Debtors } from '@/components/parties/debtor'
 import { EditParty, PartySearch, RegisteringParty, SecuredParties } from '@/components/parties/party'
