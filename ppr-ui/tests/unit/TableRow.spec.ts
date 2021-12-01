@@ -91,7 +91,7 @@ describe('TableRow tests', () => {
       registrationTableHeaders[1],
       registrationTableHeaders[3],
       registrationTableHeaders[6],
-      registrationTableHeaders[10],
+      registrationTableHeaders[10]
     ]
     await wrapper.setProps({ setHeaders: newHeaders })
     expect(wrapper.vm.$props.setHeaders).toEqual(newHeaders)
@@ -159,7 +159,7 @@ describe('TableRow tests', () => {
           // child registration
           rowData = wrapper.findAll(tableRow + ' td')
           expect(rowData.exists()).toBe(true)
-          expect(rowData.length).toBe(11) 
+          expect(rowData.length).toBe(11)
           // regNum
           expect(rowData.at(0).text()).toContain(baseReg.registrationNumber)
           expect(rowData.at(0).text()).toContain(`Base Registration: ${baseReg.baseRegistrationNumber}`)
@@ -186,7 +186,6 @@ describe('TableRow tests', () => {
         // pdf
         if (baseReg.path) expect(rowData.at(9).text()).toContain('PDF')
         else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
-        
       } else {
         // draft registration
         let rowData: WrapperArray<Vue>
@@ -307,7 +306,7 @@ describe('TableRow tests', () => {
     expect(getLastEvent(wrapper, 'action')).toEqual(
       { action: TableActions.DELETE, docId: mockedDraft1.documentId, regNum: '' }
     )
-    
+
     // main buttons: amend draft
     await wrapper.setProps({
       setChild: true,
@@ -326,7 +325,7 @@ describe('TableRow tests', () => {
           regNum: mockedDraftAmend.baseRegistrationNumber
         }
       )
-    
+
     dropButtons = wrapper.findAll('.actions__more-actions__btn')
     expect(dropButtons.length).toBe(1)
     dropButtons.at(0).trigger('click')

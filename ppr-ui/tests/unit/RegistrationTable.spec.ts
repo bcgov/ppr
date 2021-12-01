@@ -100,7 +100,7 @@ describe('Test registration table with results', () => {
     expect(wrapper.findComponent(TableRow).exists()).toBe(false)
     const rows = wrapper.findAll(tableRow)
     expect(rows.length).toBe(0)
-    
+
     // no data text
     expect(wrapper.findAll(regTable).at(0).text()).toContain('No registrations created yet.')
   })
@@ -159,7 +159,7 @@ describe('Test registration table with results', () => {
         await flushPromises()
         expect(rows.at(i).vm.$props.setIsExpanded).toEqual(true)
         // child row will not be part of original rows list
-        const childRow = wrapper.findAllComponents(TableRow).at(i+1)
+        const childRow = wrapper.findAllComponents(TableRow).at(i + 1)
         expect(childRow.vm.$props.setChild).toBe(true)
         expect(childRow.vm.$props.setHeaders).toEqual(wrapper.vm.headers)
         expect(childRow.vm.$props.setIsExpanded).toBe(false)
@@ -168,9 +168,9 @@ describe('Test registration table with results', () => {
         rows.at(i).vm.$emit('toggleExpand', true)
         await flushPromises()
         expect(rows.at(i).vm.$props.setIsExpanded).toEqual(false)
-        // verify next row in table is not the child 
-        expect(wrapper.findAllComponents(TableRow).at(i+1).vm.$props.setChild).toBe(false)
-        expect(wrapper.findAllComponents(TableRow).at(i+1).vm.$props.setItem).not.toEqual(reg.changes[0])
+        // verify next row in table is not the child
+        expect(wrapper.findAllComponents(TableRow).at(i + 1).vm.$props.setChild).toBe(false)
+        expect(wrapper.findAllComponents(TableRow).at(i + 1).vm.$props.setItem).not.toEqual(reg.changes[0])
       }
     }
   })
@@ -236,7 +236,6 @@ describe('Test registration table with results', () => {
     expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(true)
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Registration Type')
-
   })
 
   it('renders and displays the date picker', async () => {

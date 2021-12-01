@@ -21,12 +21,12 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // selectors
-const summaryInfo = ".summary-info"
-const checkboxTxtNormal = ".copy-normal p"
-const checkboxTxtError = ".check-box-error p"
-const checkboxId1 = "#discharge-confirm-checkbox-1"
-const checkboxId2 = "#discharge-confirm-checkbox-2"
-const checkboxId3 = "#discharge-confirm-checkbox-3"
+const summaryInfo = '.summary-info'
+const checkboxTxtNormal = '.copy-normal p'
+const checkboxTxtError = '.check-box-error p'
+const checkboxId1 = '#discharge-confirm-checkbox-1'
+const checkboxId2 = '#discharge-confirm-checkbox-2'
+const checkboxId3 = '#discharge-confirm-checkbox-3'
 
 /**
  * Creates and mounts a component, so that it can be tested.

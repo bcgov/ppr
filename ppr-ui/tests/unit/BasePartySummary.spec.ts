@@ -18,7 +18,6 @@ import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
 import { partyTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
 
-
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
@@ -38,7 +37,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(BasePartySummary, {
     localVue,
-    propsData: {setHeaders, setItems, setOptions},
+    propsData: { setHeaders, setItems, setOptions },
     store,
     vuetify
   })
@@ -117,7 +116,6 @@ describe('Debtor list tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    
     wrapper = createComponent(partyTableHeaders, mockedDebtors1, {
       enableNoDataAction: false,
       header: 'true',
@@ -151,7 +149,6 @@ describe('Debtor list tests', () => {
     expect(item1.querySelectorAll('td')[3].textContent).toContain('June 15, 1990')
   })
 })
-
 
 describe('Secured Party amendment list tests', () => {
   let wrapper: Wrapper<any>

@@ -53,7 +53,6 @@ describe('GenColAmend tests', () => {
   })
 
   it('renders default', async () => {
-    
     wrapper = createComponent(false)
     expect(wrapper.findComponent(GenColAmend).exists()).toBe(true)
     expect(wrapper.vm.addDesc).toBe('')
@@ -61,23 +60,20 @@ describe('GenColAmend tests', () => {
     expect(wrapper.vm.generalCollateral).toEqual([])
     expect(wrapper.findAll(deleteDescriptionTxt).length).toBe(1)
     expect(wrapper.findAll(addDescriptionTxt).length).toBe(1)
-
   })
 
   it('shows saved general collateral', async () => {
-   
     await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
-    
+
     wrapper = createComponent(false)
     expect(wrapper.vm.addDesc).toBe('addexample')
     expect(wrapper.vm.delDesc).toBe('othertest')
   })
 
   it('does not show existing general collateral from previous amendment', async () => {
-   
     await store.dispatch('setGeneralCollateral',
-    [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest', addedDateTime: '2021-10-13' }])
-    
+      [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest', addedDateTime: '2021-10-13' }])
+
     wrapper = createComponent(false)
     expect(wrapper.vm.addDesc).toBe('')
     expect(wrapper.vm.delDesc).toBe('')
@@ -95,10 +91,9 @@ describe('GenColAmend tests', () => {
     expect(store.getters.getAddCollateral.generalCollateral.length).toBe(1)
   })
 
-
   it('saves amended general collateral over the previous one', async () => {
     await store.dispatch('setGeneralCollateral',
-    [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest'}])
+      [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
     wrapper = createComponent(false)
     wrapper.find('#general-collateral-delete-desc').setValue('JOE')
     wrapper.find('#general-collateral-add-desc').setValue('SCHMOE')
@@ -109,5 +104,4 @@ describe('GenColAmend tests', () => {
     expect(store.getters.getAddCollateral.generalCollateral.length).toBe(1)
     expect(store.getters.getAddCollateral.generalCollateral[0].descriptionAdd).toBe('SCHMOE')
   })
-
 })

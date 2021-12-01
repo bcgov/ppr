@@ -131,7 +131,6 @@ describe('Renew registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
   })
 
-  
   it('doesnt proceed if validation errors', async () => {
     wrapper.vm.registrationValid = false
     wrapper.find(StickyContainer).vm.$emit('submit', true)
@@ -139,7 +138,6 @@ describe('Renew registration component', () => {
     expect(wrapper.vm.showInvalid).toBe(true)
   })
 })
-
 
 describe('Renew registration component for repairers lien', () => {
   let wrapper: any
@@ -181,7 +179,7 @@ describe('Renew registration component for repairers lien', () => {
     expect(wrapper.findComponent(CourtOrder).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
-     lifeYears: 1
+      lifeYears: 1
     })
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
@@ -189,14 +187,12 @@ describe('Renew registration component for repairers lien', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Confirm and Complete')
   })
 
-  
   it('proceeds if valid court order', async () => {
     wrapper.find(CourtOrder).vm.$emit('setCourtOrderValid', true)
     await flushPromises()
     expect(wrapper.vm.registrationValid).toBe(true)
   })
 
-  
   it('doesnt proceed if validation errors', async () => {
     wrapper.find(CourtOrder).vm.$emit('setCourtOrderValid', false)
     wrapper.find(StickyContainer).vm.$emit('submit', true)

@@ -43,7 +43,7 @@ function createComponent (
 
 describe('RegistrationLengthTrust SA tests', () => {
   let wrapper: Wrapper<any>
- 
+
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     wrapper = createComponent(false)
@@ -77,7 +77,7 @@ describe('RegistrationLengthTrust SA tests', () => {
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     expect(state.registration.lengthTrust.valid).toBe(false)
 
-    //more tests for year validations
+    // more tests for year validations
     wrapper.vm.$data.lifeYearsEdit = '3.0'
     await Vue.nextTick()
     expect(state.registration.lengthTrust.valid).toBe(true)
@@ -159,7 +159,6 @@ describe('RegistrationLengthTrust life infinite tests', () => {
   })
 })
 
-
 describe('RegistrationLengthTrust Crown tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
@@ -175,14 +174,12 @@ describe('RegistrationLengthTrust Crown tests', () => {
     expect(wrapper.vm.showTrustIndenture).toBe(false)
     expect(wrapper.find('#trust-indenture-checkbox').exists()).toBe(false)
     expect(wrapper.find('#length-in-years').exists()).toBe(false)
-    
+
     expect(wrapper.find('#lien-amount').exists()).toBe(false)
-    
+
     expect(wrapper.vm.infinityPreselected()).toBe(true)
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
-   
   })
-  
 })
 
 describe('RegistrationLengthTrust SA renewal test', () => {
@@ -199,7 +196,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     })
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     await store.dispatch('setRegistrationExpiryDate', '2021-03-31T07:00:00+00:00')
-    
+
     wrapper = createComponent(true)
   })
   afterEach(() => {
@@ -215,7 +212,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     expect(wrapper.find('#new-expiry').text()).toContain('March 31, 2022')
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
-    //also emits if valid
+    // also emits if valid
     expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeTruthy()
   })
 
@@ -226,6 +223,4 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     expect(wrapper.vm.$data.lengthTrust.valid).toBe(false)
     expect(getLastEvent(wrapper, 'lengthTrustValid')).toBeFalsy()
   })
-  
 })
-

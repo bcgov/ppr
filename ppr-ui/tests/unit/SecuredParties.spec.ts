@@ -146,20 +146,19 @@ describe('Secured Party Other registration type tests', () => {
 
   it('shows the dialog with a secured party code change', async () => {
     expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
-    
+
     // should have the dialog
     expect(wrapper.find(ChangeSecuredPartyDialog).exists()).toBeTruthy()
 
     expect(wrapper.find('#secured-party-autocomplete').exists()).toBeTruthy()
 
-    const autocompleteControls = wrapper.findAll(".v-input__slot")
+    const autocompleteControls = wrapper.findAll('.v-input__slot')
     expect(autocompleteControls.length).toBe(1)
-    
+
     // change the party code and then the dialog should show
-    wrapper.vm.selectResult({code: 123, businessName: 'Forrest Gump'})
+    wrapper.vm.selectResult({ code: 123, businessName: 'Forrest Gump' })
 
     expect(wrapper.find(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
-
   })
 
   it('is not valid if you remove the secured party for admendment', async () => {
@@ -171,7 +170,7 @@ describe('Secured Party Other registration type tests', () => {
       securedParties: parties
     })
 
-    //click remove
+    // click remove
     wrapper.find('.v-data-table .party-row .actions__more-actions .v-remove').trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
@@ -196,7 +195,7 @@ describe('Secured Party Other registration type tests', () => {
         deliveryInstructions: ''
       }
     }
-    
+
     expect(parties.length).toEqual(2)
     wrapper.vm.securedParties = parties
     await Vue.nextTick()
@@ -207,7 +206,6 @@ describe('Secured Party Other registration type tests', () => {
     const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[1]
     expect(item1.querySelectorAll('td')[0].textContent).toContain('DELETED')
     expect(item2.querySelectorAll('td')[0].textContent).toContain('ADDED')
-
   })
 })
 
@@ -283,7 +281,6 @@ describe('Secured party amendment tests', () => {
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
 
-
   it('goes from valid to invalid', async () => {
     const parties = cloneDeep(mockedSecuredParties1)
     expect(parties.length).toEqual(1)
@@ -295,17 +292,15 @@ describe('Secured party amendment tests', () => {
     // click the drop down arrow
     wrapper.find('.v-data-table .party-row .actions__more-actions__btn').trigger('click')
     await Vue.nextTick()
-    //click remove
+    // click remove
     wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
     wrapper.vm.$data.showErrorSecuredParties = true
     await Vue.nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
-
   })
 })
-
 
 describe('Secured party with code test', () => {
   let wrapper: Wrapper<any>
@@ -324,18 +319,12 @@ describe('Secured party with code test', () => {
     wrapper.destroy()
   })
 
-
   it('displays remove only for a secured party with code', async () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Delete')
-    
+
     const dropDowns = wrapper.findAll('.v-data-table .party-row .actions__more-actions__btn')
     // 0 drop downs
     expect(dropDowns.length).toBe(0)
-  
-
   })
-
-  
-
 })

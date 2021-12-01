@@ -179,7 +179,6 @@ describe('Secured Party edit individual tests', () => {
   })
 })
 
-
 describe('Registering party test', () => {
   let wrapper: Wrapper<any>
 
@@ -198,8 +197,5 @@ describe('Registering party test', () => {
     wrapper.vm.$props.setIsRegisteringParty = true
     await Vue.nextTick()
     expect(wrapper.find('.add-party-header').text()).toContain('Registering')
-
   })
-
- 
 })

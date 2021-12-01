@@ -119,7 +119,6 @@ describe('TombstoneDefault component tests', () => {
         expect(subHeader.at(0).text()).toContain('SBC Staff')
       } else {
         expect(subHeader.at(0).text()).toContain('BC Registries Staff')
-
       }
       expect(subHeader.at(0).text()).toContain(userInfo.firstname)
       expect(subHeader.at(0).text()).toContain(userInfo.lastname)

@@ -50,7 +50,7 @@ function createComponent (
 
 describe('RegistrationLengthTrust SA tests', () => {
   let wrapper: Wrapper<any>
- 
+
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
     await store.dispatch('setLengthTrust', mockedLengthTrust1)
@@ -99,8 +99,7 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.surrenderDateSummary).toBe('January 21, 2021')
     expect(wrapper.find('#registration-length').text()).toContain('180 Days')
     expect(wrapper.find('#trust-indenture-summary').exists()).toBeFalsy()
-   })
-  
+  })
 })
 
 describe('RegistrationLengthTrust SG tests', () => {
@@ -131,8 +130,6 @@ describe('RegistrationLengthTrust SG tests', () => {
   })
 })
 
-
-
 describe('RegistrationLengthTrust Crown tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
@@ -149,7 +146,5 @@ describe('RegistrationLengthTrust Crown tests', () => {
     expect(wrapper.vm.showTrustIndenture).toBe(false)
     expect(wrapper.find('#registration-length').text()).toContain('Infinite')
     expect(wrapper.find('#trust-indenture-summary').exists()).toBeFalsy()
-   
   })
-  
 })

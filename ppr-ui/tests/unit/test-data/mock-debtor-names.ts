@@ -2,10 +2,10 @@ import { DebtorNameIF } from '@/interfaces'
 
 export const mockedDebtorNames: Array<DebtorNameIF> = [
   {
-    businessName:  'Top Gun',
+    businessName: 'Top Gun'
   },
   {
-    businessName:  'Forrest Gump',
+    businessName: 'Forrest Gump'
   },
   {
     personName: {

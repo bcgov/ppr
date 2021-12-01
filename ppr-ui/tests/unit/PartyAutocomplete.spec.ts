@@ -78,7 +78,6 @@ describe('Secured Party search autocomplete tests', () => {
   })
 })
 
-
 describe('Registering Party search autocomplete tests', () => {
   let wrapper: Wrapper<any>
 

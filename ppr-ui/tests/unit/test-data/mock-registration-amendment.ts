@@ -442,7 +442,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
-  staffPayment:null,
+  staffPayment: null,
   registration: {
     amendmentDescription: 'Adding',
     collateral: {
@@ -540,7 +540,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
-  staffPayment:null,
+  staffPayment: null,
   registration: {
     amendmentDescription: 'Deleting',
     collateral: {
@@ -638,7 +638,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
-  staffPayment:null,
+  staffPayment: null,
   registration: {
     amendmentDescription: 'Editing',
     collateral: {
@@ -737,7 +737,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     authRoles: []
   },
   certifyInformation: mockedAmendmentCertified,
-  staffPayment:null,
+  staffPayment: null,
   registration: {
     amendmentDescription: 'Court Order',
     collateral: {

@@ -118,7 +118,6 @@ export const mockedVehicleCollateral1: VehicleCollateralIF[] = [
   }
 ]
 
-
 export const mockedVehicleCollateralAmendment: VehicleCollateralIF[] = [
   {
     id: 1,
@@ -149,7 +148,6 @@ export const mockedVehicleCollateralAmendment: VehicleCollateralIF[] = [
   }
 
 ]
-
 
 export const mockedVehicleCollateralAmendment2: VehicleCollateralIF[] = [
   {
@@ -298,7 +296,6 @@ export const mockedDebtorsDeleted: PartyIF[] = [
     action: ActionTypes.REMOVED
   }
 ]
-
 
 export const mockedLengthTrust1: LengthTrustIF = {
   valid: false,

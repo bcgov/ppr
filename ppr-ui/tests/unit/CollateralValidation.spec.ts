@@ -112,7 +112,6 @@ describe('Collateral validation tests', () => {
     const messages = wrapper.findAll('.v-messages__message')
     // messages length is one when correct (because of the YYYY hint for year)
     expect(messages.length).toBe(1)
-    
   })
 
   it('validates numbers only for manufactured home', async () => {

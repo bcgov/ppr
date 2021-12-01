@@ -61,6 +61,5 @@ describe('Folio number on the summarty page', () => {
     await Vue.nextTick()
     expect(wrapper.vm.$data.isValid).toBeFalsy()
     expect(wrapper.emitted().folioValid).toBeTruthy()
-    
   })
 })

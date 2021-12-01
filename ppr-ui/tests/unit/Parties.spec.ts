@@ -13,8 +13,8 @@ import {
 } from './test-data'
 
 // Components
+import PartySummary from './PartySummary.vue' // need to import like this
 import { Parties } from '@/components/parties'
-import { PartySummary } from '@/components/parties'
 import { Debtors } from '@/components/parties/debtor'
 import { EditParty, PartySearch, RegisteringParty, SecuredParties } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
@@ -130,7 +130,6 @@ describe('Parties tests', () => {
     expect(wrapper.findComponent(RegisteringParty).isVisible()).toBe(true)
     // show tooltip
     expect(wrapper.find('.registering-tooltip').exists()).toBeTruthy()
-
   })
 
   it('trigger change registering party edit', async () => {
@@ -140,7 +139,6 @@ describe('Parties tests', () => {
     expect(wrapper.find('#cancel-btn-chg-reg-party').exists()).toBeTruthy()
   })
 })
-
 
 describe('Parties sbc user tests', () => {
   let wrapper: Wrapper<any>
@@ -166,7 +164,6 @@ describe('Parties sbc user tests', () => {
     expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
     // initially registering party does not show up, only party search
     expect(wrapper.findComponent(RegisteringParty).exists()).toBe(false)
-    
   })
 
   it('shows the party search screen for sbc', async () => {
@@ -176,6 +173,4 @@ describe('Parties sbc user tests', () => {
     // no cancel button
     expect(wrapper.find('#cancel-btn-chg-reg-party').exists()).toBeFalsy()
   })
-
-  
 })
