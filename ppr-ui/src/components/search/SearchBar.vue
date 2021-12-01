@@ -142,16 +142,16 @@
 
           <v-menu v-if="isStaffBcolReg" offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :id="$style['client-search']" class="down-btn primary">
-                <v-icon>mdi-menu-down</v-icon>
+              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary">
+                <v-icon color="primary">mdi-menu-down</v-icon>
               </v-btn>
             </template>
             <v-list class="actions__more-actions">
               <v-list-item @click="clientSearch()">
                 <v-list-item-subtitle>
-                  <v-icon small>mdi-magnify</v-icon>
+                  <v-icon style="font-size: 18px;padding-bottom: 2px;">mdi-magnify</v-icon>
                   <span>
-                    Client search
+                    Client Search
                   </span>
                 </v-list-item-subtitle>
               </v-list-item>
@@ -398,7 +398,7 @@ export default defineComponent({
       if (search) {
         searchAction(true)
       }
-      localStorage.staffPaymentDialogDisplay = false
+      localState.staffPaymentDialogDisplay = false
     }
 
     const clientSearch = async () => {
@@ -458,8 +458,6 @@ export default defineComponent({
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 #search-btn, #client-search {
-  background-color: $primary-blue;
-  color: white;
   height: 2.85rem;
   min-width: 0 !important;
   width: 3rem;

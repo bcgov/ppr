@@ -9,7 +9,7 @@
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="valid = $event"
               />
-            <v-row no-gutters>
+            <v-row no-gutters class="pt-4">
               <v-col class="pl-2">
                 <v-checkbox
                   class="mt-2"
@@ -71,7 +71,7 @@ export default defineComponent({
         let pd = getStaffPayment.value
         if (!pd) {
           pd = {
-            option: StaffPaymentOptions.NO_FEE,
+            option: StaffPaymentOptions.NONE,
             routingSlipNumber: '',
             bcolAccountNumber: '',
             datNumber: '',
@@ -188,5 +188,17 @@ export default defineComponent({
 // hide messages below radio group
 ::v-deep .v-input--radio-group > .v-input__control > .v-messages {
   display: none;
+}
+
+::v-deep .theme--light.v-label, ::v-deep .theme--light.v-input input {
+  color: $gray7;
+}
+
+::v-deep .theme--light.v-label--is-disabled {
+    color: rgba(0, 0, 0, 0.38);
+}
+
+::v-deep .v-application--is-ltr .v-text-field .v-label {
+  color: rgba(0, 0, 0, 0.6);
 }
 </style>
