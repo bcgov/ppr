@@ -60,6 +60,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   reactive,
@@ -68,10 +69,12 @@ import {
   computed
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
-import { partyCodeSearch } from '@/utils'
+// local components
+import { PartyAutocomplete } from '@/components/parties/party'
+// local helpers / types / etc.
 import { RegistrationFlowType } from '@/enums'
-import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import PartyAutocomplete from './PartyAutocomplete.vue'
+import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { partyCodeSearch } from '@/utils'
 
 export default defineComponent({
   components: {

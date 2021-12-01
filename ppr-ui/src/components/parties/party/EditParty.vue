@@ -165,7 +165,6 @@
                 </v-row>
                 <base-address
                   ref="regMailingAddress"
-                  id="address-secured-party"
                   v-model="currentSecuredParty.address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
@@ -226,6 +225,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   onMounted,
@@ -234,13 +234,15 @@ import {
   computed,
   watch
 } from '@vue/composition-api'
-import BaseAddress from '@/composables/address/BaseAddress.vue'
+// local components
+import { SecuredPartyDialog } from '@/components/dialogs'
+import { AutoComplete } from '@/components/search'
+import { BaseAddress } from '@/composables/address'
+// local helpers / types / etc.
+import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
+import { useSecuredPartyValidation } from '@/components/parties/composables/useSecuredPartyValidation'
 import { formatAddress } from '@/composables/address/factories'
-import { useSecuredPartyValidation } from './composables/useSecuredPartyValidation'
-import { useSecuredParty } from './composables/useSecuredParty'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import AutoComplete from '@/components/search/AutoComplete.vue'
-import SecuredPartyDialog from '@/components/dialogs/SecuredPartyDialog.vue'
 import { partyCodeSearch } from '@/utils'
 
 export default defineComponent({
@@ -311,7 +313,6 @@ export default defineComponent({
     })
 
     const showDialog = () => {
-      // eslint-disable-line no-unused-vars
       localState.toggleDialog = true
     }
 

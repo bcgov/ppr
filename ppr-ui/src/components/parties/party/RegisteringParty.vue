@@ -111,6 +111,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   onMounted,
@@ -119,15 +120,16 @@ import {
   toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useParty } from '@/composables/useParty'
+// local components
+import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
-import EditParty from './EditParty.vue'
-
-import { editTableHeaders, registeringTableHeaders } from '@/resources'
-import { getRegisteringPartyFromAuth } from '@/utils'
-import { PartyAddressSchema } from '@/schemas'
+// local helpers / types / etc.
+import { useParty } from '@/composables/useParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
+import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { editTableHeaders, registeringTableHeaders } from '@/resources'
+import { PartyAddressSchema } from '@/schemas'
+import { getRegisteringPartyFromAuth } from '@/utils'
 
 export default defineComponent({
   components: {

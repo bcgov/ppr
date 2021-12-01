@@ -51,16 +51,16 @@ const vuetify = new Vuetify({})
 const store = getVuexStore()
 
 // Events
-const selectedType = "selected-registration-type"
+const selectedType = 'selected-registration-type'
 
 // selectors
-const searchHeader = "#search-header"
-const historyHeader = "#search-history-header"
-const myRegAddDialog = "#myRegAddDialog"
-const myRegDeleteDialog = "#myRegDeleteDialog"
-const myRegHeader = "#registration-header"
-const myRegAddTextBox = "#my-reg-add"
-const myRegTblColSelection = "#column-selection"
+const searchHeader = '#search-header'
+const historyHeader = '#search-history-header'
+const myRegAddDialog = '#myRegAddDialog'
+const myRegDeleteDialog = '#myRegDeleteDialog'
+const myRegHeader = '#registration-header'
+const myRegAddTextBox = '#my-reg-add'
+const myRegTblColSelection = '#column-selection'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -83,7 +83,7 @@ describe('Dashboard component', () => {
     sandbox = sinon.createSandbox()
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
+    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getDraft = getStub.withArgs(`drafts/${draftDocId}`)
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
     const getMyRegDrafts = getStub.withArgs('drafts')
@@ -94,7 +94,7 @@ describe('Dashboard component', () => {
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
     const getDebtorNames = getStub.withArgs(`financing-statements/${regNum}/debtorNames`)
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
-    
+
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
     patchUserSettings.returns(new Promise(resolve => resolve(
@@ -262,7 +262,7 @@ describe('Dashboard registration table tests', () => {
   const myRegHistory: RegistrationSummaryIF[] = [{ ...mockedRegistration1 }]
   const parentDrafts: DraftResultIF[] = [{ ...mockedDraft1 }]
   // setup baseReg with added child draft
-  let baseReg = { ...mockedRegistration1 }
+  const baseReg = { ...mockedRegistration1 }
   baseReg.changes = [{ ...mockedDraftAmend }]
   baseReg.expand = false
   const myRegHistoryWithChildren = [baseReg]
@@ -276,7 +276,7 @@ describe('Dashboard registration table tests', () => {
     // get stubs
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
+    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
     const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
@@ -286,19 +286,19 @@ describe('Dashboard registration table tests', () => {
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
     // delete stubs
     const deleteStub = sandbox.stub(axios, 'delete')
-    deleteStub.returns(new Promise (resolve => resolve({ status: StatusCodes.NO_CONTENT })))
+    deleteStub.returns(new Promise(resolve => resolve({ status: StatusCodes.NO_CONTENT })))
     // patch stubs
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
     patchUserSettings.returns(new Promise(resolve => resolve(
       // error will cause UI to ignore response and use default / whatever the user selected
-      { data: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection }}}
+      { data: { [SettingOptions.REGISTRATION_TABLE]: { columns: newColumnSelection } } }
     )))
 
     // set base selected columns
     await store.dispatch(
       'setUserInfo',
-      { 
+      {
         settings: {
           [SettingOptions.REGISTRATION_TABLE]: { columns: registrationTableHeaders }
         }
@@ -411,7 +411,7 @@ describe('Dashboard registration table tests', () => {
     // emit delete action
     wrapper.findComponent(RegistrationTable).vm.$emit(
       'action',
-      { 
+      {
         action: TableActions.DELETE,
         docId: myRegDraftsCopy.documentId,
         regNum: myRegDraftsCopy.baseRegistrationNumber
@@ -469,7 +469,7 @@ describe('Dashboard add registration tests', () => {
     sandbox = sinon.createSandbox()
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
-    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] }})))
+    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
     const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')

@@ -68,7 +68,6 @@ describe('Secured Party Dialog SA tests', () => {
   })
 })
 
-
 describe('Registering Party Dialog SA tests', () => {
   let wrapper: Wrapper<any>
 

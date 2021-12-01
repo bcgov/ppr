@@ -7,7 +7,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
 // Components
-import { EditParty } from '@/components/parties'
+import { EditParty } from '@/components/parties/party'
 
 Vue.use(Vuetify)
 
@@ -115,5 +115,4 @@ describe('Secured Party validation tests - individual', () => {
     expect(messages.at(0).text()).toBe('Please enter a valid email address')
     expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
   })
-
 })

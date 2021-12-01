@@ -40,5 +40,5 @@ export const mockedRenewalResponse: RenewRegistrationIF = {
   clientReferenceId: 'UT-100001',
   createDateTime: '2021-07-20T17:21:17+00:00',
   registeringParty: mockedRegisteringParty1,
-  expiryDate: '2025-08-01T17:21:17+00:00',
+  expiryDate: '2025-08-01T17:21:17+00:00'
 }

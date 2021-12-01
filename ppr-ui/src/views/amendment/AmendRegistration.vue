@@ -103,7 +103,8 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
-import { Debtors, SecuredParties } from '@/components/parties'
+import { Debtors } from '@/components/parties/debtor'
+import { SecuredParties } from '@/components/parties/party'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
@@ -433,10 +434,11 @@ export default class AmendRegistration extends Vue {
     try {
       await this.loadRegistration()
     } catch (error) {
-      console.error(error)
+      const errorMsg = error as string
+      console.error(errorMsg)
       this.emitError({
         statusCode: 500,
-        message: error
+        message: errorMsg
       })
     }
 

@@ -178,5 +178,4 @@ describe('Add Parties new registration component', () => {
       wrapper.destroy()
     }
   })
-
 })

@@ -68,7 +68,6 @@ describe('Vehicle collateral summary tests', () => {
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
     expect(wrapper.vm.vehicleCollateral.length).toBe(0)
     expect(wrapper.find('.collateral-table').exists()).toBe(false)
-    
   })
 
   it('renders with summary version with vehicle collateral', async () => {
@@ -78,7 +77,6 @@ describe('Vehicle collateral summary tests', () => {
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
     expect(wrapper.find('.collateral-table').exists()).toBe(true)
   })
-
 })
 
 describe('Vehicle collateral edit tests', () => {
@@ -174,9 +172,7 @@ describe('Vehicle Collateral amendment tests', () => {
     // option from second drop down
     expect(options.at(2).text()).toContain('Remove')
   })
-
 })
-
 
 describe('Vehicle Collateral summary amendment tests', () => {
   let wrapper: Wrapper<any>
@@ -206,8 +202,6 @@ describe('Vehicle Collateral summary amendment tests', () => {
     expect(item2.querySelectorAll('td')[0].textContent).toContain('DELETED')
     expect(item3.querySelectorAll('td')[0].textContent).toContain('ADDED')
   })
-
-  
 })
 
 describe('Vehicle Collateral repairers lien amendment tests', () => {
@@ -239,5 +233,4 @@ describe('Vehicle Collateral repairers lien amendment tests', () => {
     expect(item1.querySelectorAll('td')[5].textContent).toContain('Delete')
     expect(item2.querySelectorAll('td')[5].textContent).toContain('Undo')
   })
-  
 })

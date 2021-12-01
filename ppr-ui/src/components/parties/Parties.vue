@@ -127,6 +127,7 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import {
   defineComponent,
   reactive,
@@ -135,16 +136,14 @@ import {
   watch,
   computed
 } from '@vue/composition-api'
-// import { useGetters, useActions } from 'vuex-composition-helpers'
-import Debtors from './Debtors.vue'
-import SecuredParties from './SecuredParties.vue'
-import PartySummary from './PartySummary.vue'
-import RegisteringParty from './RegisteringParty.vue'
-import { useSecuredParty } from './composables/useSecuredParty'
 import { useGetters } from 'vuex-composition-helpers'
-import EditParty from './EditParty.vue'
-import PartySearch from './PartySearch.vue'
+// local components
+import PartySummary from './PartySummary.vue' // need to import like this for jest tests - cyclic issue?
+import { Debtors } from '@/components/parties/debtor'
+import { EditParty, PartySearch, RegisteringParty, SecuredParties } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
+// local helpers / types / etc.
+import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
@@ -195,6 +194,9 @@ export default defineComponent({
         } else {
           return 'Secured Parties'
         }
+      }),
+      summaryView: computed((): boolean => {
+        return props.isSummary
       })
     })
 
@@ -203,8 +205,6 @@ export default defineComponent({
         localState.openChangeScreen = true
       }
     })
-
-    const summaryView = toRefs(props).isSummary
 
     const changeRegisteringParty = () => {
       localState.openChangeScreen = true
@@ -231,7 +231,6 @@ export default defineComponent({
     })
 
     return {
-      summaryView,
       changeRegisteringParty,
       initAdd,
       resetData,

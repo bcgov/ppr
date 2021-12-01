@@ -23,7 +23,6 @@ import { BaseDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
 
-
 // Other
 import mockRouter from './MockRouter'
 import { ActionTypes, RouteNames } from '@/enums'
@@ -88,7 +87,6 @@ describe('Confirm Amendment registration component', () => {
     })
     await store.dispatch('setAmendmentDescription', 'test')
     await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
-    
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -119,7 +117,7 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
-    
+
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
@@ -250,7 +248,7 @@ describe('Confirm Amendment registration save registration', () => {
     expect(wrapper.vm.collateralValid).toBe(true)
     expect(wrapper.vm.partiesValid).toBe(true)
     expect(wrapper.vm.courtOrderValid).toBe(true)
-    
+
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)

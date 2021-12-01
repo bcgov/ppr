@@ -318,7 +318,6 @@ export default class App extends Mixins(AuthMixin) {
   private async loadAuth (): Promise<any> {
     // save roles from the keycloak token
     const authRoles = getKeycloakRoles()
-    console.log(authRoles)
     if (authRoles && authRoles.length > 0) {
       this.setAuthRoles(authRoles)
     } else {
@@ -336,7 +335,6 @@ export default class App extends Mixins(AuthMixin) {
       const settings: UserSettingsIF = await getPPRUserSettings()
       userInfo.settings = settings
       this.setUserInfo(userInfo)
-      console.log(userInfo)
       if (!settings || settings?.error) {
         // error popup -> user may still continue
         throw new Error('Invalid user settings')

@@ -345,9 +345,11 @@ export default class ReviewRegistration extends Vue {
       await this.loadRegistration()
     } catch (error) {
       console.error(error)
+      const errorMsg = error as string
+      console.error(errorMsg)
       this.emitError({
         statusCode: 500,
-        message: error
+        message: errorMsg
       })
     }
 

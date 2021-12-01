@@ -249,7 +249,7 @@ import {
   watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'

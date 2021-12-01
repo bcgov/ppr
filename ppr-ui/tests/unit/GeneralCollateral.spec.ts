@@ -77,7 +77,6 @@ describe('General Collateral tests', () => {
     expect(getLastEvent(wrapper, 'valid')).toBe(false)
   })
 
-
   it('renders amendment view for amendments', async () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
     wrapper = createComponent(true, false)

@@ -105,7 +105,6 @@ describe('Breadcrumb component tests', () => {
     // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
-
   })
 
   afterEach(() => {
@@ -193,7 +192,6 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-
   it('renders on renew: review renewal with breadcrumb', () => {
     wrapper = createComponent(RouteNames.RENEW_REGISTRATION, reviewRenewRoute.path, reviewRenewRoute.name)
     expect(wrapper.find(backBtn).exists()).toBe(true)
@@ -241,7 +239,5 @@ describe('Breadcrumb component tests', () => {
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
     expect(breadcrumbs.at(1).text()).toContain('Staff')
-    
   })
-  
 })

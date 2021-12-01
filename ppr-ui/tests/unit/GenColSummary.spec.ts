@@ -118,7 +118,7 @@ describe('GenColSummary tests', () => {
 describe('GenColSummary Amendment tests', () => {
   let wrapper: Wrapper<any>
 
-  beforeEach(async () => {    
+  beforeEach(async () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
   })
   afterEach(() => {
@@ -132,12 +132,11 @@ describe('GenColSummary Amendment tests', () => {
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     expect(wrapper.findAll(title).length).toBe(1)
-    //it starts with history open
+    // it starts with history open
     expect(wrapper.findAll(history).length).toBe(1)
     expect(wrapper.findAll(historyBtn).length).toBe(1)
-    //amend button
+    // amend button
     expect(wrapper.findAll('#gen-col-amend-btn').length).toBe(1)
-
   })
 
   it('renders showing general collateral and undo button', async () => {
@@ -146,10 +145,10 @@ describe('GenColSummary Amendment tests', () => {
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     expect(wrapper.findAll(title).length).toBe(1)
-    //it starts with history open
+    // it starts with history open
     expect(wrapper.findAll(history).length).toBe(1)
     expect(wrapper.findAll(historyBtn).length).toBe(1)
-    //undo button
+    // undo button
     expect(wrapper.findAll('#gen-col-undo-btn').length).toBe(1)
   })
 
@@ -161,12 +160,11 @@ describe('GenColSummary Amendment tests', () => {
     await Vue.nextTick()
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
-    //title should not show
+    // title should not show
     expect(wrapper.findAll(title).length).toBe(0)
-    //history button should not show
+    // history button should not show
     expect(wrapper.findAll(historyBtn).length).toBe(0)
-    //undo button should not show
+    // undo button should not show
     expect(wrapper.findAll('#gen-col-undo-btn').length).toBe(0)
-
   })
 })

@@ -7,7 +7,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
 // Components
-import { EditDebtor } from '@/components/parties'
+import { EditDebtor } from '@/components/parties/debtor'
 
 Vue.use(Vuetify)
 

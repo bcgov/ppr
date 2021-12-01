@@ -7,7 +7,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1 } from './test-data'
 
 // Components
-import { RegisteringParty } from '@/components/parties'
+import { RegisteringParty } from '@/components/parties/party'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
@@ -85,11 +85,10 @@ describe('RegisteringParty store tests', () => {
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    
+
     expect(wrapper.find('.actions-cell').exists()).toBeTruthy()
   })
 })
-
 
 describe('RegisteringParty store undo test', () => {
   let wrapper: Wrapper<any>
@@ -101,9 +100,8 @@ describe('RegisteringParty store undo test', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-
     await store.dispatch('setAddSecuredPartiesAndDebtors', {
-      registeringParty: 
+      registeringParty:
       {
         businessName: 'ABC REGISTERING COMPANY LTD.',
         address: {
@@ -124,11 +122,11 @@ describe('RegisteringParty store undo test', () => {
     get.returns(
       new Promise(resolve => resolve({
         data: {
-          businessName: 'ANOTHER COMPANY',
+          businessName: 'ANOTHER COMPANY'
         }
       })))
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    
+
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -136,21 +134,17 @@ describe('RegisteringParty store undo test', () => {
     wrapper.destroy()
   })
 
-
-
   it('displays the correct data in the table rows', async () => {
-    
-    
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .registering-row')[0]
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('ABC REGISTERING')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    
+
     expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
   })
 
   it('displays the correct data in the table rows', async () => {
-    let dropButtons = wrapper.findAll('.edit-btn')
+    const dropButtons = wrapper.findAll('.edit-btn')
     expect(dropButtons.length).toBe(1)
     dropButtons.at(0).trigger('click')
     await flushPromises()

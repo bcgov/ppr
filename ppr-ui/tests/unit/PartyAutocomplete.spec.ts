@@ -7,7 +7,7 @@ import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
-import { PartyAutocomplete } from '@/components/parties'
+import { PartyAutocomplete } from '@/components/parties/party'
 
 // Other
 import { SearchPartyIF } from '@/interfaces'
@@ -77,7 +77,6 @@ describe('Secured Party search autocomplete tests', () => {
     expect(wrapper.emitted().selectItem).toBeTruthy()
   })
 })
-
 
 describe('Registering Party search autocomplete tests', () => {
   let wrapper: Wrapper<any>

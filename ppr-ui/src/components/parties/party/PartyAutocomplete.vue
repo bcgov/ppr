@@ -74,11 +74,13 @@
 </template>
 
 <script lang="ts">
+// external libraries
 import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
-import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+// local helpers / types / etc.
 import { useCountriesProvinces } from '@/composables/address/factories'
-import { useSecuredParty } from './composables/useSecuredParty'
+import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes } from '@/enums'
+import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   props: {

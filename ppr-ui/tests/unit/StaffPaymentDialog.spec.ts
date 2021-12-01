@@ -27,10 +27,9 @@ const proceed = 'proceed'
 // Input field selectors / buttons
 const title = '.dialog-title'
 
-
 describe('Payment component', () => {
   let wrapper: any
-  
+
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(CompositionApi)
@@ -60,22 +59,21 @@ describe('Payment component', () => {
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('Staff Payment')
-    
   })
 
   it('Emits the cancel action', async () => {
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, false)
-      await flushPromises()
-      expect(getLastEvent(wrapper, proceed)).toEqual(false)
+    await flushPromises()
+    expect(getLastEvent(wrapper, proceed)).toEqual(false)
   })
 
   it('Emits the submit action', async () => {
     wrapper.vm.valid = true
-    
+
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
     expect(getLastEvent(wrapper, proceed)).toBe(true)
-  })  
+  })
 
   it('updates search certified when checkbox is selected', async () => {
     expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(false)
@@ -83,7 +81,6 @@ describe('Payment component', () => {
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
     expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(true)
-
   })
 
   it('updates store payment info', async () => {

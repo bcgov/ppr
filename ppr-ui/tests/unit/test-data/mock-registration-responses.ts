@@ -102,7 +102,7 @@ export const mockedDraftAmend: DraftResultIF = {
 
 export const mockedRegistration1Collapsed: RegistrationSummaryIF = {
   baseRegistrationNumber: 'GOV2343',
-  changes: [ mockedDraftAmend ],
+  changes: [mockedDraftAmend],
   clientReferenceId: 'ABC123',
   createDateTime: '2021-07-20T17:21:17+00:00',
   expireDays: 500, // Number of days until expiry
@@ -120,7 +120,7 @@ export const mockedRegistration1Collapsed: RegistrationSummaryIF = {
 
 export const mockedRegistration2Collapsed: RegistrationSummaryIF = {
   baseRegistrationNumber: 'BC456788',
-  changes: [ mockedRegistration2Child ],
+  changes: [mockedRegistration2Child],
   clientReferenceId: '',
   createDateTime: '2021-08-20T17:21:17+00:00',
   expireDays: 316,

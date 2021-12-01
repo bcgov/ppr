@@ -5,12 +5,12 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import { mockedRegisteringParty1, mockedSecuredParties1, mockedSecuredParties2 } from './test-data'
+import { mockedRegisteringParty1, mockedSecuredParties2 } from './test-data'
 import { axios as pprAxios } from '@/utils/axios-ppr'
 import sinon from 'sinon'
 
 // Components
-import { EditParty } from '@/components/parties'
+import { EditParty } from '@/components/parties/party'
 
 Vue.use(Vuetify)
 
@@ -179,7 +179,6 @@ describe('Secured Party edit individual tests', () => {
   })
 })
 
-
 describe('Registering party test', () => {
   let wrapper: Wrapper<any>
 
@@ -198,8 +197,5 @@ describe('Registering party test', () => {
     wrapper.vm.$props.setIsRegisteringParty = true
     await Vue.nextTick()
     expect(wrapper.find('.add-party-header').text()).toContain('Registering')
-
   })
-
- 
 })

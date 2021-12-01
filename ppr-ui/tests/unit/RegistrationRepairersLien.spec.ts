@@ -39,7 +39,6 @@ function createComponent (
   })
 }
 
-
 describe('RegistrationLengthTrust RL tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
@@ -81,7 +80,6 @@ describe('RegistrationLengthTrust RL tests', () => {
   })
 })
 
-
 describe('RegistrationLengthTrust RL renewal test', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
@@ -96,7 +94,7 @@ describe('RegistrationLengthTrust RL renewal test', () => {
       surrenderDate: '2021-01-21T08:00:00+00:00',
       lienAmount: ''
     })
-    
+
     wrapper = createComponent(true)
   })
   afterEach(() => {
@@ -110,7 +108,5 @@ describe('RegistrationLengthTrust RL renewal test', () => {
     expect(wrapper.find('#new-expiry-rl').text()).toContain('January 24, 2022')
     // surrender date
     expect(wrapper.find('#surrender-date').text()).toContain('January 21, 2021')
-    
   })
-  
 })

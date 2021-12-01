@@ -135,7 +135,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, onMounted, toRefs, watch } from '@vue/composition-api'
 
 import {
   baseRules,
@@ -196,6 +196,31 @@ export default defineComponent({
 
     const countryProvincesHelpers = useCountriesProvinces()
 
+    const countryChangeHandler = (val: string, oldVal: string) => {
+      // do not trigger any changes if it is view only (summary instance)
+      if (!props.editing) return
+
+      if (val === 'CA') {
+        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
+      } else if (val === 'US') {
+        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
+      } else {
+        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
+      }
+      // reset other address fields (check is for loading an existing address)
+      if (oldVal) {
+        addressLocal.value.street = ''
+        addressLocal.value.streetAdditional = ''
+        addressLocal.value.city = ''
+        addressLocal.value.region = ''
+        addressLocal.value.postalCode = ''
+      }
+    }
+
+    onMounted(() => {
+      countryChangeHandler(addressLocal.value.country, null)
+    })
+
     watch(() => addressLocal.value, (val) => {
       let valid = true
       /** checks each field against the schema rules to see if the address is valid or not
@@ -214,21 +239,7 @@ export default defineComponent({
     }, { immediate: true, deep: true })
 
     watch(() => country.value, (val, oldVal) => {
-      if (val === 'CA') {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
-      } else if (val === 'US') {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
-      } else {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
-      }
-      // reset other address fields (check is for loading an existing address)
-      if (oldVal) {
-        addressLocal.value.street = ''
-        addressLocal.value.streetAdditional = ''
-        addressLocal.value.city = ''
-        addressLocal.value.region = ''
-        addressLocal.value.postalCode = ''
-      }
+      countryChangeHandler(val, oldVal)
     })
 
     watch(() => props.triggerErrors, (val) => {

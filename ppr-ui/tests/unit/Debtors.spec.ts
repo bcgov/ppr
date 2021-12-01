@@ -11,7 +11,7 @@ import {
 } from './test-data'
 
 // Components
-import { Debtors, EditDebtor } from '@/components/parties'
+import { Debtors, EditDebtor } from '@/components/parties/debtor'
 import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
@@ -102,7 +102,6 @@ describe('Debtor store tests', () => {
   })
 })
 
-
 describe('Debtor amendment tests', () => {
   let wrapper: Wrapper<any>
 
@@ -159,9 +158,7 @@ describe('Debtor amendment tests', () => {
     // option from second drop down
     expect(options.at(2).text()).toContain('Remove')
   })
-
 })
-
 
 describe('Debtor validation tests', () => {
   let wrapper: Wrapper<any>
@@ -184,7 +181,7 @@ describe('Debtor validation tests', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .debtor-row')[0]
     expect(item1.querySelectorAll('td')[0].textContent).toContain('DELETED')
   })
-  
+
   it('displays the error', async () => {
     wrapper.vm.$props.setShowInvalid = true
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
@@ -192,7 +189,6 @@ describe('Debtor validation tests', () => {
     await Vue.nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
-
 
   it('goes from valid to invalid', async () => {
     wrapper.vm.$data.debtors = mockedDebtors1
@@ -202,11 +198,9 @@ describe('Debtor validation tests', () => {
     // click the drop down arrow
     wrapper.find('.v-data-table .debtor-row .actions__more-actions__btn').trigger('click')
     await Vue.nextTick()
-    //click remove
+    // click remove
     wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
-
   })
-
 })
