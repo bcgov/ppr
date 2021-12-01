@@ -63,7 +63,6 @@
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
       :isSummary="false"
-      @valid="generalCollateralValid = $event"
     />
   </v-container>
 </template>
@@ -130,7 +129,6 @@ export default defineComponent({
     } = useGeneralCollateral()
 
     const localState = reactive({
-      generalCollateralValid: true,
       summaryView: computed((): boolean => {
         return props.isSummary
       }),
@@ -212,11 +210,7 @@ export default defineComponent({
     })
 
     watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
-      if (
-        vehiclesValid() ||
-        (localState.collateral?.generalCollateral?.length > 0 &&
-          localState.generalCollateralValid)
-      ) {
+      if (vehiclesValid() || localState.collateral?.generalCollateral?.length > 0) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {
@@ -225,10 +219,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     watch(() => localState.collateral.generalCollateral, (val: GeneralCollateralIF[]) => {
-      if (
-        (val?.length > 0 && localState.generalCollateralValid) ||
-        vehiclesValid()
-      ) {
+      if (val?.length > 0 || vehiclesValid()) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {

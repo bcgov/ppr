@@ -58,7 +58,6 @@ describe('GenColEdit tests', () => {
     expect(wrapper.vm.newDesc).toBe('')
     expect(wrapper.vm.generalCollateral).toEqual([])
     expect(wrapper.vm.showErrorComponent).toBe(false)
-    expect(wrapper.vm.valid).toBe(true)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)
     expect(wrapper.findAll(newDescriptionTxt).length).toBe(1)
     expect(wrapper.findAll(errorMsg).length).toBe(0)
@@ -71,7 +70,6 @@ describe('GenColEdit tests', () => {
     await wrapper.find(newDescriptionTxt).setValue('new description')
     expect(wrapper.vm.newDesc).toBe('new description')
     expect(wrapper.vm.generalCollateral).toEqual([{ description: 'new description' }])
-    expect(wrapper.vm.valid).toBe(true)
   })
 
   it('updates new description text with existing general collateral txt in new registration', async () => {
@@ -80,20 +78,20 @@ describe('GenColEdit tests', () => {
     wrapper = createComponent(false)
     expect(wrapper.vm.generalCollateral).toEqual([{ description: 'existing general collateral' }])
     expect(wrapper.vm.newDesc).toBe('existing general collateral')
-    expect(wrapper.vm.valid).toBe(true)
   })
 
-  it('emits validity when changed', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    wrapper = createComponent(false)
-    const invalidTxt = 't'.repeat(4001)
-    await wrapper.find(newDescriptionTxt).setValue(invalidTxt)
-    expect(wrapper.vm.valid).toBe(false)
-    expect(getLastEvent(wrapper, 'valid')).toBe(false)
-    await wrapper.find(newDescriptionTxt).setValue('valid text')
-    expect(wrapper.vm.valid).toBe(true)
-    expect(getLastEvent(wrapper, 'valid')).toBe(true)
-  })
+  // commenting out in case we add something like this back in
+  // it('emits validity when changed', async () => {
+  //   await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+  //   wrapper = createComponent(false)
+  //   const invalidTxt = 't'.repeat(4001)
+  //   await wrapper.find(newDescriptionTxt).setValue(invalidTxt)
+  //   expect(wrapper.vm.valid).toBe(false)
+  //   expect(getLastEvent(wrapper, 'valid')).toBe(false)
+  //   await wrapper.find(newDescriptionTxt).setValue('valid text')
+  //   expect(wrapper.vm.valid).toBe(true)
+  //   expect(getLastEvent(wrapper, 'valid')).toBe(true)
+  // })
 
   it('shows error bar when set', async () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)

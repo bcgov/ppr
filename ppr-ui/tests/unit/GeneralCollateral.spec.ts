@@ -72,9 +72,6 @@ describe('General Collateral tests', () => {
     // updates showInvalid on change
     await wrapper.setProps({ setShowInvalid: true })
     expect(wrapper.findComponent(GenColEdit).vm.$props.showInvalid).toBe(true)
-    // passes validation from edit component
-    wrapper.findComponent(GenColEdit).vm.$emit('valid', false)
-    expect(getLastEvent(wrapper, 'valid')).toBe(false)
   })
 
   it('renders amendment view for amendments', async () => {

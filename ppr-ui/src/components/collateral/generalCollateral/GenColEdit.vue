@@ -14,11 +14,9 @@
             v-model="newDesc"
             id="general-collateral-new-desc"
             auto-grow
-            counter="4000"
             filled
             label="Description of General Collateral"
             class="white pt-2 text-input-field"
-            :error-messages="valid ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
@@ -48,8 +46,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['valid'],
-  setup (props, { emit }) {
+  setup (props) {
     const { getGeneralCollateral } = useGetters<any>(['getGeneralCollateral'])
     const { getRegistrationFlowType } = useGetters<any>(['getRegistrationFlowType'])
     const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
@@ -61,9 +58,6 @@ export default defineComponent({
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
-      }),
-      valid: computed((): boolean => {
-        return (localState.newDesc?.length || 0) <= 4000
       })
     })
 
@@ -77,7 +71,6 @@ export default defineComponent({
 
     watch(() => localState.newDesc, (val: string) => {
       if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
-        emit('valid', localState.valid)
         if (val) {
           setGeneralCollateral([{ description: val }])
         } else {

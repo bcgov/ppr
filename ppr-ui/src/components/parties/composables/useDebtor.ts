@@ -131,7 +131,6 @@ export const useDebtor = (props, context) => {
       newList.splice(props.activeIndex, 1, localState.currentDebtor)
     }
     parties.debtors = newList
-    // collateral.valid = true
     setAddSecuredPartiesAndDebtors(parties)
     context.emit('resetEvent')
   }
