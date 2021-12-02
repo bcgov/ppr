@@ -121,8 +121,8 @@ export default defineComponent({
     const { setCertifyInformation } = useActions<any>([
       'setCertifyInformation'
     ])
-    const { getCertifyInformation } = useGetters<any>([
-      'getCertifyInformation'
+    const { getCertifyInformation, isRoleStaff, isRoleStaffSbc } = useGetters<any>([
+      'getCertifyInformation', 'isRoleStaff', 'isRoleStaffSbc'
     ])
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
@@ -190,23 +190,40 @@ export default defineComponent({
     onMounted(async () => {
       const certifyInfo:CertifyIF = getCertifyInformation.value
       let update:boolean = false
-      if (!certifyInfo.registeringParty) {
+      let email = ''
+      if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
         update = true
         const regParty = await getRegisteringPartyFromAuth()
         if (regParty) {
           certifyInfo.registeringParty = regParty
         }
       }
+
       if (!certifyInfo.legalName) {
         update = true
         try {
           const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
           const decodedToken = JSON.parse(atob(token.split('.')[1]))
           certifyInfo.legalName = decodedToken.firstname + ' ' + decodedToken.lastname
+          email = decodedToken.email
         } catch (e) {
           console.error(e)
         }
       }
+      if (isRoleStaff.value) {
+        if (isRoleStaffSbc.value) {
+          certifyInfo.registeringParty = {
+            businessName: 'SBC Staff',
+            emailAddress: email
+          }
+        } else {
+          certifyInfo.registeringParty = {
+            businessName: 'BC Registries Staff',
+            emailAddress: email
+          }
+        }
+      }
+
       if (update) {
         setCertifyInformation(certifyInfo)
       }
