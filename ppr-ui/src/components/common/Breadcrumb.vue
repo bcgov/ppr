@@ -65,8 +65,8 @@ export default defineComponent({
     const localState = reactive({
       backUrl: computed((): string => {
         const length = localState.breadcrumbs?.length || 0
-        if (length > 0) {
-          return localState.breadcrumbs[length - 1].href || sessionStorage.getItem('BASE_URL')
+        if (length > 1) {
+          return localState.breadcrumbs[length - 2].href || sessionStorage.getItem('REGISTRY_URL')
         }
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
