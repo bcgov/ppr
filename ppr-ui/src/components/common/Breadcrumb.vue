@@ -66,7 +66,6 @@ export default defineComponent({
       backUrl: computed((): string => {
         const length = localState.breadcrumbs?.length || 0
         if (length > 1) {
-          console.log(localState.breadcrumbs[length - 2])
           return localState.breadcrumbs[length - 2].href || sessionStorage.getItem('REGISTRY_URL')
         }
       }),
