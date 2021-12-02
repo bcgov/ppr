@@ -27,11 +27,9 @@
             v-model="delDesc"
             id="general-collateral-delete-desc"
             auto-grow
-            counter="4000"
             filled
             label="Enter the General Collateral to be deleted from this registration."
             class="white pt-2 text-input-field"
-            :error-messages="validDel ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
@@ -46,11 +44,9 @@
             v-model="addDesc"
             id="general-collateral-add-desc"
             auto-grow
-            counter="4000"
             filled
             label="Enter the General Collateral to be added to this registration."
             class="white pt-2 text-input-field"
-            :error-messages="validAdd ? '' : 'Maximum 4000 characters'"
           />
         </v-col>
       </v-row>
@@ -102,7 +98,6 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['valid'],
   setup (props, { emit }) {
     const { getGeneralCollateral } = useGetters<any>([
       'getGeneralCollateral'
@@ -117,12 +112,6 @@ export default defineComponent({
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
-      }),
-      validDel: computed((): boolean => {
-        return (localState.delDesc?.length || 0) <= 4000
-      }),
-      validAdd: computed((): boolean => {
-        return (localState.addDesc?.length || 0) <= 4000
       })
     })
 
@@ -132,7 +121,7 @@ export default defineComponent({
         descriptionAdd: localState.addDesc,
         descriptionDelete: localState.delDesc
       }
-      if ((localState.addDesc || localState.delDesc) && (localState.validDel) && (localState.validAdd)) {
+      if (localState.addDesc || localState.delDesc) {
         if (newGeneralCollateral.length > 0) {
           // if there is no general collateral at the end of the array with a blank date time,
           // we know we are adding
@@ -149,9 +138,7 @@ export default defineComponent({
         }
         setGeneralCollateral(newGeneralCollateral)
       }
-      if ((localState.validDel) && (localState.validAdd)) {
-        emit('closeGenColAmend', true)
-      }
+      emit('closeGenColAmend', true)
     }
 
     const resetFormAndData = () => {

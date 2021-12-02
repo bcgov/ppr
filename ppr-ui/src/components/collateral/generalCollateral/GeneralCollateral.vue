@@ -17,10 +17,7 @@
       />
     </v-container>
     <v-container v-else class="pa-0">
-      <gen-col-edit
-        :showInvalid="showInvalid"
-        @valid="emitValid"
-      />
+      <gen-col-edit :showInvalid="showInvalid" />
     </v-container>
   </div>
 </template>
@@ -56,8 +53,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['valid'],
-  setup (props, { emit }) {
+  setup (props) {
     const {
       getRegistrationFlowType
     } = useGetters<any>(['getRegistrationFlowType'])
@@ -71,12 +67,7 @@ export default defineComponent({
       })
     })
 
-    const emitValid = (valid: boolean) => {
-      emit('valid', valid)
-    }
-
     return {
-      emitValid,
       registrationFlowType,
       RegistrationFlowType,
       ...toRefs(localState)
