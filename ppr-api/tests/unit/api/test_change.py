@@ -20,12 +20,14 @@ import copy
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 from registry_schemas.example_data.ppr import CHANGE_STATEMENT, FINANCING_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
-from tests.unit.services.utils import create_header, create_header_account
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, SBC_OFFICE, BCOL_HELP
+from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
+MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 # prep sample post change statement data
 SAMPLE_JSON = copy.deepcopy(CHANGE_STATEMENT)
 STATEMENT_VALID = {
@@ -238,7 +240,7 @@ TEST_GET_STATEMENT = [
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0001'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0009', 'TEST0002'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0009', 'TEST0002'),
-    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0009', 'TEST0001')
+    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0009', 'TEST0001')
 ]
 
 
@@ -269,7 +271,15 @@ def test_get_change(session, client, jwt, desc, roles, status, has_account, reg_
     """Assert that a get change registration statement works as expected."""
     headers = None
     # setup
-    if has_account:
+    if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
+        headers = create_header_account_report(jwt, roles)
+    elif has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
@@ -294,6 +304,7 @@ def test_get_change(session, client, jwt, desc, roles, status, has_account, reg_
 def test_change_substitute_collateral_success(session, client, jwt):
     """Assert that a valid SU type change statement returns a 200 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     rv1 = create_financing_test(session, client, jwt)
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -319,7 +330,7 @@ def test_change_substitute_collateral_success(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/changes',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -335,6 +346,7 @@ def test_change_substitute_collateral_success(session, client, jwt):
 def test_change_debtor_transfer_success(session, client, jwt):
     """Assert that a valid DT type change statement returns a 200 status."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     rv1 = create_financing_test(session, client, jwt)
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -360,7 +372,7 @@ def test_change_debtor_transfer_success(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/changes',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -386,7 +398,8 @@ def create_financing_test(session, client, jwt):
     del statement['lienAmount']
     del statement['surrenderDate']
 
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     return client.post('/api/v1/financing-statements',
                        json=statement,
-                       headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                       headers=create_header_account(jwt, [PPR_ROLE]),
                        content_type='application/json')

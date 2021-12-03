@@ -36,6 +36,10 @@ PAY_DETAILS_SEARCH = {
     'label': 'Search by SERIAL_NUMBER',
     'value': '123456789'
 }
+PAY_DETAILS_REGISTRATION = {
+    'label': 'Reg Number',
+    'value': '100468B'
+}
 # testdata pattern is ({pay_trans_type}, {quantity}, {filing_type})
 TEST_PAY_TYPE_FILING_TYPE = [
     (TransactionTypes.FINANCING_LIFE_YEAR.value, 5, 'FSREG'),
@@ -59,6 +63,20 @@ TEST_PAY_STAFF_SEARCH = [
     (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, '12345', None, None, False),
     (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, None, '62345', None, False),
     (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, None, '62345', '72345', False)
+]
+# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, 'datNUmber', 'waiveFees')
+TEST_PAY_STAFF_REGISTRATION = [
+    (TransactionTypes.DISCHARGE.value, None, None, None, True),
+    (TransactionTypes.FINANCING_NO_FEE.value, None, None, None, True),
+    (TransactionTypes.FINANCING_INFINITE.value, None, None, None, True),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, None, None, True),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, '12345', None, None, False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', None, False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', '72345', False),
+    (TransactionTypes.RENEWAL_LIFE_YEAR.value, None, None, None, True),
+    (TransactionTypes.AMENDMENT.value, '12345', None, None, False),
+    (TransactionTypes.AMENDMENT.value, None, None, None, True),
+    (TransactionTypes.RENEWAL_INFINITE.value, None, '62345', '72345', False)
 ]
 
 
@@ -126,6 +144,74 @@ def test_payment_staff_search_mock(client, jwt, pay_trans_type, routing_slip, bc
 
     # test
     pay_data = payment.create_payment_staff_search(transaction_info, 'UT-PAY-SEARCH-01')
+    # print(pay_data)
+    # check
+    assert pay_data
+    assert pay_data['invoiceId']
+    assert pay_data['receipt']
+
+
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_REGISTRATION)
+def test_payment_data_staff_registration(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number,
+                                         waive_fees):
+    """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
+    transaction_info = {
+        'transactionType': pay_trans_type,
+        'feeQuantity': 1
+    }
+    if waive_fees:
+        transaction_info['waiveFees'] = True
+    if routing_slip:
+        transaction_info['routingSlipNumber'] = routing_slip
+    if bcol_number:
+        transaction_info['bcolAccountNumber'] = bcol_number
+    if dat_number:
+        transaction_info['datNumber'] = dat_number
+    # test
+    data = SBCPaymentClient.create_payment_staff_registration_data(transaction_info, 'UT-PAY-0001')
+    # check
+    assert data
+    assert len(data['filingInfo']['filingTypes']) == 1
+    assert data['filingInfo']['filingTypes'][0]['filingTypeCode']
+    assert data['filingInfo']['folioNumber'] == 'UT-PAY-0001'
+    if waive_fees:
+        assert 'waiveFees' in data['filingInfo']['filingTypes'][0]
+    else:
+        assert 'waiveFees' not in data['filingInfo']['filingTypes'][0]
+
+    if not routing_slip and not bcol_number:
+        assert 'accountInfo' not in data
+    elif routing_slip:
+        assert 'accountInfo' in data and data['accountInfo']['routingSlip'] == routing_slip
+    elif bcol_number:
+        assert 'accountInfo' in data and data['accountInfo']['bcolAccountNumber'] == bcol_number
+        if dat_number:
+            assert data['accountInfo']['datNumber'] == dat_number
+
+
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_REGISTRATION)
+def test_payment_staff_registration_mock(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number,
+                                         waive_fees):
+    """Assert that a pay-api staff registration payment request works as expected with the mock service endpoint."""
+    # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    payment = Payment(jwt=token, account_id=None, details=PAY_DETAILS_REGISTRATION)
+    payment.api_url = MOCK_URL_NO_KEY
+    transaction_info = {
+        'transactionType': pay_trans_type,
+        'feeQuantity': 1
+    }
+    if waive_fees:
+        transaction_info['waiveFees'] = True
+    if routing_slip:
+        transaction_info['routingSlipNumber'] = routing_slip
+    if bcol_number:
+        transaction_info['bcolAccountNumber'] = bcol_number
+    if dat_number:
+        transaction_info['datNumber'] = dat_number
+
+    # test
+    pay_data = payment.create_payment_staff_registration(transaction_info, 'UT-PAY-SEARCH-01')
     # print(pay_data)
     # check
     assert pay_data
