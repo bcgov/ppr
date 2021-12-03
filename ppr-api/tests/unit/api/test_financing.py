@@ -23,10 +23,10 @@ import pytest
 from flask import current_app
 
 from ppr_api.models import FinancingStatement, Registration
-from ppr_api.resources.financing_statements import get_payment_details, get_payment_details_financing, \
+from ppr_api.resources.utils import get_payment_details, get_payment_details_financing, \
      get_payment_type_financing
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
-from ppr_api.services.payment.payment import TransactionTypes
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
+from ppr_api.services.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -287,7 +287,15 @@ TEST_CREATE_DATA = [
     ('Missing account', FINANCING_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False),
     ('Invalid role', FINANCING_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('BCOL helpdesk account', FINANCING_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True),
-    ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False)
+    ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
+    ('SBC Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True)
+]
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
+TEST_STAFF_CREATE_DATA = [
+    (STAFF_ROLE, None, None, None, HTTPStatus.CREATED),
+    (STAFF_ROLE, '12345', None, None, HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', '111111', HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', None, HTTPStatus.CREATED)
 ]
 # testdata pattern is ({description}, {roles}, {status}, {has_account})
 TEST_GET_LIST = [
@@ -345,7 +353,7 @@ TEST_GET_STATEMENT = [
     ('Invalid discharged non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0014'),
     ('Valid expired staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0013'),
     ('Valid discharged staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0014'),
-    ('Valid Request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0001')
+    ('Invalid request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001')
 ]
 # testdata pattern is ({description}, {registration_number}, {current_state}, {param_value})
 TEST_CURRENT_STATE = [
@@ -421,6 +429,8 @@ def test_create(session, client, jwt, desc, json_data, roles, status, has_accoun
     # setup
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -430,6 +440,31 @@ def test_create(session, client, jwt, desc, json_data, roles, status, has_accoun
     response = client.post('/api/v1/financing-statements',
                            json=json_data,
                            headers=headers,
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_CREATE_DATA)
+def test_create_staff(session, client, jwt, role, routing_slip, bcol_number, dat_number, status):
+    """Assert that a post staff payment financing statement registration works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    json_data = copy.deepcopy(FINANCING_VALID)
+    params = ''
+    if routing_slip:
+        params = '?routingSlipNumber=' + str(routing_slip)
+    elif bcol_number:
+        params = '?bcolAccountNumber=' + str(bcol_number)
+        if dat_number:
+            params += '&datNumber=' + str(dat_number)
+    # print('params=' + params)
+
+    # test
+    response = client.post('/api/v1/financing-statements' + params,
+                           json=json_data,
+                           headers=create_header_account(jwt, [PPR_ROLE, role], 'test-user', role),
                            content_type='application/json')
 
     # check
@@ -561,6 +596,12 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
     # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
         headers = create_header_account_report(jwt, roles)
+    elif has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -572,64 +613,6 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
 
     # check
     assert response.status_code == status
-
-
-# testdata pattern is ({reg_type}, {registration_number}, {detail_desc}, {life})
-@pytest.mark.parametrize('reg_type,reg_num,detail_desc,life', TEST_PAY_DETAILS_FINANCING)
-def test_get_payment_details_financing(session, client, jwt, reg_type, reg_num, detail_desc, life):
-    """Assert that a valid financing statement request payment details setup works as expected."""
-    # setup
-    json_data = copy.deepcopy(FINANCING_VALID)
-    json_data['type'] = reg_type
-    json_data['lifeYears'] = life
-    statement = FinancingStatement.create_from_json(json_data, 'PS12345', 'TESTID')
-    statement.registration[0].registration_num = reg_num
-    # test
-    details = get_payment_details_financing(statement.registration[0])
-
-    # check
-    # print(details)
-    assert details
-    assert details['label'] == 'Register Financing Statement ' + reg_num + ' Type:'
-    assert details['value'] == detail_desc
-
-
-@pytest.mark.parametrize('reg_type,reg_class,reg_num,label,value, life', TEST_PAY_DETAILS_REGISTRATION)
-def test_get_payment_details(session, client, jwt, reg_type, reg_class, reg_num, label, value, life):
-    """Assert that a valid registration statement request payment details setup works as expected."""
-    # setup
-    registration = Registration()
-    registration.base_registration_num = reg_num
-    registration.registration_type = reg_type
-    registration.registration_type_cl = reg_class
-    registration.life = life
-    # test
-    details = get_payment_details(registration)
-
-    # check
-    assert details
-    assert details['label'] == label
-    assert details['value'] == value
-
-
-@pytest.mark.parametrize('reg_type,life_years,quantity,pay_trans_type', TEST_PAY_TYPE_FINANCING)
-def test_get_payment_type_financing(session, client, jwt, reg_type, life_years, quantity, pay_trans_type):
-    """Assert that a valid financing statement request payment transaction type setup works as expected."""
-    # setup
-    json = copy.deepcopy(FINANCING_VALID)
-    json['type'] = reg_type
-    if life_years == 99:
-        json['lifeYears'] = 1
-        json['lifeInfinite'] = True
-    else:
-        json['lifeYears'] = life_years
-    statement = FinancingStatement.create_from_json(json, 'PS12345')
-
-    pay_type, pay_quantity = get_payment_type_financing(statement.registration[0])
-    assert pay_type
-    assert pay_quantity
-    assert pay_type == pay_trans_type
-    assert pay_quantity == quantity
 
 
 def test_get_account_registrations_collapsed(session, client, jwt):
@@ -707,3 +690,61 @@ def test_get_debtor_names(session, client, jwt, desc, roles, status, has_account
             assert json_data
             assert len(json_data) > 0
         # print(json_data)
+
+
+# testdata pattern is ({reg_type}, {registration_number}, {detail_desc}, {life})
+@pytest.mark.parametrize('reg_type,reg_num,detail_desc,life', TEST_PAY_DETAILS_FINANCING)
+def test_get_payment_details_financing(session, client, jwt, reg_type, reg_num, detail_desc, life):
+    """Assert that a valid financing statement request payment details setup works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING_VALID)
+    json_data['type'] = reg_type
+    json_data['lifeYears'] = life
+    statement = FinancingStatement.create_from_json(json_data, 'PS12345', 'TESTID')
+    statement.registration[0].registration_num = reg_num
+    # test
+    details = get_payment_details_financing(statement.registration[0])
+
+    # check
+    # print(details)
+    assert details
+    assert details['label'] == 'Register Financing Statement ' + reg_num + ' Type:'
+    assert details['value'] == detail_desc
+
+
+@pytest.mark.parametrize('reg_type,reg_class,reg_num,label,value, life', TEST_PAY_DETAILS_REGISTRATION)
+def test_get_payment_details(session, client, jwt, reg_type, reg_class, reg_num, label, value, life):
+    """Assert that a valid registration statement request payment details setup works as expected."""
+    # setup
+    registration = Registration()
+    registration.base_registration_num = reg_num
+    registration.registration_type = reg_type
+    registration.registration_type_cl = reg_class
+    registration.life = life
+    # test
+    details = get_payment_details(registration)
+
+    # check
+    assert details
+    assert details['label'] == label
+    assert details['value'] == value
+
+
+@pytest.mark.parametrize('reg_type,life_years,quantity,pay_trans_type', TEST_PAY_TYPE_FINANCING)
+def test_get_payment_type_financing(session, client, jwt, reg_type, life_years, quantity, pay_trans_type):
+    """Assert that a valid financing statement request payment transaction type setup works as expected."""
+    # setup
+    json = copy.deepcopy(FINANCING_VALID)
+    json['type'] = reg_type
+    if life_years == 99:
+        json['lifeYears'] = 1
+        json['lifeInfinite'] = True
+    else:
+        json['lifeYears'] = life_years
+    statement = FinancingStatement.create_from_json(json, 'PS12345')
+
+    pay_type, pay_quantity = get_payment_type_financing(statement.registration[0])
+    assert pay_type
+    assert pay_quantity
+    assert pay_type == pay_trans_type
+    assert pay_quantity == quantity

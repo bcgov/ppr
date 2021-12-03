@@ -15,11 +15,13 @@
 
 from http import HTTPStatus
 
-from flask import jsonify, current_app
+from flask import jsonify, current_app, request
 
 from ppr_api.exceptions import BusinessException
+from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs
+from ppr_api.services.payment import TransactionTypes
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
 
@@ -31,6 +33,11 @@ ACCOUNT_ACCESS = 'The account ID {account_id} cannot access statement informatio
                  'registration number {registration_num}.'
 PARTY_REGISTERING = 'RG'
 PARTY_SECURED = 'SP'
+
+CERTIFIED_PARAM = 'certified'
+ROUTING_SLIP_PARAM = 'routingSlipNumber'
+DAT_NUMBER_PARAM = 'datNumber'
+BCOL_NUMBER_PARAM = 'bcolAccountNumber'
 
 
 def serialize(errors):
@@ -269,3 +276,100 @@ def no_fee_amendment(registration_type: str) -> bool:
                                           CrownChargeTypes.MINING_TAX.value):
             return True
     return False
+
+
+def build_staff_registration_payment(req: request, pay_trans_type: str, fee_quantity: int):
+    """Extract payment information from request parameters."""
+    payment_info = {
+        'transactionType': pay_trans_type,
+        'feeQuantity': fee_quantity,
+        'waiveFees': False
+    }
+
+    routing_slip = req.args.get(ROUTING_SLIP_PARAM)
+    bcol_number = req.args.get(BCOL_NUMBER_PARAM)
+    dat_number = req.args.get(DAT_NUMBER_PARAM)
+    if routing_slip is not None:
+        payment_info[ROUTING_SLIP_PARAM] = str(routing_slip)
+    if bcol_number is not None:
+        payment_info[BCOL_NUMBER_PARAM] = str(bcol_number)
+    if dat_number is not None:
+        payment_info[DAT_NUMBER_PARAM] = str(dat_number)
+    if not routing_slip and not bcol_number:
+        payment_info['waiveFees'] = True
+
+    return payment_info
+
+
+def get_payment_details(registration):
+    """Extract the payment details value from the registration request."""
+    label = ' Registration:'
+    value = registration.base_registration_num
+    if registration.registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
+        label = 'Discharge' + label
+    elif registration.registration_type_cl == model_utils.REG_CLASS_RENEWAL:
+        label = 'Renew' + label
+        value += ' for '
+        if registration.life == 0:
+            value += str(model_utils.REPAIRER_LIEN_DAYS) + ' days'
+        elif registration.life == model_utils.LIFE_INFINITE:
+            value += 'infinity'
+        elif registration.life == 1:
+            value += str(registration.life) + ' year'
+        else:
+            value += str(registration.life) + ' years'
+    elif registration.registration_type_cl == model_utils.REG_CLASS_AMEND:
+        label = 'Amendment of' + label
+    elif registration.registration_type_cl == model_utils.REG_CLASS_AMEND_COURT:
+        label = 'Court Order Amendment of' + label
+    elif registration.registration_type_cl == model_utils.REG_CLASS_CHANGE:
+        label = 'Change' + label
+
+    details = {
+        'label': label,
+        'value': value
+    }
+    return details
+
+
+def get_payment_type_financing(registration):
+    """Derive the payment transaction type and quantity from the financing statement registration type or class."""
+    pay_trans_type = TransactionTypes.FINANCING_LIFE_YEAR.value
+    fee_quantity = registration.life
+    if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
+        pay_trans_type = TransactionTypes.FINANCING_NO_FEE.value
+        fee_quantity = 1
+    elif registration.registration_type in (model_utils.REG_TYPE_LAND_TAX_MH, model_utils.REG_TYPE_TAX_MH):
+        pay_trans_type = TransactionTypes.FINANCING_NO_FEE.value
+        fee_quantity = 1
+    elif registration.registration_type == model_utils.REG_TYPE_MARRIAGE_SEPARATION:
+        pay_trans_type = TransactionTypes.FINANCING_FR.value
+        fee_quantity = 1
+    elif registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+        fee_quantity = 1
+    elif registration.life == model_utils.LIFE_INFINITE:
+        pay_trans_type = TransactionTypes.FINANCING_INFINITE.value
+        fee_quantity = 1
+    return pay_trans_type, fee_quantity
+
+
+def get_payment_details_financing(registration):
+    """Extract the payment details value from the request financing statement."""
+    length = ' Length: '
+    if registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+        length += str(model_utils.REPAIRER_LIEN_DAYS) + ' days'
+    elif registration.life == model_utils.LIFE_INFINITE:
+        length += 'infinite'
+    elif registration.life == 1:
+        length += str(registration.life) + ' year'
+    else:
+        length += str(registration.life) + ' years'
+
+    if not registration.reg_type:
+        registration.get_registration_type()
+
+    details = {
+        'label': 'Register Financing Statement ' + registration.registration_num + ' Type:',
+        'value': registration.reg_type.registration_desc + length
+    }
+    return details

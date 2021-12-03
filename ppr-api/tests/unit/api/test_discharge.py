@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -164,7 +164,9 @@ TEST_CREATE_DATA = [
     ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
-    ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
+    ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
+    ('Valid SBC office role', STATEMENT_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True, 'TEST0001'),
+    ('Valid Staff role', STATEMENT_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, 'TEST0001'),
 ]
 
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num}, {base_reg_num})
@@ -178,7 +180,7 @@ TEST_GET_STATEMENT = [
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0014'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0D14', 'TEST0001'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0001'),
-    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0D14', 'TEST0014')
+    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0D14', 'TEST0014')
 ]
 
 
@@ -187,8 +189,13 @@ def test_create_discharge(session, client, jwt, desc, json_data, roles, status, 
     """Assert that a post discharge registration statement works as expected."""
     headers = None
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -207,11 +214,17 @@ def test_create_discharge(session, client, jwt, desc, json_data, roles, status, 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
 def test_get_discharge(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get discharge registration statement works as expected."""
-    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
         headers = create_header_account_report(jwt, roles)
+    elif has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -251,7 +264,7 @@ def test_discharge_success(session, client, jwt):
 
     rv1 = client.post('/api/v1/financing-statements',
                       json=statement,
-                      headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                      headers=create_header_account(jwt, [PPR_ROLE]),
                       content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
     assert rv1.json['baseRegistrationNumber']
@@ -265,7 +278,7 @@ def test_discharge_success(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/discharges',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED

@@ -20,6 +20,7 @@ import json
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
+from ppr_api.services.authz import is_staff_account
 
 from .db import db
 from .draft import Draft
@@ -425,7 +426,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         if not registering_name:
                             registering_name = ''
                         result = {
-                            'account_id': str(mapping['account_id']),
+                            'accountId': str(mapping['account_id']),
                             'registrationNumber': reg_num,
                             'baseRegistrationNumber': base_reg_num,
                             'createDateTime': model_utils.format_ts(mapping['registration_ts']),
@@ -453,10 +454,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                             result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
+                        result = Registration.__update_summary_optional(result, account_id)
                         # Set if user can access verification statement.
                         if not Registration.can_access_report(account_id, account_name, result):
                             result['path'] = ''
-                        result = Registration.__update_summary_optional(result)
 
                         if collapse and not model_utils.is_financing(reg_class):
                             registrations_json.append(result)
@@ -525,7 +526,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                 elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                     result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
-                result = Registration.__update_summary_optional(result)
+                result = Registration.__update_summary_optional(result, account_id)
                 if not model_utils.is_financing(reg_class):
                     changes.append(result)
         if not result:
@@ -537,8 +538,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def can_access_report(account_id: str, account_name: str, reg_json) -> bool:
         """Determine if request account can view the registration verification statement."""
-        reg_account_id = reg_json['account_id']
-        del reg_json['account_id']  # Only use this for report access checking.
+        # All staff roles can see any verification statement.
+        if is_staff_account(account_id):
+            return True
+        reg_account_id = reg_json['accountId']
+        del reg_json['accountId']  # Only use this for report access checking.
         if account_id == reg_account_id:
             return True
         if account_name:
@@ -550,10 +554,14 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return False
 
     @staticmethod
-    def __update_summary_optional(reg_json):
+    def __update_summary_optional(reg_json, account_id: str):
         """Single summary result replace optional property 'None' with ''."""
         if not reg_json['registeringName'] or reg_json['registeringName'].lower() == 'none':
             reg_json['registeringName'] = ''
+        # Only staff role or matching account includes registeringName
+        elif not is_staff_account(account_id) and 'accountId' in reg_json and account_id != reg_json['accountId']:
+            reg_json['registeringName'] = ''
+
         if not reg_json['clientReferenceId'] or reg_json['clientReferenceId'].lower() == 'none':
             reg_json['clientReferenceId'] = ''
         return reg_json

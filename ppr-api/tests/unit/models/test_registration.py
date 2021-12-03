@@ -32,6 +32,7 @@ from registry_schemas.example_data.ppr import (
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import Draft, GeneralCollateralLegacy, FinancingStatement, Registration, utils as model_utils
+from ppr_api.services.authz import STAFF_ROLE
 
 
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
@@ -48,7 +49,7 @@ TEST_REGISTRATION_NUMBER_DATA = [
     ('Mismatch registration numbers staff', 'TEST00R5', 'PS12345', HTTPStatus.OK, True, 'TEST0001'),
     ('Discharged staff', 'TEST0D14', 'PS12345', HTTPStatus.OK, True, 'TEST0014')
 ]
-# testdata pattern is ({description}, {account ID}, {collapse results}, {user_added_reg_num})
+# testdata pattern is ({description}, {account ID}, {collapse results}, {user_added_reg_num}, {user_removed_reg_num})
 TEST_ACCOUNT_REGISTRATION_DATA = [
     ('Default registration format user added', 'PS12345', False, 'TEST0019', None),
     ('Collapsed parent/child registration format user added', 'PS12345', True, 'TEST0019', None),
@@ -110,6 +111,21 @@ TEST_ACCOUNT_REPORT_ACCESS_DATA = [
     ('PS12345', 'PS1234X', None, 'TEST_NAME', 'DIFF1, DIFF2, DIFF3', False),
     ('PS12345', 'PS1234X', 'TEST NAME', 'TEST NAME', 'DIFF1, DIFF2, DIFF3', True),
     ('PS12345', 'PS1234X', 'TEST NAME', 'DIFF', 'DIFF1, DIFF2, TEST NAME', True)
+]
+# testdata pattern is ({reg_num}, {account ID}, {has_data})
+TEST_STAFF_ACCOUNT_ACCESS_DATA = [
+    ('TEST0019', 'PS12345', False),
+    ('TEST0021', 'PS12345', False),
+    ('TEST0021AM', 'PS12345', False),
+    ('TEST0021DC', 'PS12345', False),
+    ('TEST0021RE', 'PS12345', False),
+    ('TEST0019', STAFF_ROLE, True),
+    ('TEST0021', STAFF_ROLE, True),
+    ('TEST0021AM', STAFF_ROLE, True),
+    ('TEST0021DC', STAFF_ROLE, True),
+    ('TEST0021RE', STAFF_ROLE, True),
+    ('TEST0001', 'PS12345', True),
+    ('TEST00R6', 'PS12345', True)
 ]
 
 
@@ -248,15 +264,10 @@ def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''
-        else:
+        elif statement['baseRegistrationNumber'] not in ('TEST0019', 'TEST0021'):
+            assert statement['path']
             assert statement['registeringName']
             assert statement['clientReferenceId']
-        if statement['registrationNumber'] in ('TEST0019'):
-            assert not statement['path']
-        elif 'baseRegistrationNumber' in statement and statement['baseRegistrationNumber'] == 'TEST0019':
-            assert not statement['path']
-        else:
-            assert statement['path']
         if statement['registrationClass'] not in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
             assert statement['baseRegistrationNumber']
         if not collapse or statement['registrationClass'] in ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN'):
@@ -294,13 +305,10 @@ def test_find_summary_by_reg_num(session, reg_num, account_id, result_count, exi
         assert registration['statusType'] == 'ACT'
         assert registration['createDateTime']
         assert registration['lastUpdateDateTime']
-        assert registration['registeringName']
-        assert registration['path']
         assert registration['expireDays']
         assert registration['registeringParty']
         assert registration['securedParties']
         assert registration['baseRegistrationNumber'] == reg_num
-        assert registration['accountId']
         assert registration['existsCount'] == exist_count
         assert registration['inUserList'] == in_user_list
         if change_count == 0:
@@ -850,7 +858,7 @@ def test_verification_json(session, base_reg_num, reg_num, reg_num_name):
 def test_can_access_report(session, user_account_id, reg_account_id, account_name, rp_name, sp_names, can_access):
     """Assert that registration can access report check works as expected."""
     json_data = {
-        'account_id': reg_account_id,
+        'accountId': reg_account_id,
         'registeringParty': rp_name,
         'securedParties': sp_names
     }
@@ -920,3 +928,27 @@ def test_create_from_json(session, change_type, is_general_collateral):
                                                  'TEST0001',
                                                  'PS12345')
     assert registration.registration_type == change_type
+
+
+@pytest.mark.parametrize('reg_num,account_id,has_data', TEST_STAFF_ACCOUNT_ACCESS_DATA)
+def test_account_registering_name(session, reg_num, account_id, has_data):
+    """Assert that account registrations conditional registering name value for staff works as expected."""
+    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing')
+    for result in results:
+        if result['registrationNumber'] == reg_num:
+            if has_data:
+                assert result['registeringName']
+            else:
+                assert 'registeringName' in result and not result['registeringName']
+
+
+@pytest.mark.parametrize('reg_num,account_id,has_data', TEST_STAFF_ACCOUNT_ACCESS_DATA)
+def test_account_path(session, reg_num, account_id, has_data):
+    """Assert that account registrations conditional verfiication statement value for staff works as expected."""
+    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing')
+    for result in results:
+        if result['registrationNumber'] == reg_num:
+            if has_data:
+                assert result['path']
+            else:
+                assert 'path' in result and not result['path']

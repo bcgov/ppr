@@ -24,8 +24,8 @@ from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import FinancingStatement, Registration, utils as model_utils
-from ppr_api.resources.financing_statements import get_payment_details
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
+from ppr_api.resources.utils import get_payment_details
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -254,7 +254,15 @@ TEST_CREATE_DATA = [
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
-    ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False, 'TEST0017')
+    ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
+    ('SBC staff renewal', STATEMENT_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True, 'TEST0001')
+]
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
+TEST_STAFF_CREATE_DATA = [
+    (STAFF_ROLE, None, None, None, HTTPStatus.CREATED),
+    (STAFF_ROLE, '12345', None, None, HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', '111111', HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', None, HTTPStatus.CREATED)
 ]
 
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num}, {base_reg_num})
@@ -268,7 +276,7 @@ TEST_GET_STATEMENT = [
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0005'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST00R5', 'TEST0001'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0001'),
-    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST00R5', 'TEST0005')
+    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST00R5', 'TEST0005')
 ]
 
 
@@ -277,8 +285,11 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
     """Assert that a post renewal registration statement works as expected."""
     headers = None
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -294,6 +305,31 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
     assert response.status_code == status
 
 
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_CREATE_DATA)
+def test_create_renewal_staff(session, client, jwt, role, routing_slip, bcol_number, dat_number, status):
+    """Assert that a post renewal registration statement works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    json_data = copy.deepcopy(STATEMENT_VALID)
+    params = ''
+    if routing_slip:
+        params = '?routingSlipNumber=' + str(routing_slip)
+    elif bcol_number:
+        params = '?bcolAccountNumber=' + str(bcol_number)
+        if dat_number:
+            params += '&datNumber=' + str(dat_number)
+    # print('params=' + params)
+
+    # test
+    response = client.post('/api/v1/financing-statements/TEST0001/renewals' + params,
+                           json=json_data,
+                           headers=create_header_account(jwt, [PPR_ROLE, role], 'test-user', role),
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == status
+
+
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
 def test_get_renewal(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get renewal registration statement works as expected."""
@@ -302,6 +338,12 @@ def test_get_renewal(session, client, jwt, desc, roles, status, has_account, reg
     # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
         headers = create_header_account_report(jwt, roles)
+    elif has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -341,7 +383,7 @@ def test_renewal_sa_success(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/renewals',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
@@ -392,7 +434,8 @@ def create_financing_test(session, client, jwt, type):
         del statement['trustIndenture']
         statement['lifeYears'] = 1
         statement['surrenderDate'] = model_utils.format_ts(model_utils.now_ts())
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     return client.post('/api/v1/financing-statements',
                        json=statement,
-                       headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                       headers=create_header_account(jwt, [PPR_ROLE]),
                        content_type='application/json')

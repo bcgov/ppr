@@ -238,7 +238,10 @@ class BaseClient:
                 )
 
             if response:
-                current_app.logger.info('Account ' + self.account_id + ' pay api response=' + response.text)
+                if self.account_id:
+                    current_app.logger.info('Account ' + self.account_id + ' pay api response=' + response.text)
+                else:
+                    current_app.logger.info('Pay api response=' + response.text)
             if not response.ok:
                 raise ApiRequestError(response, str(response.status_code) + ': ' + response.text)
 
@@ -270,6 +273,42 @@ class SBCPaymentClient(BaseClient):
         else:
             del data['filingInfo']['folioNumber']
 
+        return data
+
+    @staticmethod
+    def create_payment_staff_registration_data(transaction_info, client_reference_id=None):
+        """Build the payment-request body formatted as JSON."""
+        data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
+        filing_type = TRANSACTION_TO_FILING_TYPE[transaction_info['transactionType']]
+        data['filingInfo']['filingTypes'][0]['filingTypeCode'] = filing_type
+        if transaction_info['feeQuantity'] != 1:
+            data['filingInfo']['filingTypes'][0]['quantity'] = transaction_info['feeQuantity']
+        if 'transaction_id' in transaction_info:
+            data['filingInfo']['filingIdentifier'] = transaction_info['transaction_id']
+        else:
+            del data['filingInfo']['filingIdentifier']
+
+        if client_reference_id:
+            data['filingInfo']['folioNumber'] = client_reference_id
+        else:
+            del data['filingInfo']['folioNumber']
+
+        if 'waiveFees' in transaction_info and transaction_info['waiveFees']:
+            data['filingInfo']['filingTypes'][0]['waiveFees'] = True
+        # set up FAS payment
+        elif 'routingSlipNumber' in transaction_info:
+            account_info = {
+                'routingSlip': transaction_info['routingSlipNumber']
+            }
+            data['accountInfo'] = account_info
+        # setup BCOL account payment
+        elif 'bcolAccountNumber' in transaction_info:
+            account_info = {
+                'bcolAccountNumber': transaction_info['bcolAccountNumber']
+            }
+            if 'datNumber' in transaction_info:
+                account_info['datNumber'] = transaction_info['datNumber']
+            data['accountInfo'] = account_info
         return data
 
     @staticmethod
@@ -338,7 +377,19 @@ class SBCPaymentClient(BaseClient):
             del data['details']
         current_app.logger.debug('staff search create payment payload for account: ' + self.account_id)
         current_app.logger.debug(json.dumps(data))
-        # self.account_id = None
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
+
+    def create_payment_staff_registration(self, transaction_info, client_reference_id=None):
+        """Submit a staff registration payment request for the PPR API transaction."""
+        data = SBCPaymentClient.create_payment_staff_registration_data(transaction_info, client_reference_id)
+        if self.detail_label and self.detail_value:
+            data['details'][0]['label'] = self.detail_label
+            data['details'][0]['value'] = self.detail_value
+        else:
+            del data['details']
+        current_app.logger.debug('staff registration create payment payload: ')
+        current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 

@@ -13,32 +13,10 @@
 # limitations under the License.
 """This module exposes all pay-api operations used by the PPR api."""
 
-from enum import Enum
-
 from flask import current_app
 
 from .client import SBCPaymentClient
 from .exceptions import SBCPaymentException
-
-
-class TransactionTypes(Enum):
-    """Derive payment request filing type from transaction type."""
-
-    AMENDMENT = 'AMENDMENT'
-    AMENDMENT_NO_FEE = 'AMENDMENT_NO_FEE'
-    CHANGE = 'CHANGE'
-    DISCHARGE = 'DISCHARGE'
-    FINANCING_FR = 'FINANCING_FR'  # Special flat rate fee for FR registration type.
-    FINANCING_INFINITE = 'FINANCING_INFINITE'
-    FINANCING_LIFE_YEAR = 'FINANCING_LIFE_YEAR'
-    FINANCING_NO_FEE = 'FINANCING_NO_FEE'  # No Charge fee for LT, MH, MISCLIEN class, CROWNLIEN class.
-    RENEWAL_INFINITE = 'RENEWAL_INFINITE'
-    RENEWAL_LIFE_YEAR = 'RENEWAL_LIFE_YEAR'
-    SEARCH = 'SEARCH'
-    SEARCH_STAFF = 'SEARCH_STAFF'
-    SEARCH_STAFF_NO_FEE = 'SEARCH_STAFF_NO_FEE'
-    SEARCH_STAFF_CERTIFIED = 'SEARCH_STAFF_CERTIFIED'
-    SEARCH_STAFF_CERTIFIED_NO_FEE = 'SEARCH_STAFF_CERTIFIED_NO_FEE'
 
 
 class Payment:
@@ -110,6 +88,27 @@ class Payment:
             if self.api_url:
                 api_instance.api_url = self.api_url
             api_response = api_instance.create_payment_staff_search(transaction_info, client_reference_id)
+            current_app.logger.debug(api_response)
+            return api_response
+
+        except Exception as err:  # noqa: B902; wrapping exception
+            raise SBCPaymentException(err)
+
+    def create_payment_staff_registration(self, transaction_info, client_reference_id=None):
+        """Submit a staff payment request for the transaction_info. Token must have a reg staff role.
+
+        Payment info transaction type is one of the Payment TransactionTypes.
+        Client reference ID if present maps to the pay api folio number.
+        Detail_label and detail_value if they exist will show up on the account transaction report.
+        """
+        try:
+            api_instance = SBCPaymentClient(self.jwt,
+                                            None,
+                                            self.api_key,
+                                            self.details)
+            if self.api_url:
+                api_instance.api_url = self.api_url
+            api_response = api_instance.create_payment_staff_registration(transaction_info, client_reference_id)
             current_app.logger.debug(api_response)
             return api_response
 

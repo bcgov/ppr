@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, FINANCING_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
 from ppr_api.models import utils as model_utils
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
@@ -257,9 +257,16 @@ TEST_CREATE_DATA = [
     ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
+    ('SBC staff account', STATEMENT_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
 ]
-
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
+TEST_STAFF_CREATE_DATA = [
+    (STAFF_ROLE, None, None, None, HTTPStatus.CREATED),
+    (STAFF_ROLE, '12345', None, None, HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', '111111', HTTPStatus.CREATED),
+    (STAFF_ROLE, None, '654321', None, HTTPStatus.CREATED)
+]
 # testdata pattern is ({description}, {roles}, {status}, {has_account}, {reg_num}, {base_reg_num})
 TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0007', 'TEST0001'),
@@ -271,7 +278,7 @@ TEST_GET_STATEMENT = [
     ('Invalid Registration Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXXXX', 'TEST0001'),
     ('Mismatch registrations non-staff', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0007', 'TEST0002'),
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0002'),
-    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, False, 'TEST0007', 'TEST0001')
+    ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0007', 'TEST0001')
 ]
 TEST_DATA_AMENDMENT_CHANGE_TYPE = [
     (model_utils.REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL, False),
@@ -288,8 +295,13 @@ def test_create_amendment(session, client, jwt, desc, json_data, roles, status, 
     """Assert that a post amendment registration statement works as expected."""
     headers = None
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -307,6 +319,31 @@ def test_create_amendment(session, client, jwt, desc, json_data, roles, status, 
     assert response.status_code == status
 
 
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_CREATE_DATA)
+def test_create_amendment_staff(session, client, jwt, role, routing_slip, bcol_number, dat_number, status):
+    """Assert that a post amendment staff payment registration works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    json_data = copy.deepcopy(STATEMENT_VALID)
+    params = ''
+    if routing_slip:
+        params = '?routingSlipNumber=' + str(routing_slip)
+    elif bcol_number:
+        params = '?bcolAccountNumber=' + str(bcol_number)
+        if dat_number:
+            params += '&datNumber=' + str(dat_number)
+    print('params=' + params)
+
+    # test
+    response = client.post('/api/v1/financing-statements/TEST0001/amendments' + params,
+                           json=json_data,
+                           headers=create_header_account(jwt, [PPR_ROLE, role], 'test-user', role),
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == status
+
+
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
 def test_get_amendment(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get amendment registration statement works as expected."""
@@ -315,6 +352,12 @@ def test_get_amendment(session, client, jwt, desc, roles, status, has_account, r
     # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
         headers = create_header_account_report(jwt, roles)
+    elif has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -369,7 +412,7 @@ def test_amendment_court_order_success(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/amendments',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -415,7 +458,7 @@ def test_amendment_success(session, client, jwt):
     # test
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/amendments',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check
@@ -501,7 +544,7 @@ def test_change_types(session, client, jwt, change_type, is_general_collateral):
 
     rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/amendments',
                      json=json_data,
-                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                     headers=create_header_account(jwt, [PPR_ROLE]),
                      content_type='application/json')
     # check
     # print(rv.json)
@@ -521,8 +564,9 @@ def create_financing_test(session, client, jwt):
     del statement['lifeInfinite']
     del statement['lienAmount']
     del statement['surrenderDate']
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
 
     return client.post('/api/v1/financing-statements',
                        json=statement,
-                       headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
+                       headers=create_header_account(jwt, [PPR_ROLE]),
                        content_type='application/json')
