@@ -161,6 +161,12 @@ class _Config():  # pylint: disable=too-few-public-methods
     ACCOUNT_DRAFTS_MAX_RESULTS = os.getenv('ACCOUNT_DRAFTS_MAX_RESULTS', '1000')
     ACCOUNT_SEARCH_MAX_RESULTS = os.getenv('ACCOUNT_SEARCH_MAX_RESULTS', '1000')
 
+    # DEBTOR search trgram similarity quotients
+    SIMILARITY_QUOTIENT_BUSINESS_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_BUSINESS_NAME', '0.8'))
+    SIMILARITY_QUOTIENT_FIRST_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_FIRST_NAME', '0.23'))
+    SIMILARITY_QUOTIENT_LAST_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_LAST_NAME', '0.29'))
+    SIMILARITY_QUOTIENT_DEFAULT: float = float(os.getenv('SIMILARITY_QUOTIENT_DEFAULT', '0.5'))
+
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""

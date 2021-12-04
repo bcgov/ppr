@@ -108,8 +108,9 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND (SELECT searchkey_business_name(:query_bus_name)) <% p.business_srch_key
-   AND word_similarity(p.business_srch_key, (SELECT searchkey_business_name(:query_bus_name))) >= .60
+   AND (SIMILARITY(:query_bus_name, p.business_srch_key) >= :query_bus_quotient AND
+        (SUBSTR(:query_bus_name, 1, 1) = SUBSTR(p.business_name, 1, 1) OR 
+         p.business_srch_key = :query_bus_name))
 ORDER BY match_type, p.business_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
@@ -132,7 +133,8 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first))) 
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
+                                                           :query_first_quotient, :query_default_quotient))) 
 ORDER BY match_type, p.last_name, p.first_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
@@ -157,7 +159,8 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first))) 
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
+                                                           :query_first_quotient, :query_default_quotient))) 
 ORDER BY match_type, p.last_name, p.first_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
@@ -177,8 +180,9 @@ SELECT COUNT(r.id) AS query_count
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND (SELECT searchkey_business_name(:query_bus_name)) <% p.business_srch_key
-   AND word_similarity(p.business_srch_key, (SELECT searchkey_business_name(:query_bus_name))) >= .60
+   AND (SIMILARITY(:query_bus_name, p.business_srch_key) >= :query_bus_quotient AND
+        (SUBSTR(:query_bus_name, 1, 1) = SUBSTR(p.business_name, 1, 1) OR 
+         p.business_srch_key = :query_bus_name))
 """
 
 INDIVIDUAL_NAME_TOTAL_COUNT = """
@@ -196,7 +200,8 @@ SELECT COUNT(r.id) AS query_count
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first)))
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
+                                                           :query_first_quotient, :query_default_quotient))) 
 """
 
 SERIAL_SEARCH_COUNT_BASE = """

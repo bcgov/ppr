@@ -201,7 +201,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
         result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
                                     {'query_bus_name': search_value.strip().upper(),
-                                     'max_results_size': max_results_size})
+                                     'max_results_size': max_results_size,
+                                     'query_bus_quotient': current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -236,6 +237,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         middle_name = None
         last_name = self.request_json['criteria']['debtorName']['last']
         first_name = self.request_json['criteria']['debtorName']['first']
+        quotient_first = current_app.config.get('SIMILARITY_QUOTIENT_FIRST_NAME')
+        quotient_last = current_app.config.get('SIMILARITY_QUOTIENT_LAST_NAME')
+        quotient_default = current_app.config.get('SIMILARITY_QUOTIENT_DEFAULT')
         if 'second' in self.request_json['criteria']['debtorName']:
             middle_name = self.request_json['criteria']['debtorName']['second']
         max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
@@ -244,11 +248,17 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                                         {'query_last': last_name.strip().upper(),
                                          'query_first': first_name.strip().upper(),
                                          'query_middle': middle_name.strip().upper(),
+                                         'query_last_quotient': quotient_last,
+                                         'query_first_quotient': quotient_first,
+                                         'query_default_quotient': quotient_default,
                                          'max_results_size': max_results_size})
         else:
             result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
                                         {'query_last': last_name.strip().upper(),
                                          'query_first': first_name.strip().upper(),
+                                         'query_last_quotient': quotient_last,
+                                         'query_first_quotient': quotient_first,
+                                         'query_default_quotient': quotient_default,
                                          'max_results_size': max_results_size})
         rows = result.fetchall()
         if rows is not None:
@@ -294,12 +304,20 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             result = None
             if self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json['criteria']['debtorName']['business']
-                result = db.session.execute(count_query, {'query_bus_name': search_value})
+                quotient = current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')
+                result = db.session.execute(count_query,
+                                            {'query_bus_name': search_value, 'query_bus_quotient': quotient})
             elif self.search_type == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
                 last_name = self.request_json['criteria']['debtorName']['last']
                 first_name = self.request_json['criteria']['debtorName']['first']
+                quotient_first = current_app.config.get('SIMILARITY_QUOTIENT_FIRST_NAME')
+                quotient_last = current_app.config.get('SIMILARITY_QUOTIENT_LAST_NAME')
+                quotient_default = current_app.config.get('SIMILARITY_QUOTIENT_DEFAULT')
                 result = db.session.execute(count_query, {'query_last': last_name.strip().upper(),
-                                                          'query_first': first_name.strip().upper()})
+                                                          'query_first': first_name.strip().upper(),
+                                                          'query_first_quotient': quotient_first,
+                                                          'query_last_quotient': quotient_last,
+                                                          'query_default_quotient': quotient_default})
             else:
                 search_value = self.request_json['criteria']['value']
                 result = db.session.execute(count_query, {'query_value': search_value})
