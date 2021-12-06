@@ -9,7 +9,7 @@
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="valid = $event"
               />
-            <v-row no-gutters class="pt-4">
+            <v-row no-gutters class="pt-4" v-if="showCertifiedCheckbox">
               <v-col class="pl-2">
                 <v-checkbox
                   class="mt-2"
@@ -50,7 +50,8 @@ export default defineComponent({
   },
   props: {
     setOptions: Object as () => DialogOptionsIF,
-    setDisplay: { default: false }
+    setDisplay: { default: false },
+    setShowCertifiedCheckbox: { default: false }
   },
   emits: ['proceed'],
   setup (props, { emit }) {
@@ -66,6 +67,9 @@ export default defineComponent({
       }),
       options: computed(() => {
         return props.setOptions
+      }),
+      showCertifiedCheckbox: computed(() => {
+        return props.setShowCertifiedCheckbox
       }),
       staffPaymentData: computed(() => {
         let pd = getStaffPayment.value

@@ -19,10 +19,14 @@ import {
   createAmendmentStatement,
   createDischarge,
   createRenewal,
+  staffRenewal,
   createDraft,
   createFinancingStatement,
+  staffFinancingStatement,
   getDraft,
-  updateDraft
+  updateDraft,
+  staffDischarge,
+  staffAmendment
 } from '@/utils'
 import { RegistrationTypes } from '@/resources'
 import { RegistrationConfirmation } from '@/components/dialogs'
@@ -131,6 +135,11 @@ function cleanupVehicleCollateral (collateralList:Array<VehicleCollateralIF>) {
       }
     }
   }
+}
+
+function getIsStaff (stateModel:StateModelIF): boolean {
+  return stateModel.authorization?.authRoles.includes('ppr_staff') ||
+  stateModel.authorization?.authRoles.includes('gov_account_user')
 }
 
 /** Setup the amendment registration for the API call. All data to be saved is in the store state model. */
@@ -272,7 +281,12 @@ export async function saveAmendmentStatement (stateModel:StateModelIF): Promise<
     delete statement.courtOrderInformation.action
   }
   // Now save the amendment statement.
-  const apiResponse = await createAmendmentStatement(statement)
+  let apiResponse
+  if (getIsStaff(stateModel)) {
+    apiResponse = await staffAmendment(statement, stateModel.staffPayment)
+  } else {
+    apiResponse = await createAmendmentStatement(statement, '')
+  }
 
   if (apiResponse && apiResponse.error) {
     console.error('saveAmendmentStatement failed: ' + apiResponse.error.statusCode + ': ' +
@@ -367,6 +381,7 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   const trustLength = stateModel.registration.lengthTrust
   const parties:AddPartiesIF = stateModel.registration.parties
   const collateral:AddCollateralIF = stateModel.registration.collateral
+  const isStaff = getIsStaff(stateModel)
   var statement:FinancingStatementIF = {
     type: stateModel.registration.registrationType.registrationTypeAPI,
     lifeInfinite: trustLength.lifeInfinite,
@@ -417,7 +432,12 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
     }
   }
   // Now save the financing statement.
-  const apiResponse = await createFinancingStatement(statement)
+  let apiResponse
+  if (isStaff) {
+    apiResponse = await staffFinancingStatement(statement, stateModel.staffPayment)
+  } else {
+    apiResponse = await createFinancingStatement(statement, '')
+  }
 
   if (apiResponse !== undefined && apiResponse.error !== undefined) {
     console.error('saveFinancingStatement failed: ' + apiResponse.error.statusCode + ': ' +
@@ -441,7 +461,13 @@ export async function saveDischarge (stateModel:StateModelIF): Promise<Discharge
   registration.registeringParty = cleanupParty(registration.registeringParty)
   // Now save the registration.
   console.log('saveDischarge calling api for base registration number ' + registration.baseRegistrationNumber + '.')
-  const apiResponse = await createDischarge(registration)
+
+  let apiResponse
+  if (getIsStaff(stateModel)) {
+    apiResponse = await staffDischarge(registration, stateModel.staffPayment)
+  } else {
+    apiResponse = await createDischarge(registration, '')
+  }
 
   if (apiResponse !== undefined && apiResponse.error !== undefined) {
     console.error('saveDischarge failed: ' + apiResponse.error.statusCode + ': ' +
@@ -651,7 +677,13 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
 
   // Now save the registration.
   console.log('save renewal calling api for base registration number ' + registration.baseRegistrationNumber + '.')
-  const apiResponse = await createRenewal(registration)
+
+  let apiResponse
+  if (getIsStaff(stateModel)) {
+    apiResponse = await staffRenewal(registration, stateModel.staffPayment)
+  } else {
+    apiResponse = await createRenewal(registration, '')
+  }
 
   if (apiResponse !== undefined && apiResponse.error !== undefined) {
     console.error('save renewal failed: ' + apiResponse.error.statusCode + ': ' +

@@ -1,5 +1,12 @@
 <template>
   <v-footer class="white pa-0">
+    <staff-payment-dialog
+      attach=""
+      class="mt-10"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialog"
+      @proceed="onStaffPaymentChanges($event)"
+    />
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
         <v-col cols="6">
@@ -37,6 +44,7 @@
           <v-btn
             id="reg-next-btn"
             color="primary"
+            :disabled="lastStepBcol"
             class="float-right"
             @click="submitNext"
           >
@@ -73,6 +81,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
+import { staffPaymentDialog } from '@/resources/dialogOptions'
+import { StaffPaymentDialog } from '@/components/dialogs'
+
 import {
   ButtonConfigIF, // eslint-disable-line no-unused-vars
   DraftIF, // eslint-disable-line no-unused-vars
@@ -82,6 +93,9 @@ import {
 } from '@/interfaces'
 
 export default defineComponent({
+  components: {
+    StaffPaymentDialog
+  },
   props: {
     currentStatementType: {
       type: String,
@@ -100,15 +114,43 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { getFinancingButtons } = useGetters<any>(['getFinancingButtons'])
+    const {
+      getFinancingButtons,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc
+    } = useGetters<any>([
+      'getFinancingButtons',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'isRoleStaffSbc'
+    ])
     const { getStateModel } = useGetters<any>(['getStateModel'])
     const { setDraft } = useActions<any>(['setDraft'])
     const { resetNewRegistration } = useActions<any>(['resetNewRegistration'])
     const localState = reactive({
       statementType: props.currentStatementType,
       stepName: props.currentStepName,
+      staffPaymentDialogDisplay: false,
+      staffPaymentDialog: computed(() => {
+        staffPaymentDialog.acceptText = 'Submit Registration'
+        return staffPaymentDialog
+      }),
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
+      }),
+      isStaffReg: computed((): boolean => {
+        return isRoleStaffReg.value
+      }),
+      isStaffBcol: computed((): boolean => {
+        return isRoleStaffBcol.value
+      }),
+      lastStepBcol: computed((): boolean => {
+        // bcol can't submit
+        return ((localState.stepName === RouteNames.REVIEW_CONFIRM) && isRoleStaffBcol.value)
+      }),
+      isStaffSbc: computed((): boolean => {
+        return isRoleStaffSbc.value
       }),
       buttonConfig: computed(
         (): ButtonConfigIF => {
@@ -177,12 +219,23 @@ export default defineComponent({
           StatementTypes.FINANCING_STATEMENT &&
         localState.stepName === RouteNames.REVIEW_CONFIRM
       ) {
-        submitFinancingStatement()
+        if ((localState.isStaffReg) || (localState.isStaffSbc)) {
+          localState.staffPaymentDialogDisplay = true
+        } else {
+          submitFinancingStatement()
+        }
       } else {
         props.router.push({
           name: localState.buttonConfig.nextRouteName
         })
       }
+    }
+
+    const onStaffPaymentChanges = (pay: boolean): void => {
+      if (pay) {
+        submitFinancingStatement()
+      }
+      localState.staffPaymentDialogDisplay = false
     }
 
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
@@ -220,6 +273,7 @@ export default defineComponent({
       submitCancel,
       submitNext,
       submitSave,
+      onStaffPaymentChanges,
       submitSaveResume
     }
   }

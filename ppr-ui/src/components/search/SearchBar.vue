@@ -11,6 +11,7 @@
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
       :setOptions="staffPaymentDialog"
+      :setShowCertifiedCheckbox="true"
       @proceed="onStaffPaymentChanges($event)"
     />
     <v-row no-gutters class="pt-2">
