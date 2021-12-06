@@ -12,6 +12,13 @@
       :setDisplay="showCancelDialog"
       @proceed="cancel($event)"
     />
+    <staff-payment-dialog
+      attach=""
+      class="mt-10"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialog"
+      @proceed="onStaffPaymentChanges($event)"
+    />
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -75,7 +82,7 @@
                 :setSubmitBtn="'Submit Renewal'"
                 @back="goToReviewRenewal()"
                 @cancel="showDialog()"
-                @submit="submitRenewal()"
+                @submit="submitButton()"
               />
             </affix>
           </aside>
@@ -102,6 +109,8 @@ import {
 import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
+import { staffPaymentDialog } from '@/resources/dialogOptions'
+import { StaffPaymentDialog } from '@/components/dialogs'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -125,6 +134,7 @@ import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from 
 @Component({
   components: {
     BaseDialog,
+    StaffPaymentDialog,
     CourtOrder,
     FolioNumberSummary,
     RegisteringPartySummary,
@@ -138,6 +148,9 @@ export default class ConfirmDischarge extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
   @Getter getLengthTrust: LengthTrustIF
+  @Getter isRoleStaffBcol: boolean
+  @Getter isRoleStaffReg: boolean
+  @Getter isRoleStaffSbc: boolean
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
@@ -158,6 +171,16 @@ export default class ConfirmDischarge extends Vue {
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = renewCancelDialog
   private showCancelDialog = false
+
+  private staffPaymentDialogDisplay = false
+  private staffPaymentDialogOptions: DialogOptionsIF = {
+    acceptText: 'Submit Renewal',
+    cancelText: 'Cancel',
+    title: 'Staff Payment',
+    label: '',
+    text: ''
+  }
+
   private showErrors = false
   private tooltipTxt = 'The Registering Party is based on your ' +
     'account information and cannot be changed here. This information ' +
@@ -292,6 +315,21 @@ export default class ConfirmDischarge extends Vue {
 
   private showDialog (): void {
     this.showCancelDialog = true
+  }
+
+  private onStaffPaymentChanges (pay: boolean): void {
+    if (pay) {
+      this.submitRenewal()
+    }
+    this.staffPaymentDialogDisplay = false
+  }
+
+  private submitButton(): void {
+    if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
+      this.staffPaymentDialogDisplay = true
+    } else {
+      this.submitRenewal()
+    }
   }
 
   private async submitRenewal (): Promise<void> {
