@@ -212,7 +212,10 @@ export const isPremiumAccount = (state: StateIF): boolean => {
 
 /** Whether the user has 'staff' keycloak role. */
 export const isRoleStaff = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('staff')
+  return (
+    state.stateModel.authorization?.authRoles.includes('staff') ||
+    isRoleStaffSbc(state)
+  )
 }
 
 export const isRoleStaffBcol = (state: StateIF): boolean => {
@@ -224,10 +227,7 @@ export const isRoleStaffReg = (state: StateIF): boolean => {
 }
 
 export const isRoleStaffSbc = (state: StateIF): boolean => {
-  return (
-    state.stateModel.authorization?.authRoles.includes('gov_account_user') &&
-    isRoleStaff(state)
-  )
+  return state.stateModel.authorization?.authRoles.includes('gov_account_user')
 }
 
 /** Whether the app is processing a search request or not. */

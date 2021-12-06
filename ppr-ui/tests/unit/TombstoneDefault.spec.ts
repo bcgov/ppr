@@ -109,7 +109,8 @@ describe('TombstoneDefault component tests', () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
     const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
     for (let i = 0; i < staffGroups.length; i++) {
-      await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
+      else await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
       const header = wrapper.findAll(tombstoneHeader)
       expect(header.length).toBe(1)
       expect(header.at(0).text()).toContain('Staff Personal Property Registry')

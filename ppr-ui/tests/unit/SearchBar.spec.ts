@@ -213,7 +213,8 @@ describe('Serial number search', () => {
 
     const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
     for (let i = 0; i < staffGroups.length; i++) {
-      await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
+      else await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
       expect(wrapper.findComponent(FolioNumber).exists()).toBeFalsy()
       if (staffGroups[i] === 'gov_account_user') {
         expect(wrapper.find('.fee-text').exists()).toBeTruthy()
