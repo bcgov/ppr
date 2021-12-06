@@ -173,7 +173,9 @@ TEST_CREATE_DATA = [
 TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0D14', 'TEST0014'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0D14', 'TEST0014'),
-    ('Valid Request', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
+    ('Valid Request reg staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
+    ('Valid Request sbc staff', [PPR_ROLE, SBC_OFFICE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
+    ('Valid Request bcol helpdesk', [PPR_ROLE, BCOL_HELP], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021DC', 'TEST0021'),
     ('Valid Request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019DC', 'TEST0019'),
     ('Report unauthorized request other account', [PPR_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0019DC', 'TEST0019'),

@@ -196,3 +196,8 @@ def is_reg_staff_account(account_id: str) -> bool:
 def is_sbc_office_account(account_id: str) -> bool:
     """Return True if the account id is an sbc office account id."""
     return account_id is not None and account_id == SBC_OFFICE
+
+
+def is_all_staff_account(account_id: str) -> bool:
+    """Return True if the account id is any staff role."""
+    return account_id is not None and account_id in (STAFF_ROLE, SBC_OFFICE, BCOL_HELP)
