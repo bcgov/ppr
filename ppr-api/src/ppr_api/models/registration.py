@@ -20,7 +20,7 @@ import json
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
-from ppr_api.services.authz import is_staff_account
+from ppr_api.services.authz import is_all_staff_account
 
 from .db import db
 from .draft import Draft
@@ -539,10 +539,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
     def can_access_report(account_id: str, account_name: str, reg_json) -> bool:
         """Determine if request account can view the registration verification statement."""
         # All staff roles can see any verification statement.
-        if is_staff_account(account_id):
-            return True
         reg_account_id = reg_json['accountId']
         del reg_json['accountId']  # Only use this for report access checking.
+        if is_all_staff_account(account_id):
+            return True
         if account_id == reg_account_id:
             return True
         if account_name:
@@ -559,7 +559,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not reg_json['registeringName'] or reg_json['registeringName'].lower() == 'none':
             reg_json['registeringName'] = ''
         # Only staff role or matching account includes registeringName
-        elif not is_staff_account(account_id) and 'accountId' in reg_json and account_id != reg_json['accountId']:
+        elif not is_all_staff_account(account_id) and 'accountId' in reg_json and account_id != reg_json['accountId']:
             reg_json['registeringName'] = ''
 
         if not reg_json['clientReferenceId'] or reg_json['clientReferenceId'].lower() == 'none':

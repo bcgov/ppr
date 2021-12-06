@@ -32,7 +32,7 @@ from registry_schemas.example_data.ppr import (
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import Draft, GeneralCollateralLegacy, FinancingStatement, Registration, utils as model_utils
-from ppr_api.services.authz import STAFF_ROLE
+from ppr_api.services.authz import STAFF_ROLE, BCOL_HELP, SBC_OFFICE
 
 
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
@@ -125,7 +125,10 @@ TEST_STAFF_ACCOUNT_ACCESS_DATA = [
     ('TEST0021DC', STAFF_ROLE, True),
     ('TEST0021RE', STAFF_ROLE, True),
     ('TEST0001', 'PS12345', True),
-    ('TEST00R6', 'PS12345', True)
+    ('TEST00R6', 'PS12345', True),
+    ('TEST0001', STAFF_ROLE, True),
+    ('TEST0001', BCOL_HELP, True),
+    ('TEST0001', SBC_OFFICE, True)
 ]
 
 

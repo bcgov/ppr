@@ -27,7 +27,7 @@ from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_reg_staff_account, is_sbc_office_account, is_staff_account, \
-                                   is_bcol_help
+                                   is_bcol_help, is_all_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
@@ -148,11 +148,11 @@ class GetFinancingResource(Resource):
             # Not found throws a business exception.
             statement = FinancingStatement.find_by_registration_number(registration_num,
                                                                        account_id,
-                                                                       is_staff_account(account_id))
+                                                                       is_all_staff_account(account_id))
             # Extra check account name matches either registering party or a secured party name.
             if resource_utils.is_pdf(request):
                 resource_utils.check_access_financing(jwt.get_token_auth_header(),
-                                                      is_staff_account(account_id), account_id, statement)
+                                                      is_all_staff_account(account_id), account_id, statement)
 
             # Set to false to exclude change history.
             statement.include_changes_json = False
@@ -272,13 +272,13 @@ class GetAmendmentResource(Resource):
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(amendment_registration_num,
                                                                  account_id,
-                                                                 is_staff_account(account_id),
+                                                                 is_all_staff_account(account_id),
                                                                  registration_num)
             # If requesting a verification statement report, check the account name matches either
             # the registering party or a secured party name.
             if resource_utils.is_pdf(request):
                 resource_utils.check_access_registration(jwt.get_token_auth_header(),
-                                                         is_staff_account(account_id), account_id,
+                                                         is_all_staff_account(account_id), account_id,
                                                          statement)
             response_json = statement.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
@@ -387,13 +387,13 @@ class GetChangeResource(Resource):
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(change_registration_num,
                                                                  account_id,
-                                                                 is_staff_account(account_id),
+                                                                 is_all_staff_account(account_id),
                                                                  registration_num)
             # If requesting a verification statement report, check the account name matches either
             # the registering party or a secured party name.
             if resource_utils.is_pdf(request):
                 resource_utils.check_access_registration(jwt.get_token_auth_header(),
-                                                         is_staff_account(account_id), account_id,
+                                                         is_all_staff_account(account_id), account_id,
                                                          statement)
             response_json = statement.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
@@ -496,13 +496,13 @@ class GetRenewalResource(Resource):
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(renewal_registration_num,
                                                                  account_id,
-                                                                 is_staff_account(account_id),
+                                                                 is_all_staff_account(account_id),
                                                                  registration_num)
             # If requesting a verification statement report, check the account name matches either
             # the registering party or a secured party name.
             if resource_utils.is_pdf(request):
                 resource_utils.check_access_registration(jwt.get_token_auth_header(),
-                                                         is_staff_account(account_id), account_id,
+                                                         is_all_staff_account(account_id), account_id,
                                                          statement)
             response_json = statement.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
@@ -608,13 +608,13 @@ class GetDischargeResource(Resource):
             # Try to fetch registration statement by registration number
             statement = Registration.find_by_registration_number(discharge_registration_num,
                                                                  account_id,
-                                                                 is_staff_account(account_id),
+                                                                 is_all_staff_account(account_id),
                                                                  registration_num)
             # If requesting a verification statement report, check the account name matches either
             # the registering party or a secured party name.
             if resource_utils.is_pdf(request):
                 resource_utils.check_access_registration(jwt.get_token_auth_header(),
-                                                         is_staff_account(account_id), account_id,
+                                                         is_all_staff_account(account_id), account_id,
                                                          statement)
             response_json = statement.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
@@ -747,7 +747,7 @@ class AccountRegistrationResource(Resource):
                 return resource_utils.duplicate_error_response(DUPLICATE_REGISTRATION_ERROR.format(registration_num))
 
             # Restricted access check for crown charge class of registration types.
-            if not is_staff_account(account_id) and \
+            if not is_all_staff_account(account_id) and \
                     registration['registrationClass'] == model_utils.REG_CLASS_CROWN and \
                     not AccountBcolId.crown_charge_account(account_id):
                 return resource_utils.cc_forbidden_error_response(account_id)
@@ -789,7 +789,7 @@ class AccountRegistrationResource(Resource):
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
 
             # Restricted access check for crown charge class of registration types.
-            if not is_staff_account(account_id) and \
+            if not is_all_staff_account(account_id) and \
                     registration['registrationClass'] == model_utils.REG_CLASS_CROWN and \
                     not AccountBcolId.crown_charge_account(account_id):
                 return resource_utils.cc_forbidden_error_response(account_id)
