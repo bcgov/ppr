@@ -19,7 +19,7 @@ import {
 // Components
 import { ConfirmAmendment } from '@/views'
 import { CertifyInformation, FolioNumberSummary, StickyContainer } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
+import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
 
@@ -134,6 +134,7 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // dialog
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
   })
 
   it('allows back to dashboard page', async () => {
@@ -252,5 +253,91 @@ describe('Confirm Amendment registration save registration', () => {
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+  })
+})
+
+
+describe('Confirm Amendment for staff', () => {
+  let wrapper: any
+  let sandbox
+  const { assign } = window.location
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+
+  beforeEach(async () => {
+    // mock the window.location.assign function
+    delete window.location
+    window.location = { assign: jest.fn() } as any
+    // store setup
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    // stub api call
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    get.returns(new Promise(resolve => resolve({
+      data: { ...mockedFinancingStatementAll }
+    })))
+    const post = sandbox.stub(axios, 'post')
+    post.returns(new Promise(resolve => resolve({
+      data: { ...mockedAmendmentResponse }
+    })))
+
+    await store.dispatch('setLengthTrust', {
+      valid: true,
+      trustIndenture: false,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: '',
+      action: ActionTypes.EDITED
+    })
+    await store.dispatch('setOriginalLengthTrust', {
+      valid: true,
+      trustIndenture: true,
+      lifeInfinite: false,
+      lifeYears: 5,
+      showInvalid: false,
+      surrenderDate: '',
+      lienAmount: ''
+    })
+    await store.dispatch('setAddCollateral', {
+      vehicleCollateral: mockedVehicleCollateral1,
+      generalCollateral: mockedGeneralCollateral1,
+      valid: true
+    })
+    await store.dispatch('setAmendmentDescription', 'test')
+    await store.dispatch('setCertifyInformation', mockedAmendmentCertified)
+
+    // create a Local Vue and install router on it
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = mockRouter.mock()
+    await router.push({
+      name: RouteNames.CONFIRM_AMENDMENT,
+      query: { 'reg-num': '123456B' }
+    })
+    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper.setProps({ appReady: true })
+    await flushPromises()
+  })
+
+  afterEach(() => {
+    window.location.assign = assign
+    wrapper.destroy()
+    sandbox.restore()
+  })
+
+  it('shows staff payment', async () => {
+    // Set up for valid amendment request
+    await store.dispatch('setRegistrationNumber', '023001B')
+    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    expect(wrapper.vm.collateralValid).toBe(true)
+    expect(wrapper.vm.partiesValid).toBe(true)
+    expect(wrapper.vm.courtOrderValid).toBe(true)
+
+    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
   })
 })

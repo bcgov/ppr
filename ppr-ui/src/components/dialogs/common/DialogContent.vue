@@ -27,7 +27,7 @@ import {
   toRefs
 } from '@vue/composition-api'
 // local
-import { ErrorContact } from '@/components/common'
+import ErrorContact from '@/components/common/ErrorContact.vue'
 
 export default defineComponent({
   name: 'DialogContent',

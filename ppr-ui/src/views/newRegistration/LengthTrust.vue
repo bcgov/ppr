@@ -82,7 +82,8 @@ import {
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { getFeatureFlag } from '@/utils'
 // local components
-import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
+import { Stepper, StickyContainer } from '@/components/common'
+import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 
 @Component({

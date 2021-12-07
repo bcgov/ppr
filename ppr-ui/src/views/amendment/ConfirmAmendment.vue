@@ -12,6 +12,14 @@
       :setDisplay="showCancelDialog"
       @proceed="cancel($event)"
     />
+    <staff-payment-dialog
+      attach=""
+      class="mt-10"
+      :setDisplay="staffPaymentDialogDisplay"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
+      @proceed="onStaffPaymentChanges($event)"
+    />
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -139,9 +147,10 @@
                 :setBackBtn="'Save and Resume Later'"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Register and Pay'"
+                :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="saveDraft()"
                 @cancel="showDialog()"
-                @submit="submitAmendment()"
+                @submit="submitButton()"
               />
             </affix>
           </aside>
@@ -165,7 +174,7 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
+import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
@@ -205,6 +214,7 @@ import { StatusCodes } from 'http-status-codes'
   components: {
     AmendmentDescription,
     BaseDialog,
+    StaffPaymentDialog,
     CautionBox,
     CertifyInformation,
     FolioNumberSummary,
@@ -229,6 +239,9 @@ export default class ConfirmAmendment extends Vue {
   @Getter getRegistrationNumber: string
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter isRoleStaffBcol: boolean
+  @Getter isRoleStaffReg: boolean
+  @Getter isRoleStaffSbc: boolean
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
@@ -253,6 +266,16 @@ export default class ConfirmAmendment extends Vue {
     title: 'Cancel',
     label: '',
     text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
+  }
+
+  private staffPaymentDialogDisplay = false
+
+  private staffPaymentDialogOptions: DialogOptionsIF = {
+    acceptText: 'Submit Amendment',
+    cancelText: 'Cancel',
+    title: 'Staff Payment',
+    label: '',
+    text: ''
   }
 
   private showCancelDialog = false
@@ -479,6 +502,13 @@ export default class ConfirmAmendment extends Vue {
     this.emitHaveData(false)
   }
 
+  private onStaffPaymentChanges (pay: boolean): void {
+    if (pay) {
+      this.submitAmendment()
+    }
+    this.staffPaymentDialogDisplay = false
+  }
+
   private setFolioValid (valid: boolean): void {
     this.validFolio = valid
   }
@@ -499,6 +529,14 @@ export default class ConfirmAmendment extends Vue {
       name: RouteNames.DASHBOARD
     })
     this.emitHaveData(false)
+  }
+
+  private submitButton (): void {
+    if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
+      this.staffPaymentDialogDisplay = true
+    } else {
+      this.submitAmendment()
+    }
   }
 
   private async submitAmendment (): Promise<void> {

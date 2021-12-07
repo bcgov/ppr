@@ -8,6 +8,7 @@ import { mount, createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
 
 // Components
 import { ButtonFooter } from '@/components/common'
+import { StaffPaymentDialog } from '@/components/dialogs'
 import { Dashboard, LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views'
 
 // Other
@@ -160,6 +161,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     wrapper.find(cancelBtn).trigger('click')
     await Vue.nextTick()
   })
+  
   it('Step 2 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
     await Vue.nextTick()
@@ -303,4 +305,43 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     wrapper.vm.submitNext()
     await Vue.nextTick()
   })
+})
+
+
+describe('Step 4 for SBC staff', () => {
+  let wrapper: Wrapper<any>
+  let wrapper2: any // eslint-disable-line no-unused-vars
+  const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
+  const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
+
+  beforeEach(async () => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    wrapper2 = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
+    wrapper = createComponent(currentStatementType, router, currentStepName)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with step 4 values', async () => {
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
+    
+  })
+ 
+  it('Shows staff payment dialog on submit', async () => {
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
+  })
+
+  it('disables button for bcol', async () => {
+    await store.dispatch('setAuthRoles', ['staff', 'helpdesk'])
+    await Vue.nextTick()
+    expect(wrapper.find(nextBtn).attributes('disabled')).toBe('disabled')
+    
+  })
+
 })

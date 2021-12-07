@@ -80,6 +80,7 @@
                 :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Submit Total Discharge'"
+                :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="goToReviewRegistration()"
                 @cancel="showDialog()"
                 @submit="submitDischarge()"
@@ -141,6 +142,7 @@ export default class ConfirmDischarge extends Vue {
   @Getter getConfirmDebtorName: DebtorNameIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter isRoleStaffBcol: boolean
 
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setRegistrationCreationDate: ActionBindingIF

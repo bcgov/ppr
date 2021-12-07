@@ -44,7 +44,8 @@ import {
   toRefs
 } from '@vue/composition-api'
 // local components
-import { DialogButtons, DialogContent } from './common'
+import DialogButtons from './common/DialogButtons.vue'
+import DialogContent from './common/DialogContent.vue'
 // local types/helpers/etc.
 import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
 

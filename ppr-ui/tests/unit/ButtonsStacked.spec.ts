@@ -32,7 +32,8 @@ const submitBtn = '#btn-stacked-submit'
 function createComponent (
   backBtn: string,
   cancelBtn: string,
-  submitBtn: string
+  submitBtn: string,
+  disabledSubmit: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
@@ -44,7 +45,8 @@ function createComponent (
     propsData: {
       setBackBtn: backBtn,
       setCancelBtn: cancelBtn,
-      setSubmitBtn: submitBtn
+      setSubmitBtn: submitBtn,
+      setDisableSubmitBtn: disabledSubmit
     },
     store,
     vuetify
@@ -70,7 +72,7 @@ describe('ButtonsStacked component tests', () => {
     const backBtnTxt = ''
     const cancelBtnTxt = 'Test1 Cancel'
     const submitBtnTxt = 'Test1 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt)
+    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     const back = wrapper.findAll(backBtn)
     expect(back.length).toBe(0)
@@ -86,7 +88,7 @@ describe('ButtonsStacked component tests', () => {
     const backBtnTxt = 'Test2 Back'
     const cancelBtnTxt = 'Test2 Cancel'
     const submitBtnTxt = 'Test2 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt)
+    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     const back = wrapper.findAll(backBtn)
     expect(back.length).toBe(1)
@@ -103,7 +105,7 @@ describe('ButtonsStacked component tests', () => {
     const backBtnTxt = 'Test3 Back'
     const cancelBtnTxt = 'Test3 Cancel'
     const submitBtnTxt = 'Test3 Confirm and Complete'
-    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt)
+    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, false)
     const back = wrapper.find(backBtn)
     back.trigger('click')
     await flushPromises()
@@ -116,5 +118,15 @@ describe('ButtonsStacked component tests', () => {
     submit.trigger('click')
     await flushPromises()
     expect(getLastEvent(wrapper, 'submit')).toBe(true)
+  })
+
+  it('disables the submit button', async () => {
+    const backBtnTxt = 'Test4 Back'
+    const cancelBtnTxt = 'Test4 Cancel'
+    const submitBtnTxt = 'Test4 Confirm and Complete'
+    wrapper = createComponent(backBtnTxt, cancelBtnTxt, submitBtnTxt, true)
+
+    const submit = wrapper.find(submitBtn)
+    expect(submit.attributes('disabled')).toBe('disabled')
   })
 })

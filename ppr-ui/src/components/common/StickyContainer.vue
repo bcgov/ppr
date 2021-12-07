@@ -12,6 +12,7 @@
       :setBackBtn="backBtn"
       :setCancelBtn="cancelBtn"
       :setSubmitBtn="submitBtn"
+      :setDisableSubmitBtn="disableSubmitBtn"
       @back="back()"
       @cancel="cancel()"
       @submit="submit()"
@@ -79,6 +80,9 @@ export default defineComponent({
     },
     setSubmitBtn: {
       default: ''
+    },
+    setDisableSubmitBtn: {
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -93,7 +97,8 @@ export default defineComponent({
       rightOffset: props.setRightOffset,
       showButtons: props.setShowButtons,
       showFeeSummary: props.setShowFeeSummary,
-      submitBtn: props.setSubmitBtn
+      submitBtn: props.setSubmitBtn,
+      disableSubmitBtn: props.setDisableSubmitBtn
     })
     const back = () => {
       emit('back', true)

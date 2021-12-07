@@ -9,7 +9,8 @@ import flushPromises from 'flush-promises'
 
 // Local Components
 import { Parties } from '@/components/parties'
-import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
+import { Stepper, StickyContainer } from '@/components/common'
+import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { AddSecuredPartiesAndDebtors } from '@/views'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'

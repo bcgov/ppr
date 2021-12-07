@@ -46,6 +46,23 @@ function getDefaultConfig (): Object {
   return config
 }
 
+function staffPaymentParameters (staffPayment: StaffPaymentIF) {
+  let paymentParams = ''
+  // filled out staff payment parameters
+  if (staffPayment) {
+    switch (staffPayment.option) {
+      case StaffPaymentOptions.FAS:
+        paymentParams = paymentParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
+        break
+      case StaffPaymentOptions.BCOL:
+        paymentParams = paymentParams + 'bcolAccountNumber=' + staffPayment.bcolAccountNumber
+        paymentParams = paymentParams + '&datNumber=' + staffPayment.datNumber
+        break
+    }
+  }
+  return paymentParams
+}
+
 export const successfulPPRResponses = [
   StatusCodes.OK,
   StatusCodes.CREATED,
@@ -104,21 +121,66 @@ export async function staffSearch (
     extraParams = extraParams + 'certified=True'
   }
   // filled out staff payment parameters
-  if (staffPayment) {
-    if (extraParams.length > 0) {
-      extraParams = extraParams + '&'
-    }
-    switch (staffPayment.option) {
-      case StaffPaymentOptions.FAS:
-        extraParams = extraParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
-        break
-      case StaffPaymentOptions.BCOL:
-        extraParams = extraParams + '&bcolAccountNumber=' + staffPayment.bcolAccountNumber
-        extraParams = extraParams + '&datNumber=' + staffPayment.datNumber
-        break
-    }
+  const paymentParams = staffPaymentParameters(staffPayment)
+  if (paymentParams.length > 0) {
+    extraParams = extraParams + '&'
   }
+  extraParams = extraParams + paymentParams
   return search(searchCriteria, extraParams)
+}
+
+// Save a new financing statement (staff)
+export async function staffFinancingStatement (
+  statement: FinancingStatementIF,
+  staffPayment: StaffPaymentIF
+): Promise<FinancingStatementIF> {
+  let extraParams = ''
+  const paymentParams = staffPaymentParameters(staffPayment)
+  if (paymentParams.length > 0) {
+    extraParams = '?'
+  }
+  extraParams = extraParams + paymentParams
+  return createFinancingStatement(statement, extraParams)
+}
+
+// Save a new financing statement (staff)
+export async function staffAmendment (
+  statement: AmendmentStatementIF,
+  staffPayment: StaffPaymentIF
+): Promise<AmendmentStatementIF> {
+  let extraParams = ''
+  const paymentParams = staffPaymentParameters(staffPayment)
+  if (paymentParams.length > 0) {
+    extraParams = '?'
+  }
+  extraParams = extraParams + paymentParams
+  return createAmendmentStatement(statement, extraParams)
+}
+
+export async function staffDischarge (
+  discharge: DischargeRegistrationIF,
+  staffPayment: StaffPaymentIF
+): Promise<DischargeRegistrationIF> {
+  let extraParams = ''
+  const paymentParams = staffPaymentParameters(staffPayment)
+  if (paymentParams.length > 0) {
+    extraParams = '?'
+  }
+  extraParams = extraParams + paymentParams
+  return createDischarge(discharge, extraParams)
+}
+
+export async function staffRenewal (
+  renewal: RenewRegistrationIF,
+  staffPayment: StaffPaymentIF
+): Promise<RenewRegistrationIF> {
+  let extraParams = ''
+  const paymentParams = staffPaymentParameters(staffPayment)
+  if (paymentParams.length > 0) {
+    extraParams = '?'
+  }
+  extraParams = extraParams + paymentParams
+  return createRenewal(renewal, extraParams)
 }
 
 // Update selected matches in search response (search step 2a)
@@ -485,11 +547,12 @@ export async function draftHistory (): Promise<{
 
 // Save a new financing statement.
 export async function createFinancingStatement (
-  statement: FinancingStatementIF
+  statement: FinancingStatementIF,
+  extraParams: string
 ): Promise<FinancingStatementIF> {
   return axios
     .post<FinancingStatementIF>(
-      'financing-statements',
+      `financing-statements${extraParams}`,
       statement,
       getDefaultConfig()
     )
@@ -513,10 +576,13 @@ export async function createFinancingStatement (
 }
 
 // Save a new financing statement.
-export async function createAmendmentStatement (statement: AmendmentStatementIF): Promise<AmendmentStatementIF> {
+export async function createAmendmentStatement (
+  statement: AmendmentStatementIF,
+  extraParams: string
+): Promise<AmendmentStatementIF> {
   return axios
     .post<AmendmentStatementIF>(
-      `financing-statements/${statement.baseRegistrationNumber}/amendments`,
+      `financing-statements/${statement.baseRegistrationNumber}/amendments${extraParams}`,
       statement,
       getDefaultConfig()
     )
@@ -540,10 +606,13 @@ export async function createAmendmentStatement (statement: AmendmentStatementIF)
 }
 
 // Save a discharge registration.
-export async function createDischarge (discharge: DischargeRegistrationIF): Promise<DischargeRegistrationIF> {
+export async function createDischarge (
+  discharge: DischargeRegistrationIF,
+  extraParams: string
+): Promise<DischargeRegistrationIF> {
   return axios
     .post<DischargeRegistrationIF>(
-      `financing-statements/${discharge.baseRegistrationNumber}/discharges`,
+      `financing-statements/${discharge.baseRegistrationNumber}/discharges${extraParams}`,
       discharge,
       getDefaultConfig())
     .then(response => {
@@ -566,10 +635,13 @@ export async function createDischarge (discharge: DischargeRegistrationIF): Prom
 }
 
 // Save a renewal registration.
-export async function createRenewal (renewal: RenewRegistrationIF): Promise<RenewRegistrationIF> {
+export async function createRenewal (
+  renewal: RenewRegistrationIF,
+  extraParams: string
+): Promise<RenewRegistrationIF> {
   return axios
     .post<RenewRegistrationIF>(
-      `financing-statements/${renewal.baseRegistrationNumber}/renewals`,
+      `financing-statements/${renewal.baseRegistrationNumber}/renewals${extraParams}`,
       renewal,
       getDefaultConfig())
     .then(response => {
