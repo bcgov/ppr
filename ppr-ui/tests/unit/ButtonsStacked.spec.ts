@@ -45,7 +45,8 @@ function createComponent (
     propsData: {
       setBackBtn: backBtn,
       setCancelBtn: cancelBtn,
-      setSubmitBtn: submitBtn
+      setSubmitBtn: submitBtn,
+      setDisableSubmitBtn: disabledSubmit
     },
     store,
     vuetify

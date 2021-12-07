@@ -40,7 +40,8 @@ describe('Payment component', () => {
         store,
         propsData: {
           setOptions: staffPaymentDialog,
-          setDisplay: true
+          setDisplay: true,
+          setShowCertifiedCheckbox: true
         },
         vuetify
       })

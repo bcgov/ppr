@@ -35,7 +35,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
-import { BaseDialog } from '.'
+import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 
 // Interfaces and Enums
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
@@ -49,9 +49,23 @@ export default defineComponent({
     BaseDialog
   },
   props: {
-    setOptions: Object as () => DialogOptionsIF,
-    setDisplay: { default: false },
-    setShowCertifiedCheckbox: { default: false }
+    setOptions: {
+      type: Object as () => DialogOptionsIF,
+      default: {
+        acceptText: 'Submit',
+        cancelText: 'Cancel',
+        text: '',
+        title: 'Staff Payment'
+      }
+    },
+    setDisplay: {
+      type: Boolean,
+      default: false
+    },
+    setShowCertifiedCheckbox: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['proceed'],
   setup (props, { emit }) {

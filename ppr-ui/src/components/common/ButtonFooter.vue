@@ -82,7 +82,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
-import { StaffPaymentDialog } from '@/components/dialogs'
+import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 
 import {
   ButtonConfigIF, // eslint-disable-line no-unused-vars
@@ -133,8 +133,8 @@ export default defineComponent({
       stepName: props.currentStepName,
       staffPaymentDialogDisplay: false,
       staffPaymentDialogOptions: {
-        acceptText: 'Cancel Amendment',
-        cancelText: 'Close',
+        acceptText: 'Submit Amendment',
+        cancelText: 'Cancel',
         title: 'Cancel',
         label: '',
         text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
