@@ -4,7 +4,8 @@
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialog"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
     <v-container class="pt-8 pb-15">
@@ -81,7 +82,6 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
-import { staffPaymentDialog } from '@/resources/dialogOptions'
 import { StaffPaymentDialog } from '@/components/dialogs'
 
 import {
@@ -132,10 +132,13 @@ export default defineComponent({
       statementType: props.currentStatementType,
       stepName: props.currentStepName,
       staffPaymentDialogDisplay: false,
-      staffPaymentDialog: computed(() => {
-        staffPaymentDialog.acceptText = 'Submit Registration'
-        return staffPaymentDialog
-      }),
+      staffPaymentDialogOptions: {
+        acceptText: 'Cancel Amendment',
+        cancelText: 'Close',
+        title: 'Cancel',
+        label: '',
+        text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
+      },
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
       }),

@@ -16,7 +16,7 @@ import {
 // Components
 import { ConfirmRenewal } from '@/views'
 import { FolioNumberSummary, StickyContainer, CertifyInformation, CourtOrder } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
+import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 
 // Other
@@ -101,6 +101,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // dialog
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
     // certify
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
     expect(wrapper.findComponent(CourtOrder).exists()).toBe(false)

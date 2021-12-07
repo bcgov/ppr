@@ -32,6 +32,7 @@
         class="btn-stacked"
         color="primary"
         @click="submit"
+        :disabled="disableSubmitBtn"
       >
         {{ submitBtn }}
         <v-icon color="white" style="padding-top: 2px;">mdi-chevron-right</v-icon>
@@ -58,13 +59,17 @@ export default defineComponent({
     },
     setSubmitBtn: {
       default: ''
+    },
+    setDisableSubmitBtn: {
+      default: false
     }
   },
   setup (props, { emit, root }) {
     const localState = reactive({
       backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
-      submitBtn: props.setSubmitBtn
+      submitBtn: props.setSubmitBtn,
+      disableSubmitBtn: props.setDisableSubmitBtn
     })
     const back = () => {
       emit('back', true)

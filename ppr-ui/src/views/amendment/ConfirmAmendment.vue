@@ -16,7 +16,8 @@
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialog"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
     <div class="container pa-0" style="min-width: 960px;">
@@ -146,6 +147,7 @@
                 :setBackBtn="'Save and Resume Later'"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Register and Pay'"
+                :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="saveDraft()"
                 @cancel="showDialog()"
                 @submit="submitButton()"
@@ -172,12 +174,11 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
+import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
-import { StaffPaymentDialog } from '@/components/dialogs'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -266,7 +267,9 @@ export default class ConfirmAmendment extends Vue {
     label: '',
     text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
   }
+
   private staffPaymentDialogDisplay = false
+
   private staffPaymentDialogOptions: DialogOptionsIF = {
     acceptText: 'Submit Amendment',
     cancelText: 'Cancel',
@@ -527,8 +530,8 @@ export default class ConfirmAmendment extends Vue {
     })
     this.emitHaveData(false)
   }
-  
-  private submitButton(): void {
+
+  private submitButton (): void {
     if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
       this.staffPaymentDialogDisplay = true
     } else {

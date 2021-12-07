@@ -16,7 +16,8 @@
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialog"
+      :setOptions="staffPaymentDialogOptions"
+      :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
     <div class="container pa-0" style="min-width: 960px;">
@@ -80,6 +81,7 @@
                 :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Submit Renewal'"
+                :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="goToReviewRenewal()"
                 @cancel="showDialog()"
                 @submit="submitButton()"
@@ -106,11 +108,9 @@ import {
   CourtOrder,
   StickyContainer
 } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
+import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
-import { staffPaymentDialog } from '@/resources/dialogOptions'
-import { StaffPaymentDialog } from '@/components/dialogs'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -324,7 +324,7 @@ export default class ConfirmDischarge extends Vue {
     this.staffPaymentDialogDisplay = false
   }
 
-  private submitButton(): void {
+  private submitButton (): void {
     if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
       this.staffPaymentDialogDisplay = true
     } else {
