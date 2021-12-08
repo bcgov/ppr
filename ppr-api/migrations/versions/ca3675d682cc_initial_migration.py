@@ -847,19 +847,19 @@ def upgrade():
         },
         {
             'registration_type_cl': 'PPSALIEN',
-            'registration_type_cd': 'TA',
+            'registration_type': 'TA',
             'registration_act': 'PPSA SECURITY ACT',
             'registration_desc': 'SECURITY AGREEMENT TRANSITION FINANCING STATEMENT'
         },
         {
             'registration_type_cl': 'PPSALIEN',
-            'registration_type_cd': 'TG',
+            'registration_type': 'TG',
             'registration_act': 'PPSA SECURITY ACT',
             'registration_desc': 'SALES OF GOODS TRANSITION FINANCING STATEMENT'
         },
         {
             'registration_type_cl': 'PPSALIEN',
-            'registration_type_cd': 'TM',
+            'registration_type': 'TM',
             'registration_act': 'PPSA SECURITY ACT',
             'registration_desc': 'M.H. TRANSITION FINANCING STATEMENT'
         },

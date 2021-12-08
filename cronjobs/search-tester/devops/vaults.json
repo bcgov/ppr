@@ -1,0 +1,18 @@
+[
+    {
+        "vault": "shared",
+        "application": [
+            "nats"
+        ]
+    },
+    {
+        "vault": "ppr",
+        "application": [
+            "jwt",
+            "ppr-api",
+            "ppr-postgres",
+            "launchdarkly",
+            "sentry"
+        ]
+    }
+]
