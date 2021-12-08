@@ -90,12 +90,15 @@ AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
 "ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
 
 BUSINESS_NAME_QUERY = """
+WITH q AS (
+   SELECT searchkey_business_name(:query_bus_name) AS search_key
+)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
        CASE WHEN p.business_name = :query_bus_name THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
-  FROM registrations r, financing_statements fs, parties p
+  FROM registrations r, financing_statements fs, parties p, q
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
@@ -108,9 +111,9 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND (SIMILARITY(:query_bus_name, p.business_srch_key) >= :query_bus_quotient AND
-        (SUBSTR(:query_bus_name, 1, 1) = SUBSTR(p.business_name, 1, 1) OR 
-         p.business_srch_key = :query_bus_name))
+   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient AND
+        (SUBSTR(search_key, 1, 1) = SUBSTR(p.business_name, 1, 1) OR 
+         p.business_srch_key = search_key))
 ORDER BY match_type, p.business_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
