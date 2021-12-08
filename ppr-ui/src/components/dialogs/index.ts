@@ -6,3 +6,4 @@ export { default as RegistrationConfirmation } from './RegistrationConfirmation.
 export { default as RegistrationOtherDialog } from './RegistrationOtherDialog.vue'
 export { default as SecuredPartyDialog } from './SecuredPartyDialog.vue'
 export { default as StaffPaymentDialog } from './StaffPaymentDialog.vue'
+export { default as LargeSearchResultDialog } from './LargeSearchResultDialog.vue'

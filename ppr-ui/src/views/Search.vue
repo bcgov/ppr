@@ -4,6 +4,11 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
+    <large-search-result-dialog
+      :setDisplay="largeSearchResultDialog"
+      :setOptions="largeSearchResultOptions"
+      @proceed="handleLargeReport($event)"
+    />
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="confirmOptions"
@@ -63,7 +68,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { BaseDialog, ConfirmationDialog } from '@/components/dialogs'
+import { BaseDialog, ConfirmationDialog, LargeSearchResultDialog } from '@/components/dialogs'
 import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
@@ -72,13 +77,14 @@ import {
   ActionBindingIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { searchReportError, selectionConfirmaionDialog } from '@/resources/dialogOptions'
+import { largeSearchReportError, searchReportError, selectionConfirmaionDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
 
 @Component({
   components: {
     BaseDialog,
     ConfirmationDialog,
+    LargeSearchResultDialog,
     SearchBar,
     SearchedResult
   }
@@ -111,7 +117,9 @@ export default class Search extends Vue {
   private confirmationDialog = false
   private confirmOptions = selectionConfirmaionDialog
   private errorDialog = false
+  private largeSearchResultDialog = false
   private errorOptions = searchReportError
+  private largeSearchResultOptions = largeSearchReportError
   private loading = false
   private selectedMatches: Array<SearchResultIF> = []
   private settingOption = SettingOptions.SELECT_CONFIRMATION_DIALOG
@@ -184,6 +192,10 @@ export default class Search extends Vue {
     if (!stayOnSearchResults) {
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
+  }
+
+  private handleLargeResults (generateReport: boolean): void {
+    this.largeSearchResultDialog = false
   }
 
   /** Redirects browser to Business Registry home page. */
