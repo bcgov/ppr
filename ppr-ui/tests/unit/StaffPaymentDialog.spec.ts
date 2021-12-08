@@ -84,6 +84,7 @@ describe('Payment component', () => {
     expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(true)
   })
 
+
   it('updates store payment info', async () => {
     wrapper.findComponent(StaffPaymentComponent).vm.$emit('update:staffPaymentData', {
       option: 1,
@@ -97,5 +98,21 @@ describe('Payment component', () => {
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
     expect(wrapper.vm.$store.state.stateModel.staffPayment.routingSlipNumber).toBe('999888777')
+  })
+
+  it('Clears the payment data on cancel', async () => {
+    wrapper.findComponent(StaffPaymentComponent).vm.$emit('update:staffPaymentData', {
+      option: 1,
+      routingSlipNumber: '999888777',
+      bcolAccountNumber: '',
+      datNumber: '',
+      folioNumber: '',
+      isPriority: false
+    })
+    await flushPromises()
+    wrapper.findComponent(BaseDialog).vm.$emit(proceed, false)
+    await flushPromises()
+    expect(getLastEvent(wrapper, proceed)).toEqual(false)
+    expect(wrapper.vm.$store.state.stateModel.staffPayment.routingSlipNumber).toBe('')
   })
 })
