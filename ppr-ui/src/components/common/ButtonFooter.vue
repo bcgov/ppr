@@ -136,7 +136,7 @@ export default defineComponent({
         acceptText: 'Submit Registration',
         cancelText: 'Cancel',
         title: 'Staff Payment',
-        label: '',
+        label: ''
       },
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
