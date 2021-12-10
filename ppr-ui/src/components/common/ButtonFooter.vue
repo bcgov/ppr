@@ -222,7 +222,7 @@ export default defineComponent({
           StatementTypes.FINANCING_STATEMENT &&
         localState.stepName === RouteNames.REVIEW_CONFIRM
       ) {
-        if ((localState.isStaffReg) || (localState.isStaffSbc)) {
+        if (localState.isStaffReg) {
           localState.staffPaymentDialogDisplay = true
         } else {
           submitFinancingStatement()
