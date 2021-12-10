@@ -250,7 +250,7 @@ export default class Search extends Vue {
     // if exact match is more than 75, inform about the delay
     if (this.exactResultsLength >= 75) {
       this.largeSearchDelayDialog = true
-    // if they have selected more than 75 including inexact, give them the option  
+    // if they have selected more than 75 including inexact, give them the option
     } else if (this.selectedMatches?.length >= 75) {
       this.largeSearchResultDialog = true
     } else if (
