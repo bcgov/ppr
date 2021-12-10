@@ -80,9 +80,9 @@ export default defineComponent({
   setup (props, { emit }) {
     const style = useCssModule()
     const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
-    const tooltipTxtPdf = 'We were unable to save a PDF search result report because it ' +
-      'exceeded the maximum limit of 75 results per report. Please contact us if you ' +
-      'require assistance.'
+    const tooltipTxtPdf = 'Large search result reports (over 75 registrations) ' +
+      'can take up to 20 minutes to generate. The PDF will appear here once it ' +
+      'is available. You may need to refresh this page to display the PDF download icon.'
     const localState = reactive({
       loadingPDF: '',
       headers: searchHistroyTableHeaders,

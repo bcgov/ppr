@@ -7,7 +7,14 @@
     <large-search-result-dialog
       :setDisplay="largeSearchResultDialog"
       :setOptions="largeSearchResultOptions"
+      :setNumberRegistrations="selectedResultsLength"
       @proceed="handleLargeReport($event)"
+    />
+    <large-search-delay-dialog
+      :setDisplay="largeSearchDelayDialog"
+      :setOptions="largeSearchDelayOptions"
+      :setNumberRegistrations="exactResultsLength"
+      @proceed="handleDelayReport($event)"
     />
     <confirmation-dialog
       :setDisplay="confirmationDialog"
@@ -68,7 +75,12 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { BaseDialog, ConfirmationDialog, LargeSearchResultDialog } from '@/components/dialogs'
+import {
+  BaseDialog,
+  ConfirmationDialog,
+  LargeSearchResultDialog,
+  LargeSearchDelayDialog
+} from '@/components/dialogs'
 import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
@@ -77,7 +89,12 @@ import {
   ActionBindingIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { largeSearchReportError, searchReportError, selectionConfirmaionDialog } from '@/resources/dialogOptions'
+import {
+  largeSearchReportError,
+  searchReportError,
+  selectionConfirmaionDialog,
+  largeSearchReportDelay
+} from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
 
 @Component({
@@ -85,6 +102,7 @@ import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, up
     BaseDialog,
     ConfirmationDialog,
     LargeSearchResultDialog,
+    LargeSearchDelayDialog,
     SearchBar,
     SearchedResult
   }
@@ -118,8 +136,10 @@ export default class Search extends Vue {
   private confirmOptions = selectionConfirmaionDialog
   private errorDialog = false
   private largeSearchResultDialog = false
+  private largeSearchDelayDialog = false
   private errorOptions = searchReportError
   private largeSearchResultOptions = largeSearchReportError
+  private largeSearchDelayOptions = largeSearchReportDelay
   private loading = false
   private selectedMatches: Array<SearchResultIF> = []
   private settingOption = SettingOptions.SELECT_CONFIRMATION_DIALOG
@@ -173,6 +193,21 @@ export default class Search extends Vue {
     return 0
   }
 
+  private get exactResultsLength (): number {
+    const searchResult = this.getSearchResults
+    if (searchResult) {
+      return searchResult.exactResultsSize
+    }
+    return 0
+  }
+
+  private get selectedResultsLength (): number {
+    if (this.selectedMatches) {
+      return this.selectedMatches.length
+    }
+    return 0
+  }
+
   /** Use to conditionally display selection confirmation dialog. */
   private get similarResultsLength (): number {
     const searchResult = this.getSearchResults
@@ -194,8 +229,16 @@ export default class Search extends Vue {
     }
   }
 
-  private handleLargeResults (generateReport: boolean): void {
+  private handleLargeReport (generateReport: boolean): void {
+    if (generateReport) {
+      this.submit(true)
+    }
     this.largeSearchResultDialog = false
+  }
+
+  private handleDelayReport (acknowledge: boolean): void {
+    this.submit(true)
+    this.largeSearchDelayDialog = false
   }
 
   /** Redirects browser to Business Registry home page. */
@@ -204,10 +247,16 @@ export default class Search extends Vue {
   }
 
   private submitCheck (): void {
-    if (
+    // if exact match is more than 75, inform about the delay
+    if (this.exactResultsLength >= 75) {
+      this.largeSearchDelayDialog = true
+    // if they have selected more than 75 including inexact, give them the option  
+    } else if (this.selectedMatches?.length >= 75) {
+      this.largeSearchResultDialog = true
+    } else if (
       this.getUserSettings?.selectConfirmationDialog &&
-      this.totalResultsLength > 0 &&
-      this.similarResultsLength > 0
+      this.totalResultsLength > 0 && this.totalResultsLength < 75 &&
+      this.similarResultsLength > 0 && this.similarResultsLength < 75
     ) {
       this.confirmOptions = { ...selectionConfirmaionDialog }
       this.confirmOptions.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
@@ -220,20 +269,16 @@ export default class Search extends Vue {
   private async submit (proceed: boolean): Promise<void> {
     this.confirmationDialog = false
     if (proceed) {
-      if (this.selectedMatches?.length < 76) {
-        this.loading = true
-        const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
-        this.loading = false
-        if (!successfulPPRResponses.includes(statusCode)) {
-          this.emitError({ statusCode: statusCode })
-        } else {
-          // FUTURE: design error flow for this case (might need api flow changes for how a search is saved)
-          // submit the results, but don't wait for the response or check for any error
-          submitSelected(this.getSearchResults.searchId, this.selectedMatches)
-          this.$router.push({ name: RouteNames.DASHBOARD })
-        }
+      this.loading = true
+      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+      this.loading = false
+      if (!successfulPPRResponses.includes(statusCode)) {
+        this.emitError({ statusCode: statusCode })
       } else {
-        this.errorDialog = true
+        // FUTURE: design error flow for this case (might need api flow changes for how a search is saved)
+        // submit the results, but don't wait for the response or check for any error
+        submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+        this.$router.push({ name: RouteNames.DASHBOARD })
       }
     }
   }

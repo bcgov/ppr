@@ -7,3 +7,4 @@ export { default as RegistrationOtherDialog } from './RegistrationOtherDialog.vu
 export { default as SecuredPartyDialog } from './SecuredPartyDialog.vue'
 export { default as StaffPaymentDialog } from './StaffPaymentDialog.vue'
 export { default as LargeSearchResultDialog } from './LargeSearchResultDialog.vue'
+export { default as LargeSearchDelayDialog } from './LargeSearchDelayDialog.vue'
