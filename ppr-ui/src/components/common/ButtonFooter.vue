@@ -133,11 +133,10 @@ export default defineComponent({
       stepName: props.currentStepName,
       staffPaymentDialogDisplay: false,
       staffPaymentDialogOptions: {
-        acceptText: 'Submit Amendment',
+        acceptText: 'Submit Registration',
         cancelText: 'Cancel',
-        title: 'Cancel',
+        title: 'Staff Payment',
         label: '',
-        text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
       },
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
