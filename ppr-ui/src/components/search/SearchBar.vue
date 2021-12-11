@@ -94,6 +94,7 @@
         </v-tooltip>
         <auto-complete :searchValue="autoCompleteSearchValue"
                        :setAutoCompleteIsActive="autoCompleteIsActive"
+                       v-click-outside="setCloseAutoComplete"
                        @search-value="setSearchValue"
                        @hide-details="setHideDetails">
         </auto-complete>
@@ -395,6 +396,10 @@ export default defineComponent({
       localState.folioNumber = folioNumber
     }
 
+    const setCloseAutoComplete = () => {
+      localState.autoCompleteIsActive = false
+    }
+
     const onStaffPaymentChanges = (search: boolean): void => {
       if (search) {
         searchAction(true)
@@ -448,6 +453,7 @@ export default defineComponent({
       searchCheck,
       setHideDetails,
       setSearchValue,
+      setCloseAutoComplete,
       clientSearch,
       togglePaymentConfirmation,
       updateFolioNumber

@@ -97,7 +97,7 @@
             </v-row>
             <v-row v-if="!currentIsBusiness" class="pb-4" no-gutters>
               <v-col>
-                <label class="generic-label">Birthdate</label>
+                <label class="generic-label">Birthdate</label> (Optional)
               </v-col>
             </v-row>
             <v-row v-if="!currentIsBusiness" no-gutters>
