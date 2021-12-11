@@ -51,6 +51,9 @@ def upgrade():
     )
     op.create_index(op.f('ix_test_search_results_search_id'), 'test_search_results', ['search_id'], unique=False)
 
+    # this was never added to a previous migration and is needed when setting up db for first time
+    # op.add_column('user_extra_registrations', sa.Column('removed_ind', sa.String(length=1), nullable=True))
+
     # ### end Alembic commands ###
 
 
