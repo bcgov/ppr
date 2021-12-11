@@ -12,310 +12,163 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds all of the basic data about the auto analyzer uat testing."""
+import csv
 import os
 from datetime import datetime
-from http import HTTPStatus
 from typing import List
-from urllib.parse import quote_plus
 
-import requests
 from flask import Flask
-from sqlalchemy import text
 
-from auto_analyser_uat import create_app
-from auto_analyser_uat.models import RequestName, UatJobResult, db
-from auto_analyser_uat.utils import get_names_list_from_csv
-from auto_analyser_uat.utils.logging import setup_logging
+from ppr_api.models import db, SearchRequest, TestSearch, TestSearchBatch, TestSearchResult
 
-
-setup_logging(
-    os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.conf')
-)
+from search_tester import create_app
+from search_tester.utils.helpers import TO_API_SEARCH_TYPE
+from search_tester.utils.logging import setup_logging
 
 
-def get_prev_job_names(job_id: int) -> List:
-    """Get names with given job id."""
-    job = UatJobResult.get_by_id(job_id)
-    name_objs = job.get_names()
-    names = []
-    for name_obj in name_objs:
-        names.append(name_obj.name)
-    return names
+setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.conf'))
 
 
-def clean_names_list(name_list: List) -> List:
-    """Return list with names that wont fail in namex db query."""
-    cleaned_list = []
-    for name in name_list:
-        if "'" in name:
-            cleaned_name = name.replace("'", "''")
-            cleaned_list.append(cleaned_name)
+def add_legacy_results(search: TestSearch, result_list: List[dict], match_type: TestSearchResult.MatchType):
+    """Add the given legacy results for the match type to the TestSearch obj."""
+    for legacy_result, index in zip(result_list, range(len(result_list))):
+        result = TestSearchResult()
+        result.doc_id = legacy_result['doc_id']
+        result.details = legacy_result['result']
+        result.match_type = match_type.value
+        result.source = TestSearchResult.Source.LEGACY.value
+        result.index = index
+        search.results.append(result)
+
+def add_api_results(search: TestSearch, results: List[dict]):
+    """Add the given api results to the TestSearch obj."""
+    exact_index = 0
+    similar_index = 0
+    for api_result in results:
+        result = TestSearchResult()
+        result.doc_id = api_result['baseRegistrationNumber']
+        result.source = TestSearchResult.Source.API.value
+        if TestSearchResult.MatchType[api_result['matchType']] == TestSearchResult.MatchType.EXACT:
+            result.match_type = TestSearchResult.MatchType.EXACT.value
+            result.index = exact_index
+            exact_index += 1
         else:
-            cleaned_list.append(name)
-    return cleaned_list
-
-
-def get_names_from_namex(uat_job: UatJobResult, app: Flask, excl_names: List, priority_names: List, nrs: List) -> List:
-    """Get names from namex."""
-    existing_names = RequestName.get_all_names()
-    sql = (
-        """
-        select requests.id, requests.nr_num, requests.request_type_cd, requests.state_cd, requests.submitted_date,
-            names.choice, names.name, names.decision_text, names.conflict1_num, names.conflict1, names.conflict1_num,
-            names.state
-        from requests, names
-        where requests.id=names.nr_id
-            and requests.request_type_cd='CR'
-        """
-    )
-    if excl_names:
-        name_list = clean_names_list(excl_names)
-        sql += f' and names.name not in {str(name_list)}'
-    if nrs:
-        sql += f' and requests.nr_num in {str(nrs)}'
-    if priority_names:
-        name_list = clean_names_list(priority_names)
-        sql += f' and names.name in {str(name_list)}'
-    else:
-        if existing_names:
-            name_list = clean_names_list(existing_names)
-            sql += f' and names.name not in {str(name_list)}'
-
-        if uat_job.uat_type == UatJobResult.UatTypes.REJECTION.value:
-            sql += (
-                """
-                 and names.state='REJECTED'
-                 and requests.state_cd in ('APPROVED', 'CONDITIONAL', 'REJECTED')
-                 order by requests.submitted_date desc nulls last
-                """
-            )
-        else:  # uat_job.uat_type == uat_accuracy
-            sql += " and requests.state_cd in ('DRAFT') order by requests.submitted_date asc nulls last"
-
-    sql += (f" limit {app.config['MAX_ROWS']}")
-    sql = sql.replace('[', '(').replace(']', ')').replace(', "', ", '").replace('",', "',").replace('("', "('")\
-        .replace('")', "')")
-    new_names = db.get_engine(app, 'namex').execute(text(sql))
-    return new_names.fetchall()
-
-
-def load_names_into_uat(names: list):
-    """Load names into uat database."""
-    for name in names:
-        new_name = RequestName(
-            choice=name['choice'],
-            conflict1_num=name['conflict1_num'],
-            conflict1=name['conflict1'],
-            decision_text=name['decision_text'],
-            name=name['name'],
-            name_state=name['state'],
-            nr_num=name['nr_num'],
-            nr_request_type_cd=name['request_type_cd'],
-            nr_state=name['state_cd'],
-            nr_submitted_date=name['submitted_date'],
-        )
-        new_name.save()
-
-
-def send_to_auto_analyzer(name: RequestName, app: Flask):
-    """Return result of auto analyzer given the name."""
-    payload = {
-        'name': name.name,
-        'location': 'BC',
-        'entity_type_cd': name.nr_request_type_cd,
-        'request_action_cd': 'NEW'
-    }
-    url_query = '&'.join(f'{key}={quote_plus(value)}' for (key, value) in payload.items())
-    response = requests.get(f"{app.config['AUTO_ANALYSE_URL']}?{url_query}")
-    if response.status_code != HTTPStatus.OK:
-        name.auto_analyse_issue_type = response.status_code
-        name.auto_analyse_request_time = response.elapsed.total_seconds()
-        if response.status_code < 500:
-            name.auto_analyse_response = response.json()
-        raise Exception(f'Error auto analyser returned {response.status_code}')
-    return response
-
-
-def check_auto_analyse_approved(name: RequestName) -> bool:
-    """Check if auto analyser approved would have approved this name based on uat result.
-
-    Broke this down to make it very clear how we decide this in case it changes or gets augmented in the future.
-    """
-    # unnecessary but easier to understand the logic this way
-    if name.auto_analyse_result.upper() == 'AVAILABLE':
-        return True
-
-    # if there are any issues/conflicts that are NOT from itself OR a name in its own NR then return false
-    for issue in name.auto_analyse_response.get('issues', []):
-        if issue['issue_type'] != 'queue_conflict':
-            return False
-        for conflict in issue.get('conflicts', []):
-            if conflict.get('id') != name.nr_num and (conflict.get('id') or conflict.get('name') != name.name):
-                return False
-
-    return True
-
-
-def set_uat_result(name: RequestName):
-    """Set the uat result for the name based on the job type."""
-    if name.name_state != 'NE':  # if they have state 'NE' result will be updated later
-        if name.name_state == 'REJECTED' and not check_auto_analyse_approved(name):
-            name.uat_result = RequestName.Results.PASS.value
-        elif name.name_state == 'APPROVED' and check_auto_analyse_approved(name):
-            name.uat_result = RequestName.Results.PASS.value
+            result.match_type = TestSearchResult.MatchType.SIMILAR.value
+            result.index = similar_index
+            similar_index += 1
+        if search_type in [SearchRequest.SearchTypes.BUSINESS_DEBTOR.value, SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value]:
+            result.details = api_result['debtor']
+        elif search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
+            result.details = api_result['baseRegistrationNumber']
         else:
-            name.uat_result = RequestName.Results.FAIL.value
-
-
-def uat_accuracy_update(app: Flask, excluded_names: List, prioritized_names: List) -> int:
-    """Update previously unexamined names with examined state and check result."""
-    # get all names without a uat result
-    name_objs = RequestName.get_unverified()
-    if not name_objs:
-        return 0
-    names = []
-    nrs = []
-    for name in name_objs:
-        if prioritized_names:
-            if name.name in prioritized_names:
-                names.append(str(name.name))
-                nrs.append(name.nr_num)
-        else:
-            names.append(str(name.name))
-            nrs.append(name.nr_num)
-    namex_names = get_names_from_namex(None, app, excluded_names, names, nrs)
-    # check if any of these have been examined in namex
-    if not namex_names:
-        return 0
-    count = 0
-    for name in name_objs:
-        namex_name = None
-        for n in namex_names:
-            if name.name == n['name']:
-                namex_name = n
-                break
-        if namex_name and namex_name['state'] == 'NE' and namex_name['state_cd'] not in ['DRAFT', 'INPROGRESS', 'HOLD']:
-            # name will never get examined so remove it from job
-            name.uat_job_id = None
-            name.save()
-        elif namex_name and namex_name['state'] != 'NE':
-            # update the uat_result
-            name.name_state = namex_name['state']
-            name.nr_state = namex_name['state_cd']
-            name.conflict1_num = namex_name['conflict1_num']
-            name.conflict1 = namex_name['conflict1']
-            name.decision_text = namex_name['decision_text']
-            set_uat_result(name)
-            name.save()
-            # update the job if all names finished
-            uat_job = UatJobResult.get_by_id(name.uat_job_id)
-            if not uat_job.get_unfinished_names():
-                uat_job.uat_finished = True
-                uat_job.save()
-            count += 1
-            if count == app.config['MAX_ROWS']:
-                break
-    # check for any job instances stuck in unfinished state
-    for job in UatJobResult.get_jobs(finished=False):
-        unfinished_names = job.get_unfinished_names()
-        if not job.get_names() or float(len(unfinished_names))/float(len(job.get_names())) < 0.03:
-            for name in unfinished_names:
-                # orphan the name (will be deleted later)
-                name.uat_job_id = None
-                name.save()
-            # set job to finished
-            job.uat_finished = True
-    return count
-
-
-def run_auto_analyse_uat(uat_job: UatJobResult, app: Flask) -> int:
-    """Run names through the auto analyser and save the results."""
-    names_list = RequestName.get_untested()
-
-    count = 0
-    for name in names_list:
-        try:
-            app.logger.debug(f'testing {name.name}...')
-            result = send_to_auto_analyzer(name, app)
-            result_json = result.json()
-            name.auto_analyse_request_time = int(result.elapsed.total_seconds())
-            name.uat_job_id = uat_job.id
-            name.auto_analyse_response = result_json
-            name.auto_analyse_result = result_json['status']
-            if result_json['issues']:
-                name.auto_analyse_issue_text = result_json['issues'][0]['line1']
-                name.auto_analyse_issue_type = result_json['issues'][0]['issue_type']
-                if result_json['issues'][0]['conflicts']:
-                    name.auto_analyse_conflict1 = result_json['issues'][0]['conflicts'][0]['name']
-            set_uat_result(name)
-            name.save()
-            app.logger.debug(f'{name.name} auto analyse time: {name.auto_analyse_request_time}')
-
-            count += 1
-            if count == app.config['MAX_ROWS']:
-                break
-        except Exception as err:
-            name.uat_result = RequestName.Results.ERROR.value
-            name.uat_job_id = uat_job.id
-            name.save()
-            app.logger.error(err)
-            app.logger.debug('skipping this name due to error.')
-            continue
-
-    return count
-
+            result.details = api_result['vehicleCollateral']
+        search.results.append(result)
 
 if __name__ == '__main__':
     try:
         app = create_app()
-        uat_type = app.config['UAT_TYPE']
-        app.logger.debug(f'Running {uat_type}...')
+        app.logger.debug('Running search tester...')
 
-        # delete any previously queued untested names (refresh the queue of names to test)
-        for name in RequestName.get_untested():
-            db.session.delete(name)
+        completed = 0
+        skipped = 0
 
-        if app.config['CSV_FILE'] and app.config['PREV_JOB_ID']:
-            app.logger.error(
-                'CSV_FILE and PREV_JOB_ID set in config. This is not handled, please only set one of these values.')
-            app.logger.debug('CSV_FILE will take precedence (PREV_JOB_ID will be ignored).')
+        filename = 'SEARCH_RESULTS.csv'
+        batch_searches = {
+            SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value: {},
+            SearchRequest.SearchTypes.BUSINESS_DEBTOR.value: {},
+            SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value: {},
+            SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value: {},
+            SearchRequest.SearchTypes.REGISTRATION_NUM.value: {},
+            SearchRequest.SearchTypes.SERIAL_NUM.value: {}
+        }
 
-        excluded_names = \
-            get_names_list_from_csv(app.config['EXCLUDED_NAMES']) if app.config['EXCLUDED_NAMES'] else []
-        prioritized_names = get_names_list_from_csv(app.config['CSV_FILE']) if app.config['CSV_FILE'] else None
-        if not prioritized_names:
-            prioritized_names = \
-                get_prev_job_names(int(app.config['PREV_JOB_ID'])) if app.config['PREV_JOB_ID'] else None
+        # read csv + prep for search tests
+        with open(f'csvs/{filename}', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            # organize searches by time/criteria + split into exact/similar results
+            for row in reader:
+                search_type = row['SEARCH_TYPE']
+                time = row['TIME']
 
-        if uat_type == 'uat_accuracy_update':
-            count = uat_accuracy_update(app, excluded_names, prioritized_names)
-        else:
-            if uat_type not in [x.value for x in UatJobResult.UatTypes.__members__.values()]:
-                raise Exception(f'invalid UAT_TYPE: {uat_type}. Please change it in the config.')
-            uat_job = UatJobResult(uat_type=uat_type)
-            uat_job.save()
+                if time not in batch_searches[search_type]:
+                    batch_searches[search_type][time] = {
+                        'criteria': row['CRITERIA'],
+                        'exact_matches': [],
+                        'similar_matches': []
+                    }
 
-            app.logger.debug('fetching new names...')
-            new_names = get_names_from_namex(uat_job, app, excluded_names, prioritized_names, None)
-            app.logger.debug('loading new names...')
-            if new_names:
-                load_names_into_uat(new_names)
+                if row['MATCH_TYPE'] == TestSearchResult.MatchType.EXACT.value:
+                    batch_searches[search_type][time]['exact_matches'].append({
+                        'result': row['RESULT'],
+                        'doc_id': row['DOCUMENT_ID']
+                    })
+                else:
+                    batch_searches[search_type][time]['similar_matches'].append({
+                        'result': row['RESULT'],
+                        'doc_id': row['DOCUMENT_ID']
+                    })
+        for search_type in batch_searches:
+            try:
+                if not batch_searches[search_type]:
+                    # only do search batches for search types we got legacy data for
+                    continue
+                # init new batch
+                batch = TestSearchBatch()
+                batch.search_type = search_type
+                batch.test_date = datetime.utcnow()
+                batch.sim_val_business = app.config['SIM_VAL_BUSINESS']
+                batch.sim_val_first_name = app.config['SIM_VAL_FIRST']
+                batch.sim_val_last_name = app.config['SIM_VAL_LAST']
+                batch.searches = []
+                # populate searches
+                for time in batch_searches[search_type]:
+                    legacy_search = batch_searches[search_type][time]
+                    search = TestSearch()
+                    search.search_criteria = legacy_search['criteria']
+                    search.results = []
+                    # add legacy results exact
+                    add_legacy_results(search, legacy_search['exact_matches'], TestSearchResult.MatchType.EXACT)
+                    # add legacy results similar
+                    add_legacy_results(search, legacy_search['similar_matches'], TestSearchResult.MatchType.SIMILAR)
+                
+                    ### get ppr-api search results
+                    # prep search
+                    criteria = { 'value': legacy_search['criteria'] }
+                    if search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
+                        name = legacy_search['criteria'].split(' ')
+                        criteria = { 'debtorName': { 'first': name[1], 'last': name[0] }}
+                        if len(name) > 2:
+                            criteria['debtorName']['second'] = name[2]
+                    elif search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
+                        criteria = { 'debtorName': { 'business': legacy_search['criteria'] }}
 
-                app.logger.debug('running uat...')
-                count = run_auto_analyse_uat(uat_job, app)
-                uat_job.uat_end_date = datetime.utcnow()
+                    request_json = { 'criteria': criteria, 'type': TO_API_SEARCH_TYPE[search_type] }
+                    query = SearchRequest.create_from_json(request_json, '0', 'search-tester')
+                    # run search on api fn
+                    start = datetime.utcnow()
+                    query.search()
+                    end  = datetime.utcnow()
+                    interval = end - start
+                    search.run_time = interval.total_seconds()
+                    # save results
+                    results = query.search_response or []
+                    add_api_results(search, results)
+                    # add search to batch
+                    batch.searches.append(search)
+                # save batch to db
+                batch.save()
+                completed += 1
+                
+            except Exception as err:
+                app.logger.error(err.with_traceback(None))
+                app.logger.debug('Error occurred, rolling back db...')
+                db.session.rollback()
+                app.logger.debug(f'Rollback successful. Skipping batch for {search_type}')
+                skipped += 1
 
-                # accuracy type will complete later in different job (after names have been completed)
-                if uat_job.uat_type == UatJobResult.UatTypes.REJECTION.value:
-                    uat_job.uat_finished = True
-                uat_job.save()
-            else:
-                count = 0
-        db.session.commit()
-        app.logger.debug(f'Job completed. Processed {count} names.')
+        app.logger.debug(f'Job completed.')
+        app.logger.debug(f'Completed {completed} batches.')
+        app.logger.debug(f'Skipped {skipped} batches.')
 
     except Exception as err:
-        app.logger.error(err)
-        app.logger.debug('Error occurred, rolling back uat db...')
-        db.session.rollback()
-        app.logger.debug('Rollback successful.')
+        app.logger.error(err.with_traceback(None))

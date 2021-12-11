@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 233a32fc2c67
+Revision ID: c868a87ae202
 Revises: 1fa4df7e1c7a
-Create Date: 2021-12-06 16:49:36.378020
+Create Date: 2021-12-09 12:19:26.050711
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ from alembic_utils.pg_function import PGFunction
 from sqlalchemy import text as sql_text
 
 # revision identifiers, used by Alembic.
-revision = '233a32fc2c67'
+revision = 'c868a87ae202'
 down_revision = '1fa4df7e1c7a'
 branch_labels = None
 depends_on = None
@@ -31,8 +31,8 @@ def upgrade():
     )
     op.create_table('test_searches',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('search_criteria', sa.JSON(), nullable=False),
-    sa.Column('run_time', sa.Numeric(), nullable=False),
+    sa.Column('search_criteria', sa.Text(), nullable=False),
+    sa.Column('run_time', sa.Float(), nullable=False),
     sa.Column('batch_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['batch_id'], ['test_search_batches.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -41,14 +41,15 @@ def upgrade():
     op.create_table('test_search_results',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('doc_id', sa.String(length=20), nullable=False),
-    sa.Column('details', sa.JSON(), nullable=False),
+    sa.Column('details', sa.Text(), nullable=False),
     sa.Column('index', sa.Integer(), nullable=False),
-    sa.Column('match_type', sa.Enum('EXACT', 'SIMILAR', name='matchtype'), nullable=False),
-    sa.Column('source', sa.Enum('API', 'LEGACY', name='source'), nullable=False),
+    sa.Column('match_type', sa.String(length=1), nullable=False),
+    sa.Column('source', sa.String(length=10), nullable=False),
     sa.Column('search_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['search_id'], ['test_searches.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_test_search_results_search_id'), 'test_search_results', ['search_id'], unique=False)
 
     # ### end Alembic commands ###
 

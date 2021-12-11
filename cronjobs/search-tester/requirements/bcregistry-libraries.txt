@@ -1,1 +1,2 @@
+git+https://github.com/bcgov/ppr.git#egg=ppr&subdirectory=ppr-api
 git+https://github.com/bcgov/registry-schemas.git@1.4.9#egg=registry_schemas

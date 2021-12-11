@@ -15,6 +15,9 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+from typing import List
+
 from ppr_api.models import utils as model_utils
 from ppr_api.models.search_request import SearchRequest
 
@@ -26,7 +29,7 @@ class TestSearchBatch(db.Model):
 
     __tablename__ = 'test_search_batches'
 
-    id = db.Column('id', db.Integer, db.Sequence('test_search_batch_id_seq'), primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('test_search_batches_id_seq'), primary_key=True)
     search_type = db.Column('search_type', db.String(2), db.ForeignKey('search_types.search_type'), nullable=False)
     test_date = db.Column('test_date', db.DateTime, nullable=False)
     sim_val_business = db.Column('sim_val_business', db.Float, nullable=True)
@@ -45,9 +48,9 @@ class TestSearchBatch(db.Model):
             'searchType': self.search_type,
             'date': model_utils.format_ts(self.test_date)
         }
-        if self.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR:
+        if self.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
             batch['similarityValue'] = self.sim_val_business
-        elif self.search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR:
+        elif self.search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
             batch['similarityValueFirst'] = self.sim_val_first_name
             batch['similarityValueLast'] = self.sim_val_last_name
 
@@ -55,9 +58,39 @@ class TestSearchBatch(db.Model):
         for search in self.searches:
             searches.append(search.json)
 
+        batch['searches'] = searches
+
         return batch
 
     def save(self):
         """Render a search batch to the local cache."""
         db.session.add(self)
         db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, batch_id: int = None) -> TestSearchBatch:
+        """Return a search batch object by batch ID."""
+        batch = None
+        if batch_id:
+            batch = db.session.query(TestSearchBatch).\
+                        filter(TestSearchBatch.id == batch_id).one_or_none()
+
+        return batch
+
+    @classmethod
+    def find_search_batches(
+        cls,
+        type: SearchRequest.SearchTypes = None,
+        after_date: datetime = None,
+        before_date: datetime = None
+    ) -> List[TestSearchBatch]:
+        """Return a list of search batch objects by type and/or date."""
+        batch = db.session.query(TestSearchBatch)
+        if type:
+            batch = batch.filter(TestSearchBatch.search_type == type)
+        if after_date:
+            batch = batch.filter(TestSearchBatch.test_date >= after_date)
+        if before_date:
+            batch = batch.filter(TestSearchBatch.test_date <= before_date)
+
+        return batch.all()

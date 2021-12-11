@@ -14,6 +14,7 @@
 """This module holds model data and database operations for test search results."""
 
 from __future__ import annotations
+from typing import List
 
 from enum import Enum
 
@@ -37,12 +38,12 @@ class TestSearchResult(db.Model):
 
     __tablename__ = 'test_search_results'
 
-    id = db.Column('id', db.Integer, db.Sequence('test_search_result_id_seq'), primary_key=True)
+    id = db.Column('id', db.Integer, db.Sequence('test_search_results_id_seq'), primary_key=True)
     doc_id = db.Column('doc_id', db.String(20), nullable=False)
-    details = db.Column('details', db.JSON, nullable=False)
+    details = db.Column('details', db.Text, nullable=False)
     index = db.Column('index', db.Integer, nullable=False)
-    match_type = db.Column('match_type', db.Enum(MatchType), nullable=False)
-    source = db.Column('source', db.Enum(Source), nullable=False)
+    match_type = db.Column('match_type', db.String(1), nullable=False)
+    source = db.Column('source', db.String(10), nullable=False)
 
     # parent keys
     search_id = db.Column('search_id', db.Integer, db.ForeignKey('test_searches.id'), nullable=False, index=True)
@@ -55,14 +56,14 @@ class TestSearchResult(db.Model):
     def json(self) -> dict:
         """Return the result as a json object."""
         result = {
-            'details': self.result,
+            'details': self.details,
             'documentId': self.doc_id,
+            'id': self.id,
             'index': self.index,
             'matchType': self.match_type,
+            'pairedIndex': self.paired_index,
             'source': self.source
         }
-        if self.source == TestSearchResult.Source.API:
-            result['pairedIndex'] = self.paired_index
 
         return result
 
@@ -79,3 +80,23 @@ class TestSearchResult(db.Model):
         if paired_match:
             return paired_match.index
         return -1
+
+    @classmethod
+    def find_by_id(cls, result_id: int = None) -> TestSearchResult:
+        """Return a search result object by search result ID."""
+        result = None
+        if result_id:
+            result = db.session.query(TestSearchResult).\
+                        filter(TestSearchResult.id == result_id).one_or_none()
+
+        return result
+
+    @classmethod
+    def find_all_by_search_id(cls, search_id: int = None) -> List[TestSearchResult]:
+        """Return a list of search result objects by search ID."""
+        results = []
+        if search_id:
+            results = db.session.query(TestSearchResult).\
+                        filter(TestSearchResult.search_id == search_id).all()
+
+        return results

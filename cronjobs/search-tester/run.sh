@@ -1,4 +1,2 @@
-echo 'run manage.py db upgrade'
-python manage.py db upgrade
-echo 'execute run_auto_analyser_uat.py'
-python run_auto_analyser_uat.py
+echo 'execute run_search_tester.py'
+python run_search_tester.py
