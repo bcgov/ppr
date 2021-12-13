@@ -1,18 +1,16 @@
 """empty message
 
 Revision ID: c868a87ae202
-Revises: 1fa4df7e1c7a
+Revises: 9fefc7beceec
 Create Date: 2021-12-09 12:19:26.050711
 
 """
 from alembic import op
 import sqlalchemy as sa
-from alembic_utils.pg_function import PGFunction
-from sqlalchemy import text as sql_text
 
 # revision identifiers, used by Alembic.
 revision = 'c868a87ae202'
-down_revision = '1fa4df7e1c7a'
+down_revision = '9fefc7beceec'
 branch_labels = None
 depends_on = None
 
