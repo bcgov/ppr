@@ -9,7 +9,8 @@ import { mount, createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
 // Components
 import { ButtonFooter } from '@/components/common'
 import { StaffPaymentDialog } from '@/components/dialogs'
-import { Dashboard, LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views'
+import { LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views'
+import { getLastEvent } from './utils'
 
 // Other
 import mockRouter from './MockRouter'
@@ -29,22 +30,6 @@ const saveResumeBtn: string = '#reg-save-resume-btn'
 const backBtn: string = '#reg-back-btn'
 const nextBtn: string = '#reg-next-btn'
 
-/**
- * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
- *
- * @param wrapper the wrapper for the component that is being tested.
- * @param name the name of the event that is to be returned.
- *
- * @returns the value of the last named event for the wrapper.
- */
-function getLastEvent (wrapper: Wrapper<any>, name: string): any {
-  const eventsList: Array<any> = wrapper.emitted(name)
-  if (!eventsList) {
-    return null
-  }
-  const events: Array<any> = eventsList[eventsList.length - 1]
-  return events[0]
-}
 
 const router = mockRouter.mock()
 
@@ -55,7 +40,6 @@ const router = mockRouter.mock()
  */
 function createComponent (
   currentStatementType: String,
-  testRouter: VueRouter,
   currentStepName: String
 ): Wrapper<any> {
   const localVue = createLocalVue()
@@ -82,7 +66,7 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper2 = shallowMount(LengthTrust, { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, router, currentStepName)
+    wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -133,7 +117,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper2 = shallowMount(AddSecuredPartiesAndDebtors, { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, router, currentStepName)
+    wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -195,7 +179,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper2 = shallowMount(AddCollateral, { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, router, currentStepName)
+    wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -256,7 +240,7 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper2 = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, router, currentStepName)
+    wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -319,7 +303,7 @@ describe('Step 4 for SBC staff', () => {
     localVue.use(VueRouter)
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
     wrapper2 = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, router, currentStepName)
+    wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -331,9 +315,23 @@ describe('Step 4 for SBC staff', () => {
     
   })
  
-  it('Shows staff payment dialog on submit', async () => {
+  it('doesnt show staff payment dialog on submit if not valid', async () => {
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
+    expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(false)
+    expect(getLastEvent(wrapper, 'registration-incomplete')).toMatchObject({"message": "Registration incomplete: one or more steps is invalid.", "statusCode": 400})
+  })
+
+  it('Shows staff payment dialog on submit', async () => {
+    wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid = true
+    wrapper.vm.$store.state.stateModel.registration.parties.valid = true
+    wrapper.vm.$store.state.stateModel.registration.collateral.valid  = true
+    wrapper.vm.$props.certifyValid = true
+    await Vue.nextTick()
+    await Vue.nextTick()
+    wrapper.find(nextBtn).trigger('click')
+    await Vue.nextTick()
+    
     expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
   })
 
