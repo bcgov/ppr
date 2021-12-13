@@ -132,3 +132,17 @@ class SerialType(db.Model):  # pylint: disable=too-few-public-methods
 
     # Relationships - VehicleCollateral
     vehicle_collateral = db.relationship('VehicleCollateral', back_populates='serial_type')
+
+
+class EventTrackingType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the event_tracking_types table."""
+
+    __tablename__ = 'event_tracking_types'
+
+    event_tracking_type = db.Column('event_tracking_type', db.String(20), primary_key=True)
+    event_tracking_desc = db.Column('event_tracking_desc', db.String(100), nullable=False)
+
+    # parent keys
+
+    # Relationships - EventTracking
+    event_tracking = db.relationship('EventTracking', back_populates='tracking_type')

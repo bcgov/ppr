@@ -21,6 +21,7 @@ from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
 from .court_order import CourtOrder
 from .draft import Draft
+from .event_tracking import EventTracking
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
 from .general_collateral_legacy import GeneralCollateralLegacy
@@ -32,6 +33,7 @@ from .search_result import SearchResult
 from .trust_indenture import TrustIndenture
 from .type_tables import (
     CountryType,
+    EventTrackingType,
     PartyType,
     ProvinceType,
     RegistrationType,

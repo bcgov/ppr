@@ -19,16 +19,38 @@ Test-Suite to ensure that the /searches endpoint is working as expected.
 import copy
 from http import HTTPStatus
 
+import pytest
 from flask import current_app
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_SUMMARY
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
-from tests.unit.services.utils import create_header, create_header_account
+from ppr_api.models import SearchResult, SearchRequest
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
+from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
 SAMPLE_JSON_SUMMARY = copy.deepcopy(SEARCH_SUMMARY)
+MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+TEST_SEARCH_REPORT_FILE = 'tests/unit/api/test-get-search-report.pdf'
+# testdata pattern is ({desc}, {roles}, {status}, {has_account}, {search_id}, {is_report})
+TEST_GET_DATA = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005, False),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 200000005, False),
+    ('Invalid request too old', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000006, False),
+    ('Valid request', [PPR_ROLE], HTTPStatus.OK, True, 200000005, False),
+    ('Invalid search Id', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 300000006, False),
+    ('Invalid request staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005, False),
+    ('Report pending request', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 200000007, True),
+    ('Report valid request', [PPR_ROLE], HTTPStatus.OK, True, 200000008, True)
+]
+# testdata pattern is ({desc}, {status}, {search_id})
+TEST_CALLBACK_DATA = [
+    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
+    ('Not async search id', HTTPStatus.BAD_REQUEST, 200000005),
+    ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000010),
+    ('Report already exists', HTTPStatus.OK, 200000008)
+]
 
 
 def test_search_detail_valid_200(session, client, jwt):
@@ -198,27 +220,67 @@ def test_search_detail_no_duplicates_200(session, client, jwt):
     assert len(results['details']) == 1
 
 
-def test_get_search_detail_200(session, client, jwt):
-    """Assert that a valid get search details request returns the expected result."""
-    # no setup
-
+@pytest.mark.parametrize('desc,roles,status,has_account, search_id, is_report', TEST_GET_DATA)
+def test_get_search_detail(session, client, jwt, desc, roles, status, has_account, search_id, is_report):
+    """Assert that a get search detail info by search id works as expected."""
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
+    headers = None
+    # setup
+    if is_report:
+        headers = create_header_account_report(jwt, roles)
+    elif has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and SBC_OFFICE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
     # test
-    rv = client.get('/api/v1/search-results/200000005',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
-
-    # check
-    print(rv.json)
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_get_search_detail_too_old_400(session, client, jwt):
-    """Assert that a get search details request on an old search returns a 400 status."""
-    # no setup
-
-    # test
-    rv = client.get('/api/v1/search-results/200000006',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
+    rv = client.get('/api/v1/search-results/' + str(search_id),
+                    headers=headers)
 
     # check
     # print(rv.json)
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
+    assert rv.status_code == status
+
+
+@pytest.mark.parametrize('desc,status,search_id', TEST_CALLBACK_DATA)
+def test_callback_search_report(session, client, jwt, desc, status, search_id):
+    """Assert that a callback request returns the expected status."""
+    # test
+    rv = client.patch('/api/v1/search-results/callback/' + str(search_id),
+                      headers=None)
+    # check
+    assert rv.status_code == status
+
+
+def test_valid_callback_search_report(session, client, jwt):
+    """Assert that a valid callback request returns a 200 status."""
+    # setup
+    json_data = {
+        'type': 'SERIAL_NUMBER',
+        'criteria': {
+            'value': 'JU622994'
+        },
+        'clientReferenceId': 'UT-SS-1001'
+    }
+    search_query = SearchRequest.create_from_json(json_data, 'PS12345')
+    search_query.search()
+    query_json = search_query.json
+    search_detail = SearchResult.create_from_search_query(search_query)
+    search_detail.save()
+    select_json = query_json['results']
+    search_detail.update_selection(select_json, 'UNIT TEST INC.', 'CALLBACK_URL')
+
+    # test
+    rv = client.patch('/api/v1/search-results/callback/' + str(search_detail.search_id),
+                      headers=None)
+    # check
+    # print(rv.json)
+    assert rv.status_code == HTTPStatus.OK
+    response = rv.json
+    assert response['name']
+    assert response['selfLink']
