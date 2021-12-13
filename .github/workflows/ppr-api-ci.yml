@@ -91,10 +91,10 @@ jobs:
           make setup
       - name: Upgrade db
         run: |
-          python manage.py db upgrade
+          . venv/bin/activate && python manage.py db upgrade
       - name: Create Test Data
         run: |
-          python manage.py create_test_data
+          . venv/bin/activate && python manage.py create_test_data
       - name: Test with pytest
         id: test
         run: |
