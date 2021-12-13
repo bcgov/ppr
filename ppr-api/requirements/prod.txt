@@ -11,6 +11,8 @@ attrs<=19.1.0
 flask-jwt-oidc>=0.2.0
 datedelta
 dpath==1.4.2
+google-auth
+google-auth-oauthlib
 gunicorn
 jsonschema
 launchdarkly-server-sdk

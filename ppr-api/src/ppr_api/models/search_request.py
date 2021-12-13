@@ -30,6 +30,10 @@ from ppr_api.models import search_utils
 from .db import db
 
 
+# Async search report status pending.
+REPORT_STATUS_PENDING = 'PENDING'
+
+
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search query (search step 1) information."""
 
@@ -367,8 +371,15 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             if rows is not None:
                 for row in rows:
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                    search_id = str(mapping['id'])
+                    # Set to pending if async report is not yet available.
+                    callback_url = str(mapping['callback_url'])
+                    doc_storage_url = str(mapping['doc_storage_url'])
+                    if callback_url is not None and callback_url.lower() != 'none' and \
+                            (doc_storage_url is None or doc_storage_url.lower() == 'none'):
+                        search_id = REPORT_STATUS_PENDING
                     search = {
-                        'searchId': str(mapping['id']),
+                        'searchId': search_id,
                         'searchDateTime': model_utils.format_ts(mapping['search_ts']),
                         'searchQuery': mapping['api_criteria'],
                         'totalResultsSize': int(mapping['total_results_size']),
@@ -383,12 +394,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     else:
                         search['selectedResultsSize'] = int(exact_value)
                     history_list.append(search)
-
-        # if not history_list:
-        #   raise BusinessException(
-        #       error=f'No search history found for Account ID {account_id}.',
-        #       status_code=HTTPStatus.NOT_FOUND
-        #    )
 
         return history_list
 

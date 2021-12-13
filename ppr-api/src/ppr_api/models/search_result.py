@@ -27,6 +27,10 @@ from .financing_statement import FinancingStatement
 from .search_utils import GET_DETAIL_DAYS_LIMIT
 
 
+# PPR UI search detail report callbackURL parameter: skip notification is request originates from UI.
+UI_CALLBACK_URL = 'PPR_UI'
+
+
 class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search results detail (search step 2) information."""
 
@@ -39,6 +43,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     score = db.Column('score', db.Integer, nullable=True)
     exact_match_count = db.Column('exact_match_count', db.Integer, nullable=True)
     similar_match_count = db.Column('similar_match_count', db.Integer, nullable=True)
+    # large async report requests capture callbackURL
+    callback_url = db.Column('callback_url', db.String(1000), nullable=True)
+    # large async report requests event listener updates when pdf generated and saved to document storage.
+    doc_storage_url = db.Column('doc_storage_url', db.String(1000), nullable=True)
+    # Need this for async reports (extracted from token).
+    account_name = db.Column('account_name', db.String(1000), nullable=True)
 
     # parent keys
 
@@ -68,7 +78,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
-    def update_selection(self, search_select):
+    def update_selection(self, search_select, account_name: str = None, callback_url: str = None):
         """Update the set of search details from the search query selection.
 
         Remove any original similar match financing statements that are not in the current search query selection.
@@ -124,6 +134,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         detail_response['totalResultsSize'] = (self.exact_match_count + self.similar_match_count)
         detail_response['details'] = new_results
         self.search_response = detail_response
+        if account_name:
+            self.account_name = account_name
+        if callback_url:
+            self.callback_url = callback_url
         self.save()
 
     @classmethod
@@ -148,6 +162,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             )
 
         return search_detail
+
+    def is_ui_callback(self):
+        """Return whether an async search report request originated from the UI."""
+        return self.callback_url and self.callback_url == UI_CALLBACK_URL
 
     @staticmethod
     def create_from_search_query_no_results(search_query):

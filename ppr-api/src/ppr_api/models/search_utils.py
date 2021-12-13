@@ -245,7 +245,7 @@ COUNT_QUERY_FROM_SEARCH_TYPE = {
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
 'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
-       'sr.exact_match_count, sr.similar_match_count ' + \
+       'sr.exact_match_count, sr.similar_match_count, sr.callback_url, sr.doc_storage_url ' + \
   'FROM search_requests sc, search_results sr ' + \
  'WHERE sc.id = sr.search_id ' + \
    "AND sc.account_id = '?' " + \
@@ -255,7 +255,7 @@ ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
 
 ACCOUNT_SEARCH_HISTORY_QUERY = \
 'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
-       'sr.exact_match_count, sr.similar_match_count ' + \
+       'sr.exact_match_count, sr.similar_match_count, sr.callback_url, sr.doc_storage_url ' + \
   'FROM search_requests sc, search_results sr ' + \
  'WHERE sc.id = sr.search_id ' + \
    "AND sc.account_id = '?' " + \

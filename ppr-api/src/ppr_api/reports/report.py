@@ -88,14 +88,17 @@ class Report:  # pylint: disable=too-few-public-methods
         self._account_id = account_id
         self._account_name = account_name
 
-    def get_pdf(self, report_type=None):
+    def get_pdf(self, report_type=None, token=None):
         """Render a pdf for the report type and report data."""
         if report_type:
             self._report_key = report_type
         headers = {
-            'Authorization': 'Bearer {}'.format(jwt.get_token_auth_header()),
             'Content-Type': 'application/json'
         }
+        if token is not None:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        else:
+            headers['Authorization'] = 'Bearer {}'.format(jwt.get_token_auth_header())
         data = self._setup_report_data()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
@@ -109,7 +112,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if response.status_code != HTTPStatus.OK:
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
                                      .format(self._account_id, response.status_code, str(response.content)))
-            return jsonify(message=str(response.content)), response.status_code
+            return jsonify(message=str(response.content)), response.status_code, None
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
 
     def _setup_report_data(self):

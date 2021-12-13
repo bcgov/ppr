@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Resource helper utilities for processing requests."""
-
+from enum import Enum
 from http import HTTPStatus
 
 from flask import jsonify, current_app, request
@@ -38,6 +38,18 @@ CERTIFIED_PARAM = 'certified'
 ROUTING_SLIP_PARAM = 'routingSlipNumber'
 DAT_NUMBER_PARAM = 'datNumber'
 BCOL_NUMBER_PARAM = 'bcolAccountNumber'
+
+
+class CallbackExceptionCodes(str, Enum):
+    """Render an Enum of exception codes to facilitate source of exception."""
+
+    UNKNOWN_ID = '01'
+    MAX_RETRIES = '02'
+    INVALID_ID = '03'
+    DEFAULT = '04'
+    REPORT_DATA_ERR = '05'
+    REPORT_ERR = '06'
+    STORAGE_ERR = '07'
 
 
 def serialize(errors):
@@ -68,6 +80,16 @@ def get_apikey(req):
 def account_required_response():
     """Build account required error response."""
     return jsonify({'message': ACCOUNT_REQUIRED}), HTTPStatus.BAD_REQUEST
+
+
+def error_response(status_code, message):
+    """Build generic error response."""
+    return jsonify({'message': message}), status_code
+
+
+def bad_request_response(message):
+    """Build generic bad request response."""
+    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def staff_payment_bcol_fas():
@@ -104,6 +126,11 @@ def default_exception_response(exception):
     """Build default 500 exception error response."""
     current_app.logger.error(repr(exception))
     return jsonify({'message': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+def service_exception_response(message):
+    """Build 500 exception error response."""
+    return jsonify({'message': message}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def not_found_error_response(item, key):
@@ -203,14 +230,18 @@ def validate_delete_ids(json_data, financing_statement):
 
 def get_account_name(token: str, account_id: str = None):
     """Lookup the account organization name from the user token with an auth api call."""
-    orgs = user_orgs(token)
-    if orgs and 'orgs' in orgs:
-        if (len(orgs['orgs']) == 1 or not account_id or not account_id.isdigit()):
-            return orgs['orgs'][0]['name']
-        for org in orgs['orgs']:
-            if org['id'] == int(account_id):
-                return org['name']
-    return None
+    try:
+        orgs = user_orgs(token)
+        if orgs and 'orgs' in orgs and orgs['orgs']:
+            if (len(orgs['orgs']) == 1 or not account_id or not account_id.isdigit()):
+                return orgs['orgs'][0]['name']
+            for org in orgs['orgs']:
+                if org['id'] == int(account_id):
+                    return org['name']
+        return None
+    except Exception as err:  # pylint: disable=broad-except # noqa F841;
+        current_app.logger.error('get_account_name failed: ' + repr(err))
+        return None
 
 
 def check_access_financing(token: str, staff: bool, account_id: str, statement):

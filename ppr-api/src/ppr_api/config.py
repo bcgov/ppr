@@ -167,6 +167,25 @@ class _Config():  # pylint: disable=too-few-public-methods
     SIMILARITY_QUOTIENT_LAST_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_LAST_NAME', '0.29'))
     SIMILARITY_QUOTIENT_DEFAULT: float = float(os.getenv('SIMILARITY_QUOTIENT_DEFAULT', '0.5'))
 
+    # Search results report number of financing statements threshold for async requests.
+    SEARCH_PDF_ASYNC_THRESHOLD: int = int(os.getenv('SEARCH_PDF_ASYNC_THRESHOLD', '75'))
+
+    # UI callbackURL for large reports: signal API to skip notification for UI requests.
+    UI_SEARCH_CALLBACK_URL = os.getenv('UI_SEARCH_CALLBACK_URL', 'PPR_UI')
+
+    # Event tracking max retries before human intervention.
+    EVENT_MAX_RETRIES: int = int(os.getenv('EVENT_MAX_RETRIES', '3'))
+
+    # Google APIs and cloud storage
+    GCP_PROJECT_ID = os.getenv('GCP_PROJECT_ID')
+    GCP_SA_CLIENT_EMAIL = os.getenv('GCP_SA_CLIENT_EMAIL')
+    GCP_SA_CLIENT_ID = os.getenv('GCP_SA_CLIENT_ID')
+    GCP_SA_PRIVATE_KEY = os.getenv('GCP_SA_PRIVATE_KEY')
+    # https://developers.google.com/identity/protocols/oauth2/scopes
+    GCP_SA_SCOPES = json.loads(os.getenv('GCP_SA_SCOPES', '["https://www.googleapis.com/auth/cloud-platform"]'))
+    GCP_CS_BUCKET_ID = os.getenv('GCP_CS_BUCKET_ID', 'ppr_search_results_dev')
+    GCP_CLOUD_STORAGE_URL = os.getenv('GCP_CLOUD_STORAGE_URL', 'https://storage.googleapis.com')
+
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""

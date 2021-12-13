@@ -27,3 +27,12 @@ def get_pdf(report_data, account_id, report_type=None, token=None):
     except FileNotFoundError:
         # We don't have a template for it, so it must only be available on paper.
         return jsonify({'message': _('No PDF report found.')}), HTTPStatus.NOT_FOUND
+
+
+def get_callback_pdf(report_data, account_id, report_type, token, account_name):
+    """Event callback generate a PDF of the provided report type using the provided data."""
+    try:
+        return Report(report_data, account_id, report_type, account_name).get_pdf(token=token)
+    except FileNotFoundError:
+        # We don't have a template for it, so it must only be available on paper.
+        return jsonify({'message': _('No PDF report found.')}), HTTPStatus.NOT_FOUND
