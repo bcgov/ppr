@@ -221,16 +221,38 @@ export default defineComponent({
           StatementTypes.FINANCING_STATEMENT &&
         localState.stepName === RouteNames.REVIEW_CONFIRM
       ) {
-        if (localState.isStaffReg) {
-          localState.staffPaymentDialogDisplay = true
+        if (checkValid()) {
+          if (localState.isStaffReg) {
+            localState.staffPaymentDialogDisplay = true
+          } else {
+            submitFinancingStatement()
+          }
         } else {
-          submitFinancingStatement()
+          // emit registation incomplete error
+          const error: ErrorIF = {
+            statusCode: 400,
+            message: 'Registration incomplete: one or more steps is invalid.'
+          }
+          emit('registration-incomplete', error)
         }
       } else {
         props.router.push({
           name: localState.buttonConfig.nextRouteName
         })
       }
+    }
+
+    const checkValid = (): boolean => {
+      const stateModel: StateModelIF = getStateModel.value
+      if (
+        stateModel.registration.lengthTrust.valid &&
+        stateModel.registration.parties.valid &&
+        stateModel.registration.collateral.valid &&
+        localState.isCertifyValid
+      ) {
+        return true
+      }
+      return false
     }
 
     const onStaffPaymentChanges = (pay: boolean): void => {
@@ -243,12 +265,7 @@ export default defineComponent({
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
     const submitFinancingStatement = async () => {
       const stateModel: StateModelIF = getStateModel.value
-      if (
-        stateModel.registration.lengthTrust.valid &&
-        stateModel.registration.parties.valid &&
-        stateModel.registration.collateral.valid &&
-        localState.isCertifyValid
-      ) {
+      if (checkValid()) {
         // API call here
         const apiResponse: FinancingStatementIF = await saveFinancingStatement(stateModel)
         if (apiResponse.error !== undefined) {
