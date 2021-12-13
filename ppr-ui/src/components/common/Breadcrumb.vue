@@ -61,8 +61,10 @@ export default defineComponent({
     } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType', 'isRoleStaff'])
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
-    const isStaff = isRoleStaff.value
     const localState = reactive({
+      isStaff: computed((): boolean => {
+        return isRoleStaff.value
+      }),
       backUrl: computed((): string => {
         const length = localState.breadcrumbs?.length || 0
         if (length > 1) {
@@ -99,7 +101,7 @@ export default defineComponent({
     })
 
     const handleStaff = (breadcrumbText): string => {
-      if (isStaff) {
+      if (localState.isStaff) {
         breadcrumbText = breadcrumbText.replace('My', 'Staff')
       }
       return breadcrumbText

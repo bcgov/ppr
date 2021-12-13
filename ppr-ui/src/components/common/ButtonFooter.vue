@@ -133,11 +133,10 @@ export default defineComponent({
       stepName: props.currentStepName,
       staffPaymentDialogDisplay: false,
       staffPaymentDialogOptions: {
-        acceptText: 'Submit Amendment',
+        acceptText: 'Submit Registration',
         cancelText: 'Cancel',
-        title: 'Cancel',
-        label: '',
-        text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
+        title: 'Staff Payment',
+        label: ''
       },
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
@@ -222,7 +221,7 @@ export default defineComponent({
           StatementTypes.FINANCING_STATEMENT &&
         localState.stepName === RouteNames.REVIEW_CONFIRM
       ) {
-        if ((localState.isStaffReg) || (localState.isStaffSbc)) {
+        if (localState.isStaffReg) {
           localState.staffPaymentDialogDisplay = true
         } else {
           submitFinancingStatement()
