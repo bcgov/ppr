@@ -89,6 +89,12 @@ jobs:
       - name: Install dependencies
         run: |
           make setup
+      - name: Upgrade db
+        run: |
+          python manage.py db upgrade
+      - name: Create Test Data
+        run: |
+          python manage.py create_test_data
       - name: Test with pytest
         id: test
         run: |
