@@ -96,7 +96,7 @@ class TestSearch(db.Model):
                 return result['index']
         return -1
 
-    def get_results(self, match_type, source) -> list[dict]:
+    def get_results(self, match_type, source) -> List[dict]:
         """Return results list of this search with given match type and source."""
         results = db.session.query(TestSearchResult).filter(
             TestSearchResult.search_id == self.id,

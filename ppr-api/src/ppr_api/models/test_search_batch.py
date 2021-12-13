@@ -79,15 +79,15 @@ class TestSearchBatch(db.Model):
 
     @classmethod
     def find_search_batches(
-        cls,
-        type: SearchRequest.SearchTypes = None,
-        after_date: datetime = None,
-        before_date: datetime = None
+            cls,
+            search_type: SearchRequest.SearchTypes = None,
+            after_date: datetime = None,
+            before_date: datetime = None
     ) -> List[TestSearchBatch]:
         """Return a list of search batch objects by type and/or date."""
         batch = db.session.query(TestSearchBatch)
-        if type:
-            batch = batch.filter(TestSearchBatch.search_type == type)
+        if search_type:
+            batch = batch.filter(TestSearchBatch.search_type == search_type)
         if after_date:
             batch = batch.filter(TestSearchBatch.test_date >= after_date)
         if before_date:
