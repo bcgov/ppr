@@ -129,7 +129,7 @@ import {
   DraftIF, // eslint-disable-line no-unused-vars
   CourtOrderIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { RegistrationTypes } from '@/resources'
+import { AllRegistrationTypes } from '@/resources'
 import {
   convertDate,
   getFeatureFlag,
@@ -243,7 +243,7 @@ export default class AmendRegistration extends Vue {
   }
 
   private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber || !this.getConfirmDebtorName) {
+    if (!this.registrationNumber && (!this.getConfirmDebtorName || !this.documentId)) {
       if (!this.registrationNumber) {
         console.error('No registration number given to amend. Redirecting to dashboard...')
       } else {
@@ -264,7 +264,7 @@ export default class AmendRegistration extends Vue {
       this.emitError(financingStatement.error)
     } else {
       // load data into the store
-      const registrationType = RegistrationTypes.find((reg, index) => {
+      const registrationType = AllRegistrationTypes.find((reg, index) => {
         if (reg.registrationTypeAPI === financingStatement.type) {
           return true
         }
