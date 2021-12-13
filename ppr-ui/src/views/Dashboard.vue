@@ -694,7 +694,7 @@ export default class Dashboard extends Vue {
   private handleSearchHistoryUpdate (newVal: number, oldVal: number): void {
     // show snackbar if oldVal was not null
     if (oldVal !== null) {
-      this.snackbarMsg = 'Search Result was successfully added to your table.'
+      this.snackbarMsg = 'Your search was successfully added to your table.'
       this.toggleSnackbar = !this.toggleSnackbar
     }
   }

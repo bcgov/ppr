@@ -38,3 +38,17 @@ export const searchReportError: DialogOptionsIF = {
     'limitation so that large PDF reports can be generated. If you require ' +
     'assistance, please contact us.'
 }
+
+export const largeSearchReportError: DialogOptionsIF = {
+  acceptText: 'Generate Report Now',
+  cancelText: 'Change Selected Registrations',
+  title: 'Large search result report - confirm selections',
+  text: ''
+}
+
+export const largeSearchReportDelay: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  title: 'Large search result report may be delayed',
+  text: ''
+}

@@ -163,7 +163,7 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(BaseSnackbar).exists()).toBe(true)
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(true)
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.setMessage).toBe(
-      'Search Result was successfully added to your table.'
+      'Your search was successfully added to your table.'
     )
   })
 
