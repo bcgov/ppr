@@ -30,6 +30,9 @@ from .previous_financing_statement import PreviousFinancingStatement
 from .registration import Registration
 from .search_request import SearchRequest
 from .search_result import SearchResult
+from .test_search_batch import TestSearchBatch
+from .test_search import TestSearch
+from .test_search_result import TestSearchResult
 from .trust_indenture import TrustIndenture
 from .type_tables import (
     CountryType,
@@ -52,5 +55,5 @@ __all__ = ('db',
            'AccountBcolId', 'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft',
            'FinancingStatement', 'GeneralCollateral', 'GeneralCollateralLegacy', 'Party', 'PartyType',
            'PreviousFinancingStatement', 'ProvinceType', 'Registration', 'RegistrationType', 'RegistrationTypeClass',
-           'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType', 'TrustIndenture', 'User',
-           'UserExtraRegistration', 'UserProfile', 'VehicleCollateral')
+           'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType', 'TestSearchBatch', 'TestSearch',
+           'TestSearchResult', 'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile', 'VehicleCollateral')

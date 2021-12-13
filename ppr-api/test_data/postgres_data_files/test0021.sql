@@ -13,7 +13,7 @@ INSERT INTO registrations(id, financing_id, registration_number, base_reg_number
 ;
 -- simulate bad legacy address
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
-  VALUES(200000034, 'TEST-0019RE', null, 'city', null, null, null)
+  VALUES(200000034, 'TEST-0019RE', null, 'city', null, 'V8R3A5', null)
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)

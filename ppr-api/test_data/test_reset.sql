@@ -32,4 +32,10 @@ DELETE FROM client_code
   WHERE branch_id BETWEEN 29990001 AND 29990004;
 DELETE FROM address_ppr
   WHERE address_id BETWEEN 29990001 AND 29990004;
+DELETE FROM test_search_results
+  WHERE id >= 200000000
+DELETE FROM test_searches
+  WHERE id >= 200000000
+DELETE FROM test_search_batches
+  WHERE id >= 200000000
 -- Delete test data end
