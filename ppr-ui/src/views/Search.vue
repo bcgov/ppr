@@ -270,14 +270,15 @@ export default class Search extends Vue {
     this.confirmationDialog = false
     if (proceed) {
       this.loading = true
-      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+      let shouldCallback = false
+      if (this.selectedMatches?.length >= 75) {
+        shouldCallback = true
+      }
+      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
       this.loading = false
       if (!successfulPPRResponses.includes(statusCode)) {
         this.emitError({ statusCode: statusCode })
       } else {
-        // FUTURE: design error flow for this case (might need api flow changes for how a search is saved)
-        // submit the results, but don't wait for the response or check for any error
-        submitSelected(this.getSearchResults.searchId, this.selectedMatches)
         this.$router.push({ name: RouteNames.DASHBOARD })
       }
     }
