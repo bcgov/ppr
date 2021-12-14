@@ -50,7 +50,7 @@ STATEMENT_VALID = {
         },
         'emailAddress': 'bsmith@abc-search.com'
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -97,7 +97,7 @@ MISSING_BASE_DEBTOR = {
         },
         'emailAddress': 'bsmith@abc-search.com'
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -121,7 +121,7 @@ INVALID_BASE_DEBTOR = {
         },
         'emailAddress': 'bsmith@abc-search.com'
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -145,7 +145,7 @@ INVALID_REG_NUM = {
         },
         'emailAddress': 'bsmith@abc-search.com'
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -169,7 +169,7 @@ INVALID_HISTORICAL = {
         },
         'emailAddress': 'bsmith@abc-search.com'
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -185,7 +185,7 @@ INVALID_CODE = {
     'registeringParty': {
         'code': '300000000'
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -208,7 +208,7 @@ INVALID_ADDRESS = {
             'postalCode': 'V8W 2V8'
         }
     },
-    'expiryDate': '2025-02-21T23:59:59+00:00',
+    'lifeYears': 2,
     'payment': {
         'receipt': '/pay/api/v1/payment-requests/2199700/receipts',
         'invoiceId': '2199700'
@@ -232,7 +232,6 @@ RL_INVALID_DATE = {
         },
         'emailAddress': 'bsmith@abc-search.com'
     },
-    'lifeYears': 5,
     'courtOrderInformation': {
       'courtName': 'Supreme Court of British Columbia.',
       'courtRegistry': 'VICTORIA',
@@ -397,6 +396,32 @@ def test_renewal_sa_success(session, client, jwt):
     assert 'renewalRegistrationNumber' in json_data['changes'][0]
     assert json_data['baseRegistrationNumber'] == base_reg_num
     assert json_data['changes'][0]['baseRegistrationNumber'] == base_reg_num
+
+
+def test_renewal_sa_life_infinite(session, client, jwt):
+    """Assert that a valid create renewal with infinite life returns a 201 status."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    rv1 = create_financing_test(session, client, jwt, 'SA')
+    assert rv1.status_code == HTTPStatus.CREATED
+    assert rv1.json['baseRegistrationNumber']
+    base_reg_num = rv1.json['baseRegistrationNumber']
+
+    json_data = copy.deepcopy(STATEMENT_VALID)
+    json_data['baseRegistrationNumber'] = base_reg_num
+    json_data['debtorName']['businessName'] = 'TEST BUS 2 DEBTOR'
+    del json_data['payment']
+    del json_data['lifeYears']
+    json_data['lifeInfinite'] = True
+    print(json_data)
+
+    # test
+    rv = client.post('/api/v1/financing-statements/' + base_reg_num + '/renewals',
+                     json=json_data,
+                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     content_type='application/json')
+    # check
+    assert rv.status_code == HTTPStatus.CREATED
 
 
 def test_get_payment_details_registration(session, client, jwt):

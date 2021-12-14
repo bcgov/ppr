@@ -27,6 +27,10 @@ DELETE_MISSING_ID_VEHICLE = 'Required vehicleId missing in delete Vehicle Collat
 DELETE_MISSING_ID_GENERAL = 'Required collateralId missing in delete General Collateral.\n'
 DELETE_INVALID_ID_VEHICLE = 'Invalid vehicleId {} in delete Vehicle Collateral.\n'
 DELETE_INVALID_ID_GENERAL = 'Invalid collateralId {} in delete General Collateral.\n'
+LI_NOT_ALLOWED = 'Life Infinite is not allowed with this registration type.\n'
+RENEWAL_INVALID = 'Renewal registration is now allowed: the base registration has an infinite life.\n'
+LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type.\n'
+LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed.\n'
 
 
 def validate_registration(json_data, financing_statement=None):
@@ -48,6 +52,7 @@ def validate_renewal(json_data, financing_statement):
     if not financing_statement:
         return error_msg
 
+    error_msg += validate_life(json_data, financing_statement)
     if model_utils.REG_TYPE_REPAIRER_LIEN == financing_statement.registration[0].registration_type:
         if 'courtOrderInformation' not in json_data:
             error_msg += COURT_ORDER_MISSING
@@ -111,3 +116,20 @@ def find_general_collateral_by_id(collateral_id: int, general_collateral):
             if g_collateral.id == collateral_id and not g_collateral.registration_id_end:
                 collateral = g_collateral
     return collateral
+
+
+def validate_life(json_data, financing_statement):
+    """Validate renewal lifeYears and lifeInfinite by registration type."""
+    error_msg = ''
+    reg_type = financing_statement.registration[0].registration_type
+    if financing_statement.life == model_utils.LIFE_INFINITE:
+        error_msg += RENEWAL_INVALID
+    elif reg_type == model_utils.REG_TYPE_REPAIRER_LIEN and 'lifeInfinite' in json_data and json_data['lifeInfinite']:
+        error_msg += LI_NOT_ALLOWED
+    elif reg_type != model_utils.REG_TYPE_REPAIRER_LIEN and 'lifeYears' not in json_data and \
+            'lifeInfinite' not in json_data:
+        error_msg += LIFE_MISSING
+    elif json_data.get('lifeYears', -1) > 0 and json_data.get('lifeInfinite'):
+        error_msg += LIFE_INVALID
+
+    return error_msg

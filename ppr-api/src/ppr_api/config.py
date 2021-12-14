@@ -187,6 +187,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_CS_BUCKET_ID = os.getenv('GCP_CS_BUCKET_ID', 'ppr_search_results_dev')
     GCP_CLOUD_STORAGE_URL = os.getenv('GCP_CLOUD_STORAGE_URL', 'https://storage.googleapis.com')
 
+    GATEWAY_URL = os.getenv('GATEWAY_URL', 'https://bcregistry-dev.apigee.net')
+
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""

@@ -51,6 +51,13 @@ TEST_CALLBACK_DATA = [
     ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000010),
     ('Report already exists', HTTPStatus.OK, 200000008)
 ]
+# testdata pattern is ({desc}, {status}, {search_id})
+TEST_NOTIFICATION_DATA = [
+    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
+    ('Not async search id', HTTPStatus.BAD_REQUEST, 200000005),
+    ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000012),
+    ('Bad callback url', HTTPStatus.INTERNAL_SERVER_ERROR, 200000011)
+]
 
 
 def test_search_detail_valid_200(session, client, jwt):
@@ -284,3 +291,13 @@ def test_valid_callback_search_report(session, client, jwt):
     response = rv.json
     assert response['name']
     assert response['selfLink']
+
+
+@pytest.mark.parametrize('desc,status,search_id', TEST_NOTIFICATION_DATA)
+def test_notification_search_report(session, client, jwt, desc, status, search_id):
+    """Assert that a notification message request returns the expected status."""
+    # test
+    rv = client.post('/api/v1/search-results/notifications/' + str(search_id),
+                     headers=None)
+    # check
+    assert rv.status_code == status
