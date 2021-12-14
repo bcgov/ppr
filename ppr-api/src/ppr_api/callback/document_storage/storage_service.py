@@ -73,7 +73,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
 
     @classmethod
     def delete_document(cls, name: str):
-        """Unit testing only delete the uniquely named document from cloud storage."""
+        """Delete the uniquely named document from cloud storage (unit testing only)."""
         try:
             url = cls.DOC_URL.format(name=name)
             token = GoogleStorageTokenService.get_token()
