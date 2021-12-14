@@ -24,6 +24,7 @@ from flask import current_app
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_SUMMARY
 
+from ppr_api.callback.document_storage.storage_service import GoogleStorageService
 from ppr_api.models import SearchResult, SearchRequest
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
@@ -50,6 +51,13 @@ TEST_CALLBACK_DATA = [
     ('Not async search id', HTTPStatus.BAD_REQUEST, 200000005),
     ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000010),
     ('Report already exists', HTTPStatus.OK, 200000008)
+]
+# testdata pattern is ({desc}, {status}, {search_id})
+TEST_NOTIFICATION_DATA = [
+    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
+    ('Not async search id', HTTPStatus.BAD_REQUEST, 200000005),
+    ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000012),
+    ('Bad callback url', HTTPStatus.INTERNAL_SERVER_ERROR, 200000011)
 ]
 
 
@@ -279,8 +287,19 @@ def test_valid_callback_search_report(session, client, jwt):
     rv = client.patch('/api/v1/search-results/callback/' + str(search_detail.search_id),
                       headers=None)
     # check
-    # print(rv.json)
+    print(rv.json)
     assert rv.status_code == HTTPStatus.OK
     response = rv.json
     assert response['name']
     assert response['selfLink']
+    GoogleStorageService.delete_document(response['name'])
+
+
+@pytest.mark.parametrize('desc,status,search_id', TEST_NOTIFICATION_DATA)
+def test_notification_search_report(session, client, jwt, desc, status, search_id):
+    """Assert that a notification message request returns the expected status."""
+    # test
+    rv = client.post('/api/v1/search-results/notifications/' + str(search_id),
+                     headers=None)
+    # check
+    assert rv.status_code == status

@@ -50,6 +50,7 @@ class CallbackExceptionCodes(str, Enum):
     REPORT_DATA_ERR = '05'
     REPORT_ERR = '06'
     STORAGE_ERR = '07'
+    NOTIFICATION_ERR = '08'
 
 
 def serialize(errors):

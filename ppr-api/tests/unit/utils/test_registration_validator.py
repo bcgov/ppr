@@ -16,7 +16,7 @@ import copy
 
 import pytest
 
-from ppr_api.models import FinancingStatement
+from ppr_api.models import FinancingStatement, utils as model_utils
 from ppr_api.utils.validators import registration_validator as validator
 
 
@@ -238,6 +238,66 @@ RENEWAL_SA_VALID = {
     },
     'lifeYears': 5
 }
+RENEWAL_SA_INFINITE_VALID = {
+    'baseRegistrationNumber': 'TEST0001',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeInfinite': True
+}
+RENEWAL_SA_LIFE_INVALID = {
+    'baseRegistrationNumber': 'TEST0001',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeYears': 5,
+    'lifeInfinite': True
+}
+RENEWAL_SA_LIFE_MISSING = {
+    'baseRegistrationNumber': 'TEST0001',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    }
+}
 RENEWAL_SA_INVALID = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
@@ -337,6 +397,33 @@ RENEWAL_RL_INVALID_DATE = {
       'effectOfOrder': 'Court Order to renew Repairers Lien.'
     }
 }
+RENEWAL_RL_LIFE_INFINITE = {
+    'baseRegistrationNumber': 'TEST0017',
+    'clientReferenceId': 'A-00000402',
+    'authorizationReceived': True,
+    'debtorName': {
+        'businessName': 'TEST BUS 2 DEBTOR'
+    },
+    'registeringParty': {
+        'businessName': 'ABC SEARCHING COMPANY',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'lifeInfinite': True,
+    'courtOrderInformation': {
+      'courtName': 'Supreme Court of British Columbia.',
+      'courtRegistry': 'VICTORIA',
+      'fileNumber': 'BC123495',
+      'orderDate': '2021-09-05T07:01:00+00:00',
+      'effectOfOrder': 'Court Order to renew Repairers Lien.'
+    }
+}
 
 
 DESC_MISSING_AC = 'Missing authorizaton received'
@@ -355,9 +442,14 @@ TEST_AUTHORIZATION_DATA = [
 # testdata pattern is ({base_reg_num}, {json_data}, {valid}, {message content})
 TEST_RENEWAL_DATA = [
     ('TEST0001', RENEWAL_SA_VALID, True, None),
+    ('TEST0001', RENEWAL_SA_INFINITE_VALID, True, None),
     ('TEST0017', RENEWAL_RL_VALID, True, None),
     ('TEST0001', RENEWAL_SA_INVALID, False, 'CourtOrderInformation is not allowed'),
+    ('TEST0012', RENEWAL_SA_VALID, False, validator.RENEWAL_INVALID),
+    ('TEST0001', RENEWAL_SA_LIFE_MISSING, False, validator.LIFE_MISSING),
+    ('TEST0001', RENEWAL_SA_LIFE_INVALID, False, validator.LIFE_INVALID),
     ('TEST0017', RENEWAL_RL_MISSING, False, validator.COURT_ORDER_MISSING),
+    ('TEST0017', RENEWAL_RL_LIFE_INFINITE, False, validator.LI_NOT_ALLOWED),
     ('TEST0017', RENEWAL_RL_INVALID_DATE, False, validator.COURT_ORDER_INVALID_DATE)
 ]
 
@@ -413,7 +505,8 @@ def test_validate_renewal(session, base_reg_num, json_data, valid, message_conte
     """Assert that renewal registration extra validation works as expected."""
     # setup
     statement = FinancingStatement.find_by_registration_number(base_reg_num, 'PS12345')
-
+    if base_reg_num == 'TEST0012':
+        statement.life = model_utils.LIFE_INFINITE
     # test
     error_msg = validator.validate_renewal(json_data, statement)
     if valid:

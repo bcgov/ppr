@@ -17,6 +17,7 @@
 import json
 from http import HTTPStatus
 
+import requests
 from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
@@ -43,7 +44,8 @@ CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.DEFAULT: '04: default error for id={search_id}.',
     resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR: '05: report data error for id={search_id}.',
     resource_utils.CallbackExceptionCodes.REPORT_ERR: '06: generate report failed for id={search_id}.',
-    resource_utils.CallbackExceptionCodes.STORAGE_ERR: '07: document storage save failed for id={search_id}.'
+    resource_utils.CallbackExceptionCodes.STORAGE_ERR: '07: document storage save failed for id={search_id}.',
+    resource_utils.CallbackExceptionCodes.NOTIFICATION_ERR: '08: notification failed for id={search_id}.',
 }
 CALLBACK_PARAM = 'callbackURL'
 REPORT_URL = '/ppr/api/v1/search-results/{search_id}'
@@ -168,7 +170,7 @@ class SearchResultsResource(Resource):
 @cors_preflight('PATCH,OPTIONS')
 @API.route('/callback/<path:search_id>', methods=['PATCH', 'OPTIONS'])
 class PatchSearchResultsResource(Resource):
-    """Resource to generates a large search result report for a queue callback ."""
+    """Resource to generate a large search result report for a queue callback."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -263,8 +265,65 @@ class PatchSearchResultsResource(Resource):
                                   repr(default_err))
 
 
+@cors_preflight('POST,OPTIONS')
+@API.route('/notifications/<path:search_id>', methods=['POST', 'OPTIONS'])
+class PostResultsNotificationResource(Resource):
+    """Resource to notify an API consumer that a large search result report is available."""
+
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    def post(search_id):
+        """Notify originator of async report request that the document is available."""
+        try:
+            if search_id is None:
+                return resource_utils.path_param_error_response('search ID')
+
+            # If exceeded max retries we're done.
+            event_count: int = 0
+            events = EventTracking.find_by_key_id_type(search_id, EventTracking.EventTrackingTypes.API_NOTIFICATION)
+            if events:
+                event_count = len(events)
+            if event_count > current_app.config.get('EVENT_MAX_RETRIES'):
+                return notification_error(resource_utils.CallbackExceptionCodes.MAX_RETRIES, search_id,
+                                          HTTPStatus.INTERNAL_SERVER_ERROR)
+
+            search_detail = SearchResult.find_by_search_id(search_id, False)
+            if not search_detail:
+                return notification_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, search_id,
+                                          HTTPStatus.NOT_FOUND)
+
+            # Check if search result is async: always have callback_url.
+            callback_url = search_detail.callback_url
+            if callback_url is None:
+                return notification_error(resource_utils.CallbackExceptionCodes.INVALID_ID,
+                                          search_id,
+                                          HTTPStatus.BAD_REQUEST,
+                                          'Required callbackURL is missing.')
+
+            # Send the notification.
+            response = send_notification(callback_url, search_id)
+            status_code = response.status_code
+            if status_code not in (HTTPStatus.OK, HTTPStatus.ACCEPTED, HTTPStatus.NO_CONTENT):
+                message = f'Status code={status_code}. Response: ' + str(response.content)
+                return notification_error(resource_utils.CallbackExceptionCodes.NOTIFICATION_ERR,
+                                          search_id,
+                                          HTTPStatus.INTERNAL_SERVER_ERROR,
+                                          message)
+
+            # Track success event.
+            EventTracking.create(search_id, EventTracking.EventTrackingTypes.API_NOTIFICATION, int(status_code))
+
+            return response.content, response.status_code
+
+        except Exception as default_err:  # noqa: B902; return nicer default error
+            return notification_error(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                      search_id,
+                                      HTTPStatus.INTERNAL_SERVER_ERROR,
+                                      repr(default_err))
+
+
 def callback_error(code: str, search_id: str, status_code, message: str = None):
-    """Return a callback error response based on the code."""
+    """Return to the event listener callback error response based on the code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
     if message:
         error += ' ' + message
@@ -272,6 +331,34 @@ def callback_error(code: str, search_id: str, status_code, message: str = None):
     # Track event here.
     EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
     return resource_utils.error_response(status_code, error)
+
+
+def notification_error(code: str, search_id: str, status_code, message: str = None):
+    """Return to the event listener a notification error response based on the status code."""
+    error = CALLBACK_MESSAGES[code].format(search_id=search_id)
+    if message:
+        error += ' ' + message
+    current_app.logger.error(error)
+    # Track event here.
+    EventTracking.create(search_id, EventTracking.EventTrackingTypes.API_NOTIFICATION, status_code, message)
+    return resource_utils.error_response(status_code, error)
+
+
+def send_notification(callback_url: str, search_id):
+    """Send a notification message that the search results report is available."""
+    gateway_url = current_app.config.get('GATEWAY_URL')
+    search_report_url = gateway_url + REPORT_URL.format(search_id=search_id)
+    data = {
+        'id': search_id,
+        'getReportURL': search_report_url
+    }
+    data_json = json.dumps(data)
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    current_app.logger.info('Sending ' + data_json + ' to ' + callback_url)
+    response = requests.post(url=callback_url, headers=headers, data=data_json)
+    return response
 
 
 def is_async(search_detail: SearchResult, search_select):
