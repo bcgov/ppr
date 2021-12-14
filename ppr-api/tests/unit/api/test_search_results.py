@@ -24,6 +24,7 @@ from flask import current_app
 # prep sample post search data
 from registry_schemas.example_data.ppr import SEARCH_SUMMARY
 
+from ppr_api.callback.document_storage.storage_service import GoogleStorageService
 from ppr_api.models import SearchResult, SearchRequest
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
@@ -286,11 +287,12 @@ def test_valid_callback_search_report(session, client, jwt):
     rv = client.patch('/api/v1/search-results/callback/' + str(search_detail.search_id),
                       headers=None)
     # check
-    # print(rv.json)
+    print(rv.json)
     assert rv.status_code == HTTPStatus.OK
     response = rv.json
     assert response['name']
     assert response['selfLink']
+    GoogleStorageService.delete_document(response['name'])
 
 
 @pytest.mark.parametrize('desc,status,search_id', TEST_NOTIFICATION_DATA)

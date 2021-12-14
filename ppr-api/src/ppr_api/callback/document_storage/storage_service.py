@@ -23,6 +23,7 @@ from ppr_api.callback.auth.token_service import GoogleStorageTokenService
 from ppr_api.callback.utils.exceptions import StorageException
 
 
+HTTP_DELETE = 'delete'
 HTTP_GET = 'get'
 HTTP_POST = 'post'
 
@@ -50,7 +51,9 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     # Google cloud storage configuration.
     GCP_BUCKET_ID = str(os.getenv('GCP_CS_BUCKET_ID'))
     GCP_URL = str(os.getenv('GCP_CS_URL', 'https://storage.googleapis.com'))
-    GET_DOC_URL = GCP_URL + '/storage/v1/b/' + GCP_BUCKET_ID + '/o/{name}?alt=media'
+    DOC_URL = GCP_URL + '/storage/v1/b/' + GCP_BUCKET_ID + '/o/{name}'
+    GET_DOC_URL = DOC_URL + '?alt=media'
+    DELETE_DOC_URL = GCP_URL + '/storage/v1/b/' + GCP_BUCKET_ID + '/o/{name}'
     UPLOAD_DOC_URL = GCP_URL + '/upload/storage/v1/b/' + GCP_BUCKET_ID + '/o?uploadType=media&name='
 
     @classmethod
@@ -67,6 +70,18 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             current_app.logger.error('get_document failed for url=' + url)
             current_app.logger.error(repr(err))
             raise StorageException('GET document failed for url=' + url)
+
+    @classmethod
+    def delete_document(cls, name: str):
+        """Unit testing only delete the uniquely named document from cloud storage."""
+        try:
+            url = cls.DOC_URL.format(name=name)
+            token = GoogleStorageTokenService.get_token()
+            current_app.logger.info('Deleting doc with DELETE ' + url)
+            return cls.__call_api(HTTP_DELETE, url, token)
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
+            current_app.logger.error('get_document failed for url=' + url)
+            current_app.logger.error(repr(err))
 
     @classmethod
     def save_document(cls, name: str, raw_data):
@@ -112,4 +127,6 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         current_app.logger.info(method + ' ' + url + ' successful.')
         if method == HTTP_GET:
             return response.content
-        return json.loads(response.text)
+        if method != HTTP_DELETE:
+            return json.loads(response.text)
+        return {}
