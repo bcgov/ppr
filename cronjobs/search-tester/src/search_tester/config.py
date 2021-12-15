@@ -62,6 +62,12 @@ class _Config():  # pylint: disable=too-few-public-methods
 
     POD_NAMESPACE = os.getenv('POD_NAMESPACE', '')
 
+    PAUSE = os.getenv('PAUSE', False)
+    CSV = os.getenv('CSV', False)
+    FILE_NAME = os.getenv('FILE_NAME', 'SEARCH_RESULTS.csv')
+    SEARCH_DATE = os.getenv('SEARCH_DATE', None)
+    SEARCH_TIME = os.getenv('SEARCH_TIME', None)
+
     SIM_VAL_BUSINESS = os.getenv('SIM_VAL_BUSINESS', 0.5)
     SIM_VAL_FIRST = os.getenv('SIM_VAL_FIRST', 0.5)
     SIM_VAL_LAST = os.getenv('SIM_VAL_LAST', 0.5)

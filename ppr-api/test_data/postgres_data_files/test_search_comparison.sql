@@ -81,7 +81,7 @@ INSERT INTO test_search_results(search_id, id, doc_id, details, index, match_typ
 
 -- TestSearch pass, exact + similar fail
 INSERT INTO test_searches(batch_id, id, search_criteria, run_time)
-   VALUES(200000000, 300000101, 'SEARCHTEST2 INDIVIDUAL', 0.2222)
+   VALUES(200000001, 300000101, 'SEARCHTEST2 INDIVIDUAL', 0.2222)
 ;
 
 -- TestSearchResult
