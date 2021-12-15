@@ -9,7 +9,7 @@ Jinja2==2.11.3
 Mako==1.1.6
 MarkupSafe==2.0.1
 SQLAlchemy==1.4.27
-Werkzeug==2.0.2
+Werkzeug==1.0.1
 alembic==1.7.5
 aniso8601==9.0.1
 asyncio-nats-client==0.11.5
