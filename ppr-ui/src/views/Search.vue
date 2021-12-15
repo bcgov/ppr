@@ -195,7 +195,7 @@ export default class Search extends Vue {
 
   private get exactResultsLength (): number {
     const selectedExactMatches = []
-    const results = this.getSearchResults.results
+    const results = this.getSearchResults?.results
     let count = 0
     let x:any
     for (x in results) {
