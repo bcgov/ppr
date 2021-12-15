@@ -666,7 +666,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     registration.financing_statement.expire_date = new_expiry_date
 
                 # Verify this is updated.
-                registration.financing_statement.life += registration.life
+                if 'lifeInfinite' in json_data and json_data['lifeInfinite']:
+                    registration.financing_statement.life = registration.life
+                else:
+                    registration.financing_statement.life += registration.life
 
         # Repairer's lien renewal or amendment can have court order information.
         if (registration.registration_type == model_utils.REG_TYPE_AMEND_COURT or
