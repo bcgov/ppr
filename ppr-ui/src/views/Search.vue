@@ -39,14 +39,14 @@
         <v-row no-gutters style="padding-top: 22px;">
           <v-col :class="$style['search-info']">
             <span v-if="totalResultsLength !== 0" id="results-info">
-              Select the registrations you want to include in a printable search report. Exact matches
+              Select the registrations you want to include in a printable PDF search report. Exact matches
               are automatically selected. This report will contain the full record of each selected registration
               and will be saved to your Personal Property Registry dashboard. A general record
-              of your search results will also be saved.
+              of your search will also be saved.
             </span>
             <span v-else id="no-results-info">
-              No Registrations were found. Your search results and a printable PDF have been automatically
-              saved to your Personal Property Registry dashboard.
+              No Registrations were found. A printable PDF search result report and a general record of your search
+              will be saved to your Personal Property Registry dashboard.
             </span>
           </v-col>
           <!-- to cut off in line with table submit btn -->

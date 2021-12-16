@@ -121,8 +121,8 @@ export default defineComponent({
     const { setCertifyInformation } = useActions<any>([
       'setCertifyInformation'
     ])
-    const { getCertifyInformation, isRoleStaff, isRoleStaffSbc } = useGetters<any>([
-      'getCertifyInformation', 'isRoleStaff', 'isRoleStaffSbc'
+    const { getCertifyInformation, isRoleStaff, isRoleStaffSbc, isRoleStaffBcol } = useGetters<any>([
+      'getCertifyInformation', 'isRoleStaff', 'isRoleStaffSbc', 'isRoleStaffBcol'
     ])
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
@@ -214,6 +214,11 @@ export default defineComponent({
         if (isRoleStaffSbc.value) {
           certifyInfo.registeringParty = {
             businessName: 'SBC Staff',
+            emailAddress: email
+          }
+        } else if (isRoleStaffBcol.value) {
+          certifyInfo.registeringParty = {
+            businessName: 'BC Online Help',
             emailAddress: email
           }
         } else {
