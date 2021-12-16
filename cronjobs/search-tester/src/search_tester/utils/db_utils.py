@@ -17,16 +17,19 @@ QUERY_LEGACY_RESULTS_MOST_RECENT = """
 SELECT date, time, criteria, search_type, match_type, result, document_id, id
 FROM ssa_search_records
 WHERE date = (SELECT MAX(date) FROM ssa_search_records)
+ORDER BY id asc
 """
 
 QUERY_LEGACY_RESULTS_DATE = """
 SELECT date, time, criteria, search_type, match_type, result, document_id, id
 FROM ssa_search_records
 WHERE date = :date
+ORDER BY id asc
 """
 
 QUERY_LEGACY_RESULTS_DATE_TIME = """
 SELECT date, time, criteria, search_type, match_type, result, document_id, id
 FROM ssa_search_records
 WHERE date = :date AND time = :time
+ORDER BY id asc
 """
