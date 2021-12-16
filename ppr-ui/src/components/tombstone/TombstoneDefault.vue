@@ -53,7 +53,6 @@ export default defineComponent({
       getUserLastName,
       isRoleStaff,
       isRoleStaffBcol,
-      isRoleStaffReg,
       isRoleStaffSbc
     } = useGetters<any>([
       'getAccountLabel',
@@ -61,7 +60,6 @@ export default defineComponent({
       'getUserLastName',
       'isRoleStaff',
       'isRoleStaffBcol',
-      'isRoleStaffReg',
       'isRoleStaffSbc'
     ])
     const localState = reactive({
