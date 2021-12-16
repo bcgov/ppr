@@ -11,12 +11,16 @@
 """Module to manage the calls and content to the reporting service."""
 from http import HTTPStatus
 
-from flask import jsonify
+from flask import current_app, jsonify
 from flask_babel import _
 
+from ppr_api.exceptions import BusinessException
 from ppr_api.resources.utils import get_account_name
 
 from .report import Report, ReportTypes
+
+
+DEFAULT_ERROR_MSG = 'Data related error generating report.'
 
 
 def get_pdf(report_data, account_id, report_type=None, token=None):
@@ -27,6 +31,9 @@ def get_pdf(report_data, account_id, report_type=None, token=None):
     except FileNotFoundError:
         # We don't have a template for it, so it must only be available on paper.
         return jsonify({'message': _('No PDF report found.')}), HTTPStatus.NOT_FOUND
+    except Exception as err:   # noqa: B902; return nicer default error
+        current_app.logger.error(f'Generate report failed for account {account_id}, type {report_type}: ' + repr(err))
+        raise BusinessException(error=DEFAULT_ERROR_MSG, status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 def get_callback_pdf(report_data, account_id, report_type, token, account_name):
@@ -36,3 +43,6 @@ def get_callback_pdf(report_data, account_id, report_type, token, account_name):
     except FileNotFoundError:
         # We don't have a template for it, so it must only be available on paper.
         return jsonify({'message': _('No PDF report found.')}), HTTPStatus.NOT_FOUND
+    except Exception as err:   # noqa: B902; return nicer default error
+        current_app.logger.error(f'Generate report failed for account {account_id}, type {report_type}: ' + repr(err))
+        raise BusinessException(error=DEFAULT_ERROR_MSG, status_code=HTTPStatus.INTERNAL_SERVER_ERROR)

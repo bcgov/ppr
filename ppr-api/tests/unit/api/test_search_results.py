@@ -40,6 +40,7 @@ TEST_GET_DATA = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 200000005, False),
     ('Invalid request too old', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000006, False),
     ('Valid request', [PPR_ROLE], HTTPStatus.OK, True, 200000005, False),
+    ('Invalid no search selection', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000001, False),
     ('Invalid search Id', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 300000006, False),
     ('Invalid request staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005, False),
     ('Report pending request', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 200000007, True),

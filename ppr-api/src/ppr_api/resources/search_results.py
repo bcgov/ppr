@@ -36,6 +36,7 @@ from ppr_api.callback.document_storage.storage_service import GoogleStorageServi
 
 API = Namespace('search-results', description='Endpoints for PPR search details (Search step 2).')
 VAL_ERROR = 'Search details request data validation errors.'  # Validation error prefix
+GET_DETAILS_ERROR = 'Submit a search step 2 select results request before getting search result details.'
 SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
 CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.UNKNOWN_ID: '01: no search result data found for id={search_id}.',
@@ -141,6 +142,10 @@ class SearchResultsResource(Resource):
             search_detail = SearchResult.find_by_search_id(search_id, True)
             if not search_detail:
                 return resource_utils.not_found_error_response('searchId', search_id)
+
+            # If no search selection (step 2) return an error.
+            if not search_detail.search_select:
+                return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
             # If the request is for an async large report, fetch binary data from doc storage.
             if resource_utils.is_pdf(request) and search_detail.callback_url is not None:
