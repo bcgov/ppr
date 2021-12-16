@@ -11,7 +11,7 @@
 """Module to manage the calls and content to the reporting service."""
 from http import HTTPStatus
 
-from flask import jsonify, current_app
+from flask import current_app, jsonify
 from flask_babel import _
 
 from ppr_api.exceptions import BusinessException
