@@ -118,8 +118,8 @@ describe('TombstoneDefault component tests', () => {
       expect(subHeader.length).toBe(1)
       if (staffGroups[i] === 'gov_account_user') {
         expect(subHeader.at(0).text()).toContain('SBC Staff')
-      } else {
-        expect(subHeader.at(0).text()).toContain('BC Registries Staff')
+      } else if (staffGroups[i] === 'helpdesk') {
+        expect(subHeader.at(0).text()).toContain('BC Online Help')
       }
       expect(subHeader.at(0).text()).toContain(userInfo.firstname)
       expect(subHeader.at(0).text()).toContain(userInfo.lastname)
