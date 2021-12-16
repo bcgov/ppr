@@ -32,13 +32,13 @@ setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.
 
 def add_legacy_results(search: TestSearch, result_list: List[dict], match_type: TestSearchResult.MatchType):
     """Add the given legacy results for the match type to the TestSearch obj."""
-    for legacy_result in result_list:
+    for legacy_result, index in zip(result_list, range(len(result_list)):
         result = TestSearchResult()
         result.doc_id = legacy_result['doc_id']
         result.details = legacy_result['result']
         result.match_type = match_type.value
         result.source = TestSearchResult.Source.LEGACY.value
-        result.index = legacy_result['index']
+        result.index = index
         search.results.append(result)
 
 def add_api_results(search: TestSearch, results: List[dict]):
@@ -67,7 +67,7 @@ def add_api_results(search: TestSearch, results: List[dict]):
 
 def parse_results(batch_searches, rows, lower):
     """Return batch_searches with all parsed rows information."""
-    row_keys = ['SEARCH_TYPE', 'TIME', 'CRITERIA', 'MATCH_TYPE', 'RESULT', 'DOCUMENT_ID', 'ID']
+    row_keys = ['SEARCH_TYPE', 'TIME', 'CRITERIA', 'MATCH_TYPE', 'RESULT', 'DOCUMENT_ID']
     if lower:
         row_keys = [k.lower() for k in row_keys]
     for row in rows:
@@ -86,15 +86,13 @@ def parse_results(batch_searches, rows, lower):
             # add exact match to search
             batch_searches[search_type][time]['exact_matches'].append({
                 'result': row[row_keys[4]],
-                'doc_id': row[row_keys[5]],
-                'index': row[row_keys[6]]
+                'doc_id': row[row_keys[5]]
             })
         else:
             # add similar match to search
             batch_searches[search_type][time]['similar_matches'].append({
                 'result': row[row_keys[4]],
-                'doc_id': row[row_keys[5]],
-                'index': row[row_keys[6]]
+                'doc_id': row[row_keys[5]]
             })
     return batch_searches
 
