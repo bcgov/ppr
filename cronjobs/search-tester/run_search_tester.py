@@ -32,7 +32,7 @@ setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.
 
 def add_legacy_results(search: TestSearch, result_list: List[dict], match_type: TestSearchResult.MatchType):
     """Add the given legacy results for the match type to the TestSearch obj."""
-    for legacy_result, index in zip(result_list, range(len(result_list)):
+    for legacy_result, index in zip(result_list, range(len(result_list))):
         result = TestSearchResult()
         result.doc_id = legacy_result['doc_id']
         result.details = legacy_result['result']
