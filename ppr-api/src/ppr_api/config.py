@@ -174,6 +174,10 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_SA_SCOPES = json.loads(os.getenv('GCP_SA_SCOPES', '["https://www.googleapis.com/auth/cloud-platform"]'))
     GCP_CS_BUCKET_ID = os.getenv('GCP_CS_BUCKET_ID', 'ppr_search_results_dev')
     GCP_CLOUD_STORAGE_URL = os.getenv('GCP_CLOUD_STORAGE_URL', 'https://storage.googleapis.com')
+    # Pub/Sub
+    GCP_PS_PROJECT_ID = os.getenv('GCP_PS_PROJECT_ID')
+    GCP_PS_SEARCH_REPORT_TOPIC = os.getenv('GCP_PS_SEARCH_REPORT_TOPIC')
+    GCP_PS_NOTIFICATION_TOPIC = os.getenv('GCP_PS_NOTIFICATION_TOPIC')
 
     GATEWAY_URL = os.getenv('GATEWAY_URL', 'https://bcregistry-dev.apigee.net')
 

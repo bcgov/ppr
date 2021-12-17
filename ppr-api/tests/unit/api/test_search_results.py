@@ -260,8 +260,8 @@ def test_get_search_detail(session, client, jwt, desc, roles, status, has_accoun
 def test_callback_search_report(session, client, jwt, desc, status, search_id):
     """Assert that a callback request returns the expected status."""
     # test
-    rv = client.patch('/api/v1/search-results/callback/' + str(search_id),
-                      headers=None)
+    rv = client.post('/api/v1/search-results/callback/' + str(search_id),
+                     headers=None)
     # check
     assert rv.status_code == status
 
@@ -285,8 +285,8 @@ def test_valid_callback_search_report(session, client, jwt):
     search_detail.update_selection(select_json, 'UNIT TEST INC.', 'CALLBACK_URL')
 
     # test
-    rv = client.patch('/api/v1/search-results/callback/' + str(search_detail.search_id),
-                      headers=None)
+    rv = client.post('/api/v1/search-results/callback/' + str(search_detail.search_id),
+                     headers=None)
     # check
     print(rv.json)
     assert rv.status_code == HTTPStatus.OK
