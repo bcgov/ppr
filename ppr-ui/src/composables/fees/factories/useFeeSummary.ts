@@ -62,7 +62,8 @@ export const hasNoChargeAmendment = (val: UIRegistrationTypes): boolean => {
     UIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
     UIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
     UIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
-    UIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX
+    UIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+    UIRegistrationTypes.TRANSITION_TAX_LIEN
   ]
   // it will not be in the UIRegistrationTypes enum list if 'Other' was selected
   return hfArray.includes(val) || !Object.values(UIRegistrationTypes).includes(val)

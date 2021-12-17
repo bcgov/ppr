@@ -158,10 +158,11 @@ export default defineComponent({
         false
       )
       // check if results are still relevant before updating list
-      if (response?.length > 0) {
+      if ((response?.length > 0) && (searchValue === localState.searchValue)) {
         // will take up to 25 results
         localState.autoCompleteResults = response?.slice(0, 25)
-      } else {
+      }
+      if (response?.length < 1) {
         localState.autoCompleteResults = []
       }
       localState.setAutoCompleteActive = true
