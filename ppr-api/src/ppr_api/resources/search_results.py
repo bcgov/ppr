@@ -26,6 +26,7 @@ from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException
 from ppr_api.services.authz import authorized
+from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.models import EventTracking, SearchResult, utils as model_utils
 from ppr_api.resources import utils as resource_utils
 from ppr_api.reports import ReportTypes, get_pdf
@@ -104,6 +105,7 @@ class SearchResultsResource(Resource):
                 # If results over threshold return JSON with callbackURL, getReportURL
                 if callback_url is not None:
                     # Add enqueue report generation event here.
+                    enqueue_search_report(search_id)
                     response_data['callbackURL'] = callback_url
                     response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
                     return jsonify(response_data), HTTPStatus.OK
@@ -144,7 +146,7 @@ class SearchResultsResource(Resource):
                 return resource_utils.not_found_error_response('searchId', search_id)
 
             # If no search selection (step 2) return an error.
-            if not search_detail.search_select:
+            if not search_detail.search_select and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
             # If the request is for an async large report, fetch binary data from doc storage.
@@ -172,14 +174,14 @@ class SearchResultsResource(Resource):
             return resource_utils.default_exception_response(default_exception)
 
 
-@cors_preflight('PATCH,OPTIONS')
-@API.route('/callback/<path:search_id>', methods=['PATCH', 'OPTIONS'])
+@cors_preflight('POST,OPTIONS')
+@API.route('/callback/<path:search_id>', methods=['POST', 'OPTIONS'])
 class PatchSearchResultsResource(Resource):
     """Resource to generate a large search result report for a queue callback."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
-    def patch(search_id):  # pylint: disable=too-many-branches
+    def post(search_id):  # pylint: disable=too-many-branches
         """Generate and store a report, update search_result.doc_storage_url."""
         try:
             if search_id is None:
@@ -245,6 +247,7 @@ class PatchSearchResultsResource(Resource):
             else:  # Enqueue notification event.
                 current_app.logger.info(f'Queueing report notification for id={search_id}, callback=' +
                                         search_detail.callback_url)
+                enqueue_notification(search_id)
 
             return response, HTTPStatus.OK
 
@@ -335,6 +338,10 @@ def callback_error(code: str, search_id: str, status_code, message: str = None):
     current_app.logger.error(error)
     # Track event here.
     EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
+    if status_code != HTTPStatus.BAD_REQUEST and code not in (resource_utils.CallbackExceptionCodes.MAX_RETRIES,
+                                                              resource_utils.CallbackExceptionCodes.UNKNOWN_ID):
+        # set up retry
+        enqueue_search_report(search_id)
     return resource_utils.error_response(status_code, error)
 
 
@@ -346,6 +353,10 @@ def notification_error(code: str, search_id: str, status_code, message: str = No
     current_app.logger.error(error)
     # Track event here.
     EventTracking.create(search_id, EventTracking.EventTrackingTypes.API_NOTIFICATION, status_code, message)
+    if status_code != HTTPStatus.BAD_REQUEST and code not in (resource_utils.CallbackExceptionCodes.MAX_RETRIES,
+                                                              resource_utils.CallbackExceptionCodes.UNKNOWN_ID):
+        # set up retry
+        enqueue_notification(search_id)
     return resource_utils.error_response(status_code, error)
 
 
@@ -366,7 +377,7 @@ def send_notification(callback_url: str, search_id):
     return response
 
 
-def is_async(search_detail: SearchResult, search_select):
+def is_async(search_detail: SearchResult, search_select) -> bool:
     """Check if the request number of financing statements exceeds the real time threshold."""
     threshold = current_app.config.get('SEARCH_PDF_ASYNC_THRESHOLD')
     if search_detail.search.total_results_size < threshold:
@@ -390,3 +401,27 @@ def is_async(search_detail: SearchResult, search_select):
         return True
 
     return False
+
+
+def enqueue_search_report(search_id: str):
+    """Add the search report request to the queue."""
+    try:
+        payload = {
+            'searchId': search_id
+        }
+        GoogleQueueService().publish_search_report(payload)
+        current_app.logger.info(f'Enqueue search report successful for id={search_id}.')
+    except Exception as err:  # noqa: B902; return nicer default error
+        current_app.logger.error(f'Enqueue search report failed for id={search_id}: ' + repr(err))
+
+
+def enqueue_notification(search_id: str):
+    """Add the notification request to the queue."""
+    try:
+        payload = {
+            'searchId': search_id
+        }
+        GoogleQueueService().publish_notification(payload)
+        current_app.logger.info(f'Enqueue notification successful for id={search_id}.')
+    except Exception as err:  # noqa: B902; return nicer default error
+        current_app.logger.error(f'Enqueue notification failed for id={search_id}: ' + repr(err))

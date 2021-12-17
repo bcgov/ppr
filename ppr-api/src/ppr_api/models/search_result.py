@@ -106,6 +106,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         new_results = []
         exact_count = 0
         similar_count = 0
+        self.search_select = self.set_search_selection(search_select)
         for result in results:
             # Always include exact matches.
             if result['matchType'] == model_utils.SEARCH_MATCH_EXACT:
@@ -124,7 +125,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     new_results.append(result)
 
         # current_app.logger.debug('exact_count=' + str(exact_count) + ' similar_count=' + str(similar_count))
-        self.search_select = search_select
         self.exact_match_count = exact_count
         self.similar_match_count = similar_count
         # current_app.logger.debug('saving updates')
@@ -139,6 +139,26 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         if callback_url:
             self.callback_url = callback_url
         self.save()
+
+    def set_search_selection(self, search_select):
+        """Replace the request items with the matching search query items so selection is complete for report TOC."""
+        original_select = self.search.search_response
+        reg_list = [s['baseRegistrationNumber'] for s in search_select
+                    if s['matchType'] != model_utils.SEARCH_MATCH_EXACT]
+        # Remove duplicates
+        reg_list = list(dict.fromkeys(reg_list))
+        update_select = []
+        # Always use original exact matches
+        for original in original_select:
+            if original['matchType'] == model_utils.SEARCH_MATCH_EXACT:
+                update_select.append(original)
+        # Set similar matches with no duplicates.
+        for reg_num in reg_list:
+            for original in original_select:
+                if original['matchType'] != model_utils.SEARCH_MATCH_EXACT and \
+                        original['baseRegistrationNumber'] == reg_num:
+                    update_select.append(original)
+        return update_select
 
     @classmethod
     def find_by_search_id(cls, search_id: int, limit_by_date: bool = False):

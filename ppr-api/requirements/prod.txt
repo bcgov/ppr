@@ -13,6 +13,7 @@ datedelta
 dpath==1.4.2
 google-auth
 google-auth-oauthlib
+google-cloud-pubsub
 gunicorn
 jsonschema
 launchdarkly-server-sdk

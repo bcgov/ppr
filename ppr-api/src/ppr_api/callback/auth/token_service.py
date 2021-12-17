@@ -68,3 +68,12 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
         cls.credentials.refresh(request)
         current_app.logger.info('Call successful: obtained token.')
         return cls.credentials.token
+
+    @classmethod
+    def get_credentials(cls):
+        """Generate GCP auth credentials to pass to a GCP client."""
+        if cls.credentials is None:
+            cls.credentials = service_account.Credentials.from_service_account_info(cls.service_account_info,
+                                                                                    scopes=cls.GCP_SA_SCOPES)
+        current_app.logger.info('Call successful: obtained credentials.')
+        return cls.credentials

@@ -43,6 +43,56 @@ SINGLE_RENEWAL_JSON = [{
     'matchType': 'EXACT',
     'registrationType': 'SA'
 }]
+SET_SELECT = [
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2018, 'make': 'HONDA',
+                           'model': 'CIVIC'}},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2014, 'make': 'BMW', 'model': 'Z4'}},
+    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-03T00:31:40+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'TUCSON'}},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'TUSCON'}},
+    {'baseRegistrationNumber': '103838B', 'matchType': 'SIMILAR', 'createDateTime': '2021-10-08T00:02:33+00:00',
+     'registrationType': 'RL',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'TUCSON'}},
+    {'baseRegistrationNumber': 'TEST0002', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'registrationType': 'RL',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KX8J3CA46JU622994', 'year': 2014, 'make': 'HYUNDAI',
+                           'model': 'TUSCON'}},
+    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'YJ46JU622994', 'year': 2018, 'make': 'TESLA',
+                           'model': 'MODEL 3'}}
+]
+SEARCH_SELECT_1 = [
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': '103838B', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': 'TEST0002', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR'}
+]
+SEARCH_SELECT_2 = [
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT'}
+]
+SEARCH_SELECT_3 = [
+    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR'}
+]
+SEARCH_SELECT_4 = [
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR'},
+]
 
 # testdata pattern is ({description}, {JSON data}, {search id}, {has history}, {first statement type})
 TEST_VALID_DATA = [
@@ -55,6 +105,14 @@ TEST_VALID_DATA = [
 TEST_INVALID_DATA = [
     ('Invalid search id', SINGLE_JSON, 390000001, True, None),
     ('Invalid search completed', SINGLE_JSON, 200000000, True, None)
+]
+
+# testdata pattern is ({description}, {select_data}, {select_count})
+TEST_SEARCH_SELECT_DATA = [
+    ('All selection', SEARCH_SELECT_1, 7),
+    ('EXACT missing 1 selection', SEARCH_SELECT_2, 2),
+    ('Just 1 SIMILAR selection', SEARCH_SELECT_3, 3),
+    ('All exact, 2 SIMILAR selection', SEARCH_SELECT_4, 4)
 ]
 
 
@@ -201,3 +259,30 @@ def test_search_history_sort(session, client, jwt):
     assert history[1]['changeRegistrationNumber'] == 'TEST0009'
     assert history[2]['changeRegistrationNumber'] == 'TEST0008'
     assert history[3]['amendmentRegistrationNumber'] == 'TEST0007'
+
+
+@pytest.mark.parametrize('desc,select_data,select_count', TEST_SEARCH_SELECT_DATA)
+def test_set_search_select(session, client, jwt, desc, select_data, select_count):
+    """Assert that submitting a new search selection with minimal data works as expected."""
+    # setup
+    search_request: SearchRequest = SearchRequest(search_response=SET_SELECT)
+    search_result: SearchResult = SearchResult()
+    search_result.search = search_request
+
+    # test
+    selection = search_result.set_search_selection(select_data)
+
+    # check
+    assert selection
+    assert len(selection) == select_count
+    for select in selection:
+        assert select['baseRegistrationNumber']
+        assert select['matchType']
+        assert select['createDateTime']
+        assert select['registrationType']
+        assert select['vehicleCollateral']
+        assert select['vehicleCollateral']['type']
+        assert select['vehicleCollateral']['serialNumber']
+        assert select['vehicleCollateral']['year']
+        assert select['vehicleCollateral']['make']
+        assert select['vehicleCollateral']['model']
