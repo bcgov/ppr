@@ -40,7 +40,7 @@ class GoogleQueueService():
         """Publish the search report request json payload to the Queue Service."""
         try:
             self.publish(self.search_report_topic_name, payload)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error('Error: ' + repr(err))
             raise err
 
@@ -48,7 +48,7 @@ class GoogleQueueService():
         """Publish the api notification request json payload to the Queue Service."""
         try:
             self.publish(self.notification_topic_name, payload)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error('Error: ' + repr(err))
             raise err
 
