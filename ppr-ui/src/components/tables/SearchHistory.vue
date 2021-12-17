@@ -109,8 +109,7 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs,
-  useCssModule
+  toRefs
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
@@ -125,7 +124,6 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, { emit }) {
-    const style = useCssModule()
     const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
     const tooltipTxtPdf =
       'Large search result reports (over 75 registrations) ' +
@@ -222,7 +220,6 @@ export default defineComponent({
       displaySearchValue,
       displayType,
       downloadPDF,
-      style,
       retrySearch,
       tooltipTxtPdf
     }

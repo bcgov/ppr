@@ -34,7 +34,7 @@ export const searchResultsError: DialogOptionsIF = {
   title: 'Unable to retrieve search results',
   text: 'Search results could not be retrieved. Your search fee will be refunded. ' +
     'Please try your search again later. If this issue persists, please contact us.',
-  hasContactInfo: true  
+  hasContactInfo: true
 }
 
 export const searchPdfError: DialogOptionsIF = {
@@ -43,7 +43,7 @@ export const searchPdfError: DialogOptionsIF = {
   title: 'Unable to open document',
   text: 'We are currently unable to open this document. ' +
     'Please try again later. If this issue persists, please contact us.',
-  hasContactInfo: true  
+  hasContactInfo: true
 }
 
 export const searchReportError: DialogOptionsIF = {

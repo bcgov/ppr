@@ -501,11 +501,13 @@ export default class Dashboard extends Vue {
   }
 
   private searchError (error: ErrorIF): void {
+    console.error(error)
     this.myRegAddDialog = { ...searchResultsError }
     this.myRegAddDialogDisplay = true
   }
 
   private historyError (error: ErrorIF): void {
+    console.error(error)
     this.myRegAddDialog = { ...searchPdfError }
     this.myRegAddDialogDisplay = true
   }
@@ -660,7 +662,7 @@ export default class Dashboard extends Vue {
     }
 
     this.retrieveSearchHistory()
-    
+
     const myRegDrafts = await draftHistory()
     const myRegHistory = await registrationHistory()
 
