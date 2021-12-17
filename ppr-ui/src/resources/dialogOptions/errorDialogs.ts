@@ -28,6 +28,24 @@ export const saveSearchError: DialogOptionsIF = {
   text: 'We were unable to complete this search. Please try again later.'
 }
 
+export const searchResultsError: DialogOptionsIF = {
+  acceptText: '',
+  cancelText: 'OK',
+  title: 'Unable to retrieve search results',
+  text: 'Search results could not be retrieved. Your search fee will be refunded. ' +
+    'Please try your search again later. If this issue persists, please contact us.',
+  hasContactInfo: true  
+}
+
+export const searchPdfError: DialogOptionsIF = {
+  acceptText: '',
+  cancelText: 'OK',
+  title: 'Unable to open document',
+  text: 'We are currently unable to open this document. ' +
+    'Please try again later. If this issue persists, please contact us.',
+  hasContactInfo: true  
+}
+
 export const searchReportError: DialogOptionsIF = {
   acceptText: 'Return to Search Results',
   cancelText: 'Return to My PPR Dashboard',
