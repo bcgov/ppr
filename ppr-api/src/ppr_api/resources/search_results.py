@@ -146,7 +146,7 @@ class SearchResultsResource(Resource):
                 return resource_utils.not_found_error_response('searchId', search_id)
 
             # If no search selection (step 2) return an error.
-            if not search_detail.search_select:
+            if not search_detail.search_select and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
             # If the request is for an async large report, fetch binary data from doc storage.
