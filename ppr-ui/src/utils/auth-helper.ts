@@ -35,7 +35,6 @@ export function getKeycloakRoles (): Array<string> {
   const jwt = getJWT()
   const keycloakRoles = jwt.roles
   if (keycloakRoles && keycloakRoles.length > 0) {
-    console.log(keycloakRoles)
     return keycloakRoles
   }
   throw new Error('Error getting Keycloak roles')
