@@ -131,6 +131,7 @@ export default defineComponent({
     }
 
     const getDebtors = async () => {
+      localState.debtors = []
       const names: Array<DebtorNameIF> = await debtorNames(
         props.registrationNumber
       )
