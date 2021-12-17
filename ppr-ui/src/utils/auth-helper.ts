@@ -35,6 +35,7 @@ export function getKeycloakRoles (): Array<string> {
   const jwt = getJWT()
   const keycloakRoles = jwt.roles
   if (keycloakRoles && keycloakRoles.length > 0) {
+    console.log(keycloakRoles)
     return keycloakRoles
   }
   throw new Error('Error getting Keycloak roles')
@@ -78,6 +79,36 @@ export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
     ).catch(
       error => {
         throw new Error('Auth API error getting Registering Party: status code = ' +
+                        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+      }
+    )
+}
+
+// Get SBC info from auth api /api/v1/orgs/{org_id}
+export async function getSbcFromAuth (): Promise<boolean> {
+  const url = sessionStorage.getItem('AUTH_API_URL')
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountInfo = JSON.parse(currentAccount)
+  console.log(accountInfo)
+  const accountId = accountInfo.id
+
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios.get(`orgs/${accountId}`, config)
+    .then(
+      response => {
+        const data = response?.data
+        if (!data) {
+          return false
+        }
+        const branchName = data?.branchName
+        if (branchName.includes('Service BC')) {
+          return true
+        }
+        return false
+      }
+    ).catch(
+      error => {
+        throw new Error('Auth API error getting SBC: status code = ' +
                         error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
       }
     )

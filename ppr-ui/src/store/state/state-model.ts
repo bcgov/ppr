@@ -10,7 +10,8 @@ export const stateModel: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    authRoles: []
+    authRoles: [],
+    isSbc: false
   },
   certifyInformation: {
     valid: false,

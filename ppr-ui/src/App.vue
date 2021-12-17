@@ -82,7 +82,7 @@ import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
 import { fetchError, loginError, paymentError, saveSearchError } from '@/resources/dialogOptions'
-import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser } from '@/utils'
+import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser, getSbcFromAuth } from '@/utils'
 // local Enums, Constants, Interfaces
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, RouteNames } from '@/enums'
 import {
@@ -119,6 +119,7 @@ export default class App extends Mixins(AuthMixin) {
   @Action setAccountInformation!: ActionBindingIF
   @Action setKeycloakRoles!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
+  @Action setRoleSbc: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -319,6 +320,11 @@ export default class App extends Mixins(AuthMixin) {
     // save roles from the keycloak token
     const authRoles = getKeycloakRoles()
     if (authRoles && authRoles.length > 0) {
+      if (authRoles.includes('staff')) {
+        // if staff make call to check for sbc
+        const isSbc = getSbcFromAuth()
+        this.setRoleSbc(isSbc)
+      }
       this.setAuthRoles(authRoles)
     } else {
       throw new Error('Invalid auth roles')

@@ -60,6 +60,10 @@ export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): vo
   commit('mutateAuthRoles', authRoles)
 }
 
+export const setRoleSbc: ActionIF = ({ commit }, isSbc: boolean): void => {
+  commit('mutateRoleSbc', isSbc)
+}
+
 export const setCertifyInformation: ActionIF = ({ commit }, certifyInformation: CertifyIF): void => {
   commit('mutateCertifyInformation', certifyInformation)
 }
