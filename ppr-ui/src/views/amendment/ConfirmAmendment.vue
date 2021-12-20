@@ -532,6 +532,10 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private submitButton (): void {
+    if (!this.validFolio || !this.certifyInformationValid) {
+      this.showErrors = true
+      return
+    }
     if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
       this.staffPaymentDialogDisplay = true
     } else {
@@ -540,10 +544,6 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private async submitAmendment (): Promise<void> {
-    if (!this.validFolio || !this.certifyInformationValid) {
-      this.showErrors = true
-      return
-    }
 
     // Incomplete validation check: all changes must be valid to submit registration.
     if (this.collateralValid && this.partiesValid && this.courtOrderValid) {

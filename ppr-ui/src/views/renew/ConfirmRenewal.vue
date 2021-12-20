@@ -325,6 +325,10 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private submitButton (): void {
+    if ((!this.validFolio) || (!this.validCertify)) {
+      this.showErrors = true
+      return
+    }
     if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
       this.staffPaymentDialogDisplay = true
     } else {
@@ -333,10 +337,6 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submitRenewal (): Promise<void> {
-    if ((!this.validFolio) || (!this.validCertify)) {
-      this.showErrors = true
-      return
-    }
 
     const stateModel: StateModelIF = this.getStateModel
     const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
