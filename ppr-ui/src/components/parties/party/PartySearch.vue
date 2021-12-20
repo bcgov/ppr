@@ -161,11 +161,12 @@ export default defineComponent({
       if ((response?.length > 0) && (searchValue === localState.searchValue)) {
         // will take up to 25 results
         localState.autoCompleteResults = response?.slice(0, 25)
+        localState.setAutoCompleteActive = true
       }
-      if (response?.length < 1) {
+      if ((response?.length < 1) && (searchValue === localState.searchValue)) {
         localState.autoCompleteResults = []
+        localState.setAutoCompleteActive = true
       }
-      localState.setAutoCompleteActive = true
     }
 
     watch(
