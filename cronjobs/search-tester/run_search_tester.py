@@ -68,8 +68,10 @@ def add_api_results(search: TestSearch, results: List[dict]):
             result.match_type = TestSearchResult.MatchType.SIMILAR.value
             result.index = similar_index
             similar_index += 1
-        if search_type in [SearchRequest.SearchTypes.BUSINESS_DEBTOR.value, SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value]:
-            result.details = api_result['debtor']
+        if search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
+            result.details = api_result['debtor']['businessName']
+        elif search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
+            result.details = f'{api_result["debtor"]["personName"]["last"]} {api_result["debtor"]["personName"]["first"]} {api_result["debtor"]["personName"].get("middle", "")}' 
         elif search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
             result.details = api_result['baseRegistrationNumber']
         else:
