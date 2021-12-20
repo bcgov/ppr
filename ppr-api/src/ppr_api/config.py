@@ -180,6 +180,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_PS_NOTIFICATION_TOPIC = os.getenv('GCP_PS_NOTIFICATION_TOPIC')
 
     GATEWAY_URL = os.getenv('GATEWAY_URL', 'https://bcregistry-dev.apigee.net')
+    SUBSCRIPTION_API_KEY = os.getenv('SUBSCRIPTION_API_KEY')
 
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
