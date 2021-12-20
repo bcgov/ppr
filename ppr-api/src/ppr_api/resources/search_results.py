@@ -194,7 +194,8 @@ class PatchSearchResultsResource(Resource):
                 event_count = len(events)
             if event_count > current_app.config.get('EVENT_MAX_RETRIES'):
                 return callback_error(resource_utils.CallbackExceptionCodes.MAX_RETRIES, search_id,
-                                      HTTPStatus.INTERNAL_SERVER_ERROR)
+                                      HTTPStatus.INTERNAL_SERVER_ERROR,
+                                      'Max retries reached.')
 
             search_detail = SearchResult.find_by_search_id(search_id, False)
             if not search_detail:
@@ -222,7 +223,7 @@ class PatchSearchResultsResource(Resource):
                                       'No data or status code.')
             current_app.logger.debug('report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
             if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-                message = f'Status code={status_code}. Response: ' + json.dumps(raw_data)
+                message = f'Status code={status_code}. Response: ' + str(raw_data)
                 return callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
                                       search_id,
                                       HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -293,7 +294,8 @@ class PostResultsNotificationResource(Resource):
                 event_count = len(events)
             if event_count > current_app.config.get('EVENT_MAX_RETRIES'):
                 return notification_error(resource_utils.CallbackExceptionCodes.MAX_RETRIES, search_id,
-                                          HTTPStatus.INTERNAL_SERVER_ERROR)
+                                          HTTPStatus.INTERNAL_SERVER_ERROR,
+                                          'Max retries reached.')
 
             search_detail = SearchResult.find_by_search_id(search_id, False)
             if not search_detail:
@@ -409,10 +411,17 @@ def enqueue_search_report(search_id: str):
         payload = {
             'searchId': search_id
         }
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
         GoogleQueueService().publish_search_report(payload)
         current_app.logger.info(f'Enqueue search report successful for id={search_id}.')
-    except Exception as err:  # noqa: B902; return nicer default error
+    except Exception as err:  # noqa: B902; do not alter app processing
         current_app.logger.error(f'Enqueue search report failed for id={search_id}: ' + repr(err))
+        EventTracking.create(search_id,
+                             EventTracking.EventTrackingTypes.SEARCH_REPORT,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             'Enqueue search report event failed: ' + repr(err))
 
 
 def enqueue_notification(search_id: str):
@@ -421,7 +430,14 @@ def enqueue_notification(search_id: str):
         payload = {
             'searchId': search_id
         }
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
         GoogleQueueService().publish_notification(payload)
         current_app.logger.info(f'Enqueue notification successful for id={search_id}.')
-    except Exception as err:  # noqa: B902; return nicer default error
+    except Exception as err:  # noqa: B902; do not alter app processing
         current_app.logger.error(f'Enqueue notification failed for id={search_id}: ' + repr(err))
+        EventTracking.create(search_id,
+                             EventTracking.EventTrackingTypes.API_NOTIFICATION,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             'Enqueue api notification event failed: ' + repr(err))
