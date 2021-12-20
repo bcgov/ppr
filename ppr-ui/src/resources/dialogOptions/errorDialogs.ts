@@ -8,10 +8,11 @@ export const fetchError: DialogOptionsIF = {
 }
 
 export const loginError: DialogOptionsIF = {
-  acceptText: 'Retry',
+  acceptText: 'OK',
   cancelText: '',
-  title: 'Account Authorization Error',
-  text: 'There was an issue logging in to your account. Please try again later.'
+  title: 'Unable to retrieve user account information',
+  text: 'We are unable to retrieve your Personal Property Registry account information. ' +
+  'Please try again later. If this issue persists, please contact us.'
 }
 
 export const paymentError: DialogOptionsIF = {
