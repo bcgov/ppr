@@ -320,7 +320,7 @@ export default class App extends Mixins(AuthMixin) {
     // save roles from the keycloak token
     const authRoles = getKeycloakRoles()
     if (authRoles && authRoles.length > 0) {
-      if (authRoles.includes('staff')) {
+      if (authRoles.includes('gov_account_user')) {
         // if staff make call to check for sbc
         const isSbc = getSbcFromAuth()
         this.setRoleSbc(isSbc)

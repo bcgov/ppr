@@ -439,7 +439,8 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    authRoles: []
+    authRoles: [],
+    isSbc: false
   },
   certifyInformation: mockedAmendmentCertified,
   staffPayment: null,
@@ -537,7 +538,8 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    authRoles: []
+    authRoles: [],
+    isSbc: false
   },
   certifyInformation: mockedAmendmentCertified,
   staffPayment: null,
@@ -635,7 +637,8 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    authRoles: []
+    authRoles: [],
+    isSbc: false
   },
   certifyInformation: mockedAmendmentCertified,
   staffPayment: null,
@@ -734,7 +737,8 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
   },
   accountProductSubscriptions: null,
   authorization: {
-    authRoles: []
+    authRoles: [],
+    isSbc: false
   },
   certifyInformation: mockedAmendmentCertified,
   staffPayment: null,

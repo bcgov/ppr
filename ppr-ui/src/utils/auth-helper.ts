@@ -88,7 +88,6 @@ export async function getSbcFromAuth (): Promise<boolean> {
   const url = sessionStorage.getItem('AUTH_API_URL')
   const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
   const accountInfo = JSON.parse(currentAccount)
-  console.log(accountInfo)
   const accountId = accountInfo.id
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
