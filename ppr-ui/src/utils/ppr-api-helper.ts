@@ -203,13 +203,18 @@ export async function updateSelected (
 // Submit selected matches in search response (search step 2b)
 export async function submitSelected (
   searchId: string,
-  selected: Array<SearchResultIF>
+  selected: Array<SearchResultIF>,
+  shouldCallback: boolean
 ): Promise<number> {
   const url = sessionStorage.getItem('PPR_API_URL')
   // change to application/pdf to get the pdf right away
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  let callback = ''
+  if (shouldCallback) {
+    callback = '?callbackURL=PPR_UI'
+  }
   return axios
-    .post(`search-results/${searchId}`, selected, config)
+    .post(`search-results/${searchId}${callback}`, selected, config)
     .then(response => {
       return response.status
     })

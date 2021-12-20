@@ -522,23 +522,8 @@ describe('Aircraft validation', () => {
     await Vue.nextTick()
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
-    expect(messages1.at(0).text()).toContain('Maximum 25 letters')
-    // letters only
-    wrapper.vm.$data.searchValue = 'abcd1'
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
-    await Vue.nextTick()
-    const messages2 = wrapper.findAll('.v-messages__message')
-    expect(messages2.length).toBe(1)
-    expect(messages2.at(0).text()).toContain('Must contain letters only')
-    // special chars
-    wrapper.vm.$data.searchValue = '10@'
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
-    await Vue.nextTick()
-    const messages3 = wrapper.findAll('.v-messages__message')
-    expect(messages3.length).toBe(1)
-    expect(messages3.at(0).text()).toContain('Must contain letters only')
+    expect(messages1.at(0).text()).toContain('Maximum 25 characters')
+
   })
 })
 

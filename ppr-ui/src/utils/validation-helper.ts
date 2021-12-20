@@ -173,10 +173,7 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
     case UISearchTypes.AIRCRAFT:
       searchValue = searchValue?.replace(dash, '')
       if (searchValue?.length > 25) {
-        validation.searchValue.message = 'Maximum 25 letters'
-      }
-      if (!lettersOnly.test(searchValue)) {
-        validation.searchValue.message = 'Must contain letters only'
+        validation.searchValue.message = 'Maximum 25 characters'
       }
       // only want popup if there isn't an error message that will prevent searching already
       if (!validation.searchValue.message && searchValue?.length < 10) {

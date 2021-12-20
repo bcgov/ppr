@@ -84,7 +84,7 @@ import {
 import { SearchedResult } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
-import { RouteNames, SettingOptions } from '@/enums'
+import { MatchTypes, RouteNames, SettingOptions } from '@/enums'
 import {
   ActionBindingIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
@@ -194,11 +194,17 @@ export default class Search extends Vue {
   }
 
   private get exactResultsLength (): number {
-    const searchResult = this.getSearchResults
-    if (searchResult) {
-      return searchResult.exactResultsSize
+    const selectedExactMatches = []
+    const results = this.getSearchResults?.results
+    let count = 0
+    let x:any
+    for (x in results) {
+      if (results[x].matchType === MatchTypes.EXACT) {
+        count += 1
+        selectedExactMatches.push(results[x])
+      }
     }
-    return 0
+    return count
   }
 
   private get selectedResultsLength (): number {
@@ -270,14 +276,15 @@ export default class Search extends Vue {
     this.confirmationDialog = false
     if (proceed) {
       this.loading = true
-      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches)
+      let shouldCallback = false
+      if (this.selectedMatches?.length >= 75) {
+        shouldCallback = true
+      }
+      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
       this.loading = false
       if (!successfulPPRResponses.includes(statusCode)) {
         this.emitError({ statusCode: statusCode })
       } else {
-        // FUTURE: design error flow for this case (might need api flow changes for how a search is saved)
-        // submit the results, but don't wait for the response or check for any error
-        submitSelected(this.getSearchResults.searchId, this.selectedMatches)
         this.$router.push({ name: RouteNames.DASHBOARD })
       }
     }
