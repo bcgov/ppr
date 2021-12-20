@@ -52,7 +52,7 @@
           <!-- to cut off in line with table submit btn -->
           <v-col cols="auto" style="width: 320px;" />
         </v-row>
-        <v-row no-gutters style="padding-top: 24px;">
+        <v-row v-if="totalResultsLength !== 0" no-gutters style="padding-top: 24px;">
           <v-col :class="$style['search-note']">
             Note: If some of the selected matches are part of the same base registration, that base registration
             will only be shown in the report once.
