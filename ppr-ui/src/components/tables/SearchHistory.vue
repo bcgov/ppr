@@ -76,7 +76,7 @@
             <tbody v-else>
               <tr>
                 <td :colspan="headers.length" style="text-align: center">
-                  <div v-if="!isSearchHistory" class="pt-4 pb-3">
+                  <div id="no-history-info" v-if="!isSearchHistory" class="pt-4 pb-3">
                     We were unable to retrieve your search history. Please try
                     again later. If this issue persists, please contact us.
                     <br /><br />
@@ -90,7 +90,7 @@
                     </v-btn>
                     <error-contact class="search-contact-container pt-6" />
                   </div>
-                  <div v-else>
+                  <div id="no-history-info" v-else>
                     Your search history will display here
                   </div>
                 </td>
