@@ -68,9 +68,9 @@ class _Config():  # pylint: disable=too-few-public-methods
     SEARCH_DATE = os.getenv('SEARCH_DATE', None)
     SEARCH_TIME = os.getenv('SEARCH_TIME', None)
 
-    SIM_VAL_BUSINESS = os.getenv('SIM_VAL_BUSINESS', 0.5)
-    SIM_VAL_FIRST = os.getenv('SIM_VAL_FIRST', 0.5)
-    SIM_VAL_LAST = os.getenv('SIM_VAL_LAST', 0.5)
+    SIMILARITY_QUOTIENT_BUSINESS_NAME = os.getenv('SIMILARITY_QUOTIENT_BUSINESS_NAME', 0.8)
+    SIMILARITY_QUOTIENT_FIRST_NAME = os.getenv('SIMILARITY_QUOTIENT_FIRST_NAME', 0.23)
+    SIMILARITY_QUOTIENT_LAST_NAME = os.getenv('SIMILARITY_QUOTIENT_LAST_NAME', 0.29)
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

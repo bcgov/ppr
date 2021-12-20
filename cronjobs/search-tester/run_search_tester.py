@@ -130,7 +130,7 @@ if __name__ == '__main__':
         completed = 0
         skipped = 0
 
-        if app.config['PAUSE']:
+        if app.config['PAUSE'] == True:
             app.logger.debug(f'Job paused. Update config to unpause.')
         else:
             batch_searches = {
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 SearchRequest.SearchTypes.REGISTRATION_NUM.value: {},
                 SearchRequest.SearchTypes.SERIAL_NUM.value: {}
             }
-            if app.config['CSV']:
+            if app.config['CSV'] == True:
                 batch_searches = get_batch_searches_csv(app, batch_searches)
             else:
                 batch_searches = get_batch_searches_table(app, batch_searches)
@@ -155,9 +155,9 @@ if __name__ == '__main__':
                     batch = TestSearchBatch()
                     batch.search_type = search_type
                     batch.test_date = datetime.utcnow()
-                    batch.sim_val_business = app.config['SIM_VAL_BUSINESS']
-                    batch.sim_val_first_name = app.config['SIM_VAL_FIRST']
-                    batch.sim_val_last_name = app.config['SIM_VAL_LAST']
+                    batch.sim_val_business = app.config['SIMILARITY_QUOTIENT_BUSINESS_NAME']
+                    batch.sim_val_first_name = app.config['SIMILARITY_QUOTIENT_FIRST_NAME']
+                    batch.sim_val_last_name = app.config['SIMILARITY_QUOTIENT_LAST_NAME']
                     batch.searches = []
                     # populate searches
                     for time in batch_searches[search_type]:
