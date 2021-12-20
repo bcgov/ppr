@@ -107,7 +107,7 @@ describe('TombstoneDefault component tests', () => {
 
   it('displays staff versions', async () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
-    const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
+    const staffGroups = ['helpdesk', 'ppr_staff']
     for (let i = 0; i < staffGroups.length; i++) {
       if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
       else await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
@@ -116,13 +116,15 @@ describe('TombstoneDefault component tests', () => {
       expect(header.at(0).text()).toContain('Staff Personal Property Registry')
       const subHeader = wrapper.findAll(tombstoneSubHeader)
       expect(subHeader.length).toBe(1)
-      if (staffGroups[i] === 'gov_account_user') {
-        expect(subHeader.at(0).text()).toContain('SBC Staff')
-      } else if (staffGroups[i] === 'helpdesk') {
+      if (staffGroups[i] === 'helpdesk') {
         expect(subHeader.at(0).text()).toContain('BC Online Help')
       }
       expect(subHeader.at(0).text()).toContain(userInfo.firstname)
       expect(subHeader.at(0).text()).toContain(userInfo.lastname)
     }
+    await store.dispatch('setRoleSbc', true)
+    const subHeader = wrapper.findAll(tombstoneSubHeader)
+    expect(subHeader.at(0).text()).toContain('SBC Staff')
   })
+  
 })

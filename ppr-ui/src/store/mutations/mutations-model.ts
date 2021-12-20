@@ -55,6 +55,10 @@ export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
   state.stateModel.authorization.authRoles = authRoles
 }
 
+export const mutateRoleSbc = (state: StateIF, isSbc: boolean) => {
+  state.stateModel.authorization.isSbc = isSbc
+}
+
 export const mutateCertifyInformation = (state: StateIF, certifyInformation: CertifyIF) => {
   state.stateModel.certifyInformation = certifyInformation
 }

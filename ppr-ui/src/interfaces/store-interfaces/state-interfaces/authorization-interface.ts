@@ -1,4 +1,5 @@
 // interface for authorizations
 export interface AuthorizationIF {
-  authRoles: Array<string>
+  authRoles: Array<string>,
+  isSbc: boolean
 }

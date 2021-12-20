@@ -211,18 +211,17 @@ describe('Serial number search', () => {
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
     expect(wrapper.vm.$store.state.stateModel.staffPayment).toBe(null)
 
-    const staffGroups = ['helpdesk', 'ppr_staff', 'gov_account_user']
+    const staffGroups = ['helpdesk', 'ppr_staff']
     for (let i = 0; i < staffGroups.length; i++) {
-      if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
-      else await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
       expect(wrapper.findComponent(FolioNumber).exists()).toBeFalsy()
-      if (staffGroups[i] === 'gov_account_user') {
-        expect(wrapper.find('.fee-text').exists()).toBeTruthy()
-        expect(wrapper.find('.fee-text').text()).toContain('10.00')
-      } else {
-        expect(wrapper.find('.fee-text').exists()).toBeFalsy()
-      }
+      expect(wrapper.find('.fee-text').exists()).toBeFalsy()
     }
+    await store.dispatch('setAuthRoles', [])
+    await store.dispatch('setRoleSbc', true)
+    await flushPromises
+    expect(wrapper.find('.fee-text').exists()).toBeTruthy()
+    expect(wrapper.find('.fee-text').text()).toContain('10.00')
   })
 })
 
