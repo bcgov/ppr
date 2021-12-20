@@ -18,8 +18,8 @@ from datetime import datetime
 from typing import List
 
 from flask import Flask
-
-from ppr_api.models import db, SearchRequest, TestSearch, TestSearchBatch, TestSearchResult
+from ppr_api.exceptions import BusinessException
+from ppr_api.models import db, Registration, SearchRequest, TestSearch, TestSearchBatch, TestSearchResult
 
 from search_tester import create_app
 from search_tester.utils.db_utils import QUERY_LEGACY_RESULTS_DATE, QUERY_LEGACY_RESULTS_DATE_TIME, QUERY_LEGACY_RESULTS_MOST_RECENT
@@ -33,6 +33,17 @@ setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'logging.
 def add_legacy_results(search: TestSearch, result_list: List[dict], match_type: TestSearchResult.MatchType):
     """Add the given legacy results for the match type to the TestSearch obj."""
     for legacy_result, index in zip(result_list, range(len(result_list))):
+        # get registration from api
+        reg = None
+        try:
+            reg = Registration.query.filter(Registration.registration_num == legacy_result['doc_id']).one_or_none()
+        except Exception as err:
+            # ignore error (it's not in the db)
+            print(err)
+            reg = None
+        # skip results that aren't in the test db
+        if not reg:
+            continue
         result = TestSearchResult()
         result.doc_id = legacy_result['doc_id']
         result.details = legacy_result['result']
