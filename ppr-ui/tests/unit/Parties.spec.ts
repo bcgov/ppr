@@ -151,7 +151,7 @@ describe('Parties sbc user tests', () => {
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
     })
-    await store.dispatch('setAuthRoles', ['gov_account_user'])
+    store.dispatch('setRoleSbc', true)
     wrapper = createComponent(false)
   })
   afterEach(() => {
