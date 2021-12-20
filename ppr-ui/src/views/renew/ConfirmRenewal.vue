@@ -337,7 +337,6 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submitRenewal (): Promise<void> {
-
     const stateModel: StateModelIF = this.getStateModel
     const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
     if (apiResponse === undefined || apiResponse?.error !== undefined) {

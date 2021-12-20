@@ -544,7 +544,6 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private async submitAmendment (): Promise<void> {
-
     // Incomplete validation check: all changes must be valid to submit registration.
     if (this.collateralValid && this.partiesValid && this.courtOrderValid) {
       const stateModel: StateModelIF = this.getStateModel
