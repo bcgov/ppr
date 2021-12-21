@@ -111,9 +111,8 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient AND
-        (SUBSTR(search_key, 1, 1) = SUBSTR(p.business_name, 1, 1) OR 
-         p.business_srch_key = search_key))
+   AND SUBSTR(search_key,1,1) = SUBSTR(p.business_name,1,1)
+   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key)
 ORDER BY match_type, p.business_name 
 """  + RESULTS_SIZE_LIMIT_CLAUSE
 
@@ -169,8 +168,11 @@ ORDER BY match_type, p.last_name, p.first_name
 
 # Total result count queries for serial number, debtor name searches:
 BUSINESS_NAME_TOTAL_COUNT = """
+WITH q AS (
+   SELECT searchkey_business_name(:query_bus_name) AS search_key
+)
 SELECT COUNT(r.id) AS query_count
-  FROM registrations r, financing_statements fs, parties p
+  FROM registrations r, financing_statements fs, parties p, q
  WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
@@ -183,9 +185,8 @@ SELECT COUNT(r.id) AS query_count
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND (SIMILARITY(:query_bus_name, p.business_srch_key) >= :query_bus_quotient AND
-        (SUBSTR(:query_bus_name, 1, 1) = SUBSTR(p.business_name, 1, 1) OR 
-         p.business_srch_key = :query_bus_name))
+   AND SUBSTR(search_key,1,1) = SUBSTR(p.business_name,1,1)
+   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key)
 """
 
 INDIVIDUAL_NAME_TOTAL_COUNT = """
