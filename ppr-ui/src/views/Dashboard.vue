@@ -42,7 +42,7 @@
                         @searched-value="setSearchedValue"
                         @search-data="setSearchResults"
                         @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
-                        @search-error="emitError"/>
+                        @search-error="searchError"/>
           </v-row>
         </v-col>
       </v-row>
@@ -56,7 +56,7 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-history class="soft-corners-bottom" @error="emitError"/>
+            <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="historyError"/>
           </v-row>
         </v-col>
       </v-row>
@@ -238,6 +238,8 @@ import {
   registrationNotFoundDialog,
   registrationRestrictedDialog,
   renewConfirmationDialog,
+  searchPdfError,
+  searchResultsError,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -498,6 +500,18 @@ export default class Dashboard extends Vue {
     this.myRegAddDialogDisplay = true
   }
 
+  private searchError (error: ErrorIF): void {
+    console.error(error)
+    this.myRegAddDialog = { ...searchResultsError }
+    this.myRegAddDialogDisplay = true
+  }
+
+  private historyError (error: ErrorIF): void {
+    console.error(error)
+    this.myRegAddDialog = { ...searchPdfError }
+    this.myRegAddDialogDisplay = true
+  }
+
   private myRegAddFoundSetDialog (searchedRegNum: string, reg: RegistrationSummaryIF): void {
     this.myRegAddDialog = Object.assign({ ...registrationFoundDialog })
     searchedRegNum = searchedRegNum?.trim()?.toUpperCase()
@@ -624,6 +638,16 @@ export default class Dashboard extends Vue {
     this.$router.push({ name: RouteNames.LENGTH_TRUST })
   }
 
+  private async retrieveSearchHistory (): Promise<void> {
+    // get/set search history
+    const resp = await searchHistory()
+    if (!resp || resp?.error) {
+      this.setSearchHistory(null)
+    } else {
+      this.setSearchHistory(resp?.searches)
+    }
+  }
+
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
   private async onAppReady (val: boolean): Promise<void> {
@@ -637,13 +661,8 @@ export default class Dashboard extends Vue {
       return
     }
 
-    // get/set search history
-    const resp = await searchHistory()
-    if (!resp || resp?.error) {
-      this.emitError({ statusCode: StatusCodes.NOT_FOUND })
-    } else {
-      this.setSearchHistory(resp?.searches)
-    }
+    this.retrieveSearchHistory()
+
     const myRegDrafts = await draftHistory()
     const myRegHistory = await registrationHistory()
 

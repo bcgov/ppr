@@ -1,9 +1,8 @@
 <template>
-  <v-container :class="[$style['main-results-div'], 'pa-0', 'white']">
-    <v-row v-if="historyLength !== 0" no-gutters class="pt-4">
+  <v-container class="main-results-div pa-0 white">
+    <v-row no-gutters class="pt-4">
       <v-col cols="12">
         <v-data-table
-          v-if="searchHistory"
           id="search-history-table"
           hide-default-footer
           fixed
@@ -18,49 +17,87 @@
           sort-desc
           return-object
         >
-          <template v-slot:[`item.searchQuery.criteria.value`]="{ item }">
-            {{ displaySearchValue(item.searchQuery) }}
-          </template>
-          <template v-slot:[`item.UISearchType`]="{ item }">
-            {{ displayType(item.searchQuery.type) }}
-          </template>
-          <template v-slot:[`item.searchDateTime`]="{ item }">
-            {{ displayDate(item.searchDateTime) }}
-          </template>
-          <template v-slot:[`item.pdf`]="{ item }">
-            <v-btn
-              v-if="item.selectedResultsSize < 76"
-              :id="`pdf-btn-${item.searchId}`"
-              class="pdf-btn px-0 mt-n3"
-              depressed
-              :loading="item.searchId === loadingPDF"
-              @click="downloadPDF(item.searchId)"
-            >
-              <img src="@/assets/svgs/pdf-icon-blue.svg">
-              <span class="pl-1">PDF</span>
-            </v-btn>
-            <v-tooltip
-              v-else
-              class="pa-2"
-              content-class="top-tooltip"
-              nudge-right="2"
-              top
-              transition="fade-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
-              </template>
-              <div class="pt-2 pb-2">
-                {{ tooltipTxtPdf }}
-              </div>
-            </v-tooltip>
+          <template v-slot:body="{ items, headers }">
+            <tbody v-if="items.length > 0">
+              <tr v-for="item in items" :key="item.name">
+                <td>
+                  {{ displaySearchValue(item.searchQuery) }}
+                </td>
+                <td>
+                  {{ displayType(item.searchQuery.type) }}
+                </td>
+                <td>
+                  {{ item.searchQuery.clientReferenceId }}
+                </td>
+                <td>
+                  {{ displayDate(item.searchDateTime) }}
+                </td>
+                <td>
+                  {{ item.totalResultsSize }}
+                </td>
+                <td>
+                  {{ item.exactResultsSize }}
+                </td>
+                <td>
+                  {{ item.selectedResultsSize }}
+                </td>
+                <td>
+                  <v-btn
+                    v-if="item.selectedResultsSize < 76"
+                    :id="`pdf-btn-${item.searchId}`"
+                    class="pdf-btn px-0 mt-n3"
+                    depressed
+                    :loading="item.searchId === loadingPDF"
+                    @click="downloadPDF(item.searchId)"
+                  >
+                    <img src="@/assets/svgs/pdf-icon-blue.svg" />
+                    <span class="pl-1">PDF</span>
+                  </v-btn>
+                  <v-tooltip
+                    v-else
+                    class="pa-2"
+                    content-class="top-tooltip"
+                    nudge-right="2"
+                    top
+                    transition="fade-transition"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon color="primary" v-bind="attrs" v-on="on"
+                        >mdi-information-outline</v-icon
+                      >
+                    </template>
+                    <div class="pt-2 pb-2">
+                      {{ tooltipTxtPdf }}
+                    </div>
+                  </v-tooltip>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td :colspan="headers.length" style="text-align: center">
+                  <div id="no-history-info" v-if="!isSearchHistory" class="pt-4 pb-3">
+                    We were unable to retrieve your search history. Please try
+                    again later. If this issue persists, please contact us.
+                    <br /><br />
+                    <v-btn
+                      id="retry-search-history"
+                      outlined
+                      color="primary"
+                      @click="retrySearch()"
+                    >
+                      Retry <v-icon>mdi-refresh</v-icon>
+                    </v-btn>
+                    <error-contact class="search-contact-container pt-6" />
+                  </div>
+                  <div id="no-history-info" v-else>
+                    Your search history will display here
+                  </div>
+                </td>
+              </tr>
+            </tbody>
           </template>
         </v-data-table>
-      </v-col>
-    </v-row>
-    <v-row v-else no-gutters justify="center" id="no-history-info" :class="[$style['no-results-info'], 'pa-5']">
-      <v-col cols="auto">
-        Your search history will display here
       </v-col>
     </v-row>
   </v-container>
@@ -68,19 +105,28 @@
 
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, useCssModule } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs
+} from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { searchHistroyTableHeaders, SearchTypes } from '@/resources'
 import { convertDate, searchPDF } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
+import { ErrorContact } from '../common'
 
 export default defineComponent({
+  components: {
+    ErrorContact
+  },
   setup (props, { emit }) {
-    const style = useCssModule()
     const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
-    const tooltipTxtPdf = 'Large search result reports (over 75 registrations) ' +
+    const tooltipTxtPdf =
+      'Large search result reports (over 75 registrations) ' +
       'can take up to 20 minutes to generate. The PDF will appear here once it ' +
       'is available. You may need to refresh this page to display the PDF download icon.'
     const localState = reactive({
@@ -89,10 +135,21 @@ export default defineComponent({
       historyLength: computed((): number => {
         return localState.searchHistory?.length || 0
       }),
-      searchHistory: computed((): Array<SearchResponseIF> => {
-        let searchHistory = null
-        searchHistory = getSearchHistory.value
-        return searchHistory
+      searchHistory: computed(
+        (): Array<SearchResponseIF> => {
+          let searchHistory = null
+          searchHistory = getSearchHistory.value
+          if (!searchHistory) {
+            return []
+          }
+          return searchHistory
+        }
+      ),
+      isSearchHistory: computed((): boolean => {
+        if (getSearchHistory.value) {
+          return true
+        }
+        return false
       })
     })
     const displayDate = (searchDate: string): string => {
@@ -153,38 +210,30 @@ export default defineComponent({
       }
       localState.loadingPDF = ''
     }
+    const retrySearch = (): void => {
+      emit('retry')
+    }
+
     return {
       ...toRefs(localState),
       displayDate,
       displaySearchValue,
       displayType,
       downloadPDF,
-      style,
+      retrySearch,
       tooltipTxtPdf
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .main-results-div {
   width: 100%;
 }
-.no-history-info {
-  color: $gray9 !important;
-  font-size: 0.825rem;
-}
-.pdf-btn {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-  justify-content: start;
-}
-.pdf-btn::before {
-  background-color: transparent !important;
-  color: $primary-blue !important;
-}
-.pdf-btn-text {
-  text-decoration: underline;
+.search-contact-container {
+  width: 350px;
+  font-size: 0.875rem;
 }
 </style>

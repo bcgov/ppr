@@ -8,10 +8,11 @@ export const fetchError: DialogOptionsIF = {
 }
 
 export const loginError: DialogOptionsIF = {
-  acceptText: 'Retry',
+  acceptText: 'OK',
   cancelText: '',
-  title: 'Account Authorization Error',
-  text: 'There was an issue logging in to your account. Please try again later.'
+  title: 'Unable to retrieve user account information',
+  text: 'We are unable to retrieve your Personal Property Registry account information. ' +
+  'Please try again later. If this issue persists, please contact us.'
 }
 
 export const paymentError: DialogOptionsIF = {
@@ -26,6 +27,24 @@ export const saveSearchError: DialogOptionsIF = {
   cancelText: 'Okay',
   title: 'Search Error',
   text: 'We were unable to complete this search. Please try again later.'
+}
+
+export const searchResultsError: DialogOptionsIF = {
+  acceptText: '',
+  cancelText: 'OK',
+  title: 'Unable to retrieve search results',
+  text: 'Search results could not be retrieved. Your search fee will be refunded. ' +
+    'Please try your search again later. If this issue persists, please contact us.',
+  hasContactInfo: true
+}
+
+export const searchPdfError: DialogOptionsIF = {
+  acceptText: '',
+  cancelText: 'OK',
+  title: 'Unable to open document',
+  text: 'We are currently unable to open this document. ' +
+    'Please try again later. If this issue persists, please contact us.',
+  hasContactInfo: true
 }
 
 export const searchReportError: DialogOptionsIF = {

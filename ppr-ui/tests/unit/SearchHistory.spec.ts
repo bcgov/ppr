@@ -23,6 +23,7 @@ const store = getVuexStore()
 const historyTable: string = '#search-history-table'
 const noResultsInfo: string = '#no-history-info'
 
+
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -53,10 +54,11 @@ describe('Test result table with no results', () => {
   it('renders and displays correct elements for no results', async () => {
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
     expect(wrapper.vm.historyLength).toBe(0)
-    expect(wrapper.find(historyTable).exists()).toBe(false)
+    expect(wrapper.find(historyTable).exists()).toBe(true)
     const noResultsDisplay = wrapper.findAll(noResultsInfo)
     expect(noResultsDisplay.length).toBe(1)
     expect(noResultsDisplay.at(0).text()).toContain('Your search history will display here')
+    expect(wrapper.find('#retry-search-history').exists()).toBe(false)
   })
 })
 
@@ -118,3 +120,25 @@ describe('Test result table with results', () => {
     }
   })
 })
+
+describe('Test result table with error', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setSearchHistory', null)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders and displays correct elements for no results', async () => {
+    expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+    expect(wrapper.vm.historyLength).toBe(0)
+    expect(wrapper.find(historyTable).exists()).toBe(true)
+    const noResultsDisplay = wrapper.findAll(noResultsInfo)
+    expect(noResultsDisplay.at(0).text()).toContain('We were unable to retrieve your search history.')
+    expect(wrapper.find('#retry-search-history').exists()).toBe(true)
+  })
+})
+
