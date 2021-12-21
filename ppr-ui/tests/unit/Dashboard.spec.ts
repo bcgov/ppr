@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import { createLocalVue, Wrapper, mount } from '@vue/test-utils'
+import { createLocalVue, Wrapper, mount, shallowMount } from '@vue/test-utils'
 import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
@@ -100,7 +100,6 @@ describe('Dashboard component', () => {
     patchUserSettings.returns(new Promise(resolve => resolve(
       { data: mockedUpdateRegTableUserSettingsResponse }
     )))
-
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
     localVue.use(CompositionApi)
@@ -108,7 +107,17 @@ describe('Dashboard component', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(Dashboard, { localVue, store, propsData: { appReady: true }, router, vuetify })
+    wrapper = mount(Dashboard, {
+      localVue,
+      store,
+      propsData: { appReady: true },
+      router,
+      vuetify,
+      stubs: {
+        SearchHistory: true
+      }
+    })
+
     await flushPromises()
   })
 
@@ -311,7 +320,16 @@ describe('Dashboard registration table tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(Dashboard, { localVue, store, propsData: { appReady: true }, router, vuetify })
+    wrapper = mount(Dashboard, {
+      localVue,
+      store,
+      propsData: { appReady: true },
+      router,
+      vuetify,
+      stubs: {
+        SearchHistory: true
+      }
+    })
     await flushPromises()
   })
 
@@ -497,7 +515,16 @@ describe('Dashboard add registration tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(Dashboard, { localVue, store, propsData: { appReady: true }, router, vuetify })
+    wrapper = mount(Dashboard, {
+      localVue,
+      store,
+      propsData: { appReady: true },
+      router,
+      vuetify,
+      stubs: {
+        SearchHistory: true
+      }
+    })
     await flushPromises()
   })
 
@@ -541,5 +568,75 @@ describe('Dashboard add registration tests', () => {
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.setMessage).toBe(
       'Registration was successfully added to your table.'
     )
+  })
+})
+
+
+describe('Dashboard error modal tests', () => {
+  let wrapper: Wrapper<any>
+  let sandbox
+  const { assign } = window.location
+  const myRegAdd: RegistrationSummaryIF = mockedRegistration1
+  sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    const getStub = sandbox.stub(axios, 'get')
+    const getSearchHistory = getStub.withArgs('search-history')
+    getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
+    const getMyRegDrafts = getStub.withArgs('drafts')
+    getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
+    getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
+
+    const getMyRegAdd = getStub.withArgs(
+      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
+    )
+    getMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
+
+    const postMyRegAdd = sandbox.stub(axios, 'post').withArgs(
+      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
+    )
+    postMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
+    // patch stubs
+    const patchStub = sandbox.stub(axios, 'patch')
+    const patchUserSettings = patchStub.withArgs('user-profile')
+    patchUserSettings.returns(new Promise(resolve => resolve(
+      { data: mockedUpdateRegTableUserSettingsResponse }
+    )))
+
+    const localVue = createLocalVue()
+    localVue.use(CompositionApi)
+    localVue.use(Vuetify)
+    localVue.use(VueRouter)
+    const router = mockRouter.mock()
+    await router.push({ name: 'dashboard' })
+    wrapper = shallowMount(Dashboard, { localVue, store, propsData: { appReady: true }, router, vuetify })
+    await flushPromises()
+  })
+
+  afterEach(() => {
+    window.location.assign = assign
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('displays error for search', async () => {
+    await wrapper.findComponent(SearchBar).vm.$emit('search-error', {
+      statusCode: 404
+    })
+    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.title).toBe('Unable to retrieve search results')
+  })
+
+  it('displays error for search pdf', async () => {
+    await wrapper.findComponent(SearchHistory).vm.$emit('error', {
+      statusCode: 404
+    })
+    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.title).toBe('Unable to open document')
   })
 })

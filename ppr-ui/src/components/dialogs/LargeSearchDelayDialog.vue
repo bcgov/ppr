@@ -5,7 +5,7 @@
       <b>{{ numberRegistrations }} exact match registrations</b> will be included in your PDF search result
       report along with an overiew of the search results.
       </p>
-      <p>
+      <p class="body-text">
         Reports containing more than 75 results <b>may
         take up to 20 minutes to generate.</b> Once generated, the report will appear
         in your search result list.
@@ -66,4 +66,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.body-text {
+  color: $gray7;
+}
 </style>
