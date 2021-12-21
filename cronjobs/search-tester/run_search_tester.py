@@ -14,6 +14,7 @@
 """This module holds all of the basic data about the auto analyzer uat testing."""
 import csv
 import os
+import re
 from datetime import datetime
 from typing import List
 
@@ -187,6 +188,8 @@ if __name__ == '__main__':
                         # prep search
                         criteria = { 'value': legacy_search['criteria'] }
                         if search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
+                            # remove dbl spaces
+                            legacy_search['criteria'] = re.sub(' +', ' ', legacy_search['criteria'])
                             name = legacy_search['criteria'].split(' ')
                             criteria = { 'debtorName': { 'first': name[1], 'last': name[0] }}
                             if len(name) > 2:
