@@ -86,7 +86,7 @@ class TestSearch(db.Model):
             if result['pairedIndex'] != -1:
                 total_diff += abs(result['index'] - result['pairedIndex'])
                 total_paired_results += 1
-        return total_diff / total_paired_results
+        return (total_diff / total_paired_results) if total_paired_results else 0
 
     def fail_index(self, match_type) -> int:
         """Return the first index that diffs between api/legacy results. Includes missed results."""
