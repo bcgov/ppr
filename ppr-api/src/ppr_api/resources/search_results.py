@@ -158,7 +158,7 @@ class SearchResultsResource(Resource):
                 doc_name = SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
                 current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
                 raw_data = GoogleStorageService.get_document(doc_name)
-                return raw_data, HTTPStatus.OK
+                return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
