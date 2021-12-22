@@ -70,12 +70,14 @@ TO_CHANGE_TYPE_DESCRIPTION = {
 class ReportTypes(Enum):
     """Render an Enum of the PPR PDF report types."""
 
+    COVER_PAGE_REPORT = 'cover'
     SEARCH_DETAIL_REPORT = 'searchDetail'
     FINANCING_STATEMENT_REPORT = 'financingStatement'
     RENEWAL_STATEMENT_REPORT = 'renewalStatement'
     DISCHARGE_STATEMENT_REPORT = 'dischargeStatement'
     CHANGE_STATEMENT_REPORT = 'changeStatement'
     AMENDMENT_STATEMENT_REPORT = 'amendmentStatement'
+    VERIFICATION_STATEMENT_MAIL_REPORT = 'financingStatementMail'
 
 
 class Report:  # pylint: disable=too-few-public-methods
@@ -110,9 +112,10 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, response.status_code))
 
         if response.status_code != HTTPStatus.OK:
+            content = response.content.decode('ascii')
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
-                                     .format(self._account_id, response.status_code, str(response.content)))
-            return jsonify(message=str(response.content)), response.status_code, None
+                                     .format(self._account_id, response.status_code, content))
+            return jsonify(message=content), response.status_code, None
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
 
     def _setup_report_data(self):
@@ -162,6 +165,9 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value and \
                 'amendmentRegistrationNumber' in self._report_data:
             report_id = self._report_data['amendmentRegistrationNumber']
+        elif self._report_key == ReportTypes.COVER_PAGE_REPORT.value and \
+                'registrationNumber' in self._report_data:
+            report_id = self._report_data['registrationNumber']
 
         return report_id
 
@@ -197,6 +203,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'style',
             'stylePage',
             'stylePageDraft',
+            'stylePageCover',
             'logo',
             'macros',
             'registration/securedParties',
@@ -244,12 +251,65 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _get_template_data(self):
         """Get the data for the report, modifying the original for the template output."""
-        self._set_addresses()
-        self._set_date_times()
-        self._set_vehicle_collateral()
         self._set_meta_info()
-        self._set_selected()
+        if self._report_key != ReportTypes.COVER_PAGE_REPORT.value:
+            self._set_addresses()
+            self._set_date_times()
+            self._set_vehicle_collateral()
+            self._set_selected()
+        else:
+            self._set_cover()
         return self._report_data
+
+    def _set_cover(self):  # pylint: disable=too-many-branches
+        """Cover page envelope window lines up to a maximum of 4."""
+        if 'cover' in self._report_data:
+            cover_info = self._report_data['cover']
+            line_count = 1  # always line 4
+            name = ''
+            line1 = ''
+            line2 = ''
+            line3 = ''
+            line4 = ''
+            if 'businessName' in cover_info:
+                name = cover_info['businessName']
+            elif 'personName' in cover_info:
+                name = cover_info['personName']['first'] + ' ' + cover_info['personName']['last']
+            if name:
+                line1 = name
+                line_count += 1
+                if len(line1) > 40:
+                    line_count += 1
+                    line1 = line1[0:40]
+                    line2 = name[40:80]
+            line4 = ' ' + cover_info['address']['postalCode']
+            if cover_info['address']['country'] != 'CA':
+                line4 = cover_info['address']['region'] + ' ' + cover_info['address']['country'] + line4
+            else:
+                line4 = cover_info['address']['region'] + line4
+            if (len(cover_info['address']['city']) + len(line4)) < 40:
+                line4 = cover_info['address']['city'] + ' ' + line4
+            if 'street' in cover_info['address']:
+                street = cover_info['address']['street']
+                if not line2:
+                    line2 = street
+                    if len(street) > 40:
+                        line3 = street[40:80]
+                else:
+                    line3 = street
+            if not line3 and 'streetAdditional' in cover_info['address']:
+                line3 = cover_info['address']['streetAdditional']
+            if line2 and len(line2) > 40:
+                line2 = line2[0:40]
+            if line3 and len(line3) > 40:
+                line3 = line3[0:40]
+            # cover_info['addressLineCount'] = line_count
+            cover_info['line1'] = line1
+            if line2:
+                cover_info['line2'] = line2
+            if line3:
+                cover_info['line3'] = line3
+            cover_info['line4'] = line4
 
     def _set_addresses(self):
         """Replace address country code with description."""
@@ -610,6 +670,12 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
     """Helper class to maintain the report meta information."""
 
     reports = {
+        ReportTypes.COVER_PAGE_REPORT.value: {
+            'reportDescription': 'CoverPage',
+            'fileName': 'cover',
+            'metaTitle': 'Personal Property Registry',
+            'metaSubject': ''
+        },
         ReportTypes.SEARCH_DETAIL_REPORT.value: {
             'reportDescription': 'SearchResult',
             'fileName': 'searchResult',

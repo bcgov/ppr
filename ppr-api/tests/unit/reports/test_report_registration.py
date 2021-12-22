@@ -33,6 +33,8 @@ CHANGE_AC_DATAFILE = 'tests/unit/reports/data/change-ac-example.json'
 AMENDMENT_DATAFILE = 'tests/unit/reports/data/amendment-example.json'
 AMENDMENT_CO_DATAFILE = 'tests/unit/reports/data/amendment-co-example.json'
 DISCHARGE_DATAFILE = 'tests/unit/reports/data/discharge-example.json'
+DISCHARGE_DATAFILE_COVER = 'tests/unit/reports/data/discharge-example-cover.json'
+AMENDMENT_DATAFILE_COVER = 'tests/unit/reports/data/amendment-example-cover.json'
 
 TEST_REPORT_DATA = [
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, FINANCING_RL_DATAFILE),
@@ -44,7 +46,9 @@ TEST_REPORT_DATA = [
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, AMENDMENT_CO_DATAFILE),
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, CHANGE_AC_DATAFILE),
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, CHANGE_DT_DATAFILE),
-    (ReportTypes.FINANCING_STATEMENT_REPORT.value, DISCHARGE_DATAFILE)
+    (ReportTypes.FINANCING_STATEMENT_REPORT.value, DISCHARGE_DATAFILE),
+    (ReportTypes.COVER_PAGE_REPORT.value, DISCHARGE_DATAFILE_COVER),
+    (ReportTypes.COVER_PAGE_REPORT.value, AMENDMENT_DATAFILE_COVER)
 ]
 
 
@@ -72,5 +76,10 @@ def test_registration_config(client, jwt, type, json_data_file):
     assert report_data['meta_title']
     assert report_data['meta_account_id']
     assert report_data['environment']
-    assert report_data['createDateTime'].endswith('Pacific time')
-    assert report_data['registeringParty']['address']['country'] == 'Canada'
+    if type != ReportTypes.COVER_PAGE_REPORT.value:
+        assert report_data['createDateTime'].endswith('Pacific time')
+        assert report_data['registeringParty']['address']['country'] == 'Canada'
+    else:
+        assert report_data['cover']['line1']
+        assert report_data['cover']['line2']
+        assert report_data['cover']['line4']
