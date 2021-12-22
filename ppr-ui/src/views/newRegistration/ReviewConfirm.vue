@@ -1,6 +1,11 @@
 <template>
   <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleError($event)" />
+    <base-dialog
+      id="reviewDialog"
+      :setDisplay="errorDialog"
+      :setOptions="errorOptions"
+      @proceed="handleError($event)"
+    />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>

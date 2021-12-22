@@ -151,3 +151,40 @@ describe('RegisteringParty store undo test', () => {
     expect(getLastEvent(wrapper, 'setRegisteringParty')).toBe(null)
   })
 })
+
+describe('Test result table with error', () => {
+  let wrapper: Wrapper<any>
+  let sandbox
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+
+  beforeEach(async () => {
+    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+      registeringParty: null
+    })
+
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    get.returns(
+      new Promise(resolve => resolve({
+        data: null
+      })))
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders and displays correct elements for no results', async () => {
+    expect(wrapper.findComponent(RegisteringParty).exists()).toBe(true)
+    expect(wrapper.vm.registeringParty.length).toBe(0)
+    expect(wrapper.find('.registering-table').exists()).toBe(true)
+    const noResultsDisplay = wrapper.findAll('.v-data-table__empty-wrapper')
+    expect(noResultsDisplay.at(0).text()).toContain('We were unable to retrieve Registering Party')
+    expect(wrapper.find('#retry-registering-party').exists()).toBe(true)
+  })
+})

@@ -13,6 +13,7 @@ import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { ReviewConfirm } from '@/views'
+import { BaseDialog } from '@/components/dialogs'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
@@ -97,6 +98,7 @@ describe('Review Confirm new registration component', () => {
     expect(wrapper.vm.dataLoaded).toBe(true)
     expect(wrapper.findComponent(ReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
@@ -184,4 +186,33 @@ describe('Review Confirm new registration component', () => {
       wrapper.destroy()
     }
   })
+
+  it('displays error modals', async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent()
+    await flushPromises()
+    await wrapper.findComponent(ButtonFooter).vm.$emit('error', {
+      statusCode: 404
+    })
+    expect(wrapper.find('#reviewDialog').exists()).toBe(true)
+    expect(wrapper.find('#reviewDialog').vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find('#reviewDialog').vm.$props.setOptions.title).toBe('Unable to complete registration')
+    
+  })
+
+  it('displays error modals', async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent()
+    await flushPromises()
+    await wrapper.findComponent(ButtonFooter).vm.$emit('draft-save-error', {
+      statusCode: 404
+    })
+    expect(wrapper.find('#reviewDialog').exists()).toBe(true)
+    expect(wrapper.find('#reviewDialog').vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find('#reviewDialog').vm.$props.setOptions.title).toBe('Unable to save draft registration')
+    
+  })
+
 })
