@@ -106,7 +106,7 @@ class SearchResultsResource(Resource):
                 if callback_url is not None:
                     # Add enqueue report generation event here.
                     enqueue_search_report(search_id)
-                    response_data['callbackURL'] = callback_url
+                    response_data['callbackURL'] = requests.utils.unquote(callback_url)
                     response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
                     return jsonify(response_data), HTTPStatus.OK
 
