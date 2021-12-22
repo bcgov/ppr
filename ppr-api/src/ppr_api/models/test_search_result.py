@@ -75,7 +75,7 @@ class TestSearchResult(db.Model):
             TestSearchResult.match_type == self.match_type,
             TestSearchResult.doc_id == self.doc_id,
             TestSearchResult.source != self.source
-        ).one_or_none()
+        ).first()
 
         if paired_match:
             return paired_match.index
