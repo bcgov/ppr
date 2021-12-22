@@ -56,7 +56,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APISearchTypes.AIRCRAFT,
     textLabel: 'Enter an aircraft airframe D.O.T. number',
     hints: {
-      searchValue: 'Up to 25 letters'
+      searchValue: 'Up to 25 characters'
     }
   },
   {

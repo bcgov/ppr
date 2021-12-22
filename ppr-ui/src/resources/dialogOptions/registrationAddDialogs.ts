@@ -41,3 +41,31 @@ export const registrationRestrictedDialog: DialogOptionsIF = {
   title: 'Restricted Access Registration Found',
   text: '' // added in component (contains dynamic info)
 }
+
+export const registrationSaveDraftErrorDialog: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to save draft registration',
+  text: 'We are unable to save your draft registration at this time. ' +
+    'error. Please try this again later. If this issue persists, please contact us.'
+}
+
+export const registrationCompleteErrorDialog: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to complete registration',
+  text: 'We are unable to complete your registration at this time. Your draft registration ' +
+    'will be saved under "My Registrations". Please try to complete this registration later. ' +
+    'If this issue persists, please contact us.'
+}
+
+export const registrationOpenDraftErrorDialog: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to open draft registration',
+  text: 'We are currently unable to open your draft registration. ' +
+    'Please try again later. If this issue persists, please contact us.'
+}

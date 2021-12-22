@@ -38,6 +38,24 @@ export const searchResultsError: DialogOptionsIF = {
   hasContactInfo: true
 }
 
+export const saveResultsError: DialogOptionsIF = {
+  acceptText: '',
+  cancelText: 'OK',
+  title: 'Unable to save search results',
+  text: 'We are unable to save your search results. Your search fee will be refunded. ' +
+    'Please try this search again later. If this issue persists, please contact us.',
+  hasContactInfo: true
+}
+
+export const saveSelectionsError: DialogOptionsIF = {
+  acceptText: '',
+  cancelText: 'OK',
+  title: 'Unable to save your selections',
+  text: 'We are unable to save your search results. Your search fee will be refunded. ' +
+    'Please try this search again later. If this issue persists, please contact us.',
+  hasContactInfo: true
+}
+
 export const searchPdfError: DialogOptionsIF = {
   acceptText: '',
   cancelText: 'OK',

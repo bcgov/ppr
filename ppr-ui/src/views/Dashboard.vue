@@ -11,6 +11,13 @@
       @proceed="myRegAddDialogProceed($event)"
     />
     <base-dialog
+      id="myRegErrDialog"
+      setAttach=""
+      :setDisplay="myRegErrDialogDisplay"
+      :setOptions="myRegErrDialog"
+      @proceed="myRegErrDialogProceed($event)"
+    />
+    <base-dialog
       id="myRegDeleteDialog"
       setAttach=""
       :setDisplay="myRegDeleteDialogDisplay"
@@ -237,6 +244,7 @@ import {
   registrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog,
+  registrationOpenDraftErrorDialog,
   renewConfirmationDialog,
   searchPdfError,
   searchResultsError,
@@ -317,8 +325,10 @@ export default class Dashboard extends Vue {
   private myRegActionRoute: RouteNames = null
   private myRegAdd = ''
   private myRegAddDialog: DialogOptionsIF = null
+  private myRegErrDialog: DialogOptionsIF = null
   private myRegAddDialogError: StatusCodes = null
   private myRegAddDialogDisplay = false
+  private myRegErrDialogDisplay = false
   private myRegDataDrafts: DraftResultIF[] = []
   private myRegDataHistory: RegistrationSummaryIF[] = []
   private myRegDeleteDialogDisplay = false
@@ -395,7 +405,8 @@ export default class Dashboard extends Vue {
     // Get draft details and setup store for editing the draft financing statement.
     const stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
     if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
-      alert('Attempt to get draft for editing failed.')
+      this.myRegAddDialog = { ...registrationOpenDraftErrorDialog }
+      this.myRegAddDialogDisplay = true
     } else {
       this.setLengthTrust(stateModel.registration.lengthTrust)
       this.setAddCollateral(stateModel.registration.collateral)
@@ -572,6 +583,10 @@ export default class Dashboard extends Vue {
     this.myRegActionDocId = ''
     this.myRegActionRegNum = ''
     this.myRegDeleteDialogDisplay = false
+  }
+
+  private myRegErrDialogProceed (val: boolean): void {
+    this.myRegErrDialogDisplay = false
   }
 
   /** Redirects browser to Business Registry home page. */

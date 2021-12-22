@@ -1,5 +1,6 @@
 <template>
   <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
+    <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleError($event)" />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -124,6 +125,11 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
+import { BaseDialog } from '@/components/dialogs'
+import {
+  registrationSaveDraftErrorDialog,
+  registrationCompleteErrorDialog
+} from '@/resources/dialogOptions'
 
 @Component({
   components: {
@@ -134,6 +140,7 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
     RegistrationLengthTrustSummary,
     Stepper,
     CertifyInformation,
+    BaseDialog,
     StickyContainer
   }
 })
@@ -163,6 +170,8 @@ export default class ReviewConfirm extends Vue {
   private statementType = StatementTypes.FINANCING_STATEMENT
   private stepName = RouteNames.REVIEW_CONFIRM
   private validCertify = false
+  private errorDialog = false
+  private errorOptions = registrationSaveDraftErrorDialog
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -186,6 +195,13 @@ export default class ReviewConfirm extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
 
+  private handleError (stay: boolean): void {
+    this.errorDialog = false
+    if (!stay) {
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
+  }
+
   mounted () {
     this.onAppReady(this.appReady)
   }
@@ -193,7 +209,8 @@ export default class ReviewConfirm extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    alert('Error saving registration. Replace when design complete.')
+    this.errorOptions = { ...registrationCompleteErrorDialog }
+    this.errorDialog = true
   }
 
   /** Emits Have Data event. */
@@ -244,14 +261,14 @@ export default class ReviewConfirm extends Vue {
 
   @Watch('saveDraftError')
   private saveDraftError (val: ErrorIF): void {
-    alert('Error saving draft. Replace when design complete.')
+    this.errorOptions = { ...registrationSaveDraftErrorDialog }
+    this.errorDialog = true
   }
 
   @Watch('registrationIncomplete')
   private registrationIncomplete (): void {
     this.showStepErrors = true
     this.setShowStepErrors(true)
-    alert('Registration incomplete. Replace when design complete.')
   }
 }
 </script>
