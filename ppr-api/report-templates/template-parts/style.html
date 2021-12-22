@@ -6,6 +6,10 @@
 	html body article#registration {
 		page: registration;
 	}
+	html body article#cover-page {
+		page: cover-page;
+	}
+
 	.fixed-header {
 		/* NB: repeats on every page due to fixed position */
 		position: fixed;
@@ -19,11 +23,37 @@
 		top: -110px; /* -192 approx 2 in */
 		width: 98%;
 	}
+
+	.header-cover {
+		/* NB: repeats on every page due to fixed position */
+		position: fixed;
+		top: -90px; /* -192 approx 2 in */
+		width: 98%;
+	}
+
+	table.report-container {
+    	page-break-after:always;
+		width: 100%;
+	}
+	thead.report-header {
+		display:table-header-group;
+		width: 100%;
+	}
+	table.report-container tbody td {
+		min-width: 98%;
+	}
 	
 	.header-registration {
 		/* NB: repeats on every page due to fixed position */
 		position: fixed;
 		top: -165px; /* -186 -142 -132 -192 approx 2 in */
+		width: 98%;
+	}
+
+	.header-cover-table {
+		/* NB: repeats on every page due to fixed position */
+		position: fixed;
+		top: -100px; /* -186 -142 -132 -192 approx 2 in */
 		width: 98%;
 	}
 
@@ -423,6 +453,30 @@
 		padding-bottom: 1rem;
 	}
 
+
+	.cover-data-table {
+		width: 100%;
+		margin: 0px;
+		padding: 0px;
+		table-layout: fixed;
+		border-collapse: collapse;
+	}
+
+	.cover-data-table td {
+		vertical-align: bottom;
+		overflow-wrap: break-word;
+  		word-wrap: break-word;
+	}
+
+	.cover-data {
+		font-family: 'BCSans-Regular', sans-serif !important;
+		color: #313132;
+		font-size: 11pt;
+		line-height: 12pt;
+		text-align: left;
+	}
+
+
 	.statement-title {
 		font-family: 'BCSans-Bold', sans-serif !important;
 		font-weight: bold;
@@ -590,6 +644,13 @@
 	.mt-6 { margin-top: 1.5rem; }
 	.mt-7 { margin-top: 1.75rem; }
 	.mt-8 { margin-top: 2rem; }
+	.mt-9 { margin-top: 2.25rem; }
+	.mt-10 { margin-top: 2.5rem; }
+	.mt-11 { margin-top: 2.75rem; }
+	.mt-12 { margin-top: 3rem; }
+	.mt-14 { margin-top: 3.5rem; }
+	.mt-16 { margin-top: 4rem; }
+	.mt-32 { margin-top: 8rem; }
 
 	.pt-1 { padding-top: 0.25rem; }
 	.pt-2 { padding-top: 0.5rem; }
@@ -618,6 +679,15 @@
 	.mb-7 { margin-bottom: 1.75rem; }
 	.mb-8 { margin-bottom: 2rem; }
 
+	.ml-1 { margin-left: 0.25rem; }
+	.ml-2 { margin-left: 0.5rem; }
+	.ml-3 { margin-left: 0.75rem; }
+	.ml-4 { margin-left: 1rem; }
+	.ml-5 { margin-left: 1.25rem; }
+	.ml-6 { margin-left: 1.5rem; }
+	.ml-7 { margin-left: 1.75rem; }
+	.ml-8 { margin-left: 2rem; }
+
 	.pb-1 { padding-bottom: 0.25rem; }
 	.pb-2 { padding-bottom: 0.5rem; }
 	.pb-3 { padding-bottom: 0.75rem; }
@@ -627,6 +697,14 @@
 	.pb-7 { padding-bottom: 1.75rem; }
 	.pb-8 { padding-bottom: 2rem; }
 
+	.pl-1 { padding-left: 0.25rem; }
+	.pl-2 { padding-left: 0.5rem; }
+	.pl-3 { padding-left: 0.75rem; }
+	.pl-4 { padding-left: 1rem; }
+	.pl-5 { padding-left: 1.25rem; }
+	.pl-6 { padding-left: 1.5rem; }
+	.pl-7 { padding-left: 1.75rem; }
+	.pl-8 { padding-left: 2rem; }
 
 	.vehicle-collateral-table-mh {
 		width: 100%;

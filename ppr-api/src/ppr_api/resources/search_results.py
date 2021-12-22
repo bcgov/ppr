@@ -106,7 +106,7 @@ class SearchResultsResource(Resource):
                 if callback_url is not None:
                     # Add enqueue report generation event here.
                     enqueue_search_report(search_id)
-                    response_data['callbackURL'] = callback_url
+                    response_data['callbackURL'] = requests.utils.unquote(callback_url)
                     response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
                     return jsonify(response_data), HTTPStatus.OK
 
@@ -158,7 +158,7 @@ class SearchResultsResource(Resource):
                 doc_name = SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
                 current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
                 raw_data = GoogleStorageService.get_document(doc_name)
-                return raw_data, HTTPStatus.OK
+                return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
@@ -223,7 +223,7 @@ class PatchSearchResultsResource(Resource):
                                       'No data or status code.')
             current_app.logger.debug('report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
             if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-                message = f'Status code={status_code}. Response: ' + str(raw_data)
+                message = f'Status code={status_code}. Response: ' + json.dumps(raw_data)
                 return callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
                                       search_id,
                                       HTTPStatus.INTERNAL_SERVER_ERROR,
