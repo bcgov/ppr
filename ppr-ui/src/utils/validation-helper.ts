@@ -85,10 +85,7 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
       } else {
         searchValue = searchValue?.replace(dash, '')
         if (searchValue?.length > 25) {
-          validation.searchValue.message = 'Maximum 25 letters'
-        }
-        if (!lettersOnly.test(searchValue)) {
-          validation.searchValue.message = 'Must contain letters only'
+          validation.searchValue.message = 'Maximum 25 characters'
         }
       }
       break

@@ -497,7 +497,7 @@ describe('Aircraft search', () => {
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Up to 25 letters')
+    expect(messages.at(0).text()).toContain('Up to 25 characters')
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()

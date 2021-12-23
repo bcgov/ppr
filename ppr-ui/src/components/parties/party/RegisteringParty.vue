@@ -10,7 +10,6 @@
             disable-pagination
             disable-sort
             hide-default-footer
-            no-data-text="No Registering Party obtained from user Account Information."
           >
             <template v-slot:item="row" class="party-data-table">
               <tr :key="row.item.id" class="registering-row">
@@ -100,6 +99,20 @@
               </td>
             </tr>
             </template>
+            <template  v-slot:no-data>
+              We were unable to retrieve Registering Party from your account. Please try
+              again later. If this issue persists, please contact us.
+              <br /><br />
+              <v-btn
+                id="retry-registering-party"
+                outlined
+                color="primary"
+                @click="getRegisteringParty()"
+              >
+                Retry <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+              <error-contact class="search-contact-container pt-6" />
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
@@ -130,11 +143,13 @@ import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-u
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { getRegisteringPartyFromAuth } from '@/utils'
+import { ErrorContact } from '@/components/common'
 
 export default defineComponent({
   components: {
     BaseAddress,
-    EditParty
+    EditParty,
+    ErrorContact
   },
   setup (props, context) {
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
@@ -210,6 +225,7 @@ export default defineComponent({
       registrationFlowType,
       changeRegisteringParty,
       editRegisteringParty,
+      getRegisteringParty,
       resetData,
       RegistrationFlowType,
       ActionTypes,
@@ -221,6 +237,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
-
+<style lang="scss" scoped>
+.search-contact-container {
+  width: 350px;
+  font-size: 0.875rem;
+}
 </style>

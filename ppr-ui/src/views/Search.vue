@@ -93,7 +93,9 @@ import {
   largeSearchReportError,
   searchReportError,
   selectionConfirmaionDialog,
-  largeSearchReportDelay
+  largeSearchReportDelay,
+  saveResultsError,
+  saveSelectionsError
 } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
 
@@ -283,6 +285,8 @@ export default class Search extends Vue {
       const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
       this.loading = false
       if (!successfulPPRResponses.includes(statusCode)) {
+        this.errorOptions = { ...saveResultsError }
+        this.errorDialog = true
         this.emitError({ statusCode: statusCode })
       } else {
         this.$router.push({ name: RouteNames.DASHBOARD })
@@ -294,8 +298,8 @@ export default class Search extends Vue {
     this.selectedMatches = matches
     const statusCode = await updateSelected(this.getSearchResults.searchId, matches)
     if (!successfulPPRResponses.includes(statusCode)) {
-      this.emitError({ statusCode: statusCode })
-      this.$router.push({ name: RouteNames.DASHBOARD })
+      this.errorOptions = { ...saveSelectionsError }
+      this.errorDialog = true
     }
   }
 
