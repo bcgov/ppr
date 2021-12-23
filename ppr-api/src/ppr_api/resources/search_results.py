@@ -86,14 +86,16 @@ class SearchResultsResource(Resource):
             search_detail = SearchResult.validate_search_select(request_json, search_id)
 
             # Large report threshold check, require/save callbackURL parameter.
-            callback_url = None
-            if resource_utils.is_pdf(request) and is_async(search_detail, request_json):
-                callback_url = request.args.get(CALLBACK_PARAM)
+            # UI may not request a report in step 2.
+            callback_url = request.args.get(CALLBACK_PARAM)
+            if is_async(search_detail, request_json) and (resource_utils.is_pdf(request) or
+                                                          callback_url == SearchResult.UI_CALLBACK_URL):
                 if callback_url is None:
                     error = f'Large search report required callbackURL parameter missing for {search_id}.'
                     current_app.logger.warn(error)
                     return resource_utils.error_response(HTTPStatus.BAD_REQUEST, error)
-
+            else:
+                callback_url = None
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
             search_detail.update_selection(request_json, account_name, callback_url)

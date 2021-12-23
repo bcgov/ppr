@@ -619,6 +619,7 @@ def test_find_by_account_id(session):
     assert history[0]['exactResultsSize']
     assert history[0]['selectedResultsSize']
     assert history[0]['searchQuery']
+    assert 'username' in history[0]
     assert len(history) >= 1
 
 

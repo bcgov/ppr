@@ -114,8 +114,10 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                         'type': str(mapping['draft_type']),
                         'lastUpdateDateTime': model_utils.format_ts(mapping['last_update_ts']),
                         'path': '/ppr/api/v1/drafts/' + str(mapping['document_number']),
+                        'registeringParty': str(mapping['registering_party']),
+                        'securedParties': str(mapping['secured_party']),
                         'registeringName': registering_name,
-                        'client_reference_id': ref_id
+                        'clientReferenceId': ref_id
                     }
                     drafts_json.append(draft_json)
 
