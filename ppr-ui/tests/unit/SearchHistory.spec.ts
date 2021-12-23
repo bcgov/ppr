@@ -107,10 +107,13 @@ describe('Test result table with results', () => {
       expect(rows.at(i + 1).text()).toContain(totalResultsSize)
       expect(rows.at(i + 1).text()).toContain(exactResultsSize)
       expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
-      expect(rows.at(i + 1).text()).toContain('PDF')
-      wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
-      await Vue.nextTick()
-      expect(downloadMock).toHaveBeenCalledWith(searchId)
+      // PDF only shows for selected result size < 76
+      if (selectedResultsSize < 76) {
+        expect(rows.at(i + 1).text()).toContain('PDF')
+        wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
+        await Vue.nextTick()
+        expect(downloadMock).toHaveBeenCalledWith(searchId)
+      }
     }
   })
 })
