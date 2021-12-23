@@ -164,6 +164,7 @@ export default class AmendRegistration extends Vue {
   @Getter getConfirmDebtorName: DebtorNameIF
 
   @Action setAddCollateral: ActionBindingIF
+  @Action setStaffPayment: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setAmendmentDescription: ActionBindingIF
   @Action setCourtOrderInformation: ActionBindingIF
@@ -317,6 +318,14 @@ export default class AmendRegistration extends Vue {
       this.setCourtOrderInformation(courtOrder)
       this.setFolioOrReferenceNumber('')
       this.setCertifyInformation(certifyInfo)
+      this.setStaffPayment({
+        option: -1,
+        routingSlipNumber: '',
+        bcolAccountNumber: '',
+        datNumber: '',
+        folioNumber: '',
+        isPriority: false
+      })
       if (this.documentId) {
         const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
         if (stateModel.registration.draft.error) {

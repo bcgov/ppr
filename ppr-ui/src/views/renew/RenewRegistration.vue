@@ -139,6 +139,7 @@ export default class ReviewRegistration extends Vue {
   @Getter getRegistrationNumber: String
 
   @Action setAddCollateral: ActionBindingIF
+  @Action setStaffPayment: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
@@ -267,6 +268,14 @@ export default class ReviewRegistration extends Vue {
           legalName: '',
           registeringParty: null
         }
+        this.setStaffPayment({
+          option: -1,
+          routingSlipNumber: '',
+          bcolAccountNumber: '',
+          datNumber: '',
+          folioNumber: '',
+          isPriority: false
+        })
         this.setCourtOrderInformation(courtOrder)
         this.setRegistrationCreationDate(financingStatement.createDateTime)
         this.setRegistrationExpiryDate(financingStatement.expiryDate)

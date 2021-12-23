@@ -272,6 +272,7 @@ export default defineComponent({
           // Emit error message.
           emit('error', apiResponse.error)
         } else {
+          // blank out payment information
           props.router.push({
             name: localState.buttonConfig.nextRouteName
           })
