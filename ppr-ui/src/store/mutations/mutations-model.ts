@@ -130,6 +130,14 @@ export const mutateNewRegistration = (state: StateIF) => {
     legalName: ''
   }
   state.stateModel.folioOrReferenceNumber = ''
+  state.stateModel.staffPayment = {
+    option: -1,
+    routingSlipNumber: '',
+    bcolAccountNumber: '',
+    datNumber: '',
+    folioNumber: '',
+    isPriority: false
+  }
 }
 
 export const mutateRegistrationConfirmDebtorName = (state: StateIF, debtorName: DebtorNameIF) => {
