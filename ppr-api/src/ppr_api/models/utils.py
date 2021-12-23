@@ -395,6 +395,44 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
             WHEN d.registration_type_cl = 'AMENDMENT' THEN d.draft -> 'amendmentStatement' ->> 'clientReferenceId'
             WHEN d.registration_type_cl = 'CHANGE' THEN d.draft -> 'changeStatement' ->> 'clientReferenceId'
             ELSE '' END client_reference_id,
+       CASE WHEN d.registration_type_cl IN ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN') AND
+                 d.draft -> 'financingStatement' -> 'registeringParty' IS NOT NULL THEN
+                 CASE WHEN d.draft -> 'financingStatement' -> 'registeringParty' -> 'businessName' IS NOT NULL THEN
+                           d.draft -> 'financingStatement' -> 'registeringParty' ->> 'businessName'
+                      WHEN d.draft -> 'financingStatement' -> 'registeringParty' ->> 'personName' IS NOT NULL THEN
+                      concat(d.draft -> 'financingStatement' -> 'registeringParty' -> 'personName' ->> 'first', ' ',
+                             d.draft -> 'financingStatement' -> 'registeringParty' -> 'personName' ->> 'last')
+                 END
+            WHEN d.registration_type_cl = 'AMENDMENT' AND
+                 (d.draft -> 'amendmentStatement' -> 'registeringParty') IS NOT NULL THEN
+                 CASE WHEN d.draft -> 'amendmentStatement' -> 'registeringParty' -> 'businessName' IS NOT NULL THEN
+                           d.draft -> 'amendmentStatement' -> 'registeringParty' ->> 'businessName'
+                      WHEN d.draft -> 'amendmentStatement' -> 'registeringParty' -> 'personName' IS NOT NULL THEN
+                        concat(d.draft -> 'amendmentStatement' -> 'registeringParty' -> 'personName' ->> 'first', ' ',
+                               d.draft -> 'amendmentStatement' -> 'registeringParty' -> 'personName' ->> 'last')
+                 END
+            ELSE '' END registering_party,
+      CASE WHEN d.registration_type_cl IN ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN') AND
+                 d.draft -> 'financingStatement' -> 'securedParties' IS NOT NULL THEN
+                (SELECT string_agg((CASE WHEN (sp -> 'businessName') IS NOT NULL THEN
+                                             (sp ->> 'businessName')
+                                         WHEN sp -> 'personName' IS NOT NULL THEN
+                                            concat((sp -> 'personName' ->> 'first'), ' ',
+                                                   (sp -> 'personName' ->> 'last'))
+                                         END),
+                                   ',')
+                   FROM json_array_elements(d.draft -> 'financingStatement' -> 'securedParties') sp)
+          WHEN d.registration_type_cl = 'AMENDMENT' AND
+                 d.draft -> 'amendmentStatement' -> 'securedParties' IS NOT NULL THEN
+                (SELECT string_agg((CASE WHEN (sp2 -> 'businessName') IS NOT NULL THEN
+                                             (sp2 ->> 'businessName')
+                                         WHEN sp2 -> 'personName' IS NOT NULL THEN
+                                            concat((sp2 -> 'personName' ->> 'first'), ' ',
+                                                   (sp2 -> 'personName' ->> 'last'))
+                                         END),
+                                   ',')
+                   FROM json_array_elements(d.draft -> 'amendmentStatement' -> 'securedParties') sp2)
+            ELSE ' ' END secured_party,
        (SELECT CASE WHEN d.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u

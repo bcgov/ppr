@@ -383,7 +383,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                         'searchDateTime': model_utils.format_ts(mapping['search_ts']),
                         'searchQuery': mapping['api_criteria'],
                         'totalResultsSize': int(mapping['total_results_size']),
-                        'returnedResultsSize': int(mapping['returned_results_size'])
+                        'returnedResultsSize': int(mapping['returned_results_size']),
+                        'username': str(mapping['username'])
                     }
                     exact_value = mapping['exact_match_count']
                     if exact_value is not None:

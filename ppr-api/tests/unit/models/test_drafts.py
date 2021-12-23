@@ -39,8 +39,10 @@ def test_find_all_by_account_id(session):
         assert draft['registrationDescription']
         assert draft['createDateTime']
         assert draft['lastUpdateDateTime']
-        # assert draft['clientReferenceId']
+        assert 'clientReferenceId' in draft
         assert draft['path']
+        assert 'registeringParty' in draft
+        assert 'securedParties' in draft
         assert draft['registeringName']
         if draft['type'] != 'FINANCING_STATEMENT':
             assert draft['baseRegistrationNumber']
