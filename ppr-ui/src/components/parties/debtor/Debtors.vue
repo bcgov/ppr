@@ -403,20 +403,11 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.length-trust-label {
-  font-size: 0.875rem;
-}
-.summary-text {
-  font-size: 14px;
-  color: $gray7;
-}
 
-.summary-cell {
-  overflow: visible;
-  text-overflow: inherit;
-  white-space: inherit;
+td {
+  word-wrap: break-word;
 }
 
 </style>

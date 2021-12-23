@@ -671,6 +671,10 @@ export default defineComponent({
   width: 35rem;
 }
 
+td {
+  word-wrap: break-word;
+}
+
 ::v-deep .party-search .v-select__selections {
   color: $gray7 !important;
 }
