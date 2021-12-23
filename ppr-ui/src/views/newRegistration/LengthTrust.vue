@@ -154,8 +154,8 @@ export default class LengthTrust extends Vue {
     switch (this.registrationType) {
       case APIRegistrationTypes.REPAIRERS_LIEN:
         return 'Enter the amount of the Lien and the date the vehicle was (or will be) surrendered. ' +
-                'Please note that this must be within the last 21 days. The length of the Lien is automatically set ' +
-                'to 180 days.'
+                'Please note that this cannot be more than 21 days in the past. The length of the Lien is ' +
+                'automatically set to 180 days.'
 
       case APIRegistrationTypes.MARRIAGE_MH:
         return (

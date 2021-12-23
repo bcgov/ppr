@@ -520,6 +520,10 @@ export default defineComponent({
   white-space: inherit;
 }
 
+td {
+  word-wrap: break-word;
+}
+
 .vehicle-cell {
   text-transform: uppercase;
 }

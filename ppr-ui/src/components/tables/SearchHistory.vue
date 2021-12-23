@@ -26,7 +26,10 @@
                 <td>
                   {{ displayType(item.searchQuery.type) }}
                 </td>
-                <td>
+                <td v-if="isStaff">
+                  {{ item.username }}
+                </td>
+                <td v-else>
                   {{ item.searchQuery.clientReferenceId }}
                 </td>
                 <td>
@@ -114,7 +117,7 @@ import {
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { searchHistroyTableHeaders, SearchTypes } from '@/resources'
+import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 import { ErrorContact } from '../common'
@@ -124,14 +127,25 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, { emit }) {
-    const { getSearchHistory } = useGetters<any>(['getSearchHistory'])
+    const { getSearchHistory, isRoleStaff } = useGetters<any>(['getSearchHistory', 'isRoleStaff'])
     const tooltipTxtPdf =
       'Large search result reports (over 75 registrations) ' +
       'can take up to 20 minutes to generate. The PDF will appear here once it ' +
       'is available. You may need to refresh this page to display the PDF download icon.'
     const localState = reactive({
       loadingPDF: '',
-      headers: searchHistroyTableHeaders,
+      headers: computed((): Array<any> => {
+        if (localState.isStaff) {
+          return searchHistoryTableHeadersStaff
+        }
+        return searchHistoryTableHeaders
+      }),
+      isStaff: computed((): boolean => {
+        if (isRoleStaff.value) {
+          return true
+        }
+        return false
+      }),
       historyLength: computed((): number => {
         return localState.searchHistory?.length || 0
       }),

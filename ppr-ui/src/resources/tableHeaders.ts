@@ -112,7 +112,7 @@ export const searchTableHeaders: TableHeadersIF = {
   ]
 }
 
-export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
+export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: false,
@@ -130,6 +130,56 @@ export const searchHistroyTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Folio',
     value: 'searchQuery.clientReferenceId'
+  },
+  {
+    class: 'column-lg',
+    text: 'Date/Time (Pacific time)',
+    value: 'searchDateTime'
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Results Found',
+    value: 'totalResultsSize'
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Exact Matches',
+    value: 'exactResultsSize'
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Results Selected',
+    value: 'selectedResultsSize'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Download Report',
+    value: 'pdf'
+  }
+]
+
+export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Search Value',
+    value: 'searchQuery.criteria.value'
+  },
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Type',
+    value: 'UISearchType'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Username',
+    value: 'username'
   },
   {
     class: 'column-lg',

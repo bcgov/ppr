@@ -113,9 +113,6 @@ describe('Test result table with results', () => {
         wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
         await Vue.nextTick()
         expect(downloadMock).toHaveBeenCalledWith(searchId)
-      } else {
-        expect(rows.at(i + 1).text()).not.toContain('PDF')
-        expect(wrapper.find(`#pdf-btn-${searchId}`).exists()).toBe(false)
       }
     }
   })
@@ -141,4 +138,3 @@ describe('Test result table with error', () => {
     expect(wrapper.find('#retry-search-history').exists()).toBe(true)
   })
 })
-

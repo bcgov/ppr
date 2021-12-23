@@ -124,7 +124,7 @@
                 :value="computedDateFormatted"
                 :error-messages="surrenderDateMessage || ''"
                 filled
-                hint="Must be within the last 21 days"
+                hint="Must not be more than 21 days in the past"
                 persistent-hint
                 label="Date"
                 append-icon="mdi-calendar"
