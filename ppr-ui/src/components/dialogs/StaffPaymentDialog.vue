@@ -105,16 +105,6 @@ export default defineComponent({
           }
         }
         return pd
-      }),
-      showStaffPaymentInvalidSection: computed(() => {
-        let option
-        if (getStaffPayment.value && getStaffPayment.value.option) {
-          option = getStaffPayment.value.option
-        } else {
-          option = StaffPaymentOptions.NONE
-        }
-        // True if no option is selected
-        return localState.validate && option === StaffPaymentOptions.NONE
       })
     })
 

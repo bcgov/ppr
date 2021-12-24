@@ -159,6 +159,7 @@ export default defineComponent({
       )
       // check if results are still relevant before updating list
       if ((response?.length > 0) && (searchValue === localState.searchValue)) {
+        localState.autoCompleteResults = response
         localState.setAutoCompleteActive = true
       }
       if ((response?.length < 1) && (searchValue === localState.searchValue)) {
