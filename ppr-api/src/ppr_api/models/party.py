@@ -26,7 +26,7 @@ from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
 BUS_SEARCH_KEY_SP = "select searchkey_business_name('?')"
-FIRST_NAME_KEY_SP = "select searchkey_first_name('?')"
+FIRST_NAME_KEY_SP = "select searchkey_individual('last', 'first')"
 LAST_NAME_KEY_SP = "select searchkey_last_name('?')"
 
 
@@ -272,7 +272,8 @@ def party_before_insert_listener(mapper, connection, target):   # pylint: disabl
         sp_call = BUS_SEARCH_KEY_SP.replace('?', target.business_name)
         target.business_search_key = connection.scalar(sp_call)
     elif target.party_type == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
-        sp_call_firstname = FIRST_NAME_KEY_SP.replace('?', target.first_name)
-        sp_call_lastname = LAST_NAME_KEY_SP.replace('?', target.last_name)
+        sp_call_firstname = FIRST_NAME_KEY_SP.replace('last', target.last_name)
+        sp_call_firstname = sp_call_firstname.replace('first', target.first_name)
+        # sp_call_lastname = LAST_NAME_KEY_SP.replace('?', target.last_name)
         target.first_name_key = connection.scalar(sp_call_firstname)
-        target.last_name_key = connection.scalar(sp_call_lastname)
+        # target.last_name_key = connection.scalar(sp_call_lastname)

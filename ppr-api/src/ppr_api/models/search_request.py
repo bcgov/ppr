@@ -156,9 +156,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         elif self.search_type == 'AC':
             query = search_utils.AIRCRAFT_DOT_QUERY
 
-        max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
-        result = db.session.execute(query, {'query_value': search_value.strip().upper(),
-                                            'max_results_size': max_results_size})
+        result = db.session.execute(query, {'query_value': search_value.strip().upper()})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -202,10 +200,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_business_name(self):
         """Execute a debtor business name search query."""
         search_value = self.request_json['criteria']['debtorName']['business']
-        max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
         result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
                                     {'query_bus_name': search_value.strip().upper(),
-                                     'max_results_size': max_results_size,
                                      'query_bus_quotient': current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
         rows = result.fetchall()
         if rows is not None:
@@ -246,7 +242,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         quotient_default = current_app.config.get('SIMILARITY_QUOTIENT_DEFAULT')
         if 'second' in self.request_json['criteria']['debtorName']:
             middle_name = self.request_json['criteria']['debtorName']['second']
-        max_results_size = int(current_app.config.get('ACCOUNT_SEARCH_MAX_RESULTS'))
         if middle_name is not None and middle_name.strip() != '' and middle_name.strip().upper() != 'NONE':
             result = db.session.execute(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY,
                                         {'query_last': last_name.strip().upper(),
@@ -254,16 +249,14 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                                          'query_middle': middle_name.strip().upper(),
                                          'query_last_quotient': quotient_last,
                                          'query_first_quotient': quotient_first,
-                                         'query_default_quotient': quotient_default,
-                                         'max_results_size': max_results_size})
+                                         'query_default_quotient': quotient_default})
         else:
             result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
                                         {'query_last': last_name.strip().upper(),
                                          'query_first': first_name.strip().upper(),
                                          'query_last_quotient': quotient_last,
                                          'query_first_quotient': quotient_first,
-                                         'query_default_quotient': quotient_default,
-                                         'max_results_size': max_results_size})
+                                         'query_default_quotient': quotient_default})
         rows = result.fetchall()
         if rows is not None:
             results_json = []
@@ -342,11 +335,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             self.search_by_business_name()
         else:
             self.search_by_individual_name()
-
-        if self.returned_results_size == search_utils.SEARCH_RESULTS_MAX_SIZE:
-            # Actual result size exceeds limit: need to get total match count
-            self.get_total_count()
-
         self.save()
 
     @classmethod

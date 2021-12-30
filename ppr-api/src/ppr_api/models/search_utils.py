@@ -27,7 +27,7 @@ GET_HISTORY_DAYS_LIMIT = -1
 # Account search history max result set size.
 ACCOUNT_SEARCH_HISTORY_MAX_SIZE = 1000
 # Maximum number or results returned by search.
-SEARCH_RESULTS_MAX_SIZE = 1000
+SEARCH_RESULTS_MAX_SIZE = 5000
 
 # Result set size limit clause
 RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
@@ -75,19 +75,19 @@ SELECT r2.registration_type, r2.registration_ts AS base_registration_ts,
 MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type = 'MH' " + \
      "AND sc.mhr_number = (SELECT searchkey_mhr(:query_value)) " + \
-"ORDER BY match_type, r.registration_ts ASC " + RESULTS_SIZE_LIMIT_CLAUSE
+"ORDER BY match_type, r.registration_ts ASC "
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
 SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type NOT IN ('AC', 'AF', 'AP') " + \
      "AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value)) " + \
-"ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
+"ORDER BY match_type, sc.serial_number "
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
 AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
     " AND sc.serial_type IN ('AC', 'AF', 'AP') " + \
      "AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value)) " + \
-"ORDER BY match_type, sc.serial_number " + RESULTS_SIZE_LIMIT_CLAUSE
+"ORDER BY match_type, sc.serial_number "
 
 BUSINESS_NAME_QUERY = """
 WITH q AS (
@@ -96,7 +96,8 @@ WITH q AS (
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN p.business_name = :query_bus_name THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN regexp_replace(p.business_name,'[.,]','','gi') = regexp_replace(:query_bus_name,'[.,]','','gi')
+            THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
   FROM registrations r, financing_statements fs, parties p, q
  WHERE r.financing_id = fs.id
@@ -114,7 +115,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND SUBSTR(search_key,1,1) = SUBSTR(p.business_name,1,1)
    AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key)
 ORDER BY match_type, p.business_name 
-"""  + RESULTS_SIZE_LIMIT_CLAUSE
+"""
 
 INDIVIDUAL_NAME_QUERY = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
@@ -138,7 +139,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
                                                            :query_first_quotient, :query_default_quotient))) 
 ORDER BY match_type, p.last_name, p.first_name 
-"""  + RESULTS_SIZE_LIMIT_CLAUSE
+"""
 
 INDIVIDUAL_NAME_MIDDLE_QUERY = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
@@ -164,7 +165,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
                                                            :query_first_quotient, :query_default_quotient))) 
 ORDER BY match_type, p.last_name, p.first_name 
-"""  + RESULTS_SIZE_LIMIT_CLAUSE
+"""
 
 # Total result count queries for serial number, debtor name searches:
 BUSINESS_NAME_TOTAL_COUNT = """
