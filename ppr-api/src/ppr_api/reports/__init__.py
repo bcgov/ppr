@@ -11,10 +11,10 @@
 """Module to manage the calls and content to the reporting service."""
 from http import HTTPStatus
 
+import fitz  # noqa: I001
 from flask import current_app, jsonify
 from flask_babel import _
 
-import fitz
 from ppr_api.exceptions import BusinessException
 from ppr_api.resources.utils import get_account_name
 
