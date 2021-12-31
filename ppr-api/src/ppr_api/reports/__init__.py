@@ -11,10 +11,10 @@
 """Module to manage the calls and content to the reporting service."""
 from http import HTTPStatus
 
-import fitz
 from flask import current_app, jsonify
 from flask_babel import _
 
+import fitz
 from ppr_api.exceptions import BusinessException
 from ppr_api.resources.utils import get_account_name
 
@@ -74,8 +74,8 @@ def get_verification_mail(  # pylint: disable=too-many-locals
                                      str(status_code))
             return cover_output, status_code, headers
 
-        doc1 = fitz.open(stream=cover_output, filetype="pdf")
-        doc2 = fitz.open(stream=statement_output, filetype="pdf")
+        doc1 = fitz.open(stream=cover_output, filetype='pdf')
+        doc2 = fitz.open(stream=statement_output, filetype='pdf')
         doc1.insert_pdf(doc2)
         final_output = doc1.convert_to_pdf()
         doc2.close()
