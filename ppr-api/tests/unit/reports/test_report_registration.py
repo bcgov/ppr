@@ -16,11 +16,13 @@
 
 Test-Suite to ensure that the report service for registration reports is working as expected.
 """
+from http import HTTPStatus
 import json
 
 import pytest
 
-from ppr_api.reports import Report, ReportTypes
+from ppr_api.reports import Report, ReportTypes, get_verification_mail
+from ppr_api.services.payment.client import SBCPaymentClient
 
 
 FINANCING_SA_DATAFILE = 'tests/unit/reports/data/financing-sa-example.json'
@@ -35,6 +37,7 @@ AMENDMENT_CO_DATAFILE = 'tests/unit/reports/data/amendment-co-example.json'
 DISCHARGE_DATAFILE = 'tests/unit/reports/data/discharge-example.json'
 DISCHARGE_DATAFILE_COVER = 'tests/unit/reports/data/discharge-example-cover.json'
 AMENDMENT_DATAFILE_COVER = 'tests/unit/reports/data/amendment-example-cover.json'
+VERIFICATION_MAIL_PDFFILE = 'tests/unit/reports/data/verification-mail-discharge-example.pdf'
 
 TEST_REPORT_DATA = [
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, FINANCING_RL_DATAFILE),
@@ -83,3 +86,22 @@ def test_registration_config(client, jwt, type, json_data_file):
         assert report_data['cover']['line1']
         assert report_data['cover']['line2']
         assert report_data['cover']['line4']
+
+
+def test_verification_mail(client, jwt):
+    """Assert that merging a cover page with a verification statement works as expected."""
+    # setup
+    text_data = None
+    with open(DISCHARGE_DATAFILE_COVER, 'r') as data_file:
+        text_data = data_file.read()
+        data_file.close()
+    # print(text_data)
+    report_data = json.loads(text_data)
+    token = SBCPaymentClient.get_sa_token()
+    pdf_output, status, headers = get_verification_mail(report_data, 'PS12345', token, 'UNIT TEST ACCOUNT', 99999999)
+    # test
+    assert pdf_output
+    assert status == HTTPStatus.OK
+    with open(VERIFICATION_MAIL_PDFFILE, "wb") as pdf_file:
+        pdf_file.write(pdf_output)
+        pdf_file.close()

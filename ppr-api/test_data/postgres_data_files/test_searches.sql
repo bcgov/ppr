@@ -356,3 +356,12 @@ INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, me
   VALUES(200000012, 200000012, CURRENT_TIMESTAMP  at time zone 'utc' + interval '4 minutes', 'API_NOTIFICATION', 500, 'some error 3', null);
 INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message, email_address)
   VALUES(200000013, 200000012, CURRENT_TIMESTAMP  at time zone 'utc' + interval '6 minutes', 'API_NOTIFICATION', 500, 'max retries', null);
+-- verification statement mail event test data
+INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message, email_address)
+  VALUES(200000014, 200000030, CURRENT_TIMESTAMP  at time zone 'utc', 'SURFACE_MAIL', 500, 'some error 1 9999999', null);
+INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message, email_address)
+  VALUES(200000015, 200000030, CURRENT_TIMESTAMP  at time zone 'utc' + interval '2 minutes', 'SURFACE_MAIL', 500, 'some error 2 9999999', null);
+INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message, email_address)
+  VALUES(200000016, 200000030, CURRENT_TIMESTAMP  at time zone 'utc' + interval '4 minutes', 'SURFACE_MAIL', 500, 'some error 3 9999999', null);
+INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message, email_address)
+  VALUES(200000017, 200000030, CURRENT_TIMESTAMP  at time zone 'utc' + interval '6 minutes', 'SURFACE_MAIL', 500, 'max retries 9999999', null);

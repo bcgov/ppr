@@ -36,3 +36,7 @@ class StorageException(Exception):
 
 class EmailException(Exception):
     """No email processor to match queue payload."""
+
+
+class FileTransferException(Exception):
+    """Base exception for the file transfer Services."""

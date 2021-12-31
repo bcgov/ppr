@@ -18,10 +18,11 @@ from http import HTTPStatus
 from flask import jsonify, current_app, request
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import utils as model_utils
+from ppr_api.models import EventTracking, Party, Registration, utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs
 from ppr_api.services.payment import TransactionTypes
+from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
 
@@ -51,6 +52,8 @@ class CallbackExceptionCodes(str, Enum):
     REPORT_ERR = '06'
     STORAGE_ERR = '07'
     NOTIFICATION_ERR = '08'
+    FILE_TRANSFER_ERR = '09'
+    SETUP_ERR = '10'
 
 
 def serialize(errors):
@@ -405,3 +408,54 @@ def get_payment_details_financing(registration):
         'value': registration.reg_type.registration_desc + length
     }
     return details
+
+
+def enqueue_verification_report(registration_id: int, party_id: int):
+    """Add the mail verification report request to the queue."""
+    try:
+        payload = {
+            'registrationId': registration_id,
+            'partyId': party_id
+        }
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_verification_report(payload)
+        current_app.logger.info(f'Enqueue verification report successful for id={registration_id}.')
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f'Enqueue verification report failed for id={registration_id}, party={party_id}: ' + repr(err)
+        current_app.logger.error(msg)
+        EventTracking.create(registration_id,
+                             EventTracking.EventTrackingTypes.SURFACE_MAIL,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             msg)
+
+
+def find_secured_party(registration: Registration, party_id: int):
+    """Find secured party that belongs to a registration financing statement by id."""
+    for party in registration.financing_statement.parties:
+        if party.party_type == Party.PartyTypes.SECURED_PARTY.value and party.id == party_id:
+            return party
+    return None
+
+
+def find_secured_parties(registration: Registration):
+    """Find secured parties that are active at the time of the registration."""
+    parties = []
+    for party in registration.financing_statement.parties:
+        if party.party_type == Party.PartyTypes.SECURED_PARTY.value and \
+                (not party.registration_id_end or party.registration_id_end >= registration.id):
+            parties.append(party)
+    return parties
+
+
+def queue_secured_party_verification(registration: Registration):
+    """Set up mail out of verification statements to secured parties."""
+    try:
+        registration_id = registration.id
+        parties = find_secured_parties(registration)
+        for party in parties:
+            enqueue_verification_report(registration_id, party.id)
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f'Queue secured parties failed for id={registration_id}: ' + repr(err)
+        current_app.logger.error(msg)

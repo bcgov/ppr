@@ -91,7 +91,7 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
         return event_tracking
 
     @classmethod
-    def find_by_key_id_type(cls, key_id: int, event_tracking_type: str):
+    def find_by_key_id_type(cls, key_id: int, event_tracking_type: str, extra_key: str = None):
         """Return a list of event tracking objects by key id and event tracking type."""
         event_tracking = None
         if key_id and event_tracking_type:
@@ -99,6 +99,12 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
                                               EventTracking.event_tracking_type == event_tracking_type) \
                                       .order_by(EventTracking.id).all()
 
+            if event_tracking is not None and extra_key:
+                events = []
+                for event in event_tracking:
+                    if event.message and event.message.find(extra_key) > 0:
+                        events.append(event)
+                return events
         return event_tracking
 
     @staticmethod

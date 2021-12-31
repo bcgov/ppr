@@ -51,6 +51,12 @@ TEST_DATA_CREATE = [
     ('Surface mail', 200000013, EventTracking.EventTrackingTypes.SURFACE_MAIL, int(HTTPStatus.OK), 'message'),
     ('Email report', 200000014, EventTracking.EventTrackingTypes.EMAIL_REPORT, int(HTTPStatus.OK), 'message')
 ]
+# testdata pattern is ({description}, {results_size}, {key_id}, {type}, extra_key)
+TEST_DATA_KEY_ID_TYPE_EXTRA = [
+    ('No results registration id', 0, 200000000, EventTracking.EventTrackingTypes.SURFACE_MAIL, '9999998'),
+    ('No results party id', 0, 200000030, EventTracking.EventTrackingTypes.SURFACE_MAIL, '9999998'),
+    ('4 results party id', 4, 200000030, EventTracking.EventTrackingTypes.SURFACE_MAIL, '9999999')
+]
 
 
 @pytest.mark.parametrize('desc,exists,search_value', TEST_DATA_ID)
@@ -102,6 +108,17 @@ def test_create(session, desc, key_id, type, status, message):
     assert event_tracking.event_tracking_type == type
     assert event_tracking.status == status
     assert event_tracking.message == message
+
+
+@pytest.mark.parametrize('desc,results_size,key_id,type,extra_key', TEST_DATA_KEY_ID_TYPE_EXTRA)
+def test_find_by_id_type_extra(session, desc, results_size, key_id, type, extra_key):
+    """Assert that find event tracking by key id, extra key, and type contains all expected elements."""
+    events = EventTracking.find_by_key_id_type(key_id, type, extra_key)
+    if results_size > 0:
+        assert events
+        assert len(events) >= results_size
+    else:
+        assert not events
 
 
 def test_event_tracking_json(session):

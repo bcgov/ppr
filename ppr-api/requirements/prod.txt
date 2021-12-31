@@ -20,6 +20,7 @@ launchdarkly-server-sdk
 psycopg2-binary
 python-dotenv
 pycountry
+PyMuPDF
 requests
 sentry-sdk[flask]
 strict-rfc3339

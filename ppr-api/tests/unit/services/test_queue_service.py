@@ -11,20 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Google Storage token tests."""
+"""Google queue service publish tests."""
+from flask import current_app
+
 from ppr_api.services.queue_service import GoogleQueueService
 
 
+SUB_URL = 'https://bcregistry-dev.apigee.net/ppr-sub/api/v1/'
 TEST_PAYLOAD = {
     'searchId': 999999999
+}
+TEST_PAYLOAD_VERIFICATION = {
+    'registrationId': 9999999,
+    'partyId': 9999999
 }
 
 
 def test_publish_search_report(session):
     """Assert that enqueuing/publishing a search report event works as expected."""
-    GoogleQueueService().publish_search_report(TEST_PAYLOAD)
+    payload = TEST_PAYLOAD
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if apikey:
+        payload['apikey'] = apikey
+    GoogleQueueService().publish_search_report(payload)
 
 
 def test_publish_api_notification(session):
     """Assert that enqueuing/publishing an api notification event works as expected."""
-    GoogleQueueService().publish_notification(TEST_PAYLOAD)
+    payload = TEST_PAYLOAD
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if apikey:
+        payload['apikey'] = apikey
+    GoogleQueueService().publish_notification(payload)
+
+
+def test_publish_verification_mail(session):
+    """Assert that enqueuing/publishing an api verification statement mail event works as expected."""
+    payload = TEST_PAYLOAD_VERIFICATION
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if apikey:
+        payload['apikey'] = apikey
+    GoogleQueueService().publish_verification_report(payload)

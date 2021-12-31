@@ -422,6 +422,14 @@ TEST_PAY_TYPE_FINANCING = [
     ('SS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('TL', 99, 1, TransactionTypes.FINANCING_NO_FEE.value)
 ]
+# testdata pattern is ({desc}, {status}, {registration_id}, {party_id})
+TEST_VERIFICATION_CALLBACK_DATA = [
+    ('Missing reg id', HTTPStatus.BAD_REQUEST, None, 200000022),
+    ('Invalid reg id', HTTPStatus.NOT_FOUND, 300000005, 200000022),
+    ('Missing party id', HTTPStatus.BAD_REQUEST, 200000010, None),
+    ('Invalid party id', HTTPStatus.NOT_FOUND, 200000010, 300000022),
+    ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000030, 9999999)
+]
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
@@ -751,3 +759,25 @@ def test_get_payment_type_financing(session, client, jwt, reg_type, life_years, 
     assert pay_quantity
     assert pay_type == pay_trans_type
     assert pay_quantity == quantity
+
+
+@pytest.mark.parametrize('desc,status,reg_id,party_id', TEST_VERIFICATION_CALLBACK_DATA)
+def test_callback_verification_report(session, client, jwt, desc, status, reg_id, party_id):
+    """Assert that a callback request returns the expected status."""
+    # setup
+    json_data = {
+        'registrationId': reg_id,
+        'partyId': party_id
+    }
+    if reg_id is None:
+        del json_data['registrationId']
+    if party_id is None:
+        del json_data['partyId']
+
+    # test
+    rv = client.post('/api/v1/financing-statements/verification-callback',
+                     json=json_data,
+                     headers=None,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
