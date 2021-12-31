@@ -96,8 +96,8 @@ WITH q AS (
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN regexp_replace(p.business_name,'[.,]','','gi') = regexp_replace(:query_bus_name,'[.,]','','gi')
-            THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN trim(regexp_replace(p.business_name,'[^\w]+',' ','g')) = 
+                 trim(regexp_replace(:query_bus_name,'[^\w]+',' ','g')) THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
   FROM registrations r, financing_statements fs, parties p, q
  WHERE r.financing_id = fs.id
