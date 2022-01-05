@@ -33,8 +33,10 @@ class GoogleQueueService():
         self.project_id = str(current_app.config.get('GCP_PS_PROJECT_ID'))
         self.search_report_topic = str(current_app.config.get('GCP_PS_SEARCH_REPORT_TOPIC'))
         self.notification_topic = str(current_app.config.get('GCP_PS_NOTIFICATION_TOPIC'))
+        self.verification_report_topic = str(current_app.config.get('GCP_PS_VERIFICATION_REPORT_TOPIC'))
         self.search_report_topic_name = f'projects/{self.project_id}/topics/{self.search_report_topic}'
         self.notification_topic_name = f'projects/{self.project_id}/topics/{self.notification_topic}'
+        self.verification_report_topic_name = f'projects/{self.project_id}/topics/{self.verification_report_topic}'
 
     def publish_search_report(self, payload):
         """Publish the search report request json payload to the Queue Service."""
@@ -48,6 +50,14 @@ class GoogleQueueService():
         """Publish the api notification request json payload to the Queue Service."""
         try:
             self.publish(self.notification_topic_name, payload)
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
+            current_app.logger.error('Error: ' + repr(err))
+            raise err
+
+    def publish_verification_report(self, payload):
+        """Publish the registration verification request json payload to the Queue Service."""
+        try:
+            self.publish(self.verification_report_topic_name, payload)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
             current_app.logger.error('Error: ' + repr(err))
             raise err

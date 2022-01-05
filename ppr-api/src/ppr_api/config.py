@@ -152,7 +152,7 @@ class _Config():  # pylint: disable=too-few-public-methods
 
     # DEBTOR search trgram similarity quotients
     SIMILARITY_QUOTIENT_BUSINESS_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_BUSINESS_NAME', '0.6 '))
-    SIMILARITY_QUOTIENT_FIRST_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_FIRST_NAME', '0.23'))
+    SIMILARITY_QUOTIENT_FIRST_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_FIRST_NAME', '0.4'))
     SIMILARITY_QUOTIENT_LAST_NAME: float = float(os.getenv('SIMILARITY_QUOTIENT_LAST_NAME', '0.29'))
     SIMILARITY_QUOTIENT_DEFAULT: float = float(os.getenv('SIMILARITY_QUOTIENT_DEFAULT', '0.5'))
 
@@ -178,9 +178,15 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_PS_PROJECT_ID = os.getenv('GCP_PS_PROJECT_ID')
     GCP_PS_SEARCH_REPORT_TOPIC = os.getenv('GCP_PS_SEARCH_REPORT_TOPIC')
     GCP_PS_NOTIFICATION_TOPIC = os.getenv('GCP_PS_NOTIFICATION_TOPIC')
+    GCP_PS_VERIFICATION_REPORT_TOPIC = os.getenv('GCP_PS_VERIFICATION_REPORT_TOPIC')
 
     GATEWAY_URL = os.getenv('GATEWAY_URL', 'https://bcregistry-dev.apigee.net')
     SUBSCRIPTION_API_KEY = os.getenv('SUBSCRIPTION_API_KEY')
+    # Host name/IP of mail out service for file transfer: only in TEST and PROD.
+    SURFACE_MAIL_HOST = os.getenv('SURFACE_MAIL_HOST', '')
+    SURFACE_MAIL_TARGET_PATH = os.getenv('SURFACE_MAIL_TARGET_PATH', 'FIN_PPR/TEST')
+    # Storage of verification mail reports
+    GCP_CS_BUCKET_ID_VERIFICATION = os.getenv('GCP_CS_BUCKET_ID_VERIFICATION', 'ppr_verification_report_dev')
 
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods

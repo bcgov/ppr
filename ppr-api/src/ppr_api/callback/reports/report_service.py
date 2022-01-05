@@ -14,10 +14,11 @@
 """This class maintains the callback handler report generation."""
 from flask import current_app
 
-from ppr_api.reports import ReportTypes, get_callback_pdf
-from ppr_api.services.payment.client import SBCPaymentClient
-from ppr_api.models import SearchResult
 from ppr_api.callback.utils.exceptions import ReportException, ReportDataException
+from ppr_api.exceptions import BusinessException
+from ppr_api.reports import ReportTypes, get_callback_pdf, get_verification_mail
+from ppr_api.services.payment.client import SBCPaymentClient
+from ppr_api.models import Party, Registration, SearchResult, utils as model_utils
 
 
 def get_search_report(search_id: str):
@@ -38,3 +39,30 @@ def get_search_report(search_id: str):
         current_app.logger.error('Search report generation failed for id=' + search_id)
         current_app.logger.error(repr(err))
         raise ReportException('Search report generation failed for id=' + search_id)
+
+
+def get_mail_verification_statement(registration: Registration, party: Party, account_name: str = None):
+    """Generate a surface mail verification statement report."""
+    event_id = str(registration.id)
+    current_app.logger.info(f'Mail verification report id={event_id}.')
+    try:
+        statement_type = model_utils.REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl]
+        reg_num_key = 'dischargeRegistrationNumber'
+        if statement_type == model_utils.DRAFT_TYPE_AMENDMENT:
+            reg_num_key = 'amendmentRegistrationNumber'
+        report_data = registration.verification_json(reg_num_key)
+        cover_data = party.json
+        cover_data['statementType'] = statement_type
+        cover_data['partyType'] = party.party_type
+        cover_data['createDateTime'] = report_data['createDateTime']
+        cover_data['registrationNumber'] = registration.registration_num
+        report_data['cover'] = cover_data
+        account_id = registration.account_id
+        token = SBCPaymentClient.get_sa_token()
+        return get_verification_mail(report_data, account_id, token, account_name, registration.id)
+    except BusinessException as b_err:
+        raise b_err
+    except Exception as err:  # pylint: disable=broad-except # noqa F841;
+        msg = f'Mail verification report generation failed for id={event_id}: ' + repr(err)
+        # current_app.logger.error(msg)
+        raise ReportException(msg)

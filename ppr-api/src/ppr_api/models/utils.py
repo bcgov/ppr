@@ -601,6 +601,11 @@ def to_local_timestamp(utc_ts):
     return utc_ts.astimezone(LOCAL_TZ)
 
 
+def today_local():
+    """Return today in the local timezone."""
+    return now_ts().astimezone(LOCAL_TZ)
+
+
 def is_historical(financing_statement, create: bool):
     """Check if a financing statement is in a historical, non-viewable state."""
     if financing_statement.state_type == STATE_ACTIVE and financing_statement.expire_date and \

@@ -21,6 +21,7 @@ import copy
 import pytest
 from flask import current_app
 
+from ppr_api.models import Registration
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import PPR_ROLE
 from tests.unit.services.utils import helper_create_jwt
@@ -83,6 +84,12 @@ TEST_NO_FEE_AMENDMENT_DATA = [
     ('WL', True),
     ('LT', True)
 ]
+# testdata pattern is ({description}, {reg_id}, {party_id}, {valid data})
+TEST_FINANCING_SP_DATA = [
+    ('Valid base registration secured party', 200000010, 200000004, True),
+    ('Valid registration secured party', 200000010, 200000022, True),
+    ('Invalid registration secured party', 200000010, 200000016, False)
+]
 
 
 @pytest.mark.parametrize('desc, account_id, has_name', TEST_USER_ORGS_DATA_JSON)
@@ -142,3 +149,28 @@ def test_no_fee_amendment(session, client, jwt, reg_type, no_fee):
     # test
     result = resource_utils.no_fee_amendment(reg_type)
     assert result == no_fee
+
+
+@pytest.mark.parametrize('desc, reg_id, party_id, valid', TEST_FINANCING_SP_DATA)
+def test_find_secured_party(session, client, jwt, desc, reg_id, party_id, valid):
+    """Assert that find a registration secured party by works as expected."""
+    # setup
+    registration = Registration.find_by_id(reg_id)
+
+    # test
+    party = resource_utils.find_secured_party(registration, party_id)
+    if valid:
+        assert party
+    else:
+        assert not party
+
+
+def test_find_secured_parties(session, client, jwt):
+    """Assert that find active secured parties for a registration works as expected."""
+    # setup
+    registration = Registration.find_by_id(200000010)
+
+    # test
+    parties = resource_utils.find_secured_parties(registration)
+    assert parties
+    assert len(parties) >= 3
