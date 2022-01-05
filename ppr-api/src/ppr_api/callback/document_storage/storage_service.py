@@ -15,6 +15,7 @@
 import os
 import json
 from abc import ABC, abstractmethod
+from enum import Enum
 
 import requests
 from flask import current_app
@@ -28,17 +29,24 @@ HTTP_GET = 'get'
 HTTP_POST = 'post'
 
 
+class DocumentTypes(str, Enum):
+    """Render an Enum of storage document types."""
+
+    SEARCH_RESULTS = 'SEARCH_RESULTS'
+    VERIFICATION_MAIL = 'VERIFICATION_MAIL'
+
+
 class StorageService(ABC):  # pylint: disable=too-few-public-methods
     """Storage Service abstract class for all implementations."""
 
     @classmethod
     @abstractmethod
-    def get_document(cls, name: str):
+    def get_document(cls, name: str, doc_type: str = None):
         """Fetch the uniquely named document from storage as binary data."""
 
     @classmethod
     @abstractmethod
-    def save_document(cls, name: str, raw_data):
+    def save_document(cls, name: str, raw_data, doc_type: str = None):
         """Save or replace the named document in storage with the binary data as the file contents."""
 
 
@@ -50,17 +58,19 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
 
     # Google cloud storage configuration.
     GCP_BUCKET_ID = str(os.getenv('GCP_CS_BUCKET_ID'))
+    GCP_BUCKET_ID_VERIFICATION = str(os.getenv('GCP_CS_BUCKET_ID_VERIFICATION'))
     GCP_URL = str(os.getenv('GCP_CS_URL', 'https://storage.googleapis.com'))
-    DOC_URL = GCP_URL + '/storage/v1/b/' + GCP_BUCKET_ID + '/o/{name}'
+    DOC_URL = GCP_URL + '/storage/v1/b/{bucket_id}/o/{name}'
     GET_DOC_URL = DOC_URL + '?alt=media'
-    DELETE_DOC_URL = GCP_URL + '/storage/v1/b/' + GCP_BUCKET_ID + '/o/{name}'
-    UPLOAD_DOC_URL = GCP_URL + '/upload/storage/v1/b/' + GCP_BUCKET_ID + '/o?uploadType=media&name='
+    DELETE_DOC_URL = GCP_URL + '/storage/v1/b/{bucket_id}/o/{name}'
+    UPLOAD_DOC_URL = GCP_URL + '/upload/storage/v1/b/{bucket_id}/o?uploadType=media&name={name}'
 
     @classmethod
-    def get_document(cls, name: str):
+    def get_document(cls, name: str, doc_type: str = None):
         """Fetch the uniquely named document from cloud storage as binary data."""
         try:
-            url = cls.GET_DOC_URL.format(name=name)
+            bucket_id = cls.__get_bucket_id(doc_type)
+            url = cls.GET_DOC_URL.format(bucket_id=bucket_id, name=name)
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Fetching doc with GET ' + url)
             return cls.__call_api(HTTP_GET, url, token)
@@ -72,10 +82,11 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             raise StorageException('GET document failed for url=' + url)
 
     @classmethod
-    def delete_document(cls, name: str):
+    def delete_document(cls, name: str, doc_type: str = None):
         """Delete the uniquely named document from cloud storage (unit testing only)."""
         try:
-            url = cls.DOC_URL.format(name=name)
+            bucket_id = cls.__get_bucket_id(doc_type)
+            url = cls.DOC_URL.format(bucket_id=bucket_id, name=name)
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Deleting doc with DELETE ' + url)
             return cls.__call_api(HTTP_DELETE, url, token)
@@ -84,10 +95,11 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             current_app.logger.error(repr(err))
 
     @classmethod
-    def save_document(cls, name: str, raw_data):
+    def save_document(cls, name: str, raw_data, doc_type: str = None):
         """Save or replace the named document in cloud storage with the binary data as the file contents."""
         try:
-            url = cls.UPLOAD_DOC_URL + name
+            bucket_id = cls.__get_bucket_id(doc_type)
+            url = cls.UPLOAD_DOC_URL.format(bucket_id=bucket_id, name=name)
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Saving doc with POST ' + url)
             return cls.__call_api(HTTP_POST, url, token, raw_data)
@@ -97,6 +109,15 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             current_app.logger.error('save_document failed for url=' + url)
             current_app.logger.error(repr(err))
             raise StorageException('POST document failed for url=' + url)
+
+    @classmethod
+    def __get_bucket_id(cls, doc_type: str = None):
+        """Map the document type to a bucket ID. The default is GCP_BUCKET_ID."""
+        if not doc_type or doc_type == DocumentTypes.SEARCH_RESULTS:
+            return cls.GCP_BUCKET_ID
+        if doc_type == DocumentTypes.VERIFICATION_MAIL:
+            return cls.GCP_BUCKET_ID_VERIFICATION
+        return cls.GCP_BUCKET_ID
 
     @classmethod
     def __call_api(cls, method, url, token, data=None):

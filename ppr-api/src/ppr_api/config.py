@@ -185,6 +185,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     # Host name/IP of mail out service for file transfer: only in TEST and PROD.
     SURFACE_MAIL_HOST = os.getenv('SURFACE_MAIL_HOST', '')
     SURFACE_MAIL_TARGET_PATH = os.getenv('SURFACE_MAIL_TARGET_PATH', 'FIN_PPR/TEST')
+    # Storage of verification mail reports
+    GCP_CS_BUCKET_ID_VERIFICATION = os.getenv('GCP_CS_BUCKET_ID_VERIFICATION', 'ppr_verification_report_dev')
 
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods

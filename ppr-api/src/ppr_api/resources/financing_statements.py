@@ -34,7 +34,9 @@ from ppr_api.services.payment.payment import Payment
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.callback.reports.report_service import get_mail_verification_statement
-from ppr_api.callback.utils.exceptions import FileTransferException, ReportException, ReportDataException
+from ppr_api.callback.utils.exceptions import FileTransferException, ReportException, ReportDataException, \
+                                              StorageException
+from ppr_api.callback.document_storage.storage_service import GoogleStorageService, DocumentTypes
 from ppr_api.callback.file_transfer.file_transfer_service import BCMailFileTransferService
 
 
@@ -69,6 +71,7 @@ CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.FILE_TRANSFER_ERR: '09: SFTP failed for id={key_id}.',
     resource_utils.CallbackExceptionCodes.SETUP_ERR: '10: setup failed for id={key_id}.'
 }
+STORAGE_DOC_NAME_VERIFICATION = 'verification-report-{registration_id}-{party_id}.pdf'
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -756,7 +759,7 @@ class AccountRegistrationResource(Resource):
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/verification-callback', methods=['POST', 'OPTIONS'])
-class PostVerifficationResource(Resource):
+class PostVerificationResource(Resource):
     """Resource to handle a verification report mail request from a callback event."""
 
     @staticmethod
@@ -810,7 +813,9 @@ class PostVerifficationResource(Resource):
                                       registration_id,
                                       HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
                                       message)
-            # Now sftp report:
+            # Store a copy of the report
+            store_verification_document(raw_data, registration_id, party_id)
+            # Now sftp the report:
             current_app.logger.info(f'Transferring report output to mail service: party={party_id}.')
             BCMailFileTransferService().transfer_verification_statement(raw_data, registration_id, party_id)
             # Track success event.
@@ -961,3 +966,14 @@ def callback_error(code: str, registration_id: int, status_code, party_id: int, 
         # set up retry
         resource_utils.enqueue_verification_report(registration_id, party_id)
     return resource_utils.error_response(status_code, error)
+
+
+def store_verification_document(raw_data, registration_id: int, party_id: int):
+    """Try to save a copy of the verification report to document storage."""
+    doc_name = STORAGE_DOC_NAME_VERIFICATION.format(registration_id=registration_id, party_id=party_id)
+    try:
+        current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
+        response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.VERIFICATION_MAIL)
+        current_app.logger.info('Save document storage response: ' + json.dumps(response))
+    except StorageException:
+        current_app.logger.error(f'Store document {doc_name} failed.')
