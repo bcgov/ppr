@@ -105,7 +105,7 @@
           :forceSave="saveDraftExit"
           @draft-save-error="saveDraftError"
           @registration-incomplete="registrationIncomplete"
-          @error="emitError($event)"
+          @error="handleSubmitError($event)"
         />
       </v-col>
     </v-row>
@@ -135,8 +135,11 @@ import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { BaseDialog } from '@/components/dialogs'
-import { registrationSaveDraftErrorDialog } from '@/resources/dialogOptions'
-
+import {
+  registrationSaveDraftErrorDialog,
+  registrationCompleteErrorDialog
+} from '@/resources/dialogOptions'
+import { StatusCodes } from 'http-status-codes'
 @Component({
   components: {
     ButtonFooter,
@@ -157,22 +160,15 @@ export default class ReviewConfirm extends Vue {
   @Getter getRegistrationFlowType: RegistrationFlowType
   @Getter getRegistrationOther: string
   @Getter getRegistrationType: RegistrationTypeIF
-
   @Action setAddCollateral: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setShowStepErrors: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
-
   @Prop({ default: false })
   private isJestRunning: boolean
-
-  @Prop({ default: false })
-  private saveDraftExit: boolean
-
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
   private showStepErrors: boolean = false
@@ -181,49 +177,48 @@ export default class ReviewConfirm extends Vue {
   private validCertify = false
   private errorDialog = false
   private errorOptions = registrationSaveDraftErrorDialog
-
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
-
   private get registrationLength (): RegistrationLengthI {
     return {
       lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
       lifeYears: this.getLengthTrust?.lifeYears || 0
     }
   }
-
   private get registrationTypeUI (): string {
     if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
       return this.getRegistrationOther || ''
     }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
-
   private get registrationType (): string {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
-
   private handleError (stay: boolean): void {
     this.errorDialog = false
     if (!stay) {
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
-
+  private handleSubmitError (error: ErrorIF): void {
+    if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+      this.emitError(error)
+    } else {
+      this.errorOptions = { ...registrationCompleteErrorDialog }
+      this.errorDialog = true
+    }
+  }
   mounted () {
     this.onAppReady(this.appReady)
   }
-
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
   }
-
   /** Emits Have Data event. */
   @Emit('haveData')
   private emitHaveData (haveData: Boolean = true): void { }
-
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
   private async onAppReady (val: boolean): Promise<void> {
@@ -236,7 +231,6 @@ export default class ReviewConfirm extends Vue {
       })
       return
     }
-
     // redirect if store doesn't contain all needed data (happens on page reload, etc.)
     if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
       this.$router.push({
@@ -244,7 +238,6 @@ export default class ReviewConfirm extends Vue {
       })
       return
     }
-
     const collateral = this.getAddCollateral
     if (!collateral.valid) {
       collateral.showInvalid = true
@@ -260,18 +253,15 @@ export default class ReviewConfirm extends Vue {
       parties.showInvalid = true
       this.setAddSecuredPartiesAndDebtors(parties)
     }
-
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
   }
-
   @Watch('saveDraftError')
   private saveDraftError (val: ErrorIF): void {
     this.errorOptions = { ...registrationSaveDraftErrorDialog }
     this.errorDialog = true
   }
-
   @Watch('registrationIncomplete')
   private registrationIncomplete (): void {
     this.showStepErrors = true
@@ -290,7 +280,6 @@ export default class ReviewConfirm extends Vue {
   display: flex;
   flex-flow: column nowrap;
   position: relative;
-
   > label:first-child {
     font-weight: 700;
   }
@@ -305,17 +294,14 @@ export default class ReviewConfirm extends Vue {
     }
   }
 }
-
 .review-header {
   color: $gray9;
   font-size: 1.5rem;
   font-weight: bold;
 }
-
 .reg-default-btn {
   background-color: $gray3 !important;
 }
-
 .reg-default-btn::before {
   background-color: transparent !important;
 }
