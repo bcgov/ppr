@@ -250,11 +250,20 @@ def test_sbc_payment(session, client, jwt):
 
 def test_pay_exception(session, client, jwt):
     """Assert that a pay exception error response works as expected."""
-    exception = SBCPaymentException(DatabaseException('400 error'))
+    json_data = {
+        'detail': 'Invalid Corp Type or Filing Type.', 
+        'message': 'Invalid Request', 
+        'type': 'INVALID_CORP_OR_FILING_TYPE',
+        'status_code': 400
+    }
+    exception = SBCPaymentException(DatabaseException('400 error'), json_data=json_data)
     body, status = resource_utils.pay_exception_response(exception, '12345')
     assert status == HTTPStatus.PAYMENT_REQUIRED
     data = json.loads(body.get_data(as_text=True))
     assert str(data['message']).startswith(ResourceErrorCodes.PAY_ERR)
+    assert data['status_code'] == 400
+    assert data['detail'] == 'Invalid Corp Type or Filing Type.'
+    assert data['type'] == 'INVALID_CORP_OR_FILING_TYPE'
 
 
 def test_not_found(session, client, jwt):

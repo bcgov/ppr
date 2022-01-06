@@ -15,7 +15,7 @@
 
 from flask import current_app
 
-from .client import SBCPaymentClient
+from .client import ApiRequestError, SBCPaymentClient
 from .exceptions import SBCPaymentException
 
 
@@ -55,6 +55,8 @@ class Payment:
             current_app.logger.debug(api_response)
             return api_response
 
+        except ApiRequestError as api_err:
+            raise SBCPaymentException(api_err, json_data=api_err.json_data)
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err)
 

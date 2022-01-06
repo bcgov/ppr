@@ -158,15 +158,16 @@ class ApiRequestError(Exception):
 
     def __init__(self, response=None, message='API request failed'):
         """Set up the exception."""
-        if response:
+        if response is not None:
             self.status_code = response.status_code
-            info = json.loads(response.text)
-            self.detail = info.get('detail')
-            self.title = info.get('title')
-            self.invalid_params = info.get('invalidParams')
-            self.message = message + ': ' + str(response.statuscode) + ': ' + info
+            self.json_data = json.loads(response.text)
+            self.json_data['status_code'] = response.status_code
+            self.detail = self.json_data.get('detail', '')
+            self.title = self.json_data.get('title', '')
+            self.message = str(response.status_code) + ': ' + self.detail
         else:
             self.message = message
+            self.json_data = None
 
         super().__init__(self.message)
 
@@ -237,7 +238,7 @@ class BaseClient:
                     headers=headers
                 )
 
-            if response:
+            if response is not None:
                 if self.account_id:
                     current_app.logger.info('Account ' + self.account_id + ' pay api response=' + response.text)
                 else:
@@ -248,7 +249,7 @@ class BaseClient:
             return json.loads(response.text)
 
         except (ApiRequestError) as err:
-            current_app.logger.error(err.message)
+            current_app.logger.error('call_api error: ' + err.message)
             raise err
 
 

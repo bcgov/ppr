@@ -22,6 +22,7 @@ from ppr_api.models import EventTracking, Party, Registration, utils as model_ut
 from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs
 from ppr_api.services.payment import TransactionTypes
+from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
@@ -144,12 +145,16 @@ def business_exception_response(exception):
     return jsonify({'message': exception.error}), exception.status_code
 
 
-def pay_exception_response(exception, account_id: str = None):
+def pay_exception_response(exception: SBCPaymentException, account_id: str = None):
     """Build pay 402 exception error response."""
-    status = str(exception.status_code)
-    if hasattr(exception, 'err') and hasattr(exception.err, 'message'):
-        status = exception.err.message[0:3]
+    status = exception.status_code
     message = PAYMENT.format(code=ResourceErrorCodes.PAY_ERR, status=status, account_id=account_id)
+    if exception.json_data:
+        detail = exception.json_data.get('detail', '')
+        err_type = exception.json_data.get('type', '')
+        return jsonify({'message': message, 'status_code': status, 'type': err_type, 'detail': detail}),\
+            HTTPStatus.PAYMENT_REQUIRED
+
     current_app.logger.error(repr(exception))
     return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.PAYMENT_REQUIRED
 
