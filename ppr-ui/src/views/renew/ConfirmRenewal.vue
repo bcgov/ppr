@@ -98,7 +98,6 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
-import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
@@ -340,8 +339,8 @@ export default class ConfirmDischarge extends Vue {
     const stateModel: StateModelIF = this.getStateModel
     const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
     if (apiResponse === undefined || apiResponse?.error !== undefined) {
-      console.error(apiResponse.error)
-      alert('There was an internal error attempting to save this renewal. Please try again later.')
+      console.error(apiResponse?.error)
+      this.emitError(apiResponse?.error)
     } else {
       // unset registration number
       this.setRegistrationNumber(null)
@@ -366,17 +365,6 @@ export default class ConfirmDischarge extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) {
-      alert('This registration does not exist.')
-    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
-      alert('You do not have access to this registration.')
-    } else {
-      alert('There was an internal error loading this registration. Please try again later.')
-    }
-    this.emitHaveData(true)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
   }
 
   /** Called when App is ready and this component can load its data. */

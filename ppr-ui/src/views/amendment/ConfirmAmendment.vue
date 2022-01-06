@@ -208,7 +208,6 @@ import {
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
-import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
@@ -256,6 +255,9 @@ export default class ConfirmAmendment extends Vue {
 
   @Prop({ default: false })
   private isJestRunning: boolean
+
+  @Prop({ default: false })
+  private saveDraftExit: boolean
 
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
@@ -549,8 +551,7 @@ export default class ConfirmAmendment extends Vue {
       const stateModel: StateModelIF = this.getStateModel
       const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
-        console.error(apiResponse.error)
-        alert('There was an internal error attempting to save this amendment. Please try again later.')
+        this.emitError(apiResponse?.error)
       } else {
         // On success return to dashboard
         this.goToDashboard()
@@ -579,18 +580,7 @@ export default class ConfirmAmendment extends Vue {
 
   @Emit('error')
   private emitError (error: ErrorIF): void {
-    console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) {
-      alert('This registration does not exist.')
-    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
-      alert('You do not have access to this registration.')
-    } else {
-      alert('There was an internal error loading this registration. Please try again later.')
-    }
-    this.emitHaveData(true)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
+    console.log(error)
   }
 
   /** Called when App is ready and this component can load its data. */
@@ -621,6 +611,11 @@ export default class ConfirmAmendment extends Vue {
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
+  }
+
+  @Watch('saveDraftExit')
+  private saveDraftExitHandler (val: boolean): void {
+    this.saveDraft()
   }
 }
 </script>

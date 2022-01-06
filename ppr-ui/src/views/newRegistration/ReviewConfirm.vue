@@ -97,12 +97,16 @@
     </div>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                       :router="this.$router"
-                       :certifyValid="validCertify"
-                       @draft-save-error="saveDraftError"
-                       @registration-incomplete="registrationIncomplete"
-                       @error="emitError" />
+        <button-footer
+          :currentStatementType="statementType"
+          :currentStepName="stepName"
+          :router="this.$router"
+          :certifyValid="validCertify"
+          :forceSave="saveDraftExit"
+          @draft-save-error="saveDraftError"
+          @registration-incomplete="registrationIncomplete"
+          @error="emitError($event)"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -131,10 +135,7 @@ import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { BaseDialog } from '@/components/dialogs'
-import {
-  registrationSaveDraftErrorDialog,
-  registrationCompleteErrorDialog
-} from '@/resources/dialogOptions'
+import { registrationSaveDraftErrorDialog } from '@/resources/dialogOptions'
 
 @Component({
   components: {
@@ -168,6 +169,9 @@ export default class ReviewConfirm extends Vue {
 
   @Prop({ default: false })
   private isJestRunning: boolean
+
+  @Prop({ default: false })
+  private saveDraftExit: boolean
 
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
@@ -214,8 +218,6 @@ export default class ReviewConfirm extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    this.errorOptions = { ...registrationCompleteErrorDialog }
-    this.errorDialog = true
   }
 
   /** Emits Have Data event. */

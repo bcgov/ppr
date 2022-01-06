@@ -23,7 +23,7 @@ import {
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { SettingOptions } from '@/enums'
+import { ErrorCodes, SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -103,7 +103,9 @@ export async function search (
         results: [],
         error: {
           statusCode: error?.response?.status,
-          message: error?.response?.data?.message
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -266,9 +268,10 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
       return {
         searches: null,
         error: {
-          statusCode:
-            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-          message: error?.response?.data?.message
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -294,9 +297,10 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
         defaultDropDowns: true,
         defaultTableFilters: true,
         error: {
-          statusCode:
-            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-          message: error?.response?.data?.message
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -325,9 +329,10 @@ export async function updateUserSettings (
         defaultDropDowns: true,
         defaultTableFilters: true,
         error: {
-          statusCode:
-            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-          message: error?.response?.data?.message
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -347,10 +352,9 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
     .catch(error => {
       draft.error = {
         statusCode: error?.response?.status,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return draft
     })
@@ -384,10 +388,9 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
     .catch(error => {
       draft.error = {
         statusCode: error?.response?.status,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return draft
     })
@@ -416,10 +419,9 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
     .catch(error => {
       draft.error = {
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return draft
     })
@@ -436,10 +438,9 @@ export async function deleteDraft (documentId: string): Promise<ErrorIF> {
     .catch(error => {
       return {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
     })
 }
@@ -466,7 +467,10 @@ export async function partyCodeSearch (
     .catch(error => {
       return {
         error: {
-          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+          message: error?.response?.data?.errorMessage,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -488,7 +492,10 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
     .catch(error => {
       return {
         error: {
-          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+          message: error?.response?.data?.errorMessage,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -514,9 +521,10 @@ export async function registrationHistory (): Promise<{
       return {
         registrations: null,
         error: {
-          statusCode:
-            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-          message: error?.response?.data?.message
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.errorMessage,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -542,9 +550,10 @@ export async function draftHistory (): Promise<{
       return {
         drafts: null,
         error: {
-          statusCode:
-            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-          message: error?.response?.data?.message
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.errorMessage,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -571,10 +580,9 @@ export async function createFinancingStatement (
     .catch(error => {
       statement.error = {
         statusCode: error?.response?.status,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return statement
     })
@@ -601,10 +609,9 @@ export async function createAmendmentStatement (
     .catch(error => {
       statement.error = {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return statement
     })
@@ -630,10 +637,9 @@ export async function createDischarge (
     .catch(error => {
       discharge.error = {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return discharge
     })
@@ -659,10 +665,9 @@ export async function createRenewal (
     .catch(error => {
       renewal.error = {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
       return renewal
     })
@@ -693,10 +698,9 @@ export async function getFinancingStatement (
         debtors: [],
         error: {
           statusCode: error?.response?.status,
-          message:
-            error?.response?.data?.errorMessage +
-            ' ' +
-            error?.response?.data?.rootCause
+          message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -729,10 +733,9 @@ export async function addRegistrationSummary (
         securedParties: '',
         error: {
           statusCode: error?.response?.status,
-          message:
-            error?.response?.data?.errorMessage +
-            ' ' +
-            error?.response?.data?.rootCause
+          message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -769,10 +772,9 @@ export async function getRegistrationSummary (
         securedParties: '',
         error: {
           statusCode: error?.response?.status,
-          message:
-            error?.response?.data?.errorMessage +
-            ' ' +
-            error?.response?.data?.rootCause
+          message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -790,10 +792,9 @@ export async function deleteRegistrationSummary (
     .catch(error => {
       return {
         statusCode: error?.response?.status,
-        message:
-          error?.response?.data?.errorMessage +
-          ' ' +
-          error?.response?.data?.rootCause
+        message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
+        detail: error?.response?.data?.detail,
+        type: error?.response?.data?.type
       }
     })
 }
@@ -820,7 +821,10 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
     .catch(error => {
       return {
         error: {
-          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+          message: error?.response?.data?.errorMessage,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
@@ -843,9 +847,10 @@ export async function debtorNames (registrationNum: string): Promise<[DebtorName
       return {
         searches: null,
         error: {
-          statusCode:
-            error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
-          message: error?.response?.data?.message
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.errorMessage,
+          detail: error?.response?.data?.detail,
+          type: error?.response?.data?.type
         }
       }
     })
