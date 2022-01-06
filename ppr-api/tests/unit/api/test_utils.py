@@ -17,13 +17,17 @@
 Test-Suite to ensure that the /party-codes endpoint is working as expected.
 """
 import copy
+from http import HTTPStatus
+import json
 
 import pytest
 from flask import current_app
 
+from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import Registration
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import PPR_ROLE
+from ppr_api.services.payment.exceptions import SBCPaymentException
 from tests.unit.services.utils import helper_create_jwt
 from tests.unit.utils.test_financing_validator import FINANCING
 from tests.unit.utils.test_registration_validator import AMENDMENT_VALID
@@ -174,3 +178,136 @@ def test_find_secured_parties(session, client, jwt):
     parties = resource_utils.find_secured_parties(registration)
     assert parties
     assert len(parties) >= 3
+
+
+def test_account_required(session, client, jwt):
+    """Assert that an account id required error response works as expected."""
+    body, status = resource_utils.account_required_response()
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.ACCOUNT_REQUIRED_ERR)
+
+
+def test_unauthorized(session, client, jwt):
+    """Assert that an unauthorized error response works as expected."""
+    body, status = resource_utils.unauthorized_error_response('123456')
+    assert status == HTTPStatus.UNAUTHORIZED
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.UNAUTHORIZED_ERR)
+
+
+def test_default_exception(session, client, jwt):
+    """Assert that a default exception error response works as expected."""
+    body, status = resource_utils.default_exception_response(DatabaseException('error'))
+    assert status == HTTPStatus.INTERNAL_SERVER_ERROR
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.DEFAULT_ERR)
+
+
+def test_db_exception(session, client, jwt):
+    """Assert that a database exception error response works as expected."""
+    body, status = resource_utils.db_exception_response(DatabaseException('error'),
+                                                        '12345',
+                                                        'UNIT TEST')
+    assert status == HTTPStatus.INTERNAL_SERVER_ERROR
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.DATABASE_ERR)
+
+
+def test_business_exception(session, client, jwt):
+    """Assert that a business exception error response works as expected."""
+    exception = BusinessException(error=ResourceErrorCodes.NOT_FOUND_ERR + ': business error',
+                                  status_code=HTTPStatus.NOT_FOUND)
+    body, status = resource_utils.business_exception_response(exception)
+    assert status == HTTPStatus.NOT_FOUND
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.NOT_FOUND_ERR)
+
+
+def test_validation(session, client, jwt):
+    """Assert that a data validation error response works as expected."""
+    body, status = resource_utils.validation_error_response(None, 'validation errors', 'extra validation errors')
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.VALIDATION_ERR)
+
+
+def test_staff_payment(session, client, jwt):
+    """Assert that a staff payment error response works as expected."""
+    body, status = resource_utils.staff_payment_bcol_fas()
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.VALIDATION_ERR)
+
+
+def test_sbc_payment(session, client, jwt):
+    """Assert that a sbc payment error response works as expected."""
+    body, status = resource_utils.sbc_payment_invalid()
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.VALIDATION_ERR)
+
+
+def test_pay_exception(session, client, jwt):
+    """Assert that a pay exception error response works as expected."""
+    exception = SBCPaymentException(DatabaseException('400 error'))
+    body, status = resource_utils.pay_exception_response(exception, '12345')
+    assert status == HTTPStatus.PAYMENT_REQUIRED
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.PAY_ERR)
+
+
+def test_not_found(session, client, jwt):
+    """Assert that a not found error response works as expected."""
+    body, status = resource_utils.not_found_error_response('amendment', '0063452')
+    assert status == HTTPStatus.NOT_FOUND
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.NOT_FOUND_ERR)
+
+
+def test_duplicate(session, client, jwt):
+    """Assert that a duplicate error response works as expected."""
+    body, status = resource_utils.duplicate_error_response('duplicate error')
+    assert status == HTTPStatus.CONFLICT
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.DUPLICATE_ERR)
+
+
+def test_cc_forbidden(session, client, jwt):
+    """Assert that a crown charge forbidden error response works as expected."""
+    body, status = resource_utils.cc_forbidden_error_response('12345')
+    assert status == HTTPStatus.FORBIDDEN
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.UNAUTHORIZED_ERR)
+
+
+def test_path_param(session, client, jwt):
+    """Assert that a path parameter error response works as expected."""
+    body, status = resource_utils.path_param_error_response('searchId')
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.PATH_PARAM_ERR)
+
+
+def test_data_mismatch(session, client, jwt):
+    """Assert that a data mismatch error response works as expected."""
+    body, status = resource_utils.path_data_mismatch_error_response('path_val', 'mismatch', 'data_val')
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.DATA_MISMATCH_ERR)
+
+
+def test_historical(session, client, jwt):
+    """Assert that a historical error response works as expected."""
+    body, status = resource_utils.historical_error_response('0234322')
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.HISTORICAL_ERR)
+
+
+def test_debtor(session, client, jwt):
+    """Assert that a debtor name error response works as expected."""
+    body, status = resource_utils.base_debtor_invalid_response()
+    assert status == HTTPStatus.BAD_REQUEST
+    data = json.loads(body.get_data(as_text=True))
+    assert str(data['message']).startswith(ResourceErrorCodes.DEBTOR_NAME_ERR)

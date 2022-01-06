@@ -15,13 +15,13 @@ import fitz  # noqa: I001
 from flask import current_app, jsonify
 from flask_babel import _
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, ResourceErrorCodes
 from ppr_api.resources.utils import get_account_name
 
 from .report import Report, ReportTypes
 
 
-DEFAULT_ERROR_MSG = 'Data related error generating report.'
+DEFAULT_ERROR_MSG = '{code}: Data related error generating report.'.format(code=ResourceErrorCodes.REPORT_ERR)
 
 
 def get_pdf(report_data, account_id, report_type=None, token=None):

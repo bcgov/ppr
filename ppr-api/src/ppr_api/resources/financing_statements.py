@@ -21,7 +21,7 @@ from flask import jsonify, request, current_app, g
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf
@@ -93,8 +93,11 @@ class FinancingResource(Resource):
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
             # Try to fetch financing statement list for account ID
-            statement_list = FinancingStatement.find_all_by_account_id(account_id)
-            return jsonify(statement_list), HTTPStatus.OK
+            try:
+                statement_list = FinancingStatement.find_all_by_account_id(account_id)
+                return jsonify(statement_list), HTTPStatus.OK
+            except Exception as db_exception:   # noqa: B902; return nicer default error
+                return resource_utils.db_exception_response(db_exception, account_id, 'GET financing statements')
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -106,7 +109,6 @@ class FinancingResource(Resource):
     def post():
         """Create a new financing statement."""
         try:
-
             # Quick check: must be staff or provide an account ID.
             account_id = resource_utils.get_account_id(request)
             if account_id is None:
@@ -114,26 +116,23 @@ class FinancingResource(Resource):
             # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
             if not authorized(account_id, jwt) or is_bcol_help(account_id):
                 return resource_utils.unauthorized_error_response(account_id)
-
             request_json = request.get_json(silent=True)
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'financingStatement', 'ppr')
             extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
                 return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
-
             # Set up the financing statement registration, pay, and save the data.
             statement = pay_and_save_financing(request, request_json, account_id)
-
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return statement.json, HTTPStatus.CREATED
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'POST financing statement')
         except SBCPaymentException as pay_exception:
-            return resource_utils.pay_exception_response(pay_exception)
+            return resource_utils.pay_exception_response(pay_exception, account_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -169,7 +168,6 @@ class GetFinancingResource(Resource):
             if resource_utils.is_pdf(request):
                 resource_utils.check_access_financing(jwt.get_token_auth_header(),
                                                       is_all_staff_account(account_id), account_id, statement)
-
             # Set to false to exclude change history.
             statement.include_changes_json = False
             # Set to false as default to generate json with original financing statement data.
@@ -186,11 +184,12 @@ class GetFinancingResource(Resource):
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return statement.json, HTTPStatus.OK
-
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET financing statement id=' + registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -226,19 +225,15 @@ class AmendmentResource(Resource):
                 return resource_utils.path_data_mismatch_error_response(registration_num,
                                                                         'base registration number',
                                                                         request_json['baseRegistrationNumber'])
-
             # Fetch base registration information: business exception thrown if not
             # found or historical.
             statement = FinancingStatement.find_by_registration_number(registration_num, account_id,
                                                                        is_staff_account(account_id), True)
-
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff_account(account_id)):
                 return resource_utils.base_debtor_invalid_response()
-
             # Verify delete party and collateral ID's
             resource_utils.validate_delete_ids(request_json, statement)
-
             # Set up the registration, pay, and save the data.
             registration = pay_and_save(request,
                                         request_json,
@@ -246,7 +241,6 @@ class AmendmentResource(Resource):
                                         statement,
                                         registration_num,
                                         account_id)
-
             response_json = registration.verification_json('amendmentRegistrationNumber')
             # If get to here request was successful, enqueue verification statements for secured parties.
             resource_utils.queue_secured_party_verification(registration)
@@ -256,11 +250,12 @@ class AmendmentResource(Resource):
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.CREATED
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'POST Amendment id=' + registration_num)
         except SBCPaymentException as pay_exception:
-            return resource_utils.pay_exception_response(pay_exception)
+            return resource_utils.pay_exception_response(pay_exception, account_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -306,6 +301,9 @@ class GetAmendmentResource(Resource):
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Amendment id=' + amendment_registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -349,6 +347,9 @@ class GetChangeResource(Resource):
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Change id=' + change_registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -383,7 +384,6 @@ class RenewalResource(Resource):
                 return resource_utils.path_data_mismatch_error_response(registration_num,
                                                                         'base registration number',
                                                                         request_json['baseRegistrationNumber'])
-
             # Fetch base registration information: business exception thrown if not
             # found or historical.
             statement = FinancingStatement.find_by_registration_number(registration_num, account_id,
@@ -394,7 +394,6 @@ class RenewalResource(Resource):
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff_account(account_id)):
                 return resource_utils.base_debtor_invalid_response()
-
             # Set up the registration, pay, and save the data.
             registration = pay_and_save(request,
                                         request_json,
@@ -402,17 +401,17 @@ class RenewalResource(Resource):
                                         statement,
                                         registration_num,
                                         account_id)
-
             response_json = registration.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
                 return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.CREATED
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'POST Renewal id=' + registration_num)
         except SBCPaymentException as pay_exception:
-            return resource_utils.pay_exception_response(pay_exception)
+            return resource_utils.pay_exception_response(pay_exception, account_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -458,6 +457,9 @@ class GetRenewalResource(Resource):
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Renewal id=' + renewal_registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -517,11 +519,12 @@ class DischargeResource(Resource):
                                account_id,
                                ReportTypes.FINANCING_STATEMENT_REPORT.value,
                                jwt.get_token_auth_header())
-
             return response_json, HTTPStatus.CREATED
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'POST Discharge id=' + registration_num)
         except SBCPaymentException as pay_exception:
-            return resource_utils.pay_exception_response(pay_exception)
+            return resource_utils.pay_exception_response(pay_exception, account_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -569,6 +572,9 @@ class GetDischargeResource(Resource):
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Discharge id=' + discharge_registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -596,9 +602,9 @@ class GetDebtorNamesResource(Resource):
             # Try to fetch financing statement list for account ID
             names_list = FinancingStatement.find_debtor_names_by_registration_number(registration_num)
             return jsonify(names_list), HTTPStatus.OK
-
-        except BusinessException as exception:
-            return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Debtor Names id=' + registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -635,9 +641,9 @@ class GetRegistrationResource(Resource):
                                                                  collapse_param,
                                                                  account_name)
             return jsonify(statement_list), HTTPStatus.OK
-
-        except BusinessException as exception:
-            return resource_utils.business_exception_response(exception)
+        except DatabaseException as db_exception:   # noqa: B902; return nicer error
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Account Registration Summary id=' + account_id)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -687,7 +693,9 @@ class AccountRegistrationResource(Resource):
             if 'inUserList' in registration:
                 del registration['inUserList']
             return registration, HTTPStatus.CREATED
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'POST Extra Registration id=' + registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -718,7 +726,9 @@ class AccountRegistrationResource(Resource):
             del registration['accountId']
             del registration['existsCount']
             return registration, HTTPStatus.OK
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET Registration Summary id=' + registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -750,9 +760,10 @@ class AccountRegistrationResource(Resource):
                 extra_registration = UserExtraRegistration(account_id=account_id, registration_number=registration_num)
                 extra_registration.removed_ind = UserExtraRegistration.REMOVE_IND
                 extra_registration.save()
-
             return '', HTTPStatus.NO_CONTENT
-
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'DELETE Extra Registration id=' + registration_num)
         except Exception as default_exception:   # noqa: B902; return nicer default error
             return resource_utils.default_exception_response(default_exception)
 
@@ -886,11 +897,9 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
                           account_id=None,
                           details=resource_utils.get_payment_details(registration))
         pay_ref = payment.create_payment_staff_registration(payment_info, registration.client_reference_id)
-
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']
-
     # Try to save the registration: failure will rollback the payment if one was made.
     try:
         registration.save()
@@ -904,8 +913,7 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
             except SBCPaymentException as cancel_exception:
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id,
                                                                  repr(cancel_exception)))
-        raise db_exception
-
+        raise DatabaseException(db_exception)
     return registration
 
 
@@ -930,11 +938,9 @@ def pay_and_save_financing(req: request, request_json, account_id):
                           account_id=None,
                           details=resource_utils.get_payment_details_financing(registration))
         pay_ref = payment.create_payment_staff_registration(payment_info, registration.client_reference_id)
-
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']
-
     # Try to save the financing statement: failure throws an exception.
     try:
         statement.save()
@@ -947,8 +953,7 @@ def pay_and_save_financing(req: request, request_json, account_id):
             except SBCPaymentException as cancel_exception:
                 current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'financing', invoice_id,
                                                                  repr(cancel_exception)))
-        raise db_exception
-
+        raise DatabaseException(db_exception)
     return statement
 
 
@@ -957,7 +962,6 @@ def callback_error(code: str, registration_id: int, status_code, party_id: int, 
     error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
     if message:
         error += ' ' + message
-    current_app.logger.error(error)
     # Track event here.
     EventTracking.create(registration_id, EventTracking.EventTrackingTypes.SURFACE_MAIL, status_code, message)
     if status_code != HTTPStatus.BAD_REQUEST and code not in (resource_utils.CallbackExceptionCodes.MAX_RETRIES,

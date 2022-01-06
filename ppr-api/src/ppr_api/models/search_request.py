@@ -23,7 +23,7 @@ from http import HTTPStatus
 
 from flask import current_app
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import utils as model_utils
 from ppr_api.models import search_utils
 
@@ -108,10 +108,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             db.session.commit()
         except Exception as db_exception:
             current_app.logger.error('DB search_client save exception: ' + repr(db_exception))
-            raise BusinessException(
-                error='Database search_client save failed: ' + repr(db_exception),
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
+            raise DatabaseException(db_exception)
 
     def update_search_selection(self, search_json):
         """Support UI search selection autosave: replace search response."""
@@ -123,8 +120,14 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_registration_number(self):
         """Execute a search by registration number query."""
         reg_num = self.request_json['criteria']['value']
-        result = db.session.execute(search_utils.REG_NUM_QUERY, {'query_value': reg_num.strip().upper()})
-        row = result.first()
+        row = None
+        try:
+            result = db.session.execute(search_utils.REG_NUM_QUERY, {'query_value': reg_num.strip().upper()})
+            row = result.first()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_registration_number exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
+
         if row is not None:
             mapping = row._mapping  # pylint: disable=protected-access; follows documentation
             registration_type = str(mapping['registration_type'])
@@ -155,9 +158,13 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             query = query.replace('CASE WHEN serial_number', 'CASE WHEN mhr_number')
         elif self.search_type == 'AC':
             query = search_utils.AIRCRAFT_DOT_QUERY
-
-        result = db.session.execute(query, {'query_value': search_value.strip().upper()})
-        rows = result.fetchall()
+        rows = None
+        try:
+            result = db.session.execute(query, {'query_value': search_value.strip().upper()})
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_serial_type exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
         if rows is not None:
             results_json = []
             for row in rows:
@@ -200,10 +207,16 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_business_name(self):
         """Execute a debtor business name search query."""
         search_value = self.request_json['criteria']['debtorName']['business']
-        result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
-                                    {'query_bus_name': search_value.strip().upper(),
-                                     'query_bus_quotient': current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
-        rows = result.fetchall()
+        rows = None
+        try:
+            result = db.session.execute(search_utils.BUSINESS_NAME_QUERY,
+                                        {'query_bus_name': search_value.strip().upper(),
+                                         'query_bus_quotient':
+                                         current_app.config.get('SIMILARITY_QUOTIENT_BUSINESS_NAME')})
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_business_name exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
         if rows is not None:
             results_json = []
             for row in rows:
@@ -242,22 +255,27 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         quotient_default = current_app.config.get('SIMILARITY_QUOTIENT_DEFAULT')
         if 'second' in self.request_json['criteria']['debtorName']:
             middle_name = self.request_json['criteria']['debtorName']['second']
-        if middle_name is not None and middle_name.strip() != '' and middle_name.strip().upper() != 'NONE':
-            result = db.session.execute(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY,
-                                        {'query_last': last_name.strip().upper(),
-                                         'query_first': first_name.strip().upper(),
-                                         'query_middle': middle_name.strip().upper(),
-                                         'query_last_quotient': quotient_last,
-                                         'query_first_quotient': quotient_first,
-                                         'query_default_quotient': quotient_default})
-        else:
-            result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
-                                        {'query_last': last_name.strip().upper(),
-                                         'query_first': first_name.strip().upper(),
-                                         'query_last_quotient': quotient_last,
-                                         'query_first_quotient': quotient_first,
-                                         'query_default_quotient': quotient_default})
-        rows = result.fetchall()
+        rows = None
+        try:
+            if middle_name is not None and middle_name.strip() != '' and middle_name.strip().upper() != 'NONE':
+                result = db.session.execute(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY,
+                                            {'query_last': last_name.strip().upper(),
+                                             'query_first': first_name.strip().upper(),
+                                             'query_middle': middle_name.strip().upper(),
+                                             'query_last_quotient': quotient_last,
+                                             'query_first_quotient': quotient_first,
+                                             'query_default_quotient': quotient_default})
+            else:
+                result = db.session.execute(search_utils.INDIVIDUAL_NAME_QUERY,
+                                            {'query_last': last_name.strip().upper(),
+                                             'query_first': first_name.strip().upper(),
+                                             'query_last_quotient': quotient_last,
+                                             'query_first_quotient': quotient_first,
+                                             'query_default_quotient': quotient_default})
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_individual_name exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
         if rows is not None:
             results_json = []
             for row in rows:
@@ -353,9 +371,13 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace('?', account_id)
             if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
                 query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY.replace('?', account_id)
-
-            result = db.session.execute(query)
-            rows = result.fetchall()
+            rows = None
+            try:
+                result = db.session.execute(query)
+                rows = result.fetchall()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_all_by_account_id exception: ' + repr(db_exception))
+                raise DatabaseException(db_exception)
             if rows is not None:
                 for row in rows:
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation

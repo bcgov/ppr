@@ -20,20 +20,12 @@ from http import HTTPStatus
 from flask import g, jsonify, request
 from flask_restx import Namespace, Resource, cors
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import Draft
-from ppr_api.services.authz import authorized, is_staff
+from ppr_api.resources import utils as resource_utils
+from ppr_api.services.authz import authorized
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-
-from .utils import (
-    account_required_response,
-    business_exception_response,
-    default_exception_response,
-    get_account_id,
-    path_param_error_response,
-    unauthorized_error_response,
-)
 
 
 API = Namespace('drafts', description='Endpoints for maintaining draft statements.')
@@ -54,23 +46,24 @@ class DraftResource(Resource):
         try:
 
             # Quick check: must provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch draft list for account ID
             draft_list = Draft.find_all_by_account_id(account_id)
-
             return jsonify(draft_list), HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'GET drafts')
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -80,13 +73,13 @@ class DraftResource(Resource):
         try:
 
             # Quick check: must provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Disable schema validation: draft may be partial/incomplele.
@@ -97,14 +90,17 @@ class DraftResource(Resource):
             # Save new draft statement: BusinessException raised if failure.
             token: dict = g.jwt_oidc_token_info
             draft = Draft.create_from_json(request_json, account_id, token.get('username', None))
-            draft.save()
+            try:
+                draft.save()
+            except Exception as db_exception:   # noqa: B902; return nicer default error
+                return resource_utils.db_exception_response(db_exception, account_id, 'POST draft')
 
             return draft.json, HTTPStatus.CREATED
 
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
 
 @cors_preflight('GET,PUT,DELETE,OPTIONS')
@@ -119,26 +115,27 @@ class MaintainDraftResource(Resource):
         """Get a draft statement by document ID."""
         try:
             if document_id is None:
-                return path_param_error_response('document ID')
+                return resource_utils.path_param_error_response('document ID')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
-            if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch draft statement by document ID
             draft = Draft.find_by_document_number(document_id, False)
-
             return draft.json, HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'GET draft id=' + document_id)
         except BusinessException as exception:
-            return business_exception_response(exception)
+            return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -147,16 +144,16 @@ class MaintainDraftResource(Resource):
         """Update a draft statement by document ID with data in the request body."""
         try:
             if document_id is None:
-                return path_param_error_response('document ID')
+                return resource_utils.path_param_error_response('document ID')
 
             # Quick check: must provide an account ID.
-            account_id = get_account_id(request)
+            account_id = resource_utils.get_account_id(request)
             if account_id is None:
-                return account_required_response()
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
             request_json = request.get_json(silent=True)
             # Disable schema validation: draft may be partial/incomplele.
@@ -165,15 +162,17 @@ class MaintainDraftResource(Resource):
             #   return validation_error_response(errors, VAL_ERROR)
 
             # Save draft statement update: BusinessException raised if failure.
-            draft = Draft.update(request_json, document_id)
-            draft.save()
+            try:
+                draft = Draft.update(request_json, document_id)
+                draft.save()
+                return draft.json, HTTPStatus.OK
+            except BusinessException as exception:
+                return resource_utils.business_exception_response(exception)
+            except Exception as db_exception:   # noqa: B902; return nicer default error
+                return resource_utils.db_exception_response(db_exception, account_id, 'PUT draft id=' + document_id)
 
-            return draft.json, HTTPStatus.OK
-
-        except BusinessException as exception:
-            return business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -182,23 +181,26 @@ class MaintainDraftResource(Resource):
         """Delete a draft statement by document ID."""
         try:
             if document_id is None:
-                return path_param_error_response('document ID')
+                return resource_utils.path_param_error_response('document ID')
 
             # Quick check: must be staff or provide an account ID.
-            account_id = get_account_id(request)
-            if not is_staff(jwt) and account_id is None:
-                return account_required_response()
+            account_id = resource_utils.get_account_id(request)
+            if account_id is None:
+                return resource_utils.account_required_response()
 
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
-                return unauthorized_error_response(account_id)
+                return resource_utils.unauthorized_error_response(account_id)
 
-            # Try to fetch draft statement by document ID
-            Draft.delete(document_id)
+            # Try to delete draft statement by document ID
+            try:
+                Draft.delete(document_id)
+            except BusinessException as exception:
+                return resource_utils.business_exception_response(exception)
+            except Exception as db_exception:   # noqa: B902; return nicer default error
+                return resource_utils.db_exception_response(db_exception, account_id, 'DELETE draft id=' + document_id)
 
             return '', HTTPStatus.NO_CONTENT
 
-        except BusinessException as exception:
-            return business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            return default_exception_response(default_exception)
+            return resource_utils.default_exception_response(default_exception)

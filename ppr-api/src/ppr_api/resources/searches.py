@@ -20,7 +20,7 @@ from flask import current_app, g, jsonify, request
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import SearchRequest, SearchResult
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_bcol_help, is_staff_account
@@ -120,7 +120,7 @@ class SearchResource(Resource):
             return query.json, HTTPStatus.CREATED
 
         except SBCPaymentException as pay_exception:
-            return resource_utils.pay_exception_response(pay_exception)
+            return resource_utils.pay_exception_response(pay_exception, account_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -165,6 +165,8 @@ class SearchDetailResource(Resource):
             search_request.update_search_selection(request_json)
             return jsonify(search_request.updated_selection), HTTPStatus.ACCEPTED
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'PUT search selection update')
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error

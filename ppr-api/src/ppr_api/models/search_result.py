@@ -19,7 +19,7 @@ from http import HTTPStatus
 
 from flask import current_app
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -73,10 +73,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             db.session.commit()
         except Exception as db_exception:  # noqa: B902; just logging
             current_app.logger.error('DB search_result save exception: ' + repr(db_exception))
-            raise BusinessException(
-                error='Database search_result save failed: ' + repr(db_exception),
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
+            raise DatabaseException(db_exception)
 
     def update_selection(self, search_select, account_name: str = None, callback_url: str = None):
         """Update the set of search details from the search query selection.
@@ -121,6 +118,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                        ('selected' not in select or select['selected']):
                         found = True
                         similar_count += 1
+                        break
                 if found:
                     new_results.append(result)
 
@@ -166,20 +164,27 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         search_detail = None
         error_msg = ''
         if search_id and not limit_by_date:
-            search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
+            try:
+                search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_search_id exception: ' + repr(db_exception))
+                raise DatabaseException(db_exception)
         elif search_id and limit_by_date:
             min_allowed_date = model_utils.today_ts_offset(GET_DETAIL_DAYS_LIMIT, False)
-            search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
+            try:
+                search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_search_id exception: ' + repr(db_exception))
+                raise DatabaseException(db_exception)
             if search_detail and search_detail.search and \
                     search_detail.search.search_ts.timestamp() < min_allowed_date.timestamp():
                 min_ts = model_utils.format_ts(min_allowed_date)
-                error_msg = f'Search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
+                error_msg = model_utils.ERR_SEARCH_TOO_OLD.format(code=ResourceErrorCodes.TOO_OLD_ERR,
+                                                                  search_id=search_id,
+                                                                  min_ts=min_ts)
 
         if error_msg != '':
-            raise BusinessException(
-                error=error_msg,
-                status_code=HTTPStatus.BAD_REQUEST
-            )
+            raise BusinessException(error=error_msg, status_code=HTTPStatus.BAD_REQUEST)
 
         return search_detail
 
@@ -273,18 +278,18 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         the same search ID has not been submitted.
         """
         error_msg = ''
-
+        status_code = HTTPStatus.BAD_REQUEST
         search_result = SearchResult.find_by_search_id(search_id)
         if not search_result:
-            error_msg = f'Search select results failed: invalid search ID {search_id}.'
+            error_msg = model_utils.ERR_SEARCH_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                search_id=search_id)
+            status_code = HTTPStatus.NOT_FOUND
         elif search_result.search_select:
             # Search detail request already submitted.
-            error_msg = f'Search select results failed: results already provided for search ID {search_id}.'
+            error_msg = model_utils.ERR_SEARCH_COMPLETE.format(code=ResourceErrorCodes.DUPLICATE_ERR,
+                                                               search_id=search_id)
 
         if error_msg != '':
-            raise BusinessException(
-                error=error_msg,
-                status_code=HTTPStatus.BAD_REQUEST
-            )
+            raise BusinessException(error=error_msg, status_code=status_code)
 
         return search_result

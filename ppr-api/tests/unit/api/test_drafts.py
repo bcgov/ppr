@@ -352,7 +352,7 @@ def test_draft_get_nonstaff_missing_account_400(session, client, jwt):
     assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_draft_get_staff_missing_account_201(session, client, jwt):
+def test_draft_get_staff_missing_account_400(session, client, jwt):
     """Assert that a staff draft get request with no account ID returns a 201 status."""
     # setup
 
@@ -360,7 +360,7 @@ def test_draft_get_staff_missing_account_201(session, client, jwt):
     rv = client.get('/api/v1/drafts/D-T-FS01',
                     headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]))
     # check
-    assert rv.status_code == HTTPStatus.OK
+    assert rv.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_draft_get_nonstaff_unauthorized_401(session, client, jwt):

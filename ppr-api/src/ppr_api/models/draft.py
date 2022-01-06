@@ -21,7 +21,7 @@ from http import HTTPStatus
 
 from flask import current_app
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, ResourceErrorCodes, DatabaseException
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -91,7 +91,9 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     def find_all_by_account_id(cls, account_id: str = None):
         """Return a summary list of drafts belonging to an account."""
         drafts_json = []
-        if account_id:
+        if not account_id:
+            return drafts_json
+        try:
             max_results_size = int(current_app.config.get('ACCOUNT_DRAFTS_MAX_RESULTS'))
             results = db.session.execute(model_utils.QUERY_ACCOUNT_DRAFTS,
                                          {'query_account': account_id, 'max_results_size': max_results_size})
@@ -120,6 +122,9 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                         'clientReferenceId': ref_id
                     }
                     drafts_json.append(draft_json)
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_all_by_account_id exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
 
         return drafts_json
 
@@ -128,17 +133,25 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a draft statement by document ID."""
         draft = None
         if document_number:
-            draft = cls.query.filter(Draft.document_number == document_number).one_or_none()
+            try:
+                draft = cls.query.filter(Draft.document_number == document_number).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_document_number exception: ' + repr(db_exception))
+                raise DatabaseException(db_exception)
 
         if not draft:
+            code = ResourceErrorCodes.NOT_FOUND_ERR
+            message = model_utils.ERR_DRAFT_NOT_FOUND.format(code=code, document_number=document_number)
             raise BusinessException(
-                error=f'No Draft Statement found for Document ID {document_number}.',
+                error=message,
                 status_code=HTTPStatus.NOT_FOUND
             )
 
         if draft.registration and not allow_used:
+            code = ResourceErrorCodes.UNAUTHORIZED_ERR
+            message = model_utils.ERR_DRAFT_USED.format(code=code, document_number=document_number)
             raise BusinessException(
-                error=f'Draft Statement for Document ID {document_number} has been used.',
+                error=message,
                 status_code=HTTPStatus.BAD_REQUEST
             )
 

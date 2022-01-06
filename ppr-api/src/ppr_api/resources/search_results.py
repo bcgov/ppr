@@ -24,7 +24,7 @@ from registry_schemas import utils as schema_utils
 
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.services.authz import authorized
 from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.models import EventTracking, SearchResult, utils as model_utils
@@ -61,7 +61,7 @@ class SearchResultsResource(Resource):
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def post(search_id):
+    def post(search_id):  # pylint: disable=too-many-branches
         """Execute a search detail request using selection choices in the request body."""
         try:
             if search_id is None:
@@ -119,6 +119,8 @@ class SearchResultsResource(Resource):
 
             return jsonify(response_data), HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'POST search select id=' + search_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -171,6 +173,8 @@ class SearchResultsResource(Resource):
 
             return jsonify(response_data), HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'GET search details id=' + search_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -184,7 +188,7 @@ class PatchSearchResultsResource(Resource):
 
     @staticmethod
     @cors.crossdomain(origin='*')
-    def post(search_id):  # pylint: disable=too-many-branches
+    def post(search_id):  # pylint: disable=too-many-branches, too-many-locals
         """Generate and store a report, update search_result.doc_storage_url."""
         try:
             if search_id is None:
@@ -270,6 +274,8 @@ class PatchSearchResultsResource(Resource):
                                   search_id,
                                   HTTPStatus.INTERNAL_SERVER_ERROR,
                                   repr(storage_err))
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, None, 'POST large report event')
         except Exception as default_err:  # noqa: B902; return nicer default error
             return callback_error(resource_utils.CallbackExceptionCodes.DEFAULT,
                                   search_id,
@@ -328,6 +334,8 @@ class PostResultsNotificationResource(Resource):
 
             return response.content, response.status_code
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, None, 'POST notificaton event')
         except Exception as default_err:  # noqa: B902; return nicer default error
             return notification_error(resource_utils.CallbackExceptionCodes.DEFAULT,
                                       search_id,

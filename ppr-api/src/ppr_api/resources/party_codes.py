@@ -20,7 +20,7 @@ from http import HTTPStatus
 from flask import request, current_app, jsonify
 from flask_restx import Namespace, Resource, cors
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import ClientCode
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import is_staff, authorized
@@ -63,6 +63,8 @@ class ClientPartyResource(Resource):
 
             return party, HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'GET client party code=' + code)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -100,6 +102,8 @@ class ClientPartyHeadOfficeResource(Resource):
             #    return resource_utils.not_found_error_response('party', code)
             return jsonify(parties), HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'GET client party matches')
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -109,7 +113,7 @@ class ClientPartyHeadOfficeResource(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/accounts', methods=['GET', 'OPTIONS'])
 class ClientPartyAccountResource(Resource):
-    """Resource for looking up client parties belonging to an account linke to a BCOL number."""
+    """Resource for looking up client parties belonging to an account linked to a BCOL number."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
@@ -131,6 +135,9 @@ class ClientPartyAccountResource(Resource):
             parties = ClientCode.find_by_account_id(account_id, True)
             return jsonify(parties), HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id,
+                                                        'GET account client party codes account=' + account_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error

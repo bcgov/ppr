@@ -18,7 +18,9 @@ from enum import Enum
 from http import HTTPStatus
 import json
 
-from ppr_api.exceptions import BusinessException
+from flask import current_app
+
+from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 from ppr_api.services.authz import is_all_staff_account
 
@@ -365,11 +367,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the registration matching the registration number."""
         registration = None
         if registration_num:
-            registration = cls.query.filter(Registration.registration_num == registration_num).one_or_none()
+            try:
+                registration = cls.query.filter(Registration.registration_num == registration_num).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_registration_number exception: ' + repr(db_exception))
+                raise DatabaseException(db_exception)
 
         if not registration:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_NOT_FOUND.format(registration_num=registration_num),
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                    registration_num=registration_num),
                 status_code=HTTPStatus.NOT_FOUND
             )
 
@@ -378,20 +385,23 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             extra_reg = UserExtraRegistration.find_by_registration_number(base_reg_num, account_id)
             if not extra_reg:
                 raise BusinessException(
-                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                                                      account_id=account_id,
                                                                       registration_num=registration_num),
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
 
         if not staff and model_utils.is_historical(registration.financing_statement, False):
             raise BusinessException(
-                error=model_utils.ERR_FINANCING_HISTORICAL.format(registration_num=registration_num),
+                error=model_utils.ERR_FINANCING_HISTORICAL.format(code=ResourceErrorCodes.HISTORICAL_ERR,
+                                                                  registration_num=registration_num),
                 status_code=HTTPStatus.BAD_REQUEST
             )
 
         if not staff and base_reg_num and base_reg_num != registration.base_registration_num:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_MISMATCH.format(registration_num=registration_num,
+                error=model_utils.ERR_REGISTRATION_MISMATCH.format(code=ResourceErrorCodes.DATA_MISMATCH_ERR,
+                                                                   registration_num=registration_num,
                                                                    base_reg_num=base_reg_num),
                 status_code=HTTPStatus.BAD_REQUEST
             )
@@ -409,8 +419,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         3. The request account name matches one of the base registration secured party names.
         """
         results_json = []
+        if account_id is None:
+            return results_json
+
         registrations_json = []
-        if account_id:
+        try:
             results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
                                          {'query_account': account_id,
                                           'max_results_size': model_utils.get_max_registrations_size()})
@@ -465,6 +478,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                             results_json.append(result)
                 if collapse:
                     return Registration.__build_account_collapsed_json(results_json, registrations_json)
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_all_by_account_id exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
 
         return results_json
 
@@ -475,60 +491,64 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         changes = []
         if account_id is None or registration_num is None:
             return result
+        try:
+            results = db.session.execute(model_utils.QUERY_ACCOUNT_ADD_REGISTRATION,
+                                         {'query_account': account_id, 'query_reg_num': registration_num})
+            rows = results.fetchall()
+            if rows is not None:
+                for row in rows:
+                    mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+                    reg_num = str(mapping['registration_number'])
+                    base_reg_num = str(mapping['base_reg_number'])
+                    reg_class = str(mapping['registration_type_cl'])
+                    result = {
+                        'registrationNumber': reg_num,
+                        'baseRegistrationNumber': base_reg_num,
+                        'createDateTime': model_utils.format_ts(mapping['registration_ts']),
+                        'registrationType': str(mapping['registration_type']),
+                        'registrationDescription': str(mapping['registration_desc']),
+                        'registrationClass': reg_class,
+                        'registeringParty': str(mapping['registering_party']),
+                        'securedParties': str(mapping['secured_party']),
+                        'clientReferenceId': str(mapping['client_reference_id']),
+                        'registeringName': str(mapping['registering_name'])
+                    }
+                    if model_utils.is_financing(reg_class):
+                        result['baseRegistrationNumber'] = reg_num
+                        result['path'] = FINANCING_PATH + reg_num
+                        result['statusType'] = str(mapping['state'])
+                        result['expireDays'] = int(mapping['expire_days'])
+                        result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
+                        result['existsCount'] = int(mapping['exists_count'])
+                        result['accountId'] = str(mapping['account_id'])
+                        # Another account already added.
+                        if result['existsCount'] > 0 and result['accountId'] != account_id:
+                            result['inUserList'] = True
+                        # User account previously removed (can be added back).
+                        elif result['existsCount'] > 0 and result['accountId'] == account_id:
+                            result['inUserList'] = False
+                        # User account added by default.
+                        elif result['accountId'] == account_id:
+                            result['inUserList'] = True
+                        # Another account excluded by default.
+                        else:
+                            result['inUserList'] = False
+                    elif reg_class == model_utils.REG_CLASS_DISCHARGE:
+                        result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
+                    elif reg_class == model_utils.REG_CLASS_RENEWAL:
+                        result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
+                    elif reg_class == model_utils.REG_CLASS_CHANGE:
+                        result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
+                    elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+                        result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
-        results = db.session.execute(model_utils.QUERY_ACCOUNT_ADD_REGISTRATION,
-                                     {'query_account': account_id, 'query_reg_num': registration_num})
-        rows = results.fetchall()
-        if rows is not None:
-            for row in rows:
-                mapping = row._mapping  # pylint: disable=protected-access; follows documentation
-                reg_num = str(mapping['registration_number'])
-                base_reg_num = str(mapping['base_reg_number'])
-                reg_class = str(mapping['registration_type_cl'])
-                result = {
-                    'registrationNumber': reg_num,
-                    'baseRegistrationNumber': base_reg_num,
-                    'createDateTime': model_utils.format_ts(mapping['registration_ts']),
-                    'registrationType': str(mapping['registration_type']),
-                    'registrationDescription': str(mapping['registration_desc']),
-                    'registrationClass': reg_class,
-                    'registeringParty': str(mapping['registering_party']),
-                    'securedParties': str(mapping['secured_party']),
-                    'clientReferenceId': str(mapping['client_reference_id']),
-                    'registeringName': str(mapping['registering_name'])
-                }
-                if model_utils.is_financing(reg_class):
-                    result['baseRegistrationNumber'] = reg_num
-                    result['path'] = FINANCING_PATH + reg_num
-                    result['statusType'] = str(mapping['state'])
-                    result['expireDays'] = int(mapping['expire_days'])
-                    result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
-                    result['existsCount'] = int(mapping['exists_count'])
-                    result['accountId'] = str(mapping['account_id'])
-                    # Another account already added.
-                    if result['existsCount'] > 0 and result['accountId'] != account_id:
-                        result['inUserList'] = True
-                    # User account previously removed (can be added back).
-                    elif result['existsCount'] > 0 and result['accountId'] == account_id:
-                        result['inUserList'] = False
-                    # User account added by default.
-                    elif result['accountId'] == account_id:
-                        result['inUserList'] = True
-                    # Another account excluded by default.
-                    else:
-                        result['inUserList'] = False
-                elif reg_class == model_utils.REG_CLASS_DISCHARGE:
-                    result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
-                elif reg_class == model_utils.REG_CLASS_RENEWAL:
-                    result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
-                elif reg_class == model_utils.REG_CLASS_CHANGE:
-                    result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
-                elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
-                    result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
+                    result = Registration.__update_summary_optional(result, account_id)
+                    if not model_utils.is_financing(reg_class):
+                        changes.append(result)
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_summary_by_reg_num exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
 
-                result = Registration.__update_summary_optional(result, account_id)
-                if not model_utils.is_financing(reg_class):
-                    changes.append(result)
         if not result:
             return None
         if result and changes:
