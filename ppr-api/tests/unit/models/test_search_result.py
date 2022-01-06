@@ -152,8 +152,11 @@ def test_search_invalid(session, desc, json_data, search_id, has_history, statem
 
     # check
     assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    print(bad_request_err.value.error)
+    if desc == 'Invalid search id':
+        assert bad_request_err.value.status_code == HTTPStatus.NOT_FOUND
+    else:
+        assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
+    # print(bad_request_err.value.error)
 
 
 def test_search_id_date_valid(session, client, jwt):

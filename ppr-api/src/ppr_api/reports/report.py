@@ -20,6 +20,7 @@ import pycountry
 import requests
 from flask import current_app, jsonify
 
+from ppr_api.exceptions import ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 from ppr_api.utils.auth import jwt
 
@@ -101,9 +102,9 @@ class Report:  # pylint: disable=too-few-public-methods
             headers['Authorization'] = 'Bearer {}'.format(token)
         else:
             headers['Authorization'] = 'Bearer {}'.format(jwt.get_token_auth_header())
-        data = self._setup_report_data()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
+        data = self._setup_report_data()
         url = current_app.config.get('REPORT_SVC_URL')
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))
@@ -112,7 +113,7 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, response.status_code))
 
         if response.status_code != HTTPStatus.OK:
-            content = response.content.decode('ascii')
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
                                      .format(self._account_id, response.status_code, content))
             return jsonify(message=content), response.status_code, None

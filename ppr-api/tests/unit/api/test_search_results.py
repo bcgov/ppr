@@ -133,7 +133,7 @@ def test_search_detail_nonstaff_missing_account_400(session, client, jwt):
     # test
     rv = client.post('/api/v1/search-results/123456',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE]),
+                     headers=create_header(jwt, [PPR_ROLE]),
                      content_type='application/json')
 
     # check

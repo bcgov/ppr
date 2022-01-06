@@ -446,13 +446,18 @@ FETCH FIRST :max_results_size ROWS ONLY
 """
 
 # Error messages
-ERR_FINANCING_NOT_FOUND = 'No Financing Statement found for registration number {registration_num}.'
-ERR_REGISTRATION_NOT_FOUND = 'No registration found for registration number {registration_num}.'
+ERR_FINANCING_NOT_FOUND = '{code}: no Financing Statement found for registration number {registration_num}.'
+ERR_REGISTRATION_NOT_FOUND = '{code}: no registration found for registration number {registration_num}.'
 ERR_FINANCING_HISTORICAL = \
-    'The Financing Statement for registration number {registration_num} has expired or been discharged.'
-ERR_REGISTRATION_ACCOUNT = 'The account ID {account_id} does not match registration number {registration_num}.'
+    '{code}: the Financing Statement for registration number {registration_num} has expired or been discharged.'
+ERR_REGISTRATION_ACCOUNT = '{code}: the account ID {account_id} does not match registration number {registration_num}.'
 ERR_REGISTRATION_MISMATCH = \
-    'The registration {registration_num} does not match the Financing Statement registration {base_reg_num}.'
+    '{code}: the registration {registration_num} does not match the Financing Statement registration {base_reg_num}.'
+ERR_DRAFT_NOT_FOUND = '{code}: no Draft Statement found for Document ID {document_number}.'
+ERR_DRAFT_USED = '{code}: Draft Statement for Document ID {document_number} has been used.'
+ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
+ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
+ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
 
 
 def get_max_registrations_size():

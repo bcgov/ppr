@@ -17,21 +17,35 @@ from http import HTTPStatus
 
 from flask import jsonify, current_app, request
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, ResourceErrorCodes
 from ppr_api.models import EventTracking, Party, Registration, utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs
 from ppr_api.services.payment import TransactionTypes
+from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
 
 
-ACCOUNT_REQUIRED = 'Account-Id header required.'
-STAFF_SEARCH_BCOL_FAS = 'Provide either a BCOL Account Number or a Routing Slip Number but not both.'
-SBC_SEARCH_NO_PAYMENT = 'Provide either a BCOL Account Number or a Routing Slip Number.'
-CROWN_CHARGE_FORBIDDEN = 'The account ID {account_id} is not authorized to access a Crown Charge registration.'
-ACCOUNT_ACCESS = 'The account ID {account_id} cannot access statement information for ' + \
+# Resource error messages
+# Model business error messages in models.utils.py
+ACCOUNT_REQUIRED = '{code}: Account-Id header required.'
+UNAUTHORIZED = '{code}: authorization failure submitting a request for {account_id}.'
+CROWN_CHARGE_FORBIDDEN = '{code}: the account ID {account_id} is not authorized to access a Crown Charge registration.'
+ACCOUNT_ACCESS = '{code}: the account ID {account_id} cannot access statement information for ' + \
                  'registration number {registration_num}.'
+STAFF_SEARCH_BCOL_FAS = '{code}: provide either a BCOL Account Number or a Routing Slip Number but not both.'
+SBC_SEARCH_NO_PAYMENT = '{code}: provide either a BCOL Account Number or a Routing Slip Number.'
+DATABASE = '{code}: {context} database error for {account_id}.'
+NOT_FOUND = '{code}: no {item} found for {key}.'
+PATH_PARAM = '{code}: a {param_name} path parameter is required.'
+PATH_MISMATCH = '{code}: the path value ({path_value}) does not match the data {description} value ({data_value}).'
+HISTORICAL = '{code}: the Financing Statement for registration number {reg_num} has been discharged.'
+DEBTOR_NAME = '{code}: No match found for the provided debtor name and registration.'
+REPORT = '{code}: error generating report. Detail: {detail}'
+DEFAULT = '{code}: error processing request.'
+PAYMENT = '{code}:{status} payment error for account {account_id}.'
+
 PARTY_REGISTERING = 'RG'
 PARTY_SECURED = 'SP'
 
@@ -83,7 +97,8 @@ def get_apikey(req):
 
 def account_required_response():
     """Build account required error response."""
-    return jsonify({'message': ACCOUNT_REQUIRED}), HTTPStatus.BAD_REQUEST
+    message = ACCOUNT_REQUIRED.format(code=ResourceErrorCodes.ACCOUNT_REQUIRED_ERR)
+    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def error_response(status_code, message):
@@ -98,20 +113,30 @@ def bad_request_response(message):
 
 def staff_payment_bcol_fas():
     """Build staff payment info error response."""
-    return jsonify({'message': STAFF_SEARCH_BCOL_FAS}), HTTPStatus.BAD_REQUEST
+    message = STAFF_SEARCH_BCOL_FAS.format(code=ResourceErrorCodes.VALIDATION_ERR)
+    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def sbc_payment_invalid():
     """Build sbc payment info error response."""
-    return jsonify({'message': SBC_SEARCH_NO_PAYMENT}), HTTPStatus.BAD_REQUEST
+    message = SBC_SEARCH_NO_PAYMENT.format(code=ResourceErrorCodes.VALIDATION_ERR)
+    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def validation_error_response(errors, cause, additional_msg: str = None):
     """Build a schema validation error response."""
+    message = ResourceErrorCodes.VALIDATION_ERR + ': ' + cause
     details = serialize(errors)
     if additional_msg:
         details.append('Additional validation: ' + additional_msg)
-    return jsonify({'message': cause, 'detail': details}), HTTPStatus.BAD_REQUEST
+    return jsonify({'message': message, 'detail': details}), HTTPStatus.BAD_REQUEST
+
+
+def db_exception_response(exception, account_id: str, context: str):
+    """Build a database error response."""
+    message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR, context=context, account_id=account_id)
+    current_app.logger.error(message)
+    return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def business_exception_response(exception):
@@ -120,16 +145,25 @@ def business_exception_response(exception):
     return jsonify({'message': exception.error}), exception.status_code
 
 
-def pay_exception_response(exception):
+def pay_exception_response(exception: SBCPaymentException, account_id: str = None):
     """Build pay 402 exception error response."""
+    status = exception.status_code
+    message = PAYMENT.format(code=ResourceErrorCodes.PAY_ERR, status=status, account_id=account_id)
+    if exception.json_data:
+        detail = exception.json_data.get('detail', '')
+        err_type = exception.json_data.get('type', '')
+        return jsonify({'message': message, 'status_code': status, 'type': err_type, 'detail': detail}),\
+            HTTPStatus.PAYMENT_REQUIRED
+
     current_app.logger.error(repr(exception))
-    return jsonify({'message': repr(exception)}), HTTPStatus.PAYMENT_REQUIRED
+    return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.PAYMENT_REQUIRED
 
 
 def default_exception_response(exception):
     """Build default 500 exception error response."""
     current_app.logger.error(repr(exception))
-    return jsonify({'message': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR)
+    return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def service_exception_response(message):
@@ -139,34 +173,35 @@ def service_exception_response(message):
 
 def not_found_error_response(item, key):
     """Build a not found error response."""
-    message = f'No {item} found for {key}.'
+    message = NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR, item=item, key=key)
     current_app.logger.info(str(HTTPStatus.NOT_FOUND.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.NOT_FOUND
 
 
 def duplicate_error_response(message):
     """Build a duplicate request error response."""
+    err_msg = ResourceErrorCodes.DUPLICATE_ERR + ': ' + message
     current_app.logger.info(str(HTTPStatus.CONFLICT.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.CONFLICT
+    return jsonify({'message': err_msg}), HTTPStatus.CONFLICT
 
 
 def unauthorized_error_response(account_id):
     """Build an unauthorized error response."""
-    message = f'Authorization failure submitting a request for {account_id}.'
+    message = UNAUTHORIZED.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR, account_id=account_id)
     current_app.logger.info(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
 
 
 def cc_forbidden_error_response(account_id):
     """Build a crown charge registration class access forbidden error response."""
-    message = CROWN_CHARGE_FORBIDDEN.format(account_id=account_id)
+    message = CROWN_CHARGE_FORBIDDEN.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR, account_id=account_id)
     current_app.logger.info(str(HTTPStatus.FORBIDDEN.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.FORBIDDEN
 
 
 def path_param_error_response(param_name):
     """Build a bad request param missing error response."""
-    message = f'A {param_name} path parameter is required.'
+    message = PATH_PARAM.format(code=ResourceErrorCodes.PATH_PARAM_ERR, param_name=param_name)
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
@@ -180,22 +215,22 @@ def unprocessable_error_response(description):
 
 def path_data_mismatch_error_response(path_value, description, data_value):
     """Build a bad request path param - payload data mismatch error."""
-    message = f'The path value ({path_value}) does not match the data ' + \
-              f'{description} value ({data_value}).'
+    message = PATH_MISMATCH.format(code=ResourceErrorCodes.DATA_MISMATCH_ERR, path_value=path_value,
+                                   description=description, data_value=data_value)
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def historical_error_response(reg_num):
     """Build a bad request financing statement discharged (non-staff) error response."""
-    message = f'The Financing Statement for registration number {reg_num} has been discharged.'
+    message = HISTORICAL.format(code=ResourceErrorCodes.HISTORICAL_ERR, reg_num=reg_num)
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
 
 def base_debtor_invalid_response():
     """Build an error response for no match on base debtor name."""
-    message = 'No exact match found for provided base debtor name.'
+    message = DEBTOR_NAME.format(code=ResourceErrorCodes.DEBTOR_NAME_ERR)
     current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
     return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
 
@@ -266,7 +301,8 @@ def check_access_financing(token: str, staff: bool, account_id: str, statement):
         reg_num = statement.registration[0].registration_num
         current_app.logger.error('Account name ' + account_name + ' cannot access registration ' + reg_num)
         raise BusinessException(
-            error=ACCOUNT_ACCESS.format(account_id=account_id, registration_num=reg_num),
+            error=ACCOUNT_ACCESS.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                        account_id=account_id, registration_num=reg_num),
             status_code=HTTPStatus.UNAUTHORIZED
         )
 
@@ -289,7 +325,8 @@ def check_access_registration(token: str, staff: bool, account_id: str, statemen
         reg_num = statement.registration_num
         current_app.logger.error('Account name ' + account_name + ' cannot access registration ' + reg_num)
         raise BusinessException(
-            error=ACCOUNT_ACCESS.format(account_id=account_id, registration_num=reg_num),
+            error=ACCOUNT_ACCESS.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                        account_id=account_id, registration_num=reg_num),
             status_code=HTTPStatus.UNAUTHORIZED
         )
 

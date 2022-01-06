@@ -22,7 +22,7 @@ from http import HTTPStatus
 
 from flask import current_app
 
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 
 from .db import db
@@ -395,15 +395,20 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Return a financing statement by registration number."""
         statement = None
         if registration_num:
-            statement = db.session.query(FinancingStatement).\
-                        filter(FinancingStatement.id == Registration.financing_id,
-                               Registration.registration_num == registration_num,
-                               Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
-                               one_or_none()
+            try:
+                statement = db.session.query(FinancingStatement).\
+                            filter(FinancingStatement.id == Registration.financing_id,
+                                   Registration.registration_num == registration_num,
+                                   Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
+                                   one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_registration_number exception: ' + repr(db_exception))
+                raise DatabaseException(db_exception)
 
         if not statement:
             raise BusinessException(
-                error=model_utils.ERR_FINANCING_NOT_FOUND.format(registration_num=registration_num),
+                error=model_utils.ERR_FINANCING_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                 registration_num=registration_num),
                 status_code=HTTPStatus.NOT_FOUND
             )
 
@@ -413,7 +418,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                                                           account_id)
             if not extra_reg:
                 raise BusinessException(
-                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(account_id=account_id,
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                                                      account_id=account_id,
                                                                       registration_num=registration_num),
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
@@ -422,7 +428,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             return statement
         if model_utils.is_historical(statement, create):  # and (not staff or create):
             raise BusinessException(
-                error=model_utils.ERR_FINANCING_HISTORICAL.format(registration_num=registration_num),
+                error=model_utils.ERR_FINANCING_HISTORICAL.format(code=ResourceErrorCodes.HISTORICAL_ERR,
+                                                                  registration_num=registration_num),
                 status_code=HTTPStatus.BAD_REQUEST
             )
         return statement
@@ -444,12 +451,17 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         names_json = []
         if not registration_num:
             return names_json
+        statement = None
+        try:
+            statement = db.session.query(FinancingStatement).\
+                        filter(FinancingStatement.id == Registration.financing_id,
+                               Registration.registration_num == registration_num,
+                               Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
+                               one_or_none()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_debtor_names_by_registration_number exception: ' + repr(db_exception))
+            raise DatabaseException(db_exception)
 
-        statement = db.session.query(FinancingStatement).\
-                    filter(FinancingStatement.id == Registration.financing_id,
-                           Registration.registration_num == registration_num,
-                           Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
-                           one_or_none()
         if statement and statement.parties:
             for party in statement.parties:
                 if party.party_type == model_utils.PARTY_DEBTOR_BUS:

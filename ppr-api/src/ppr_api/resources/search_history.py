@@ -22,7 +22,7 @@ from flask_restx import Namespace, Resource, cors
 
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.exceptions import BusinessException
+from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.services.authz import authorized
 from ppr_api.models import SearchRequest
 from ppr_api.resources import utils as resource_utils
@@ -58,6 +58,8 @@ class SearchHistoryResource(Resource):
             history = SearchRequest.find_all_by_account_id(account_id)
             return jsonify(history), HTTPStatus.OK
 
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, account_id, 'GET search history')
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
