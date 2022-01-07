@@ -167,8 +167,10 @@ export default class ReviewConfirm extends Vue {
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
+
   @Prop({ default: false })
   private isJestRunning: boolean
+
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
   private showStepErrors: boolean = false
@@ -180,27 +182,32 @@ export default class ReviewConfirm extends Vue {
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
+
   private get registrationLength (): RegistrationLengthI {
     return {
       lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
       lifeYears: this.getLengthTrust?.lifeYears || 0
     }
   }
+
   private get registrationTypeUI (): string {
     if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
       return this.getRegistrationOther || ''
     }
     return this.getRegistrationType?.registrationTypeUI || ''
   }
+
   private get registrationType (): string {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
+
   private handleError (stay: boolean): void {
     this.errorDialog = false
     if (!stay) {
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
+
   private handleSubmitError (error: ErrorIF): void {
     if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
       this.emitError(error)
@@ -209,16 +216,20 @@ export default class ReviewConfirm extends Vue {
       this.errorDialog = true
     }
   }
+
   mounted () {
     this.onAppReady(this.appReady)
   }
+
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
   }
+
   /** Emits Have Data event. */
   @Emit('haveData')
   private emitHaveData (haveData: Boolean = true): void { }
+
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
   private async onAppReady (val: boolean): Promise<void> {
@@ -257,11 +268,13 @@ export default class ReviewConfirm extends Vue {
     this.emitHaveData(true)
     this.dataLoaded = true
   }
+
   @Watch('saveDraftError')
   private saveDraftError (val: ErrorIF): void {
     this.errorOptions = { ...registrationSaveDraftErrorDialog }
     this.errorDialog = true
   }
+
   @Watch('registrationIncomplete')
   private registrationIncomplete (): void {
     this.showStepErrors = true
