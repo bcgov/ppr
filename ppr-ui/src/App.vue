@@ -7,6 +7,12 @@
       :options="dialogOptions"
       @proceed="proceedAfterError"
     />
+    <base-dialog
+      id="payErrorDialogApp"
+      :setDisplay="payErrorDisplay"
+      :setOptions="payErrorOptions"
+      @proceed="payErrorDialogHandler()"
+    />
 
     <!-- Initial Page Load Transition -->
     <transition name="fade">
@@ -43,11 +49,12 @@
           <v-row no-gutters>
             <v-col cols="12">
               <router-view
-                :appReady=appReady
-                :isJestRunning=isJestRunning
-                :registryUrl=registryUrl
+                :appReady="appReady"
+                :isJestRunning="isJestRunning"
+                :saveDraftExit="saveDraftExitToggle"
+                :registryUrl="registryUrl"
                 @profileReady="profileReady = true"
-                @error="handleError"
+                @error="handleError($event)"
                 @haveData="haveData = $event"
               />
             </v-col>
@@ -81,13 +88,16 @@ import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { fetchError, loginError, paymentError, saveSearchError } from '@/resources/dialogOptions'
+import { fetchError, loginError, paymentErrorReg, saveSearchError } from '@/resources/dialogOptions'
 import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser, getSbcFromAuth } from '@/utils'
 // local Enums, Constants, Interfaces
-import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, RouteNames } from '@/enums'
+import {
+  AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
+  ErrorCodes, RegistrationFlowType, RouteNames
+} from '@/enums'
 import {
   AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
-  ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
 
 @Component({
@@ -103,6 +113,9 @@ import {
 })
 export default class App extends Mixins(AuthMixin) {
   // Global getters
+  @Getter getRegistrationFlowType: RegistrationFlowType
+  @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getRegistrationOther: string
   @Getter getUserEmail!: string
   @Getter getUserFirstName!: string
   @Getter getUserLastName!: string
@@ -118,6 +131,7 @@ export default class App extends Mixins(AuthMixin) {
   @Action setAccountProductSubscribtion!: ActionBindingIF
   @Action setAccountInformation!: ActionBindingIF
   @Action setKeycloakRoles!: ActionBindingIF
+  @Action setRegistrationNumber!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
 
@@ -126,6 +140,9 @@ export default class App extends Mixins(AuthMixin) {
   private currentPathName: RouteNames = null
   private errorDialog = false
   private dialogOptions: DialogOptionsIF = loginError
+  private saveDraftExitToggle = false
+  private payErrorDisplay = false
+  private payErrorOptions: DialogOptionsIF = null
 
   // FUTURE: change profileReady/appReady/haveData to a state machine?
 
@@ -180,6 +197,13 @@ export default class App extends Mixins(AuthMixin) {
     return Boolean(false)
   }
 
+  private get registrationTypeUI (): string {
+    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+      return this.getRegistrationOther || ''
+    }
+    return this.getRegistrationType?.registrationTypeUI || ''
+  }
+
   /**
    * Called when component is created.
    * NB: User may not be authed yet.
@@ -206,6 +230,16 @@ export default class App extends Mixins(AuthMixin) {
       // if we are already authenticated then go right to init
       // (since we won't get the event from Signin component)
       if (this.isAuthenticated) this.onProfileReady(true)
+    }
+  }
+
+  private payErrorDialogHandler () {
+    this.payErrorDisplay = false
+    if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
+      this.saveDraftExitToggle = !this.saveDraftExitToggle
+    } else {
+      this.setRegistrationNumber(null)
+      this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
 
@@ -313,6 +347,7 @@ export default class App extends Mixins(AuthMixin) {
     this.appReady = false
     this.haveData = false
     this.errorDialog = false
+    this.payErrorDisplay = false
   }
 
   /** Fetches authorizations and verifies and stores roles. */
@@ -391,23 +426,78 @@ export default class App extends Mixins(AuthMixin) {
 
   private handleError (error: ErrorIF): void {
     if (!this.loggedOut && this.$route?.path !== `/${RouteNames.SIGN_OUT}`) {
-      const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
-      if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-        this.dialogOptions = paymentError
-        this.errorDialog = true
-      } else if (saveErrorCodes.includes(error.statusCode)) {
-        this.dialogOptions = saveSearchError
-        this.errorDialog = true
-      } else if (error.statusCode === StatusCodes.NOT_FOUND) {
-        this.dialogOptions = fetchError
-        this.errorDialog = true
-      } else if (error.statusCode === StatusCodes.UNAUTHORIZED) {
-        this.dialogOptions = loginError
-        this.errorDialog = true
-      } else {
-        // temporary catch all (should be a more generic dialogue)
-        this.dialogOptions = saveSearchError
-        this.errorDialog = true
+      // cases are for different payment errors, other errors caught at bottom
+      let filing = this.registrationTypeUI
+      if (this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
+        filing = this.getRegistrationFlowType?.toLowerCase() || 'registration'
+      }
+      this.payErrorOptions = { ...paymentErrorReg }
+      if (this.registrationTypeUI) {
+        this.payErrorOptions.text = this.payErrorOptions.text.replace('filing_type', filing)
+      }
+      switch (error.type) {
+        case (
+          ErrorCodes.BCOL_ACCOUNT_CLOSED ||
+          ErrorCodes.BCOL_USER_REVOKED ||
+          ErrorCodes.BCOL_ACCOUNT_REVOKED ||
+          ErrorCodes.BCOL_UNAVAILABLE
+        ):
+          // bcol expected errors
+          if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
+            this.payErrorOptions.text += '<br/><br/>' + error.detail +
+              `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
+              'once the issue has been resolved.'
+          } else {
+            this.payErrorOptions.acceptText = 'Return to Dashboard'
+            this.payErrorOptions.text += '<br/><br/>' + error.detail +
+              'You can retry your payment once the issue has been resolved.'
+          }
+          this.payErrorDisplay = true
+          break
+        case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
+          // pad expected errors
+          this.payErrorOptions.text += '<br/><br/>' + error.detail +
+            '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+          this.payErrorOptions.hasContactInfo = true
+          this.payErrorDisplay = true
+          break
+        default:
+          if (error.type && error.type?.includes('BCOL') && error.detail) {
+            // generic catch all bcol
+            if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
+              this.payErrorOptions.text += '<br/><br/>' + error.detail +
+                `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
+                'once the issue has been resolved.'
+            } else {
+              this.payErrorOptions.acceptText = 'Return to Dashboard'
+              this.payErrorOptions.text += '<br/><br/>' + error.detail +
+                'You can retry your payment once the issue has been resolved.'
+            }
+            this.payErrorDisplay = true
+          } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+            // generic cath all pay error
+            this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
+              '<br/><br/>If this issue persists, please contact us.'
+            this.payErrorOptions.hasContactInfo = true
+            this.payErrorDisplay = true
+          } else {
+            // for other errors:
+            const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
+            if (saveErrorCodes.includes(error.statusCode)) {
+              this.dialogOptions = saveSearchError
+              this.errorDialog = true
+            } else if (error.statusCode === StatusCodes.NOT_FOUND) {
+              this.dialogOptions = fetchError
+              this.errorDialog = true
+            } else if (error.statusCode === StatusCodes.UNAUTHORIZED) {
+              this.dialogOptions = loginError
+              this.errorDialog = true
+            } else {
+              // temporary catch all (should be a more generic dialogue)
+              this.dialogOptions = saveSearchError
+              this.errorDialog = true
+            }
+          }
       }
     }
   }

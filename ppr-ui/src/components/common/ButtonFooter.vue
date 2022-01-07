@@ -76,7 +76,8 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs
+  toRefs,
+  watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
@@ -109,6 +110,10 @@ export default defineComponent({
       default: 'length-trust'
     },
     certifyValid: {
+      type: Boolean,
+      default: false
+    },
+    forceSave: {
       type: Boolean,
       default: false
     }
@@ -285,6 +290,11 @@ export default defineComponent({
         emit('registration-incomplete', error)
       }
     }
+
+    watch(() => props.forceSave, (val: boolean) => {
+      // on change (T/F doesn't matter), save and go back to dash
+      submitSaveResume()
+    })
 
     return {
       ...toRefs(localState),

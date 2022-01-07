@@ -97,12 +97,16 @@
     </div>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                       :router="this.$router"
-                       :certifyValid="validCertify"
-                       @draft-save-error="saveDraftError"
-                       @registration-incomplete="registrationIncomplete"
-                       @error="emitError" />
+        <button-footer
+          :currentStatementType="statementType"
+          :currentStepName="stepName"
+          :router="this.$router"
+          :certifyValid="validCertify"
+          :forceSave="saveDraftExit"
+          @draft-save-error="saveDraftError"
+          @registration-incomplete="registrationIncomplete"
+          @error="handleSubmitError($event)"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -135,7 +139,7 @@ import {
   registrationSaveDraftErrorDialog,
   registrationCompleteErrorDialog
 } from '@/resources/dialogOptions'
-
+import { StatusCodes } from 'http-status-codes'
 @Component({
   components: {
     ButtonFooter,
@@ -156,18 +160,19 @@ export default class ReviewConfirm extends Vue {
   @Getter getRegistrationFlowType: RegistrationFlowType
   @Getter getRegistrationOther: string
   @Getter getRegistrationType: RegistrationTypeIF
-
   @Action setAddCollateral: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setShowStepErrors: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
 
   @Prop({ default: false })
   private isJestRunning: boolean
+
+  @Prop({ default: false })
+  private saveDraftExit: boolean
 
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
@@ -177,7 +182,6 @@ export default class ReviewConfirm extends Vue {
   private validCertify = false
   private errorDialog = false
   private errorOptions = registrationSaveDraftErrorDialog
-
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
@@ -207,6 +211,15 @@ export default class ReviewConfirm extends Vue {
     }
   }
 
+  private handleSubmitError (error: ErrorIF): void {
+    if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+      this.emitError(error)
+    } else {
+      this.errorOptions = { ...registrationCompleteErrorDialog }
+      this.errorDialog = true
+    }
+  }
+
   mounted () {
     this.onAppReady(this.appReady)
   }
@@ -214,8 +227,6 @@ export default class ReviewConfirm extends Vue {
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    this.errorOptions = { ...registrationCompleteErrorDialog }
-    this.errorDialog = true
   }
 
   /** Emits Have Data event. */
@@ -234,7 +245,6 @@ export default class ReviewConfirm extends Vue {
       })
       return
     }
-
     // redirect if store doesn't contain all needed data (happens on page reload, etc.)
     if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
       this.$router.push({
@@ -242,7 +252,6 @@ export default class ReviewConfirm extends Vue {
       })
       return
     }
-
     const collateral = this.getAddCollateral
     if (!collateral.valid) {
       collateral.showInvalid = true
@@ -258,7 +267,6 @@ export default class ReviewConfirm extends Vue {
       parties.showInvalid = true
       this.setAddSecuredPartiesAndDebtors(parties)
     }
-
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
@@ -288,7 +296,6 @@ export default class ReviewConfirm extends Vue {
   display: flex;
   flex-flow: column nowrap;
   position: relative;
-
   > label:first-child {
     font-weight: 700;
   }
@@ -303,17 +310,14 @@ export default class ReviewConfirm extends Vue {
     }
   }
 }
-
 .review-header {
   color: $gray9;
   font-size: 1.5rem;
   font-weight: bold;
 }
-
 .reg-default-btn {
   background-color: $gray3 !important;
 }
-
 .reg-default-btn::before {
   background-color: transparent !important;
 }

@@ -22,6 +22,21 @@ export const paymentError: DialogOptionsIF = {
   text: 'We are unable to process your payment at this time. Please try again later.'
 }
 
+export const paymentErrorReg: DialogOptionsIF = {
+  acceptText: 'Save Draft and Return to Dashboard',
+  cancelText: '',
+  title: 'Payment Incomplete',
+  // filing_type is replaced by the filing type at the time of error
+  text: 'The filing_type could not be completed for the following reason:'
+}
+
+export const paymentErrorSearch: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  title: 'Payment Incomplete',
+  text: 'The search could not be completed for the following reason:'
+}
+
 export const saveSearchError: DialogOptionsIF = {
   acceptText: '',
   cancelText: 'Okay',

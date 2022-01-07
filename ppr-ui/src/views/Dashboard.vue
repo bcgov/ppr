@@ -5,24 +5,27 @@
     </v-overlay>
     <base-dialog
       id="myRegAddDialog"
-      setAttach=""
       :setDisplay="myRegAddDialogDisplay"
       :setOptions="myRegAddDialog"
       @proceed="myRegAddDialogProceed($event)"
     />
     <base-dialog
       id="myRegErrDialog"
-      setAttach=""
       :setDisplay="myRegErrDialogDisplay"
       :setOptions="myRegErrDialog"
       @proceed="myRegErrDialogProceed($event)"
     />
     <base-dialog
       id="myRegDeleteDialog"
-      setAttach=""
       :setDisplay="myRegDeleteDialogDisplay"
       :setOptions="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
+    />
+    <base-dialog
+      id="payErrorDialogDash"
+      :setDisplay="payErrorDisplay"
+      :setOptions="payErrorOptions"
+      @proceed="payErrorDisplay=false"
     />
     <registration-confirmation
       attach=""
@@ -49,7 +52,7 @@
                         @searched-value="setSearchedValue"
                         @search-data="setSearchResults"
                         @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
-                        @search-error="searchError"/>
+                        @search-error="searchError($event)"/>
           </v-row>
         </v-col>
       </v-row>
@@ -217,7 +220,7 @@ import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { RouteNames, SettingOptions, TableActions } from '@/enums' // eslint-disable-line no-unused-vars
+import { ErrorCodes, RouteNames, SettingOptions, TableActions } from '@/enums' // eslint-disable-line no-unused-vars
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   BaseHeaderIF, // eslint-disable-line no-unused-vars
@@ -239,6 +242,7 @@ import {
 import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,
+  paymentErrorSearch,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
@@ -338,6 +342,10 @@ export default class Dashboard extends Vue {
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
   private myRegHeadersSelected = [...registrationTableHeaders]
+
+  private payErrorDisplay = false
+  private payErrorOptions: DialogOptionsIF = null
+
   private snackbarMsg = ''
   private toggleSnackbar = false
   private tooltipTxtRegSrch = 'Retrieve existing registrations you would like to ' +
@@ -513,8 +521,43 @@ export default class Dashboard extends Vue {
 
   private searchError (error: ErrorIF): void {
     console.error(error)
-    this.myRegAddDialog = { ...searchResultsError }
-    this.myRegAddDialogDisplay = true
+    switch (error.type) {
+      case (
+        ErrorCodes.BCOL_ACCOUNT_CLOSED ||
+        ErrorCodes.BCOL_USER_REVOKED ||
+        ErrorCodes.BCOL_ACCOUNT_REVOKED ||
+        ErrorCodes.BCOL_UNAVAILABLE
+      ):
+        this.payErrorOptions = { ...paymentErrorSearch }
+        this.payErrorOptions.text += '<br/><br/>' + error.detail
+        this.payErrorDisplay = true
+        break
+      case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
+        this.payErrorOptions = { ...paymentErrorSearch }
+        this.payErrorOptions.text += '<br/><br/>' + error.detail +
+          '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+        this.payErrorOptions.hasContactInfo = true
+        this.payErrorDisplay = true
+        break
+      default:
+        if (error.type && error.type?.includes('BCOL') && error.detail) {
+          // bcol generic
+          this.payErrorOptions = { ...paymentErrorSearch }
+          this.payErrorOptions.text += '<br/><br/>' + error.detail
+          this.payErrorDisplay = true
+        } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+          // generic pay error
+          this.payErrorOptions = { ...paymentErrorSearch }
+          this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
+            '<br/><br/>If this issue persists, please contact us.'
+          this.payErrorOptions.hasContactInfo = true
+          this.payErrorDisplay = true
+        } else {
+          // generic search error
+          this.myRegAddDialog = { ...searchResultsError }
+          this.myRegAddDialogDisplay = true
+        }
+    }
   }
 
   private historyError (error: ErrorIF): void {
