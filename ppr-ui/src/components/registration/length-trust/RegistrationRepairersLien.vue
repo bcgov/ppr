@@ -111,51 +111,45 @@
           >
         </v-col>
         <v-col>
-          <v-dialog
-            ref="dialog"
-            v-model="modal"
-            :return-value.sync="surrenderDate"
-            persistent
+          <date-picker
+            ref="datePickerRef"
+            title="Date"
+            nudge-right="40"
+            :minDate="dateToYyyyMmDd(minSurrenderDate)"
+            @emitDate="surrenderDate = $event"
+            @emitCancel="surrenderDate = ''"
+          />
+          <!-- <v-text-field
+            id="date-text-field"
+            :value="computedDateFormatted"
+            :error-messages="surrenderDateMessage || ''"
+            filled
+            hint="Must not be more than 21 days in the past"
+            persistent-hint
+            label="Date"
+            append-icon="mdi-calendar"
+            readonly
+          />
+          <v-date-picker
+            id="date-picker-calendar"
+            v-model="surrenderDate"
+            elevation="15"
+            :min="minSurrenderDate"
+            scrollable
             width="450px"
           >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                id="date-text-field"
-                :value="computedDateFormatted"
-                :error-messages="surrenderDateMessage || ''"
-                filled
-                hint="Must not be more than 21 days in the past"
-                persistent-hint
-                label="Date"
-                append-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-                v-on:click:append="on.click"
-              >
-              </v-text-field>
-            </template>
-            <v-date-picker
-              id="date-picker-calendar"
-              v-model="surrenderDate"
-              elevation="15"
-              :min="minSurrenderDate"
-              scrollable
-              width="450px"
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              color="primary"
+              @click="$refs.dialog.save(surrenderDate)"
             >
-              <v-spacer></v-spacer>
-              <v-btn
-                text
-                color="primary"
-                @click="$refs.dialog.save(surrenderDate)"
-              >
-                <strong>OK</strong>
-              </v-btn>
-              <v-btn text color="primary" @click="modal = false">
-                Cancel
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
+              <strong>OK</strong>
+            </v-btn>
+            <v-btn text color="primary" @click="modal = false">
+              Cancel
+            </v-btn>
+          </v-date-picker> -->
         </v-col>
       </v-row>
     </div>
@@ -173,13 +167,17 @@ import {
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-
+// bcregistry
+import { DatePicker } from '@bcrs-shared-components/date-picker'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
+  components: {
+    DatePicker
+  },
   props: {
     isRenewal: {
       type: Boolean,
@@ -236,11 +234,11 @@ export default defineComponent({
         }
         return 'Registration'
       }),
-      minSurrenderDate: computed((): string => {
+      minSurrenderDate: computed((): Date => {
         var dateOffset = 24 * 60 * 60 * 1000 * 21 // 21 days in milliseconds
         var minDate = new Date()
         minDate.setTime(minDate.getTime() - dateOffset)
-        return minDate.toISOString()
+        return minDate
       }),
       computedDateFormatted: computed((): string => {
         return getLengthTrust.value.surrenderDate !== ''
@@ -293,6 +291,17 @@ export default defineComponent({
         return getLengthTrust.value.surrenderDate
       })
     })
+
+    const dateToYyyyMmDd = (date: Date): string => {
+      const dateStr = date.toLocaleDateString('en-CA', {
+        timeZone: 'America/Vancouver',
+        month: 'numeric', // 12
+        day: 'numeric', // 31
+        year: 'numeric' // 2020
+      })
+
+      return dateStr
+    }
 
     const validLienAmount = (val: string): boolean => {
       if (!val || val === '') {
@@ -352,6 +361,7 @@ export default defineComponent({
 
     return {
       APIRegistrationTypes,
+      dateToYyyyMmDd,
       registrationType,
       modal,
       ...toRefs(localState)
