@@ -31,7 +31,7 @@ export const paymentErrorReg: DialogOptionsIF = {
 }
 
 export const paymentErrorSearch: DialogOptionsIF = {
-  acceptText: '',
+  acceptText: 'OK',
   cancelText: '',
   title: 'Payment Incomplete',
   text: 'The search could not be completed for the following reason:'

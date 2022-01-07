@@ -358,7 +358,6 @@ export default class Dashboard extends Vue {
     this.setSearchedValue('')
     this.setSearchResults(null)
     this.onAppReady(this.appReady)
-    console.log('here')
   }
 
   private get breadcrumbs (): Array<BreadcrumbIF> {

@@ -89,6 +89,7 @@ venv.bak/
 .env.local
 .env.*.local
 configuration.json.*
+local/
 
 # Template parameter files
 k8s/*.param

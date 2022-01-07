@@ -171,6 +171,9 @@ export default class ReviewConfirm extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
+  @Prop({ default: false })
+  private saveDraftExit: boolean
+
   private dataLoaded = false
   private feeType = FeeSummaryTypes.NEW
   private showStepErrors: boolean = false
