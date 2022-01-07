@@ -323,6 +323,7 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   vertical-align: top;
   padding-top: 20px !important;
   padding-bottom: 20px !important;
+  word-wrap: break-word;
 }
 
 .registration-table.v-data-table tr.filter-row td {
