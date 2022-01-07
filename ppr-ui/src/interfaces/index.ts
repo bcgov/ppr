@@ -1,6 +1,7 @@
 export * from './account-interfaces'
 export * from './breadcrumb-interface'
 export * from './data-table-interfaces'
+export * from './date-picker-interfaces'
 export * from './dialog-inerfaces'
 export * from './party-interfaces'
 export * from './ppr-api-interfaces'

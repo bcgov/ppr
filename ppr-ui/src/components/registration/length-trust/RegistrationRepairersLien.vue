@@ -115,41 +115,14 @@
             ref="datePickerRef"
             title="Date"
             nudge-right="40"
-            :minDate="dateToYyyyMmDd(minSurrenderDate)"
-            @emitDate="surrenderDate = $event"
-            @emitCancel="surrenderDate = ''"
-          />
-          <!-- <v-text-field
-            id="date-text-field"
-            :value="computedDateFormatted"
-            :error-messages="surrenderDateMessage || ''"
-            filled
             hint="Must not be more than 21 days in the past"
-            persistent-hint
-            label="Date"
-            append-icon="mdi-calendar"
-            readonly
+            :errorMsg="surrenderDateMessage || ''"
+            :minDate="dateToYyyyMmDd(minSurrenderDate)"
+            :persistentHint="true"
+            @emitDate="surrenderDate = $event"
+            @emitCancel="showingDatePicker = false"
+            @click="showingDatePicker = true"
           />
-          <v-date-picker
-            id="date-picker-calendar"
-            v-model="surrenderDate"
-            elevation="15"
-            :min="minSurrenderDate"
-            scrollable
-            width="450px"
-          >
-            <v-spacer></v-spacer>
-            <v-btn
-              text
-              color="primary"
-              @click="$refs.dialog.save(surrenderDate)"
-            >
-              <strong>OK</strong>
-            </v-btn>
-            <v-btn text color="primary" @click="modal = false">
-              Cancel
-            </v-btn>
-          </v-date-picker> -->
         </v-col>
       </v-row>
     </div>
@@ -239,10 +212,6 @@ export default defineComponent({
         var minDate = new Date()
         minDate.setTime(minDate.getTime() - dateOffset)
         return minDate
-      }),
-      computedDateFormatted: computed((): string => {
-        return getLengthTrust.value.surrenderDate !== ''
-          ? convertDate(new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'), false, false) : ''
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
