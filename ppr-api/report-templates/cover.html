@@ -29,7 +29,7 @@
     <div class="separator-strong mb-6"></div>
 
     <div class="container">
-      <div class="section-sub-title ml-6">
+      <div class="section-sub-title ml-2">
         {% if cover.partyType == 'SP' %}
           Secured Party:
         {% else %}
@@ -54,21 +54,22 @@
               </td>
             </tr>
           </table> 
-        </div>
-
-        <div class="section-data mt-32 ml-4">
-          {% if cover.statementType == 'AMENDMENT_STATEMENT' %}
-          This report specifies the details of your current registration and any related Financing Change Statements on our files. 
-          Compare the details on the Verification Statement to the statement submitted for registration and if it is recorded as submitted, 
-          file this Verification Statement with your record of the security agreement as a permanent record of what is recorded with the 
-          Personal Property Registry.
-          {% else %}
-          Review the Discharge Verification Statement carefully to ensure that the discharge was authorized and the correct registrations 
-          have been removed from the system. Refer to Section 35(7) of the Personal Property Security Act in the event of an unauthorized
-          discharge or error, and re-register accordingly.
-          {% endif %}
-        </div>
       </div>
+    </div>
+    <div class="container mt-32 ml-2">
+      <div class="section-data">
+        {% if cover.statementType == 'AMENDMENT_STATEMENT' %}
+        This report specifies the details of your current registration and any related Financing Change Statements on our files. 
+        Compare the details on the Verification Statement to the statement submitted for registration and if it is recorded as submitted, 
+        file this Verification Statement with your record of the security agreement as a permanent record of what is recorded with the 
+        Personal Property Registry.
+        {% else %}
+        Review the Discharge Verification Statement carefully to ensure that the discharge was authorized and the correct registrations 
+        have been removed from the system. Refer to Section 35(7) of the Personal Property Security Act in the event of an unauthorized
+        discharge or error, and re-register accordingly.
+        {% endif %}
+      </div>
+    </div>
   </article>
 </body>
 </html>
