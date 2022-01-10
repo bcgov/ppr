@@ -114,16 +114,14 @@
           <td>{% if trustIndenture == true %}Yes{% else %}No{% endif %}</td>
         </tr>
         {% endif %}
+        {% if clientReferenceId is defined and clientReferenceId != "" %}
         <tr>
           <td>Folio Number:</td>
           <td>
-            {% if clientReferenceId is defined and clientReferenceId != "" %}
               {{clientReferenceId}}
-            {% else %}
-              Not available.
-            {% endif %}
           </td>
         </tr>
+        {% endif %}
       </table>          
     </div>      
 
