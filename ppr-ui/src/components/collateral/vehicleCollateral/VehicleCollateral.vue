@@ -304,7 +304,8 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs
+  toRefs,
+  watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local components
@@ -469,11 +470,13 @@ export default defineComponent({
       localState.activeIndex = index
       localState.addEditInProgress = true
       localState.showEditVehicle[index] = true
+      context.emit('collateralOpen', true)
     }
 
     const initAdd = () => {
       localState.addEditInProgress = true
       localState.showAddVehicle = true
+      context.emit('collateralOpen', true)
     }
 
     const resetData = () => {
@@ -481,6 +484,7 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddVehicle = false
       localState.showEditVehicle = [false]
+      context.emit('collateralOpen', false)
     }
 
     const undo = (index: number): void => {
@@ -488,7 +492,6 @@ export default defineComponent({
       const originalCollateral = getOriginalAddCollateral.value
       newVCollateral.splice(index, 1, cloneDeep(originalCollateral.vehicleCollateral[index]))
       setVehicleCollateral(newVCollateral)
-      // getDebtorValidity()
     }
 
     return {

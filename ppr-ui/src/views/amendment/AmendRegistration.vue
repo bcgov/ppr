@@ -40,10 +40,16 @@
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
             @setSecuredPartiesValid="securedPartiesValid = $event"
+            @securedPartyOpen="securedPartyOpen = $event"
             :setShowInvalid="showInvalid" class="pt-4"
           />
+          <div v-if="!securedPartiesValid">
+          <span class="invalid-message">
+            You must include at least one secured party
+          </span>
+          </div>
           <secured-party-summary
-            v-else
+            v-if="registrationType === registrationTypeRL"
             class="secured-party-summary"
             :setEnableNoDataAction="false"
           />
@@ -51,15 +57,22 @@
           <debtors
             v-if="registrationType !== registrationTypeRL"
             @setDebtorValid="debtorValid = $event"
+            @debtorOpen="debtorOpen = $event"
             :setShowInvalid="showInvalid"
           />
+          <div class="pt-4" v-if="!debtorValid">
+          <span class="invalid-message">
+            You must include at least one debtor
+          </span>
+          </div>
           <debtor-summary
-            v-else
+            v-if="registrationType === registrationTypeRL"
             class="debtor-summary"
             :setEnableNoDataAction="false"
           />
           <collateral
             @setCollateralValid="collateralValid = $event"
+            @collateralOpen="collateralOpen = $event"
             class="mt-15"
           />
           <amendment-description class="mt-15"
@@ -83,6 +96,7 @@
                 :setCancelBtn="'Cancel'"
                 :setBackBtn="'Save and Resume Later'"
                 :setSubmitBtn="'Review and Complete'"
+                :setErrMsg="amendErrMsg"
                 @cancel="goToDashboard()"
                 @submit="confirmAmendment()"
                 @back="saveDraft()"
@@ -137,7 +151,7 @@ import {
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 import { StatusCodes } from 'http-status-codes'
 
 @Component({
@@ -162,6 +176,11 @@ export default class AmendRegistration extends Vue {
   @Getter getLengthTrust: LengthTrustIF
   @Getter getAmendmentDescription: string
   @Getter getConfirmDebtorName: DebtorNameIF
+  @Getter getOriginalAddCollateral: AddCollateralIF
+  @Getter getOriginalAddSecuredPartiesAndDebtors: AddPartiesIF
+  @Getter getOriginalLengthTrust: LengthTrustIF
+  @Getter getAddCollateral: AddCollateralIF
+  @Getter getCourtOrderInformation: CourtOrderIF
 
   @Action setAddCollateral: ActionBindingIF
   @Action setStaffPayment: ActionBindingIF
@@ -203,6 +222,10 @@ export default class AmendRegistration extends Vue {
   private courtOrderValid = true
   private fromConfirmation = false
   private requireCourtOrder = false
+  private debtorOpen = false
+  private securedPartyOpen = false
+  private collateralOpen = false
+  private amendErrMsg = ''
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -353,6 +376,14 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
+    if (!this.hasAmendmentChanged()) {
+      this.amendErrMsg = '< Please make any required changes'
+      return
+    }
+    if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen) {
+      this.amendErrMsg = '< You have unfinished changes'
+      return
+    }
     const description = this.getAmendmentDescription
     if (
       this.debtorValid &&
@@ -374,6 +405,39 @@ export default class AmendRegistration extends Vue {
         this.setCollateralShowInvalid(true)
       }
     }
+  }
+
+  private hasAmendmentChanged (): boolean {
+    let hasChanged = false
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors, this.getOriginalAddSecuredPartiesAndDebtors)) {
+      hasChanged = true
+    }
+    if (!isEqual(this.getLengthTrust, this.getOriginalLengthTrust)) {
+      hasChanged = true
+    }
+    if (!isEqual(this.getAddCollateral.vehicleCollateral, this.getOriginalAddCollateral.vehicleCollateral)) {
+      hasChanged = true
+    }
+
+    if (!isEqual(this.getAddCollateral.generalCollateral, this.getOriginalAddCollateral.generalCollateral)) {
+      hasChanged = true
+    }
+
+    if (this.getAmendmentDescription) {
+      hasChanged = true
+    }
+
+    const blankCourtOrder: CourtOrderIF = {
+      courtName: '',
+      courtRegistry: '',
+      effectOfOrder: '',
+      fileNumber: '',
+      orderDate: ''
+    }
+    if (!isEqual(this.getCourtOrderInformation, blankCourtOrder)) {
+      hasChanged = true
+    }
+    return hasChanged
   }
 
   private async saveDraft (): Promise<void> {
@@ -464,6 +528,9 @@ export default class AmendRegistration extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.invalid-message {
+  font-size: 14px;
+}
 </style>

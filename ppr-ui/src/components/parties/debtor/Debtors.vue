@@ -336,12 +336,14 @@ export default defineComponent({
       localState.activeIndex = index
       localState.addEditInProgress = true
       localState.showEditDebtor[index] = true
+      emit('debtorOpen', true)
     }
 
     const initAdd = (currentIsBusiness: boolean) => {
       localState.currentIsBusiness = currentIsBusiness
       localState.addEditInProgress = true
       localState.showAddDebtor = true
+      emit('debtorOpen', true)
     }
 
     const resetData = () => {
@@ -353,6 +355,7 @@ export default defineComponent({
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
       getDebtorValidity()
+      emit('debtorOpen', false)
     }
 
     const undo = (index: number): void => {

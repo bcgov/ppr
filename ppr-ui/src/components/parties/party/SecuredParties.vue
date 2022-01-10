@@ -366,7 +366,7 @@ import { useParty } from '@/composables/useParty'
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { editTableHeaders, partyTableHeaders } from '@/resources'
+import { editTableHeaders, partyTableHeaders, tombstoneBreadcrumbRenewal } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeAccount } from '@/utils'
 
@@ -496,11 +496,13 @@ export default defineComponent({
       localState.activeIndex = index
       localState.addEditInProgress = true
       localState.showEditParty[index] = true
+      context.emit('securedPartyOpen', true)
     }
 
     const initAdd = () => {
       localState.addEditInProgress = true
       localState.showAddSecuredParty = true
+      context.emit('securedPartyOpen', true)
     }
 
     const resetData = () => {
@@ -512,6 +514,7 @@ export default defineComponent({
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
       getSecuredPartyValidity()
+      context.emit('securedPartyOpen', false)
     }
 
     const fetchOtherSecuredParties = async () => {
