@@ -448,7 +448,7 @@ export default class ConfirmAmendment extends Vue {
       await component.scrollIntoView({ behavior: 'smooth' })
     }
     if (!this.certifyInformationValid) {
-      const component = document.getElementById('certify-summary')
+      const component = document.getElementById('certify-information')
       await component.scrollIntoView({ behavior: 'smooth' })
     }
   }
@@ -549,6 +549,7 @@ export default class ConfirmAmendment extends Vue {
   private submitButton (): void {
     if (!this.validFolio || !this.certifyInformationValid) {
       this.showErrors = true
+      this.scrollToInvalid()
       return
     }
     if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {

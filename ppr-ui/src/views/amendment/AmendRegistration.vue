@@ -386,7 +386,7 @@ export default class AmendRegistration extends Vue {
     }
 
     if (this.debtorOpen || !this.debtorValid) {
-      const component = document.getElementById('debtor-component')
+      const component = document.getElementById('debtors-component')
       await component.scrollIntoView({ behavior: 'smooth' })
     }
 

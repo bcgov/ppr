@@ -33,6 +33,7 @@
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :isSummary="summaryView"
         :showInvalid="collateral.showInvalid"
+        @collateralOpen="setCollateralOpen($event)"
       />
       <general-collateral
         v-if="showGeneralCollateral"
