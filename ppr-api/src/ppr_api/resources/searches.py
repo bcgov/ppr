@@ -23,7 +23,7 @@ from registry_schemas import utils as schema_utils
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import SearchRequest, SearchResult
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_bcol_help, is_staff_account
+from ppr_api.services.authz import authorized, is_bcol_help, is_gov_account, is_sbc_office_account, is_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
@@ -91,7 +91,20 @@ class SearchResource(Resource):
             payment = Payment(jwt=jwt.get_token_auth_header(),
                               account_id=account_id,
                               details=get_payment_details(query, request_json['type']))
-            pay_ref = payment.create_payment(TransactionTypes.SEARCH.value, 1, None, query.client_reference_id)
+            
+            transaction_type = TransactionTypes.SEARCH.value
+            # if gov account user then check if sbc
+            if is_gov_account(jwt):
+                # if SBC staff user (authy, api call) then change transaction type to $10 fee
+                is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
+                if is_sbc:
+                    transaction_type = TransactionTypes.SEARCH_STAFF.value
+                elif is_sbc == None:
+                    # didn't get a succesful response from auth
+                    raise BusinessException('Unable to verify possible SBC staff user before payment.', HTTPStatus.INTERNAL_SERVER_ERROR)
+                    
+            
+            pay_ref = payment.create_payment(transaction_type, 1, None, query.client_reference_id)
             invoice_id = pay_ref['invoiceId']
             query.pay_invoice_id = int(invoice_id)
             query.pay_path = pay_ref['receipt']

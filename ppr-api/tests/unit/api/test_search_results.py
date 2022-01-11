@@ -26,7 +26,7 @@ from registry_schemas.example_data.ppr import SEARCH_SUMMARY
 
 from ppr_api.callback.document_storage.storage_service import GoogleStorageService
 from ppr_api.models import SearchResult, SearchRequest
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -241,8 +241,8 @@ def test_get_search_detail(session, client, jwt, desc, roles, status, has_accoun
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', GOV_ACCOUNT_ROLE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:

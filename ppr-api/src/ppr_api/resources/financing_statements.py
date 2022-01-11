@@ -26,7 +26,7 @@ from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Reg
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_reg_staff_account, is_sbc_office_account, is_staff_account, \
+from ppr_api.services.authz import authorized, is_gov_account, is_reg_staff_account, is_sbc_office_account, is_staff_account, \
                                    is_bcol_help, is_all_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
@@ -886,7 +886,17 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
         pay_trans_type = TransactionTypes.DISCHARGE.value
 
     if not is_reg_staff_account(account_id):
-        pay_account_id: str = account_id if not is_sbc_office_account(account_id) else None
+        pay_account_id: str = account_id
+        # if gov user then check if sbc staff
+        if is_gov_account(jwt):
+            # if SBC staff user (authy, api call) then set payment account id to None
+            is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
+            if is_sbc:
+                pay_account_id = None
+            elif is_sbc == None:
+                # didn't get a succesful response from auth
+                raise BusinessException('Unable to verify possible SBC staff user before payment.', HTTPStatus.INTERNAL_SERVER_ERROR)
+
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details(registration))
@@ -903,6 +913,9 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
     # Try to save the registration: failure will rollback the payment if one was made.
     try:
         registration.save()
+    except BusinessException as bus_exception:
+        # just pass it along
+        raise bus_exception
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, repr(db_exception)))
         if account_id and invoice_id is not None:
@@ -927,7 +940,16 @@ def pay_and_save_financing(req: request, request_json, account_id):
     pay_trans_type, fee_quantity = resource_utils.get_payment_type_financing(registration)
     pay_ref = None
     if not is_reg_staff_account(account_id):
-        pay_account_id: str = account_id if not is_sbc_office_account(account_id) else None
+        pay_account_id: str = account_id
+        # if gov user then check if sbc staff
+        if is_gov_account(jwt):
+            # if SBC staff user (authy, api call) then set payment account id to None
+            is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
+            if is_sbc:
+                pay_account_id = None
+            elif is_sbc == None:
+                # didn't get a succesful response from auth
+                raise BusinessException('Unable to verify possible SBC staff user before payment.', HTTPStatus.INTERNAL_SERVER_ERROR)
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details_financing(registration))

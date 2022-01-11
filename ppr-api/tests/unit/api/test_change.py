@@ -22,7 +22,7 @@ from http import HTTPStatus
 import pytest
 from registry_schemas.example_data.ppr import CHANGE_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, SBC_OFFICE, BCOL_HELP
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, GOV_ACCOUNT_ROLE, BCOL_HELP
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -242,8 +242,8 @@ def test_get_change(session, client, jwt, desc, roles, status, has_account, reg_
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', GOV_ACCOUNT_ROLE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:

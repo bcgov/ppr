@@ -25,7 +25,7 @@ from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import FinancingStatement, Registration, utils as model_utils
 from ppr_api.resources.utils import get_payment_details
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -254,7 +254,7 @@ TEST_CREATE_DATA = [
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
-    ('SBC staff renewal', STATEMENT_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True, 'TEST0001')
+    ('SBC staff renewal', STATEMENT_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True, 'TEST0001')
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
 TEST_STAFF_CREATE_DATA = [
@@ -270,7 +270,7 @@ TEST_GET_STATEMENT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST00R5', 'TEST0005'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0005'),
     ('Valid Request reg staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0005'),
-    ('Valid Request sbc staff', [PPR_ROLE, SBC_OFFICE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0005'),
+    ('Valid Request sbc staff', [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0005'),
     ('Valid Request bcol helpdesk', [PPR_ROLE, BCOL_HELP], HTTPStatus.OK, True, 'TEST00R5', 'TEST0005'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021RE', 'TEST0021'),
     ('Valid request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019RE', 'TEST0019'),
@@ -290,8 +290,10 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
+        headers = create_header_account(jwt, roles, 'test-user', '1234')
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -333,19 +335,20 @@ def test_create_renewal_staff(session, client, jwt, role, routing_slip, bcol_num
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
-def test_get_renewal(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
+def test_get_renewal(session, client, jwt, desc, requests_mock, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get renewal registration statement works as expected."""
+    # setup
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
-    # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
         headers = create_header_account_report(jwt, roles)
     elif has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', '1234')
+        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:

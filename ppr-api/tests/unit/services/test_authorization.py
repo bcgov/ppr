@@ -28,27 +28,26 @@ MOCK_URL = 'https://bcregistry-bcregistry-mock.apigee.net/auth/api/v1/'
 
 # testdata pattern is ({description}, {account id}, {valid})
 TEST_SBC_DATA = [
-    ('Valid account id', authz.SBC_OFFICE, True),
-    ('No account id', None, False),
-    ('Invalid account id', authz.STAFF_ROLE, False),
-    ('Invalid account id', '2518', False)
+    ('Valid account id', authz.GOV_ACCOUNT_ROLE, 'Service BC', True),
+    ('No account id', None, '', False),
+    ('Invalid account id', authz.STAFF_ROLE, 'BC Registries', False),
+    ('Invalid account id', '2518', 'Something', False)
 ]
 TEST_REG_STAFF_DATA = [
     ('Valid account id', authz.STAFF_ROLE, True),
     ('No account id', None, False),
-    ('Invalid account id', authz.SBC_OFFICE, False),
+    ('Invalid account id', authz.GOV_ACCOUNT_ROLE, False),
     ('Invalid account id', '2518', False)
 ]
 TEST_STAFF_DATA = [
     ('Valid account id', authz.STAFF_ROLE, True),
-    ('Valid account id', authz.SBC_OFFICE, True),
     ('No account id', None, False),
     ('Invalid account id', authz.BCOL_HELP, False),
     ('Invalid account id', '2518', False)
 ]
 
 
-def test_user_orgs_mock(client, jwt):
+def test_user_orgs_mock(client, session, jwt):
     """Assert that a auth-api user orgs request works as expected with the mock service endpoint."""
     # setup
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
@@ -71,11 +70,14 @@ def test_user_orgs_mock(client, jwt):
     assert org['name']
 
 
-@pytest.mark.parametrize('desc,account_id,valid', TEST_SBC_DATA)
-def test_sbc_office_account(session, desc, account_id, valid):
+@pytest.mark.parametrize('desc,account_id,branch_name,valid', TEST_SBC_DATA)
+def test_sbc_office_account(session, jwt, requests_mock, desc, account_id, branch_name, valid):
     """Assert that sbc office account check returns the expected result."""
-    # test
-    result = authz.is_sbc_office_account(account_id)
+    # setup
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL)
+    requests_mock.get(f'{MOCK_URL}orgs/{account_id}', json={'branchName': branch_name})
+    token = helper_create_jwt(jwt, [authz.GOV_ACCOUNT_ROLE])
+    result = authz.is_sbc_office_account(token, account_id) or False
     # check
     assert result == valid
 

@@ -30,7 +30,7 @@ BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
-SBC_OFFICE = 'gov_account_user'
+GOV_ACCOUNT_ROLE = 'gov_account_user'
 BCOL_HELP = 'helpdesk'
 
 
@@ -167,6 +167,40 @@ def user_orgs(token: str) -> dict:
 
     return response
 
+def account_org(token: str, account_id: str) -> dict:
+    """Auth API call to get the account organization info identified by the account id."""
+    response = None
+    if not token or not account_id:
+        return response
+
+    service_url = current_app.config.get('AUTH_SVC_URL')
+    api_url = service_url + '/' if service_url[-1] != '/' else service_url
+    api_url += f'orgs/{account_id}'
+
+    try:
+        headers = {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        # current_app.logger.debug('Auth get user orgs url=' + url)
+        http = Session()
+        retries = Retry(total=3,
+                        backoff_factor=0.1,
+                        status_forcelist=[500, 502, 503, 504])
+        http.mount('http://', HTTPAdapter(max_retries=retries))
+        ret_val = http.get(url=api_url, headers=headers)
+        current_app.logger.debug('Auth get user orgs response status: ' + str(ret_val.status_code))
+        # current_app.logger.debug('Auth get account org response data:')
+        response = ret_val.json()
+        # current_app.logger.debug(response)
+    except (exceptions.ConnectionError,  # pylint: disable=broad-except
+            exceptions.Timeout,
+            ValueError,
+            Exception) as err:
+        current_app.logger.error(f'Authorization connection failure using svc:{api_url}', err)
+
+    return response
+
 
 def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
     """Return True if the user has the BC Registries staff role."""
@@ -185,7 +219,7 @@ def is_bcol_help(account_id: str) -> bool:
 
 def is_staff_account(account_id: str) -> bool:
     """Return True if the account id is a registries staff or sbc office account id."""
-    return account_id is not None and account_id in (STAFF_ROLE, SBC_OFFICE)
+    return account_id is not None and account_id in (STAFF_ROLE)
 
 
 def is_reg_staff_account(account_id: str) -> bool:
@@ -193,11 +227,28 @@ def is_reg_staff_account(account_id: str) -> bool:
     return account_id is not None and account_id == STAFF_ROLE
 
 
-def is_sbc_office_account(account_id: str) -> bool:
+def is_sbc_office_account(token: str, account_id: str) -> bool:
     """Return True if the account id is an sbc office account id."""
-    return account_id is not None and account_id == SBC_OFFICE
+    try:
+        org_info = account_org(token, account_id)
+        if org_info and 'branchName' in org_info:
+            return 'Service BC' in org_info['branchName']
+        return None
+    except Exception as err:  # pylint: disable=broad-except # noqa F841;
+        current_app.logger.error('is_sbc_office_account failed: ' + repr(err))
+        return None
+
+
+def is_gov_account(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
+    """Return True if the user has the gov account user role."""
+    if not jwt:
+        return False
+    if jwt.validate_roles([GOV_ACCOUNT_ROLE]):
+        return True
+
+    return False
 
 
 def is_all_staff_account(account_id: str) -> bool:
     """Return True if the account id is any staff role."""
-    return account_id is not None and account_id in (STAFF_ROLE, SBC_OFFICE, BCOL_HELP)
+    return account_id is not None and account_id in (STAFF_ROLE, BCOL_HELP)
