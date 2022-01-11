@@ -357,7 +357,7 @@ export default class App extends Mixins(AuthMixin) {
     if (authRoles && authRoles.length > 0) {
       if (authRoles.includes('gov_account_user')) {
         // if staff make call to check for sbc
-        const isSbc = getSbcFromAuth()
+        const isSbc = await getSbcFromAuth()
         this.setRoleSbc(isSbc)
       }
       this.setAuthRoles(authRoles)
