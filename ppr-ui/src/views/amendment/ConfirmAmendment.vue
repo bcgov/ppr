@@ -447,6 +447,10 @@ export default class ConfirmAmendment extends Vue {
       const component = document.getElementById('court-order-component')
       await component.scrollIntoView({ behavior: 'smooth' })
     }
+    if (!this.certifyInformationValid) {
+      const component = document.getElementById('certify-summary')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   private cancel (val: boolean): void {
