@@ -39,7 +39,9 @@
           <td class="lbl-business-detail">
             <div>Search Date and Time:</div>
             <div>Account Name:</div>
-            <div>Folio Number:</div>
+            {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+              <div>Folio Number:</div>
+            {% endif %}
           </td>
           <td>
             <div>{{searchDateTime}}</div>
@@ -50,13 +52,11 @@
                 Not available.
               {% endif %}
             </div>
-            <div>
-              {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
-                {{searchQuery.clientReferenceId}}
-              {% else %}
-                Not available.
-              {% endif %}
-            </div>
+            {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+              <div>
+                  {{searchQuery.clientReferenceId}}
+              </div>
+            {% endif %}
           </td>
           <td class="registar-certify-section">
             {% if searchQuery.certified is defined and searchQuery.certified %}
@@ -97,7 +97,7 @@
           </td>
       </tr>
     </table>
-      
+    
     {% if totalResultsSize > 0 %}
       {% if selected is defined %}
         [[search-result/selected.html]]
@@ -105,6 +105,7 @@
     {% else %}
       <div class="nil-message pt-4">The search returned a NIL result. 0 registrations were found.</div> 
     {% endif %}
+
   </article>
 
     {% if totalResultsSize > 0 %}
@@ -133,7 +134,7 @@
             {% endfor %}
           </div>
 
-          {% endif %} 
+        {% endif %} 
       {% endfor %}
 
     {% endif %}

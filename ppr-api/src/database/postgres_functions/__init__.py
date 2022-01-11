@@ -15,6 +15,11 @@
 """Export all of the Postgres db functions."""
 from .get_draft_document_number import get_draft_document_number
 from .get_registration_num import get_registration_num
+from .sim_number import sim_number
+from .individual_split_1 import individual_split_1
+from .individual_split_2 import individual_split_2
+from .individual_split_3 import individual_split_3
+from .searchkey_individual import searchkey_individual
 from .match_individual_name import match_individual_name
 from .searchkey_aircraft import searchkey_aircraft
 from .searchkey_business_name import searchkey_business_name

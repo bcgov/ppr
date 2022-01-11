@@ -424,6 +424,7 @@ TEST_PAY_TYPE_FINANCING = [
 ]
 # testdata pattern is ({desc}, {status}, {registration_id}, {party_id})
 TEST_VERIFICATION_CALLBACK_DATA = [
+    ('Valid', HTTPStatus.CREATED, 200000008, 200000003),
     ('Missing reg id', HTTPStatus.BAD_REQUEST, None, 200000022),
     ('Invalid reg id', HTTPStatus.NOT_FOUND, 300000005, 200000022),
     ('Missing party id', HTTPStatus.BAD_REQUEST, 200000010, None),
@@ -762,8 +763,8 @@ def test_get_payment_type_financing(session, client, jwt, reg_type, life_years, 
 
 
 @pytest.mark.parametrize('desc,status,reg_id,party_id', TEST_VERIFICATION_CALLBACK_DATA)
-def test_callback_verification_report(session, client, jwt, desc, status, reg_id, party_id):
-    """Assert that a callback request returns the expected status."""
+def test_callback_verification_report_data(session, client, jwt, desc, status, reg_id, party_id):
+    """Assert that a verification report data callback request returns the expected status."""
     # setup
     json_data = {
         'registrationId': reg_id,
@@ -781,3 +782,9 @@ def test_callback_verification_report(session, client, jwt, desc, status, reg_id
                      content_type='application/json')
     # check
     assert rv.status_code == status
+    if status == HTTPStatus.CREATED:
+        json_data = rv.json
+        assert json_data
+        assert 'coverLetterData' in json_data
+        assert 'verificationData' in json_data
+

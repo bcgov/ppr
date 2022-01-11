@@ -21,7 +21,9 @@ import json
 
 import pytest
 
-from ppr_api.reports import Report, ReportTypes, get_verification_mail
+from ppr_api.models import Party, Registration
+from ppr_api.reports import Report, ReportTypes, get_verification_mail, get_report_api_payload
+from ppr_api.resources.financing_statements import get_mail_verification_data
 from ppr_api.services.payment.client import SBCPaymentClient
 
 
@@ -38,6 +40,8 @@ DISCHARGE_DATAFILE = 'tests/unit/reports/data/discharge-example.json'
 DISCHARGE_DATAFILE_COVER = 'tests/unit/reports/data/discharge-example-cover.json'
 AMENDMENT_DATAFILE_COVER = 'tests/unit/reports/data/amendment-example-cover.json'
 VERIFICATION_MAIL_PDFFILE = 'tests/unit/reports/data/verification-mail-discharge-example.pdf'
+TEST_VERIFICATION_JSON_FILE = 'tests/unit/reports/data/test-verification-data.json'
+TEST_COVER_JSON_FILE = 'tests/unit/reports/data/test-cover-data.json'
 
 TEST_REPORT_DATA = [
     (ReportTypes.FINANCING_STATEMENT_REPORT.value, FINANCING_RL_DATAFILE),
@@ -104,4 +108,38 @@ def test_verification_mail(client, jwt):
     assert status == HTTPStatus.OK
     with open(VERIFICATION_MAIL_PDFFILE, "wb") as pdf_file:
         pdf_file.write(pdf_output)
+        pdf_file.close()
+
+
+def test_verification_report_data(session):
+    """Assert that a callback request to generate a surface mail verification report data works as expected."""
+    # setup
+    account_id = 'PS12345'
+    registration: Registration = Registration.find_by_registration_number('TEST0019DC', 'PS12345', True)
+    secured_party: Party = None
+    account_name = 'UNIT TEST ACCOUNT'
+    # Any secured party will do - must have at lease 1:
+    for party in registration.financing_statement.parties:
+        if party.party_type == Party.PartyTypes.SECURED_PARTY.value:
+            secured_party = party
+    json_data = get_mail_verification_data(registration.id, registration, party)
+    # test
+    cover_data = get_report_api_payload(json_data, account_id, ReportTypes.COVER_PAGE_REPORT.value, account_name)
+    verification_data = get_report_api_payload(json_data,
+                                               account_id,
+                                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                               None)
+   # check
+    assert cover_data
+    assert 'template' in cover_data
+    assert 'templateVars' in cover_data
+    assert verification_data
+    assert 'template' in verification_data
+    assert 'templateVars' in verification_data
+    with open(TEST_COVER_JSON_FILE, "w") as pdf_file:
+        pdf_file.write(json.dumps(cover_data))
+        pdf_file.close()
+
+    with open(TEST_VERIFICATION_JSON_FILE, "w") as pdf_file:
+        pdf_file.write(json.dumps(verification_data))
         pdf_file.close()

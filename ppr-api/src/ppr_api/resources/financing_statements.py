@@ -14,7 +14,6 @@
 """API endpoints for maintaining financing statements and updates to financing statements."""
 
 # pylint: disable=too-many-return-statements
-import json
 from http import HTTPStatus
 
 from flask import jsonify, request, current_app, g
@@ -22,9 +21,9 @@ from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, UserExtraRegistration
+from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Party, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
-from ppr_api.reports import ReportTypes, get_pdf
+from ppr_api.reports import ReportTypes, get_pdf, get_report_api_payload
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_reg_staff_account, is_sbc_office_account, is_staff_account, \
                                    is_bcol_help, is_all_staff_account
@@ -33,11 +32,7 @@ from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
-from ppr_api.callback.reports.report_service import get_mail_verification_statement
-from ppr_api.callback.utils.exceptions import FileTransferException, ReportException, ReportDataException, \
-                                              StorageException
-from ppr_api.callback.document_storage.storage_service import GoogleStorageService, DocumentTypes
-from ppr_api.callback.file_transfer.file_transfer_service import BCMailFileTransferService
+from ppr_api.callback.utils.exceptions import ReportDataException
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
@@ -71,7 +66,6 @@ CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.FILE_TRANSFER_ERR: '09: SFTP failed for id={key_id}.',
     resource_utils.CallbackExceptionCodes.SETUP_ERR: '10: setup failed for id={key_id}.'
 }
-STORAGE_DOC_NAME_VERIFICATION = 'verification-report-{registration_id}-{party_id}.pdf'
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -770,13 +764,13 @@ class AccountRegistrationResource(Resource):
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/verification-callback', methods=['POST', 'OPTIONS'])
-class PostVerificationResource(Resource):
-    """Resource to handle a verification report mail request from a callback event."""
+class VerificationResource(Resource):
+    """Resource to handle a verification report mail request for a callback event."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
     def post():
-        """Generate a verification mail report for the registration and party. SFTP to the mail service."""
+        """Get report data including cover letter for mailing a verification report."""
         request_json = request.get_json(silent=True)
         registration_id: int = request_json.get('registrationId', -1)
         party_id: int = request_json.get('partyId', -1)
@@ -809,41 +803,12 @@ class PostVerificationResource(Resource):
                 return callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, registration_id,
                                       HTTPStatus.NOT_FOUND, party_id,
                                       f'No party found for id={party_id}')
-            # Generate the report with an API call
-            current_app.logger.info(f'Generating verification mail report for {registration_id}, party={party_id}')
-            raw_data, status_code, headers = get_mail_verification_statement(registration, party, None)
-            if not raw_data or not status_code:
-                return callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
-                                      registration_id,
-                                      HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                      'No data or status code, party={party_id}.')
-            current_app.logger.debug('Report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
-            if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-                message = f'Party={party_id}, status code={status_code}. Response: ' + raw_data.get_data(as_text=True)
-                return callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
-                                      registration_id,
-                                      HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                      message)
-            # Store a copy of the report
-            store_verification_document(raw_data, registration_id, party_id)
-            # Now sftp the report:
-            current_app.logger.info(f'Transferring report output to mail service: party={party_id}.')
-            BCMailFileTransferService().transfer_verification_statement(raw_data, registration_id, party_id)
-            # Track success event.
-            EventTracking.create(registration_id, EventTracking.EventTrackingTypes.SURFACE_MAIL, int(HTTPStatus.OK),
-                                 f'Party={party_id}.')
-            return raw_data, HTTPStatus.OK
+            # Generate the verification json data with the cover letter info for the secured party.
+            json_data = get_mail_verification_data(registration_id, registration, party)
+            report_data = get_verification_report_data(registration_id, json_data, registration.account_id, None)
+            current_app.logger.info(f'Generated the mail report data for id={registration_id}, party={party_id}')
+            return jsonify(report_data), HTTPStatus.CREATED
 
-        except FileTransferException as report_err:
-            return callback_error(resource_utils.CallbackExceptionCodes.FILE_TRANSFER_ERR,
-                                  registration_id,
-                                  HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                  f'Party={party_id}. ' + repr(report_err))
-        except ReportException as report_err:
-            return callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
-                                  registration_id,
-                                  HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                  f'Party={party_id}. ' + repr(report_err))
         except ReportDataException as report_data_err:
             return callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
                                   registration_id,
@@ -972,12 +937,41 @@ def callback_error(code: str, registration_id: int, status_code, party_id: int, 
     return resource_utils.error_response(status_code, error)
 
 
-def store_verification_document(raw_data, registration_id: int, party_id: int):
-    """Try to save a copy of the verification report to document storage."""
-    doc_name = STORAGE_DOC_NAME_VERIFICATION.format(registration_id=registration_id, party_id=party_id)
+def get_mail_verification_data(registration_id: int, registration: Registration, party: Party):
+    """Generate json for a surface mail verification statement report."""
     try:
-        current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
-        response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.VERIFICATION_MAIL)
-        current_app.logger.info('Save document storage response: ' + json.dumps(response))
-    except StorageException:
-        current_app.logger.error(f'Store document {doc_name} failed.')
+        statement_type = model_utils.REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl]
+        reg_num_key = 'dischargeRegistrationNumber'
+        if statement_type == model_utils.DRAFT_TYPE_AMENDMENT:
+            reg_num_key = 'amendmentRegistrationNumber'
+        report_data = registration.verification_json(reg_num_key)
+        cover_data = party.json
+        cover_data['statementType'] = statement_type
+        cover_data['partyType'] = party.party_type
+        cover_data['createDateTime'] = report_data['createDateTime']
+        cover_data['registrationNumber'] = registration.registration_num
+        report_data['cover'] = cover_data
+        return report_data
+    except Exception as err:  # pylint: disable=broad-except # noqa F841;
+        msg = f'Mail verification json data generation failed for id={registration_id}: ' + repr(err)
+        # current_app.logger.error(msg)
+        raise ReportDataException(msg)
+
+
+def get_verification_report_data(registration_id: int, json_data, account_id: str, account_name: str = None):
+    """Generate report data json for a surface mail verification statement report."""
+    try:
+        cover_data = get_report_api_payload(json_data, account_id, ReportTypes.COVER_PAGE_REPORT.value, account_name)
+        verification_data = get_report_api_payload(json_data,
+                                                   account_id,
+                                                   ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                   account_name)
+        report_data = {
+            'coverLetterData': cover_data,
+            'verificationData': verification_data
+        }
+        return report_data
+    except Exception as err:  # pylint: disable=broad-except # noqa F841;
+        msg = f'Mail verification report data generation failed for id={registration_id}: ' + repr(err)
+        # current_app.logger.error(msg)
+        raise ReportDataException(msg)

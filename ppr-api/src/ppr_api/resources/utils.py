@@ -20,7 +20,7 @@ from flask import jsonify, current_app, request
 from ppr_api.exceptions import BusinessException, ResourceErrorCodes
 from ppr_api.models import EventTracking, Party, Registration, utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
-from ppr_api.services.authz import user_orgs
+from ppr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.queue_service import GoogleQueueService
@@ -53,6 +53,10 @@ CERTIFIED_PARAM = 'certified'
 ROUTING_SLIP_PARAM = 'routingSlipNumber'
 DAT_NUMBER_PARAM = 'datNumber'
 BCOL_NUMBER_PARAM = 'bcolAccountNumber'
+
+REG_STAFF_DESC = 'BC Registries Staff'
+SBC_STAFF_DESC = 'SBC Staff'
+BCOL_STAFF_DESC = 'BC Online Help'
 
 
 class CallbackExceptionCodes(str, Enum):
@@ -267,9 +271,16 @@ def validate_delete_ids(json_data, financing_statement):
         )
 
 
-def get_account_name(token: str, account_id: str = None):
+def get_account_name(token: str, account_id: str = None):  # pylint: disable=too-many-return-statements; added staff
     """Lookup the account organization name from the user token with an auth api call."""
     try:
+        if is_reg_staff_account(account_id):
+            return REG_STAFF_DESC
+        if is_sbc_office_account(account_id):
+            return SBC_STAFF_DESC
+        if is_bcol_help(account_id):
+            return BCOL_STAFF_DESC
+
         orgs = user_orgs(token)
         if orgs and 'orgs' in orgs and orgs['orgs']:
             if (len(orgs['orgs']) == 1 or not account_id or not account_id.isdigit()):
