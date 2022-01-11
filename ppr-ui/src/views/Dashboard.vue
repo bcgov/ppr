@@ -108,10 +108,12 @@
                   'soft-corners-top'
                 ]"
                 append-icon="mdi-magnify"
+                autocomplete="chrome-off"
                 dense
                 :error-messages="myRegAddInvalid ? 'error' : ''"
                 hide-details
                 label="Registration Number"
+                :name="Math.random()"
                 persistent-hint
                 single-line
                 style="width:270px"
@@ -388,6 +390,11 @@ export default class Dashboard extends Vue {
     this.loading = true
     const addReg = await addRegistrationSummary(regNum)
     if (!addReg.error) {
+      // set expand if its not a base reg
+      if (regNum !== addReg.registrationNumber) {
+        addReg.new = true
+        addReg.expand = true
+      }
       // add to my registrations list
       this.myRegDataHistory.unshift(addReg)
       this.snackbarMsg = 'Registration was successfully added to your table.'
