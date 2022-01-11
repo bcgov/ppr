@@ -91,6 +91,10 @@ class Report:  # pylint: disable=too-few-public-methods
         self._account_id = account_id
         self._account_name = account_name
 
+    def get_payload_data(self):
+        """Generate report data including template data for report api call."""
+        return self._setup_report_data()
+
     def get_pdf(self, report_type=None, token=None):
         """Render a pdf for the report type and report data."""
         if report_type:

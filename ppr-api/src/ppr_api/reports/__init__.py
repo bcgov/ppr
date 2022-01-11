@@ -49,6 +49,16 @@ def get_callback_pdf(report_data, account_id, report_type, token, account_name):
         raise BusinessException(error=DEFAULT_ERROR_MSG, status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
+def get_report_api_payload(report_data, account_id, report_type, account_name):
+    """Get the report api payload data without calling the service."""
+    try:
+        return Report(report_data, account_id, report_type, account_name).get_payload_data()
+    except Exception as err:   # noqa: B902; return nicer default error
+        current_app.logger.error(f'Get report payload data failed for account {account_id}, type {report_type}: ' +
+                                 repr(err))
+        raise BusinessException(error=DEFAULT_ERROR_MSG, status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
 def get_verification_mail(  # pylint: disable=too-many-locals
         report_data, account_id, token, account_name, registration_id: int):
     """Event callback for verification surface mail: concatenate cover letter and verification statement."""
