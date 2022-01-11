@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pa-0">
+  <v-container fluid no-gutters id="secured-parties-component" class="pa-0">
     <change-secured-party-dialog
       attach="#app"
       :display="showDialog"
@@ -366,7 +366,7 @@ import { useParty } from '@/composables/useParty'
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { editTableHeaders, partyTableHeaders, tombstoneBreadcrumbRenewal } from '@/resources'
+import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeAccount } from '@/utils'
 

@@ -304,8 +304,7 @@ import {
   computed,
   defineComponent,
   reactive,
-  toRefs,
-  watch
+  toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local components

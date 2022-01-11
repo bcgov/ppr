@@ -1,5 +1,6 @@
 <template>
   <v-container fluid no-gutters
+    id="collateral-component"
     class="white pa-0"
     :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"

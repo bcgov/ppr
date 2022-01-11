@@ -375,6 +375,27 @@ export default class AmendRegistration extends Vue {
     this.onAppReady(this.appReady)
   }
 
+  private async scrollToInvalid (): Promise<void> {
+    if (this.collateralOpen || !this.collateralValid) {
+      const component = document.getElementById('collateral-component')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+    if (this.securedPartyOpen || !this.securedPartiesValid) {
+      const component = document.getElementById('secured-parties-component')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    if (this.debtorOpen || !this.debtorValid) {
+      const component = document.getElementById('debtor-component')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    if (!this.registrationLengthTrustValid) {
+      const component = document.getElementById('length-trust-component')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   private confirmAmendment (): void {
     if (!this.hasAmendmentChanged()) {
       this.amendErrMsg = '< Please make any required changes'
@@ -382,6 +403,7 @@ export default class AmendRegistration extends Vue {
     }
     if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen) {
       this.amendErrMsg = '< You have unfinished changes'
+      this.scrollToInvalid()
       return
     }
     const description = this.getAmendmentDescription
@@ -404,6 +426,7 @@ export default class AmendRegistration extends Vue {
       if (!this.collateralValid) {
         this.setCollateralShowInvalid(true)
       }
+      this.scrollToInvalid()
     }
   }
 
