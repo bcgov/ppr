@@ -28,10 +28,10 @@ from registry_schemas.example_data.ppr import SEARCH_QUERY
 from ppr_api.models import SearchRequest
 from ppr_api.models.utils import format_ts, now_ts_offset
 from ppr_api.resources.searches import get_payment_details
-from ppr_api.services.authz import BCOL_HELP, COLIN_ROLE, PPR_ROLE, SBC_OFFICE, STAFF_ROLE
+from ppr_api.services.authz import BCOL_HELP, COLIN_ROLE, PPR_ROLE, GOV_ACCOUNT_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 
-
+MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
@@ -102,10 +102,10 @@ TEST_STAFF_SEARCH_DATA = [
     (STAFF_ROLE, None, None, None, True, HTTPStatus.CREATED),
     (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST),
     (BCOL_HELP, None, None, None, False, HTTPStatus.CREATED),
-    (SBC_OFFICE, '12345', None, None, False, HTTPStatus.CREATED),
-    (SBC_OFFICE, '12345', None, None, True, HTTPStatus.CREATED),
-    (SBC_OFFICE, None, '654321', '111111', False, HTTPStatus.CREATED),
-    (SBC_OFFICE, None, None, None, False, HTTPStatus.CREATED)
+    (GOV_ACCOUNT_ROLE, '12345', None, None, False, HTTPStatus.CREATED),
+    (GOV_ACCOUNT_ROLE, '12345', None, None, True, HTTPStatus.CREATED),
+    (GOV_ACCOUNT_ROLE, None, '654321', '111111', False, HTTPStatus.CREATED),
+    (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.CREATED)
 ]
 
 
@@ -137,10 +137,12 @@ def test_staff_search_certified(session, client, jwt, search_type, json_data):
 
 # testdata pattern is ({role}, {routing_slip}, {bcol_number}, {datNUmber}, {certified}, {status})
 @pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,certified,status', TEST_STAFF_SEARCH_DATA)
-def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, certified, status):
+def test_staff_search(session, client, jwt, requests_mock, role, routing_slip, bcol_number, dat_number, certified, status):
     """Assert that staff search requests returns the correct status."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    requests_mock.get(f'{MOCK_AUTH_URL}orgs/1234', json={'branchName': 'Service BC'})
     params = ''
     if certified:
         params = '?certified=true'
@@ -158,9 +160,14 @@ def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat
         if len(params) > 0:
             params += '&datNumber=' + str(dat_number)
     print('params=' + params)
+    roles = [PPR_ROLE]
+    account_id = role
+    if role == GOV_ACCOUNT_ROLE:
+        roles.append(GOV_ACCOUNT_ROLE)
+        account_id = '1234'
     rv = client.post('/api/v1/searches' + params,
                      json=REGISTRATION_NUMBER_JSON,
-                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', role),
+                     headers=create_header_account(jwt, roles, 'test-user', account_id),
                      content_type='application/json')
     # check
     assert rv.status_code == status

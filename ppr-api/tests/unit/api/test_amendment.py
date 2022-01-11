@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT, FINANCING_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 from ppr_api.models import utils as model_utils
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
@@ -257,7 +257,7 @@ TEST_CREATE_DATA = [
     ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
-    ('SBC staff account', STATEMENT_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True, 'TEST0001'),
+    ('SBC staff account', STATEMENT_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001')
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
@@ -273,7 +273,7 @@ TEST_GET_STATEMENT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0007', 'TEST0001'),
     ('Valid Request', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
     ('Valid Request reg staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
-    ('Valid Request sbc staff', [PPR_ROLE, SBC_OFFICE], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
+    ('Valid Request sbc staff', [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
     ('Valid Request bcol helpdesk', [PPR_ROLE, BCOL_HELP], HTTPStatus.OK, True, 'TEST0007', 'TEST0001'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021AM', 'TEST0021'),
     ('Valid Request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019AM', 'TEST0019'),
@@ -294,17 +294,19 @@ TEST_DATA_AMENDMENT_CHANGE_TYPE = [
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
-def test_create_amendment(session, client, jwt, desc, json_data, roles, status, has_account, reg_num):
+def test_create_amendment(session, client, jwt, requests_mock, desc, json_data, roles, status, has_account, reg_num):
     """Assert that a post amendment registration statement works as expected."""
     headers = None
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', '1234')
+        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -359,8 +361,8 @@ def test_get_amendment(session, client, jwt, desc, roles, status, has_account, r
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', GOV_ACCOUNT_ROLE)
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:

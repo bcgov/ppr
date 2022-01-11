@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, SBC_OFFICE
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -165,7 +165,7 @@ TEST_CREATE_DATA = [
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
-    ('Valid SBC office role', STATEMENT_VALID, [PPR_ROLE, SBC_OFFICE], HTTPStatus.CREATED, True, 'TEST0001'),
+    ('Valid SBC office role', STATEMENT_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True, 'TEST0001'),
     ('Valid Staff role', STATEMENT_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, 'TEST0001'),
 ]
 
@@ -174,7 +174,7 @@ TEST_GET_STATEMENT = [
     ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0D14', 'TEST0014'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0D14', 'TEST0014'),
     ('Valid Request reg staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
-    ('Valid Request sbc staff', [PPR_ROLE, SBC_OFFICE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
+    ('Valid Request sbc staff', [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
     ('Valid Request bcol helpdesk', [PPR_ROLE, BCOL_HELP], HTTPStatus.OK, True, 'TEST0D14', 'TEST0014'),
     ('Valid Request other account', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0021DC', 'TEST0021'),
     ('Valid Request other account not report', [PPR_ROLE], HTTPStatus.OK, True, 'TEST0019DC', 'TEST0019'),
@@ -187,7 +187,7 @@ TEST_GET_STATEMENT = [
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
-def test_create_discharge(session, client, jwt, desc, json_data, roles, status, has_account, reg_num):
+def test_create_discharge(session, client, jwt, requests_mock, desc, json_data, roles, status, has_account, reg_num):
     """Assert that a post discharge registration statement works as expected."""
     headers = None
     # setup
@@ -196,8 +196,9 @@ def test_create_discharge(session, client, jwt, desc, json_data, roles, status, 
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', '1234')
+        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -214,19 +215,20 @@ def test_create_discharge(session, client, jwt, desc, json_data, roles, status, 
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
-def test_get_discharge(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
+def test_get_discharge(session, client, jwt, requests_mock, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get discharge registration statement works as expected."""
+    # setup
     headers = None
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
-    # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
         headers = create_header_account_report(jwt, roles)
     elif has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
-    elif has_account and SBC_OFFICE in roles:
-        headers = create_header_account(jwt, roles, 'test-user', SBC_OFFICE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', '1234')
+        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
