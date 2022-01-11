@@ -143,54 +143,6 @@
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
             />
-            <!-- <v-dialog
-              ref="dialog"
-              v-model="modal"
-              :return-value.sync="orderDate"
-              persistent
-              width="450px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  id="court-date-text-field"
-                  :value="computedDateFormatted"
-                  filled
-                  persistent-hint
-                  label="Select the date of the order"
-                  append-icon="mdi-calendar"
-                  clearable
-                  v-bind="attrs"
-                  v-on="on"
-                  v-on:click:append="on.click"
-                  @click:clear="orderDate = ''"
-                  :error-messages="
-                    errors.orderDate.message ? errors.orderDate.message : ''
-                  "
-                >
-                </v-text-field>
-              </template>
-              <v-date-picker
-                id="court-date-picker-calendar"
-                v-model="orderDate"
-                elevation="15"
-                scrollable
-                :min="minCourtDate"
-                :max="maxCourtDate"
-                width="450px"
-              >
-                <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="$refs.dialog.save(orderDate)"
-                >
-                  <strong>OK</strong>
-                </v-btn>
-                <v-btn text color="primary" @click="modal = false">
-                  Cancel
-                </v-btn>
-              </v-date-picker>
-            </v-dialog> -->
           </v-col>
         </v-row>
         <v-row no-gutters style="padding: 0 30px;">
