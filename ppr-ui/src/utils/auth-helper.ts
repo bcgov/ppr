@@ -99,7 +99,7 @@ export async function getSbcFromAuth (): Promise<boolean> {
           return false
         }
         const branchName = data?.branchName
-        if (branchName.includes('Service BC')) {
+        if (branchName?.includes('Service BC')) {
           return true
         }
         return false
