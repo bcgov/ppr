@@ -176,9 +176,9 @@ describe('Individual debtor validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.messageSecond).toBeUndefined()
     expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(2)
+    expect(messages.length).toBe(3)
     expect(messages.at(0).text()).toBe('Enter a first name')
-    expect(messages.at(1).text()).toBe('Enter a last name')
+    expect(messages.at(2).text()).toBe('Enter a last name')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
@@ -196,7 +196,7 @@ describe('Individual debtor validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.messageSecond).toBeUndefined()
     expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeUndefined()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
+    expect(messages.length).toBe(2)
     expect(messages.at(0).text()).toBe('Maximum 15 characters')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
@@ -215,8 +215,8 @@ describe('Individual debtor validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.messageSecond).toBeUndefined()
     expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 25 characters')
+    expect(messages.length).toBe(2)
+    expect(messages.at(1).text()).toBe('Maximum 25 characters')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
@@ -509,6 +509,7 @@ describe('Aircraft validation', () => {
 
   })
 })
+
 
 describe('Registration number validation', () => {
   let wrapper: Wrapper<any>
