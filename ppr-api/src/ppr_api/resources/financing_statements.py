@@ -13,7 +13,7 @@
 # limitations under the License.
 """API endpoints for maintaining financing statements and updates to financing statements."""
 
-# pylint: disable=too-many-return-statements
+# pylint: disable=too-many-return-statements, too-many-lines
 from http import HTTPStatus
 
 from flask import jsonify, request, current_app, g
