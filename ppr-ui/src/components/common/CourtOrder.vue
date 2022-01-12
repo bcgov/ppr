@@ -131,54 +131,18 @@
         <v-row no-gutters style="padding: 0 30px;">
           <v-col cols="3" class="generic-label pt-6">Date of Order</v-col>
           <v-col cols="9" class="pt-4">
-            <v-dialog
-              ref="dialog"
-              v-model="modal"
-              :return-value.sync="orderDate"
-              persistent
-              width="450px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  id="court-date-text-field"
-                  :value="computedDateFormatted"
-                  filled
-                  persistent-hint
-                  label="Select the date of the order"
-                  append-icon="mdi-calendar"
-                  clearable
-                  v-bind="attrs"
-                  v-on="on"
-                  v-on:click:append="on.click"
-                  @click:clear="orderDate = ''"
-                  :error-messages="
-                    errors.orderDate.message ? errors.orderDate.message : ''
-                  "
-                >
-                </v-text-field>
-              </template>
-              <v-date-picker
-                id="court-date-picker-calendar"
-                v-model="orderDate"
-                elevation="15"
-                scrollable
-                :min="minCourtDate"
-                :max="maxCourtDate"
-                width="450px"
-              >
-                <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="$refs.dialog.save(orderDate)"
-                >
-                  <strong>OK</strong>
-                </v-btn>
-                <v-btn text color="primary" @click="modal = false">
-                  Cancel
-                </v-btn>
-              </v-date-picker>
-            </v-dialog>
+            <date-picker
+              id="court-date-text-field"
+              nudge-right="40"
+              ref="datePickerRef"
+              title="Select the date of the order"
+              :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
+              :minDate="minCourtDate"
+              :maxDate="maxCourtDate"
+              :persistentHint="true"
+              @emitDate="orderDate = $event"
+              @emitCancel="orderDate = ''"
+            />
           </v-col>
         </v-row>
         <v-row no-gutters style="padding: 0 30px;">
@@ -204,9 +168,7 @@
 </template>
 
 <script lang="ts">
-import { APIRegistrationTypes } from '@/enums'
-import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, tzOffsetMinutes } from '@/utils'
+// external
 import {
   defineComponent,
   reactive,
@@ -216,9 +178,18 @@ import {
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+// bcregistry
+import { DatePicker } from '@bcrs-shared-components/date-picker'
+// local
+import { APIRegistrationTypes } from '@/enums'
+import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { convertDate } from '@/utils'
 import { useCourtOrderValidation } from './composables'
 
 export default defineComponent({
+  components: {
+    DatePicker
+  },
   props: {
     setShowErrors: {
       default: false
@@ -289,19 +260,14 @@ export default defineComponent({
       minCourtDate: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           const minDate = new Date(getRegistrationCreationDate.value)
-          return minDate.toISOString()
+          return minDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
         } else {
           return '0'
         }
       }),
       maxCourtDate: computed((): string => {
         const maxDate = new Date()
-        const offset = tzOffsetMinutes(maxDate)
-        maxDate.setHours(23)
-        maxDate.setMinutes(59)
-        maxDate.setSeconds(59)
-        maxDate.setTime(maxDate.getTime() - (offset * 60 * 1000)) // Subtract to get locale as Pacific
-        return maxDate.toISOString()
+        return maxDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
