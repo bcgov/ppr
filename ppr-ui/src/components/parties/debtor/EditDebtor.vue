@@ -76,8 +76,9 @@
               <v-col cols="4" class="pr-4">
                 <v-text-field
                   filled
-                  label="Middle Name (Optional)"
+                  label="Middle Name"
                   id="txt-middle-debtor"
+                  hint="Required if person has middle name"
                   v-model="currentDebtor.personName.middle"
                   persistent-hint
                 />
