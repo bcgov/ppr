@@ -23,6 +23,7 @@ const doneButtonSelector: string = '#done-btn-debtor'
 const cancelButtonSelector: string = '#cancel-btn-debtor'
 const removeButtonSelector: string = '#remove-btn-debtor'
 
+
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -87,8 +88,8 @@ describe('Debtor add individual tests', () => {
 
     // no validation messages
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Street address, PO box, rural route, or general delivery address')
+    expect(messages.length).toBe(2)
+    expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
@@ -115,9 +116,9 @@ describe('Debtor add individual tests', () => {
 
     // Expect 2 validation messages
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(3)
-    expect(messages.at(0).text()).toBe('Please enter a valid day')
-    expect(messages.at(1).text()).toBe('Please enter a valid year')
+    expect(messages.length).toBe(4)
+    expect(messages.at(1).text()).toBe('Please enter a valid day')
+    expect(messages.at(2).text()).toBe('Please enter a valid year')
   })
 })
 
