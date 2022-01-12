@@ -105,7 +105,8 @@ export const useDebtor = (props, context) => {
         parseInt(localState.day)
       )
       if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
-        localState.currentDebtor.birthDate = dateOfBirth.toISOString().substring(0, 10) + 'T00:00:00-08:00'
+        // eslint-disable-line
+        localState.currentDebtor.birthDate = dateOfBirth.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
       } else {
         localState.currentDebtor.birthDate = null
       }

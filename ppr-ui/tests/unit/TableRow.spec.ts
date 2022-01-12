@@ -153,7 +153,7 @@ describe('TableRow tests', () => {
           if (![APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
             expect(rowData.at(10).text()).toContain('Amend')
           } else {
-            expect(rowData.at(10).text()).toContain('Re-Register')
+            expect(rowData.at(10).text()).toContain('Remove From Table')
           }
         } else {
           // child registration
@@ -258,20 +258,14 @@ describe('TableRow tests', () => {
     })
     const dischargedRegButton = wrapper.findAll('.edit-action .v-btn')
     expect(dischargedRegButton.length).toBe(1)
-    expect(dischargedRegButton.at(0).text()).toContain('Re-Register')
+    expect(dischargedRegButton.at(0).text()).toContain('Remove From Table')
     // FUTURE: test it emits the correct thing here once built
     activeRegButton.at(0).trigger('click')
 
     // click dropdown for discharged reg
     buttons = wrapper.findAll('.actions__more-actions__btn')
-    expect(buttons.length).toBe(1)
-    buttons.at(0).trigger('click')
-    await Vue.nextTick()
-    // it renders the remove action in drop down
-    const menuItemsDischarge = wrapper.findAll('.registration-actions .v-list-item')
-    expect(menuItemsDischarge.length).toBe(1)
-    expect(menuItemsDischarge.at(0).text()).toContain('Remove From Table')
-    await menuItemsDischarge.at(0).trigger('click')
+    expect(buttons.length).toBe(0)
+    await dischargedRegButton.at(0).trigger('click')
     expect(getLastEvent(wrapper, 'action')).toEqual(
       { action: TableActions.REMOVE, regNum: mockedRegistration3.baseRegistrationNumber }
     )

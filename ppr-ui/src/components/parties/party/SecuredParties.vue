@@ -441,11 +441,12 @@ export default defineComponent({
       if (isRegisteringParty(localState.securedParties[index])) {
         localState.registeringPartyAdded = false
       }
-      const currentParty = currentParties.securedParties[index]
+      const currentParty = localState.securedParties[index]
 
       if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentParty.action !== ActionTypes.ADDED)) {
         currentParty.action = ActionTypes.REMOVED
         localState.securedParties.splice(index, 1, currentParty)
+        currentParties.securedParties = localState.securedParties
         setAddSecuredPartiesAndDebtors(currentParties)
       } else {
         localState.securedParties.splice(index, 1)
@@ -468,7 +469,12 @@ export default defineComponent({
 
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
-      localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
+      if (isSecuredPartyRestrictedList(registrationType)) {
+        localState.securedParties = cloneDeep(originalParties.securedParties)
+        delete localState.securedParties[0].action
+      } else {
+        localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
+      }
       getSecuredPartyValidity()
     }
 

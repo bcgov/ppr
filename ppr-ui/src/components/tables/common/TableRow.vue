@@ -178,14 +178,15 @@
           </v-btn>
           <v-btn
             v-else
-            :class="$style['edit-btn']"
+            :class="$style['remove-btn']"
             color="primary"
             elevation="0"
+            @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span>Re-Register</span>
+            <span>Remove From Table</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0">
+        <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
           <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
             <template v-slot:activator="{ on: onMenu }">
               <v-btn
@@ -557,6 +558,11 @@ export default defineComponent({
   font-weight: normal !important;
   height: 35px !important;
   width: 100px;
+}
+.remove-btn {
+  width: 140px;
+  font-weight: normal;
+  height: 36px;
 }
 .discharge-btn {
   line-height: 14px;
