@@ -2,6 +2,7 @@
   <v-container
     fluid
     no-gutters
+    id="length-trust-component"
     class="white pb-6 pr-10 pl-8 rounded"
     :class="{ 'invalid-message': showInvalid }"
   >

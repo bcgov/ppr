@@ -1,5 +1,6 @@
 <template>
   <v-container fluid no-gutters
+    id="collateral-component"
     class="white pa-0"
     :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
@@ -32,6 +33,7 @@
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :isSummary="summaryView"
         :showInvalid="collateral.showInvalid"
+        @collateralOpen="setCollateralOpen($event)"
       />
       <general-collateral
         v-if="showGeneralCollateral"
@@ -58,7 +60,11 @@
         </span>
       </v-col>
     </v-row>
-    <vehicle-collateral :isSummary="false" :showInvalid="collateral.showInvalid && !valid" />
+    <vehicle-collateral
+      :isSummary="false"
+      :showInvalid="collateral.showInvalid && !valid"
+      @collateralOpen="setCollateralOpen($event)"
+    />
     <general-collateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
@@ -194,6 +200,10 @@ export default defineComponent({
       context.emit('setCollateralValid', valid)
     }
 
+    const setCollateralOpen = (isOpen): void => {
+      context.emit('collateralOpen', isOpen)
+    }
+
     const vehiclesValid = (): boolean => {
       let validity = false
       for (let i = 0; i < localState.collateral.vehicleCollateral?.length; i++) {
@@ -234,6 +244,7 @@ export default defineComponent({
       registrationFlowType,
       registrationType,
       RegistrationFlowType,
+      setCollateralOpen,
       ...toRefs(localState)
     }
   }

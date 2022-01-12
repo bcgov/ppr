@@ -440,6 +440,21 @@ export default class ConfirmAmendment extends Vue {
     return ''
   }
 
+  private async scrollToInvalid (): Promise<void> {
+    if (!this.validFolio) {
+      const component = document.getElementById('folio-summary')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+    if (!this.courtOrderValid) {
+      const component = document.getElementById('court-order-component')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+    if (!this.certifyInformationValid) {
+      const component = document.getElementById('certify-information')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   private cancel (val: boolean): void {
     this.showCancelDialog = false
     if (val) {
@@ -536,6 +551,7 @@ export default class ConfirmAmendment extends Vue {
   private submitButton (): void {
     if (!this.validFolio || !this.certifyInformationValid) {
       this.showErrors = true
+      this.scrollToInvalid()
       return
     }
     if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {

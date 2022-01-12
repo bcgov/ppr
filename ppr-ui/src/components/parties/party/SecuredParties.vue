@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pa-0">
+  <v-container fluid no-gutters id="secured-parties-component" class="pa-0">
     <change-secured-party-dialog
       attach="#app"
       :display="showDialog"
@@ -496,11 +496,13 @@ export default defineComponent({
       localState.activeIndex = index
       localState.addEditInProgress = true
       localState.showEditParty[index] = true
+      context.emit('securedPartyOpen', true)
     }
 
     const initAdd = () => {
       localState.addEditInProgress = true
       localState.showAddSecuredParty = true
+      context.emit('securedPartyOpen', true)
     }
 
     const resetData = () => {
@@ -512,6 +514,7 @@ export default defineComponent({
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
       getSecuredPartyValidity()
+      context.emit('securedPartyOpen', false)
     }
 
     const fetchOtherSecuredParties = async () => {

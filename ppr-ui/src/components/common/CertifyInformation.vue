@@ -52,7 +52,7 @@
     </v-row>
     <v-row class="no-gutters">
       <v-col cols="12" class="pa-0" :class="showErrorComponent ? 'border-error-left': ''">
-        <v-card flat>
+        <v-card flat id="certify-information">
           <v-row no-gutters style="padding: 0 30px;">
             <v-col cols="3" class="generic-label pt-8">
               <span :class="showErrorComponent ? 'invalid-color': ''">Confirm<br/>Authorization</span>

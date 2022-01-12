@@ -23,6 +23,8 @@ import { SecuredParties, EditParty, PartySearch } from '@/components/parties/par
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 import { SearchPartyIF } from '@/interfaces'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
+import { getLastEvent } from './utils'
+import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -279,6 +281,12 @@ describe('Secured party amendment tests', () => {
     wrapper.vm.$data.showErrorSecuredParties = true
     await Vue.nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
+  })
+
+  it('fires the open event', async () => {
+    wrapper.vm.initEdit(1)
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'securedPartyOpen')).toBeTruthy()
   })
 
   it('goes from valid to invalid', async () => {

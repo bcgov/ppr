@@ -13,6 +13,7 @@ import {
 // Components
 import { Debtors, EditDebtor } from '@/components/parties/debtor'
 import { RegistrationFlowType } from '@/enums'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -158,6 +159,13 @@ describe('Debtor amendment tests', () => {
     // option from second drop down
     expect(options.at(2).text()).toContain('Remove')
   })
+
+  it('fires the open event', async () => {
+    
+    wrapper.vm.initEdit(1)
+    expect(getLastEvent(wrapper, 'debtorOpen')).toBeTruthy()
+  })
+
 })
 
 describe('Debtor validation tests', () => {

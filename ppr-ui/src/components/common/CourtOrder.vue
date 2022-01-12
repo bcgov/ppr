@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="renewalView && isSummary" class="pa-0">
+  <v-container v-if="renewalView && isSummary" id="court-order-component" class="pa-0">
     <h2 class="pt-2 pb-5">Court Order</h2>
     <v-container class="white" style="padding: 40px 30px;">
       <v-row no-gutters class="pb-7">

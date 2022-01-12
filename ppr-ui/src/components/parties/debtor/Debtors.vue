@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pa-0">
+  <v-container fluid no-gutters id="debtors-component" class="pa-0">
     <v-row no-gutters>
       <v-col cols="auto"
         >Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
@@ -336,12 +336,14 @@ export default defineComponent({
       localState.activeIndex = index
       localState.addEditInProgress = true
       localState.showEditDebtor[index] = true
+      emit('debtorOpen', true)
     }
 
     const initAdd = (currentIsBusiness: boolean) => {
       localState.currentIsBusiness = currentIsBusiness
       localState.addEditInProgress = true
       localState.showAddDebtor = true
+      emit('debtorOpen', true)
     }
 
     const resetData = () => {
@@ -353,6 +355,7 @@ export default defineComponent({
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
       getDebtorValidity()
+      emit('debtorOpen', false)
     }
 
     const undo = (index: number): void => {

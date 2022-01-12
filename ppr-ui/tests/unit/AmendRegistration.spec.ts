@@ -60,7 +60,7 @@ describe('Amendment registration component', () => {
     post.returns(new Promise(resolve => resolve({
       data: { ...mockedDraftAmendmentStatement }
     })))
-
+   
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
     localVue.use(VueRouter)
@@ -131,9 +131,17 @@ describe('Amendment registration component', () => {
 
   it('goes to the confirmation page', async () => {
     wrapper.vm.courtOrderValid = true
+    await store.dispatch('setAmendmentDescription', 'test12')
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
+  })
+
+  it('does not go to the confirmation page if component open', async () => {
+    wrapper.vm.collateralOpen = true
+    wrapper.find(StickyContainer).vm.$emit('submit', true)
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
   it('saves the draft and redirects to dashboard', async () => {
