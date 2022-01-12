@@ -136,6 +136,7 @@
               nudge-right="40"
               ref="datePickerRef"
               title="Select the date of the order"
+              clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :minDate="minCourtDate"
               :maxDate="maxCourtDate"
