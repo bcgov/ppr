@@ -49,6 +49,13 @@ export const useRegistration = () => {
     }
   }
 
+  const getRegisteringName = (name: string): string => {
+    if (!name) {
+      return 'Not Available'
+    }
+    return name
+  }
+
   const getPdfLink = (reg: string): string => {
     return ''
   }
@@ -275,6 +282,7 @@ export const useRegistration = () => {
   return {
     getFormattedDate,
     getStatusDescription,
+    getRegisteringName,
     getPdfLink,
     getRegistrationType,
     filterResults,

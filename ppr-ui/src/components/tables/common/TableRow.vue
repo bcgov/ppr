@@ -87,7 +87,7 @@
       v-if="inSelectedHeaders('registeringName')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      {{ item.registeringName }}
+      {{ getRegisteringName(item.registeringName) }}
     </td>
     <td
       v-if="inSelectedHeaders('registeringParty')"
@@ -301,6 +301,7 @@ export default defineComponent({
       getFormattedDate,
       getRegistrationType,
       getStatusDescription,
+      getRegisteringName,
       registrationNumber,
       registeringParty,
       hasRenewal,
@@ -502,6 +503,7 @@ export default defineComponent({
       getFormattedDate,
       getRegistrationType,
       getStatusDescription,
+      getRegisteringName,
       showExpireDays,
       deleteDraft,
       editDraft,
