@@ -16,6 +16,11 @@ const validationSchema = {
         validator: Validators.required.validator,
         message: 'Enter the vehicle model',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.maxLength.validator,
+        customArgs: { length: 60 },
+        message: 'Maximum {{length}} characters',
       }
     ],
     manufacturedHomeRegistrationNumber: [
@@ -62,6 +67,11 @@ const validationSchema = {
         validator: Validators.required.validator,
         message: 'Enter the vehicle make',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.maxLength.validator,
+        customArgs: { length: 60 },
+        message: 'Maximum {{length}} characters',
       }
     ]
   },
