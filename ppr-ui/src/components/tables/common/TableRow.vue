@@ -178,12 +178,12 @@
           </v-btn>
           <v-btn
             v-else
-            :class="$style['remove-btn']"
+            :class="[$style['remove-btn'], 'text-wrap']"
             color="primary"
             elevation="0"
             @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span>Remove From Table</span>
+            <span>Remove<br>From Table</span>
           </v-btn>
         </v-col>
         <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
@@ -560,9 +560,10 @@ export default defineComponent({
   width: 100px;
 }
 .remove-btn {
-  width: 140px;
-  font-weight: normal;
-  height: 36px;
+  width: 135px;
+  font-weight: normal !important;
+  height: 36px !important;
+  line-height: 14px;
 }
 .discharge-btn {
   line-height: 14px;
