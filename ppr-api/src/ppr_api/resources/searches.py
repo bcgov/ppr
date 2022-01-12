@@ -60,7 +60,7 @@ class SearchResource(Resource):
 #    @TRACER.trace()
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def post():  # pylint: disable=too-many-branches
+    def post():  # pylint: disable=too-many-branches,too-many-locals
         """Execute a new search request using criteria in the request body."""
         try:
             # Quick check: must be staff or provide an account ID.
@@ -91,7 +91,7 @@ class SearchResource(Resource):
             payment = Payment(jwt=jwt.get_token_auth_header(),
                               account_id=account_id,
                               details=get_payment_details(query, request_json['type']))
-            
+
             transaction_type = TransactionTypes.SEARCH.value
             # if gov account user then check if sbc
             if is_gov_account(jwt):
@@ -99,11 +99,11 @@ class SearchResource(Resource):
                 is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
                 if is_sbc:
                     transaction_type = TransactionTypes.SEARCH_STAFF.value
-                elif is_sbc == None:
+                elif is_sbc is None:
                     # didn't get a succesful response from auth
-                    raise BusinessException('Unable to verify possible SBC staff user before payment.', HTTPStatus.INTERNAL_SERVER_ERROR)
-                    
-            
+                    raise BusinessException('Unable to verify possible SBC staff user before payment.',
+                                            HTTPStatus.INTERNAL_SERVER_ERROR)
+
             pay_ref = payment.create_payment(transaction_type, 1, None, query.client_reference_id)
             invoice_id = pay_ref['invoiceId']
             query.pay_invoice_id = int(invoice_id)

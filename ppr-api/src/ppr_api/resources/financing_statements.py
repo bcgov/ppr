@@ -25,8 +25,8 @@ from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Par
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf, get_report_api_payload
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_gov_account, is_reg_staff_account, is_sbc_office_account, is_staff_account, \
-                                   is_bcol_help, is_all_staff_account
+from ppr_api.services.authz import authorized, is_gov_account, is_reg_staff_account, is_sbc_office_account, \
+                                   is_staff_account, is_bcol_help, is_all_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
@@ -821,12 +821,8 @@ class VerificationResource(Resource):
                                   f'Party={party_id}. ' + repr(default_err))
 
 
-def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-locals
-                 request_json,
-                 registration_class,
-                 financing_statement,
-                 registration_num,
-                 account_id):
+def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
+                 request_json, registration_class, financing_statement, registration_num, account_id):
     """Set up the registration, pay if there is an account id, and save the data."""
     token: dict = g.jwt_oidc_token_info
     registration = Registration.create_from_json(request_json,
@@ -849,7 +845,6 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
         pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
     elif registration_class == model_utils.REG_CLASS_DISCHARGE:
         pay_trans_type = TransactionTypes.DISCHARGE.value
-
     if not is_reg_staff_account(account_id):
         pay_account_id: str = account_id
         # if gov user then check if sbc staff
@@ -858,9 +853,10 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
             is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
             if is_sbc:
                 pay_account_id = None
-            elif is_sbc == None:
+            elif is_sbc is None:
                 # didn't get a succesful response from auth
-                raise BusinessException('Unable to verify possible SBC staff user before payment.', HTTPStatus.INTERNAL_SERVER_ERROR)
+                raise BusinessException('Unable to verify possible SBC staff user before payment.',
+                                        HTTPStatus.INTERNAL_SERVER_ERROR)
 
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
@@ -895,7 +891,7 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
     return registration
 
 
-def pay_and_save_financing(req: request, request_json, account_id):
+def pay_and_save_financing(req: request, request_json, account_id):  # pylint: disable=too-many-locals
     """Set up the financing statement, pay if there is an account id, and save the data."""
     # Charge a fee.
     token: dict = g.jwt_oidc_token_info
@@ -912,9 +908,10 @@ def pay_and_save_financing(req: request, request_json, account_id):
             is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
             if is_sbc:
                 pay_account_id = None
-            elif is_sbc == None:
+            elif is_sbc is None:
                 # didn't get a succesful response from auth
-                raise BusinessException('Unable to verify possible SBC staff user before payment.', HTTPStatus.INTERNAL_SERVER_ERROR)
+                raise BusinessException('Unable to verify possible SBC staff user before payment.',
+                                        HTTPStatus.INTERNAL_SERVER_ERROR)
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details_financing(registration))
