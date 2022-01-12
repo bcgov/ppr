@@ -129,4 +129,19 @@ describe('Collateral validation tests', () => {
       'Manufactured Home Registration Number must contain 6 digits'
     )
   })
+
+  it('validates max lengths', async () => {
+    wrapper.find('#txt-type-drop').setValue('MV')
+    await Vue.nextTick()
+    wrapper.find('#txt-serial').setValue('ABC123')
+    wrapper.find('#txt-make').setValue('This is a very long make for a car or any vehicle for that matter but is it too long')
+    wrapper.find('#txt-model').setValue('This is a very long model for a car or any vehicle for that matter but is it too long')
+    wrapper.find('#txt-years').setValue(2016)
+    wrapper.find(doneButtonSelector).trigger('click')
+    await flushPromises()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(3)
+    expect(messages.at(1).text()).toBe('Maximum 60 characters')
+    expect(messages.at(2).text()).toBe('Maximum 60 characters')
+  })
 })
