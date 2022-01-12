@@ -485,7 +485,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return results_json
 
     @classmethod
-    def find_summary_by_reg_num(cls, account_id: str, registration_num: str):
+    def find_summary_by_reg_num(cls, account_id: str, registration_num: str, account_name: str = None):
         """Return a single registration summary by registration_number."""
         result = {}
         changes = []
@@ -541,7 +541,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
                     elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                         result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
-
+                    # Set if user can access verification statement.
+                    if not Registration.can_access_report(account_id, account_name, result):
+                        result['path'] = ''
                     result = Registration.__update_summary_optional(result, account_id)
                     if not model_utils.is_financing(reg_class):
                         changes.append(result)
