@@ -99,6 +99,9 @@
           <template v-slot:[`item.debtor.birthDate`]="{ item }">
             {{ displayDate(item.debtor.birthDate) }}
           </template>
+          <template v-if="regNumberType" v-slot:[`item.registrationNumber`]="{ item }">
+            <span>{{ item.baseRegistrationNumber }}</span>
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
@@ -120,7 +123,7 @@ import { useGetters } from 'vuex-composition-helpers'
 
 import { searchTableHeaders } from '@/resources'
 import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { MatchTypes } from '@/enums'
+import { MatchTypes, APISearchTypes } from '@/enums'
 import { convertDate } from '@/utils'
 
 export default defineComponent({
@@ -149,6 +152,14 @@ export default defineComponent({
       totalResultsLength: 0,
       selectedLength: computed((): number => {
         return localState.selected?.length | 0
+      }),
+      regNumberType: computed((): boolean => {
+        let resp = null
+        resp = getSearchResults.value
+        if (resp) {
+          return (resp.searchQuery.type === APISearchTypes.REGISTRATION_NUMBER)
+        }
+        return false
       }),
       setTableData: computed((): SearchResponseIF => {
         let resp = null
