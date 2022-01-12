@@ -274,11 +274,11 @@ def validate_delete_ids(json_data, financing_statement):
 def get_account_name(token: str, account_id: str = None):  # pylint: disable=too-many-return-statements; added staff
     """Lookup the account organization name from the user token with an auth api call."""
     try:
-        if is_reg_staff_account(account_id):
+        if account_id is not None and is_reg_staff_account(account_id):
             return REG_STAFF_DESC
-        if is_sbc_office_account(account_id):
+        if account_id is not None and is_sbc_office_account(token, account_id):
             return SBC_STAFF_DESC
-        if is_bcol_help(account_id):
+        if account_id is not None and is_bcol_help(account_id):
             return BCOL_STAFF_DESC
 
         orgs = user_orgs(token)

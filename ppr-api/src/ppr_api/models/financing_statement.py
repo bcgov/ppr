@@ -104,6 +104,11 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         if self.state_type == model_utils.STATE_DISCHARGED:
             index = len(self.registration) - 1
             statement['dischargedDateTime'] = model_utils.format_ts(self.registration[index].registration_ts)
+        if not self.current_view_json and self.state_type != model_utils.STATE_ACTIVE:
+            statement['statusType'] = model_utils.STATE_ACTIVE
+        elif self.current_view_json and self.state_type == model_utils.STATE_ACTIVE and self.expire_date and \
+                self.expire_date.timestamp() < model_utils.now_ts().timestamp():
+            statement['statusType'] = model_utils.STATE_EXPIRED
 
         if self.registration and self.registration[0]:
             reg = self.registration[0]
@@ -152,13 +157,27 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         else:
             statement['trustIndenture'] = False
 
-        if self.life and self.life == model_utils.LIFE_INFINITE:
-            statement['lifeInfinite'] = True
-        elif self.life:
-            statement['lifeYears'] = self.life
+        if self.current_view_json:
+            if self.life and self.life == model_utils.LIFE_INFINITE:
+                statement['lifeInfinite'] = True
+            elif self.life:
+                statement['lifeYears'] = self.life
 
-        if self.expire_date:
-            statement['expiryDate'] = model_utils.format_ts(self.expire_date)
+            if self.expire_date:
+                statement['expiryDate'] = model_utils.format_ts(self.expire_date)
+        else:
+            # Set the original life years and expiry date: not current view is the verification statement
+            registration = self.registration[0]
+            if registration.life == model_utils.LIFE_INFINITE:
+                statement['lifeInfinite'] = True
+            elif registration.life:
+                statement['lifeYears'] = registration.life
+                expiry = model_utils.expiry_dt_from_registration(registration.registration_ts, registration.life)
+                statement['expiryDate'] = model_utils.format_ts(expiry)
+            elif model_utils.REG_TYPE_REPAIRER_LIEN == registration.registration_type:
+                statement['lifeYears'] = 0
+                expiry = model_utils.expiry_dt_repairer_lien(registration.registration_ts)
+                statement['expiryDate'] = model_utils.format_ts(expiry)
 
         self.set_court_order_json(statement)
         self.set_payment_json(statement)

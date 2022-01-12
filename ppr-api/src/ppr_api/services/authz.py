@@ -167,6 +167,7 @@ def user_orgs(token: str) -> dict:
 
     return response
 
+
 def account_org(token: str, account_id: str) -> dict:
     """Auth API call to get the account organization info identified by the account id."""
     response = None
@@ -219,7 +220,7 @@ def is_bcol_help(account_id: str) -> bool:
 
 def is_staff_account(account_id: str) -> bool:
     """Return True if the account id is a registries staff or sbc office account id."""
-    return account_id is not None and account_id in (STAFF_ROLE)
+    return account_id is not None and account_id == STAFF_ROLE
 
 
 def is_reg_staff_account(account_id: str) -> bool:

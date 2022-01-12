@@ -28,12 +28,22 @@
         </tr>
       </table>
     </div>
-
     <div class="business-details-container">
+
+    {% if meta_subject|length > 70 %}
+      <table class="business-name-header-long ma-0 pa-0" role="presentation">
+        <tr>
+          <td class="lbl-business-name ma-0 pt-3 pb-3">
+            {{ meta_subject }}
+          </td>
+        </tr>
+      </table>
+    {% else %}
       <div class="business-name-header">
         <span class="lbl-business-name ma-0 pa-0">{{ meta_subject }}</span>
       </div>
-  
+    {% endif %}
+
       <table class="business-details-table" role="presentation">
         <tr>
           <td class="lbl-business-detail">
@@ -86,7 +96,13 @@
         </th>
       </tr>
       <tr class="mt-2">
-          <td>Registrations in this Report: {{ totalResultsSize }}</td>
+          <td>
+            {% if totalResultsSize > 0 %}
+              {{ selected|length }} Matches in {{ totalResultsSize }} Registrations
+            {% else %}
+              0 Matches in 0 Registrations
+            {% endif %}  
+          </td>
           <td>Exact Matches: {{ exactResultsSize }} (in bold)</td>
           <td>Total Search Report Pages:
             {% if totalResultsSize > 0 %}
