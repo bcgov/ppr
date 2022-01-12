@@ -20,7 +20,7 @@ const validationSchema = {
       {
         validator: Validators.maxLength.validator,
         customArgs: { length: 60 },
-        message: 'Maximum {{length}} characters',
+        message: 'Maximum {{length}} characters'
       }
     ],
     manufacturedHomeRegistrationNumber: [
@@ -71,7 +71,7 @@ const validationSchema = {
       {
         validator: Validators.maxLength.validator,
         customArgs: { length: 60 },
-        message: 'Maximum {{length}} characters',
+        message: 'Maximum {{length}} characters'
       }
     ]
   },
