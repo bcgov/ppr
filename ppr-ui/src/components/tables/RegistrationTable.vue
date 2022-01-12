@@ -173,6 +173,7 @@
                     v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
                     :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pl-6', 'pt-4']"
                     color="primary"
+                    :ripple="false"
                     text
                     @click="clearFilters()"
                   >

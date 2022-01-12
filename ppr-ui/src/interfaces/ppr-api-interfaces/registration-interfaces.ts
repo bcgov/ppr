@@ -70,6 +70,7 @@ export interface RegistrationSummaryIF {
   hide?: boolean, // FUTURE: take this out -- added by UI and is unnecessary
   inUserList?: boolean, // whether the registration is in their table or not
   lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
+  new?: boolean, // used to prevent the collapse of a newly added base reg
   path: string,
   registeringName?: string,
   registeringParty: string,

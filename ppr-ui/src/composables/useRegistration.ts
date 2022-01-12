@@ -130,8 +130,8 @@ export const useRegistration = () => {
   const filterResults = (originalData: RegistrationSummaryIF[]): any[] => {
     const newTableData = [] // filtered list of base registrations
     for (let i = 0; i < originalData.length; i++) {
-      // start by setting expand to false if relevant
-      if (originalData[i].changes) originalData[i].expand = false
+      // start by setting expand to false if relevant (unless it is a newly added registration)
+      if (originalData[i].changes && !originalData[i].new) originalData[i].expand = false
       if (localState.registrationNumber) {
         const regNumFilter = (item: any): boolean => {
           // item is RegistrationSummaryIF or DraftResultIF
@@ -213,15 +213,17 @@ export const useRegistration = () => {
       if (localState.submittedStartDate && localState.submittedEndDate) {
         const sDateFilter = (item: any): boolean => {
           if (item.createDateTime) {
-            const created = item.createDateTime.substring(0, 10)
-            if (created < localState.submittedStartDate) return false
+            const createdDate = new Date(item.createDateTime)
+            const localDateStr = createdDate.toLocaleDateString('en-CA')
+            if (localDateStr < localState.submittedStartDate) return false
           }
           return true
         }
         const eDateFilter = (item: any): boolean => {
           if (item.createDateTime) {
-            const created = item.createDateTime.substring(0, 10)
-            if (created > localState.submittedEndDate) return false
+            const createdDate = new Date(item.createDateTime)
+            const localDateStr = createdDate.toLocaleDateString('en-CA')
+            if (localDateStr > localState.submittedEndDate) return false
           }
           return true
         }
