@@ -85,7 +85,7 @@ export default defineComponent({
       }),
       today: computed(() => {
         const todayDate = new Date()
-        return todayDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
+        return todayDate.toLocaleDateString('en-CA')
       })
     })
     const emitDateRange = (): void => {
