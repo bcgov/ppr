@@ -107,6 +107,7 @@ export enum APIAmendmentTypes {
     DEBTOR_RELEASE = 'AR', // Only removing a debtor.
     DISCHARGE = 'DC',
     PARTIAL_DISCHARGE = 'AP', // Only removing collateral.
+    RENEWAL = 'RE',
     SECURED_PARTY_TRANSFER = 'AS' // Only adding and removing a secured party.
 }
 
@@ -118,6 +119,7 @@ export enum UIAmendmentTypes {
     DEBTOR_TRANSFER = 'Debtor Transfer',
     DEBTOR_RELEASE = 'Debtor Release',
     DISCHARGE = 'Discharge',
+    RENEWAL = 'Renewal',
     PARTIAL_DISCHARGE = 'Partial Discharge',
     SECURED_PARTY_TRANSFER = 'Secured Party Transfer'
 }
