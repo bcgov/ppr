@@ -121,6 +121,7 @@
           </h2>
           <registering-party
             class="pt-4"
+            @changeRegisteringParty="changeRegisteringParty"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
