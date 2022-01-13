@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from sqlalchemy import event
+from sqlalchemy import event, text
 
 from ppr_api.models import utils as model_utils
 
@@ -25,9 +25,9 @@ from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
-BUS_SEARCH_KEY_SP = "select searchkey_business_name('?')"
-FIRST_NAME_KEY_SP = "select searchkey_individual('last', 'first')"
-LAST_NAME_KEY_SP = "select searchkey_last_name('?')"
+BUS_SEARCH_KEY_SP = "select searchkey_business_name(:bus_name)"
+FIRST_NAME_KEY_SP = "select searchkey_individual(:last_name, :first_name)"
+LAST_NAME_KEY_SP = "select searchkey_last_name(:last_name)"
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -130,6 +130,14 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 party['birthDate'] = model_utils.format_ts(self.birth_date)
 
         return party
+
+
+    def save(self):
+        """Save the object to the database immediately."""
+        db.session.add(self)
+        db.session.commit()
+
+        return self.json
 
     @property
     def name(self) -> str:
@@ -269,11 +277,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 def party_before_insert_listener(mapper, connection, target):   # pylint: disable=unused-argument; don't use mapper
     """Conditionally set debtor search key values."""
     if target.party_type == target.PartyTypes.DEBTOR_COMPANY.value:
-        sp_call = BUS_SEARCH_KEY_SP.replace('?', target.business_name)
-        target.business_search_key = connection.scalar(sp_call)
+        stmt = text(BUS_SEARCH_KEY_SP)
+        stmt = stmt.bindparams(bus_name=target.business_name)
+        target.business_search_key = connection.execute(stmt).scalar()
     elif target.party_type == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
-        sp_call_firstname = FIRST_NAME_KEY_SP.replace('last', target.last_name)
-        sp_call_firstname = sp_call_firstname.replace('first', target.first_name)
-        # sp_call_lastname = LAST_NAME_KEY_SP.replace('?', target.last_name)
-        target.first_name_key = connection.scalar(sp_call_firstname)
-        # target.last_name_key = connection.scalar(sp_call_lastname)
+        stmt = text(FIRST_NAME_KEY_SP)
+        stmt = stmt.bindparams(last_name=target.last_name, first_name=target.first_name)
+        target.first_name_key = connection.execute(stmt).scalar()

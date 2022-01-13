@@ -513,7 +513,7 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_financing_date_time(statement):
         """Replace financing statement API ISO UTC strings with local report format strings."""
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
-        if 'expiryDate' in statement:
+        if 'expiryDate' in statement and len(statement['expiryDate']) > 10:
             statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
         if 'surrenderDate' in statement:
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
@@ -545,7 +545,7 @@ class Report:  # pylint: disable=too-few-public-methods
             statement['courtOrderInformation']['orderDate'] = order_date
         if 'changeType' in statement:
             statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
-        if 'expiryDate' in statement:
+        if 'expiryDate' in statement and len(statement['expiryDate']) > 10:
             statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
         if 'surrenderDate' in statement:
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
