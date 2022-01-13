@@ -131,7 +131,6 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return party
 
-
     def save(self):
         """Save the object to the database immediately."""
         db.session.add(self)
