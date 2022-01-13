@@ -322,12 +322,7 @@ export default defineComponent({
       } else if (localState.selectedSearchType.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR) {
         return { debtorName: { business: localState.searchValue?.trim() } }
       } else {
-        let cleanedSearchValue = localState.searchValue?.trim()
-        if (localState.selectedSearchType.searchTypeUI === UISearchTypes.AIRCRAFT) {
-          // replaceAll fails in jest so use regex
-          const dash = /-/g
-          cleanedSearchValue = cleanedSearchValue?.replace(dash, '')
-        }
+        const cleanedSearchValue = localState.searchValue?.trim()
         return { value: cleanedSearchValue }
       }
     }
