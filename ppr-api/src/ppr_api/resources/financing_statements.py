@@ -850,17 +850,6 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
         pay_trans_type = TransactionTypes.DISCHARGE.value
     if not is_reg_staff_account(account_id):
         pay_account_id: str = account_id
-        # if gov user then check if sbc staff
-        if is_gov_account(jwt):
-            # if SBC staff user (authy, api call) then set payment account id to None
-            is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
-            if is_sbc:
-                pay_account_id = None
-            elif is_sbc is None:
-                # didn't get a succesful response from auth
-                raise BusinessException('Unable to verify possible SBC staff user before payment.',
-                                        HTTPStatus.INTERNAL_SERVER_ERROR)
-
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details(registration))
@@ -905,16 +894,6 @@ def pay_and_save_financing(req: request, request_json, account_id):  # pylint: d
     pay_ref = None
     if not is_reg_staff_account(account_id):
         pay_account_id: str = account_id
-        # if gov user then check if sbc staff
-        if is_gov_account(jwt):
-            # if SBC staff user (authy, api call) then set payment account id to None
-            is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
-            if is_sbc:
-                pay_account_id = None
-            elif is_sbc is None:
-                # didn't get a succesful response from auth
-                raise BusinessException('Unable to verify possible SBC staff user before payment.',
-                                        HTTPStatus.INTERNAL_SERVER_ERROR)
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details_financing(registration))
