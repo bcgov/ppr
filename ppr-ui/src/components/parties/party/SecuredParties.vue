@@ -608,6 +608,7 @@ export default defineComponent({
 
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) {
+        let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
         if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
           const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
           // original secured party must be shown as removed
@@ -615,11 +616,11 @@ export default defineComponent({
           originalParty.action = ActionTypes.REMOVED
           localState.securedParties = [originalParty, localState.savedParty]
         } else {
-          parties.securedParties = [localState.savedParty]
-          parties.valid = isPartiesValid(parties)
-          setAddSecuredPartiesAndDebtors(parties)
           localState.securedParties = [localState.savedParty]
         }
+        parties.securedParties = localState.securedParties
+        parties.valid = isPartiesValid(parties)
+        setAddSecuredPartiesAndDebtors(parties)
       } else {
         localState.searchValue = {
           code: localState.securedParties[0].code,
