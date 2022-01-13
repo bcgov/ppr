@@ -18,7 +18,7 @@
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
-          <registration-length-trust-amendment class="mt-15" />
+          <registration-length-trust-amendment @lengthTrustOpen="lengthTrustOpen = $event" class="mt-15" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -225,6 +225,7 @@ export default class AmendRegistration extends Vue {
   private debtorOpen = false
   private securedPartyOpen = false
   private collateralOpen = false
+  private lengthTrustOpen = false
   private amendErrMsg = ''
 
   private get asOfDateTime (): string {
@@ -376,34 +377,37 @@ export default class AmendRegistration extends Vue {
   }
 
   private async scrollToInvalid (): Promise<void> {
-    if (this.collateralOpen || !this.collateralValid) {
-      const component = document.getElementById('collateral-component')
+    if (this.lengthTrustOpen || !this.registrationLengthTrustValid) {
+      const component = document.getElementById('length-trust-amendment')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (this.securedPartyOpen || !this.securedPartiesValid) {
       const component = document.getElementById('secured-parties-component')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
 
     if (this.debtorOpen || !this.debtorValid) {
       const component = document.getElementById('debtors-component')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
-
-    if (!this.registrationLengthTrustValid) {
-      const component = document.getElementById('length-trust-component')
+    if (this.collateralOpen || !this.collateralValid) {
+      const component = document.getElementById('collateral-component')
       await component.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
   private confirmAmendment (): void {
-    if (!this.hasAmendmentChanged()) {
-      this.amendErrMsg = '< Please make any required changes'
+    if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen || this.lengthTrustOpen) {
+      this.amendErrMsg = '< You have unfinished changes'
+      this.showInvalid = true
+      this.scrollToInvalid()
       return
     }
-    if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen) {
-      this.amendErrMsg = '< You have unfinished changes'
-      this.scrollToInvalid()
+    if (!this.hasAmendmentChanged()) {
+      this.amendErrMsg = '< Please make any required changes'
       return
     }
     const description = this.getAmendmentDescription

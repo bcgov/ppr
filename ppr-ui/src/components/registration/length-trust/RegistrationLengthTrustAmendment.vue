@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="!summaryView" fluid no-gutters class="white pb-6 pr-10 pl-8 rounded">
+  <v-container v-if="!summaryView" fluid id="length-trust-amendment" no-gutters class="white pb-6 pr-10 pl-8 rounded">
     <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
@@ -170,11 +170,13 @@ export default defineComponent({
     const initEdit = () => {
       localState.editInProgress = true
       localState.showEditTrustIndenture = true
+      context.emit('lengthTrustOpen', true)
     }
 
     const resetEdit = () => {
       localState.editInProgress = false
       localState.showEditTrustIndenture = false
+      context.emit('lengthTrustOpen', false)
     }
 
     onMounted(() => {
