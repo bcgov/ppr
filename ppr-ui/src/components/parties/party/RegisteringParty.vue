@@ -33,7 +33,7 @@
                 </td>
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
-                <td class="actions-cell actions-width px-0" v-if="registrationFlowType === RegistrationFlowType.NEW">
+                <td class="actions-cell actions-width px-0">
                 <div class="actions float-right actions-up">
 
                   <v-btn
@@ -183,11 +183,7 @@ export default defineComponent({
         return []
       }),
       partyHeaders: computed((): Array<any> => {
-        if (registrationFlowType === RegistrationFlowType.NEW) {
-          return [...registeringTableHeaders, ...editTableHeaders]
-        } else {
-          return registeringTableHeaders
-        }
+        return [...registeringTableHeaders, ...editTableHeaders]
       })
     })
 
