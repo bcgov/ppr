@@ -472,6 +472,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         if not Registration.can_access_report(account_id, account_name, result):
                             result['path'] = ''
 
+                        if 'accountId' in result:
+                            del result['accountId']  # Only use this for report access checking.
+
                         if collapse and not model_utils.is_financing(reg_class):
                             registrations_json.append(result)
                         else:
@@ -511,7 +514,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         'registeringParty': str(mapping['registering_party']),
                         'securedParties': str(mapping['secured_party']),
                         'clientReferenceId': str(mapping['client_reference_id']),
-                        'registeringName': str(mapping['registering_name'])
+                        'registeringName': str(mapping['registering_name']),
+                        'accountId': str(mapping['account_id'])
                     }
                     if model_utils.is_financing(reg_class):
                         result['baseRegistrationNumber'] = reg_num
@@ -520,7 +524,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         result['expireDays'] = int(mapping['expire_days'])
                         result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
                         result['existsCount'] = int(mapping['exists_count'])
-                        result['accountId'] = str(mapping['account_id'])
                         # Another account already added.
                         if result['existsCount'] > 0 and result['accountId'] != account_id:
                             result['inUserList'] = True
@@ -562,7 +565,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Determine if request account can view the registration verification statement."""
         # All staff roles can see any verification statement.
         reg_account_id = reg_json['accountId']
-        del reg_json['accountId']  # Only use this for report access checking.
         if is_all_staff_account(account_id):
             return True
         if account_id == reg_account_id:
