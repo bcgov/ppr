@@ -13,7 +13,7 @@
 # limitations under the License.
 """API endpoints for maintaining financing statements and updates to financing statements."""
 
-# pylint: disable=too-many-return-statements
+# pylint: disable=too-many-return-statements, too-many-lines
 from http import HTTPStatus
 
 from flask import jsonify, request, current_app, g
@@ -663,7 +663,8 @@ class AccountRegistrationResource(Resource):
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
             # Try to fetch summary registration by registration number
-            registration = Registration.find_summary_by_reg_num(account_id, registration_num)
+            account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name)
             if registration is None:
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
             # Save the base registration: request may be a change registration number.
@@ -709,7 +710,8 @@ class AccountRegistrationResource(Resource):
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
             # Try to fetch summary registration by registration number
-            registration = Registration.find_summary_by_reg_num(account_id, registration_num)
+            account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name)
             if registration is None:
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
             # Restricted access check for crown charge class of registration types.
@@ -742,7 +744,8 @@ class AccountRegistrationResource(Resource):
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
             # Try and get existing record
-            registration = Registration.find_summary_by_reg_num(account_id, registration_num)
+            account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name)
             extra_registration = UserExtraRegistration.find_by_registration_number(registration_num, account_id)
             if extra_registration is None and registration is None:
                 return resource_utils.not_found_error_response('user account registration', registration_num)
