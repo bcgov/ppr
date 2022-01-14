@@ -397,13 +397,8 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'deleteVehicleCollateral' in statement and 'addVehicleCollateral' in statement:
             for add in statement['addVehicleCollateral']:
                 for delete in statement['deleteVehicleCollateral']:
-                    if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id']:
-                        add['edit'] = True
-                        delete['edit'] = True
-        if 'deleteGeneralCollateral' in statement and 'addGeneralCollateral' in statement:
-            for add in statement['addGeneralCollateral']:
-                for delete in statement['deleteGeneralCollateral']:
-                    if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id']:
+                    if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id'] and \
+                            add['type'] == delete['type'] and add['serialNumber'] == delete['serialNumber']:
                         add['edit'] = True
                         delete['edit'] = True
 
