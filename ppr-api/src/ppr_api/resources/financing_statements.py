@@ -25,7 +25,7 @@ from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Par
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import ReportTypes, get_pdf, get_report_api_payload
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_gov_account, is_reg_staff_account, is_sbc_office_account, \
+from ppr_api.services.authz import authorized, is_reg_staff_account, is_sbc_office_account, \
                                    is_staff_account, is_bcol_help, is_all_staff_account
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
@@ -631,9 +631,11 @@ class GetRegistrationResource(Resource):
             # Try to fetch financing statement list for account ID
             # To access a registration report, use the account name to match on registering/secured parties.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
+            sbc_staff: bool = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
             statement_list = Registration.find_all_by_account_id(account_id,
                                                                  collapse_param,
-                                                                 account_name)
+                                                                 account_name,
+                                                                 sbc_staff)
             return jsonify(statement_list), HTTPStatus.OK
         except DatabaseException as db_exception:   # noqa: B902; return nicer error
             return resource_utils.db_exception_response(db_exception, account_id,
@@ -711,7 +713,8 @@ class AccountRegistrationResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
             # Try to fetch summary registration by registration number
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
-            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name)
+            sbc_staff: bool = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name, sbc_staff)
             if registration is None:
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
             # Restricted access check for crown charge class of registration types.
