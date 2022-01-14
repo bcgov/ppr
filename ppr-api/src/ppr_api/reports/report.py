@@ -479,30 +479,40 @@ class Report:  # pylint: disable=too-few-public-methods
                         delete['edit'] = True
 
     @staticmethod
-    def _set_modified_party(add_party, delete_party):
+    def _set_modified_party(add_party, delete_parties):
         """Set the update flags for a single party ."""
-        if 'reg_id' in add_party and 'reg_id' in delete_party and add_party['reg_id'] == delete_party['reg_id']:
-            delete_party['edit'] = True
-            if add_party['address'] != delete_party['address']:
-                add_party['address_change'] = True
-            if 'businessName' in add_party and 'businessName' in delete_party and \
-                    add_party['businessName'] != delete_party['businessName']:
-                add_party['name_change'] = True
-            elif 'personName' in add_party and 'personName' in delete_party and \
-                    add_party['personName'] != delete_party['personName']:
-                add_party['name_change'] = True
+        for delete_party in delete_parties:
+            if 'reg_id' in add_party and 'reg_id' in delete_party and \
+                    add_party['reg_id'] == delete_party['reg_id'] and 'edit' not in delete_party:
+                if add_party['address'] == delete_party['address']:
+                    if 'businessName' in add_party and 'businessName' in delete_party and \
+                            add_party['businessName'] != delete_party['businessName']:
+                        add_party['name_change'] = True
+                        delete_party['edit'] = True
+                    elif 'personName' in add_party and 'personName' in delete_party and \
+                            add_party['personName'] != delete_party['personName']:
+                        add_party['name_change'] = True
+                        delete_party['edit'] = True
+                elif 'businessName' in add_party and 'businessName' in delete_party and \
+                        add_party['businessName'] == delete_party['businessName']:
+                    add_party['address_change'] = True
+                    delete_party['edit'] = True
+                elif 'personName' in add_party and 'personName' in delete_party and \
+                        add_party['personName'] == delete_party['personName']:
+                    add_party['address_change'] = True
+                    delete_party['edit'] = True
 
     def _set_modified_parties(self, statement):
         """Replace amendment or change address country code with description. Set if party edited."""
         self._set_amend_change_addresses(statement)
         if 'deleteSecuredParties' in statement and 'addSecuredParties' in statement:
             for add_secured in statement['addSecuredParties']:
-                for delete_secured in statement['deleteSecuredParties']:
-                    Report._set_modified_party(add_secured, delete_secured)
+                if statement['deleteSecuredParties']:
+                    Report._set_modified_party(add_secured, statement['deleteSecuredParties'])
         if 'deleteDebtors' in statement and 'addDebtors' in statement:
             for add_debtor in statement['addDebtors']:
-                for delete_debtor in statement['deleteDebtors']:
-                    Report._set_modified_party(add_debtor, delete_debtor)
+                if statement['deleteDebtors']:
+                    Report._set_modified_party(add_debtor, statement['deleteDebtors'])
 
     @staticmethod
     def _set_financing_date_time(statement):
