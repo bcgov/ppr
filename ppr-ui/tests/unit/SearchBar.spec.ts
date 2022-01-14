@@ -275,8 +275,7 @@ describe('Individual debtor search', () => {
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
-    // middle name hint
-    expect(wrapper.findAll('.v-messages__message').length).toBe(1)
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
@@ -305,8 +304,7 @@ describe('Individual debtor search', () => {
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
-    // middle name hint
-    expect(wrapper.findAll('.v-messages__message').length).toBe(1)
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
@@ -487,7 +485,6 @@ describe('Aircraft search', () => {
     sandbox.restore()
     wrapper.destroy()
   })
-
 
   it('searches when fields are filled', async () => {
     expect(select.searchTypeUI).toEqual(UISearchTypes.AIRCRAFT)
