@@ -15,16 +15,16 @@
          <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>
       {% else %}
          {% if collateral.descriptionAdd is defined %}
-            <div class="pb-2"><span class="label">ADDED</span></div>
             <div class="section-data page-break-inside : auto">{{ collateral.descriptionAdd }}</div>
+            <div class="pb-2"><span class="label">ADDED</span></div>
          {% endif %}
          {% if collateral.descriptionDelete is defined %}
-            {% if collateral.descriptionAdd is defined %}
-               <div class="pt-3 pb-2"><span class="label">REMOVED</span></div>
-            {% else %}
-               <div class="pb-2"><span class="label">REMOVED</span></div>
-            {% endif %}
             <div class="section-data page-break-inside : auto">{{ collateral.descriptionDelete }}</div>
+            {% if collateral.descriptionAdd is defined %}
+               <div class="pt-3 pb-2"><span class="label">DELETED</span></div>
+            {% else %}
+               <div class="pb-2"><span class="label">DELETED</span></div>
+            {% endif %}
          {% endif %}
       {% endif %}
       {% if not loop.last %}
@@ -35,8 +35,8 @@
    <div class="general-collateral-datetime pt-3">{{ change.createDateTime }}</div>
    {% if change.addGeneralCollateral is defined %}
       {% for collateral in change.addGeneralCollateral %}
-         <div class="pt-3 pb-3"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
          <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>
+         <div class="pt-3 pb-3"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
          {% if not loop.last %}
             <div class="separator-section mt-4 mb-1"></div>
          {% endif %}
@@ -45,8 +45,8 @@
    {% if change.deleteGeneralCollateral is defined %}
       {% for collateral in change.deleteGeneralCollateral %}
          {% if collateral.edit is not defined %}
-            <div class="pt-3 pb-3"><span class="label">REMOVED</span></div>
             <div class="section-data page-break-inside : auto">{{ collateral.description }}</div>
+            <div class="pt-3 pb-3"><span class="label">DELETED</span></div>
             {% if loop.last == false  %}
                <div class="separator-section mt-4 mb-1"></div>
             {% endif %}

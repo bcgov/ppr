@@ -129,7 +129,7 @@ def test_party_json(session):
 def test_create_from_json(session):
     """Assert that the party json renders to a party model correctly."""
     party_bus_json = {
-        'businessName': 'business',
+        'businessName': 'business\'s, inc',
         'emailAddress': 'asmith@gmail.com',
         'address': {
             'street': 'street',
@@ -217,3 +217,54 @@ def test_verify_party_code_false(session):
     """Assert that Party.verify_party_code works correctly with an invalid code."""
     result = Party.verify_party_code('300000000')
     assert not result
+
+
+def test_save_business(session):
+    """Assert that saving a business name party works correctly."""
+    party_bus_json = {
+        'businessName': 'business\'s, inc',
+        'emailAddress': 'asmith@gmail.com',
+        'address': {
+            'street': 'street',
+            'streetAdditional': 'additional',
+            'city': 'city',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8S2J4'
+        }
+    }
+
+    party_bus = Party.create_from_json(party_bus_json, Party.PartyTypes.DEBTOR_COMPANY.value, 1234)
+    party_bus.registration_id = 200000000
+    party_bus.financing_id = 200000000
+    party_bus.save()
+    assert party_bus.business_search_key
+    assert party_bus.id
+
+
+def test_save_individual(session):
+    """Assert that saving a business name party works correctly."""
+    party_ind_json = {
+        'personName': {
+            'first': 'first\'s name',
+            'last': 'last, name',
+            'middle': 'middle'
+        },
+        'emailAddress': 'asmith@gmail.com',
+        'birthDate': '1990-06-15',
+        'address': {
+            'street': 'street',
+            'streetAdditional': 'additional',
+            'city': 'city',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8S2J4'
+        }
+    }
+
+    party = Party.create_from_json(party_ind_json, Party.PartyTypes.DEBTOR_INDIVIDUAL.value, 1234)
+    party.registration_id = 200000000
+    party.financing_id = 200000000
+    party.save()
+    assert party.first_name_key
+    assert party.id

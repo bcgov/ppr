@@ -55,8 +55,8 @@
       {% for collateral in change.addVehicleCollateral %}
          <tr class="no-page-break">
             <td>
-               {{collateral.type}}
-               <div class="mb-1"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}EDITED{% endif %}</span></div>
+               <div class="mt-5">{{collateral.type}}</div>
+               <div class="mb-2"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
             </td>
             <td>{{collateral.year}}</td>
             <td>{{collateral.make}} 
@@ -76,8 +76,8 @@
          {% if collateral.edit is not defined %}
          <tr class="no-page-break">
             <td>
-               {{collateral.type}} 
-               <div class="mb-1"><span class="label">REMOVED</span></div>
+               <div class="mt-5">{{collateral.type}}</div>
+               <div class="mb-2"><span class="label">DELETED</span></div>
             </td>
             <td>{{collateral.year}}</td>
             <td>{{collateral.make}} 
