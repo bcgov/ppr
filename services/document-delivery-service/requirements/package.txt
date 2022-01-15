@@ -1,0 +1,8 @@
+Flask
+PyPDF2
+google-cloud-storage
+gunicorn
+launchdarkly-server-sdk
+paramiko
+python-dotenv
+pytz
