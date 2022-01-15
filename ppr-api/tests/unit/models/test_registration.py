@@ -936,7 +936,8 @@ def test_create_from_json(session, change_type, is_general_collateral):
 @pytest.mark.parametrize('reg_num,account_id,has_data', TEST_STAFF_ACCOUNT_ACCESS_DATA)
 def test_account_registering_name(session, reg_num, account_id, has_data):
     """Assert that account registrations conditional registering name value for staff works as expected."""
-    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing')
+    sbc_staff = True if account_id == GOV_ACCOUNT_ROLE else False
+    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing', sbc_staff)
     for result in results:
         if result['registrationNumber'] == reg_num:
             if has_data:
@@ -948,7 +949,8 @@ def test_account_registering_name(session, reg_num, account_id, has_data):
 @pytest.mark.parametrize('reg_num,account_id,has_data', TEST_STAFF_ACCOUNT_ACCESS_DATA)
 def test_account_path(session, reg_num, account_id, has_data):
     """Assert that account registrations conditional verfiication statement value for staff works as expected."""
-    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing')
+    sbc_staff = True if account_id == GOV_ACCOUNT_ROLE else False
+    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing', sbc_staff)
     for result in results:
         if result['registrationNumber'] == reg_num:
             if has_data:

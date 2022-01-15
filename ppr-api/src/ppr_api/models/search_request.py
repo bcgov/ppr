@@ -399,11 +399,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     exact_value = mapping['exact_match_count']
                     if exact_value is not None:
                         search['exactResultsSize'] = int(exact_value)
-                    similar_value = mapping['similar_match_count']
-                    if similar_value is not None:
-                        search['selectedResultsSize'] = (int(similar_value) + int(exact_value))
+                    selected_value = mapping['selected_match_count']
+                    if selected_value is not None:
+                        search['selectedResultsSize'] = int(selected_value)
                     else:
-                        search['selectedResultsSize'] = int(exact_value)
+                        search['selectedResultsSize'] = 0
                     history_list.append(search)
 
         return history_list

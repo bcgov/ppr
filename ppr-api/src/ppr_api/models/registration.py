@@ -410,7 +410,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def find_all_by_account_id(  # pylint: disable=too-many-locals
-            cls, account_id: str, collapse: bool = False, account_name: str = None):
+            cls, account_id: str, collapse: bool = False, account_name: str = None, sbc_staff: bool = False):
         """Return a summary list of recent registrations belonging to an account.
 
         To access a verification statement report, one of the followng conditions must be true:
@@ -466,10 +466,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                             result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
                         elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                             result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
+                        if result['statusType'] == model_utils.STATE_ACTIVE and result['expireDays'] < 0 \
+                                and result['expireDays'] != -99:
+                            result['statusType'] = model_utils.STATE_EXPIRED
 
-                        result = Registration.__update_summary_optional(result, account_id)
+                        result = Registration.__update_summary_optional(result, account_id, sbc_staff)
                         # Set if user can access verification statement.
-                        if not Registration.can_access_report(account_id, account_name, result):
+                        if not Registration.can_access_report(account_id, account_name, result, sbc_staff):
                             result['path'] = ''
 
                         if 'accountId' in result:
@@ -488,7 +491,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return results_json
 
     @classmethod
-    def find_summary_by_reg_num(cls, account_id: str, registration_num: str, account_name: str = None):
+    def find_summary_by_reg_num(cls, account_id: str, registration_num: str, account_name: str = None,
+                                sbc_staff: bool = False):
         """Return a single registration summary by registration_number."""
         result = {}
         changes = []
@@ -524,6 +528,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                         result['expireDays'] = int(mapping['expire_days'])
                         result['lastUpdateDateTime'] = model_utils.format_ts(mapping['last_update_ts'])
                         result['existsCount'] = int(mapping['exists_count'])
+                        if result['statusType'] == model_utils.STATE_ACTIVE and result['expireDays'] < 0 \
+                                and result['expireDays'] != -99:
+                            result['statusType'] = model_utils.STATE_EXPIRED
+
                         # Another account already added.
                         if result['existsCount'] > 0 and result['accountId'] != account_id:
                             result['inUserList'] = True
@@ -545,9 +553,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                         result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
                     # Set if user can access verification statement.
-                    if not Registration.can_access_report(account_id, account_name, result):
+                    if not Registration.can_access_report(account_id, account_name, result, sbc_staff):
                         result['path'] = ''
-                    result = Registration.__update_summary_optional(result, account_id)
+                    result = Registration.__update_summary_optional(result, account_id, sbc_staff)
                     if not model_utils.is_financing(reg_class):
                         changes.append(result)
         except Exception as db_exception:   # noqa: B902; return nicer error
@@ -561,11 +569,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return result
 
     @staticmethod
-    def can_access_report(account_id: str, account_name: str, reg_json) -> bool:
+    def can_access_report(account_id: str, account_name: str, reg_json, sbc_staff: bool = False) -> bool:
         """Determine if request account can view the registration verification statement."""
         # All staff roles can see any verification statement.
         reg_account_id = reg_json['accountId']
-        if is_all_staff_account(account_id):
+        if is_all_staff_account(account_id) or sbc_staff:
             return True
         if account_id == reg_account_id:
             return True
@@ -578,12 +586,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return False
 
     @staticmethod
-    def __update_summary_optional(reg_json, account_id: str):
+    def __update_summary_optional(reg_json, account_id: str, sbc_staff: bool = False):
         """Single summary result replace optional property 'None' with ''."""
         if not reg_json['registeringName'] or reg_json['registeringName'].lower() == 'none':
             reg_json['registeringName'] = ''
         # Only staff role or matching account includes registeringName
-        elif not is_all_staff_account(account_id) and 'accountId' in reg_json and account_id != reg_json['accountId']:
+        elif not is_all_staff_account(account_id) and not sbc_staff and 'accountId' in reg_json and \
+                account_id != reg_json['accountId']:
             reg_json['registeringName'] = ''
 
         if not reg_json['clientReferenceId'] or reg_json['clientReferenceId'].lower() == 'none':
