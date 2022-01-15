@@ -139,7 +139,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-sm',
     sortable: false,
-    text: 'Results Found',
+    text: 'Matches Found',
     value: 'totalResultsSize'
   },
   {
@@ -151,7 +151,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-sm',
     sortable: false,
-    text: 'Results Selected',
+    text: 'Matches Selected',
     value: 'selectedResultsSize'
   },
   {
@@ -189,7 +189,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   {
     class: 'column-sm',
     sortable: false,
-    text: 'Results Found',
+    text: 'Matches Found',
     value: 'totalResultsSize'
   },
   {
@@ -201,7 +201,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   {
     class: 'column-sm',
     sortable: false,
-    text: 'Results Selected',
+    text: 'Matches Selected',
     value: 'selectedResultsSize'
   },
   {

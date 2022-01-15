@@ -4,13 +4,29 @@
       <v-col style="padding-right: 30px;" cols="auto">
         <v-row no-gutters>
           <v-col class="divider pr-3 mr-3" cols="auto">
-            <b>{{ totalResultsLength }}</b> registrations found
+            <b>{{ totalResultsLength }}</b> matches found
           </v-col>
           <v-col :class="totalResultsLength !== 0 ? 'divider pr-3 mr-3' : ''" cols="auto">
             <b>{{ exactMatchesLength }}</b> exact matches
           </v-col>
           <v-col v-if="totalResultsLength !== 0" cols="auto">
-            Registrations added to search result report: <b>{{ selectedLength }}</b>
+            <b>{{ selectedLength }}</b> total matches in
+            <b>{{ selectedRegistrationsLength }}</b> registrations added to report
+            <v-tooltip
+              v-if="selectedRegistrationsLength !== selectedLength"
+              class="pa-2"
+              content-class="top-tooltip"
+              nudge-right="6"
+              top
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon class="pl-2" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+              </template>
+              <div class="pt-2 pb-2">
+                {{ tooltipTxtSrchMtchs }}
+              </div>
+            </v-tooltip>
           </v-col>
         </v-row>
       </v-col>
@@ -146,10 +162,14 @@ export default defineComponent({
       searchValue: '',
       selected: props.defaultSelected,
       selectedInitialized: false,
+      tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
+        'the same registration. That registration will only be shown once in the report.',
       headers: props.defaultHeaders,
       results: props.defaultResults,
+      exactMatchRegistrations: 0,
       exactMatchesLength: 0,
       totalResultsLength: 0,
+      selectedRegistrationsLength: 0,
       selectedLength: computed((): number => {
         return localState.selected?.length | 0
       }),
@@ -212,13 +232,18 @@ export default defineComponent({
     watch(() => localState.results, (results) => {
       const selectedExactMatches = []
       let count = 0
+      const baseRegs = []
       let x:any
       for (x in results) {
         if (results[x].matchType === MatchTypes.EXACT) {
           count += 1
           selectedExactMatches.push(results[x])
         }
+        if (!baseRegs.includes(results[x].baseRegistrationNumber)) {
+          baseRegs.push(results[x].baseRegistrationNumber)
+        }
       }
+      localState.selectedRegistrationsLength = baseRegs.length
       localState.exactMatchesLength = count
       localState.selected = selectedExactMatches
     })
