@@ -27,6 +27,7 @@ import {
   computed,
   defineComponent,
   reactive,
+  watch,
   toRefs
 } from '@vue/composition-api'
 // local components
@@ -53,7 +54,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props) {
+  setup (props, context) {
     const {
       getRegistrationFlowType
     } = useGetters<any>(['getRegistrationFlowType'])
@@ -65,6 +66,10 @@ export default defineComponent({
       showInvalid: computed((): boolean => {
         return props.setShowInvalid
       })
+    })
+
+    watch(() => localState.amendMode, (val: boolean) => {
+      context.emit('collateralOpen', val)
     })
 
     return {

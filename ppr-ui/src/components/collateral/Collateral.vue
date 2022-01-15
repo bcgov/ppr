@@ -33,11 +33,12 @@
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :isSummary="summaryView"
         :showInvalid="collateral.showInvalid"
-        @collateralOpen="setCollateralOpen($event)"
+        @collateralOpen="setVehicleCollateralOpen($event)"
       />
       <general-collateral
         v-if="showGeneralCollateral"
         :isSummary="summaryView"
+        @collateralOpen="setGeneralCollateralOpen($event)"
       />
     </v-card>
   </v-container>
@@ -63,11 +64,12 @@
     <vehicle-collateral
       :isSummary="false"
       :showInvalid="collateral.showInvalid && !valid"
-      @collateralOpen="setCollateralOpen($event)"
+      @collateralOpen="setVehicleCollateralOpen($event)"
     />
     <general-collateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
+      @collateralOpen="setGeneralCollateralOpen($event)"
       :isSummary="false"
     />
   </v-container>
@@ -135,6 +137,8 @@ export default defineComponent({
     } = useGeneralCollateral()
 
     const localState = reactive({
+      vehicleCollateralOpen: false,
+      generalCollateralOpen: false,
       summaryView: computed((): boolean => {
         return props.isSummary
       }),
@@ -200,8 +204,13 @@ export default defineComponent({
       context.emit('setCollateralValid', valid)
     }
 
-    const setCollateralOpen = (isOpen): void => {
-      context.emit('collateralOpen', isOpen)
+    const setVehicleCollateralOpen = (isOpen): void => {
+      localState.vehicleCollateralOpen = isOpen
+      context.emit('collateralOpen', localState.vehicleCollateralOpen || localState.generalCollateralOpen)
+    }
+    const setGeneralCollateralOpen = (isOpen): void => {
+      localState.generalCollateralOpen = isOpen
+      context.emit('collateralOpen', localState.vehicleCollateralOpen || localState.generalCollateralOpen)
     }
 
     const vehiclesValid = (): boolean => {
@@ -244,7 +253,8 @@ export default defineComponent({
       registrationFlowType,
       registrationType,
       RegistrationFlowType,
-      setCollateralOpen,
+      setVehicleCollateralOpen,
+      setGeneralCollateralOpen,
       ...toRefs(localState)
     }
   }
