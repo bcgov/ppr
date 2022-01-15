@@ -116,9 +116,9 @@
                           autocomplete="off"
                           :error-messages="searchMessageSecond ? searchMessageSecond : ''"
                           filled
-                          hint="Required if person has middle name"
+                          :hint="searchHintSecond"
                           persistent-hint
-                          placeholder="Middle Name"
+                          placeholder="Middle Name (Optional)"
                           v-model="searchValueSecond"/>
           </v-col>
           <v-col cols="4" class="pl-3">
@@ -296,6 +296,10 @@ export default defineComponent({
       searchHintFirst: computed((): string => {
         if (localState.searchMessageFirst) return ''
         else return localState.selectedSearchType?.hints?.searchValueFirst || ''
+      }),
+      searchHintSecond: computed((): string => {
+        if (localState.searchMessageSecond) return ''
+        else return localState.selectedSearchType?.hints?.searchValueSecond || ''
       }),
       searchHintLast: computed((): string => {
         if (localState.searchMessageLast) return ''
