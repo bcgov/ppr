@@ -15,9 +15,7 @@
 from __future__ import annotations
 
 import io
-import json
-from base64 import decodebytes
-from typing import Dict, Callable
+from typing import Callable
 
 import paramiko
 
@@ -76,7 +74,7 @@ class SftpConnection:
 
                 if self.private_key_passphrase:
                     private_key = f__from_private_key(io.StringIO(self.private_key),
-                                                password=self.private_key_passphrase)
+                                                      password=self.private_key_passphrase)
                 else:
                     private_key = f__from_private_key(io.StringIO(self.private_key))
 
@@ -87,12 +85,12 @@ class SftpConnection:
             else:
                 self.ssh_connection.connect(hostname=self.host, port=self.port,
                                             username=self.username, password=self.password)
-            
+
             self.sftp_handler = paramiko.SFTPClient.from_transport(self.ssh_connection.get_transport())
 
             print('sftp_connection successful')
             return self.sftp_handler
-        except Exception as e:
+        except Exception as e:  # noqa: B902
             print(e)
             raise e
 
@@ -101,7 +99,7 @@ class SftpConnection:
         self.sftp_handler.close()
         if self.ssh_connection:
             self.ssh_connection.close()
-    
+
     def put(self, local_path: str, remote_path: str, **kwargs) -> None:
         """Upload a file to the SFTP server.
 
@@ -111,11 +109,12 @@ class SftpConnection:
             **kwargs: Additional keyword arguments.
         """
         if self.sftp_handler:
-            if buffer := io.open(local_path, 'rb').read():
-                file = self.sftp_handler.open(remote_path, 'wb')
-                file.write(buffer)
-                file.close()
-    
+            with io.open(local_path, 'rb').read() as buffer:
+                # file = self.sftp_handler.open(remote_path, 'wb')
+                with self.sftp_handler.open(remote_path, 'wb') as file:
+                    file.write(buffer)
+                    file.close()
+
     def put_buffer(self, buffer: bytes, remote_path: str, **kwargs) -> None:
         """Upload a buffer of bytes to the SFTP server.
 

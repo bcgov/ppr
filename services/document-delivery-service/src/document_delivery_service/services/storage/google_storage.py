@@ -1,13 +1,28 @@
+# Copyright © 2021 Province of British Columbia
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""This is the concrete implementation of the StorageService, using Google Cloud Storage."""
 import base64
 import json
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 from google.cloud import storage
 
 from document_delivery_service.services.logging import logging
-from .abstract_storage import AbstractStorageService
-from .abstract_storage import StorageServiceError
-from .abstract_storage import StorageDocumentTypes
+
+from .abstract_storage import AbstractStorageService  # noqa: I001
+from .abstract_storage import StorageDocumentTypes  # noqa: I001
+from .abstract_storage import StorageServiceError  # noqa: I001
 
 
 class GoogleCloudStorage(AbstractStorageService):
@@ -21,7 +36,7 @@ class GoogleCloudStorage(AbstractStorageService):
         super().__init__()
         self.config = config
         self.client = None
-    
+
     def connect(self) -> Callable:
         """Connect to the storage service."""
         if self.client is None:
@@ -34,17 +49,21 @@ class GoogleCloudStorage(AbstractStorageService):
                 # if not, try to use the default credentials attached to the environment
                 else:
                     self.client = storage.Client()
-            except Exception as err:
+            except Exception as err:  # noqa: B902
                 logging.error('GoogleCloudStorage.connect() failed: {}'.format(err))
                 raise StorageServiceError('GoogleCloudStorage.connect() failed: {}'.format(err), e=err)
 
         return self.client
 
-    def get_document(self, bucket: str, name: str, doc_type: str = None) -> Optional[bytes]:
+    def get_document(self, bucket_name: str, filename: str, doc_type: str = None) -> Optional[bytes]:
         """Fetch the uniquely named document from cloud storage as binary data."""
         raise StorageServiceError('Not Implemented.')
 
-    def save_document(self, bucket_name: str, filename: str, raw_data, doc_type: str = StorageDocumentTypes.BINARY.value):
+    def save_document(self,
+                      bucket_name: str,
+                      filename: str,
+                      raw_data: Union[bytes, str],
+                      doc_type: str = StorageDocumentTypes.BINARY.value) -> None:
         """Save or replace the named document in storage with the binary data as the file contents."""
         gcs = self.connect()
         bucket = gcs.bucket(bucket_name)

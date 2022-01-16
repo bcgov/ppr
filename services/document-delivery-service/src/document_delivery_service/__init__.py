@@ -12,4 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module is manages the delivery of required documents."""
+from .config import Config
 from .version import __version__
+
+config = Config()
