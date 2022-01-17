@@ -65,15 +65,19 @@ class GoogleCloudStorage(AbstractStorageService):
                       raw_data: Union[bytes, str],
                       doc_type: str = StorageDocumentTypes.BINARY.value) -> None:
         """Save or replace the named document in storage with the binary data as the file contents."""
-        gcs = self.connect()
-        bucket = gcs.bucket(bucket_name)
-        blob = bucket.blob(filename)
-        if doc_type == StorageDocumentTypes.BINARY:
-            gcs_file = blob.open(mode='wb')
-        elif doc_type == StorageDocumentTypes.TEXT:
-            gcs_file = blob.open(mode='w')
-        else:
-            raise StorageServiceError('Unsupported document type: {}'.format(doc_type))
+        try:
+            gcs = self.connect()
+            bucket = gcs.bucket(bucket_name)
+            blob = bucket.blob(filename)
+            if doc_type == StorageDocumentTypes.BINARY:
+                gcs_file = blob.open(mode='wb')
+            elif doc_type == StorageDocumentTypes.TEXT:
+                gcs_file = blob.open(mode='w')
+            else:
+                raise StorageServiceError('Unsupported document type: {}'.format(doc_type))
 
-        gcs_file.write(raw_data)
-        gcs_file.close()
+            gcs_file.write(raw_data)
+            gcs_file.close()
+        except Exception as err:  # noqa: B902
+            logging.error('GoogleCloudStorage.save_document() failed: {}'.format(err))
+            raise StorageServiceError('GoogleCloudStorage.save_document() failed: {}'.format(err), e=err)
