@@ -145,6 +145,7 @@
               :persistentHint="true"
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
+              @emitClear="orderDate = ''"
             />
           </v-col>
         </v-row>

@@ -124,6 +124,7 @@
             :persistentHint="true"
             @emitDate="surrenderDate = $event"
             @emitCancel="surrenderDate = ''"
+            @emitClear="surrenderDate = ''"
           />
         </v-col>
       </v-row>
