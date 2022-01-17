@@ -914,18 +914,26 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return collateral
 
     def get_former_party_name(self, new_party: Party):
-        """Search parties for a party former name."""
+        """Search parties for a party former name: add and remove in the same registration and addresses match."""
         former_name = ''
         for party in self.financing_statement.parties:
             if new_party.party_type == party.party_type and new_party.registration_id == party.registration_id_end:
-                if party.client_code and party.client_code.name:
-                    former_name = party.client_code.name
-                elif party.business_name:
-                    former_name = party.business_name
-                else:
-                    former_name = party.last_name + ', ' + party.first_name
-                    if party.middle_initial:
-                        former_name += ' ' + party.middle_initial
+                address1 = party.address
+                address2 = new_party.address
+                if address1 is None and party.client_code:
+                    address1 = party.client_code.address
+                if address2 is None and new_party.client_code:
+                    address2 = new_party.client_code.address
+                if address1 and address2 and address1.json == address2.json:
+                    if party.client_code and party.client_code.name:
+                        former_name = party.client_code.name
+                    elif party.business_name:
+                        former_name = party.business_name
+                    else:
+                        former_name = party.last_name + ', ' + party.first_name
+                        if party.middle_initial:
+                            former_name += ' ' + party.middle_initial
+                    return former_name
         return former_name
 
     def __get_renewal_rl_expiry(self):

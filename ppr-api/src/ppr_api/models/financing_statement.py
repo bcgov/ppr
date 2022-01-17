@@ -280,23 +280,37 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             elif self.current_view_json and \
                     (self.verification_reg_id < 1 or self.verification_reg_id >= collateral.registration_id):
                 gc_json = collateral.current_json
-                # If amendment/change registration is 1 add, 1 remove then combine them.
                 exists = False
-                for exists_collateral in collateral_json:
-                    if exists_collateral['addedDateTime'] == gc_json['addedDateTime']:
-                        if 'descriptionAdd' in exists_collateral and \
-                                'descriptionDelete' not in exists_collateral and \
-                                    'descriptionDelete' in gc_json:
-                            exists = True
-                            exists_collateral['descriptionDelete'] = gc_json['descriptionDelete']
-                        elif 'descriptionDelete' in exists_collateral and \
-                                'descriptionAdd' not in exists_collateral and \
-                                    'descriptionAdd' in gc_json:
-                            exists = True
-                            exists_collateral['descriptionAdd'] = gc_json['descriptionAdd']
+                # If amendment/change registration is 1 add, 1 remove then combine them.
+                if self.__is_edit_general_collateral(collateral.registration_id, legacy):
+                    for exists_collateral in collateral_json:
+                        if exists_collateral['addedDateTime'] == gc_json['addedDateTime']:
+                            if 'descriptionAdd' in exists_collateral and \
+                                    'descriptionDelete' not in exists_collateral and \
+                                        'descriptionDelete' in gc_json:
+                                exists = True
+                                exists_collateral['descriptionDelete'] = gc_json['descriptionDelete']
+                            elif 'descriptionDelete' in exists_collateral and \
+                                    'descriptionAdd' not in exists_collateral and \
+                                        'descriptionAdd' in gc_json:
+                                exists = True
+                                exists_collateral['descriptionAdd'] = gc_json['descriptionAdd']
                 if not exists:
                     collateral_json.append(gc_json)
         return collateral_json
+
+    def __is_edit_general_collateral(self, registration_id, legacy: bool):
+        """True if an amendment adds 1 gc and removes 1 gc."""
+        add_count = 0
+        delete_count = 0
+        collateral_list = self.general_collateral if not legacy else self.general_collateral_legacy
+        for collateral in collateral_list:
+            if collateral.registration_id == registration_id and collateral.status:
+                if collateral.status == GeneralCollateralLegacy.StatusTypes.ADDED:
+                    add_count += 1
+                elif collateral.status == GeneralCollateralLegacy.StatusTypes.DELETED:
+                    delete_count += 1
+        return (add_count == 1 and delete_count == 1)
 
     def vehicle_collateral_json(self, registration_id):
         """Build vehicle collateral JSON: current_view_json determines if current or original data is included."""
