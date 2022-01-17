@@ -167,8 +167,10 @@
                     :disabled="addEditInProgress"
                   >
                   <v-list-item
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                      && row.item.action === ActionTypes.REMOVED"
+                    v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT
+                      && row.item.action === ActionTypes.REMOVED && !isSecuredPartyRestrictedList(registrationType))
+                      || (isSecuredPartyRestrictedList(registrationType) && row.item.action === ActionTypes.ADDED
+                      && registrationFlowType === RegistrationFlowType.AMENDMENT)"
                       class="v-remove"
                       @click="undo(row.index)"
                     >
@@ -178,7 +180,8 @@
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item
-                      v-else
+                      v-else-if="!isSecuredPartyRestrictedList(registrationType)
+                        || registrationFlowType === RegistrationFlowType.NEW"
                       class="v-remove"
                       @click="removeParty(row.index)"
                     >
@@ -614,7 +617,7 @@ export default defineComponent({
           // original secured party must be shown as removed
           const originalParty = originalParties.securedParties[0]
           originalParty.action = ActionTypes.REMOVED
-          localState.securedParties = [originalParty, localState.savedParty]
+          localState.securedParties = [localState.savedParty, originalParty]
         } else {
           localState.securedParties = [localState.savedParty]
         }
