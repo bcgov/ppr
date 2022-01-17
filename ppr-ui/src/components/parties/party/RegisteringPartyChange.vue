@@ -76,9 +76,7 @@ export default defineComponent({
     const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors'
     ])
-    const { getRegistrationType, isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
-    const registrationType = getRegistrationType.value.registrationTypeAPI
-    const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
+    const { isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
     const localState = reactive({
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,
@@ -90,20 +88,6 @@ export default defineComponent({
         'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
         return getAddSecuredPartiesAndDebtors.value.registeringParty
-      }),
-      securedPartyText: computed((): string => {
-        if (isSecuredPartyRestrictedList(registrationType)) {
-          return 'The Secured Party'
-        } else {
-          return 'At least one Secured Party'
-        }
-      }),
-      securedPartyTitle: computed((): string => {
-        if (isSecuredPartyRestrictedList(registrationType)) {
-          return 'Secured Party'
-        } else {
-          return 'Secured Parties'
-        }
       }),
       summaryView: computed((): boolean => {
         return props.isSummary

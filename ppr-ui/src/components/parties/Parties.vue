@@ -63,49 +63,7 @@
         </h3>
       </v-col>
     </v-row>
-    <v-row no-gutters>
-      <v-col v-if="!openChangeScreen">
-        <registering-party
-          @changeRegisteringParty="changeRegisteringParty"
-        />
-      </v-col>
-      <v-col v-else>
-        <v-card flat class="add-party-container mt-2 mb-8">
-          <div class="px-6 pt-8">
-            <h3 v-if="!isSbc" class="pb-2">Change Registering Party</h3>
-            <span class="body-text">
-            {{ !isSbc ? 'Change' : 'Include' }} the Registering Party
-            by entering the registering party code
-            or their name (business or person), or if the Registering Party you
-            want to include is new (i.e., they do not have a registering party
-            code) you can add their information manually.
-            </span>
-          </div>
-          <party-search
-            :isAutoCompleteDisabled="addEditInProgress"
-            :setIsRegisteringParty="true"
-            @showSecuredPartyAdd="initAdd"
-            @hideSearch="openChangeScreen = false"
-          />
-          <div v-if="showAddRegisteringParty">
-            <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
-          </div>
-          <div v-if="!showAddRegisteringParty" class="px-5 pt-0 pb-8" style="height:80px">
-            <v-btn
-              v-if="!isSbc"
-              id="cancel-btn-chg-reg-party"
-              large
-              outlined
-              color="primary"
-              class="float-right"
-              @click="openChangeScreen = false"
-            >
-              Cancel
-            </v-btn>
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
+    <registering-party-change />
     <v-row no-gutters v-if="registeringParty && registeringParty.action">
       <v-col>
         <caution-box class="mt-4 mb-8" :setMsg="cautionTxt" :setImportantWord="'Note'" />
@@ -140,7 +98,10 @@ import { useGetters } from 'vuex-composition-helpers'
 // local components
 import PartySummary from './PartySummary.vue' // need to import like this for jest tests - cyclic issue?
 import { Debtors } from '@/components/parties/debtor'
-import { EditParty, PartySearch, RegisteringParty, SecuredParties } from '@/components/parties/party'
+import {
+  RegisteringPartyChange,
+  SecuredParties
+} from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
 // local helpers / types / etc.
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
@@ -151,10 +112,8 @@ export default defineComponent({
     Debtors,
     SecuredParties,
     PartySummary,
-    PartySearch,
-    EditParty,
-    CautionBox,
-    RegisteringParty
+    RegisteringPartyChange,
+    CautionBox
   },
   props: {
     isSummary: {
@@ -172,10 +131,7 @@ export default defineComponent({
     const localState = reactive({
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,
-      openChangeScreen: false,
       isSbc: isRoleStaffSbc.value,
-      showAddRegisteringParty: false,
-      addEditInProgress: false,
       cautionTxt: 'The Registry will not send the verification statement for this registration ' +
         'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
@@ -200,40 +156,7 @@ export default defineComponent({
       })
     })
 
-    onMounted(() => {
-      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
-        localState.openChangeScreen = true
-      }
-    })
-
-    const changeRegisteringParty = () => {
-      localState.openChangeScreen = true
-    }
-
-    const initAdd = () => {
-      localState.addEditInProgress = true
-      localState.showAddRegisteringParty = true
-    }
-
-    const resetData = () => {
-      localState.addEditInProgress = false
-      localState.showAddRegisteringParty = false
-      localState.openChangeScreen = false
-      if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
-        localState.openChangeScreen = true
-      }
-    }
-
-    watch(() => localState.registeringParty, (rp) => {
-      if (!rp && localState.isSbc) {
-        localState.openChangeScreen = true
-      }
-    })
-
     return {
-      changeRegisteringParty,
-      initAdd,
-      resetData,
       ...toRefs(localState)
     }
   }
