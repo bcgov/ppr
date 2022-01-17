@@ -262,7 +262,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         collateral_json = self.__build_general_collateral_json(registration_id, collateral_json, True)
         return collateral_json
 
-    def __build_general_collateral_json(self, registration_id, collateral_json, legacy: bool):
+    def __build_general_collateral_json(self,  # pylint: disable=too-many-nested-blocks
+                                        registration_id, collateral_json, legacy: bool):
         """Build general collateral JSON for a financing statement from either the API or legacy table."""
         collateral_list = None
         if (not legacy and not self.general_collateral) or (legacy and not self.general_collateral_legacy):
@@ -310,7 +311,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     add_count += 1
                 elif collateral.status == GeneralCollateralLegacy.StatusTypes.DELETED:
                     delete_count += 1
-        return (add_count == 1 and delete_count == 1)
+        return add_count == 1 and delete_count == 1
 
     def vehicle_collateral_json(self, registration_id):
         """Build vehicle collateral JSON: current_view_json determines if current or original data is included."""
