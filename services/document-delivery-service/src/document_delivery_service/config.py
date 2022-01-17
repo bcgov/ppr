@@ -42,6 +42,8 @@ class Config(BaseConfig):
     # Google SA account
     # create key base64.b64encode(json.dumps(auth_json).encode('utf-8'))
     GOOGLE_STORAGE_SERVICE_ACCOUNT = os.getenv('GOOGLE_STORAGE_SERVICE_ACCOUNT')
+    if GOOGLE_STORAGE_SERVICE_ACCOUNT and isinstance(GOOGLE_STORAGE_SERVICE_ACCOUNT, str):
+        GOOGLE_STORAGE_SERVICE_ACCOUNT = bytes(GOOGLE_STORAGE_SERVICE_ACCOUNT, 'utf-8')
     STORAGE_BUCKET_NAME = os.getenv('STORAGE_BUCKET_NAME')
     STORAGE_FILEPATH = os.getenv('STORAGE_FILEPATH')
 

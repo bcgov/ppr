@@ -109,8 +109,8 @@ def get_filename(registration_id, party_id) -> str:
     reg_key = reg_key[:13]
 
     filename = filename_template.format(statement_key=reg_key,
-                                        day=str(today_local.day),
-                                        month=str(today_local.month),
+                                        day=str(today_local.day).zfill(2),
+                                        month=str(today_local.month).zfill(2),
                                         year=str(today_local.year))
     return filename
 

@@ -36,5 +36,5 @@ rsa==4.8
 semver==2.13.0
 six==1.16.0
 urllib3==1.26.8
-git+https://github.com/daxiom/service-runner.py.git@0.0.6
+git+https://github.com/daxiom/service-runner.py.git@0.0.7
 git+https://github.com/daxiom/simple-cloudevent.py.git@0.0.2
