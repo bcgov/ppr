@@ -296,14 +296,14 @@ describe('Business debtor validation', () => {
     const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
-    wrapper.vm.$data.searchValue = '12345678901234567890123456789012345678901234567890123456789012345678901'
+    wrapper.vm.$data.searchValue = '1'.repeat(151)
     await Vue.nextTick()
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 70 characters')
+    expect(messages.at(0).text()).toBe('Maximum 150 characters')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
