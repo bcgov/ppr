@@ -42,20 +42,11 @@
               Select the registrations you want to include in a printable PDF search report. Exact matches
               are automatically selected. This report will contain the full record of the registration for
               each selected match and will be automatically saved to your PPR Dashboard.
-              A general record of your search results will also be saved.
             </span>
             <span v-else id="no-results-info">
               No Registrations were found. A printable PDF search result report and a general record of your search
               will be saved to your Personal Property Registry dashboard.
             </span>
-          </v-col>
-          <!-- to cut off in line with table submit btn -->
-          <v-col cols="auto" style="width: 320px;" />
-        </v-row>
-        <v-row v-if="totalResultsLength !== 0" no-gutters style="padding-top: 24px;">
-          <v-col :class="$style['search-note']">
-            Note: If some of the selected matches are part of the same base registration, that base registration
-            will only be shown in the report once.
           </v-col>
           <!-- to cut off in line with table submit btn -->
           <v-col cols="auto" style="width: 320px;" />
