@@ -35,6 +35,7 @@ const store = getVuexStore()
 
 // Input field selectors / buttons
 
+
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 

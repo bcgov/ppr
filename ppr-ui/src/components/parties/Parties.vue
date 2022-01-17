@@ -90,8 +90,6 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  onMounted,
-  watch,
   computed
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
