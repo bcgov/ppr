@@ -232,27 +232,29 @@ export default defineComponent({
     watch(() => localState.results, (results) => {
       const selectedExactMatches = []
       let count = 0
-      const baseRegs = []
-      let x:any
-      for (x in results) {
+      for (const x in results) {
         if (results[x].matchType === MatchTypes.EXACT) {
           count += 1
           selectedExactMatches.push(results[x])
         }
-        if (!baseRegs.includes(results[x].baseRegistrationNumber)) {
-          baseRegs.push(results[x].baseRegistrationNumber)
-        }
       }
-      localState.selectedRegistrationsLength = baseRegs.length
       localState.exactMatchesLength = count
       localState.selected = selectedExactMatches
     })
-    watch(() => localState.selected, (val) => {
+    watch(() => localState.selected, (selected) => {
+      const baseRegs = []
+      for (const x in selected) {
+        if (!baseRegs.includes(selected[x].baseRegistrationNumber)) {
+          baseRegs.push(selected[x].baseRegistrationNumber)
+        }
+      }
+      localState.selectedRegistrationsLength = baseRegs.length
+
       if (!localState.selectedInitialized) {
         localState.selectedInitialized = true
         return
       }
-      emit('selected-matches', val)
+      emit('selected-matches', selected)
     })
 
     return {
