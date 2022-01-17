@@ -28,8 +28,8 @@ import mockRouter from './MockRouter'
 import { ActionTypes, RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
-import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { RegisteringPartyChange } from '@/components/parties/party'
 
 Vue.use(Vuetify)
 
@@ -120,7 +120,7 @@ describe('Confirm Amendment registration component', () => {
 
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
-    expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
+    expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     // check fee summary + buttons

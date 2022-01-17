@@ -119,9 +119,8 @@
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-summary
+          <registering-party-change
             class="pt-4"
-            :setEnableNoDataAction="false"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -176,7 +175,8 @@ import {
 } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { GenColSummary } from '@/components/collateral/generalCollateral'
-import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
+import { SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
+import { RegisteringPartyChange } from '@/components/parties/party'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
 
@@ -217,7 +217,7 @@ import {
     CautionBox,
     CertifyInformation,
     FolioNumberSummary,
-    RegisteringPartySummary,
+    RegisteringPartyChange,
     SecuredPartySummary,
     DebtorSummary,
     VehicleCollateral,

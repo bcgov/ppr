@@ -33,8 +33,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Input field selectors / buttons
-
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 
@@ -138,7 +136,8 @@ describe('Amendment registration component', () => {
   })
 
   it('does not go to the confirmation page if component open', async () => {
-    wrapper.vm.collateralOpen = true
+    wrapper.vm.debtorOpen = true
+    await Vue.nextTick()
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)

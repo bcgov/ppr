@@ -379,23 +379,31 @@ export default class AmendRegistration extends Vue {
   private async scrollToInvalid (): Promise<void> {
     if (this.lengthTrustOpen || !this.registrationLengthTrustValid) {
       const component = document.getElementById('length-trust-amendment')
-      await component.scrollIntoView({ behavior: 'smooth' })
-      return
+      if (component) {
+        await component.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
     }
     if (this.securedPartyOpen || !this.securedPartiesValid) {
       const component = document.getElementById('secured-parties-component')
-      await component.scrollIntoView({ behavior: 'smooth' })
-      return
+      if (component) {
+        await component.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
     }
 
     if (this.debtorOpen || !this.debtorValid) {
       const component = document.getElementById('debtors-component')
-      await component.scrollIntoView({ behavior: 'smooth' })
-      return
+      if (component) {
+        await component.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
     }
     if (this.collateralOpen || !this.collateralValid) {
       const component = document.getElementById('collateral-component')
-      await component.scrollIntoView({ behavior: 'smooth' })
+      if (component) {
+        await component.scrollIntoView({ behavior: 'smooth' })
+      }
     }
   }
 
