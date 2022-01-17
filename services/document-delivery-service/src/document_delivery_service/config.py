@@ -51,6 +51,7 @@ class Config(BaseConfig):
     SFTP_PORT = os.getenv('SFTP_PORT', None)
     SFTP_USERNAME = os.getenv('SFTP_USERNAME', None)
     SFTP_PASSWORD = os.getenv('SFTP_PASSWORD', None)
+    # create key as base64.b64encode(key.encode('utf-8'))
     SFTP_PRIVATE_KEY = os.getenv('SFTP_PRIVATE_KEY', None)
     SFTP_PRIVATE_KEY_ALGORITHM = os.getenv('SFTP_PRIVATE_KEY_ALGORITHM', 'ED25519')
     SFTP_PRIVATE_KEY_PASSPHRASE = os.getenv('SFTP_PRIVATE_KEY_PASSPHRASE', None)

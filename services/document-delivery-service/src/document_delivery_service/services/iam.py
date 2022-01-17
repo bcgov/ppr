@@ -43,7 +43,7 @@ class JWTService:
             'Content-Type': 'application/x-www-form-urlencoded'
         }
         template = 'grant_type=client_credentials&scope=openid&client_id={client_id}&client_secret={client_secret}'
-        data = template.format(self.client_id, self.client_secret)  # line split for length limit
+        data = template.format(client_id=self.client_id, client_secret=self.client_secret)  # length limit
         response = requests.post(
             self.oidc_token_url,
             data=data,

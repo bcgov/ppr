@@ -14,6 +14,7 @@
 """This module contains the service."""
 from __future__ import annotations
 
+import base64
 from http import HTTPStatus
 
 from simple_cloudevent import SimpleCloudEvent
@@ -50,7 +51,7 @@ def doc_service_callback(ce: SimpleCloudEvent, alt: str) -> HTTPStatus:
                                       host=config.SFTP_HOST,
                                       port=config.SFTP_PORT,
                                       password=config.SFTP_PASSWORD,
-                                      private_key=config.SFTP_PRIVATE_KEY,
+                                      private_key=base64.b64decode(config.SFTP_PRIVATE_KEY).decode('utf-8'),
                                       private_key_algorithm=config.SFTP_PRIVATE_KEY_ALGORITHM,
                                       private_key_passphrase=config.SFTP_PRIVATE_KEY_PASSPHRASE)
 

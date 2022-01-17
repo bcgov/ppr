@@ -19,4 +19,4 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run(port=os.getenv('OIDC_TOKEN_URL', '8080'), debug=True)
+    app.run(port=os.getenv('PORT', '8080'), debug=True)
