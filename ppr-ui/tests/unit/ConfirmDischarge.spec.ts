@@ -16,7 +16,7 @@ import {
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { RegisteringPartySummary } from '@/components/parties/summaries'
+import { RegisteringPartyChange } from '@/components/parties/party'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -86,7 +86,7 @@ describe('ConfirmDischarge registration view', () => {
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
-    expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
+    expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     // check confirm discharge section
     expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegNum).toContain(regNum)

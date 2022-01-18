@@ -13,9 +13,9 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { CautionBox, StickyContainer } from '@/components/common'
 import {
   DebtorSummary,
-  RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
+import { RegisteringPartyChange } from '@/components/parties/party'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -87,7 +87,7 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
-    expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
+    expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     // check secured parties
     expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
     expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
