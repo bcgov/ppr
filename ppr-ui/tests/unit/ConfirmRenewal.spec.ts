@@ -24,8 +24,8 @@ import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
+import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { RegisteringPartyChange } from '@/components/parties/party'
 
 Vue.use(Vuetify)
 
@@ -88,7 +88,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
-    expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
+    expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
