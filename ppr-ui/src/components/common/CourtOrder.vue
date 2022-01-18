@@ -138,11 +138,14 @@
               title="Select the date of the order"
               clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
+              :initialValue="orderDate"
+              :key="datePickerKey"
               :minDate="minCourtDate"
               :maxDate="maxCourtDate"
               :persistentHint="true"
               @emitDate="orderDate = $event"
               @emitCancel="orderDate = ''"
+              @emitClear="orderDate = ''"
             />
           </v-col>
         </v-row>
@@ -229,6 +232,7 @@ export default defineComponent({
       fileNumber: '',
       orderDate: '',
       effectOfOrder: '',
+      datePickerKey: Math.random(),
       courtOrderInfo: computed(
         (): CourtOrderIF => {
           return getCourtOrderInformation.value as CourtOrderIF
@@ -398,6 +402,8 @@ export default defineComponent({
           localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
                                       ' an additional 180 days.'
         }
+        // rerender date-picker
+        localState.datePickerKey = Math.random()
       }
     })
 

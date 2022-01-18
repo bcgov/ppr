@@ -112,16 +112,19 @@
         </v-col>
         <v-col>
           <date-picker
+            clearable
             ref="datePickerRef"
             title="Date"
             nudge-right="40"
             hint="Must not be more than 21 days in the past"
             :errorMsg="surrenderDateMessage || ''"
+            :initialValue="surrenderDate"
+            :key="datePickerKey"
             :minDate="dateToYyyyMmDd(minSurrenderDate)"
             :persistentHint="true"
             @emitDate="surrenderDate = $event"
-            @emitCancel="showingDatePicker = false"
-            @click="showingDatePicker = true"
+            @emitCancel="surrenderDate = ''"
+            @emitClear="surrenderDate = ''"
           />
         </v-col>
       </v-row>
@@ -167,6 +170,7 @@ export default defineComponent({
     const modal = false
 
     const localState = reactive({
+      datePickerKey: Math.random(),
       renewalView: props.isRenewal,
       trustIndentureHint: '',
       surrenderDate: getLengthTrust.value.surrenderDate,
@@ -326,6 +330,8 @@ export default defineComponent({
         lt.lifeYears = 1
         setLengthTrust(lt)
       }
+      // rerender date-picker
+      localState.datePickerKey = Math.random()
     })
 
     return {
