@@ -112,7 +112,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND SUBSTR(search_key,1,1) = SUBSTR(p.business_name,1,1)
+   AND SUBSTR(search_key,1,1) = SUBSTR(p.business_srch_key,1,1)
    AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key)
 ORDER BY match_type, p.business_name 
 """
@@ -247,7 +247,11 @@ COUNT_QUERY_FROM_SEARCH_TYPE = {
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
 'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
-       'sr.exact_match_count, sr.similar_match_count, sr.callback_url, sr.doc_storage_url, ' + \
+       '(SELECT CASE WHEN sr.api_result IS NULL THEN 0 ' + \
+                    'ELSE (SELECT COUNT(*) ' + \
+                            'FROM json_array_elements(sr.api_result) sr2 ' + \
+                           "WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count, " + \
+       'sr.similar_match_count, sr.callback_url, sr.doc_storage_url, ' + \
        'json_array_length(sr.api_result) as selected_match_count, ' + \
        "(SELECT CASE WHEN sc.user_id IS NULL THEN '' " + \
                     "ELSE (SELECT u.firstname || ' ' || u.lastname " + \
@@ -262,7 +266,11 @@ ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
 
 ACCOUNT_SEARCH_HISTORY_QUERY = \
 'SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,' + \
-       'sr.exact_match_count, sr.similar_match_count, sr.callback_url, sr.doc_storage_url, ' + \
+       '(SELECT CASE WHEN sr.api_result IS NULL THEN 0 ' + \
+                    'ELSE (SELECT COUNT(*) ' + \
+                            'FROM json_array_elements(sr.api_result) sr2 ' + \
+                           "WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count, " + \
+       'sr.similar_match_count, sr.callback_url, sr.doc_storage_url, ' + \
        'json_array_length(sr.api_result) as selected_match_count, ' + \
        "(SELECT CASE WHEN sc.user_id IS NULL THEN '' " + \
                     "ELSE (SELECT u.firstname || ' ' || u.lastname " + \

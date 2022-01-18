@@ -97,13 +97,15 @@
       </tr>
       <tr class="mt-2">
           <td>
-            {% if totalResultsSize > 0 %}
+            {% if totalResultsSize == 1 %}
+              1 Match in 1 Registration
+            {% elif totalResultsSize > 1 %}
               {{ selected|length }} Matches in {{ totalResultsSize }} Registrations
             {% else %}
               0 Matches in 0 Registrations
             {% endif %}  
           </td>
-          <td>Exact Matches: {{ exactResultsSize }} (in bold)</td>
+          <td>Exact Matches: {{ exactMatchCount }} (in bold)</td>
           <td>Total Search Report Pages:
             {% if totalResultsSize > 0 %}
               <span id="pagesCounter"></span>
