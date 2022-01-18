@@ -46,9 +46,8 @@
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-summary
+          <registering-party-change
             class="pt-4"
-            :setEnableNoDataAction="false"
           />
           <registration-length-trust-summary class="mt-10" :isRenewal="true"
           />
@@ -108,8 +107,8 @@ import {
   StickyContainer
 } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
-import { RegisteringPartySummary } from '@/components/parties/summaries'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
+import { RegisteringPartyChange } from '@/components/parties/party'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -136,7 +135,7 @@ import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from 
     StaffPaymentDialog,
     CourtOrder,
     FolioNumberSummary,
-    RegisteringPartySummary,
+    RegisteringPartyChange,
     RegistrationLengthTrustSummary,
     CertifyInformation,
     StickyContainer
