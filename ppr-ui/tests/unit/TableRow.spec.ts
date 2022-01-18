@@ -153,7 +153,7 @@ describe('TableRow tests', () => {
           if (![APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
             expect(rowData.at(10).text()).toContain('Amend')
           } else {
-            expect(rowData.at(10).text()).toContain('RemoveFrom Table')
+            expect(rowData.at(10).text()).toContain('Remove FromTable')
           }
         } else {
           // child registration
