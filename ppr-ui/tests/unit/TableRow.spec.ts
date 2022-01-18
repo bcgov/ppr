@@ -258,7 +258,7 @@ describe('TableRow tests', () => {
     })
     const dischargedRegButton = wrapper.findAll('.edit-action .v-btn')
     expect(dischargedRegButton.length).toBe(1)
-    expect(dischargedRegButton.at(0).text()).toContain('RemoveFrom Table')
+    expect(dischargedRegButton.at(0).text()).toContain('Remove FromTable')
     // FUTURE: test it emits the correct thing here once built
     activeRegButton.at(0).trigger('click')
 
