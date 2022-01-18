@@ -45,24 +45,24 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
     case UISearchTypes.INDIVIDUAL_DEBTOR:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
-      } else if (first?.length > 15) {
-        validation.searchValue.messageFirst = 'Maximum 15 characters'
+      } else if (first?.length > 50) {
+        validation.searchValue.messageFirst = 'Maximum 50 characters'
       }
-      if (second && second?.length > 15) {
-        validation.searchValue.messageSecond = 'Maximum 15 characters'
+      if (second && second?.length > 50) {
+        validation.searchValue.messageSecond = 'Maximum 50 characters'
       }
       if (!last) {
         validation.searchValue.messageLast = 'Enter a last name'
-      } else if (last?.length > 25) {
-        validation.searchValue.messageLast = 'Maximum 25 characters'
+      } else if (last?.length > 50) {
+        validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
     case UISearchTypes.BUSINESS_DEBTOR:
       if (!searchValue) {
         validation.searchValue.message = 'Enter a business debtor name to search'
       }
-      if (searchValue?.length > 70) {
-        validation.searchValue.message = 'Maximum 70 characters'
+      if (searchValue?.length > 150) {
+        validation.searchValue.message = 'Maximum 150 characters'
       }
       if (searchValue?.length < 2) {
         validation.searchValue.message = 'Must contain more than 1 character'
