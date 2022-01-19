@@ -34,7 +34,6 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         AIRCRAFT_AIRFRAME = 'AF'
         AIRPLANE = 'AP'
         BOAT = 'BO'
-        ELECTRIC_VEHICLE = 'EV'
         MANUFACTURED_HOME = 'MH'
         MOTOR_VEHICLE = 'MV'
         OUTBOARD_MOTOR = 'OB'

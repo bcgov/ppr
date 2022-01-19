@@ -15,7 +15,7 @@
 
 Validation includes verifying delete collateral ID's and timestamps.
 """
-from ppr_api.models import utils as model_utils
+from ppr_api.models import utils as model_utils, VehicleCollateral
 
 
 COURT_ORDER_INVALID = 'CourtOrderInformation is not allowed with a base registration type of {}.\n'
@@ -31,6 +31,7 @@ LI_NOT_ALLOWED = 'Life Infinite is not allowed with this registration type.\n'
 RENEWAL_INVALID = 'Renewal registration is now allowed: the base registration has an infinite life.\n'
 LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type.\n'
 LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed.\n'
+VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed.\n'
 
 
 def validate_registration(json_data, financing_statement=None):
@@ -38,7 +39,7 @@ def validate_registration(json_data, financing_statement=None):
     error_msg = ''
     if 'authorizationReceived' not in json_data or not json_data['authorizationReceived']:
         error_msg += AUTHORIZATION_INVALID
-    error_msg += validate_collateral_ids(json_data, financing_statement)
+    error_msg += validate_collateral(json_data, financing_statement)
 
     return error_msg
 
@@ -67,7 +68,7 @@ def validate_renewal(json_data, financing_statement):
     return error_msg
 
 
-def validate_collateral_ids(json_data, financing_statement=None):
+def validate_collateral(json_data, financing_statement=None):
     """Check amendment, change registration delete collateral ID's are valid."""
     error_msg = ''
     # Check delete vehicle ID's
@@ -80,6 +81,11 @@ def validate_collateral_ids(json_data, financing_statement=None):
                 existing = find_vehicle_collateral_by_id(collateral_id, financing_statement.vehicle_collateral)
                 if not existing:
                     error_msg += DELETE_INVALID_ID_VEHICLE.format(str(collateral_id))
+
+    if 'addVehicleCollateral' in json_data:
+        for collateral in json_data['addVehicleCollateral']:
+            if 'type' in collateral and collateral['type'] == VehicleCollateral.SerialTypes.AIRPLANE.value:
+                error_msg += VC_AP_NOT_ALLOWED
 
     # Check delete general collateral ID's.
     # Removed: with th "add only" model the check on delete general collateral ID is no longer required.

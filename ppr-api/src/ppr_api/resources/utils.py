@@ -263,7 +263,7 @@ def validate_renewal(json_data, financing_statement):
 def validate_delete_ids(json_data, financing_statement):
     """Perform non-schema extra validation on a change amendment delete party, collateral ID's."""
     error_msg = party_validator.validate_party_ids(json_data, financing_statement)
-    error_msg += registration_validator.validate_collateral_ids(json_data, financing_statement)
+    error_msg += registration_validator.validate_collateral(json_data, financing_statement)
     if error_msg != '':
         raise BusinessException(
             error=error_msg,
