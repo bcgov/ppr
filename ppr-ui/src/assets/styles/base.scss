@@ -552,27 +552,35 @@ tr.registration-row.draft-registration-row td.actions-cell,
 
 .min-column-lg {
   min-width: 15.5rem;
-  width: 5%;
+  width: 100%;
 }
 
 .min-column-md {
-  min-width: 10.5rem;
-  width: 3%;
+  min-width: 13rem;
+  width: 100%;
 }
 
 .min-column-mdl {
-  min-width: 13rem;
-  width: 4%;
+  min-width: 14rem;
+  width: 100%;
 }
 
 .min-column-mds {
-  min-width: 8rem;
-  width: 2%;
+  min-width: 12rem;
+  width: 100%;
+  max-width: 12rem;
 }
 
 .min-column-sm {
+  max-width: 8rem;
   min-width: 6rem;
-  width: 1%;
+  width: 100%;
+}
+
+.min-column-sm {
+  max-width: 6rem;
+  min-width: 6rem;
+  width: 100%;
 }
 
 .picker-title {

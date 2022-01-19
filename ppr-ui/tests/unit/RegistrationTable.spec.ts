@@ -102,7 +102,7 @@ describe('Test registration table with results', () => {
     expect(rows.length).toBe(0)
 
     // no data text
-    expect(wrapper.findAll(regTable).at(0).text()).toContain('No registrations created yet.')
+    expect(wrapper.findAll(regTable).at(0).text()).toContain('No registrations to show.')
   })
 
   it('updates table headers when given new ones', async () => {

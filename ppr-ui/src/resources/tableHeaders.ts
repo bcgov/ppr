@@ -343,7 +343,7 @@ export const editTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'min-column-mdl',
+    class: 'min-column-mds',
     sortable: true,
     text: 'Registration Number',
     value: 'registrationNumber',
@@ -364,7 +364,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'min-column-mds',
+    class: 'min-column-sm',
     sortable: true,
     text: 'Status',
     value: 'statusType',
@@ -393,7 +393,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
 
   {
-    class: 'min-column-md',
+    class: 'min-column-mds',
     sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
@@ -407,14 +407,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'min-column-sms',
     sortable: false,
     text: 'Verification Statement',
     value: 'vs',
     display: true
   },
   {
-    class: 'registration-action min-column-sm',
+    class: 'registration-action',
     sortable: false,
     text: 'Actions',
     value: 'actions',

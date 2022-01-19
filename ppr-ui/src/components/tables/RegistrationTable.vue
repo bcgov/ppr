@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pa-0">
+  <v-container fluid no-gutters class="pa-0" ref="tableHeaderRef">
     <date-picker
       v-show="showDatePicker"
       ref="datePicker"
@@ -27,7 +27,7 @@
       :items="tableData"
       item-key="baseRegistrationNumber"
       mobile-breakpoint="0"
-      :no-data-text="tableFiltersActive ? 'No registrations found.' : 'No registrations created yet.'"
+      :no-data-text="tableFiltersActive ? 'No registrations found.' : 'No registrations to show.'"
       :sort-desc="[false, true]"
     >
       <template v-slot:header="{ props }">
@@ -38,6 +38,8 @@
               :key="index"
               :class="header.class"
               class="text-left pa-0"
+              :ref="header.value + 'Ref'"
+              :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
             >
               <v-row class="my-reg-header pl-3" no-gutters @click="selectAndSort(header.value)">
                 <v-col :class="{ 'pl-7': header.value === 'actions' }">
@@ -197,6 +199,7 @@
       </template>
       <template v-slot:item="{ expand, item, isExpanded }" class="registration-data-table">
         <table-row
+          :setDisableActionShadow="overrideWidth"
           :setHeaders="headers"
           :setIsExpanded="isExpanded"
           :setItem="item"
@@ -209,6 +212,7 @@
         <table-row
           v-for="change in item.changes"
           :key="change.documentId"
+          :setDisableActionShadow="overrideWidth"
           :setChild="true"
           :setHeaders="headers"
           :setItem="change"
@@ -224,6 +228,7 @@
 import {
   computed,
   defineComponent,
+  onUpdated,
   reactive,
   ref,
   toRefs,
@@ -275,6 +280,35 @@ export default defineComponent({
   setup (props, { emit }) {
     // refs
     const datePicker = ref(null)
+    const tableHeaderRef = ref(null)
+    const registrationNumberRef = ref(null)
+    const registrationTypeRef = ref(null)
+    const createDateTimeRef = ref(null)
+    const statusTypeRef = ref(null)
+    const registeringNameRef = ref(null)
+    const registeringPartyRef = ref(null)
+    const securedPartiesRef = ref(null)
+    const clientReferenceIdRef = ref(null)
+    const refs = [
+      registrationNumberRef,
+      registrationTypeRef,
+      createDateTimeRef,
+      statusTypeRef,
+      registeringNameRef,
+      registeringPartyRef,
+      securedPartiesRef,
+      clientReferenceIdRef
+    ]
+    const headersToRefsIndex = {
+      registrationNumber: 0,
+      registrationType: 1,
+      createDateTime: 2,
+      statusType: 3,
+      registeringName: 4,
+      registeringParty: 5,
+      securedParties: 6,
+      clientReferenceId: 7
+    }
     // getters
     const { getAccountProductSubscriptions } = useGetters<any>([
       'getAccountProductSubscriptions'
@@ -303,6 +337,7 @@ export default defineComponent({
       expanded: [],
       freezeTableScroll: false,
       loadingPDF: '',
+      overrideWidth: false,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       selectedSort: 'createDateTime',
       showDatePicker: false,
@@ -332,6 +367,23 @@ export default defineComponent({
           return true
         }
         return false
+      }),
+      tableHeadersWidth: computed(() => {
+        const width = tableHeaderRef?.value?.clientWidth || 0
+        if (width > 1360) return 1360
+        return width
+      }),
+      firstColRef: computed(() => {
+        if (props.setHeaders?.length < 1) return null
+        else if (localState.tableHeadersWidth === 0) return null
+        return refs[headersToRefsIndex[localState.headers[0].value]]
+      }),
+      firstColWidth: computed(() => {
+        if (!localState.firstColRef) return 0
+        if (localState.firstColRef.value?.length > 0) {
+          return localState.firstColRef.value[0]?.clientWidth || 0
+        }
+        return 0
       })
     })
 
@@ -341,6 +393,16 @@ export default defineComponent({
         docId: docId as string,
         regNum: regNum as string
       })
+    }
+
+    const getHeaderStyle = (overrideWidth: boolean, header: string): string => {
+      if (overrideWidth && header !== 'actions') {
+        return `min-width: ${(localState.tableHeadersWidth - 180) / (localState.headers.length - 1)}px`
+      }
+      if (overrideWidth && header === 'actions') {
+        return 'box-shadow: none; border-left: none; border-bottom: 1px solid #dee2e6 !important;'
+      }
+      return ''
     }
 
     const selectAndSort = (col: string) => {
@@ -406,10 +468,25 @@ export default defineComponent({
       }
     })
 
+    watch(() => localState.firstColWidth, (val) => {
+      // needed to set overrideWidth back to false
+      if (!localState.firstColRef || val < 350) localState.overrideWidth = false
+    })
+
+    onUpdated(() => {
+      // needed to set overrideWidth to true
+      if (localState.firstColRef?.value?.length > 0) {
+        if (localState.firstColRef.value[0].clientWidth > 350) {
+          localState.overrideWidth = true
+        }
+      }
+    })
+
     return {
       datePicker,
       dateTxt,
       emitRowAction,
+      getHeaderStyle,
       registrationNumber,
       registrationType,
       shouldClearType,
@@ -428,6 +505,15 @@ export default defineComponent({
       submittedEndDate,
       submittedStartDate,
       TableActions,
+      tableHeaderRef,
+      registrationNumberRef,
+      registrationTypeRef,
+      createDateTimeRef,
+      statusTypeRef,
+      registeringNameRef,
+      registeringPartyRef,
+      securedPartiesRef,
+      clientReferenceIdRef,
       ...toRefs(localState)
     }
   }
