@@ -113,7 +113,7 @@ import {
   CourtOrderIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
-import { RegistrationTypes } from '@/resources'
+import { AllRegistrationTypes } from '@/resources'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
@@ -223,7 +223,7 @@ export default class ReviewRegistration extends Vue {
         this.emitError(financingStatement.error)
       } else {
         // load data into the store
-        const registrationType = RegistrationTypes.find((reg, index) => {
+        const registrationType = AllRegistrationTypes.find((reg, index) => {
           if (reg.registrationTypeAPI === financingStatement.type) {
             return true
           }

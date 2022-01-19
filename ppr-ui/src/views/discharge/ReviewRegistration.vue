@@ -79,7 +79,7 @@ import {
   CertifyIF, // eslint-disable-line no-unused-vars
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { RegistrationTypes } from '@/resources'
+import { AllRegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
 import { StatusCodes } from 'http-status-codes'
 
@@ -165,7 +165,7 @@ export default class ReviewRegistration extends Vue {
       this.emitError(financingStatement.error)
     } else {
       // load data into the store
-      const registrationType = RegistrationTypes.find(
+      const registrationType = AllRegistrationTypes.find(
         (reg, index) => {
           if (reg.registrationTypeAPI === financingStatement.type) {
             return true
