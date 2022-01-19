@@ -94,6 +94,21 @@ export async function search (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         searchId: 'error',
         maxResultsSize: 0,
@@ -104,8 +119,8 @@ export async function search (
         error: {
           statusCode: error?.response?.status,
           message: error?.response?.data?.message,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -265,13 +280,28 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
       return { searches: data }
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         searches: null,
         error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -291,6 +321,21 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         paymentConfirmationDialog: true,
         selectConfirmationDialog: true,
@@ -299,8 +344,8 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
         error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -323,6 +368,21 @@ export async function updateUserSettings (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         paymentConfirmationDialog: true,
         selectConfirmationDialog: true,
@@ -331,8 +391,8 @@ export async function updateUserSettings (
         error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -350,11 +410,26 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       draft.error = {
         statusCode: error?.response?.status,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return draft
     })
@@ -386,11 +461,26 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       draft.error = {
         statusCode: error?.response?.status,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return draft
     })
@@ -417,11 +507,26 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       draft.error = {
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return draft
     })
@@ -436,11 +541,26 @@ export async function deleteDraft (documentId: string): Promise<ErrorIF> {
       return { statusCode: response?.status as StatusCodes }
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
     })
 }
@@ -465,12 +585,27 @@ export async function partyCodeSearch (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         error: {
           statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
           message: error?.response?.data?.errorMessage,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -490,12 +625,27 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         error: {
           statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
           message: error?.response?.data?.errorMessage,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -518,13 +668,28 @@ export async function registrationHistory (): Promise<{
       return { registrations: data, error: null }
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         registrations: null,
         error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.errorMessage,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -547,13 +712,28 @@ export async function draftHistory (): Promise<{
       return { drafts: data, error: null }
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         drafts: null,
         error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.errorMessage,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -578,11 +758,26 @@ export async function createFinancingStatement (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       statement.error = {
         statusCode: error?.response?.status,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return statement
     })
@@ -610,8 +805,8 @@ export async function createAmendmentStatement (
       statement.error = {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return statement
     })
@@ -635,11 +830,26 @@ export async function createDischarge (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       discharge.error = {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return discharge
     })
@@ -663,11 +873,26 @@ export async function createRenewal (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       renewal.error = {
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
       return renewal
     })
@@ -691,6 +916,21 @@ export async function getFinancingStatement (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         type: null,
         registeringParty: null,
@@ -699,8 +939,8 @@ export async function getFinancingStatement (
         error: {
           statusCode: error?.response?.status,
           message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -721,6 +961,21 @@ export async function addRegistrationSummary (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         baseRegistrationNumber: '',
         createDateTime: '',
@@ -734,8 +989,8 @@ export async function addRegistrationSummary (
         error: {
           statusCode: error?.response?.status,
           message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -760,6 +1015,21 @@ export async function getRegistrationSummary (
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         baseRegistrationNumber: '',
         createDateTime: '',
@@ -773,8 +1043,8 @@ export async function getRegistrationSummary (
         error: {
           statusCode: error?.response?.status,
           message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -790,11 +1060,26 @@ export async function deleteRegistrationSummary (
       return { statusCode: response?.status as StatusCodes }
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         statusCode: error?.response?.status,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
-        detail: error?.response?.data?.detail,
-        type: error?.response?.data?.type
+        detail: error?.parsed?.rootCause?.detail,
+        type: error?.parsed?.rootCause?.type
       }
     })
 }
@@ -819,12 +1104,27 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         error: {
           statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
           message: error?.response?.data?.errorMessage,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
@@ -844,13 +1144,28 @@ export async function debtorNames (registrationNum: string): Promise<[DebtorName
       return data
     })
     .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.parsed = JSON.parse(error?.response?.data.replaceAll('\n', '').replaceAll('\\', ''))
+          error.parsed.rootCause = error.parsed.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"status_code":"')
+            .replaceAll(',', '",')
+          error.parsed.rootCause = `{${error.parsed.rootCause}"}`
+          error.parsed.rootCause = JSON.parse(error.parsed.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
       return {
         searches: null,
         error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.errorMessage,
-          detail: error?.response?.data?.detail,
-          type: error?.response?.data?.type
+          detail: error?.parsed?.rootCause?.detail,
+          type: error?.parsed?.rootCause?.type
         }
       }
     })
