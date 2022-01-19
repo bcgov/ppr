@@ -288,7 +288,7 @@ describe('TableRow tests', () => {
     )
 
     // drop down buttons
-    let dropButtons = wrapper.findAll('.actions__more-actions__btn')
+    let dropButtons = wrapper.findAll('.actions__more-actions__btn.reg-table')
     expect(dropButtons.length).toBe(1)
     dropButtons.at(0).trigger('click')
     await Vue.nextTick()

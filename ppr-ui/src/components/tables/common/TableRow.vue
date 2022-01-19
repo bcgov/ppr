@@ -200,7 +200,6 @@
                 color="primary"
                 class="actions__more-actions__btn reg-table"
                 :class="$style['down-btn']"
-                @focus="value"
               >
                 <v-icon v-if="value">mdi-menu-up</v-icon>
                 <v-icon v-else>mdi-menu-down</v-icon>
