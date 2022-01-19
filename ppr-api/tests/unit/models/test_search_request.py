@@ -552,7 +552,9 @@ def test_debtor_middle_name(session):
     assert result['returnedResultsSize'] >= 1
     assert len(result['results']) >= 1
     for match in result['results']:
-        if 'middle' in match['debtor']['personName'] and match['debtor']['personName']['middle'] == '4':
+        if 'middle' in match['debtor']['personName'] and match['debtor']['personName']['middle'] == '4' and \
+                    match['debtor']['personName']['last'] == 'Debtor' and \
+                    match['debtor']['personName']['first'] == 'Test Ind':
             assert match['matchType'] == 'EXACT'
         else:
             assert match['matchType'] == 'SIMILAR'

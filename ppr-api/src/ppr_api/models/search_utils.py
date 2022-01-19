@@ -91,16 +91,18 @@ AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
 
 BUSINESS_NAME_QUERY = """
 WITH q AS (
-   SELECT searchkey_business_name(:query_bus_name) AS search_key
-)
+   SELECT(SELECT searchkey_business_name(:query_bus_name)) AS search_key,
+   (SELECT array_length(string_to_array(trim(regexp_replace(:query_bus_name,'^THE','','gi')),' '),1)) AS word_length)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN trim(regexp_replace(p.business_name,'[^\\w]+',' ','g')) = 
-                 trim(regexp_replace(:query_bus_name,'[^\\w]+',' ','g')) THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') =
+                 regexp_replace(regexp_replace(:query_bus_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') THEN
+                 'EXACT'
+            ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
   FROM registrations r, financing_statements fs, parties p, q
- WHERE r.financing_id = fs.id
+WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
@@ -113,8 +115,9 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
    AND SUBSTR(search_key,1,1) = SUBSTR(p.business_srch_key,1,1)
-   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key)
-ORDER BY match_type, p.business_name 
+   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key
+                  or word_length=1 and search_key = split_part(business_name,' ',1))
+ORDER BY match_type, p.business_name
 """
 
 INDIVIDUAL_NAME_QUERY = """
@@ -124,7 +127,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        CASE WHEN p.last_name = :query_last AND p.first_name = :query_first THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
- WHERE r.financing_id = fs.id
+WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
@@ -138,7 +141,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.party_type = 'DI'
    AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
                                                            :query_first_quotient, :query_default_quotient))) 
-ORDER BY match_type, p.last_name, p.first_name 
+ORDER BY match_type, p.last_name, p.first_name
 """
 
 INDIVIDUAL_NAME_MIDDLE_QUERY = """
@@ -147,10 +150,10 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = :query_last AND
                  p.first_name = :query_first AND
-                 p.middle_initial = :query_middle THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+                 p.middle_initial = 'E' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
- WHERE r.financing_id = fs.id
+WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
    AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
@@ -164,7 +167,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
    AND p.party_type = 'DI'
    AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
                                                            :query_first_quotient, :query_default_quotient))) 
-ORDER BY match_type, p.last_name, p.first_name 
+ORDER BY match_type, p.last_name, p.first_name
 """
 
 # Total result count queries for serial number, debtor name searches:

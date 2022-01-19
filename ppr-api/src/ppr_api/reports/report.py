@@ -271,7 +271,6 @@ class Report:  # pylint: disable=too-few-public-methods
         """Cover page envelope window lines up to a maximum of 4."""
         if 'cover' in self._report_data:
             cover_info = self._report_data['cover']
-            line_count = 1  # always line 4
             name = ''
             line1: str = ''
             line2: str = ''
@@ -283,11 +282,8 @@ class Report:  # pylint: disable=too-few-public-methods
                 name = cover_info['personName']['first'] + ' ' + cover_info['personName']['last']
             if name:
                 line1 = name
-                line_count += 1
                 if len(line1) > 40:
-                    line_count += 1
                     line1 = line1[0:40]
-                    line2 = name[40:80]
             line4 = cover_info['address']['region'] + ' ' + cover_info['address']['postalCode']
             if (len(cover_info['address']['city']) + len(line4)) < 40:
                 line4 = cover_info['address']['city'] + ' ' + line4
