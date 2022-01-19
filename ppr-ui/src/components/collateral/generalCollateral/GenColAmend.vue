@@ -1,8 +1,8 @@
 <template>
-  <v-container class="pa-0">
+  <v-container class="pa-0" :class="{ 'border-error-left': showErrorBar }">
     <v-card
       id="general-collateral-amendment"
-      :class="{ 'invalid-message': showErrorComponent }"
+      :class="cardClass"
       flat
     >
       <v-row no-gutters class="py-6">
@@ -96,6 +96,10 @@ export default defineComponent({
     showInvalid: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -112,6 +116,17 @@ export default defineComponent({
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
+      }),
+      cardClass: computed((): string => {
+        if (localState.showErrorComponent) {
+          return 'invalid-message'
+        } 
+        if (localState.showErrorBar) {
+          return 'border-over'
+        }
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 
@@ -164,6 +179,14 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.border-error-left
+{
+  margin-left: -20px;
+}
+.border-over
+{
+  margin-left: 25px;
+}
 </style>

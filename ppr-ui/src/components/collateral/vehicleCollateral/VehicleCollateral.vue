@@ -80,6 +80,7 @@
               <edit-collateral
                 :activeIndex="activeIndex"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -285,6 +286,7 @@
                     <edit-collateral
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeVehicle="removeVehicle($event)"
                       @resetEvent="resetData"
                     />
@@ -304,6 +306,7 @@ import {
   computed,
   defineComponent,
   reactive,
+  watch,
   toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -326,6 +329,10 @@ export default defineComponent({
       default: false
     },
     showInvalid: {
+      type: Boolean,
+      default: false
+    },
+    setShowErrorBar: {
       type: Boolean,
       default: false
     }
@@ -428,6 +435,9 @@ export default defineComponent({
         } else {
           return vehicles
         }
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 
@@ -492,6 +502,14 @@ export default defineComponent({
       newVCollateral.splice(index, 1, cloneDeep(originalCollateral.vehicleCollateral[index]))
       setVehicleCollateral(newVCollateral)
     }
+
+    watch(
+      () => localState.showErrorBar,
+      (val: boolean) => {
+        console.log('show error')
+        console.log(val)
+      }
+    )
 
     return {
       removeVehicle,

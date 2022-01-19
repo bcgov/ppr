@@ -18,7 +18,11 @@
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
-          <registration-length-trust-amendment @lengthTrustOpen="lengthTrustOpen = $event" class="mt-15" />
+          <registration-length-trust-amendment
+            :setShowErrorBar="errorBar"
+            @lengthTrustOpen="lengthTrustOpen = $event"
+            class="mt-15"
+          />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -42,6 +46,7 @@
             @setSecuredPartiesValid="securedPartiesValid = $event"
             @securedPartyOpen="securedPartyOpen = $event"
             :setShowInvalid="showInvalid" class="pt-4"
+            :setShowErrorBar="errorBar"
           />
           <div v-if="!securedPartiesValid">
           <span class="invalid-message">
@@ -59,6 +64,7 @@
             @setDebtorValid="debtorValid = $event"
             @debtorOpen="debtorOpen = $event"
             :setShowInvalid="showInvalid"
+            :setShowErrorBar="errorBar"
           />
           <div class="pt-4" v-if="!debtorValid">
           <span class="invalid-message">
@@ -73,6 +79,7 @@
           <collateral
             @setCollateralValid="collateralValid = $event"
             @collateralOpen="collateralOpen = $event"
+            :setShowErrorBar="errorBar"
             class="mt-15"
           />
           <amendment-description class="mt-15"
@@ -224,6 +231,7 @@ export default class AmendRegistration extends Vue {
   private requireCourtOrder = false
   private debtorOpen = false
   private securedPartyOpen = false
+  private errorBar = false
   private collateralOpen = false
   private lengthTrustOpen = false
   private amendErrMsg = ''
@@ -411,6 +419,7 @@ export default class AmendRegistration extends Vue {
     if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen || this.lengthTrustOpen) {
       this.amendErrMsg = '< You have unfinished changes'
       this.showInvalid = true
+      this.errorBar = true
       this.scrollToInvalid()
       return
     }
