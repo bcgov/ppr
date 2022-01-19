@@ -129,8 +129,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Mac OS X
-.DS_Store
-
-# History (vscode)
-.history
+# OSX
+.DStore

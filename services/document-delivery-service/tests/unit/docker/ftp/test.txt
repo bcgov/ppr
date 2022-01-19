@@ -1,0 +1,3 @@
+Golden File
+Check contents
+Line 3 is here

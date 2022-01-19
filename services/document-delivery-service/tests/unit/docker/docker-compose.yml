@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  sftp:
+    image: atmoz/sftp
+    volumes:
+        - ./ftp/:/home/ftp_user/documentfolder/
+        - ./config/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key
+        - ./config/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key
+    ports:
+        - "2222:22"
+    command: ftp_user:ftp_pass:1001
