@@ -5,6 +5,8 @@
       :setFeeType="feeType"
       :setRegistrationLength="registrationLength"
       :setRegistrationType="registrationType"
+      :setStaffReg="isStaffReg"
+      :setStaffSBC="isStaffSBC"
     />
     <buttons-stacked
       v-if="showButtons"
@@ -25,11 +27,13 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   reactive,
   toRefs,
   watch
 } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 // local components
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
@@ -86,6 +90,11 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    const {
+      isRoleStaffReg,
+      isRoleStaffSbc
+    } = useGetters<any>(['isRoleStaffReg', 'isRoleStaffSbc'])
+
     const localState = reactive({
       backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
@@ -98,7 +107,13 @@ export default defineComponent({
       showButtons: props.setShowButtons,
       showFeeSummary: props.setShowFeeSummary,
       submitBtn: props.setSubmitBtn,
-      disableSubmitBtn: props.setDisableSubmitBtn
+      disableSubmitBtn: props.setDisableSubmitBtn,
+      isStaffReg: computed(() => {
+        return isRoleStaffReg.value as boolean
+      }),
+      isStaffSBC: computed(() => {
+        return isRoleStaffSbc.value as boolean
+      })
     })
     const back = () => {
       emit('back', true)
