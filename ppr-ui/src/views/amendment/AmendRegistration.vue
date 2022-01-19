@@ -569,6 +569,17 @@ export default class AmendRegistration extends Vue {
   private showInvalidComponents (val: boolean): void {
     this.showInvalid = true
   }
+
+  @Watch('securedPartyOpen')
+  @Watch('debtorOpen')
+  @Watch('collateralOpen')
+  @Watch('lengthTrustOpen')
+  private resetOpenError (isOpen: boolean): void {
+    if (!isOpen) {
+      this.errorBar = false
+      this.amendErrMsg = ''
+    }
+  }
 }
 </script>
 

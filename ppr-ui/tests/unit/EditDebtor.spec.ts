@@ -204,5 +204,12 @@ describe('Debtor edit business tests', () => {
   it('renders debtor when editing', async () => {
     expect(wrapper.findComponent(EditDebtor).exists()).toBe(true)
     expect(wrapper.vm.currentDebtor.businessName).toEqual('SOMEBODYS BUSINESS')
+    expect(wrapper.find('.border-error-left').exists()).toBe(false)
+  })
+
+  it('shows error bar', async () => {
+    await wrapper.setProps({ setShowErrorBar: true })
+    await Vue.nextTick()
+    expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
 })
