@@ -164,7 +164,17 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
     statement.changeType = APIAmendmentTypes.COURT_ORDER
     statement.courtOrderInformation = stateModel.registration.courtOrderInformation
     if (statement.courtOrderInformation.orderDate.length === 10) {
-      statement.courtOrderInformation.orderDate += 'T00:00:00-08:00'
+      // add time (latest possible time to avoid conflicts with creation date)
+      const d = new Date(statement.courtOrderInformation.orderDate + 'T23:59:59')
+      // convert back to UTC (required to pass api validation properly in some edge cases)
+      let month = `${d.getUTCMonth() + 1}`
+      let day = `${d.getUTCDate()}`
+      let hours = `${d.getUTCHours()}`
+      if (month.length < 2) month = `0${month}`
+      if (day.length < 2) day = `0${day}`
+      if (hours.length < 2) hours = `0${hours}`
+      const orderDateUTC = `${d.getUTCFullYear()}-${month}-${day}T${hours}:59:59+00:00`
+      statement.courtOrderInformation.orderDate = orderDateUTC
     }
   } else {
     statement.changeType = APIAmendmentTypes.AMENDMENT
@@ -667,7 +677,17 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     registration.courtOrderInformation = stateModel.registration.courtOrderInformation
     if (registration.courtOrderInformation.orderDate.length === 10) {
-      registration.courtOrderInformation.orderDate += 'T00:00:00-08:00'
+      // add time (latest possible time to avoid conflicts with creation date)
+      const d = new Date(registration.courtOrderInformation.orderDate + 'T23:59:59')
+      // convert back to UTC (required to pass api validation properly in some edge cases)
+      let month = `${d.getUTCMonth() + 1}`
+      let day = `${d.getUTCDate()}`
+      let hours = `${d.getUTCHours()}`
+      if (month.length < 2) month = `0${month}`
+      if (day.length < 2) day = `0${day}`
+      if (hours.length < 2) hours = `0${hours}`
+      const orderDateUTC = `${d.getUTCFullYear()}-${month}-${day}T${hours}:59:59+00:00`
+      registration.courtOrderInformation.orderDate = orderDateUTC
     }
   } else if (trustLength.lifeInfinite) {
     registration.lifeInfinite = trustLength.lifeInfinite

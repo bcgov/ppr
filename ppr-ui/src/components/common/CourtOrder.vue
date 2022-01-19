@@ -387,7 +387,7 @@ export default defineComponent({
         }
         setCourtOrderInformation(newCourtOrderInfo)
       } else {
-        localState.orderDate = localState.courtOrderInfo.orderDate
+        localState.orderDate = localState.courtOrderInfo.orderDate?.substring(0, 10)
         localState.effectOfOrder = localState.courtOrderInfo.effectOfOrder
         localState.courtName = localState.courtOrderInfo.courtName
         localState.courtRegistry = localState.courtOrderInfo.courtRegistry
