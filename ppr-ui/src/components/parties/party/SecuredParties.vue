@@ -472,12 +472,15 @@ export default defineComponent({
 
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+      const currentParties = getAddSecuredPartiesAndDebtors.value
       if (isSecuredPartyRestrictedList(registrationType)) {
         localState.securedParties = cloneDeep(originalParties.securedParties)
         delete localState.securedParties[0].action
       } else {
         localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
       }
+      currentParties.securedParties = localState.securedParties
+      setAddSecuredPartiesAndDebtors(currentParties)
       getSecuredPartyValidity()
     }
 
