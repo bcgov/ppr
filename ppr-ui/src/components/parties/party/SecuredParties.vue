@@ -476,6 +476,7 @@ export default defineComponent({
       if (isSecuredPartyRestrictedList(registrationType)) {
         localState.securedParties = cloneDeep(originalParties.securedParties)
         delete localState.securedParties[0].action
+        localState.searchValue = { code: '', businessName: '' }
       } else {
         localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
       }
