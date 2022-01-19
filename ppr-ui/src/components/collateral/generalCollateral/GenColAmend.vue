@@ -120,7 +120,7 @@ export default defineComponent({
       cardClass: computed((): string => {
         if (localState.showErrorComponent) {
           return 'invalid-message'
-        } 
+        }
         if (localState.showErrorBar) {
           return 'border-over'
         }
