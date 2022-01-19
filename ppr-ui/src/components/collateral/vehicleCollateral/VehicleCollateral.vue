@@ -503,14 +503,6 @@ export default defineComponent({
       setVehicleCollateral(newVCollateral)
     }
 
-    watch(
-      () => localState.showErrorBar,
-      (val: boolean) => {
-        console.log('show error')
-        console.log(val)
-      }
-    )
-
     return {
       removeVehicle,
       initEdit,
