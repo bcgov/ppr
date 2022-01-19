@@ -39,9 +39,8 @@
               </div>
             </v-tooltip>
           </h2>
-          <registering-party-summary
+          <registering-party-change
             class="pt-4"
-            :setEnableNoDataAction="false"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -107,8 +106,8 @@ import {
   CertifyInformation,
   StickyContainer
 } from '@/components/common'
+import { RegisteringPartyChange } from '@/components/parties/party'
 import { BaseDialog } from '@/components/dialogs'
-import { RegisteringPartySummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -132,7 +131,7 @@ import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } fro
     CautionBox,
     DischargeConfirmSummary,
     FolioNumberSummary,
-    RegisteringPartySummary,
+    RegisteringPartyChange,
     CertifyInformation,
     StickyContainer
   }
