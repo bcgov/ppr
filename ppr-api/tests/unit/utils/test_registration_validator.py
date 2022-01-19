@@ -455,9 +455,9 @@ TEST_RENEWAL_DATA = [
 
 
 @pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_COLLATERAL_IDS_DATA)
-def test_validate_collateral_ids(session, desc, json_data, valid, message_content):
+def test_validate_collateral(session, desc, json_data, valid, message_content):
     """Assert that registration delete collateral id provided validation works as expected."""
-    error_msg = validator.validate_collateral_ids(json_data)
+    error_msg = validator.validate_collateral(json_data)
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -470,11 +470,11 @@ def test_actual_collateral_ids(session):
     json_data = copy.deepcopy(AMENDMENT_VALID)
     statement = FinancingStatement.find_by_registration_number('TEST0001', False)
     # example registration collateral ID's are bogus
-    error_msg = validator.validate_collateral_ids(json_data, statement)
+    error_msg = validator.validate_collateral(json_data, statement)
     assert error_msg != ''
     assert error_msg.find('Invalid vehicleId') != -1
     json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
-    error_msg = validator.validate_collateral_ids(json_data, statement)
+    error_msg = validator.validate_collateral(json_data, statement)
     if error_msg != '':
         print(error_msg)
     assert error_msg == ''
@@ -514,3 +514,14 @@ def test_validate_renewal(session, base_reg_num, json_data, valid, message_conte
     elif message_content:
         assert error_msg != ''
         assert error_msg.find(message_content) != -1
+
+
+def test_validate_sc_ap(session):
+    """Assert that financing statement serial collateral AP type validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    json_data['addVehicleCollateral'][0]['type'] = 'AP'
+    error_msg = validator.validate_registration(json_data)
+    # print(error_msg)
+    assert error_msg != ''
+    assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1

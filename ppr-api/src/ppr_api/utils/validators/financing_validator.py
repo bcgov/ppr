@@ -18,7 +18,7 @@ https://docs.google.com/spreadsheets/d/18eTumnf5H6TG2qWXwXJ_iAA-Gc7iNMpnm0ly7ctc
 """
 # pylint: disable=superfluous-parens
 
-from ppr_api.models import utils as model_utils
+from ppr_api.models import utils as model_utils, VehicleCollateral
 from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
 
 
@@ -45,6 +45,7 @@ VC_NOT_ALLOWED = 'Vehicle Collateral is not allowed with this registration type.
 VC_REQUIRED = 'Vehicle Collateral is required with this registration type.\n'
 VC_MH_ONLY = 'Only Vehicle Collateral type MH is allowed with this registration type.\n'
 VC_MH_NOT_ALLOWED = 'Vehicle Collateral type MH is not allowed with this registration type.\n'
+VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed.\n'
 
 GC_NOT_ALLOWED_LIST = [MiscellaneousTypes.MH_NOTICE.value,
                        PPSATypes.MARRIAGE_SEPARATION.value,
@@ -141,12 +142,16 @@ def validate_vehicle_collateral(json_data, reg_type: str, reg_class: str):
         error_msg = VC_REQUIRED
     elif reg_type in VC_MH_ONLY_LIST:
         for collateral in json_data['vehicleCollateral']:
-            if 'type' in collateral and collateral['type'] != 'MH':
+            if 'type' in collateral and collateral['type'] != VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
                 error_msg = VC_MH_ONLY
     elif reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
         for collateral in json_data['vehicleCollateral']:
-            if 'type' in collateral and collateral['type'] == 'MH':
+            if 'type' in collateral and collateral['type'] == VehicleCollateral.SerialTypes.MANUFACTURED_HOME.value:
                 error_msg = VC_MH_NOT_ALLOWED
+    if 'vehicleCollateral' in json_data and json_data['vehicleCollateral']:
+        for collateral in json_data['vehicleCollateral']:
+            if 'type' in collateral and collateral['type'] == VehicleCollateral.SerialTypes.AIRPLANE.value:
+                error_msg += VC_AP_NOT_ALLOWED
 
     return error_msg
 

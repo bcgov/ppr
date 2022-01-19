@@ -4,23 +4,27 @@ from alembic_utils.pg_function import PGFunction
 
 searchkey_last_name = PGFunction(
     schema="public",
-    signature="searchkey_last_name(actual_name IN VARCHAR)",
+    signature="searchkey_last_name(actual_name IN character varying)",
     definition="""
-    RETURNS VARCHAR
+    RETURNS character varying
     LANGUAGE plpgsql
+    COST 100
+    VOLATILE PARALLEL UNSAFE
     AS
     $$
-    DECLARE
-        v_search_key VARCHAR(60);
+DECLARE
+        v_last_name VARCHAR(60);
     BEGIN
-        -- Remove prefixes
-        v_search_key := REGEXP_REPLACE(actual_name,'^DR |^DR.|^DR. |^MR |^MR.|^MR. |^MRS |^MRS.|^MRS. |^MS |^MS.|^MS. ','','gi');
-        -- Remove suffixes
-        v_search_key := REGEXP_REPLACE(v_search_key,' JR$| JR.$| JR. $| SR$| SR $| SR.$| SR. $','','gi');
-        v_search_key := REGEXP_REPLACE(v_search_key,'[^0-9A-Za-z]',' ','gi');
-        -- Remove internal extra space characters
-        v_search_key := TRIM(REGEXP_REPLACE(v_search_key,'( ){2,}',' ','g'));
-        RETURN UPPER(v_search_key);
+        -- Remove special characters last name
+        v_last_name := regexp_replace(actual_name,'[^\w]+',' ','gi');
+        -- Remove prefixes suffixes last name
+		v_last_name := regexp_replace(v_last_name,'\y(DR|MR|MRS|MS|CH|DE|DO|DA|LE|LA|MA|JR|SR|I|II|III)\y','','gi');
+		-- Remove extra spaces
+		v_last_name := trim(regexp_replace(v_last_name, '\s+', ' ', 'gi'));
+		-- Remove repeating letters
+		v_last_name := regexp_replace(v_last_name, '(.)\1{1,}', '\1', 'g');
+		-- Remove special characters first name
+     RETURN UPPER(v_last_name);
     END
     ; 
     $$;

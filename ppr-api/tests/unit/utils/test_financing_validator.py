@@ -492,3 +492,14 @@ def test_validate_authorization(session, desc, valid, message_content):
     elif message_content:
         assert error_msg != ''
         assert error_msg.find(message_content) != -1
+
+
+def test_validate_sc_ap(session):
+    """Assert that financing statement serial collateral AP type validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING)
+    json_data['vehicleCollateral'][0]['type'] = 'AP'
+    error_msg = validator.validate(json_data)
+    # print(error_msg)
+    assert error_msg != ''
+    assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1

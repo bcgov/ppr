@@ -261,45 +261,41 @@ class Report:  # pylint: disable=too-few-public-methods
             self._set_addresses()
             self._set_date_times()
             self._set_vehicle_collateral()
-            self._set_selected()
+            if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value:
+                self._set_selected()
         else:
             self._set_cover()
         return self._report_data
 
-    def _set_cover(self):  # pylint: disable=too-many-branches
+    def _set_cover(self):  # pylint: disable=too-many-branches, too-many-statements
         """Cover page envelope window lines up to a maximum of 4."""
         if 'cover' in self._report_data:
             cover_info = self._report_data['cover']
-            line_count = 1  # always line 4
             name = ''
-            line1 = ''
-            line2 = ''
-            line3 = ''
-            line4 = ''
+            line1: str = ''
+            line2: str = ''
+            line3: str = ''
+            line4: str = ''
             if 'businessName' in cover_info:
                 name = cover_info['businessName']
             elif 'personName' in cover_info:
                 name = cover_info['personName']['first'] + ' ' + cover_info['personName']['last']
             if name:
                 line1 = name
-                line_count += 1
                 if len(line1) > 40:
-                    line_count += 1
                     line1 = line1[0:40]
-                    line2 = name[40:80]
-            line4 = ' ' + cover_info['address']['postalCode']
-            if cover_info['address']['country'] != 'CA':
-                line4 = cover_info['address']['region'] + ' ' + cover_info['address']['country'] + line4
-            else:
-                line4 = cover_info['address']['region'] + line4
+            line4 = cover_info['address']['region'] + ' ' + cover_info['address']['postalCode']
             if (len(cover_info['address']['city']) + len(line4)) < 40:
                 line4 = cover_info['address']['city'] + ' ' + line4
+            else:
+                line3 = cover_info['address']['city']
             if 'street' in cover_info['address']:
                 street = cover_info['address']['street']
                 if not line2:
                     line2 = street
-                    if len(street) > 40:
+                    if len(street) > 40 and line3 == '':
                         line3 = street[40:80]
+                        line2 = street[0:40]
                 else:
                     line3 = street
             if not line3 and 'streetAdditional' in cover_info['address']:
@@ -308,13 +304,18 @@ class Report:  # pylint: disable=too-few-public-methods
                 line2 = line2[0:40]
             if line3 and len(line3) > 40:
                 line3 = line3[0:40]
-            # cover_info['addressLineCount'] = line_count
-            cover_info['line1'] = line1
+            if cover_info['address']['country'] != 'CA':
+                if not line3:
+                    line3 = line4
+                    line4 = cover_info['address']['country']
+                else:
+                    line4 = line4 + ' ' + cover_info['address']['country']
+            cover_info['line1'] = line1.strip()
             if line2:
-                cover_info['line2'] = line2
+                cover_info['line2'] = line2.strip()
             if line3:
-                cover_info['line3'] = line3
-            cover_info['line4'] = line4
+                cover_info['line3'] = line3.strip()
+            cover_info['line4'] = line4.strip()
 
     def _set_addresses(self):
         """Replace address country code with description."""
@@ -593,8 +594,11 @@ class Report:  # pylint: disable=too-few-public-methods
         """Replace selection serial type code with description. Remove unselected items."""
         if 'selected' in self._report_data:
             new_selected = []
+            exact_match_count = 0
             for result in self._report_data['selected']:
                 if result['matchType'] == 'EXACT' or 'selected' not in result or result['selected']:
+                    if result['matchType'] == 'EXACT':
+                        exact_match_count += 1
                     if 'vehicleCollateral' in result:
                         code = result['vehicleCollateral']['type']
                         result['vehicleCollateral']['type'] = TO_VEHICLE_TYPE_DESCRIPTION[code]
@@ -602,6 +606,7 @@ class Report:  # pylint: disable=too-few-public-methods
                         result['debtor']['birthDate'] = Report._to_report_datetime(result['debtor']['birthDate'], False)
                     new_selected.append(result)
             self._report_data['selected'] = new_selected
+            self._report_data['exactMatchCount'] = exact_match_count
 
     @staticmethod
     def _format_address(address):

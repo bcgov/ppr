@@ -87,8 +87,8 @@ class _Config():  # pylint: disable=too-few-public-methods
         SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
     # Connection pool settings
-    DB_MIN_POOL_SIZE = os.getenv('DATABASE_MIN_POOL_SIZE', '5')
-    DB_MAX_POOL_SIZE = os.getenv('DATABASE_MAX_POOL_SIZE', '5')
+    DB_MIN_POOL_SIZE = os.getenv('DATABASE_MIN_POOL_SIZE', '2')
+    DB_MAX_POOL_SIZE = os.getenv('DATABASE_MAX_POOL_SIZE', '10')
     DB_CONN_WAIT_TIMEOUT = os.getenv('DATABASE_CONN_WAIT_TIMEOUT', '5')
     DB_CONN_TIMEOUT = os.getenv('DATABASE_CONN_TIMEOUT', '900')
 
