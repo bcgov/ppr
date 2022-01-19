@@ -150,7 +150,7 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = :query_last AND
                  p.first_name = :query_first AND
-                 p.middle_initial = 'E' THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+                 p.middle_initial = :query_middle THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
 WHERE r.financing_id = fs.id
