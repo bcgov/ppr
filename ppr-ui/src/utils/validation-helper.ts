@@ -130,26 +130,26 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
     case UISearchTypes.INDIVIDUAL_DEBTOR:
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst = "Names don't normally contain special characters"
-      } else if (first && first?.length > 15) {
-        validation.searchValue.messageFirst = 'Maximum 15 characters'
+      } else if (first && first?.length > 50) {
+        validation.searchValue.messageFirst = 'Maximum 50 characters'
       }
       if (second && specialCharsLax.test(second)) {
         validation.searchValue.messageSecond = "Names don't normally contain special characters"
-      } else if (second && second?.length > 15) {
-        validation.searchValue.messageSecond = 'Maximum 15 characters'
+      } else if (second && second?.length > 50) {
+        validation.searchValue.messageSecond = 'Maximum 50 characters'
       }
       if (last && specialCharsLax.test(last)) {
         validation.searchValue.messageLast = "Names don't normally contain special characters"
-      } else if (last?.length > 25) {
-        validation.searchValue.messageLast = 'Maximum 25 characters'
+      } else if (last?.length > 50) {
+        validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
     case UISearchTypes.BUSINESS_DEBTOR:
       if (searchValue && specialCharsLax.test(searchValue)) {
         validation.searchValue.message = "Names don't normally contain special characters"
       }
-      if (searchValue?.length > 70) {
-        validation.searchValue.message = 'Maximum 70 characters'
+      if (searchValue?.length > 150) {
+        validation.searchValue.message = 'Maximum 150 characters'
       }
       break
     case UISearchTypes.MHR_NUMBER:

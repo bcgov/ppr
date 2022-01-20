@@ -188,7 +188,7 @@ describe('Individual debtor validation', () => {
     const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
-    wrapper.vm.$data.searchValueFirst = '1234567890123456'
+    wrapper.vm.$data.searchValueFirst = '1'.repeat(51)
     wrapper.vm.$data.searchValueLast = 'last'
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
@@ -197,7 +197,7 @@ describe('Individual debtor validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeUndefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 15 characters')
+    expect(messages.at(0).text()).toBe('Maximum 50 characters')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
@@ -208,7 +208,7 @@ describe('Individual debtor validation', () => {
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     wrapper.vm.$data.searchValueFirst = 'first'
-    wrapper.vm.$data.searchValueLast = '12345678901234567890123456'
+    wrapper.vm.$data.searchValueLast = '1'.repeat(51)
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations.searchValue?.messageFirst).toBeUndefined()
@@ -216,7 +216,7 @@ describe('Individual debtor validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.messageLast).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 25 characters')
+    expect(messages.at(0).text()).toBe('Maximum 50 characters')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
@@ -318,13 +318,13 @@ describe('Business debtor validation', () => {
     expect(hints.length).toBe(1)
     expect(hints.at(0).text()).toContain('Business names must contain')
     // max chars
-    wrapper.vm.$data.searchValue = '12345678901234567890123456789012345678901234567890123456789012345678901'
+    wrapper.vm.$data.searchValue = '1'.repeat(151)
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
     await Vue.nextTick()
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
-    expect(messages1.at(0).text()).toContain('Maximum 70 characters')
+    expect(messages1.at(0).text()).toContain('Maximum 150 characters')
     // special chars
     wrapper.vm.$data.searchValue = 'F10@'
     await Vue.nextTick()
