@@ -62,6 +62,10 @@ td {
   font-weight: normal;
 }
 
+.reg-table.v-btn:not(.v-btn--text):not(.v-btn--outlined):focus:before {
+  opacity: 0;
+}
+
 tbody {
   tr:hover {
     background-color: transparent !important;
@@ -492,6 +496,8 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   position: sticky;
   right: 0;
   width: 156px;
+  max-width: 156px;
+  min-width: 156px;
   z-index: 3;
 }
 

@@ -62,7 +62,7 @@
                   id="search-history-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
-              <b>My Searches</b> ({{ searchHistoryLength }})
+              <b>Searches</b> ({{ searchHistoryLength }})
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -137,7 +137,7 @@
             no-gutters
           >
             <v-col cols="auto">
-              <b>My Registrations</b> ({{ myRegistrationsLength }})
+              <b>Registrations</b> ({{ myRegistrationsLength }})
             </v-col>
             <v-col>
               <v-row justify="end" no-gutters>

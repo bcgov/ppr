@@ -155,7 +155,7 @@ describe('Dashboard component', () => {
     expect(wrapper.vm.searchHistoryLength).toBe(0)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('My Searches (0)')
+    expect(header.at(0).text()).toContain('Searches (0)')
   })
 
   it('updates the search history header based on history data', async () => {
@@ -167,7 +167,7 @@ describe('Dashboard component', () => {
     expect(wrapper.vm.searchHistoryLength).toBe(6)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('My Searches (6)')
+    expect(header.at(0).text()).toContain('Searches (6)')
     // snackbar should trigger
     expect(wrapper.findComponent(BaseSnackbar).exists()).toBe(true)
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(true)
@@ -345,7 +345,7 @@ describe('Dashboard registration table tests', () => {
     expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain(`My Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`)
+    expect(header.at(0).text()).toContain(`Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`)
     // removed filter until UX decides they want it or not
     // expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)

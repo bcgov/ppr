@@ -145,7 +145,11 @@
     </td>
 
     <!-- Action Btns -->
-    <td v-if="headers.length > 1" class="actions-cell pl-2 py-4">
+    <td
+      v-if="headers.length > 1"
+      class="actions-cell pl-2 py-4"
+      :style="disableActionShadow ? 'box-shadow: none; border-left: none;' : ''"
+    >
       <v-row v-if="!isChild || isDraft(item)" class="actions" no-gutters>
         <v-col class="edit-action pa-0" cols="auto">
           <v-btn
@@ -188,16 +192,17 @@
         </v-col>
         <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
           <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
-            <template v-slot:activator="{ on: onMenu }">
+            <template v-slot:activator="{ on: onMenu, value }">
               <v-btn
                 small
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
-                class="actions__more-actions__btn"
+                class="actions__more-actions__btn reg-table"
                 :class="$style['down-btn']"
               >
-                <v-icon>mdi-menu-down</v-icon>
+                <v-icon v-if="value">mdi-menu-up</v-icon>
+                <v-icon v-else>mdi-menu-down</v-icon>
               </v-btn>
             </template>
             <v-list v-if="isDraft(item)" class="actions__more-actions registration-actions">
@@ -291,6 +296,7 @@ import { useRegistration } from '@/composables/useRegistration'
 export default defineComponent({
   name: 'TableRow',
   props: {
+    setDisableActionShadow: { default: false },
     setChild: { default: false },
     setHeaders: { default: [] as BaseHeaderIF[] },
     setIsExpanded: { default: false },
@@ -314,6 +320,9 @@ export default defineComponent({
       rollover: false,
       applyRolloverEffect: computed((): boolean => {
         return localState.rollover || localState.isExpanded
+      }),
+      disableActionShadow: computed((): boolean => {
+        return props.setDisableActionShadow
       }),
       headers: computed(() => {
         return props.setHeaders
@@ -537,6 +546,8 @@ export default defineComponent({
 }
 .btn-expand {
   background-color: $primary-blue;
+  height: 25px !important;
+  width: 25px !important;
 }
 .btn-txt, .btn-txt::before, .btn-txt::after {
   background-color: transparent !important;
