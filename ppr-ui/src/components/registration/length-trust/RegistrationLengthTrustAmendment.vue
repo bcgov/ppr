@@ -1,5 +1,12 @@
 <template>
-  <v-container v-if="!summaryView" fluid id="length-trust-amendment" no-gutters class="white pb-6 pr-10 pl-8 rounded">
+  <v-container
+    v-if="!summaryView"
+    fluid
+    id="length-trust-amendment"
+    no-gutters
+    class="white pb-6 pr-10 pl-8 rounded"
+    :class="{ 'border-error-left': showErrorBar && editInProgress }"
+  >
     <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
@@ -112,6 +119,10 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -154,6 +165,9 @@ export default defineComponent({
       }),
       trustIndentureSummary: computed((): string => {
         return localState.lengthTrust.trustIndenture ? 'Yes' : 'No'
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       }),
       trustIndentureModified: computed((): boolean => {
         return localState.lengthTrust.trustIndenture !== localState.originalTrustIndenture

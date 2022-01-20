@@ -97,6 +97,7 @@
               <edit-party
                 :activeIndex="activeIndex"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -330,6 +331,7 @@
                     <edit-party
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeSecuredParty="removeParty"
                       @resetEvent="resetData"
                     />
@@ -389,6 +391,10 @@ export default defineComponent({
     setShowInvalid: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -434,6 +440,9 @@ export default defineComponent({
       savedParty: null,
       showErrorSummary: computed((): boolean => {
         return !parties.valid
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       }),
       showErrorSecuredParties: parties.showInvalid,
       headers: [...partyTableHeaders, ...editTableHeaders]

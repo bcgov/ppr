@@ -4,7 +4,7 @@
       v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
       style="padding: 28px 12px 0 30px;"
     >
-      <gen-col-amend @closeGenColAmend="amendMode = false" />
+      <gen-col-amend :setShowErrorBar="showErrorBar" @closeGenColAmend="amendMode = false" />
     </v-container>
     <v-container
       v-if="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
@@ -52,6 +52,10 @@ export default defineComponent({
     setShowInvalid: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -65,6 +69,9 @@ export default defineComponent({
       amendMode: false,
       showInvalid: computed((): boolean => {
         return props.setShowInvalid
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 

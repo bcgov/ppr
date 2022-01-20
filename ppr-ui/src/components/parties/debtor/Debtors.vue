@@ -45,6 +45,7 @@
                 :activeIndex="activeIndex"
                 :isBusiness="currentIsBusiness"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -226,6 +227,7 @@
                     <edit-debtor
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeDebtor="removeDebtor"
                       @resetEvent="resetData"
                     />
@@ -272,6 +274,10 @@ export default defineComponent({
     setShowInvalid: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -312,6 +318,9 @@ export default defineComponent({
       showErrorDebtors: getAddSecuredPartiesAndDebtors.value.showInvalid,
       parties: computed((): AddPartiesIF => {
         return getAddSecuredPartiesAndDebtors.value
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       }),
       headers: [...debtorTableHeaders, ...editTableHeaders]
     })

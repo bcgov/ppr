@@ -80,6 +80,7 @@
               <edit-collateral
                 :activeIndex="activeIndex"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -285,6 +286,7 @@
                     <edit-collateral
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeVehicle="removeVehicle($event)"
                       @resetEvent="resetData"
                     />
@@ -326,6 +328,10 @@ export default defineComponent({
       default: false
     },
     showInvalid: {
+      type: Boolean,
+      default: false
+    },
+    setShowErrorBar: {
       type: Boolean,
       default: false
     }
@@ -428,6 +434,9 @@ export default defineComponent({
         } else {
           return vehicles
         }
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 
