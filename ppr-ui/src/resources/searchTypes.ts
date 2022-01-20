@@ -27,7 +27,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APISearchTypes.BUSINESS_DEBTOR,
     textLabel: 'Enter a business debtor name',
     hints: {
-      searchValue: 'Business names must contain between 2 and 70 characters'
+      searchValue: 'Business names must contain between 2 and 150 characters'
     }
   },
   {
