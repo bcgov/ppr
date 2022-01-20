@@ -666,7 +666,8 @@ class AccountRegistrationResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
             # Try to fetch summary registration by registration number
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
-            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name)
+            sbc_staff: bool = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
+            registration = Registration.find_summary_by_reg_num(account_id, registration_num, account_name, sbc_staff)
             if registration is None:
                 return resource_utils.not_found_error_response('Financing Statement registration', registration_num)
             # Save the base registration: request may be a change registration number.
