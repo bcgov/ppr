@@ -96,8 +96,8 @@ WITH q AS (
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') =
-                 regexp_replace(regexp_replace(:query_bus_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') THEN
+       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),'\y(CORPORATION|INCORPORATED|INCORPOREE|LIMITED|LIMITEE|NON PERSONAL LIABILITY|CORP|INC|LTD|LTEE|NPL)\y','','gi') =
+                 regexp_replace(regexp_replace('675613 BC LTEE.','[.,]','','gi'),'\y(CORPORATION|INCORPORATED|INCORPOREE|LIMITED|LIMITEE|NON PERSONAL LIABILITY|CORP|INC|LTD|LTEE|NPL)\y','','gi') THEN
                  'EXACT'
             ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
