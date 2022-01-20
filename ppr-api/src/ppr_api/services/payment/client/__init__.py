@@ -50,6 +50,16 @@ TRANSACTION_TO_FILING_TYPE = {
     'SEARCH_STAFF_CERTIFIED_NO_FEE': 'PPRCD'
 }
 
+# Mapping from normal filing type to staff version of filing type
+TO_STAFF_FILING_TYPE = {
+    'FSCHG': 'FSCHS',
+    'FLREG': 'FLRGS',
+    'FSREG': 'FSRGS',
+    'INFRG': 'INFRS',
+    'FSREN' :'FSRNS',
+    'INFRN': 'INFNS'
+}
+
 PAYMENT_REQUEST_TEMPLATE = {
     'filingInfo': {
         'filingIdentifier': '',
@@ -272,6 +282,10 @@ class SBCPaymentClient(BaseClient):
             del data['filingInfo']['filingIdentifier']
 
         if processing_fee:
+            # alter fee code to staff fee code
+            if filing_type in TO_STAFF_FILING_TYPE:
+                data['filingInfo']['filingTypes'][0]['filingTypeCode'] = TO_STAFF_FILING_TYPE[filing_type]
+            # add processing fee item
             processing_filing_type = TRANSACTION_TO_FILING_TYPE[processing_fee]
             data['filingInfo']['filingTypes'].append({
                 'filingTypeCode': processing_filing_type,
@@ -301,6 +315,10 @@ class SBCPaymentClient(BaseClient):
             del data['filingInfo']['filingIdentifier']
 
         if processing_fee:
+            # alter fee code to staff fee code
+            if filing_type in TO_STAFF_FILING_TYPE:
+                data['filingInfo']['filingTypes'][0]['filingTypeCode'] = TO_STAFF_FILING_TYPE[filing_type]
+            # add processing fee item
             processing_filing_type = TRANSACTION_TO_FILING_TYPE[processing_fee]
             data['filingInfo']['filingTypes'].append({
                 'filingTypeCode': processing_filing_type,
