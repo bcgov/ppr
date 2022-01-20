@@ -387,7 +387,13 @@ export default defineComponent({
         }
         setCourtOrderInformation(newCourtOrderInfo)
       } else {
-        localState.orderDate = localState.courtOrderInfo.orderDate?.substring(0, 10)
+        if (localState.courtOrderInfo.orderDate?.length > 10) {
+          // convert back to local iso date string
+          const orderDate = new Date(localState.courtOrderInfo.orderDate)
+          localState.orderDate = orderDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
+        } else {
+          localState.orderDate = localState.courtOrderInfo.orderDate
+        }
         localState.effectOfOrder = localState.courtOrderInfo.effectOfOrder
         localState.courtName = localState.courtOrderInfo.courtName
         localState.courtRegistry = localState.courtOrderInfo.courtRegistry
