@@ -304,7 +304,7 @@ export default class AmendRegistration extends Vue {
       })
       const collateral = {
         valid: true,
-        vehicleCollateral: financingStatement.vehicleCollateral,
+        vehicleCollateral: financingStatement.vehicleCollateral || null,
         generalCollateral: financingStatement.generalCollateral
       } as AddCollateralIF
       const lengthTrust = {
