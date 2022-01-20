@@ -25,7 +25,18 @@ export const useGeneralCollateral = () => {
       APIRegistrationTypes.OTHER,
       APIRegistrationTypes.MINERAL_LAND_TAX,
       APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
-      APIRegistrationTypes.SCHOOL_ACT
+      APIRegistrationTypes.SCHOOL_ACT,
+      APIRegistrationTypes.MISC_MINERAL_RESOURCE,
+      APIRegistrationTypes.CROWN_MINING_TAX,
+      APIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
+      APIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
+      APIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
+      APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+      APIRegistrationTypes.TRANSITION_SECURITY_AGREEMENT,
+      APIRegistrationTypes.TRANSITION_FINANCING_STATEMENT,
+      APIRegistrationTypes.TRANSITION_SALE_OF_GOODS,
+      APIRegistrationTypes.TRANSITION_TAX_LIEN,
+      APIRegistrationTypes.TRANSITION_MH
     ]
     return ghArray.includes(registrationType)
   }
