@@ -851,18 +851,28 @@ def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-lo
         pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
     elif registration_class == model_utils.REG_CLASS_DISCHARGE:
         pay_trans_type = TransactionTypes.DISCHARGE.value
+    processing_fee = None
+    is_dicharge = pay_trans_type == TransactionTypes.DISCHARGE.value
     if not is_reg_staff_account(account_id):
+        # if sbc staff and not 'no fee' then add processing fee
+        if not is_dicharge and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
+            processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
         pay_account_id: str = account_id
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details(registration))
-        pay_ref = payment.create_payment(pay_trans_type, fee_quantity, None, registration.client_reference_id)
+        pay_ref = payment.create_payment(
+            pay_trans_type, fee_quantity, None, registration.client_reference_id, processing_fee)
     else:
+        # if not discharge add process fee
+        if not is_dicharge:
+            processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
         payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=None,
                           details=resource_utils.get_payment_details(registration))
-        pay_ref = payment.create_payment_staff_registration(payment_info, registration.client_reference_id)
+        pay_ref = payment.create_payment_staff_registration(
+            payment_info, registration.client_reference_id, processing_fee)
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']
@@ -895,18 +905,28 @@ def pay_and_save_financing(req: request, request_json, account_id):  # pylint: d
     registration = statement.registration[0]
     pay_trans_type, fee_quantity = resource_utils.get_payment_type_financing(registration)
     pay_ref = None
+    processing_fee = None
+    is_no_fee = pay_trans_type == TransactionTypes.FINANCING_NO_FEE.value
     if not is_reg_staff_account(account_id):
+        # if sbc staff and not 'no fee' then add processing fee
+        if not is_no_fee and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
+            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
         pay_account_id: str = account_id
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=pay_account_id,
                           details=resource_utils.get_payment_details_financing(registration))
-        pay_ref = payment.create_payment(pay_trans_type, fee_quantity, None, registration.client_reference_id)
+        pay_ref = payment.create_payment(
+            pay_trans_type, fee_quantity, None, registration.client_reference_id, processing_fee)
     else:
+        # if not 'no fee' then add processing fee
+        if not is_no_fee:
+            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
         payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
         payment = Payment(jwt=jwt.get_token_auth_header(),
                           account_id=None,
                           details=resource_utils.get_payment_details_financing(registration))
-        pay_ref = payment.create_payment_staff_registration(payment_info, registration.client_reference_id)
+        pay_ref = payment.create_payment_staff_registration(
+            payment_info, registration.client_reference_id, processing_fee)
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']

@@ -30,7 +30,14 @@ class Payment:
         self.api_key = api_key
         self.details = details
 
-    def create_payment(self, transaction_type, quantity, transaction_id=None, client_reference_id=None):
+    def create_payment(  # pylint: disable=too-many-arguments
+            self,
+            transaction_type,
+            quantity,
+            transaction_id=None,
+            client_reference_id=None,
+            processing_fee=None
+    ):
         """Submit a payment request for the account_id-jwt pair.
 
         Quantity is always 1 except for financing and renewal statements, where it is the number of life
@@ -51,7 +58,8 @@ class Payment:
             api_response = api_instance.create_payment(transaction_type,
                                                        quantity,
                                                        transaction_id,
-                                                       client_reference_id)
+                                                       client_reference_id,
+                                                       processing_fee)
             current_app.logger.debug(api_response)
             return api_response
 
@@ -96,7 +104,7 @@ class Payment:
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err)
 
-    def create_payment_staff_registration(self, transaction_info, client_reference_id=None):
+    def create_payment_staff_registration(self, transaction_info, client_reference_id=None, processing_fee=None):
         """Submit a staff payment request for the transaction_info. Token must have a reg staff role.
 
         Payment info transaction type is one of the Payment TransactionTypes.
@@ -110,7 +118,8 @@ class Payment:
                                             self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
-            api_response = api_instance.create_payment_staff_registration(transaction_info, client_reference_id)
+            api_response = api_instance.create_payment_staff_registration(
+                transaction_info, client_reference_id, processing_fee)
             current_app.logger.debug(api_response)
             return api_response
 
