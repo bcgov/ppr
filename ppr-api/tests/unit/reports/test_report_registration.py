@@ -92,23 +92,24 @@ def test_registration_config(client, jwt, type, json_data_file):
         assert report_data['cover']['line4']
 
 
-def test_verification_mail(client, jwt):
-    """Assert that merging a cover page with a verification statement works as expected."""
-    # setup
-    text_data = None
-    with open(DISCHARGE_DATAFILE_COVER, 'r') as data_file:
-        text_data = data_file.read()
-        data_file.close()
-    # print(text_data)
-    report_data = json.loads(text_data)
-    token = SBCPaymentClient.get_sa_token()
-    pdf_output, status, headers = get_verification_mail(report_data, 'PS12345', token, 'UNIT TEST ACCOUNT', 99999999)
-    # test
-    assert pdf_output
-    assert status == HTTPStatus.OK
-    with open(VERIFICATION_MAIL_PDFFILE, "wb") as pdf_file:
-        pdf_file.write(pdf_output)
-        pdf_file.close()
+# TODO: This is being removed from the API, but leaving the code here for a sprint.
+# def test_verification_mail(client, jwt):
+#     """Assert that merging a cover page with a verification statement works as expected."""
+#     # setup
+#     text_data = None
+#     with open(DISCHARGE_DATAFILE_COVER, 'r') as data_file:
+#         text_data = data_file.read()
+#         data_file.close()
+#     # print(text_data)
+#     report_data = json.loads(text_data)
+#     token = SBCPaymentClient.get_sa_token()
+#     pdf_output, status, headers = get_verification_mail(report_data, 'PS12345', token, 'UNIT TEST ACCOUNT', 99999999)
+#     # test
+#     assert pdf_output
+#     assert status == HTTPStatus.OK
+#     with open(VERIFICATION_MAIL_PDFFILE, "wb") as pdf_file:
+#         pdf_file.write(pdf_output)
+#         pdf_file.close()
 
 
 def test_verification_report_data(session):

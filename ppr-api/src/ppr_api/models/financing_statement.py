@@ -273,7 +273,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         else:
             collateral_list = reversed(self.general_collateral_legacy)
 
-        for collateral in collateral_list:
+        for collateral in collateral_list:  # pylint: disable=too-many-nested-blocks
             if collateral.registration_id == registration_id or not collateral.status:
                 gc_json = collateral.json
                 collateral_json.append(gc_json)

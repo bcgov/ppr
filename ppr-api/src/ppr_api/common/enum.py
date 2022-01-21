@@ -14,8 +14,9 @@
 """This provides a base Enum class that supports standard functionality."""
 from __future__ import annotations
 
-from enum import Enum, EnumMeta, auto # pylint: disable=unused-import
+from enum import Enum, EnumMeta, auto  # pylint: disable=unused-import; # noqa: F401,I003
 from typing import Optional
+
 
 class BaseMeta(EnumMeta):
     """Meta class for the enum."""
@@ -43,6 +44,6 @@ class BaseEnum(str, Enum, metaclass=BaseMeta):
 
     #pragma warning disable S5720; # noqa: E265
     # disable sonar cloud complaining about this signature
-    def _generate_next_value_(name, start, count, last_values):  # pylint: disable=E0213
+    def _generate_next_value_(name, start, count, last_values):  # pylint: disable=E0213; # noqa: N805
         """Return the name of the key."""
         return name

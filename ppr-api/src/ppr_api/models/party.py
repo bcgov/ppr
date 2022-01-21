@@ -25,9 +25,9 @@ from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
-BUS_SEARCH_KEY_SP = "select searchkey_business_name(:bus_name)"
-FIRST_NAME_KEY_SP = "select searchkey_individual(:last_name, :first_name)"
-LAST_NAME_KEY_SP = "select searchkey_last_name(:last_name)"
+BUS_SEARCH_KEY_SP = 'select searchkey_business_name(:bus_name)'
+FIRST_NAME_KEY_SP = 'select searchkey_individual(:last_name, :first_name)'
+LAST_NAME_KEY_SP = 'select searchkey_last_name(:last_name)'
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
