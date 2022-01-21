@@ -13,7 +13,7 @@
         </v-col>
       </v-row>
       <v-container
-        v-if="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT"
+        v-if="!valid && registrationFlowType === RegistrationFlowType.NEW"
         :class="{ 'invalid-message': !valid }"
       >
         <v-row no-gutters class="pa-6">
