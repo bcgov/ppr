@@ -1,4 +1,17 @@
 .pytest_cache
 __pycache__
+venv
 .env
 .env*
+.eggs
+LICENSE
+Makefile
+README.md
+devops
+k8s
+manage.py
+migrations
+pre-hook-update-db.sh
+requirements
+test_data
+tests
