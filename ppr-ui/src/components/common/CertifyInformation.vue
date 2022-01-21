@@ -204,10 +204,24 @@ export default defineComponent({
         try {
           const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
           const decodedToken = JSON.parse(atob(token.split('.')[1]))
-          certifyInfo.legalName = decodedToken.firstname + ' ' + decodedToken.lastname
+          console.log(decodedToken)
+          if (decodedToken.firstname && decodedToken.lastname) {
+            certifyInfo.legalName = decodedToken.firstname + ' ' + decodedToken.lastname
+          } else if (decodedToken.name) {
+            certifyInfo.legalName = decodedToken.name
+          } else if (decodedToken.firstname) {
+            certifyInfo.legalName = decodedToken.firstName
+          } else if (decodedToken.lastname) {
+            certifyInfo.legalName = decodedToken.lastname
+          } else if (decodedToken.username) {
+            certifyInfo.legalName = decodedToken.username
+          } else {
+            certifyInfo.legalName = 'Not Available'
+          }
           email = decodedToken.email
         } catch (e) {
           console.error(e)
+          certifyInfo.legalName = 'Not Available'
         }
       }
       if (isRoleStaff.value) {
