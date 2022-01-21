@@ -204,7 +204,6 @@ export default defineComponent({
         try {
           const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
           const decodedToken = JSON.parse(atob(token.split('.')[1]))
-          console.log(decodedToken)
           if (decodedToken.firstname && decodedToken.lastname) {
             certifyInfo.legalName = decodedToken.firstname + ' ' + decodedToken.lastname
           } else if (decodedToken.name) {
