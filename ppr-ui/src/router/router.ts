@@ -21,18 +21,33 @@ export function getVueRouter () {
   })
 
   router.beforeEach((to, from, next) => {
-    if (requiresAuth(to) && !isAuthenticated()) {
-      // this route needs authentication, so re-route to signin
-      // NB: save current route for future redirect
-
+    if (isLoginSuccess(to)) {
+      // this route is to verify login
       next({
         name: 'signin',
-        query: { redirect: to.fullPath }
+        query: { redirect: to.query.redirect }
       })
     } else {
-      // otherwise just proceed normally
-      next()
+      if (requiresAuth(to) && !isAuthenticated()) {
+        // this route needs authentication, so re-route to login
+        next({
+          name: 'login',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        // otherwise just proceed normally
+        next()
+      }
     }
+  })
+
+  router.afterEach((to, from) => {
+    // Overrid the browser tab name
+    Vue.nextTick(() => {
+      if (to.meta.title) {
+        document.title = to.meta.title
+      }
+    })
   })
 
   /** Returns True if route requires authentication, else False. */
@@ -54,6 +69,11 @@ export function getVueRouter () {
   /** Returns True if route is Signout, else False. */
   function isSignoutRoute (route: Route): boolean {
     return Boolean(route.name === 'signout')
+  }
+
+  /** Returns True if route is Login success, else False. */
+  function isLoginSuccess (route: Route): boolean {
+    return Boolean(route.name === 'login' && route.hash)
   }
 
   return router

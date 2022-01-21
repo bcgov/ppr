@@ -1,5 +1,5 @@
 {
-  "REGISTRY_URL": "https://dev.bcregistry.ca/business/auth/",
+  "REGISTRY_URL": "https://yfthig-dev.web.app/dashboard",
   "PPR_API_URL": "https://bcregistry-dev.apigee.net/ppr",
   "PPR_API_VERSION": "/api/v1",
   "PPR_API_KEY": "diGbLm3qjmKLjvU4GWIgPNlhxtpLWlN0",

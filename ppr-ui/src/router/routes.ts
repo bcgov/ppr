@@ -13,11 +13,23 @@ import {
   Signin,
   Signout,
   AmendRegistration,
-  ConfirmAmendment
+  ConfirmAmendment,
+  Login
 } from '@/views'
 import { RouteNames } from '@/enums'
 
 export const routes = [
+  {
+    // router.beforeEach() routes here:
+    path: '/login',
+    name: RouteNames.LOGIN,
+    component: Login,
+    props: true,
+    meta: {
+      requiresAuth: false,
+      title: 'BC Registries Account Login'
+    }
+  },
   {
     // router.beforeEach() routes here:
     path: '/signin',
@@ -146,6 +158,6 @@ export const routes = [
     // default/fallback route
     // must be last
     path: '*',
-    redirect: '/dashboard'
+    redirect: '/login'
   }
 ]

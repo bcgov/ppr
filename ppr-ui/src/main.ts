@@ -25,7 +25,7 @@ import '@/assets/styles/overrides.scss'
 import App from './App.vue'
 
 // Helpers
-import { fetchConfig, initLdClient } from '@/utils'
+import { fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 
 // get rid of "element implicitly has an 'any' type..."
@@ -58,9 +58,23 @@ async function start () {
     await initLdClient()
   }
 
-  // configure KeyCloak Service
-  console.info('Starting Keycloak service...') // eslint-disable-line no-console
-  await KeycloakService.setKeycloakConfigUrl(sessionStorage.getItem('KEYCLOAK_CONFIG_PATH'))
+  // Initialize Keycloak / sync SSO
+  await syncSession()
+
+  async function syncSession () {
+    console.info('Starting Keycloak service...') // eslint-disable-line no-console
+    await KeycloakService.setKeycloakConfigUrl(sessionStorage.getItem('KEYCLOAK_CONFIG_PATH'))
+
+    // Auto authenticate user only if they are not trying a login or logout
+    if (!isSigningIn() && !isSigningOut()) {
+      // Initialize token service which will do a check-sso to initiate session
+      await KeycloakService.initializeToken(null).then(() => { }).catch(err => {
+        if (err?.message !== 'NOT_AUTHENTICATED') {
+          throw err
+        }
+      })
+    }
+  }
 
   // start Vue application
   console.info('Starting app...') // eslint-disable-line no-console
