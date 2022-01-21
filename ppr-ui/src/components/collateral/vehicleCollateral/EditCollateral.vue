@@ -132,7 +132,7 @@
                   id="txt-make"
                   v-model="currentVehicle.make"
                   persistent-hint
-                  @blur="onBlur('make')"
+                  @keyup="onBlur('make')"
                   :error-messages="
                     errors.make.message ? errors.make.message : ''
                   "
@@ -146,7 +146,7 @@
                   label="Model"
                   id="txt-model"
                   v-model="currentVehicle.model"
-                  @blur="onBlur('model')"
+                  @keyup="onBlur('model')"
                   persistent-hint
                   :error-messages="
                     errors.model.message ? errors.model.message : ''
