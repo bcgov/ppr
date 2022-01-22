@@ -17,8 +17,7 @@
     <sbc-header
         class="sbc-header"
         :in-auth="false"
-        :show-actions="true"
-        :show-login-actions="true"
+        :show-login-menu="false"
       />
 
     <div class="app-body">
