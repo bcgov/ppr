@@ -96,8 +96,8 @@ WITH q AS (
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') =
-                 regexp_replace(regexp_replace(:query_bus_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') THEN
+       CASE WHEN trim(regexp_replace(regexp_replace(regexp_replace(p.business_name,'[^\w\s]+','','gi'),'\y(CORPORATION|INCORPORATED|INCORPOREE|LIMITED|LIMITEE|NON PERSONAL LIABILITY|CORP|INC|LTD|LTEE|NPL|ULC)\y','','gi'),'\s+', '', 'gi')) =
+                 trim(regexp_replace(regexp_replace(regexp_replace(:query_bus_name,'[^\w\s]+','','gi'),'\y(CORPORATION|INCORPORATED|INCORPOREE|LIMITED|LIMITEE|NON PERSONAL LIABILITY|CORP|INC|LTD|LTEE|NPL)\y','','gi'),'\s+', '', 'gi')) THEN
                  'EXACT'
             ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
@@ -124,7 +124,9 @@ INDIVIDUAL_NAME_QUERY = """
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
-       CASE WHEN p.last_name = :query_last AND p.first_name = :query_first THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN p.last_name = :query_last AND
+                 (p.first_name = :query_first OR p.first_name = SUBSTR(:query_first,1,1) or substr(p.first_name,1,1)= :query_first)
+       THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
 WHERE r.financing_id = fs.id
@@ -149,8 +151,9 @@ SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
        CASE WHEN p.last_name = :query_last AND
-                 p.first_name = :query_first AND
-                 p.middle_initial = :query_middle THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+                 (p.first_name = :query_first OR p.first_name = SUBSTR(:query_first,1,1) or substr(p.first_name,1,1)= :query_first) AND
+                 (SUBSTR(p.middle_initial,1,1) = SUBSTR(:query_middle,1,1) OR p.middle_initial is NULL)
+          THEN 'EXACT' ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
   FROM registrations r, financing_statements fs, parties p
 WHERE r.financing_id = fs.id

@@ -15,12 +15,12 @@
 import csv
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 
 from flask import Flask
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import db, Registration, SearchRequest, TestSearch, TestSearchBatch, TestSearchResult
+from ppr_api.models import db, FinancingStatement, Registration, SearchRequest, TestSearch, TestSearchBatch, TestSearchResult
 
 from search_tester import create_app
 from search_tester.utils.db_utils import QUERY_LEGACY_RESULTS_DATE, QUERY_LEGACY_RESULTS_DATE_TIME, QUERY_LEGACY_RESULTS_MOST_RECENT
@@ -38,6 +38,10 @@ def add_legacy_results(search: TestSearch, result_list: List[dict], match_type: 
         reg = None
         try:
             reg = Registration.query.filter(Registration.registration_num == legacy_result['doc_id']).one_or_none()
+            financing_statement = FinancingStatement.find_by_id(reg.financing_id)
+            threshold_date = datetime.utcnow() - timedelta(days=30)
+            if financing_statement.state_type != 'ACT' or (financing_statement.expire_date and financing_statement.expire_date < threshold_date) or financing_statement.discharged == 'Y':
+                reg = None
         except Exception as err:
             # ignore error (it's not in the db)
             print(err)
@@ -76,7 +80,7 @@ def add_api_results(search: TestSearch, results: List[dict]):
         elif search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
             result.details = api_result['baseRegistrationNumber']
         else:
-            result.details = api_result['vehicleCollateral']
+            result.details = str(api_result['vehicleCollateral'])
         search.results.append(result)
 
 def parse_results(batch_searches, rows, lower):
@@ -86,6 +90,8 @@ def parse_results(batch_searches, rows, lower):
         row_keys = [k.lower() for k in row_keys]
     for row in rows:
         search_type = row[row_keys[0]]
+        if search_type not in batch_searches:
+            continue
         time = row[row_keys[1]]
 
         if time not in batch_searches[search_type]:
@@ -148,12 +154,12 @@ if __name__ == '__main__':
             app.logger.debug(f'Job paused. Update config to unpause.')
         else:
             batch_searches = {
-                SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value: {},
-                SearchRequest.SearchTypes.BUSINESS_DEBTOR.value: {},
+                # SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value: {},
+                # SearchRequest.SearchTypes.BUSINESS_DEBTOR.value: {},
                 SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value: {},
-                SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value: {},
-                SearchRequest.SearchTypes.REGISTRATION_NUM.value: {},
-                SearchRequest.SearchTypes.SERIAL_NUM.value: {}
+                # SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value: {},
+                # SearchRequest.SearchTypes.REGISTRATION_NUM.value: {},
+                # SearchRequest.SearchTypes.SERIAL_NUM.value: {}
             }
             if app.config['CSV'] == True:
                 batch_searches = get_batch_searches_csv(app, batch_searches)
@@ -183,7 +189,6 @@ if __name__ == '__main__':
                         add_legacy_results(search, legacy_search['exact_matches'], TestSearchResult.MatchType.EXACT)
                         # add legacy results similar
                         add_legacy_results(search, legacy_search['similar_matches'], TestSearchResult.MatchType.SIMILAR)
-                    
                         ### get ppr-api search results
                         # prep search
                         criteria = { 'value': legacy_search['criteria'] }
