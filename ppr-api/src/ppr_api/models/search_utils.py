@@ -89,15 +89,21 @@ AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
      "AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value)) " + \
 "ORDER BY match_type, sc.serial_number "
 
+# pylint: disable=anomalous-backslash-in-string
 BUSINESS_NAME_QUERY = """
 WITH q AS (
    SELECT(SELECT searchkey_business_name(:query_bus_name)) AS search_key,
+   SUBSTR((SELECT searchkey_business_name(:query_bus_name)),1,1) AS search_key_char1,
    (SELECT array_length(string_to_array(trim(regexp_replace(:query_bus_name,'^THE','','gi')),' '),1)) AS word_length)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') =
-                 regexp_replace(regexp_replace(:query_bus_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') THEN
+       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),
+          '\y(CORPORATION|INCORPORATED|INCORPOREE|LIMITED|LIMITEE|NON PERSONAL LIABILITY|CORP|INC|LTD|LTEE|NPL)\y',
+          '','gi') =
+                 regexp_replace(regexp_replace(:query_bus_name,'[.,]','','gi'),
+          '\y(CORPORATION|INCORPORATED|INCORPOREE|LIMITED|LIMITEE|NON PERSONAL LIABILITY|CORP|INC|LTD|LTEE|NPL)\y',
+          '','gi') THEN
                  'EXACT'
             ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
@@ -114,7 +120,8 @@ WHERE r.financing_id = fs.id
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND SUBSTR(search_key,1,1) = SUBSTR(p.business_srch_key,1,1)
+   AND SUBSTR(p.business_srch_key,1,1) = search_key_char1
+   AND search_key <% p.business_srch_key
    AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key
                   or word_length=1 and search_key = split_part(business_name,' ',1))
 ORDER BY match_type, p.business_name

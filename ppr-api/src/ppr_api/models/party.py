@@ -28,6 +28,9 @@ from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 BUS_SEARCH_KEY_SP = "select searchkey_business_name(:bus_name)"
 FIRST_NAME_KEY_SP = "select searchkey_individual(:last_name, :first_name)"
 LAST_NAME_KEY_SP = "select searchkey_last_name(:last_name)"
+SPLIT1_SP = "select individual_split_1(:actual_name)"
+SPLIT2_SP = "select individual_split_2(:actual_name)"
+SPLIT3_SP = "select individual_split_3(:actual_name)"
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -58,6 +61,13 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
     last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
+
+    # For ind debtor searching
+    last_name_split1 = db.Column('last_name_split1', db.String(50), nullable=True, index=True)
+    last_name_split2 = db.Column('last_name_split2', db.String(50), nullable=True, index=True)
+    last_name_split3 = db.Column('last_name_split3', db.String(50), nullable=True, index=True)
+    first_name_split1 = db.Column('first_name_split1', db.String(50), nullable=True, index=True)
+    first_name_split2 = db.Column('first_name_split2', db.String(50), nullable=True, index=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -283,3 +293,16 @@ def party_before_insert_listener(mapper, connection, target):   # pylint: disabl
         stmt = text(FIRST_NAME_KEY_SP)
         stmt = stmt.bindparams(last_name=target.last_name, first_name=target.first_name)
         target.first_name_key = connection.execute(stmt).scalar()
+        stmt = text(SPLIT1_SP)
+        stmt = stmt.bindparams(actual_name=target.last_name)
+        target.last_name_split1 = connection.execute(stmt).scalar()
+        stmt = stmt.bindparams(actual_name=target.first_name)
+        target.first_name_split1 = connection.execute(stmt).scalar()
+        stmt = text(SPLIT2_SP)
+        stmt = stmt.bindparams(actual_name=target.last_name)
+        target.last_name_split2 = connection.execute(stmt).scalar()
+        stmt = stmt.bindparams(actual_name=target.first_name)
+        target.first_name_split2 = connection.execute(stmt).scalar()
+        stmt = text(SPLIT3_SP)
+        stmt = stmt.bindparams(actual_name=target.last_name)
+        target.last_name_split3 = connection.execute(stmt).scalar()

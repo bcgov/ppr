@@ -246,8 +246,8 @@ def test_save_individual(session):
     """Assert that saving a business name party works correctly."""
     party_ind_json = {
         'personName': {
-            'first': 'first\'s name',
-            'last': 'last, name',
+            'first': 'JEAN PAUL',
+            'last': 'PONCE DE LEON JUNIOR',
             'middle': 'middle'
         },
         'emailAddress': 'asmith@gmail.com',
@@ -268,3 +268,8 @@ def test_save_individual(session):
     party.save()
     assert party.first_name_key
     assert party.id
+    assert party.last_name_split1 == 'PONCE'
+    assert party.last_name_split2 == 'LEON'
+    assert party.last_name_split3 == 'JUNIOR'
+    assert party.first_name_split1 == 'JEAN'
+    assert party.first_name_split2 == 'PAUL'
