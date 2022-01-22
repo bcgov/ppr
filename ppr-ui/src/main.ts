@@ -61,21 +61,6 @@ async function start () {
   // Initialize Keycloak / sync SSO
   await syncSession()
 
-  async function syncSession () {
-    console.info('Starting Keycloak service...') // eslint-disable-line no-console
-    await KeycloakService.setKeycloakConfigUrl(sessionStorage.getItem('KEYCLOAK_CONFIG_PATH'))
-
-    // Auto authenticate user only if they are not trying a login or logout
-    if (!isSigningIn() && !isSigningOut()) {
-      // Initialize token service which will do a check-sso to initiate session
-      await KeycloakService.initializeToken(null).then(() => { }).catch(err => {
-        if (err?.message !== 'NOT_AUTHENTICATED') {
-          throw err
-        }
-      })
-    }
-  }
-
   // start Vue application
   console.info('Starting app...') // eslint-disable-line no-console
   new Vue({
@@ -96,6 +81,21 @@ async function start () {
     store: getVuexStore(),
     render: h => h(App)
   }).$mount('#app')
+}
+
+async function syncSession () {
+  console.info('Starting Keycloak service...') // eslint-disable-line no-console
+  await KeycloakService.setKeycloakConfigUrl(sessionStorage.getItem('KEYCLOAK_CONFIG_PATH'))
+
+  // Auto authenticate user only if they are not trying a login or logout
+  if (!isSigningIn() && !isSigningOut()) {
+    // Initialize token service which will do a check-sso to initiate session
+    await KeycloakService.initializeToken(null).then(() => { }).catch(err => {
+      if (err?.message !== 'NOT_AUTHENTICATED') {
+        throw err
+      }
+    })
+  }
 }
 
 // execution and error handling

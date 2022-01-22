@@ -81,8 +81,8 @@ describe('App component', () => {
     expect(wrapper.findComponent(App).exists()).toBe(true)
     expect(wrapper.findComponent(SbcHeader).exists()).toBe(true)
     expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)
-    expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
-    expect(wrapper.findComponent(Breadcrumb).exists()).toBe(true)
+    expect(wrapper.findComponent(Tombstone).exists()).toBe(false)
+    expect(wrapper.findComponent(Breadcrumb).exists()).toBe(false)
   })
 
   it('gets auth and user info/settings properly', () => {
