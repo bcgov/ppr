@@ -97,6 +97,7 @@ WITH q AS (
    (SELECT array_length(string_to_array(trim(regexp_replace(:query_bus_name,'^THE','','gi')),' '),1)) AS word_length)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
+       r.registration_number AS base_registration_num,
        CASE WHEN p.bus_name_base = search_name_base THEN 'EXACT'
             ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
