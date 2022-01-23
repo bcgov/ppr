@@ -25,12 +25,19 @@ from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .client_code import ClientCode  # noqa: F401 pylint: disable=unused-import
 
 
-BUS_SEARCH_KEY_SP = "select searchkey_business_name(:bus_name)"
-FIRST_NAME_KEY_SP = "select searchkey_individual(:last_name, :first_name)"
-LAST_NAME_KEY_SP = "select searchkey_last_name(:last_name)"
-SPLIT1_SP = "select individual_split_1(:actual_name)"
-SPLIT2_SP = "select individual_split_2(:actual_name)"
-SPLIT3_SP = "select individual_split_3(:actual_name)"
+BUSINESS_UPDATE_QUERY = """
+    SELECT (select searchkey_business_name(:actual_name)) AS search_key,
+           (select business_name_strip_designation(:actual_name)) AS bus_name_base
+"""
+INDIVIDUAL_UPDATE_QUERY = """
+    SELECT (select searchkey_individual(:last_name, :first_name)) AS first_search_key,
+           (select searchkey_last_name(:last_name)) AS last_search_key,
+           (select individual_split_1(:first_name)) AS first_split1,
+           (select individual_split_2(:first_name)) AS first_split2,
+           (select individual_split_1(:last_name)) AS last_split1,
+           (select individual_split_2(:last_name)) AS last_split2,
+           (select individual_split_3(:last_name)) AS last_split3
+"""
 
 
 class Party(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -68,6 +75,12 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     last_name_split3 = db.Column('last_name_split3', db.String(50), nullable=True, index=True)
     first_name_split1 = db.Column('first_name_split1', db.String(50), nullable=True, index=True)
     first_name_split2 = db.Column('first_name_split2', db.String(50), nullable=True, index=True)
+    first_name_char1 = db.Column('first_name_char1', db.String(1), nullable=True)
+    first_name_key_char1 = db.Column('first_name_key_char1', db.String(1), nullable=True)
+
+    # For bus debtor searching
+    bus_name_base = db.Column('bus_name_base', db.String(150), nullable=True)
+    bus_name_key_char1 = db.Column('bus_name_key_char1', db.String(1), nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -207,6 +220,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             else:
                 party.last_name = json_data['personName']['last'].strip().upper()
                 party.first_name = json_data['personName']['first'].strip().upper()
+                party.first_name_char1 = party.first_name[0:1]
                 if 'middle' in json_data['personName']:
                     party.middle_initial = json_data['personName']['middle'].strip().upper()
 
@@ -286,23 +300,26 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 def party_before_insert_listener(mapper, connection, target):   # pylint: disable=unused-argument; don't use mapper
     """Conditionally set debtor search key values."""
     if target.party_type == target.PartyTypes.DEBTOR_COMPANY.value:
-        stmt = text(BUS_SEARCH_KEY_SP)
-        stmt = stmt.bindparams(bus_name=target.business_name)
-        target.business_search_key = connection.execute(stmt).scalar()
+        stmt = text(BUSINESS_UPDATE_QUERY)
+        stmt = stmt.bindparams(actual_name=target.business_name)
+        result = connection.execute(stmt)
+        row = result.first()
+        mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+        target.business_search_key = str(mapping['search_key'])
+        target.bus_name_base = str(mapping['bus_name_base'])
+        target.bus_name_key_char1 = target.business_search_key[0:1]
+
     elif target.party_type == target.PartyTypes.DEBTOR_INDIVIDUAL.value:
-        stmt = text(FIRST_NAME_KEY_SP)
+        stmt = text(INDIVIDUAL_UPDATE_QUERY)
         stmt = stmt.bindparams(last_name=target.last_name, first_name=target.first_name)
-        target.first_name_key = connection.execute(stmt).scalar()
-        stmt = text(SPLIT1_SP)
-        stmt = stmt.bindparams(actual_name=target.last_name)
-        target.last_name_split1 = connection.execute(stmt).scalar()
-        stmt = stmt.bindparams(actual_name=target.first_name)
-        target.first_name_split1 = connection.execute(stmt).scalar()
-        stmt = text(SPLIT2_SP)
-        stmt = stmt.bindparams(actual_name=target.last_name)
-        target.last_name_split2 = connection.execute(stmt).scalar()
-        stmt = stmt.bindparams(actual_name=target.first_name)
-        target.first_name_split2 = connection.execute(stmt).scalar()
-        stmt = text(SPLIT3_SP)
-        stmt = stmt.bindparams(actual_name=target.last_name)
-        target.last_name_split3 = connection.execute(stmt).scalar()
+        result = connection.execute(stmt)
+        row = result.first()
+        mapping = row._mapping  # pylint: disable=protected-access; follows documentation
+        target.first_name_key = str(mapping['first_search_key'])
+        target.last_name_key = str(mapping['last_search_key'])
+        target.first_name_split1 = str(mapping['first_split1'])
+        target.first_name_split2 = str(mapping['first_split2'])
+        target.last_name_split1 = str(mapping['last_split1'])
+        target.last_name_split2 = str(mapping['last_split2'])
+        target.last_name_split3 = str(mapping['last_split3'])
+        target.first_name_key_char1 = target.first_name_key[0:1]

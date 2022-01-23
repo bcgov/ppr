@@ -222,7 +222,7 @@ def test_verify_party_code_false(session):
 def test_save_business(session):
     """Assert that saving a business name party works correctly."""
     party_bus_json = {
-        'businessName': 'business\'s, inc',
+        'businessName': 'business\'s, holdings inc',
         'emailAddress': 'asmith@gmail.com',
         'address': {
             'street': 'street',
@@ -240,6 +240,8 @@ def test_save_business(session):
     party_bus.save()
     assert party_bus.business_search_key
     assert party_bus.id
+    assert party_bus.bus_name_base
+    assert party_bus.bus_name_key_char1 == 'B'
 
 
 def test_save_individual(session):
@@ -273,3 +275,6 @@ def test_save_individual(session):
     assert party.last_name_split3 == 'JUNIOR'
     assert party.first_name_split1 == 'JEAN'
     assert party.first_name_split2 == 'PAUL'
+    assert party.first_name_char1 == 'J'
+    assert party.first_name_key_char1 == 'P'
+ 
