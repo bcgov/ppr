@@ -22,6 +22,7 @@ import copy
 import pytest
 
 from ppr_api.models import SearchRequest
+from ppr_api.models.search_request import CHARACTER_SET_UNSUPPORTED
 from ppr_api.models.utils import now_ts_offset, format_ts
 from ppr_api.exceptions import BusinessException
 
@@ -290,6 +291,26 @@ IS_NONE_JSON = {
     },
     'clientReferenceId': 'T-SQ-IS-3'
 }
+IS_INVALID_NAME_JSON = {
+    'type': 'INDIVIDUAL_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'first': 'FN répertoire',
+            'middle': 'MN répertoire',
+            'last': 'LN répertoire'
+        }
+    },
+    'clientReferenceId': 'T-SQ-IS-3'
+}
+BS_INVALID_NAME_JSON = {
+    'type': 'BUSINESS_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'business': '\U0001d5c4\U0001d5c6/\U0001d5c1'
+        }
+    },
+    'clientReferenceId': 'T-SQ-DB-4'
+}
 
 # testdata pattern is ({search type}, {JSON data})
 TEST_VALID_DATA = [
@@ -299,9 +320,9 @@ TEST_VALID_DATA = [
     ('CH', CHANGE_NUMBER_JSON),
     ('RG', REGISTRATION_NUMBER_JSON),
     ('MH', MHR_NUMBER_JSON),
-    ('SS', SERIAL_NUMBER_JSON),
     ('IS', INDIVIDUAL_DEBTOR_JSON),
-    ('BS', BUSINESS_DEBTOR_JSON)
+    ('BS', BUSINESS_DEBTOR_JSON),
+    ('SS', SERIAL_NUMBER_JSON)
 ]
 
 # testdata pattern is ({search type}, {JSON data})
@@ -358,6 +379,18 @@ TEST_REGISTRATION_TYPES = [
     ('Change', 'TEST0008'),
     ('Discharge', 'TEST00D4'),
     ('Renewal', 'TEST00R5')
+]
+TEST_DEBTOR_NAME_DATA = [
+    ('Valid ind names', IS_NONE_JSON, True, None),
+    ('Valid bus name', BS_NONE_JSON, True, None),
+    ('Invalid bus name', BS_INVALID_NAME_JSON, False,
+     CHARACTER_SET_UNSUPPORTED.format('\U0001d5c4\U0001d5c6/\U0001d5c1')),
+    ('Invalid ind first name', IS_INVALID_NAME_JSON, False,
+     CHARACTER_SET_UNSUPPORTED.format('FN répertoire')),
+    ('Invalid ind middle name', IS_INVALID_NAME_JSON, False,
+     CHARACTER_SET_UNSUPPORTED.format('MN répertoire')),
+    ('Invalid ind last name', IS_INVALID_NAME_JSON, False,
+     CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
 ]
 
 
@@ -686,3 +719,19 @@ def test_get_total_count(session, search_type, json_data, result_size):
     search_client.get_total_count()
     # print('test_total_count ' + search_type + ' actual results size=' + str(search_client.total_results_size))
     assert search_client.total_results_size >= result_size
+
+
+@pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_DEBTOR_NAME_DATA)
+def test_validate_debtor_names(session, desc, json_data, valid, message_content):
+    """Assert that search debtore name validation works as expected."""
+    # test
+    if valid:
+        SearchRequest.validate_query(json_data)
+    else:
+        with pytest.raises(BusinessException) as bad_request_err:
+            SearchRequest.validate_query(json_data)
+
+        # check
+        assert bad_request_err
+        error_msg = bad_request_err.value.error
+        assert error_msg.find(message_content) != -1

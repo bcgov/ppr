@@ -19,6 +19,7 @@ import pycountry
 
 from ppr_api.models import Party
 from ppr_api.models import utils as model_utils
+from ppr_api.utils.validators import valid_charset
 
 
 REGISTERING_CODE_MSG = 'No registering party client party found for code {}. '
@@ -33,6 +34,7 @@ INVALID_COUNTRY_SECURED = 'Secured Party country {} is invalid. '
 INVALID_REGION_SECURED = 'Secured Party region {} is invalid. '
 INVALID_COUNTRY_DEBTOR = 'Debtor country {} is invalid. '
 INVALID_REGION_DEBTOR = 'Debtor region {} is invalid. '
+CHARACTER_SET_UNSUPPORTED = 'The charcter set is not supported for name {}.\n'
 
 
 def validate_financing_parties(json_data):
@@ -75,6 +77,54 @@ def validate_party_codes(json_data):
                 if not Party.verify_party_code(code):
                     error_msg += SECURED_CODE_MSG.format(code)
 
+    return error_msg
+
+
+def validate_party_names(json_data):
+    """Verify party names for all added parties in json_data."""
+    error_msg = ''
+
+    if 'registeringParty' in json_data:
+        error_msg += validate_party_name(json_data['registeringParty'])
+
+    if 'securedParties' in json_data:
+        for party in json_data['securedParties']:
+            error_msg += validate_party_name(party)
+
+    if 'addSecuredParties' in json_data:
+        for party in json_data['addSecuredParties']:
+            error_msg += validate_party_name(party)
+
+    if 'debtors' in json_data:
+        for party in json_data['debtors']:
+            error_msg += validate_party_name(party)
+
+    if 'addDebtors' in json_data:
+        for party in json_data['addDebtors']:
+            error_msg += validate_party_name(party)
+
+    return error_msg
+
+
+def validate_party_name(party_json):
+    """Verify party name is valid."""
+    error_msg = ''
+    name = party_json.get('businessName', None)
+    if name:
+        if not valid_charset(name):
+            error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+        return error_msg
+    person = party_json.get('personName', None)
+    if person:
+        name = person['first']
+        if not valid_charset(name):
+            error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+        name = person['last']
+        if not valid_charset(name):
+            error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+        name = person.get('middle', None)
+        if name and not valid_charset(name):
+            error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
     return error_msg
 
 
