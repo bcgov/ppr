@@ -325,15 +325,7 @@ describe('Business debtor validation', () => {
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
     expect(messages1.at(0).text()).toContain('Maximum 150 characters')
-    // special chars
-    wrapper.vm.$data.searchValue = 'F10@'
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations?.searchValue?.message).toBeDefined()
-    await Vue.nextTick()
-    const messages2 = wrapper.findAll('.v-messages__message')
-    expect(messages2.length).toBe(1)
-    expect(messages2.at(0).text()).toContain("don't normally contain special characters")
-  })
+    })
 })
 
 describe('MHR validation', () => {

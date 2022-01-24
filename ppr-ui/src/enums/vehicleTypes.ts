@@ -13,7 +13,7 @@ export enum UIVehicleTypes {
   MOTOR_VEHICLE = 'Motor Vehicle (MV)',
   BOAT = 'Boat (BO)',
   TRAILER = 'Trailer (TR)',
-  OUTBOARD_MOTOR = 'Outboard Motor (OM)',
+  OUTBOARD_MOTOR = 'Outboard Motor (OB)',
   MANUFACTURED_HOME = 'Manufactured Home (MH)',
   AIRCRAFT = 'Aircraft/Airframe Registered in Canada (AC)',
   AIRCRAFT_AIRFRAME = 'Aircraft/Airframe Not Registered in Canada (AF)'

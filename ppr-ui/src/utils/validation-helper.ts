@@ -145,9 +145,6 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
       }
       break
     case UISearchTypes.BUSINESS_DEBTOR:
-      if (searchValue && specialCharsLax.test(searchValue)) {
-        validation.searchValue.message = "Names don't normally contain special characters"
-      }
       if (searchValue?.length > 150) {
         validation.searchValue.message = 'Maximum 150 characters'
       }
