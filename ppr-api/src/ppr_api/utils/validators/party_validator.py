@@ -41,6 +41,7 @@ def validate_financing_parties(json_data):
     """Verify party data for all parties in json_data representing a financing statement."""
     error_msg = validate_party_codes(json_data)
     error_msg += validate_party_addresses(json_data)
+    error_msg += validate_party_names(json_data)
     return error_msg
 
 
@@ -48,6 +49,7 @@ def validate_registration_parties(json_data, financing_statement=None):
     """Verify party data for all parties in json_data representing a registration."""
     error_msg = validate_party_codes(json_data)
     error_msg += validate_party_addresses(json_data)
+    error_msg += validate_party_names(json_data)
     error_msg += validate_party_ids(json_data, financing_statement)
 
     return error_msg
@@ -83,7 +85,6 @@ def validate_party_codes(json_data):
 def validate_party_names(json_data):
     """Verify party names for all added parties in json_data."""
     error_msg = ''
-
     if 'registeringParty' in json_data:
         error_msg += validate_party_name(json_data['registeringParty'])
 
