@@ -14,20 +14,10 @@
       @proceed="payErrorDialogHandler()"
     />
 
-    <!-- Initial Page Load Transition -->
-    <transition name="fade">
-      <div class="loading-container" v-show="!haveData">
-        <div class="loading__content">
-          <v-progress-circular color="primary" size="50" indeterminate />
-          <div class="loading-msg">Loading</div>
-        </div>
-      </div>
-    </transition>
-
     <sbc-header
         class="sbc-header"
         :in-auth="false"
-        :show-actions="true"
+        :show-login-menu="false"
       />
 
     <div class="app-body">
@@ -43,8 +33,8 @@
             This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
           </v-col>
         </v-row>
-        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" />
-        <tombstone :setCurrentPath="currentPath" />
+        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
+        <tombstone :setCurrentPath="currentPath" v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">

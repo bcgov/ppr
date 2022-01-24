@@ -182,11 +182,6 @@ p {
   text-align: center;
 }
 
-.loading-msg {
-  margin-top: 1rem;
-  font-weight: 600;
-}
-
 .fade-out {
   animation: fadeOut 2s forwards;
 }
@@ -481,7 +476,7 @@ tr.disabled-text-not-first td:first-child {
   font-weight: 800 !important;
 }
 
-.theme--light.v-btn--active.v-date-picker-table__current:hover::before, 
+.theme--light.v-btn--active.v-date-picker-table__current:hover::before,
 .theme--light.v-btn--active.v-date-picker-table__current::before {
   opacity: 0;
 }
@@ -645,7 +640,7 @@ tr.registration-row.draft-registration-row td.actions-cell,
   background-size: 100%;
   background-repeat: no-repeat;
   width: 150px;
-}  
+}
 
 .disabled-custom .v-label--is-disabled, .disabled-custom .v-input__slot {
   opacity: 0.4;

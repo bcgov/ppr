@@ -16,7 +16,7 @@ import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 })
 export default class Signout extends Vue {
   private get logoutURL (): string {
-    const url = `${sessionStorage.getItem('BASE_URL')}?logout=true`
+    const url = `${sessionStorage.getItem('REGISTRY_URL')}?logout=true`
     if (url) return url
     return null
   }

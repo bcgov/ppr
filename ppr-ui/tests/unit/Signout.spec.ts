@@ -21,7 +21,7 @@ document.body.setAttribute('data-app', 'true')
 describe('Signout component', () => {
   let wrapper: any
   const baseURL = 'myhost/basePath'
-  sessionStorage.setItem('BASE_URL', baseURL)
+  sessionStorage.setItem('REGISTRY_URL', baseURL)
 
   beforeEach(async () => {
     const localVue = createLocalVue()

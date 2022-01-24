@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter, { Route } from 'vue-router'
 import { routes } from './routes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { RouteNames } from '@/enums'
 
 /**
  * Configures and returns Vue Router.
@@ -21,18 +22,33 @@ export function getVueRouter () {
   })
 
   router.beforeEach((to, from, next) => {
-    if (requiresAuth(to) && !isAuthenticated()) {
-      // this route needs authentication, so re-route to signin
-      // NB: save current route for future redirect
-
+    if (isLoginSuccess(to)) {
+      // this route is to verify login
       next({
-        name: 'signin',
-        query: { redirect: to.fullPath }
+        name: RouteNames.SIGN_IN,
+        query: { redirect: to.query.redirect }
       })
     } else {
-      // otherwise just proceed normally
-      next()
+      if (requiresAuth(to) && !isAuthenticated()) {
+        // this route needs authentication, so re-route to login
+        next({
+          name: RouteNames.LOGIN,
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        // otherwise just proceed normally
+        next()
+      }
     }
+  })
+
+  router.afterEach((to, from) => {
+    // Overrid the browser tab name
+    Vue.nextTick(() => {
+      if (to.meta.title) {
+        document.title = to.meta.title
+      }
+    })
   })
 
   /** Returns True if route requires authentication, else False. */
@@ -48,12 +64,17 @@ export function getVueRouter () {
 
   /** Returns True if route is Signin, else False. */
   function isSigninRoute (route: Route): boolean {
-    return Boolean(route.name === 'signin')
+    return Boolean(route.name === RouteNames.SIGN_IN)
   }
 
   /** Returns True if route is Signout, else False. */
   function isSignoutRoute (route: Route): boolean {
-    return Boolean(route.name === 'signout')
+    return Boolean(route.name === RouteNames.SIGN_OUT)
+  }
+
+  /** Returns True if route is Login success, else False. */
+  function isLoginSuccess (route: Route): boolean {
+    return Boolean(route.name === RouteNames.LOGIN && route.hash)
   }
 
   return router
