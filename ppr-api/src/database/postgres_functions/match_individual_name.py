@@ -49,6 +49,7 @@ DECLARE
     OR  (FIRST_LENGTH = 1 AND FIRST_CHAR1 = p.first_name_char1)
     OR  (FIRST_LENGTH > 1 AND FIRST_CHAR1 = p.first_name_char1 AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-')
     OR  (FIRST_LENGTH > 1 AND FIRST_CHAR2 IS NOT NULL AND FIRST_CHAR2 = '-' AND FIRST_CHAR1 = p.first_name_char1)
+    OR (p.first_name_char1 = FIRST_CHAR1 AND LENGTH(p.first_name) = 1)
     OR (indkey <% p.FIRST_NAME_KEY AND
         SIMILARITY(p.FIRST_NAME_KEY, indkey) >= SIMNUMBER AND 
         p.first_name_key_char1 = INDKEY_CHAR1 AND 
