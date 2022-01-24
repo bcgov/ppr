@@ -57,7 +57,7 @@ BEGIN
     ELSE
         v_search_key := v_search_key;
     END IF;
-    
+
     v_name_2 := SPLIT_PART(v_search_key,' ',2);
     v_name_3 := SPLIT_PART(v_search_key,' ',3);
     v_name_4 := SPLIT_PART(v_search_key,' ',4);
@@ -90,7 +90,13 @@ BEGIN
     ELSE
         v_search_key := v_search_key;
     END IF;
-    
+
+    IF v_search_key is null or LENGTH(TRIM(v_search_key)) = 0 THEN
+        v_search_key := actual_name;
+    ELSE
+        v_search_key := v_search_key;
+    END IF;
+
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(BRITISH COLUMBIA|BRITISHCOLUMBIA|BC)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(LIMITED|PARTNERSHIP|GP|LP)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(SOCIETY|ASSOCIATION|TRUST|TRUSTEE|SOCIETE)\y','','gi');
