@@ -36,7 +36,7 @@ export function getVueRouter () {
           query: { redirect: to.fullPath }
         })
       } else {
-        if (isLogin(to)) {
+        if (isLogin(to) && isAuthenticated()) {
           // this route is to login
           next({ name: RouteNames.DASHBOARD })
         } else {
