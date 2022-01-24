@@ -309,6 +309,91 @@ AMENDMENT_INVALID = {
   ]
 }
 
+AMENDMENT_INVALID_NAMES = {
+  'statementType': 'AMENDMENT_STATEMENT',
+  'baseDebtor': {
+      'businessName': 'DEBTOR 1 INC.'
+  },
+  'registeringParty': {
+      'businessName': 'RP \U0001d5c4\U0001d5c6/\U0001d5c1',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AM',
+  'addDebtors': [
+    {
+        'businessName': 'AD \U0001d5c4\U0001d5c6/\U0001d5c1',
+        'address': {
+            'street': '1234 Blanshard St',
+            'city': 'Victoria',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8S 3J5'
+        }
+    }
+  ],
+  'addSecuredParties': [
+    {
+      'personName': {
+          'first': 'FN répertoire',
+          'middle': 'MN répertoire',
+          'last': 'LN répertoire'
+      }
+    }
+  ]
+}
+FINANCING_INVALID_NAMES = {
+    'type': 'SA',
+    'registeringParty': {
+        'businessName': 'RP \U0001d5c4\U0001d5c6/\U0001d5c1',
+        'address': {
+            'street': '222 SUMMER STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'country': 'CA',
+            'postalCode': 'V8W 2V8'
+        },
+        'emailAddress': 'bsmith@abc-search.com'
+    },
+    'securedParties': [
+        {
+          'personName': {
+              'first': 'FN répertoire',
+              'middle': 'MN répertoire',
+              'last': 'LN répertoire'
+          },
+          'address': {
+              'street': '3720 BEACON AVENUE',
+              'city': 'SIDNEY',
+              'region': 'BC',
+              'country': 'CA',
+              'postalCode': 'V7R 1R7'
+          },
+          'partyId': 1321095
+        },
+    ],
+    'debtors': [
+        {
+          'businessName': 'AD \U0001d5c4\U0001d5c6/\U0001d5c1',
+          'address': {
+              'street': '1234 Blanshard St',
+              'city': 'Victoria',
+              'region': 'BC',
+              'country': 'CA',
+              'postalCode': 'V8S 3J5'
+            },
+          'emailAddress': 'csmith@bwc.com',
+          'partyId': 1400094
+        }
+    ]
+}
+
 
 # testdata pattern is ({description}, {financing statement data}, {valid}, {message contents})
 TEST_CODE_FS_DATA = [
@@ -353,6 +438,34 @@ TEST_PARTIES_AM_DATA = [
     ('Invalid party code', AMENDMENT_INVALID, False, validator.SECURED_CODE_MSG.format('300000000')),
     ('Invalid party address', AMENDMENT_INVALID, False, validator.INVALID_REGION_SECURED.format('BX')),
     ('Missing delete debtor id', AMENDMENT_INVALID, False, validator.DELETE_MISSING_ID_DEBTOR)
+]
+# testdata pattern is ({description}, {amendment statement data}, {valid}, {message contents})
+TEST_PARTIES_AM_NAME_DATA = [
+    ('Valid names', AMENDMENT_VALID, True, None),
+    ('Invalid registering party name', AMENDMENT_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('RP \U0001d5c4\U0001d5c6/\U0001d5c1')),
+    ('Invalid debtor name', AMENDMENT_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('AD \U0001d5c4\U0001d5c6/\U0001d5c1')),
+    ('Invalid secured party first name', AMENDMENT_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('FN répertoire')),
+    ('Invalid secured party middle name', AMENDMENT_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('MN répertoire')),
+    ('Invalid secured party last name', AMENDMENT_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
+]
+# testdata pattern is ({description}, {amendment statement data}, {valid}, {message contents})
+TEST_PARTIES_FS_NAME_DATA = [
+    ('Valid names', FINANCING_VALID, True, None),
+    ('Invalid registering party name', FINANCING_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('RP \U0001d5c4\U0001d5c6/\U0001d5c1')),
+    ('Invalid debtor name', FINANCING_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('AD \U0001d5c4\U0001d5c6/\U0001d5c1')),
+    ('Invalid secured party first name', FINANCING_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('FN répertoire')),
+    ('Invalid secured party middle name', FINANCING_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('MN répertoire')),
+    ('Invalid secured party last name', FINANCING_INVALID_NAMES, False,
+     validator.CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
 ]
 
 
@@ -451,3 +564,25 @@ def test_actual_party_ids(session):
     if error_msg != '':
         print(error_msg)
     assert error_msg == ''
+
+
+@pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_PARTIES_AM_NAME_DATA)
+def test_validate_am_party_names(session, desc, json_data, valid, message_content):
+    """Assert that registration statement party name validation works as expected."""
+    error_msg = validator.validate_party_names(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_PARTIES_FS_NAME_DATA)
+def test_validate_fs_party_names(session, desc, json_data, valid, message_content):
+    """Assert that financing statement party name validation works as expected."""
+    error_msg = validator.validate_party_names(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1

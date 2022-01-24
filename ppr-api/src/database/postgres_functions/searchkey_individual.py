@@ -30,12 +30,10 @@ DECLARE
 		v_first_name := trim(regexp_replace(v_first_name, '\s+', ' ', 'gi'));
 		-- Remove repeating letters
 		v_first_name := regexp_replace(v_first_name, '(.)\1{1,}', '\1', 'g');
-		
+
 		-- join last first name
 		v_ind_key := v_last_name||' '||v_first_name;
-		
-		
-		
+
      RETURN UPPER(v_ind_key);
     END
     ; 

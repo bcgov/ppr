@@ -92,13 +92,13 @@ AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
 BUSINESS_NAME_QUERY = """
 WITH q AS (
    SELECT(SELECT searchkey_business_name(:query_bus_name)) AS search_key,
+   SUBSTR((SELECT searchkey_business_name(:query_bus_name)),1,1) AS search_key_char1,
+   (SELECT business_name_strip_designation(:query_bus_name)) AS search_name_base,
    (SELECT array_length(string_to_array(trim(regexp_replace(:query_bus_name,'^THE','','gi')),' '),1)) AS word_length)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.business_name,
        r.registration_number AS base_registration_num,
-       CASE WHEN regexp_replace(regexp_replace(p.business_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') =
-                 regexp_replace(regexp_replace(:query_bus_name,'[.,]','','gi'),'\\y(INC$|LTD$|LTEE$)\\y','','gi') THEN
-                 'EXACT'
+       CASE WHEN p.bus_name_base = search_name_base THEN 'EXACT'
             ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type,p.id
   FROM registrations r, financing_statements fs, parties p, q
@@ -114,19 +114,30 @@ WHERE r.financing_id = fs.id
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
-   AND SUBSTR(search_key,1,1) = SUBSTR(p.business_srch_key,1,1)
+   AND p.bus_name_key_char1 = search_key_char1
+   AND search_key <% p.business_srch_key
    AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key
                   or word_length=1 and search_key = split_part(business_name,' ',1))
 ORDER BY match_type, p.business_name
 """
 
 INDIVIDUAL_NAME_QUERY = """
+WITH q AS (SELECT(searchkey_last_name(:query_last)) AS search_last_key)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
-       CASE WHEN p.last_name = :query_last AND p.first_name = :query_first THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN search_last_key = p.last_name_key AND p.first_name = :query_first THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) = 1 AND
+                 :query_first = p.first_name_char1 THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(p.first_name) = 1 AND
+                 p.first_name = LEFT(:query_first, 1) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-' AND
+                 p.first_name_char1 = LEFT(:query_first, 1) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) > 1 AND SUBSTR(:query_first, 2, 1) = '-'
+                 AND p.first_name_char1 = LEFT(:query_first, 1) THEN 'EXACT'
+            ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
-  FROM registrations r, financing_statements fs, parties p
+  FROM registrations r, financing_statements fs, parties p, q
 WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL
@@ -145,14 +156,27 @@ ORDER BY match_type, p.last_name, p.first_name
 """
 
 INDIVIDUAL_NAME_MIDDLE_QUERY = """
+WITH q AS (SELECT(searchkey_last_name(:query_last)) AS search_last_key)
 SELECT r.registration_type,r.registration_ts AS base_registration_ts,
        p.last_name,p.first_name,p.middle_initial,p.id,
        r.registration_number AS base_registration_num,
-       CASE WHEN p.last_name = :query_last AND
-                 p.first_name = :query_first AND
-                 p.middle_initial = :query_middle THEN 'EXACT' ELSE 'SIMILAR' END match_type,
+       CASE WHEN search_last_key = p.last_name_key AND p.first_name = :query_first AND
+               (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) = 1 AND
+                 :query_first = p.first_name_char1 AND
+                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(p.first_name) = 1 AND
+                 p.first_name = LEFT(:query_first, 1) AND
+                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-' AND
+                 p.first_name_char1 = LEFT(:query_first, 1) AND
+                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
+            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) > 1 AND SUBSTR(:query_first, 2, 1) = '-'
+                 AND p.first_name_char1 = LEFT(:query_first, 1) AND
+                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
+            ELSE 'SIMILAR' END match_type,
        fs.expire_date,fs.state_type, p.birth_date
-  FROM registrations r, financing_statements fs, parties p
+  FROM registrations r, financing_statements fs, parties p, q
 WHERE r.financing_id = fs.id
    AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
    AND r.base_reg_number IS NULL

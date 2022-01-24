@@ -26,12 +26,14 @@ from flask import current_app
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import utils as model_utils
 from ppr_api.models import search_utils
+from ppr_api.utils.validators import valid_charset
 
 from .db import db
 
 
 # Async search report status pending.
 REPORT_STATUS_PENDING = 'PENDING'
+CHARACTER_SET_UNSUPPORTED = 'The search name {} charcter set is not supported.\n'
 
 
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -429,13 +431,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return new_search
 
     @staticmethod
-    def validate_query(json_data):
+    def validate_query(json_data):  # pylint: disable=too-many-branches
         """Perform any extra data validation here, either because it is too complicated for the schema.
 
         Or because it requires existing data.
         """
         error_msg = ''
-
         # validate search type - criteria combinations
         search_type = json_data['type']
         if search_type not in ('INDIVIDUAL_DEBTOR', 'BUSINESS_DEBTOR'):
@@ -448,6 +449,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 error_msg += f'Search criteria debtorName last is required for search type {search_type}. '
             elif search_type == 'BUSINESS_DEBTOR' and 'business' not in json_data['criteria']['debtorName']:
                 error_msg += f'Search criteria debtorName businessName is required for search type {search_type}. '
+            error_msg += SearchRequest.validate_debtor_name(json_data)
 
         # Verify the start and end dates.
         if 'startDateTime' in json_data or 'startDateTime' in json_data:
@@ -471,3 +473,23 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 error=error_msg,
                 status_code=HTTPStatus.BAD_REQUEST
             )
+
+    @staticmethod
+    def validate_debtor_name(json_data):
+        """Verify search debtor name is valid."""
+        error_msg = ''
+        if 'criteria' in json_data and 'debtorName' in json_data['criteria']:
+            debtor_json = json_data['criteria']['debtorName']
+            name = debtor_json.get('business', None)
+            if name and not valid_charset(name):
+                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            name = debtor_json.get('first', None)
+            if name and not valid_charset(name):
+                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            name = debtor_json.get('middle', None)
+            if name and not valid_charset(name):
+                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            name = debtor_json.get('last', None)
+            if name and not valid_charset(name):
+                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+        return error_msg

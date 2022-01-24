@@ -24,9 +24,14 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
            null, 200000007)
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
-                  middle_initial, last_name, business_name, birth_date, address_id, first_name_key, last_name_key)
+                  middle_initial, last_name, business_name, birth_date, address_id, first_name_key, last_name_key,
+                  last_name_split1, last_name_split2, last_name_split3, first_name_split1, first_name_split2,
+                  first_name_char1, first_name_key_char1)
     VALUES(200000016, 'DI', 200000005, 200000004, null, null, 'TEST IND', '5', 'DEBTOR', null,
-           null, 200000007, searchkey_individual('DEBTOR', 'TEST IND'), null)
+           null, 200000007, searchkey_individual('DEBTOR', 'TEST IND'),
+           searchkey_last_name('DEBTOR'),
+           individual_split_1('DEBTOR'), individual_split_2('DEBTOR'), individual_split_3('DEBTOR'),
+           individual_split_1('TEST IND'), individual_split_2('TEST IND'), 'T', 'T')            
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)

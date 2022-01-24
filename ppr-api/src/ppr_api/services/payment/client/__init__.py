@@ -56,7 +56,7 @@ TO_STAFF_FILING_TYPE = {
     'FLREG': 'FLRGS',
     'FSREG': 'FSRGS',
     'INFRG': 'INFRS',
-    'FSREN' :'FSRNS',
+    'FSREN': 'FSRNS',
     'INFRN': 'INFNS'
 }
 
