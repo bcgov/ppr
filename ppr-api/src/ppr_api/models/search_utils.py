@@ -150,7 +150,8 @@ WHERE r.financing_id = fs.id
    AND p.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first))) 
+   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
+                                                           :query_first_quotient, :query_default_quotient))) 
 ORDER BY match_type, p.last_name, p.first_name
 """
 
