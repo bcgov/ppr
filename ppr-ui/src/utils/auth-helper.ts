@@ -41,11 +41,16 @@ export function getKeycloakRoles (): Array<string> {
 }
 
 // Get registering party from auth api /api/v1/orgs/{org_id}
-export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
+export async function getRegisteringPartyFromAuth (isPprStaff: boolean): Promise<PartyIF> {
+  let accountId
   const url = sessionStorage.getItem('AUTH_API_URL')
-  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
-  const accountInfo = JSON.parse(currentAccount)
-  const accountId = accountInfo.id
+  if (!isPprStaff) {
+    const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+    const accountInfo = JSON.parse(currentAccount)
+    accountId = accountInfo.id
+  } else {
+    accountId = 9990003
+  }
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios.get(`orgs/${accountId}`, config)
