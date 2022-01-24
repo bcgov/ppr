@@ -26,6 +26,7 @@ def upgrade():
     op.add_column('parties', sa.Column('first_name_split1', sa.String(length=50), nullable=True))
     op.add_column('parties', sa.Column('first_name_split2', sa.String(length=50), nullable=True))
     op.add_column('parties', sa.Column('first_name_char1', sa.String(length=1), nullable=True))
+    op.add_column('parties', sa.Column('first_name_char2', sa.String(length=1), nullable=True))
     op.add_column('parties', sa.Column('first_name_key_char1', sa.String(length=1), nullable=True))
     op.add_column('parties', sa.Column('bus_name_base', sa.String(length=150), nullable=True))
     op.add_column('parties', sa.Column('bus_name_key_char1', sa.String(length=1), nullable=True))

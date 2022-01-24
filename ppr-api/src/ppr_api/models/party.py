@@ -63,7 +63,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     business_name = db.Column('business_name', db.String(150), index=True, nullable=True)
     birth_date = db.Column('birth_date', db.DateTime, nullable=True)
     email_id = db.Column('email_address', db.String(250), nullable=True)
-
+    
     # Search keys
     first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
     last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
@@ -76,6 +76,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     first_name_split1 = db.Column('first_name_split1', db.String(50), nullable=True, index=True)
     first_name_split2 = db.Column('first_name_split2', db.String(50), nullable=True, index=True)
     first_name_char1 = db.Column('first_name_char1', db.String(1), nullable=True)
+    first_name_char2 = db.Column('first_name_char2', db.String(1), nullable=True)
     first_name_key_char1 = db.Column('first_name_key_char1', db.String(1), nullable=True)
 
     # For bus debtor searching
@@ -221,6 +222,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 party.last_name = json_data['personName']['last'].strip().upper()
                 party.first_name = json_data['personName']['first'].strip().upper()
                 party.first_name_char1 = party.first_name[0:1]
+                if len(party.first_name) > 1:
+                    party.first_name_char2 = party.first_name[1:2]
                 if 'middle' in json_data['personName']:
                     party.middle_initial = json_data['personName']['middle'].strip().upper()
 

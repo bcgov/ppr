@@ -276,5 +276,6 @@ def test_save_individual(session):
     assert party.first_name_split1 == 'JEAN'
     assert party.first_name_split2 == 'PAUL'
     assert party.first_name_char1 == 'J'
+    assert party.first_name_char2 == 'E'
     assert party.first_name_key_char1 == 'P'
  

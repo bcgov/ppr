@@ -18,10 +18,13 @@ DECLARE
     SET pg_trgm.similarity_threshold = 0.29; -- assigning from variable does not work
 
     WITH q AS (SELECT(SELECT public.searchkey_individual(lastname, firstname)) AS INDKEY,
+               (SELECT public.searchkey_last_name(lastname)) AS search_last_key,              
               lastname AS LAST,
               firstname AS FIRST,
               LENGTH(lastname) AS LAST_LENGTH,
+              LENGTH(firstname) AS FIRST_LENGTH,
               SUBSTR(firstname,1,1) AS FIRST_CHAR1,
+              SUBSTR(firstname,2,1) AS FIRST_CHAR2,
               SUBSTR((SELECT(SELECT public.searchkey_individual(lastname, firstname))),1,1) AS INDKEY_CHAR1,
               (SELECT public.sim_number(lastname)) as simnumber,
               (SELECT public.individual_split_1(lastname)) AS SPLIT1,
@@ -33,7 +36,7 @@ DECLARE
     SELECT array_agg(p.id)
       INTO v_ids
   FROM PARTIES p,q
- WHERE p.LAST_NAME = LAST 
+ WHERE p.LAST_NAME_key = search_last_key 
    AND p.PARTY_TYPE = 'DI'
    AND p.REGISTRATION_ID_END IS NULL
    AND (
@@ -43,6 +46,9 @@ DECLARE
                            WHERE NAME_ID IN (SELECT NAME_ID 
                                                FROM public.NICKNAMES WHERE(FIRST) = NAME))
         )
+    OR  (FIRST_LENGTH = 1 AND FIRST_CHAR1 = p.first_name_char1)
+    OR  (FIRST_LENGTH > 1 AND FIRST_CHAR1 = p.first_name_char1 AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-')
+    OR  (FIRST_LENGTH > 1 AND FIRST_CHAR2 IS NOT NULL AND FIRST_CHAR2 = '-' AND FIRST_CHAR1 = p.first_name_char1)
     OR (indkey <% p.FIRST_NAME_KEY AND
         SIMILARITY(p.FIRST_NAME_KEY, indkey) >= SIMNUMBER AND 
         p.first_name_key_char1 = INDKEY_CHAR1 AND 
