@@ -3,6 +3,9 @@ name: PPR UI CI
 on:
   pull_request:
     types: [assigned, synchronize]
+    paths:
+      - "ppr-ui/**"
+
 
 defaults:
   run:
