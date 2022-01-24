@@ -36,8 +36,13 @@ export function getVueRouter () {
           query: { redirect: to.fullPath }
         })
       } else {
-        // otherwise just proceed normally
-        next()
+        if (isLogin(to)) {
+          // this route is to login
+          next({ name: RouteNames.DASHBOARD })
+        } else {
+          // otherwise just proceed normally
+          next()
+        }
       }
     }
   })
@@ -70,6 +75,11 @@ export function getVueRouter () {
   /** Returns True if route is Signout, else False. */
   function isSignoutRoute (route: Route): boolean {
     return Boolean(route.name === RouteNames.SIGN_OUT)
+  }
+
+  /** Returns True if route is Login success, else False. */
+  function isLogin (route: Route): boolean {
+    return Boolean(route.name === RouteNames.LOGIN)
   }
 
   /** Returns True if route is Login success, else False. */
