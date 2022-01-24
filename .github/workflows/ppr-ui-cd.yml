@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "ppr-ui/**"
+
   workflow_dispatch:
     inputs:
       environment:
