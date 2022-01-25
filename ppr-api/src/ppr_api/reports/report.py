@@ -649,6 +649,8 @@ class Report:  # pylint: disable=too-few-public-methods
                 criteria += self._report_data['searchQuery']['criteria']['debtorName']['first']
                 if 'second' in self._report_data['searchQuery']['criteria']['debtorName']:
                     criteria += ' ' + self._report_data['searchQuery']['criteria']['debtorName']['second']
+                elif 'middle' in self._report_data['searchQuery']['criteria']['debtorName']:
+                    criteria += ' ' + self._report_data['searchQuery']['criteria']['debtorName']['middle']
             else:
                 criteria = self._report_data['searchQuery']['criteria']['value']
             self._report_data['meta_subject'] = f'{search_desc} - "{criteria}"'
