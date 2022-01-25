@@ -6,9 +6,7 @@ venv
 .env
 .env*
 .eggs
-LICENSE
 Makefile
-README.md
 devops
 k8s
 manage.py
