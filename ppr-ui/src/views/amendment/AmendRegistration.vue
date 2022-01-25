@@ -50,7 +50,7 @@
           />
           <div v-if="!securedPartiesValid">
           <span class="invalid-message">
-            You must include at least one secured party
+            Your registration must include at least one Secured Party
           </span>
           </div>
           <secured-party-summary
@@ -68,7 +68,7 @@
           />
           <div class="pt-4" v-if="!debtorValid">
           <span class="invalid-message">
-            You must include at least one debtor
+            Your registration must include at least one Debtor
           </span>
           </div>
           <debtor-summary
