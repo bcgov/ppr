@@ -115,9 +115,13 @@ WHERE r.financing_id = fs.id
    AND p.registration_id_end IS NULL
    AND p.party_type = 'DB'
    AND p.bus_name_key_char1 = search_key_char1
-   AND search_key <% p.business_srch_key
-   AND (SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient OR p.business_srch_key = search_key
-                  or word_length=1 and search_key = split_part(business_name,' ',1))
+   AND ((search_key <% p.business_srch_key AND
+          SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient)
+          OR p.business_srch_key = search_key
+          OR word_length=1 and search_key = split_part(business_name,' ',1)
+          OR (LENGTH(search_key) >= 3 AND LEVENSHTEIN(search_key, p.business_srch_key) <= 1) AND 
+              p.bus_name_key_char1 = search_key_char1
+    )
 ORDER BY match_type, p.business_name
 """
 
