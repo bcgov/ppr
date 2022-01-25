@@ -21,27 +21,28 @@ env:
 
 jobs:
   ppr-doc-services-cd-by-push:
-    if: ${{ github.event.label.name == 'run-ci' }}
-      runs-on: ubuntu-20.04
+    runs-on: ubuntu-20.04
 
-      permissions:
-        contents: 'read'
-        id-token: 'write'
+    if: github.event.label.name == 'run-ci'
 
-      steps:
-      - uses: 'actions/checkout@v2'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0'
-        with:
-          workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
-          service_account: '${{ secrets.BUILD_SERVICE_ACCOUNT }}'
-        
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v0'
+    steps:
+    - uses: 'actions/checkout@v2'
 
-      - id: 'gcloud'
-        name: 'gcloud'
-        run: |-
-          gcloud secrets versions list place-holder
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ secrets.BUILD_SERVICE_ACCOUNT }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - id: 'gcloud'
+      name: 'gcloud'
+      run: |-
+        gcloud secrets versions list place-holder
