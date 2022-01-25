@@ -36,7 +36,10 @@ DECLARE
     SELECT array_agg(p.id)
       INTO v_ids
   FROM PARTIES p,q
- WHERE p.LAST_NAME_key = search_last_key 
+ WHERE (p.LAST_NAME_key = search_last_key OR 
+        (first_name_key_char1 = INDKEY_CHAR1 AND
+         indkey <% p.FIRST_NAME_KEY AND 
+         LEVENSHTEIN(p.FIRST_NAME_KEY,indkey) <= 2)) 
    AND p.PARTY_TYPE = 'DI'
    AND p.REGISTRATION_ID_END IS NULL
    AND (
