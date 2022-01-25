@@ -229,9 +229,9 @@ function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF
         statement.addGeneralCollateral.push(gc)
       }
       if (collateral.generalCollateral[i].descriptionDelete &&
-          collateral.generalCollateral[i].descriptionDelete.trim().length > 0) {
+          collateral.generalCollateral[i].descriptionDelete.trim().length > 0 &&
+          (!collateral.generalCollateral[i].collateralId || collateral.generalCollateral[i].collateralId < 1)) {
         const gc:GeneralCollateralIF = {
-          collateralId: collateral.generalCollateral[i].collateralId,
           description: collateral.generalCollateral[i].descriptionDelete
         }
         statement.deleteGeneralCollateral.push(gc)
