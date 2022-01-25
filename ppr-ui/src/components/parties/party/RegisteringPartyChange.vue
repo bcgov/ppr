@@ -1,5 +1,5 @@
 <template>
-  <v-row no-gutters>
+  <v-row no-gutters id="reg-party-change" :class="{ 'border-error-left': showErrorBar }">
       <v-col v-if="!openChangeScreen">
         <registering-party
           @changeRegisteringParty="changeRegisteringParty"
@@ -70,6 +70,10 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -91,22 +95,28 @@ export default defineComponent({
       }),
       summaryView: computed((): boolean => {
         return props.isSummary
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 
     onMounted(() => {
       if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
         localState.openChangeScreen = true
+        context.emit('registeringPartyOpen', true)
       }
     })
 
     const changeRegisteringParty = () => {
       localState.openChangeScreen = true
+      context.emit('registeringPartyOpen', true)
     }
 
     const initAdd = () => {
       localState.addEditInProgress = true
       localState.showAddRegisteringParty = true
+      context.emit('registeringPartyOpen', true)
     }
 
     const resetData = () => {
@@ -116,6 +126,7 @@ export default defineComponent({
       if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
         localState.openChangeScreen = true
       }
+      context.emit('registeringPartyOpen', false)
     }
 
     watch(() => localState.registeringParty, (rp) => {

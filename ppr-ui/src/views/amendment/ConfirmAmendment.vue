@@ -121,6 +121,8 @@
           </h2>
           <registering-party-change
             class="pt-4"
+            @registeringPartyOpen="registeringOpen = $event"
+            :setShowErrorBar="errorBar"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -261,6 +263,9 @@ export default class ConfirmAmendment extends Vue {
 
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
+  private registeringOpen = false
+  private errorBar = false
+  
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = {
     acceptText: 'Cancel Amendment',
@@ -445,6 +450,10 @@ export default class ConfirmAmendment extends Vue {
       const component = document.getElementById('folio-summary')
       await component.scrollIntoView({ behavior: 'smooth' })
     }
+    if (this.registeringOpen) {
+      const component = document.getElementById('reg-party-change')
+      await component.scrollIntoView({ behavior: 'smooth' })
+    }
     if (!this.courtOrderValid) {
       const component = document.getElementById('court-order-component')
       await component.scrollIntoView({ behavior: 'smooth' })
@@ -549,7 +558,7 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private submitButton (): void {
-    if (!this.validFolio || !this.certifyInformationValid) {
+    if (!this.validFolio || !this.certifyInformationValid || this.registeringOpen) {
       this.showErrors = true
       this.scrollToInvalid()
       return
