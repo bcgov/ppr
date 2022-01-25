@@ -234,7 +234,48 @@ export default defineComponent({
         return -1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
+        const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
+        const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
+        for (const i in generalCollateral) {
+          if (!generalCollateral[i].addedDateTime) {
+            cleanedGeneralCollateral.push(generalCollateral[i])
+            continue
+          }
+          if (generalCollateral[i].description) {
+            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
+              collateral.description &&
+              collateral.addedDateTime === generalCollateral[i].addedDateTime
+            )
+            if (existsIndex !== -1) {
+              cleanedGeneralCollateral[existsIndex].description += generalCollateral[i].description
+            } else {
+              cleanedGeneralCollateral.push(generalCollateral[i])
+            }
+          }
+          if (generalCollateral[i].descriptionAdd) {
+            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
+              collateral.descriptionAdd &&
+              collateral.addedDateTime === generalCollateral[i].addedDateTime
+            )
+            if (existsIndex !== -1) {
+              cleanedGeneralCollateral[existsIndex].descriptionAdd += generalCollateral[i].descriptionAdd
+            } else {
+              cleanedGeneralCollateral.push(generalCollateral[i])
+            }
+          }
+          if (generalCollateral[i].descriptionDelete) {
+            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
+              collateral.descriptionDelete &&
+              collateral.addedDateTime === generalCollateral[i].addedDateTime
+            )
+            if (existsIndex !== -1) {
+              cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
+            } else {
+              cleanedGeneralCollateral.push(generalCollateral[i])
+            }
+          }
+        }
+        return cleanedGeneralCollateral
       }),
       lastGeneralCollateral: computed((): GeneralCollateralIF => {
         if (localState.generalCollateral.length) {
@@ -243,14 +284,11 @@ export default defineComponent({
         return null
       }),
       generalCollateralLength: computed((): number => {
-        if (getGeneralCollateral.value && getGeneralCollateral.value.length > 0) {
-          if (localState.lastGeneralCollateral.addedDateTime) {
-            return getGeneralCollateral.value.length
-          } else {
-            return getGeneralCollateral.value.length - 1
-          }
+        if (!localState.lastGeneralCollateral) { return 0 }
+        if (localState.lastGeneralCollateral?.addedDateTime) {
+          return localState.generalCollateral.length
         }
-        return 0
+        return localState.generalCollateral.length - 1
       }),
       registrationFlowType: computed((): RegistrationFlowType => {
         return getRegistrationFlowType.value
