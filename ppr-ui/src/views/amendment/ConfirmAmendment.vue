@@ -122,7 +122,7 @@
           <registering-party-change
             class="pt-4"
             @registeringPartyOpen="registeringOpen = $event"
-            :setShowErrorBar="errorBar"
+            :setShowErrorBar="errorBar && registeringOpen"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -265,7 +265,7 @@ export default class ConfirmAmendment extends Vue {
   private dataLoaded = false
   private registeringOpen = false
   private errorBar = false
-  
+
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = {
     acceptText: 'Cancel Amendment',
@@ -439,8 +439,11 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get stickyComponentErrMsg (): string {
-    if (!this.validFolio && this.showErrors) {
+    if ((!this.validFolio || !this.courtOrderValid) && this.showErrors) {
       return '< Please complete required information'
+    }
+    if ((this.registeringOpen || !this.certifyInformationValid) && this.showErrors) {
+      return '< You have unfinished changes'
     }
     return ''
   }
@@ -449,14 +452,17 @@ export default class ConfirmAmendment extends Vue {
     if (!this.validFolio) {
       const component = document.getElementById('folio-summary')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (this.registeringOpen) {
       const component = document.getElementById('reg-party-change')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (!this.courtOrderValid) {
       const component = document.getElementById('court-order-component')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (!this.certifyInformationValid) {
       const component = document.getElementById('certify-information')
