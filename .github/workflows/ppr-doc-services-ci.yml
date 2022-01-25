@@ -4,9 +4,9 @@ on:
   label:
     types:
       - created
-  push:
-    branches:
-      - main
+
+  pull_request:
+    types: [assigned, synchronize]
     paths:
       - "ppr/services/document-delivery-service/**"
 
