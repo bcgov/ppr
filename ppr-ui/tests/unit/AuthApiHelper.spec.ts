@@ -15,7 +15,7 @@ describe('Auth API Helper Tests', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   it('Get registering party from auth', async () => {
-    const registeringParty:PartyIF = await getRegisteringPartyFromAuth()
+    const registeringParty:PartyIF = await getRegisteringPartyFromAuth(false)
     console.log(JSON.stringify(registeringParty))
     expect(registeringParty.businessName).toBeDefined()
     expect(registeringParty.address).toBeDefined()
