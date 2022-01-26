@@ -50,6 +50,14 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('REGISTRY_URL', registryUrl)
   console.log('Set REGISTRY URL to: ' + registryUrl)
 
+  const systemMessage: string = response.data.SYSTEM_MESSAGE
+  sessionStorage.setItem('SYSTEM_MESSAGE', systemMessage)
+  console.log('Set SYSTEM MESSAGE to: ' + systemMessage)
+
+  const systemMessageType: string = response.data.SYSTEM_MESSAGE_TYPE
+  sessionStorage.setItem('SYSTEM_MESSAGE_TYPE', systemMessageType)
+  console.log('Set SYSTEM MESSAGE TYPE to: ' + systemMessageType)
+
   const keycloakConfigPath: string = response.data.KEYCLOAK_CONFIG_PATH
   sessionStorage.setItem('KEYCLOAK_CONFIG_PATH', keycloakConfigPath)
   console.info('Set Keycloak Config Path to: ' + keycloakConfigPath)
