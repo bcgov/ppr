@@ -76,6 +76,9 @@ describe('Renew registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.RENEW_REGISTRATION)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
+    // wait because store getting set still
+    await Vue.nextTick()
+    await Vue.nextTick()
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
@@ -84,7 +87,8 @@ describe('Renew registration component', () => {
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.registration.parties.registeringParty).toBe(null)
+    expect(state.originalRegistration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
     expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
