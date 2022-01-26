@@ -29,7 +29,6 @@ import {
   staffAmendment
 } from '@/utils'
 import { RegistrationTypes } from '@/resources'
-import { RegistrationConfirmation } from '@/components/dialogs'
 
 /** Set the amendment add/delete lists depending on the registration list actions */
 function setAmendmentList (baseList:Array<any>, addList:Array<any>, deleteList:Array<any>) {

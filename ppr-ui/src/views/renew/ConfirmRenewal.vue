@@ -283,7 +283,7 @@ export default class ConfirmDischarge extends Vue {
       })
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null,
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF

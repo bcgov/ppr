@@ -101,6 +101,7 @@ export default class ReviewRegistration extends Vue {
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
+  @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setRegistrationCreationDate: ActionBindingIF
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
@@ -186,7 +187,12 @@ export default class ReviewRegistration extends Vue {
       } as LengthTrustIF
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null, // will be taken from account info
+        securedParties: financingStatement.securedParties,
+        debtors: financingStatement.debtors
+      } as AddPartiesIF
+      const origParties = {
+        registeringParty: financingStatement.registeringParty, // will be used for summary
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
@@ -203,6 +209,7 @@ export default class ReviewRegistration extends Vue {
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)
       this.setAddSecuredPartiesAndDebtors(parties)
+      this.setOriginalAddSecuredPartiesAndDebtors(origParties)
       this.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
       this.setFolioOrReferenceNumber('')
       this.setCertifyInformation(certifyInfo)
@@ -262,9 +269,11 @@ export default class ReviewRegistration extends Vue {
       await this.loadRegistration()
     } catch (error) {
       console.error(error)
+      const errorMsg = error as string
+      console.error(errorMsg)
       this.emitError({
         statusCode: 500,
-        message: error
+        message: errorMsg
       })
     }
 

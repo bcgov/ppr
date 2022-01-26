@@ -19,9 +19,10 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
 import { BasePartySummary } from '@/components/parties/summaries'
-import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 import { registeringTableHeaders } from '@/resources'
+import { RegistrationFlowType } from '@/enums'
 
 export default defineComponent({
   name: 'RegisteringPartySummary',
@@ -37,18 +38,28 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const {
+      getAddSecuredPartiesAndDebtors,
+      getOriginalAddSecuredPartiesAndDebtors,
+      getRegistrationFlowType
+    } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors',
+      'getOriginalAddSecuredPartiesAndDebtors',
+      'getRegistrationFlowType'
     ])
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
     const router = context.root.$router
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    let regParty: PartyIF = parties?.registeringParty
+    if (getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+      regParty = getOriginalAddSecuredPartiesAndDebtors.value?.registeringParty
+    }
 
     const localState = reactive({
       registeringParty:
-        parties.registeringParty !== null ? [parties.registeringParty] : [],
+        regParty !== null ? [regParty] : [],
       registeringPartyHeaders: computed(function () {
         const headersToShow = [...registeringTableHeaders]
         return headersToShow

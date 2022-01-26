@@ -495,7 +495,7 @@ export default class ConfirmAmendment extends Vue {
       })
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null, // will be taken from account info
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF

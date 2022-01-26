@@ -78,19 +78,12 @@ export default defineComponent({
     ])
     const { isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
     const localState = reactive({
-      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
-      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       openChangeScreen: false,
       isSbc: isRoleStaffSbc.value,
       showAddRegisteringParty: false,
       addEditInProgress: false,
-      cautionTxt: 'The Registry will not send the verification statement for this registration ' +
-        'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
-        return getAddSecuredPartiesAndDebtors.value.registeringParty
-      }),
-      summaryView: computed((): boolean => {
-        return props.isSummary
+        return getAddSecuredPartiesAndDebtors.value?.registeringParty
       })
     })
 
