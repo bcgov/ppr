@@ -291,9 +291,10 @@ export default class ConfirmAmendment extends Vue {
     'The Secured Parties in the registration ' +
     'will receive a copy of the Amendment Verification Statement.'
 
-  private tooltipTxt = 'The Registering Party is based on your ' +
-    'account information and cannot be changed here. This information ' +
-    'can be changed by updating your BC Registries account information.'
+  private tooltipTxt = 'The default Registering Party is based on your BC ' +
+    'Registries user account information. This information can be updated within ' +
+    'your account settings. You can change to a different Registering Party by ' +
+    'using the Change button.'
 
   private validFolio = true
   private feeType = FeeSummaryTypes.AMEND
@@ -509,7 +510,7 @@ export default class ConfirmAmendment extends Vue {
       })
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null, // will be taken from account info
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF

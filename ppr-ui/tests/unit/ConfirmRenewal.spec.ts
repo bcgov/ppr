@@ -10,7 +10,8 @@ import {
   mockedFinancingStatementAll,
   mockedDebtorNames,
   mockedRenewalResponse,
-  mockedFinancingStatementRepairers
+  mockedFinancingStatementRepairers,
+  mockedPartyCodeSearchResults
 } from './test-data'
 
 // Components
@@ -87,7 +88,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.registration.parties.registeringParty).toBe(null)
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check fee summary + buttons
@@ -135,6 +136,10 @@ describe('Confirm Renewal new registration component', () => {
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const parties = state.registration.parties
+    parties.registeringParty = mockedPartyCodeSearchResults[0]
+    await store.dispatch('setAddSecuredPartiesAndDebtors', parties)
 
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
     await Vue.nextTick()

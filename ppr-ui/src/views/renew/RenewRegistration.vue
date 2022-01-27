@@ -143,6 +143,7 @@ export default class ReviewRegistration extends Vue {
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setFeeSummary: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
+  @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setRegistrationCreationDate: ActionBindingIF
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
@@ -251,7 +252,12 @@ export default class ReviewRegistration extends Vue {
         }
         const parties = {
           valid: true,
-          registeringParty: financingStatement.registeringParty,
+          registeringParty: null, // will be taken from account info
+          securedParties: financingStatement.securedParties,
+          debtors: financingStatement.debtors
+        } as AddPartiesIF
+        const origParties = {
+          registeringParty: financingStatement.registeringParty, // will be used for summary
           securedParties: financingStatement.securedParties,
           debtors: financingStatement.debtors
         } as AddPartiesIF
@@ -284,6 +290,7 @@ export default class ReviewRegistration extends Vue {
         this.setAddCollateral(collateral)
         this.setLengthTrust(lengthTrust)
         this.setAddSecuredPartiesAndDebtors(parties)
+        this.setOriginalAddSecuredPartiesAndDebtors(origParties)
         this.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
         this.setFolioOrReferenceNumber('')
         this.setCertifyInformation(certifyInfo)
