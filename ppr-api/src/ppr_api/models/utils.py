@@ -21,6 +21,7 @@ from datetime import datetime as _datetime
 from datetime import time, timedelta, timezone
 
 import pytz
+from datedelta import datedelta
 from flask import current_app
 
 
@@ -563,7 +564,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
     future_ts = _datetime.combine(base_date, expiry_time)
-    future_ts = future_ts.replace(year=future_ts.year + life_years)
+    future_ts = future_ts + datedelta(years=life_years)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
     # Return as UTC before formatting
@@ -573,8 +574,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
 def expiry_dt_add_years(current_expiry, add_years: int):
     """For renewals add years to the existing expiry timestamp."""
     if current_expiry and add_years and add_years > 0:
-        return current_expiry.replace(year=current_expiry.year + add_years)
-
+        return current_expiry + datedelta(years=add_years)
     return current_expiry
 
 
