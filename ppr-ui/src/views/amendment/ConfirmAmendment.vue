@@ -265,7 +265,6 @@ export default class ConfirmAmendment extends Vue {
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
   private registeringOpen = false
- 
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = {
     acceptText: 'Cancel Amendment',
