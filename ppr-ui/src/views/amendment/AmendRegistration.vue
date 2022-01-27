@@ -29,12 +29,6 @@
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <div style="padding-top: 25px; max-width: 875px;">
-            <p class="ma-0">
-              The Registering Party has been added based on your account
-              information and cannot be changed here.
-            </p>
-          </div>
           <h3 class="pt-6 px-1">Original Registering Party</h3>
           <registering-party-summary
             class="pt-4"
@@ -317,7 +311,12 @@ export default class AmendRegistration extends Vue {
       } as LengthTrustIF
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null, // will be taken from account info
+        securedParties: financingStatement.securedParties,
+        debtors: financingStatement.debtors
+      } as AddPartiesIF
+      const origParties = {
+        registeringParty: financingStatement.registeringParty, // will be used for summary
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
@@ -343,7 +342,7 @@ export default class AmendRegistration extends Vue {
       this.setAddSecuredPartiesAndDebtors(parties)
       this.setOriginalAddCollateral(cloneDeep(collateral))
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
-      this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(parties))
+      this.setOriginalAddSecuredPartiesAndDebtors(origParties)
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
       // Reset anything left in the store that is amendment registration related.
       this.setAmendmentDescription('')

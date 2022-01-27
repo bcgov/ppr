@@ -13,7 +13,8 @@ import {
   mockedAmendmentCertified,
   mockedDraftAmendmentStatement,
   mockedVehicleCollateral1,
-  mockedGeneralCollateral1
+  mockedGeneralCollateral1,
+  mockedPartyCodeSearchResults
 } from './test-data'
 
 // Components
@@ -119,7 +120,7 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
 
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.registration.parties.registeringParty).toBe(null)
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
@@ -246,6 +247,10 @@ describe('Confirm Amendment registration save registration', () => {
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const parties = state.registration.parties
+    parties.registeringParty = mockedPartyCodeSearchResults[0]
+    await store.dispatch('setAddSecuredPartiesAndDebtors', parties)
     expect(wrapper.vm.collateralValid).toBe(true)
     expect(wrapper.vm.partiesValid).toBe(true)
     expect(wrapper.vm.courtOrderValid).toBe(true)

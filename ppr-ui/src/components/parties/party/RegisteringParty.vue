@@ -166,15 +166,15 @@ export default defineComponent({
       'isRoleStaffSbc',
       'isRoleStaffReg'
     ])
-    var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
-      if (parties.registeringParty === null) {
+      const regParty = getAddSecuredPartiesAndDebtors.value?.registeringParty
+      if (regParty === null) {
         try {
-          getRegisteringParty()
+          await getRegisteringParty()
         } catch (e) {
           console.error('RegisteringParty.vue onMounted error: ' + ((e as Error).message))
         }
@@ -185,8 +185,9 @@ export default defineComponent({
       addEditInProgress: false,
       showEditParty: false,
       registeringParty: computed((): Array<PartyIF> => {
-        if (parties.registeringParty !== null) {
-          return [parties.registeringParty]
+        const regParty: PartyIF = getAddSecuredPartiesAndDebtors.value?.registeringParty
+        if (regParty !== null) {
+          return [regParty]
         }
         return []
       }),

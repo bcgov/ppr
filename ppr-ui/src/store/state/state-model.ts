@@ -57,7 +57,7 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
-  // used for amendments only
+  // orig reg party used for discharge/renew/amend, other for amend only
   originalRegistration: {
     collateral: {
       valid: true,
