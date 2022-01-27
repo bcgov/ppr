@@ -121,8 +121,8 @@
           </h2>
           <registering-party-change
             class="pt-4"
-            @registeringPartyOpen="registeringOpen = $event"
-            :setShowErrorBar="errorBar && registeringOpen"
+            @registeringPartyOpen="regOpenClose($event)"
+            :setShowErrorBar="showErrors && registeringOpen"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -130,6 +130,7 @@
             class="pt-10"
           />
           <certify-information
+            @certifyValid="showErrors = false"
             :setShowErrors="showErrors"
             class="pt-10"
           />
@@ -264,8 +265,7 @@ export default class ConfirmAmendment extends Vue {
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
   private registeringOpen = false
-  private errorBar = false
-
+ 
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = {
     acceptText: 'Cancel Amendment',
@@ -543,6 +543,12 @@ export default class ConfirmAmendment extends Vue {
 
   private setFolioValid (valid: boolean): void {
     this.validFolio = valid
+    this.showErrors = false
+  }
+
+  private regOpenClose (open: boolean): void {
+    this.registeringOpen = open
+    this.showErrors = false
   }
 
   private showDialog (): void {

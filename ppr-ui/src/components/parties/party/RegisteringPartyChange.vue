@@ -1,12 +1,12 @@
 <template>
-  <v-row no-gutters id="reg-party-change" :class="{ 'border-error-left': showErrorBar }">
+  <v-row no-gutters id="reg-party-change">
       <v-col v-if="!openChangeScreen">
         <registering-party
           @changeRegisteringParty="changeRegisteringParty"
         />
       </v-col>
-      <v-col v-else>
-        <v-card flat class="add-party-container mt-2 mb-8">
+      <v-col class="mt-2 mb-8" v-else>
+        <v-card flat class="add-party-container" :class="{ 'border-error-left': showErrorBar }">
           <div class="px-6 pt-8">
             <h3 v-if="!isSbc" class="pb-2">Change Registering Party</h3>
             <span class="body-text">
@@ -133,6 +133,11 @@ export default defineComponent({
       if (!rp && localState.isSbc) {
         localState.openChangeScreen = true
       }
+    })
+
+    watch(() => localState.showErrorBar, (val) => {
+      console.log('errorbar?')
+      console.log(val)
     })
 
     return {
