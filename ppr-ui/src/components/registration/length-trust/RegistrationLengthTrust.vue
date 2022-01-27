@@ -161,20 +161,7 @@ export default defineComponent({
       trustIndenture: getLengthTrust.value.trustIndenture,
       lifeYearsDisabled: computed((): string => { return getLengthTrust.value.lifeInfinite }),
       lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
-      maxYears: computed((): string => {
-        return localState.yearsLeft.toString()
-      }),
-      yearsLeft: computed((): number => {
-        if (localState.renewalView) {
-          const curDateToday = new Date()
-          const curExpDate = new Date(getRegistrationExpiryDate.value)
-          const numYears = curExpDate.getFullYear() - curDateToday.getFullYear()
-          console.log()
-          return feeInfoYears.quantityMax - numYears
-        } else {
-          return feeInfoYears.quantityMax
-        }
-      }),
+      maxYears: feeInfoYears.quantityMax.toString(),
       lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
@@ -294,7 +281,7 @@ export default defineComponent({
               'Registration length must be a number between 1 and ' +
               localState.maxYears
             lt.valid = false
-          } else if (parseInt(life) < 1 || parseInt(life) > localState.yearsLeft) {
+          } else if (parseInt(life) < 1 || parseInt(life) > feeInfoYears.quantityMax) {
             localState.lifeYearsMessage =
               'Registration length must be between 1 and ' + localState.maxYears
             lt.valid = false
