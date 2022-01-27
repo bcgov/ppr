@@ -164,9 +164,10 @@ export default class ConfirmDischarge extends Vue {
   private options: DialogOptionsIF = dischargeCancelDialog
   private showCancelDialog = false
   private showErrors = false
-  private tooltipTxt = 'The Registering Party is based on your ' +
-    'account information and cannot be changed here. This information ' +
-    'can be changed by updating your BC Registries account information.'
+  private tooltipTxt = 'The default Registering Party is based on your BC ' +
+    'Registries user account information. This information can be updated within ' +
+    'your account settings. You can change to a different Registering Party by ' +
+    'using the Change button.'
   private validConfirm = false // eslint-disable-line lines-between-class-members
   private validFolio = true
   private validCertify = false
