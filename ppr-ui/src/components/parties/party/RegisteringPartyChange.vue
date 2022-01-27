@@ -135,11 +135,6 @@ export default defineComponent({
       }
     })
 
-    watch(() => localState.showErrorBar, (val) => {
-      console.log('errorbar?')
-      console.log(val)
-    })
-
     return {
       changeRegisteringParty,
       initAdd,
