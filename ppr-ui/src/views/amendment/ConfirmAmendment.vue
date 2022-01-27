@@ -121,6 +121,8 @@
           </h2>
           <registering-party-change
             class="pt-4"
+            @registeringPartyOpen="regOpenClose($event)"
+            :setShowErrorBar="showErrors && registeringOpen"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -128,6 +130,7 @@
             class="pt-10"
           />
           <certify-information
+            @certifyValid="showErrors = false"
             :setShowErrors="showErrors"
             class="pt-10"
           />
@@ -261,6 +264,7 @@ export default class ConfirmAmendment extends Vue {
 
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
+  private registeringOpen = false
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = {
     acceptText: 'Cancel Amendment',
@@ -435,8 +439,11 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get stickyComponentErrMsg (): string {
-    if (!this.validFolio && this.showErrors) {
+    if ((!this.validFolio || !this.courtOrderValid) && this.showErrors) {
       return '< Please complete required information'
+    }
+    if ((this.registeringOpen || !this.certifyInformationValid) && this.showErrors) {
+      return '< You have unfinished changes'
     }
     return ''
   }
@@ -445,10 +452,17 @@ export default class ConfirmAmendment extends Vue {
     if (!this.validFolio) {
       const component = document.getElementById('folio-summary')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    if (this.registeringOpen) {
+      const component = document.getElementById('reg-party-change')
+      await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (!this.courtOrderValid) {
       const component = document.getElementById('court-order-component')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (!this.certifyInformationValid) {
       const component = document.getElementById('certify-information')
@@ -529,6 +543,12 @@ export default class ConfirmAmendment extends Vue {
 
   private setFolioValid (valid: boolean): void {
     this.validFolio = valid
+    this.showErrors = false
+  }
+
+  private regOpenClose (open: boolean): void {
+    this.registeringOpen = open
+    this.showErrors = false
   }
 
   private showDialog (): void {
@@ -550,7 +570,7 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private submitButton (): void {
-    if (!this.validFolio || !this.certifyInformationValid) {
+    if (!this.validFolio || !this.certifyInformationValid || this.registeringOpen) {
       this.showErrors = true
       this.scrollToInvalid()
       return
