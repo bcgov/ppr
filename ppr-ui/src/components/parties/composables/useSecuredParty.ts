@@ -19,7 +19,6 @@ const initAddress = {
 }
 const { isPartiesValid } = useParty()
 
-
 export const useSecuredParty = (props, context) => {
   const { setAddSecuredPartiesAndDebtors } = useActions<any>([
     'setAddSecuredPartiesAndDebtors'
