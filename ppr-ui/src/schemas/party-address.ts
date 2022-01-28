@@ -10,7 +10,7 @@ export const PartyAddressSchema = {
     ...spaceRules
   ],
   streetAdditional: [
-    baseRules[ValidationRule.MAX_LENGTH](30),
+    baseRules[ValidationRule.MAX_LENGTH](50),
     ...spaceRules
   ],
   city: [
