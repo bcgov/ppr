@@ -241,6 +241,7 @@ export default defineComponent({
             cleanedGeneralCollateral.push(generalCollateral[i])
             continue
           }
+          let alreadyAdded = false
           if (generalCollateral[i].description) {
             const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
               collateral.description &&
@@ -250,6 +251,7 @@ export default defineComponent({
               cleanedGeneralCollateral[existsIndex].description += generalCollateral[i].description
             } else {
               cleanedGeneralCollateral.push(generalCollateral[i])
+              alreadyAdded = true
             }
           }
           if (generalCollateral[i].descriptionAdd) {
@@ -260,7 +262,10 @@ export default defineComponent({
             if (existsIndex !== -1) {
               cleanedGeneralCollateral[existsIndex].descriptionAdd += generalCollateral[i].descriptionAdd
             } else {
-              cleanedGeneralCollateral.push(generalCollateral[i])
+              if (!alreadyAdded) {
+                cleanedGeneralCollateral.push(generalCollateral[i])
+                alreadyAdded = true
+              }
             }
           }
           if (generalCollateral[i].descriptionDelete) {
@@ -271,7 +276,9 @@ export default defineComponent({
             if (existsIndex !== -1) {
               cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
             } else {
-              cleanedGeneralCollateral.push(generalCollateral[i])
+              if (!alreadyAdded) {
+                cleanedGeneralCollateral.push(generalCollateral[i])
+              }
             }
           }
         }
