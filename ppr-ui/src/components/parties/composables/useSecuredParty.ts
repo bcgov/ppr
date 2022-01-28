@@ -5,6 +5,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
+import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -16,6 +17,8 @@ const initAddress = {
   postalCode: '',
   deliveryInstructions: ''
 }
+const { isPartiesValid } = useParty()
+
 
 export const useSecuredParty = (props, context) => {
   const { setAddSecuredPartiesAndDebtors } = useActions<any>([
@@ -127,6 +130,7 @@ export const useSecuredParty = (props, context) => {
     newParty.action = ActionTypes.ADDED
     newList.push(newParty)
     parties.securedParties = newList
+    parties.valid = isPartiesValid(parties)
     setAddSecuredPartiesAndDebtors(parties)
   }
 
