@@ -189,7 +189,10 @@ def validate_address(json_party, country_message: str, region_message: str):
                 country_prefix = country.alpha_2 + '-' if country else 'CA-'
                 # test_code = country_prefix + json_address['region'].strip().upper()
                 region_code = pycountry.subdivisions.get(code=(country_prefix + json_address['region'].strip().upper()))
-            if not region_code:
+            if not region_code and country in ('CA', 'US'):
+                error_msg += region_message.format(json_address['region'])
+            # not checking region validity for outside CA + US but still must be under 2 chars
+            if len(json_address['region'].strip()) > 2:
                 error_msg += region_message.format(json_address['region'])
 
     return error_msg
