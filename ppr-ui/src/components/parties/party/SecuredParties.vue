@@ -502,7 +502,7 @@ export default defineComponent({
       newList.push(registeringParty)
 
       parties.securedParties = newList
-
+      parties.valid = isPartiesValid(parties)
       setAddSecuredPartiesAndDebtors(parties)
       localState.registeringPartyAdded = true
     }
