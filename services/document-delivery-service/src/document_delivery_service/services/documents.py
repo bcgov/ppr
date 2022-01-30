@@ -127,11 +127,13 @@ def _get_document_data(data: dict, token: str, config: BaseConfig, end_point: st
     Returns:
         The document data and the status code.
     """
+    logging.debug(f'Getting document data, signature: _get_document_data(data: {data}, token: token, config: {config}, end_point: {end_point})')
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
     url = f'{config.PPR_API_URL}{end_point}'
+    logging.debug(f'Calling API, url: {url}, data: {data}')
     rv = requests.post(url=url,
                        headers=headers,
                        data=json.dumps(data))
