@@ -541,7 +541,7 @@ export default defineComponent({
 
     const fetchOtherSecuredParties = async () => {
       localState.loading = true
-      if (parties.registeringParty) {
+      if (localState.loading) {
         // go to the service and see if there are similar secured parties
         const response: [SearchPartyIF] = await partyCodeAccount()
         // check if any results
