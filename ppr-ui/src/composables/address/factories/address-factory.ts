@@ -104,7 +104,7 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
       // In this case, v-text-input will allow manual entry but province info is probably too long
       // so set region to null and add province name to the Street Address Additional field.
       // If length is excessive, user will have to fix it.
-      addressLocal.value.region = null
+      addressLocal.value.region = ''
       addressLocal.value.streetAdditional = combineLines(
         addressLocal.value.streetAdditional, addressComplete['ProvinceName']
       )
