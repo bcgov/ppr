@@ -15,7 +15,7 @@
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title title-text" style="padding-left:30px">
                   <v-row no-gutters>
-                    <v-col cols="3">
+                    <v-col cols="auto">
                       <div class="icon-div mt-n1 pr-4">
                         <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
                         <v-icon v-else>mdi-account</v-icon>

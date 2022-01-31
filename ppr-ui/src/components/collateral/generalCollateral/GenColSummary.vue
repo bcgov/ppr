@@ -83,7 +83,7 @@
               class="pa-0"
               :class="{'ps-6': !showViewLink}">
       <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
-        <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
+        <v-chip class="badge-delete" label color="#grey lighten-2" text-color="grey darken-1" x-small>
           <b>DELETED</b>
         </v-chip>
         <p class="pt-3 ma-0">
@@ -127,7 +127,7 @@
               <b>{{ asOfDateTime(item.addedDateTime) }}</b>
             </div>
             <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
-              <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
+              <v-chip class="badge-delete" color="#grey lighten-2" text-color="grey darken-1" label x-small>
                 <b>DELETED</b>
               </v-chip>
               <p class="pt-3 ma-0">

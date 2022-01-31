@@ -39,14 +39,14 @@
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <h3 class="pt-6 px-1">Original Registering Party</h3>
+          <h3 class="pt-6">Original Registering Party</h3>
           <registering-party-summary
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <h3 class="pt-6 px-1">Secured Parties</h3>
+          <h3 class="pt-6">Secured Parties</h3>
           <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <h3 class="pt-6 px-1">Debtors</h3>
+          <h3 class="pt-6">Debtors</h3>
           <debtor-summary class="pt-4" :setEnableNoDataAction="false" />
           <collateral class="mt-15" :isSummary="true" />
           <court-order

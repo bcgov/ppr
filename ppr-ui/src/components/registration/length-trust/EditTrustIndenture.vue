@@ -1,7 +1,7 @@
 <template>
   <v-container fluid no-gutters class="pa-0">
     <div>
-      <v-row no-gutters>
+      <v-row class="pt-6" no-gutters>
         <v-col cols="3" class="generic-label">
           Trust Indenture
         </v-col>

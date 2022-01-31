@@ -407,6 +407,10 @@ tr.disabled-text-not-first td:first-child {
   border-radius: 4px 4px 0px 0px;
 }
 
+.rounded-bottom {
+  border-radius: 0px 0px 4px 4px;
+}
+
 .icon-div {
   float: left;
   height: 100%;

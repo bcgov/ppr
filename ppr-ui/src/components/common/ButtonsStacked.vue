@@ -1,7 +1,16 @@
 <template>
   <div>
-    <v-row no-gutters>
-      <v-col v-if="backBtn">
+    <div v-if="cancelBtn">
+        <v-btn
+          id="btn-stacked-cancel"
+          class="btn-stacked"
+          outlined
+          @click="cancel()"
+        >
+          {{ cancelBtn }}
+        </v-btn>
+    </div>
+    <div v-if="backBtn" :class="{ 'pt-4': cancelBtn }">
         <v-btn
           id="btn-stacked-back"
           class="btn-stacked"
@@ -13,18 +22,7 @@
           </v-icon>
           {{ backBtn }}
         </v-btn>
-      </v-col>
-      <v-col v-if="cancelBtn" :class="{ 'pl-3': backBtn }">
-        <v-btn
-          id="btn-stacked-cancel"
-          class="btn-stacked"
-          outlined
-          @click="cancel()"
-        >
-          {{ cancelBtn }}
-        </v-btn>
-      </v-col>
-    </v-row>
+    </div>
     <div class="pt-4">
       <v-btn
         v-if="submitBtn"
