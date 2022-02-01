@@ -24,7 +24,7 @@
             :class="{ 'disabled-text-not-first': row.item.action === ActionTypes.REMOVED}">
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>
-                  <v-col cols="3">
+                  <v-col cols="auto">
                     <div class="icon-div mt-n1 pr-4">
                       <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
                       <v-icon v-else>mdi-account</v-icon>
@@ -40,7 +40,11 @@
                           registrationFlowType === RegistrationFlowType.AMENDMENT
                       "
                     >
-                      <v-chip x-small label color="primary" text-color="white">
+                      <v-chip v-if="row.item.action === ActionTypes.REMOVED"
+                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          {{ row.item.action }}
+                      </v-chip>
+                      <v-chip v-else x-small label color="primary" text-color="white">
                         {{ row.item.action }}
                       </v-chip>
                     </div>

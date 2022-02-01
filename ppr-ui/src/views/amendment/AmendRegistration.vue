@@ -8,10 +8,10 @@
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
-          <h1>Registration Amendment</h1>
+          <h1>Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Review the current information for this registration as of
+              This is the current information for this registration as of
               <b>{{ asOfDateTime }}.</b><br /><br />
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
@@ -29,12 +29,12 @@
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <h3 class="pt-6 px-1">Original Registering Party</h3>
+          <h3 class="pt-6">Original Registering Party</h3>
           <registering-party-summary
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <h3 class="pt-6 px-1">Secured Parties</h3>
+          <h3 class="pt-6">Secured Parties</h3>
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
             @setSecuredPartiesValid="securedPartiesValid = $event"
@@ -52,7 +52,7 @@
             class="secured-party-summary"
             :setEnableNoDataAction="false"
           />
-          <h3 class="pt-6 px-1">Debtors</h3>
+          <h3 class="pt-6">Debtors</h3>
           <debtors
             v-if="registrationType !== registrationTypeRL"
             @setDebtorValid="debtorValid = $event"
@@ -339,10 +339,10 @@ export default class AmendRegistration extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)
-      this.setAddSecuredPartiesAndDebtors(parties)
+      this.setAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setOriginalAddCollateral(cloneDeep(collateral))
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
-      this.setOriginalAddSecuredPartiesAndDebtors(origParties)
+      this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(origParties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
       // Reset anything left in the store that is amendment registration related.
       this.setAmendmentDescription('')
@@ -452,7 +452,11 @@ export default class AmendRegistration extends Vue {
 
   private hasAmendmentChanged (): boolean {
     let hasChanged = false
-    if (!isEqual(this.getAddSecuredPartiesAndDebtors, this.getOriginalAddSecuredPartiesAndDebtors)) {
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors.securedParties,
+      this.getOriginalAddSecuredPartiesAndDebtors.securedParties)) {
+      hasChanged = true
+    }
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors.debtors, this.getOriginalAddSecuredPartiesAndDebtors.debtors)) {
       hasChanged = true
     }
     if (!isEqual(this.getLengthTrust, this.getOriginalLengthTrust)) {

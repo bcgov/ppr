@@ -137,7 +137,11 @@
                       {{ getName(row.item) }}
                     </div>
                     <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                      <v-chip x-small label color="#1669BB" text-color="white">
+                      <v-chip v-if="row.item.action === ActionTypes.REMOVED"
+                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          {{ row.item.action }}
+                      </v-chip>
+                      <v-chip v-else x-small label color="#1669BB" text-color="white">
                         {{ row.item.action }}
                       </v-chip>
                     </div>
@@ -416,7 +420,6 @@ export default defineComponent({
     const registrationFlowType = getRegistrationFlowType.value
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
     const { getName, isPartiesValid, isBusiness } = useParty()
     const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
@@ -433,18 +436,21 @@ export default defineComponent({
       savedPartyResults: [],
       searchValue: { code: '', businessName: '' },
       loading: false,
-      securedParties: parties.securedParties,
+      parties: computed((): AddPartiesIF => {
+        return getAddSecuredPartiesAndDebtors.value
+      }),
+      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       registeringPartyAdded: false,
       currentPartyName: '',
       showDialog: false,
       savedParty: null,
       showErrorSummary: computed((): boolean => {
-        return !parties.valid
+        return !getAddSecuredPartiesAndDebtors.value.valid
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
       }),
-      showErrorSecuredParties: parties.showInvalid,
+      showErrorSecuredParties: false,
       headers: [...partyTableHeaders, ...editTableHeaders]
     })
 
@@ -472,7 +478,7 @@ export default defineComponent({
 
     const removeRegisteringParty = (): void => {
       for (let i = 0; i < localState.securedParties.length; i++) {
-        if (isEqual(localState.securedParties[i], parties.registeringParty)) {
+        if (isEqual(localState.securedParties[i], localState.parties.registeringParty)) {
           removeParty(i)
           localState.registeringPartyAdded = false
         }
@@ -508,7 +514,7 @@ export default defineComponent({
     }
 
     const isRegisteringParty = (partyRow: PartyIF): boolean => {
-      if (isEqual(partyRow, parties.registeringParty)) {
+      if (isEqual(partyRow, localState.parties.registeringParty)) {
         return true
       }
       return false
@@ -553,8 +559,9 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      localState.showErrorSecuredParties = getAddSecuredPartiesAndDebtors.value.showInvalid
       for (let i = 0; i < localState.securedParties.length; i++) {
-        if (isEqual(localState.securedParties[i], parties.registeringParty)) {
+        if (isEqual(localState.securedParties[i], localState.parties.registeringParty)) {
           localState.registeringPartyAdded = true
         }
       }
@@ -655,7 +662,6 @@ export default defineComponent({
       initEdit,
       initAdd,
       resetData,
-      parties,
       isRegisteringParty,
       addRegisteringParty,
       removeRegisteringParty,
