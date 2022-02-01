@@ -101,7 +101,7 @@ def deliver_verification_document(data: dict,
 
 def get_filename(registration_id, party_id) -> str:
     """Build a correctly formatted unique name."""
-    filename_template = 'PPRVER.{year}{month}{day}{statement_key}.PDF'
+    filename_template = 'PPRVER.{year}{month}{day}.{statement_key}.PDF'
     today_utc = datetime.datetime.now(pytz.utc)
     today_local = today_utc.astimezone(pytz.timezone('Canada/Pacific'))
 
