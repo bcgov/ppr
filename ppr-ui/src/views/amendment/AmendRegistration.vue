@@ -339,10 +339,10 @@ export default class AmendRegistration extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)
-      this.setAddSecuredPartiesAndDebtors(parties)
+      this.setAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setOriginalAddCollateral(cloneDeep(collateral))
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
-      this.setOriginalAddSecuredPartiesAndDebtors(origParties)
+      this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(origParties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
       // Reset anything left in the store that is amendment registration related.
       this.setAmendmentDescription('')
