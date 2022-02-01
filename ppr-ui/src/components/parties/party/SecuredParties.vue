@@ -541,14 +541,12 @@ export default defineComponent({
 
     const fetchOtherSecuredParties = async () => {
       localState.loading = true
-      if (parties.registeringParty) {
-        // go to the service and see if there are similar secured parties
-        const response: [SearchPartyIF] = await partyCodeAccount()
-        // check if any results
-        if (response?.length > 0) {
-          localState.partyResults = response
-          localState.loading = false
-        }
+      // go to the service and see if there are similar secured parties
+      const response: [SearchPartyIF] = await partyCodeAccount()
+      // check if any results
+      if (response?.length > 0) {
+        localState.partyResults = response
+        localState.loading = false
       } else {
         setTimeout(fetchOtherSecuredParties, 3000)
       }
