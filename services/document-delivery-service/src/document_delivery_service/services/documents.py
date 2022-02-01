@@ -95,6 +95,7 @@ def deliver_verification_document(data: dict,
     sftp_service.connect()
     remote_path = f'{config.SFTP_STORAGE_DIRECTORY}/{file_name}'
     sftp_service.put_buffer(document_pdf, remote_path)
+    sftp_service.close()
 
     return HTTPStatus.CREATED
 

@@ -96,9 +96,12 @@ class SftpConnection:
 
     def close(self):
         """Close the SFTP Connection object."""
-        self.sftp_handler.close()
+        if self.sftp_handler:
+            self.sftp_handler.close()
+            self.sftp_handler = None
         if self.ssh_connection:
             self.ssh_connection.close()
+            self.ssh_connection = None
 
     def put(self, local_path: str, remote_path: str, **kwargs) -> None:
         """Upload a file to the SFTP server.
