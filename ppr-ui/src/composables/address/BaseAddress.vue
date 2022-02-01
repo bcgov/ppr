@@ -99,7 +99,6 @@
             v-model="addressLocal.region"
           />
           <v-text-field v-else
-            autocomplete="new-password"
             filled
             class="item address-region"
             :label="regionLabel"
@@ -108,7 +107,6 @@
             :rules="[...schemaLocal.region]"
           />
           <v-text-field
-            autocomplete="new-password"
             filled
             class="item postal-code"
             :label="postalCodeLabel"
@@ -223,6 +221,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
       countryChangeHandler(addressLocal.value.country, null)
     })
 
