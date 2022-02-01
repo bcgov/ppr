@@ -450,9 +450,7 @@ export default defineComponent({
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
       }),
-      showErrorSecuredParties: computed((): boolean => {
-        return getAddSecuredPartiesAndDebtors.value.showInvalid
-      }),
+      showErrorSecuredParties: false,
       headers: [...partyTableHeaders, ...editTableHeaders]
     })
 
@@ -561,6 +559,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      localState.showErrorSecuredParties = getAddSecuredPartiesAndDebtors.value.showInvalid
       for (let i = 0; i < localState.securedParties.length; i++) {
         if (isEqual(localState.securedParties[i], localState.parties.registeringParty)) {
           localState.registeringPartyAdded = true
