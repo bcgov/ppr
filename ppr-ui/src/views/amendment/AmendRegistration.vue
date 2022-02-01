@@ -452,7 +452,11 @@ export default class AmendRegistration extends Vue {
 
   private hasAmendmentChanged (): boolean {
     let hasChanged = false
-    if (!isEqual(this.getAddSecuredPartiesAndDebtors, this.getOriginalAddSecuredPartiesAndDebtors)) {
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors.securedParties,
+      this.getOriginalAddSecuredPartiesAndDebtors.securedParties)) {
+      hasChanged = true
+    }
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors.debtors, this.getOriginalAddSecuredPartiesAndDebtors.debtors)) {
       hasChanged = true
     }
     if (!isEqual(this.getLengthTrust, this.getOriginalLengthTrust)) {
