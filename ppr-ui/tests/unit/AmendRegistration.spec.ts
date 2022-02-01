@@ -96,16 +96,16 @@ describe('Amendment registration component', () => {
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(null)
-    expect(state.originalRegistration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.originalRegistration.parties.registeringParty).toEqual(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
-    expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
+    expect(state.registration.parties.securedParties).toEqual(mockedFinancingStatementAll.securedParties)
     expect(wrapper.findComponent(SecuredParties).exists()).toBe(true)
     // check debtors
-    expect(state.registration.parties.debtors).toBe(mockedFinancingStatementAll.debtors)
+    expect(state.registration.parties.debtors).toEqual(mockedFinancingStatementAll.debtors)
     expect(wrapper.findComponent(Debtors).exists()).toBe(true)
     // check vehicle collateral
-    expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
+    expect(state.registration.collateral.vehicleCollateral).toEqual(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
@@ -245,16 +245,16 @@ describe('Amendment for repairers lien component', () => {
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(null)
-    expect(state.originalRegistration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.originalRegistration.parties.registeringParty).toEqual(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
-    expect(state.registration.parties.securedParties).toBe(mockedFinancingStatementAll.securedParties)
+    expect(state.registration.parties.securedParties).toEqual(mockedFinancingStatementAll.securedParties)
     expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
     // check debtors
-    expect(state.registration.parties.debtors).toBe(mockedFinancingStatementAll.debtors)
+    expect(state.registration.parties.debtors).toEqual(mockedFinancingStatementAll.debtors)
     expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
     // check vehicle collateral
-    expect(state.registration.collateral.vehicleCollateral).toBe(mockedFinancingStatementAll.vehicleCollateral)
+    expect(state.registration.collateral.vehicleCollateral).toEqual(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
