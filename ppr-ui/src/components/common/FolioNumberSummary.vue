@@ -1,6 +1,6 @@
 <template>
   <v-container flat class="pa-0" id="folio-summary">
-    <v-form v-model="isValid">
+    <v-form ref="form" v-model="isValid">
       <v-row no-gutters>
         <v-col class="generic-label"
           ><h2>1. Folio or Reference Number</h2></v-col
@@ -44,6 +44,7 @@ import {
   reactive,
   toRefs,
   watch,
+  ref,
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -54,13 +55,14 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup (props, context) {
     const { setFolioOrReferenceNumber } = useActions<any>([
       'setFolioOrReferenceNumber'
     ])
     const { getFolioOrReferenceNumber } = useGetters<any>([
       'getFolioOrReferenceNumber'
     ])
+    const form = ref(null)
 
     const localState = reactive({
       isValid: true,
@@ -74,19 +76,26 @@ export default defineComponent({
     watch(() => props.setShowErrors, (val) => {
       localState.showErrors = val
     })
+
     watch(
       () => localState.folioNumber,
       (val: string) => {
-        emit('folioValid', localState.isValid)
-        setFolioOrReferenceNumber(val)
+        setFolioAndEmit(val)
       }
     )
+
+    const setFolioAndEmit = async (val: string) => {
+      await context.refs.form.validate()
+      context.emit('folioValid', localState.isValid)
+      setFolioOrReferenceNumber(val)
+    }
 
     onMounted(() => {
       localState.folioNumber = getFolioOrReferenceNumber.value
     })
 
     return {
+      form,
       ...toRefs(localState)
     }
   }
