@@ -288,6 +288,12 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+  AND NOT EXISTS (SELECT r2.financing_id
+                    FROM user_extra_registrations uer, registrations r2
+                   WHERE uer.account_id = :query_account
+                     AND uer.registration_number = r2.registration_number
+                     AND r2.financing_id = r.financing_id
+                     AND uer.removed_ind = 'Y')
 UNION (
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
