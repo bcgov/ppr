@@ -85,6 +85,7 @@ export default defineComponent({
     )
 
     const setFolioAndEmit = async (val: string) => {
+      // @ts-ignore - function exists
       await context.refs.form.validate()
       context.emit('folioValid', localState.isValid)
       setFolioOrReferenceNumber(val)
