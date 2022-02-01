@@ -101,12 +101,11 @@ def deliver_verification_document(data: dict,
 
 def get_filename(registration_id, party_id) -> str:
     """Build a correctly formatted unique name."""
-    filename_template = 'PPRVER.{statement_key}.{day}.{month}.{year}.PDF'
+    filename_template = 'PPRVER.{year}{month}{day}.{statement_key}.PDF'
     today_utc = datetime.datetime.now(pytz.utc)
     today_local = today_utc.astimezone(pytz.timezone('Canada/Pacific'))
 
     reg_key = str(registration_id) + '.' + str(party_id)
-    reg_key = reg_key[:13]
 
     filename = filename_template.format(statement_key=reg_key,
                                         day=str(today_local.day).zfill(2),
@@ -127,7 +126,7 @@ def _get_document_data(data: dict, token: str, config: BaseConfig, end_point: st
     Returns:
         The document data and the status code.
     """
-    logging.debug(f'Getting document data, signature: _get_document_data(data: {data}, token: token, config: {config}, end_point: {end_point})')
+    logging.debug(f'Getting document data, signature: _get_document_data(data: {data}, token: token, config: {config}, end_point: {end_point})')  # noqa: E501; pylint: disable=line-too-long
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
