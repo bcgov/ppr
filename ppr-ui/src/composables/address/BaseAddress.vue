@@ -208,7 +208,10 @@ export default defineComponent({
         schemaLocal.value.region = origRegionRules
       } else {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
-        schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
+        for (let i = 0; i < schemaLocal.value.region.length; i++) {
+          schemaLocal.value.region.pop()
+        }
+        schemaLocal.value.region.concat([baseRules.maxLength(2), ...spaceRules])
       }
       // reset other address fields (check is for loading an existing address)
       if (oldVal) {
@@ -221,7 +224,6 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
       countryChangeHandler(addressLocal.value.country, null)
     })
 
