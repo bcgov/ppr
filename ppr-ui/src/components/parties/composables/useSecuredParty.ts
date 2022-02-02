@@ -166,7 +166,8 @@ export const useSecuredParty = (props, context) => {
       APIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
       APIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
       APIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
-      APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX
+      APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+      APIRegistrationTypes.TRANSITION_TAX_LIEN
     ]
     // @ts-ignore - it doesn't like the string comparison for some reason
     if (restrictedList.includes(regType)) {
