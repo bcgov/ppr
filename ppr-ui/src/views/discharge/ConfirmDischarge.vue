@@ -121,7 +121,7 @@ import {
   DialogOptionsIF, // eslint-disable-line no-unused-vars
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { RegistrationTypes } from '@/resources'
+import { AllRegistrationTypes } from '@/resources'
 import { dischargeCancelDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 
@@ -241,7 +241,7 @@ export default class ConfirmDischarge extends Vue {
         this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
       }
       // load data into the store
-      const registrationType = RegistrationTypes.find((reg, index) => {
+      const registrationType = AllRegistrationTypes.find((reg, index) => {
         if (reg.registrationTypeAPI === financingStatement.type) {
           return true
         }
