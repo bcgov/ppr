@@ -211,7 +211,7 @@ export default defineComponent({
         for (let i = 0; i < schemaLocal.value.region.length; i++) {
           schemaLocal.value.region.pop()
         }
-        schemaLocal.value.region.concat([baseRules.maxLength(2), ...spaceRules])
+        schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
       if (oldVal) {
