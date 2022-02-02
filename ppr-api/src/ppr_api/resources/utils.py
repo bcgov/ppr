@@ -165,9 +165,9 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
 
 def default_exception_response(exception):
     """Build default 500 exception error response."""
-    current_app.logger.error(repr(exception))
+    current_app.logger.error(str(exception))
     message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR)
-    return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def service_exception_response(message):
