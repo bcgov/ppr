@@ -236,7 +236,7 @@ export default defineComponent({
       generalCollateral: computed((): GeneralCollateralIF[] => {
         const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
         const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
-        for (const i in generalCollateral) {
+        for (let i = 0; i < generalCollateral.length; i++) {
           if (!generalCollateral[i].addedDateTime) {
             cleanedGeneralCollateral.push(generalCollateral[i])
             continue
