@@ -225,7 +225,7 @@
 
             <!-- Edit Form -->
             <tr v-if="showEditDebtor[row.index]">
-              <td colspan="4" class="pa-0" :class="{ 'invalid-section': invalidSection }">
+              <td colspan="5" class="pa-0" :class="{ 'invalid-section': invalidSection }">
                 <v-expand-transition>
                   <div class="edit-debtor-container col-12 pa-0">
                     <edit-debtor

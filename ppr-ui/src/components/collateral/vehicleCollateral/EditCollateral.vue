@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-vehicle" class="white py-8 pr-6" :class="{ 'border-error-left': showErrorBar }">
+  <div id="edit-vehicle" class="white py-8" :class="{ 'border-error-left': showErrorBar }">
     <v-expand-transition>
       <v-row no-gutters :class="{ 'border-over': showErrorBar }">
         <v-col cols="3">
@@ -7,7 +7,12 @@
             class="add-vehicle-header generic-label"
             :class="{ 'error-text': invalidSection }"
           >
-            <span v-if="activeIndex === -1" class="pl-4"> Add Vehicle </span>
+            <span
+              v-if="activeIndex === -1"
+              :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? '' : 'pl-4'"
+            >
+              Add Vehicle
+            </span>
             <span v-else class="ml-n3">
               <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                         && (!currentVehicle.action || currentVehicle.action !== ActionTypes.ADDED)">
@@ -17,7 +22,7 @@
                Vehicle</span>
           </label>
         </v-col>
-        <v-col cols="9">
+        <v-col cols="9" :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? '' : 'pr-6'">
           <v-form
             ref="vehicleForm"
             class="vehicle-form"
