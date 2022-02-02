@@ -9,7 +9,7 @@
       <v-col cols="10">
         <h3 style="line-height: 1rem;">General Collateral</h3>
       </v-col>
-      <v-col>
+      <v-col style="margin-top: -5px">
         <div class="float-right">
         <span
           v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -102,7 +102,6 @@
     <div
       v-if="registrationFlowType !== RegistrationFlowType.NEW"
       id="general-collateral-history"
-      class="mt-7"
     >
       <v-btn
         v-if="showViewLink"
@@ -353,6 +352,9 @@ export default defineComponent({
   height: 1rem;
   min-width: 0;
   text-decoration: underline;
+}
+.edit-button {
+  padding-right: 15px;
 }
 ::v-deep .v-btn:not(.v-btn--round).v-size--default::before {
   background-color: transparent;
