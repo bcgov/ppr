@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""The common non-project routines that are leveraged at the Registry."""
 from .enum import BaseEnum, auto
+
 
 __all__ = ['BaseEnum', 'auto']
