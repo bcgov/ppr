@@ -276,7 +276,6 @@ export default class Search extends Vue {
       }
       let statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
       this.loading = false
-      statusCode = 590
       if (!successfulPPRResponses.includes(statusCode)) {
         this.errorOptions = { ...saveResultsError }
         this.errorDialog = true
