@@ -243,42 +243,18 @@ export default defineComponent({
           }
           let alreadyAdded = false
           if (generalCollateral[i].description) {
-            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
-              collateral.description &&
-              collateral.addedDateTime === generalCollateral[i].addedDateTime
-            )
-            if (existsIndex !== -1) {
-              cleanedGeneralCollateral[existsIndex].description += generalCollateral[i].description
-            } else {
+            cleanedGeneralCollateral.push(generalCollateral[i])
+            alreadyAdded = true
+          }
+          if (generalCollateral[i].descriptionAdd) {
+            if (!alreadyAdded) {
               cleanedGeneralCollateral.push(generalCollateral[i])
               alreadyAdded = true
             }
           }
-          if (generalCollateral[i].descriptionAdd) {
-            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
-              collateral.descriptionAdd &&
-              collateral.addedDateTime === generalCollateral[i].addedDateTime
-            )
-            if (existsIndex !== -1) {
-              cleanedGeneralCollateral[existsIndex].descriptionAdd += generalCollateral[i].descriptionAdd
-            } else {
-              if (!alreadyAdded) {
-                cleanedGeneralCollateral.push(generalCollateral[i])
-                alreadyAdded = true
-              }
-            }
-          }
           if (generalCollateral[i].descriptionDelete) {
-            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
-              collateral.descriptionDelete &&
-              collateral.addedDateTime === generalCollateral[i].addedDateTime
-            )
-            if (existsIndex !== -1) {
-              cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
-            } else {
-              if (!alreadyAdded) {
-                cleanedGeneralCollateral.push(generalCollateral[i])
-              }
+            if (!alreadyAdded) {
+              cleanedGeneralCollateral.push(generalCollateral[i])
             }
           }
         }
