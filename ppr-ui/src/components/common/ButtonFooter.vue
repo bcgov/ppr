@@ -8,6 +8,12 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
+    <base-dialog
+      id="draftErrorDialog"
+      :setDisplay="errorDialogDisplay"
+      :setOptions="errorOptions"
+      @proceed="handleError($event)"
+    />
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
         <v-col cols="6">
@@ -83,7 +89,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
+import { BaseDialog } from '../dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
+import { registrationSaveDraftErrorDialog } from '@/resources/dialogOptions'
 
 import {
   ButtonConfigIF, // eslint-disable-line no-unused-vars
@@ -95,6 +103,7 @@ import {
 
 export default defineComponent({
   components: {
+    BaseDialog,
     StaffPaymentDialog
   },
   props: {
@@ -143,6 +152,8 @@ export default defineComponent({
         title: 'Staff Payment',
         label: ''
       },
+      errorDialogDisplay: false,
+      errorOptions: registrationSaveDraftErrorDialog,
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
       }),
@@ -191,6 +202,7 @@ export default defineComponent({
       const stateModel: StateModelIF = getStateModel.value
       const draft: DraftIF = await saveFinancingStatementDraft(stateModel)
       setDraft(draft)
+      draft.error = { statusCode: 404, message: 'bad' }
       if (draft.error !== undefined) {
         console.log(
           'saveDraft error status: ' +
@@ -199,7 +211,7 @@ export default defineComponent({
             draft.error.message
         )
         // Emit error message.
-        emit('save-draft-error', draft.error)
+        showDraftError(draft.error)
         return false
       }
       return true
@@ -267,6 +279,14 @@ export default defineComponent({
       localState.staffPaymentDialogDisplay = false
     }
 
+    const showDraftError = (val: ErrorIF): void => {
+      localState.errorDialogDisplay = true
+    }
+
+    const handleError = (stay: boolean): void => {
+      localState.errorDialogDisplay = false
+    }
+
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
     const submitFinancingStatement = async () => {
       const stateModel: StateModelIF = getStateModel.value
@@ -303,6 +323,7 @@ export default defineComponent({
       submitNext,
       submitSave,
       onStaffPaymentChanges,
+      handleError,
       submitSaveResume
     }
   }

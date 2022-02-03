@@ -223,7 +223,8 @@ export default class Search extends Vue {
 
   private handleReportError (stayOnSearchResults: boolean): void {
     this.errorDialog = false
-    if (!stayOnSearchResults) {
+    if (!stayOnSearchResults || (this.errorOptions !== searchReportError &&
+      this.errorOptions !== saveSelectionsError)) {
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
@@ -273,12 +274,13 @@ export default class Search extends Vue {
       if (this.selectedMatches?.length >= 75) {
         shouldCallback = true
       }
-      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
+      let statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
       this.loading = false
+      statusCode = 590
       if (!successfulPPRResponses.includes(statusCode)) {
         this.errorOptions = { ...saveResultsError }
         this.errorDialog = true
-        this.emitError({ statusCode: statusCode })
+        console.error({ statusCode: statusCode })
       } else {
         this.$router.push({ name: RouteNames.DASHBOARD })
       }

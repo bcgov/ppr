@@ -45,8 +45,8 @@ export const saveSearchError: DialogOptionsIF = {
 }
 
 export const searchResultsError: DialogOptionsIF = {
-  acceptText: '',
-  cancelText: 'OK',
+  acceptText: 'OK',
+  cancelText: '',
   title: 'Unable to retrieve search results',
   text: 'Search results could not be retrieved. Your search fee will be refunded. ' +
     'Please try your search again later. If this issue persists, please contact us.',
@@ -54,8 +54,8 @@ export const searchResultsError: DialogOptionsIF = {
 }
 
 export const saveResultsError: DialogOptionsIF = {
-  acceptText: '',
-  cancelText: 'OK',
+  acceptText: 'OK',
+  cancelText: '',
   title: 'Unable to save search results',
   text: 'We are unable to save your search results. Your search fee will be refunded. ' +
     'Please try this search again later. If this issue persists, please contact us.',
@@ -63,8 +63,8 @@ export const saveResultsError: DialogOptionsIF = {
 }
 
 export const saveSelectionsError: DialogOptionsIF = {
-  acceptText: '',
-  cancelText: 'OK',
+  acceptText: 'OK',
+  cancelText: '',
   title: 'Unable to save your selections',
   text: 'We are unable to save your search results. Your search fee will be refunded. ' +
     'Please try this search again later. If this issue persists, please contact us.',
@@ -72,8 +72,8 @@ export const saveSelectionsError: DialogOptionsIF = {
 }
 
 export const searchPdfError: DialogOptionsIF = {
-  acceptText: '',
-  cancelText: 'OK',
+  acceptText: 'OK',
+  cancelText: '',
   title: 'Unable to open document',
   text: 'We are currently unable to open this document. ' +
     'Please try again later. If this issue persists, please contact us.',

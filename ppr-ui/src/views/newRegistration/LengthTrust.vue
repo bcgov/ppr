@@ -53,7 +53,6 @@
           :currentStatementType="statementType"
           :currentStepName="stepName"
           :router="this.$router"
-          @draft-save-error="saveDraftError"
         />
       </v-col>
     </v-row>
@@ -228,11 +227,6 @@ export default class LengthTrust extends Vue {
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
-  }
-
-  @Watch('draftSaveError')
-  private saveDraftError (val: ErrorIF): void {
-    alert('Error saving draft. Replace when design complete.')
   }
 }
 </script>
