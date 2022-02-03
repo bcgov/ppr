@@ -323,6 +323,7 @@ export default defineComponent({
       submitSave,
       onStaffPaymentChanges,
       handleError,
+      showDraftError,
       submitSaveResume
     }
   }
