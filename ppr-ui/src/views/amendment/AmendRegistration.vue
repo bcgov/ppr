@@ -465,7 +465,9 @@ export default class AmendRegistration extends Vue {
     if (!isEqual(this.getAddCollateral.vehicleCollateral, this.getOriginalAddCollateral.vehicleCollateral)) {
       hasChanged = true
     }
-    if (this.getAddCollateral.generalCollateral.length !== this.getOriginalAddCollateral.generalCollateral.length) {
+    const gcLength = this.getAddCollateral.generalCollateral?.length
+    const originalLength = this.getOriginalAddCollateral.generalCollateral?.length
+    if (gcLength !== originalLength) {
       hasChanged = true
     }
 
