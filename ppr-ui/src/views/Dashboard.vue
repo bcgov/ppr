@@ -613,7 +613,8 @@ export default class Dashboard extends Vue {
 
   private myRegAddDialogProceed (val: boolean): void {
     // add registration or not
-    if (val && !this.myRegAddDialogError) {
+    if (val && !this.myRegAddDialogError &&
+      (this.myRegAddDialog.title === 'Registration Found')) {
       this.addRegistration(this.myRegAdd)
     }
     // reset values
