@@ -274,7 +274,7 @@ export default class Search extends Vue {
       if (this.selectedMatches?.length >= 75) {
         shouldCallback = true
       }
-      let statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
+      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
       this.loading = false
       if (!successfulPPRResponses.includes(statusCode)) {
         this.errorOptions = { ...saveResultsError }
