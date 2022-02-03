@@ -89,7 +89,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
-import { BaseDialog } from '../dialogs'
+import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import { registrationSaveDraftErrorDialog } from '@/resources/dialogOptions'
 
