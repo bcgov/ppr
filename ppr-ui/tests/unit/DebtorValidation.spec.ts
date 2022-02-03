@@ -83,7 +83,7 @@ describe('Debtor validation tests - individual', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(8)
+    expect(messages.length).toBe(7)
     expect(messages.at(0).text()).toBe('Please enter a first name')
     expect(messages.at(2).text()).toBe('Please enter a last name')
     // address validation
@@ -100,7 +100,7 @@ describe('Debtor validation tests - individual', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(9)
+    expect(messages.length).toBe(8)
     expect(messages.at(1).text()).toBe('Please enter a valid month')
     expect(messages.at(2).text()).toBe('Please enter a valid day')
     expect(messages.at(3).text()).toBe('Please enter a valid year')
