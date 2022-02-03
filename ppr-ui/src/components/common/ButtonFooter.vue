@@ -202,7 +202,6 @@ export default defineComponent({
       const stateModel: StateModelIF = getStateModel.value
       const draft: DraftIF = await saveFinancingStatementDraft(stateModel)
       setDraft(draft)
-      draft.error = { statusCode: 404, message: 'bad' }
       if (draft.error !== undefined) {
         console.log(
           'saveDraft error status: ' +

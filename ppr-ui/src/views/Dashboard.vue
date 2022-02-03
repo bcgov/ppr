@@ -419,7 +419,6 @@ export default class Dashboard extends Vue {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     // Get draft details and setup store for editing the draft financing statement.
     const stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
-    stateModel.registration.draft.error = { statusCode: 404 }
     if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
       this.myRegAddDialog = { ...registrationOpenDraftErrorDialog }
       this.myRegAddDialogDisplay = true
