@@ -21,6 +21,7 @@ from datetime import datetime as _datetime
 from datetime import time, timedelta, timezone
 
 import pytz
+from datedelta import datedelta
 from flask import current_app
 
 
@@ -287,6 +288,12 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+  AND NOT EXISTS (SELECT r2.financing_id
+                    FROM user_extra_registrations uer, registrations r2
+                   WHERE uer.account_id = :query_account
+                     AND uer.registration_number = r2.registration_number
+                     AND r2.financing_id = r.financing_id
+                     AND uer.removed_ind = 'Y')
 UNION (
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
@@ -563,7 +570,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
     future_ts = _datetime.combine(base_date, expiry_time)
-    future_ts = future_ts.replace(year=future_ts.year + life_years)
+    future_ts = future_ts + datedelta(years=life_years)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
     # Return as UTC before formatting
@@ -573,8 +580,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
 def expiry_dt_add_years(current_expiry, add_years: int):
     """For renewals add years to the existing expiry timestamp."""
     if current_expiry and add_years and add_years > 0:
-        return current_expiry.replace(year=current_expiry.year + add_years)
-
+        return current_expiry + datedelta(years=add_years)
     return current_expiry
 
 

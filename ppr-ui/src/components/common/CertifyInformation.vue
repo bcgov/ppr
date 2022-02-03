@@ -121,8 +121,15 @@ export default defineComponent({
     const { setCertifyInformation } = useActions<any>([
       'setCertifyInformation'
     ])
-    const { getCertifyInformation, isRoleStaff, isRoleStaffSbc, isRoleStaffBcol } = useGetters<any>([
-      'getCertifyInformation', 'isRoleStaff', 'isRoleStaffSbc', 'isRoleStaffBcol'
+    const {
+      getCertifyInformation,
+      getUserFirstName,
+      getUserLastName,
+      isRoleStaff,
+      isRoleStaffSbc,
+      isRoleStaffBcol
+    } = useGetters<any>([
+      'getCertifyInformation', 'getUserFirstName', 'getUserLastName', 'isRoleStaff', 'isRoleStaffSbc', 'isRoleStaffBcol'
     ])
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
@@ -193,7 +200,7 @@ export default defineComponent({
       let email = ''
       if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
         update = true
-        const regParty = await getRegisteringPartyFromAuth()
+        const regParty = await getRegisteringPartyFromAuth(false)
         if (regParty) {
           certifyInfo.registeringParty = regParty
         }
@@ -201,13 +208,30 @@ export default defineComponent({
 
       if (!certifyInfo.legalName) {
         update = true
-        try {
-          const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
-          const decodedToken = JSON.parse(atob(token.split('.')[1]))
-          certifyInfo.legalName = decodedToken.firstname + ' ' + decodedToken.lastname
-          email = decodedToken.email
-        } catch (e) {
-          console.error(e)
+        if (getUserFirstName.value && getUserLastName.value) {
+          certifyInfo.legalName = `${getUserFirstName.value} ${getUserLastName.value}`
+        } else {
+          try {
+            const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
+            const decodedToken = JSON.parse(atob(token.split('.')[1]))
+            if (decodedToken.firstname && decodedToken.lastname) {
+              certifyInfo.legalName = decodedToken.firstname + ' ' + decodedToken.lastname
+            } else if (decodedToken.name) {
+              certifyInfo.legalName = decodedToken.name
+            } else if (decodedToken.firstname) {
+              certifyInfo.legalName = decodedToken.firstName
+            } else if (decodedToken.lastname) {
+              certifyInfo.legalName = decodedToken.lastname
+            } else if (decodedToken.username) {
+              certifyInfo.legalName = decodedToken.username
+            } else {
+              certifyInfo.legalName = 'Not Available'
+            }
+            email = decodedToken.email
+          } catch (e) {
+            console.error(e)
+            certifyInfo.legalName = 'Not Available'
+          }
         }
       }
       if (isRoleStaff.value) {

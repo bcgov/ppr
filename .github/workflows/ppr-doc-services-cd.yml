@@ -1,0 +1,48 @@
+name: PPR DOC SERVICES CD
+
+on:
+  label:
+    types:
+      - created
+  push:
+    branches:
+      - main
+    paths:
+      - "ppr/services/document-delivery-service/**"
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./ppr/services/document-delivery-service"
+
+env:
+  APP_NAME: "ppr-doc-services"
+  TAG_NAME: "dev"
+
+jobs:
+  ppr-doc-services-cd-by-push:
+    runs-on: ubuntu-20.04
+
+    if: github.event.label.name == 'run-ci'
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - uses: 'actions/checkout@v2'
+
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ secrets.BUILD_SERVICE_ACCOUNT }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - id: 'gcloud'
+      name: 'gcloud'
+      run: |-
+        gcloud secrets versions list place-holder

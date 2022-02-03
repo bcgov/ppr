@@ -125,7 +125,7 @@ import {
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
-import { RegistrationTypes } from '@/resources'
+import { AllRegistrationTypes } from '@/resources'
 import { renewCancelDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 
@@ -180,9 +180,10 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private showErrors = false
-  private tooltipTxt = 'The Registering Party is based on your ' +
-    'account information and cannot be changed here. This information ' +
-    'can be changed by updating your BC Registries account information.'
+  private tooltipTxt = 'The default Registering Party is based on your BC ' +
+    'Registries user account information. This information can be updated within ' +
+    'your account settings. You can change to a different Registering Party by ' +
+    'using the Change button.'
 
   private validFolio = true
   private validCertify = false
@@ -276,14 +277,14 @@ export default class ConfirmDischarge extends Vue {
         this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
       }
       // load data into the store
-      const registrationType = RegistrationTypes.find((reg, index) => {
+      const registrationType = AllRegistrationTypes.find((reg, index) => {
         if (reg.registrationTypeAPI === financingStatement.type) {
           return true
         }
       })
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null,
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF

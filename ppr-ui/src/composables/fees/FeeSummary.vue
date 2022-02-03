@@ -33,6 +33,25 @@
           <div class="fee-list__hint">{{ hintFee }}</div>
         </li>
         <li
+          v-if="hasProcessingFee"
+          :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+          :key="feeSummary.processingFee"
+        >
+          <div :class="$style['fee-list__item-name']">
+            Staff Processing Fee
+          </div>
+          <div
+            v-if="feeSummary && feeSummary.processingFee === 0"
+            :class="$style['fee-list__item-value']"
+          >
+            No Fee
+          </div>
+          <div v-else :class="$style['fee-list__item-value']">
+            ${{ feeSummary.processingFee.toFixed(2) }}
+          </div>
+        </li>
+        <li
+          v-else
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
           :key="feeSummary.serviceFee"
         >
@@ -93,7 +112,9 @@ export default defineComponent({
     },
     setRegistrationType: {
       type: String as () => UIRegistrationTypes
-    }
+    },
+    setStaffReg: { default: false },
+    setStaffSBC: { default: false }
   },
   setup (props) {
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
@@ -116,11 +137,18 @@ export default defineComponent({
         }
       }),
       feeSummary: computed((): FeeSummaryI => {
-        return getFeeSummary(
+        const feeSummary = getFeeSummary(
           localState.feeType,
           localState.registrationType,
           localState.registrationLength
         )
+        if (localState.feeType === FeeSummaryTypes.RENEW) {
+          feeSummary.processingFee = 5
+        }
+        return feeSummary
+      }),
+      hasProcessingFee: computed(() => {
+        return props.setStaffReg || props.setStaffSBC
       }),
       hintFee: computed((): string => {
         return getFeeHint(
@@ -134,10 +162,14 @@ export default defineComponent({
       }),
       totalAmount: computed((): number => {
         if (localState.isValid) {
+          let extraFee = localState.feeSummary.serviceFee
+          if (localState.hasProcessingFee) {
+            extraFee = localState.feeSummary.processingFee
+          }
           return (
             localState.feeSummary.feeAmount *
             localState.feeSummary.quantity +
-            localState.feeSummary.serviceFee
+            extraFee
           )
         }
       }),

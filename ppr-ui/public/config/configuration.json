@@ -1,5 +1,5 @@
 {
-  "REGISTRY_URL": "https://dev.bcregistry.ca/business/auth/",
+  "REGISTRY_URL": "https://yfthig-dev.web.app/dashboard",
   "PPR_API_URL": "https://bcregistry-dev.apigee.net/ppr",
   "PPR_API_VERSION": "/api/v1",
   "PPR_API_KEY": "diGbLm3qjmKLjvU4GWIgPNlhxtpLWlN0",
@@ -17,5 +17,7 @@
   "VON_API_URL": "https://orgbook.gov.bc.ca",
   "VON_API_VERSION": "/api/v3",
   "POD_NAMESPACE": "dev",
-  "ADDRESS_COMPLETE_KEY": ""
+  "ADDRESS_COMPLETE_KEY": "",
+  "SYSTEM_MESSAGE": "<a style='text-decoration: underline; color:inherit;' href='https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/permits-licences/news-updates/modernization/personal-property-registry-transition' target='_blank'>Please see known issues and updates for Personal Property Registry here</a>.",
+  "SYSTEM_MESSAGE_TYPE": "warning"
 }

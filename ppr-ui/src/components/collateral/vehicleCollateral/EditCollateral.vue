@@ -1,7 +1,7 @@
 <template>
-  <div id="edit-vehicle" class="white py-8 pr-6">
+  <div id="edit-vehicle" class="white py-8 pr-6" :class="{ 'border-error-left': showErrorBar }">
     <v-expand-transition>
-      <v-row no-gutters>
+      <v-row no-gutters :class="{ 'border-over': showErrorBar }">
         <v-col cols="3">
           <label
             class="add-vehicle-header generic-label"
@@ -132,7 +132,7 @@
                   id="txt-make"
                   v-model="currentVehicle.make"
                   persistent-hint
-                  @blur="onBlur('make')"
+                  @keyup="onBlur('make')"
                   :error-messages="
                     errors.make.message ? errors.make.message : ''
                   "
@@ -146,7 +146,7 @@
                   label="Model"
                   id="txt-model"
                   v-model="currentVehicle.model"
-                  @blur="onBlur('model')"
+                  @keyup="onBlur('model')"
                   persistent-hint
                   :error-messages="
                     errors.model.message ? errors.model.message : ''
@@ -218,6 +218,10 @@ export default defineComponent({
     invalidSection: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['resetEvent'],
@@ -255,6 +259,9 @@ export default defineComponent({
     const localState = reactive({
       currentIndex: computed((): number => {
         return props.activeIndex
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 
@@ -314,6 +321,14 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.border-error-left
+{
+  margin-left: -20px;
+}
+.border-over
+{
+  margin-left: 25px;
+}
 </style>

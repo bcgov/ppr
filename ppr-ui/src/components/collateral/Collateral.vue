@@ -13,7 +13,7 @@
         </v-col>
       </v-row>
       <v-container
-        v-if="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT"
+        v-if="!valid && registrationFlowType === RegistrationFlowType.NEW"
         :class="{ 'invalid-message': !valid }"
       >
         <v-row no-gutters class="pa-6">
@@ -33,11 +33,13 @@
         v-if="vehicleCollateralLength > 0 || !summaryView"
         :isSummary="summaryView"
         :showInvalid="collateral.showInvalid"
+        :setShowErrorBar="showErrorBar && vehicleCollateralOpen"
         @collateralOpen="setVehicleCollateralOpen($event)"
       />
       <general-collateral
         v-if="showGeneralCollateral"
         :isSummary="summaryView"
+        :setShowErrorBar="showErrorBar && generalCollateralOpen"
         @collateralOpen="setGeneralCollateralOpen($event)"
       />
     </v-card>
@@ -108,6 +110,10 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -157,6 +163,9 @@ export default defineComponent({
       }),
       vehicleCollateralLength: computed((): number => {
         return localState.collateral.vehicleCollateral?.length || 0
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 

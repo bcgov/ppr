@@ -289,6 +289,10 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   margin: 0 10px;
 }
 
+.theme--light.v-label, .theme--light.v-messages {
+  color: $gray7;
+}
+
 .v-list.actions__more-actions.v-list--disabled {
   color: #1669bb !important;
   opacity: 0.4 !important;

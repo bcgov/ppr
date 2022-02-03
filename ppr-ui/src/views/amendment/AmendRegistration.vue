@@ -8,44 +8,43 @@
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
-          <h1>Registration Amendment</h1>
+          <h1>Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Review the current information for this registration as of
+              This is the current information for this registration as of
               <b>{{ asOfDateTime }}.</b><br /><br />
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
-          <registration-length-trust-amendment @lengthTrustOpen="lengthTrustOpen = $event" class="mt-15" />
+          <registration-length-trust-amendment
+            :setShowErrorBar="errorBar"
+            @lengthTrustOpen="lengthTrustOpen = $event"
+            class="mt-15"
+          />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
               <strong>Registering Party, Secured Parties, and Debtors</strong>
             </label>
           </div>
-          <div style="padding-top: 25px; max-width: 875px;">
-            <p class="ma-0">
-              The Registering Party has been added based on your account
-              information and cannot be changed here.
-            </p>
-          </div>
-          <h3 class="pt-6 px-1">Original Registering Party</h3>
+          <h3 class="pt-6">Original Registering Party</h3>
           <registering-party-summary
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <h3 class="pt-6 px-1">Secured Parties</h3>
+          <h3 class="pt-6">Secured Parties</h3>
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
             @setSecuredPartiesValid="securedPartiesValid = $event"
             @securedPartyOpen="securedPartyOpen = $event"
             :setShowInvalid="showInvalid" class="pt-4"
+            :setShowErrorBar="errorBar"
           />
           <div v-if="!securedPartiesValid">
           <span class="invalid-message">
-            You must include at least one secured party
+            Your registration must include at least one Secured Party
           </span>
           </div>
           <secured-party-summary
@@ -53,16 +52,17 @@
             class="secured-party-summary"
             :setEnableNoDataAction="false"
           />
-          <h3 class="pt-6 px-1">Debtors</h3>
+          <h3 class="pt-6">Debtors</h3>
           <debtors
             v-if="registrationType !== registrationTypeRL"
             @setDebtorValid="debtorValid = $event"
             @debtorOpen="debtorOpen = $event"
             :setShowInvalid="showInvalid"
+            :setShowErrorBar="errorBar"
           />
           <div class="pt-4" v-if="!debtorValid">
           <span class="invalid-message">
-            You must include at least one debtor
+            Your registration must include at least one Debtor
           </span>
           </div>
           <debtor-summary
@@ -73,6 +73,7 @@
           <collateral
             @setCollateralValid="collateralValid = $event"
             @collateralOpen="collateralOpen = $event"
+            :setShowErrorBar="errorBar"
             class="mt-15"
           />
           <amendment-description class="mt-15"
@@ -224,6 +225,7 @@ export default class AmendRegistration extends Vue {
   private requireCourtOrder = false
   private debtorOpen = false
   private securedPartyOpen = false
+  private errorBar = false
   private collateralOpen = false
   private lengthTrustOpen = false
   private amendErrMsg = ''
@@ -296,7 +298,7 @@ export default class AmendRegistration extends Vue {
       })
       const collateral = {
         valid: true,
-        vehicleCollateral: financingStatement.vehicleCollateral,
+        vehicleCollateral: financingStatement.vehicleCollateral || null,
         generalCollateral: financingStatement.generalCollateral
       } as AddCollateralIF
       const lengthTrust = {
@@ -309,7 +311,12 @@ export default class AmendRegistration extends Vue {
       } as LengthTrustIF
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null, // will be taken from account info
+        securedParties: financingStatement.securedParties,
+        debtors: financingStatement.debtors
+      } as AddPartiesIF
+      const origParties = {
+        registeringParty: financingStatement.registeringParty, // will be used for summary
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
@@ -332,10 +339,10 @@ export default class AmendRegistration extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddCollateral(collateral)
       this.setLengthTrust(lengthTrust)
-      this.setAddSecuredPartiesAndDebtors(parties)
+      this.setAddSecuredPartiesAndDebtors(cloneDeep(parties))
       this.setOriginalAddCollateral(cloneDeep(collateral))
       this.setOriginalLengthTrust(cloneDeep(lengthTrust))
-      this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(parties))
+      this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(origParties))
       this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
       // Reset anything left in the store that is amendment registration related.
       this.setAmendmentDescription('')
@@ -411,6 +418,7 @@ export default class AmendRegistration extends Vue {
     if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen || this.lengthTrustOpen) {
       this.amendErrMsg = '< You have unfinished changes'
       this.showInvalid = true
+      this.errorBar = true
       this.scrollToInvalid()
       return
     }
@@ -444,7 +452,11 @@ export default class AmendRegistration extends Vue {
 
   private hasAmendmentChanged (): boolean {
     let hasChanged = false
-    if (!isEqual(this.getAddSecuredPartiesAndDebtors, this.getOriginalAddSecuredPartiesAndDebtors)) {
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors.securedParties,
+      this.getOriginalAddSecuredPartiesAndDebtors.securedParties)) {
+      hasChanged = true
+    }
+    if (!isEqual(this.getAddSecuredPartiesAndDebtors.debtors, this.getOriginalAddSecuredPartiesAndDebtors.debtors)) {
       hasChanged = true
     }
     if (!isEqual(this.getLengthTrust, this.getOriginalLengthTrust)) {
@@ -453,8 +465,7 @@ export default class AmendRegistration extends Vue {
     if (!isEqual(this.getAddCollateral.vehicleCollateral, this.getOriginalAddCollateral.vehicleCollateral)) {
       hasChanged = true
     }
-
-    if (!isEqual(this.getAddCollateral.generalCollateral, this.getOriginalAddCollateral.generalCollateral)) {
+    if (this.getAddCollateral.generalCollateral.length !== this.getOriginalAddCollateral.generalCollateral.length) {
       hasChanged = true
     }
 
@@ -559,6 +570,17 @@ export default class AmendRegistration extends Vue {
   @Watch('securedPartiesValid')
   private showInvalidComponents (val: boolean): void {
     this.showInvalid = true
+  }
+
+  @Watch('securedPartyOpen')
+  @Watch('debtorOpen')
+  @Watch('collateralOpen')
+  @Watch('lengthTrustOpen')
+  private resetOpenError (isOpen: boolean): void {
+    if (!isOpen) {
+      this.errorBar = false
+      this.amendErrMsg = ''
+    }
   }
 }
 </script>

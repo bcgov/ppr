@@ -105,7 +105,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, isInt } from '@/utils'
-import { APIRegistrationTypes, RouteNames } from '@/enums'
+import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
 export default defineComponent({
@@ -118,8 +118,16 @@ export default defineComponent({
   setup (props, context) {
     const { setLengthTrust } = useActions<any>(['setLengthTrust'])
     const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getRegistrationType, getRegistrationExpiryDate, getRegistrationSurrenderDate } = useGetters<any>([
-      'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
+    const {
+      getRegistrationType,
+      getRegistrationExpiryDate,
+      getRegistrationSurrenderDate,
+      getRegistrationFlowType
+    } = useGetters<any>([
+      'getRegistrationType',
+      'getRegistrationExpiryDate',
+      'getRegistrationSurrenderDate',
+      'getRegistrationFlowType'
     ])
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
@@ -178,7 +186,8 @@ export default defineComponent({
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
-        if (!getLengthTrust.value.lifeInfinite && (!isInt(getLengthTrust.value.lifeYears) ||
+        if (!getLengthTrust.value.lifeInfinite && getRegistrationFlowType.value === RegistrationFlowType.NEW &&
+          (!isInt(getLengthTrust.value.lifeYears) ||
           getLengthTrust.value.lifeYears < 1 || getLengthTrust.value.lifeYears > feeInfoYears.quantityMax)) {
           return 'Not valid'
         }

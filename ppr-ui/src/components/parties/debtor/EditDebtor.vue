@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-debtor" class="white pa-6">
+  <div id="edit-debtor" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
     <v-expand-transition>
       <v-row no-gutters>
         <v-col cols="3">
@@ -266,6 +266,10 @@ export default defineComponent({
     invalidSection: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['addEditDebtor', 'resetEvent'],
@@ -305,6 +309,9 @@ export default defineComponent({
       showAllAddressErrors: false,
       currentIndex: computed((): number => {
         return props.activeIndex
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 

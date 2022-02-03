@@ -1,12 +1,12 @@
 <template>
-  <v-row no-gutters>
+  <v-row no-gutters id="reg-party-change">
       <v-col v-if="!openChangeScreen">
         <registering-party
           @changeRegisteringParty="changeRegisteringParty"
         />
       </v-col>
-      <v-col v-else>
-        <v-card flat class="add-party-container mt-2 mb-8">
+      <v-col class="mt-2 mb-8" v-else>
+        <v-card flat class="add-party-container" :class="{ 'border-error-left': showErrorBar }">
           <div class="px-6 pt-8">
             <h3 v-if="!isSbc" class="pb-2">Change Registering Party</h3>
             <span class="body-text">
@@ -70,6 +70,10 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -78,35 +82,37 @@ export default defineComponent({
     ])
     const { isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
     const localState = reactive({
-      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
-      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       openChangeScreen: false,
       isSbc: isRoleStaffSbc.value,
       showAddRegisteringParty: false,
       addEditInProgress: false,
-      cautionTxt: 'The Registry will not send the verification statement for this registration ' +
-        'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
         return getAddSecuredPartiesAndDebtors.value.registeringParty
       }),
       summaryView: computed((): boolean => {
         return props.isSummary
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 
     onMounted(() => {
       if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
         localState.openChangeScreen = true
+        context.emit('registeringPartyOpen', true)
       }
     })
 
     const changeRegisteringParty = () => {
       localState.openChangeScreen = true
+      context.emit('registeringPartyOpen', true)
     }
 
     const initAdd = () => {
       localState.addEditInProgress = true
       localState.showAddRegisteringParty = true
+      context.emit('registeringPartyOpen', true)
     }
 
     const resetData = () => {
@@ -116,6 +122,7 @@ export default defineComponent({
       if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
         localState.openChangeScreen = true
       }
+      context.emit('registeringPartyOpen', false)
     }
 
     watch(() => localState.registeringParty, (rp) => {

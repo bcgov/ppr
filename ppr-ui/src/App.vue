@@ -14,20 +14,10 @@
       @proceed="payErrorDialogHandler()"
     />
 
-    <!-- Initial Page Load Transition -->
-    <transition name="fade">
-      <div class="loading-container" v-show="!haveData">
-        <div class="loading__content">
-          <v-progress-circular color="primary" size="50" indeterminate />
-          <div class="loading-msg">Loading</div>
-        </div>
-      </div>
-    </transition>
-
     <sbc-header
         class="sbc-header"
         :in-auth="false"
-        :show-actions="true"
+        :show-login-menu="false"
       />
 
     <div class="app-body">
@@ -43,8 +33,17 @@
             This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
           </v-col>
         </v-row>
-        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" />
-        <tombstone :setCurrentPath="currentPath" />
+        <sbc-system-banner
+          v-if="systemMessage != null"
+          v-bind:show="systemMessage != null"
+          v-bind:type="systemMessageType"
+          v-bind:message="systemMessage"
+          icon=" "
+          class="white--text text-lg-h5 font-weight-bold"
+          align="center"
+        ></sbc-system-banner>
+        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
+        <tombstone :setCurrentPath="currentPath" v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">
@@ -79,6 +78,7 @@ import KeycloakService from 'sbc-common-components/src/services/keycloak.service
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
+import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
 import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
 
 // local Components
@@ -106,6 +106,7 @@ import {
     SbcHeader,
     SbcFooter,
     SbcAuthenticationOptionsDialog,
+    SbcSystemBanner,
     Tombstone,
     ...Dialogs,
     ...Views
@@ -166,6 +167,20 @@ export default class App extends Mixins(AuthMixin) {
     // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
     const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')
     if (configRegistryUrl) return configRegistryUrl
+    return null
+  }
+
+  private get systemMessage (): string {
+    // if SYSTEM_MESSAGE does not exist this will return 'undefined'. Needs to be null or str
+    const systemMessage = sessionStorage.getItem('SYSTEM_MESSAGE')
+    if (systemMessage) return systemMessage
+    return null
+  }
+
+  private get systemMessageType (): string {
+    // if SYSTEM_MESSAGE_TYPE does not exist this will return 'undefined'. Needs to be null or str
+    const systemMessageType = sessionStorage.getItem('SYSTEM_MESSAGE_TYPE')
+    if (systemMessageType) return systemMessageType
     return null
   }
 
@@ -523,5 +538,4 @@ export default class App extends Mixins(AuthMixin) {
   color: #212529;
   background-color: #FCBA19;
 }
-
 </style>

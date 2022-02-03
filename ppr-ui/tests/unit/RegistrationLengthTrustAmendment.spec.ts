@@ -200,6 +200,13 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeFalsy()
     expect(wrapper.vm.showEditTrustIndenture).toBe(false)
     expect(wrapper.vm.editInProgress).toBe(false)
+    expect(wrapper.find('.border-error-left').exists()).toBe(false)
+  })
+  it('shows error bar', async () => {
+    await wrapper.setProps({ setShowErrorBar: true })
+    wrapper.vm.editInProgress = true
+    await Vue.nextTick()
+    expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
 })
 

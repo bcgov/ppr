@@ -16,5 +16,6 @@ export enum RouteNames {
     RENEW_REGISTRATION = 'renew-registration',
     CONFIRM_RENEWAL = 'confirm-renewal',
     AMEND_REGISTRATION = 'amend-registration',
-    CONFIRM_AMENDMENT = 'confirm-amendment'
+    CONFIRM_AMENDMENT = 'confirm-amendment',
+    LOGIN = 'login',
 }

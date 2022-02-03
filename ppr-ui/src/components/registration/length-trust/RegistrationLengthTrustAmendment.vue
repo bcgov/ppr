@@ -1,6 +1,13 @@
 <template>
-  <v-container v-if="!summaryView" fluid id="length-trust-amendment" no-gutters class="white pb-6 pr-10 pl-8 rounded">
-    <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
+  <v-container
+    v-if="!summaryView"
+    fluid
+    id="length-trust-amendment"
+    no-gutters
+    class="white pb-6 pr-10 pl-8 rounded-bottom"
+    :class="{ 'border-error-left': showErrorBar && editInProgress }"
+  >
+    <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
         <label class="pl-3">
@@ -9,7 +16,7 @@
       </v-col>
     </v-row>
     <div>
-      <v-row no-gutters class="py-6">
+      <v-row no-gutters class="pt-2 pb-3">
         <v-col cols="3" class="generic-label">Current Expiry</v-col>
         <v-col cols="9" id="current-expiry">{{ computedExpiryDateFormatted }}</v-col>
       </v-row>
@@ -25,12 +32,12 @@
         <v-col cols="7" class="summary-text">
             {{ trustIndentureSummary }}
         </v-col>
-        <v-col cols="2">
+        <v-col cols="2" class="text-right">
           <span v-if="trustIndentureModified" class="edit-action">
             <v-btn
               text
               color="primary"
-              :class="[$style['smaller-button'], 'edit-btn']"
+              :class="[$style['smaller-button'], 'edit-btn', 'pb-4']"
               id="trust-indenture-undo-btn"
               @click="undoTrustIndenture()"
               :disabled="editInProgress"
@@ -43,7 +50,7 @@
             <v-btn
               text
               color="primary"
-              :class="[$style['smaller-button'], 'edit-btn']"
+              :class="[$style['smaller-button'], 'edit-btn', 'pb-4']"
               id="trust-indenture-amend-btn"
               @click="initEdit()"
               :disabled="editInProgress"
@@ -56,7 +63,6 @@
       </v-row>
       <!-- Edit -->
       <v-row no-gutters v-if="showEditTrustIndenture">
-        <v-expand-transition>
           <v-col cols="12" class="edit-debtor-container pa-0">
             <edit-trust-indenture
               :currentTrustIndenture="trustIndenture"
@@ -64,7 +70,6 @@
               @resetEvent="resetEdit"
             />
           </v-col>
-        </v-expand-transition>
       </v-row>
     </div>
   </v-container>
@@ -112,6 +117,10 @@ export default defineComponent({
     isSummary: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -154,6 +163,9 @@ export default defineComponent({
       }),
       trustIndentureSummary: computed((): string => {
         return localState.lengthTrust.trustIndenture ? 'Yes' : 'No'
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       }),
       trustIndentureModified: computed((): boolean => {
         return localState.lengthTrust.trustIndenture !== localState.originalTrustIndenture

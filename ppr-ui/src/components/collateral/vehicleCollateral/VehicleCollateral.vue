@@ -34,7 +34,11 @@
                       registrationFlowType === RegistrationFlowType.AMENDMENT
                   "
                 >
-                  <v-chip x-small label color="#1669BB" text-color="white">
+                  <v-chip v-if="row.item.action === ActionTypes.REMOVED"
+                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          {{ row.item.action }}
+                  </v-chip>
+                  <v-chip v-else x-small label color="#1669BB" text-color="white">
                     {{ row.item.action }}
                   </v-chip>
                 </div>
@@ -80,6 +84,7 @@
               <edit-collateral
                 :activeIndex="activeIndex"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -111,7 +116,11 @@
                   {{ getVehicleDescription(row.item.type) }}
                 </div>
                 <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                  <v-chip x-small label color="#1669BB" text-color="white">
+                  <v-chip v-if="row.item.action === ActionTypes.REMOVED"
+                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          {{ row.item.action }}
+                      </v-chip>
+                  <v-chip v-else x-small label color="#1669BB" text-color="white">
                     {{ row.item.action }}
                   </v-chip>
                 </div>
@@ -285,6 +294,7 @@
                     <edit-collateral
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeVehicle="removeVehicle($event)"
                       @resetEvent="resetData"
                     />
@@ -326,6 +336,10 @@ export default defineComponent({
       default: false
     },
     showInvalid: {
+      type: Boolean,
+      default: false
+    },
+    setShowErrorBar: {
       type: Boolean,
       default: false
     }
@@ -428,6 +442,9 @@ export default defineComponent({
         } else {
           return vehicles
         }
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 

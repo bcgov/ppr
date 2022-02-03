@@ -261,6 +261,7 @@ class Report:  # pylint: disable=too-few-public-methods
             self._set_addresses()
             self._set_date_times()
             self._set_vehicle_collateral()
+            self._set_general_collateral()
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value:
                 self._set_selected()
         else:
@@ -359,6 +360,54 @@ class Report:  # pylint: disable=too-few-public-methods
             self._format_address(secured_party['address'])
         for debtor in statement['debtors']:
             self._format_address(debtor['address'])
+
+    @staticmethod
+    def _set_financing_general_collateral(statement):
+        """Replace report newline characters in financing statement general collateral descriptions."""
+        if 'generalCollateral' in statement:
+            for collateral in statement['generalCollateral']:
+                if 'description' in collateral:
+                    collateral['description'] = collateral['description'].replace('/r/n', '/n')
+                if 'descriptionAdd' in collateral:
+                    collateral['descriptionAdd'] = collateral['descriptionAdd'].replace('/r/n', '/n')
+                if 'descriptionDelete' in collateral:
+                    collateral['descriptionDelete'] = collateral['descriptionDelete'].replace('/r/n', '/n')
+
+    @staticmethod
+    def _set_amend_change_general_collateral(statement):
+        """Replace report newline characters in amendment statement general collateral description."""
+        if 'deleteGeneralCollateral' in statement:
+            for collateral in statement['deleteGeneralCollateral']:
+                if 'description' in collateral:
+                    collateral['description'] = collateral['description'].replace('/r/n', '/n')
+        if 'addGeneralCollateral' in statement:
+            for collateral in statement['addGeneralCollateral']:
+                if 'description' in collateral:
+                    collateral['description'] = collateral['description'].replace('/r/n', '/n')
+
+    def _set_search_general_collateral(self):
+        """Replace report newline characters in search general collateral descriptions."""
+        for detail in self._report_data['details']:
+            Report._set_financing_general_collateral(detail['financingStatement'])
+            if 'changes' in detail['financingStatement']:
+                for change in detail['financingStatement']['changes']:
+                    if change['statementType'] in ('CHANGE_STATEMENT', 'AMENDMENT_STATEMENT'):
+                        Report._set_amend_change_general_collateral(change)
+
+    def _set_general_collateral(self):
+        """Replace report newline characters in general collateral descriptions."""
+        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value and self._report_data['totalResultsSize'] > 0:
+            self._set_search_general_collateral()
+        elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
+            Report._set_financing_general_collateral(self._report_data)
+            if 'changes' in self._report_data:
+                for change in self._report_data['changes']:
+                    if change['statementType'] in ('CHANGE_STATEMENT', 'AMENDMENT_STATEMENT'):
+                        Report._set_amend_change_general_collateral(change)
+        elif self._report_key == ReportTypes.AMENDMENT_STATEMENT_REPORT.value:
+            Report._set_amend_change_general_collateral(self._report_data)
+        elif self._report_key == ReportTypes.CHANGE_STATEMENT_REPORT.value:
+            Report._set_amend_change_general_collateral(self._report_data)
 
     @staticmethod
     def _set_financing_vehicle_collateral(statement):
@@ -639,9 +688,9 @@ class Report:  # pylint: disable=too-few-public-methods
 
         # Appears in the Description section of the PDF Document Properties as Subject.
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT.value:
-            search_type = self._report_data['searchQuery']['type']
-            search_desc = TO_SEARCH_DESCRIPTION[search_type]
-            criteria = ''
+            search_type: str = self._report_data['searchQuery']['type']
+            search_desc: str = TO_SEARCH_DESCRIPTION[search_type]
+            criteria: str = ''
             if search_type == 'BUSINESS_DEBTOR':
                 criteria = self._report_data['searchQuery']['criteria']['debtorName']['business']
             elif search_type == 'INDIVIDUAL_DEBTOR':
@@ -649,8 +698,10 @@ class Report:  # pylint: disable=too-few-public-methods
                 criteria += self._report_data['searchQuery']['criteria']['debtorName']['first']
                 if 'second' in self._report_data['searchQuery']['criteria']['debtorName']:
                     criteria += ' ' + self._report_data['searchQuery']['criteria']['debtorName']['second']
+                elif 'middle' in self._report_data['searchQuery']['criteria']['debtorName']:
+                    criteria += ' ' + self._report_data['searchQuery']['criteria']['debtorName']['middle']
             else:
-                criteria = self._report_data['searchQuery']['criteria']['value']
+                criteria = self._report_data['searchQuery']['criteria']['value'].upper()
             self._report_data['meta_subject'] = f'{search_desc} - "{criteria}"'
 
     @staticmethod

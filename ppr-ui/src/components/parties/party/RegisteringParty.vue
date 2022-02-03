@@ -15,7 +15,7 @@
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title title-text" style="padding-left:30px">
                   <v-row no-gutters>
-                    <v-col cols="3">
+                    <v-col cols="auto">
                       <div class="icon-div mt-n1 pr-4">
                         <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
                         <v-icon v-else>mdi-account</v-icon>
@@ -155,18 +155,26 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
-    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType, isRoleStaffSbc } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType', 'isRoleStaffSbc'
+    const {
+      getAddSecuredPartiesAndDebtors,
+      getRegistrationFlowType,
+      isRoleStaffSbc,
+      isRoleStaffReg
+    } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors',
+      'getRegistrationFlowType',
+      'isRoleStaffSbc',
+      'isRoleStaffReg'
     ])
-    var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
-      if (parties.registeringParty === null) {
+      const regParty = getAddSecuredPartiesAndDebtors.value?.registeringParty
+      if (regParty === null) {
         try {
-          getRegisteringParty()
+          await getRegisteringParty()
         } catch (e) {
           console.error('RegisteringParty.vue onMounted error: ' + ((e as Error).message))
         }
@@ -177,8 +185,9 @@ export default defineComponent({
       addEditInProgress: false,
       showEditParty: false,
       registeringParty: computed((): Array<PartyIF> => {
-        if (parties.registeringParty !== null) {
-          return [parties.registeringParty]
+        const regParty: PartyIF = getAddSecuredPartiesAndDebtors.value?.registeringParty
+        if (regParty !== null) {
+          return [regParty]
         }
         return []
       }),
@@ -207,7 +216,7 @@ export default defineComponent({
     const getRegisteringParty = async () => {
       var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
       if (!isRoleStaffSbc.value) {
-        const regParty = await getRegisteringPartyFromAuth()
+        const regParty = await getRegisteringPartyFromAuth(isRoleStaffReg.value)
         parties.registeringParty = regParty
         setAddSecuredPartiesAndDebtors(parties)
       } else {

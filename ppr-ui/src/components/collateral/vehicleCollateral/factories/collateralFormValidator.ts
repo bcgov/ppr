@@ -25,23 +25,8 @@ const validationSchema = {
     ],
     manufacturedHomeRegistrationNumber: [
       {
-        validator: rangeNumber.validator,
-        customArgs: {
-          strictTypes: false,
-          min: {
-            value: 100000,
-            inclusive: true
-          },
-          max: {
-            value: 999999,
-            inclusive: true
-          }
-        },
-        message: 'Manufactured Home Registration Number must contain 6 digits'
-      },
-      {
-        validator: Validators.pattern.validator,
-        customArgs: { pattern: /^\d+$/ },
+        validator: Validators.pattern,
+        customArgs: { pattern: /^\d{6}$/ },
         message: 'Manufactured Home Registration Number must contain 6 digits'
       }
     ],

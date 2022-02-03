@@ -95,18 +95,18 @@ def deliver_verification_document(data: dict,
     sftp_service.connect()
     remote_path = f'{config.SFTP_STORAGE_DIRECTORY}/{file_name}'
     sftp_service.put_buffer(document_pdf, remote_path)
+    sftp_service.close()
 
     return HTTPStatus.CREATED
 
 
 def get_filename(registration_id, party_id) -> str:
     """Build a correctly formatted unique name."""
-    filename_template = 'PPRVER.{statement_key}.{day}.{month}.{year}.PDF'
+    filename_template = 'PPRVER.{year}{month}{day}.{statement_key}.PDF'
     today_utc = datetime.datetime.now(pytz.utc)
     today_local = today_utc.astimezone(pytz.timezone('Canada/Pacific'))
 
     reg_key = str(registration_id) + '.' + str(party_id)
-    reg_key = reg_key[:13]
 
     filename = filename_template.format(statement_key=reg_key,
                                         day=str(today_local.day).zfill(2),
@@ -127,11 +127,13 @@ def _get_document_data(data: dict, token: str, config: BaseConfig, end_point: st
     Returns:
         The document data and the status code.
     """
+    logging.debug(f'Getting document data, signature: _get_document_data(data: {data}, token: token, config: {config}, end_point: {end_point})')  # noqa: E501; pylint: disable=line-too-long
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
     url = f'{config.PPR_API_URL}{end_point}'
+    logging.debug(f'Calling API, url: {url}, data: {data}')
     rv = requests.post(url=url,
                        headers=headers,
                        data=json.dumps(data))

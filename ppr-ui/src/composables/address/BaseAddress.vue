@@ -99,7 +99,6 @@
             v-model="addressLocal.region"
           />
           <v-text-field v-else
-            autocomplete="new-password"
             filled
             class="item address-region"
             :label="regionLabel"
@@ -108,7 +107,6 @@
             :rules="[...schemaLocal.region]"
           />
           <v-text-field
-            autocomplete="new-password"
             filled
             class="item postal-code"
             :label="postalCodeLabel"
@@ -143,7 +141,8 @@ import {
   useAddressComplete,
   useCountryRegions,
   useCountriesProvinces,
-  useBaseValidations
+  useBaseValidations,
+  spaceRules
 } from '@/composables/address/factories'
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces' // eslint-disable-line no-unused-vars
 
@@ -189,6 +188,7 @@ export default defineComponent({
     } = useAddress(toRefs(props).value, toRefs(props).schema)
 
     const origPostalCodeRules = schemaLocal.value.postalCode
+    const origRegionRules = schemaLocal.value.region
 
     const { addressForm, validate } = useBaseValidations()
 
@@ -202,10 +202,16 @@ export default defineComponent({
 
       if (val === 'CA') {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
+        schemaLocal.value.region = origRegionRules
       } else if (val === 'US') {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
+        schemaLocal.value.region = origRegionRules
       } else {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
+        for (let i = 0; i < schemaLocal.value.region.length; i++) {
+          schemaLocal.value.region.pop()
+        }
+        schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
       if (oldVal) {

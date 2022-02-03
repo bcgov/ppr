@@ -49,9 +49,12 @@ export const mockedGeneralCollateralAdd: GeneralCollateralIF[] = [
 ]
 export const mockedGeneralCollateralDelete: GeneralCollateralIF[] = [
   {
+    descriptionDelete: 'NEW DELETE TEST GENERAL COLLATERAL'
+  },
+  {
     collateralId: 100000,
     addedDateTime: '2021-09-16T05:56:20Z',
-    descriptionDelete: 'DELETE TEST GENERAL COLLATERAL'
+    descriptionDelete: 'PREVIOUSLY DELETE TEST GENERAL COLLATERAL'
   },
   {
     collateralId: 300000,

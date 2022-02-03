@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-party" class="white pa-6">
+  <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
     <secured-party-dialog
       attach="#app"
       :defaultDialog="toggleDialog"
@@ -263,6 +263,10 @@ export default defineComponent({
     setIsRegisteringParty: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['addEditParty', 'resetEvent'],
@@ -309,6 +313,9 @@ export default defineComponent({
       }),
       isRegisteringParty: computed((): boolean => {
         return props.setIsRegisteringParty
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       })
     })
 

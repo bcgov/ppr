@@ -12,3 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds request non-schema data validation functions and helpers."""
+
+
+def valid_charset(word: str) -> bool:
+    """Verify word characters adhere to a supported set."""
+    return word == word.encode('ascii', 'ignore').decode('utf-8')

@@ -139,5 +139,13 @@ describe('Collateral edit tests', () => {
     wrapper.find(cancelButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
+    expect(wrapper.find('.border-error-left').exists()).toBe(false)
   })
+
+  it('shows error bar', async () => {
+    await wrapper.setProps({ setShowErrorBar: true })
+    await Vue.nextTick()
+    expect(wrapper.find('.border-error-left').exists()).toBe(true)
+  })
+    
 })

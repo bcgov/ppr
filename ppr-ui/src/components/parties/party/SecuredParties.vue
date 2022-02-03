@@ -97,6 +97,7 @@
               <edit-party
                 :activeIndex="activeIndex"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -136,7 +137,11 @@
                       {{ getName(row.item) }}
                     </div>
                     <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                      <v-chip x-small label color="#1669BB" text-color="white">
+                      <v-chip v-if="row.item.action === ActionTypes.REMOVED"
+                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          {{ row.item.action }}
+                      </v-chip>
+                      <v-chip v-else x-small label color="#1669BB" text-color="white">
                         {{ row.item.action }}
                       </v-chip>
                     </div>
@@ -330,6 +335,7 @@
                     <edit-party
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeSecuredParty="removeParty"
                       @resetEvent="resetData"
                     />
@@ -389,6 +395,10 @@ export default defineComponent({
     setShowInvalid: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -410,7 +420,6 @@ export default defineComponent({
     const registrationFlowType = getRegistrationFlowType.value
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
     const { getName, isPartiesValid, isBusiness } = useParty()
     const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
@@ -427,15 +436,21 @@ export default defineComponent({
       savedPartyResults: [],
       searchValue: { code: '', businessName: '' },
       loading: false,
-      securedParties: parties.securedParties,
+      parties: computed((): AddPartiesIF => {
+        return getAddSecuredPartiesAndDebtors.value
+      }),
+      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       registeringPartyAdded: false,
       currentPartyName: '',
       showDialog: false,
       savedParty: null,
       showErrorSummary: computed((): boolean => {
-        return !parties.valid
+        return !getAddSecuredPartiesAndDebtors.value.valid
       }),
-      showErrorSecuredParties: parties.showInvalid,
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
+      }),
+      showErrorSecuredParties: false,
       headers: [...partyTableHeaders, ...editTableHeaders]
     })
 
@@ -463,7 +478,7 @@ export default defineComponent({
 
     const removeRegisteringParty = (): void => {
       for (let i = 0; i < localState.securedParties.length; i++) {
-        if (isEqual(localState.securedParties[i], parties.registeringParty)) {
+        if (isEqual(localState.securedParties[i], localState.parties.registeringParty)) {
           removeParty(i)
           localState.registeringPartyAdded = false
         }
@@ -493,13 +508,13 @@ export default defineComponent({
       newList.push(registeringParty)
 
       parties.securedParties = newList
-
+      parties.valid = isPartiesValid(parties)
       setAddSecuredPartiesAndDebtors(parties)
       localState.registeringPartyAdded = true
     }
 
     const isRegisteringParty = (partyRow: PartyIF): boolean => {
-      if (isEqual(partyRow, parties.registeringParty)) {
+      if (isEqual(partyRow, localState.parties.registeringParty)) {
         return true
       }
       return false
@@ -532,22 +547,21 @@ export default defineComponent({
 
     const fetchOtherSecuredParties = async () => {
       localState.loading = true
-      if (parties.registeringParty) {
-        // go to the service and see if there are similar secured parties
-        const response: [SearchPartyIF] = await partyCodeAccount()
-        // check if any results
-        if (response?.length > 0) {
-          localState.partyResults = response
-          localState.loading = false
-        }
+      // go to the service and see if there are similar secured parties
+      const response: [SearchPartyIF] = await partyCodeAccount()
+      // check if any results
+      if (response?.length > 0) {
+        localState.partyResults = response
+        localState.loading = false
       } else {
         setTimeout(fetchOtherSecuredParties, 3000)
       }
     }
 
     onMounted(() => {
+      localState.showErrorSecuredParties = getAddSecuredPartiesAndDebtors.value.showInvalid
       for (let i = 0; i < localState.securedParties.length; i++) {
-        if (isEqual(localState.securedParties[i], parties.registeringParty)) {
+        if (isEqual(localState.securedParties[i], localState.parties.registeringParty)) {
           localState.registeringPartyAdded = true
         }
       }
@@ -648,7 +662,6 @@ export default defineComponent({
       initEdit,
       initAdd,
       resetData,
-      parties,
       isRegisteringParty,
       addRegisteringParty,
       removeRegisteringParty,

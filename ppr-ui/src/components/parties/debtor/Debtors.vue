@@ -45,6 +45,7 @@
                 :activeIndex="activeIndex"
                 :isBusiness="currentIsBusiness"
                 :invalidSection="invalidSection"
+                :setShowErrorBar="showErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -84,7 +85,11 @@
                       {{ getName(row.item) }}
                     </div>
                     <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                      <v-chip x-small label color="#1669BB" text-color="white">
+                      <v-chip v-if="row.item.action === ActionTypes.REMOVED"
+                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          {{ row.item.action }}
+                      </v-chip>
+                      <v-chip v-else x-small label color="#1669BB" text-color="white">
                         {{ row.item.action }}
                       </v-chip>
                     </div>
@@ -160,7 +165,7 @@
                   <span
                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                     && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
-                    class="edit-button"
+                    class="undo-button"
                   >
                     <v-btn
                       text
@@ -226,6 +231,7 @@
                     <edit-debtor
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
+                      :setShowErrorBar="showErrorBar"
                       @removeDebtor="removeDebtor"
                       @resetEvent="resetData"
                     />
@@ -272,6 +278,10 @@ export default defineComponent({
     setShowInvalid: {
       type: Boolean,
       default: false
+    },
+    setShowErrorBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -312,6 +322,9 @@ export default defineComponent({
       showErrorDebtors: getAddSecuredPartiesAndDebtors.value.showInvalid,
       parties: computed((): AddPartiesIF => {
         return getAddSecuredPartiesAndDebtors.value
+      }),
+      showErrorBar: computed((): boolean => {
+        return props.setShowErrorBar
       }),
       headers: [...debtorTableHeaders, ...editTableHeaders]
     })
@@ -411,6 +424,10 @@ export default defineComponent({
 
 td {
   word-wrap: break-word;
+}
+
+.undo-button {
+  padding-right: 30px;
 }
 
 </style>

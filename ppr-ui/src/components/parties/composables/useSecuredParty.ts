@@ -5,6 +5,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
+import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -16,6 +17,7 @@ const initAddress = {
   postalCode: '',
   deliveryInstructions: ''
 }
+const { isPartiesValid } = useParty()
 
 export const useSecuredParty = (props, context) => {
   const { setAddSecuredPartiesAndDebtors } = useActions<any>([
@@ -127,6 +129,7 @@ export const useSecuredParty = (props, context) => {
     newParty.action = ActionTypes.ADDED
     newList.push(newParty)
     parties.securedParties = newList
+    parties.valid = isPartiesValid(parties)
     setAddSecuredPartiesAndDebtors(parties)
   }
 
@@ -157,7 +160,14 @@ export const useSecuredParty = (props, context) => {
       APIRegistrationTypes.OTHER,
       APIRegistrationTypes.MINERAL_LAND_TAX,
       APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
-      APIRegistrationTypes.SCHOOL_ACT
+      APIRegistrationTypes.SCHOOL_ACT,
+      APIRegistrationTypes.MISC_MINERAL_RESOURCE,
+      APIRegistrationTypes.CROWN_MINING_TAX,
+      APIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
+      APIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
+      APIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
+      APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+      APIRegistrationTypes.TRANSITION_TAX_LIEN
     ]
     // @ts-ignore - it doesn't like the string comparison for some reason
     if (restrictedList.includes(regType)) {

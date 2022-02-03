@@ -83,7 +83,7 @@
               class="pa-0"
               :class="{'ps-6': !showViewLink}">
       <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
-        <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
+        <v-chip class="badge-delete" label color="#grey lighten-2" text-color="grey darken-1" x-small>
           <b>DELETED</b>
         </v-chip>
         <p class="pt-3 ma-0">
@@ -127,7 +127,7 @@
               <b>{{ asOfDateTime(item.addedDateTime) }}</b>
             </div>
             <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
-              <v-chip class="badge-delete" color="primary" label text-color="white" x-small>
+              <v-chip class="badge-delete" color="#grey lighten-2" text-color="grey darken-1" label x-small>
                 <b>DELETED</b>
               </v-chip>
               <p class="pt-3 ma-0">
@@ -234,7 +234,55 @@ export default defineComponent({
         return -1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
+        const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
+        const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
+        for (let i = 0; i < generalCollateral.length; i++) {
+          if (!generalCollateral[i].addedDateTime) {
+            cleanedGeneralCollateral.push(generalCollateral[i])
+            continue
+          }
+          let alreadyAdded = false
+          if (generalCollateral[i].description) {
+            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
+              collateral.description &&
+              collateral.addedDateTime === generalCollateral[i].addedDateTime
+            )
+            if (existsIndex !== -1) {
+              cleanedGeneralCollateral[existsIndex].description += generalCollateral[i].description
+            } else {
+              cleanedGeneralCollateral.push(generalCollateral[i])
+              alreadyAdded = true
+            }
+          }
+          if (generalCollateral[i].descriptionAdd) {
+            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
+              collateral.descriptionAdd &&
+              collateral.addedDateTime === generalCollateral[i].addedDateTime
+            )
+            if (existsIndex !== -1) {
+              cleanedGeneralCollateral[existsIndex].descriptionAdd += generalCollateral[i].descriptionAdd
+            } else {
+              if (!alreadyAdded) {
+                cleanedGeneralCollateral.push(generalCollateral[i])
+                alreadyAdded = true
+              }
+            }
+          }
+          if (generalCollateral[i].descriptionDelete) {
+            const existsIndex = cleanedGeneralCollateral.findIndex(collateral =>
+              collateral.descriptionDelete &&
+              collateral.addedDateTime === generalCollateral[i].addedDateTime
+            )
+            if (existsIndex !== -1) {
+              cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
+            } else {
+              if (!alreadyAdded) {
+                cleanedGeneralCollateral.push(generalCollateral[i])
+              }
+            }
+          }
+        }
+        return cleanedGeneralCollateral
       }),
       lastGeneralCollateral: computed((): GeneralCollateralIF => {
         if (localState.generalCollateral.length) {
@@ -243,14 +291,11 @@ export default defineComponent({
         return null
       }),
       generalCollateralLength: computed((): number => {
-        if (getGeneralCollateral.value && getGeneralCollateral.value.length > 0) {
-          if (localState.lastGeneralCollateral.addedDateTime) {
-            return getGeneralCollateral.value.length
-          } else {
-            return getGeneralCollateral.value.length - 1
-          }
+        if (!localState.lastGeneralCollateral) { return 0 }
+        if (localState.lastGeneralCollateral?.addedDateTime) {
+          return localState.generalCollateral.length
         }
-        return 0
+        return localState.generalCollateral.length - 1
       }),
       registrationFlowType: computed((): RegistrationFlowType => {
         return getRegistrationFlowType.value

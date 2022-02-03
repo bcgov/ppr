@@ -34,11 +34,13 @@ TRANSACTION_TO_FILING_TYPE = {
     'AMENDMENT': 'FSCHG',
     'AMENDMENT_NO_FEE': 'NCCHG',
     'CHANGE': 'FSCHG',
+    'CHANGE_STAFF_PROCESS_FEE': 'PRFEEA',
     'DISCHARGE': 'FSDIS',  # No charge fee.
     'FINANCING_FR': 'FLREG',  # Special flat rate fee for the FR registration type.
     'FINANCING_NO_FEE': 'NCREG',  # No Charge fee for LT, MH, MISCLIEN class, CROWNLIEN class.
     'FINANCING_LIFE_YEAR': 'FSREG',
     'FINANCING_INFINITE': 'INFRG',
+    'FINANCING_STAFF_PROCESS_FEE': 'PRFEEB',
     'RENEWAL_LIFE_YEAR': 'FSREN',
     'RENEWAL_INFINITE': 'INFRN',
     'SEARCH': 'SERCH',
@@ -46,6 +48,16 @@ TRANSACTION_TO_FILING_TYPE = {
     'SEARCH_STAFF_NO_FEE': 'SSRCH',
     'SEARCH_STAFF_CERTIFIED': 'PPRCD',
     'SEARCH_STAFF_CERTIFIED_NO_FEE': 'PPRCD'
+}
+
+# Mapping from normal filing type to staff version of filing type
+TO_STAFF_FILING_TYPE = {
+    'FSCHG': 'FSCHS',
+    'FLREG': 'FLRGS',
+    'FSREG': 'FSRGS',
+    'INFRG': 'INFRS',
+    'FSREN': 'FSRNS',
+    'INFRN': 'INFNS'
 }
 
 PAYMENT_REQUEST_TEMPLATE = {
@@ -257,7 +269,7 @@ class SBCPaymentClient(BaseClient):
     """Pay API client implementation."""
 
     @staticmethod
-    def create_payment_data(transaction_type, quantity=1, ppr_id=None, client_reference_id=None):
+    def create_payment_data(transaction_type, quantity=1, ppr_id=None, client_reference_id=None, processing_fee=None):
         """Build the payment-request body formatted as JSON."""
         data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
         filing_type = TRANSACTION_TO_FILING_TYPE[transaction_type]
@@ -269,6 +281,19 @@ class SBCPaymentClient(BaseClient):
         else:
             del data['filingInfo']['filingIdentifier']
 
+        if processing_fee:
+            # alter fee code to staff fee code
+            if filing_type in TO_STAFF_FILING_TYPE:
+                data['filingInfo']['filingTypes'][0]['filingTypeCode'] = TO_STAFF_FILING_TYPE[filing_type]
+            # add processing fee item
+            processing_filing_type = TRANSACTION_TO_FILING_TYPE[processing_fee]
+            data['filingInfo']['filingTypes'].append({
+                'filingTypeCode': processing_filing_type,
+                'priority': False,
+                'futureEffective': False,
+                'quantity': 1
+            })
+
         if client_reference_id:
             data['filingInfo']['folioNumber'] = client_reference_id
         else:
@@ -277,7 +302,7 @@ class SBCPaymentClient(BaseClient):
         return data
 
     @staticmethod
-    def create_payment_staff_registration_data(transaction_info, client_reference_id=None):
+    def create_payment_staff_registration_data(transaction_info, client_reference_id=None, processing_fee=None):
         """Build the payment-request body formatted as JSON."""
         data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
         filing_type = TRANSACTION_TO_FILING_TYPE[transaction_info['transactionType']]
@@ -288,6 +313,19 @@ class SBCPaymentClient(BaseClient):
             data['filingInfo']['filingIdentifier'] = transaction_info['transaction_id']
         else:
             del data['filingInfo']['filingIdentifier']
+
+        if processing_fee:
+            # alter fee code to staff fee code
+            if filing_type in TO_STAFF_FILING_TYPE:
+                data['filingInfo']['filingTypes'][0]['filingTypeCode'] = TO_STAFF_FILING_TYPE[filing_type]
+            # add processing fee item
+            processing_filing_type = TRANSACTION_TO_FILING_TYPE[processing_fee]
+            data['filingInfo']['filingTypes'].append({
+                'filingTypeCode': processing_filing_type,
+                'priority': False,
+                'futureEffective': False,
+                'quantity': 1
+            })
 
         if client_reference_id:
             data['filingInfo']['folioNumber'] = client_reference_id
@@ -346,9 +384,17 @@ class SBCPaymentClient(BaseClient):
 
         return data
 
-    def create_payment(self, transaction_type, quantity=1, ppr_id=None, client_reference_id=None):
+    def create_payment(  # pylint: disable=too-many-arguments
+            self,
+            transaction_type,
+            quantity=1,
+            ppr_id=None,
+            client_reference_id=None,
+            processing_fee=None
+    ):
         """Submit a payment request for the PPR API transaction."""
-        data = SBCPaymentClient.create_payment_data(transaction_type, quantity, ppr_id, client_reference_id)
+        data = SBCPaymentClient.create_payment_data(
+            transaction_type, quantity, ppr_id, client_reference_id, processing_fee)
         if self.detail_label and self.detail_value:
             data['details'][0]['label'] = self.detail_label
             data['details'][0]['value'] = self.detail_value
@@ -381,9 +427,10 @@ class SBCPaymentClient(BaseClient):
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
-    def create_payment_staff_registration(self, transaction_info, client_reference_id=None):
+    def create_payment_staff_registration(self, transaction_info, client_reference_id=None, processing_fee=None):
         """Submit a staff registration payment request for the PPR API transaction."""
-        data = SBCPaymentClient.create_payment_staff_registration_data(transaction_info, client_reference_id)
+        data = SBCPaymentClient.create_payment_staff_registration_data(
+            transaction_info, client_reference_id, processing_fee)
         if self.detail_label and self.detail_value:
             data['details'][0]['label'] = self.detail_label
             data['details'][0]['value'] = self.detail_value

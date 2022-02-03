@@ -121,6 +121,8 @@
           </h2>
           <registering-party-change
             class="pt-4"
+            @registeringPartyOpen="regOpenClose($event)"
+            :setShowErrorBar="showErrors && registeringOpen"
           />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
@@ -128,6 +130,7 @@
             class="pt-10"
           />
           <certify-information
+            @certifyValid="showErrors = false"
             :setShowErrors="showErrors"
             class="pt-10"
           />
@@ -199,7 +202,7 @@ import {
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
-import { RegistrationTypes } from '@/resources'
+import { AllRegistrationTypes } from '@/resources'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   convertDate,
@@ -261,6 +264,7 @@ export default class ConfirmAmendment extends Vue {
 
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
+  private registeringOpen = false
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = {
     acceptText: 'Cancel Amendment',
@@ -287,9 +291,10 @@ export default class ConfirmAmendment extends Vue {
     'The Secured Parties in the registration ' +
     'will receive a copy of the Amendment Verification Statement.'
 
-  private tooltipTxt = 'The Registering Party is based on your ' +
-    'account information and cannot be changed here. This information ' +
-    'can be changed by updating your BC Registries account information.'
+  private tooltipTxt = 'The default Registering Party is based on your BC ' +
+    'Registries user account information. This information can be updated within ' +
+    'your account settings. You can change to a different Registering Party by ' +
+    'using the Change button.'
 
   private validFolio = true
   private feeType = FeeSummaryTypes.AMEND
@@ -434,8 +439,11 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private get stickyComponentErrMsg (): string {
-    if (!this.validFolio && this.showErrors) {
+    if ((!this.validFolio || !this.courtOrderValid) && this.showErrors) {
       return '< Please complete required information'
+    }
+    if ((this.registeringOpen || !this.certifyInformationValid) && this.showErrors) {
+      return '< You have unfinished changes'
     }
     return ''
   }
@@ -444,10 +452,17 @@ export default class ConfirmAmendment extends Vue {
     if (!this.validFolio) {
       const component = document.getElementById('folio-summary')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    if (this.registeringOpen) {
+      const component = document.getElementById('reg-party-change')
+      await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (!this.courtOrderValid) {
       const component = document.getElementById('court-order-component')
       await component.scrollIntoView({ behavior: 'smooth' })
+      return
     }
     if (!this.certifyInformationValid) {
       const component = document.getElementById('certify-information')
@@ -488,14 +503,14 @@ export default class ConfirmAmendment extends Vue {
       this.emitError(financingStatement.error)
     } else {
       // load data into the store
-      const registrationType = RegistrationTypes.find((reg, index) => {
+      const registrationType = AllRegistrationTypes.find((reg, index) => {
         if (reg.registrationTypeAPI === financingStatement.type) {
           return true
         }
       })
       const parties = {
         valid: true,
-        registeringParty: financingStatement.registeringParty,
+        registeringParty: null, // will be taken from account info
         securedParties: financingStatement.securedParties,
         debtors: financingStatement.debtors
       } as AddPartiesIF
@@ -528,6 +543,12 @@ export default class ConfirmAmendment extends Vue {
 
   private setFolioValid (valid: boolean): void {
     this.validFolio = valid
+    this.showErrors = false
+  }
+
+  private regOpenClose (open: boolean): void {
+    this.registeringOpen = open
+    this.showErrors = false
   }
 
   private showDialog (): void {
@@ -549,7 +570,7 @@ export default class ConfirmAmendment extends Vue {
   }
 
   private submitButton (): void {
-    if (!this.validFolio || !this.certifyInformationValid) {
+    if (!this.validFolio || !this.certifyInformationValid || this.registeringOpen) {
       this.showErrors = true
       this.scrollToInvalid()
       return

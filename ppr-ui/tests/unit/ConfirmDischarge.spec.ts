@@ -24,7 +24,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll } from './test-data'
+import { mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll, mockedPartyCodeSearchResults } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -75,7 +75,7 @@ describe('ConfirmDischarge registration view', () => {
     sandbox.restore()
   })
 
-  it('renders Confirm Registration View with child components', async () => {
+  it('renders Confirm Registration View with child components', () => {
     expect(wrapper.findComponent(ConfirmDischarge).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).vm.setMsg).toContain(
@@ -85,7 +85,7 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.vm.dataLoaded).toBe(true)
     const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(mockedFinancingStatementAll.registeringParty)
+    expect(state.registration.parties.registeringParty).toBe(null)
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     // check confirm discharge section
     expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
@@ -166,6 +166,10 @@ describe('ConfirmDischarge registration view', () => {
     // Set up for valid discharge request
     await store.dispatch('setRegistrationNumber', '023001B')
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const parties = state.registration.parties
+    parties.registeringParty = mockedPartyCodeSearchResults[0]
+    await store.dispatch('setAddSecuredPartiesAndDebtors', parties)
 
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
