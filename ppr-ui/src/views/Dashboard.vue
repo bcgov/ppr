@@ -662,7 +662,7 @@ export default class Dashboard extends Vue {
   }
 
   private async myRegGetNext (): Promise<void> {
-    if (this.myRegDataLoading || !this.myRegNoMorePages) return
+    if (this.myRegDataLoading || this.myRegNoMorePages) return
     this.myRegDataLoading = true
     this.myRegPage += 1
     const nextRegs = await registrationHistory(this.myRegSortOptions, this.myRegPage)
@@ -726,6 +726,7 @@ export default class Dashboard extends Vue {
     if (error) {
       this.emitError(error)
     } else {
+      if (sortedRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
       // add child drafts to their base registration in registration history
       const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(sortedDrafts.drafts, sortedRegs.registrations, true)
       // only add parent drafts to draft results
@@ -833,6 +834,7 @@ export default class Dashboard extends Vue {
       const error = myRegHistory?.error || myRegDrafts?.error
       this.emitError(error)
     } else {
+      if (myRegHistory.registrations?.length < 100) { this.myRegNoMorePages = true }
       // add child drafts to their base registration in registration history
       const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(
         myRegDrafts.drafts, myRegHistory.registrations, false)
