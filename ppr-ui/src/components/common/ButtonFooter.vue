@@ -321,7 +321,7 @@ export default defineComponent({
       const statement = await saveFinancingStatement(stateModel)
       localState.submitting = false
       return statement
-    }, 3000, { trailing: false })
+    }, 2000, { trailing: false })
 
     const throttleSubmitStatementDraft = _.throttle(async (stateModel: StateModelIF): Promise<DraftIF> => {
       // Prevents multiple submits (i.e. double click)
@@ -329,7 +329,7 @@ export default defineComponent({
       const statement = await saveFinancingStatementDraft(stateModel)
       localState.submitting = false
       return statement
-    }, 3000, { trailing: false })
+    }, 2000, { trailing: false })
 
     watch(() => props.forceSave, (val: boolean) => {
       // on change (T/F doesn't matter), save and go back to dash
