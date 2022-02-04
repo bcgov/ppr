@@ -379,7 +379,7 @@ export default class Dashboard extends Vue {
   }
 
   private get myRegAddInvalid (): boolean {
-    return ![0, 7].includes(this.myRegAdd?.trim().length || 0)
+    return ![0, 7].includes(this.myRegAdd?.trim().length || 0) || (this.myRegAdd && !this.myRegAdd?.trim())
   }
 
   private get searchHistoryLength (): number {
