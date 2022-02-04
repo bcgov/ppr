@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pa-0" ref="tableHeaderRef">
+  <v-container fluid no-gutters class="pa-0" ref="tableHeaderRef" style="position: relative">
     <date-picker
       v-show="showDatePicker"
       ref="datePicker"
@@ -9,13 +9,13 @@
     />
 
     <v-data-table
-      v-if="!loadingData"
       id="registration-table"
       :class="{
         'freeze-scroll': freezeTableScroll,
         'full-width': headers.length <= 1,
         'registration-table': true
       }"
+      ref="regTable"
       disable-pagination
       disable-sort
       :expanded.sync="expanded"
@@ -24,11 +24,10 @@
       height="100%"
       hide-default-footer
       hide-default-header
-      :items="tableData"
+      :items="registrationHistory"
       item-key="baseRegistrationNumber"
       mobile-breakpoint="0"
       :no-data-text="tableFiltersActive ? 'No registrations found.' : 'No registrations to show.'"
-      :sort-desc="[false, true]"
     >
       <template v-slot:header="{ props }">
         <thead v-if="headers.length > 1">
@@ -41,15 +40,15 @@
               :ref="header.value + 'Ref'"
               :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
             >
-              <v-row class="my-reg-header pl-3" no-gutters @click="selectAndSort(header.value)">
+              <v-row class="my-reg-header pl-3" no-gutters @click="toggleOrderBy(header.value, header.sortable)">
                 <v-col :class="{ 'pl-7': header.value === 'actions' }">
                   {{ header.text }}
-                  <span v-if="header.value === selectedSort && header.sortable">
-                    <v-icon v-if="currentOrder === 'asc'" small style="color: black;">
-                      mdi-arrow-down
+                  <span v-if="header.value === orderBy && header.sortable">
+                    <v-icon v-if="orderVal === 'asc'" small style="color: black;">
+                      mdi-arrow-up
                     </v-icon>
                     <v-icon v-else small style="color: black;">
-                      mdi-arrow-up
+                      mdi-arrow-down
                     </v-icon>
                   </span>
                 </v-col>
@@ -128,7 +127,6 @@
                     label="Status"
                     :menu-props="{ bottom: true, offsetY: true }"
                     v-model="status"
-                    @change="filterResults(tableData)"
                     clearable
                   />
                   <v-text-field
@@ -141,7 +139,8 @@
                     label="Registered By"
                     dense
                   />
-                  <v-text-field
+                  <!-- removed until further notice -->
+                  <!-- <v-text-field
                     v-if="header.value === 'registeringParty'"
                     filled
                     single-line
@@ -160,7 +159,7 @@
                     type="text"
                     label="Secured Parties"
                     dense
-                  />
+                  /> -->
                   <v-text-field
                     v-if="header.value === 'clientReferenceId'"
                     filled
@@ -186,6 +185,22 @@
               </v-row>
             </th>
           </tr>
+          <tr v-if="loadingData">
+            <div
+              class="v-progress-linear v-progress-linear--absolute theme--light"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              role="progressbar"
+              style="height: 4px;"
+            >
+              <div class="v-progress-linear__background primary" style="opacity: 0.3; left: 0%; width: 100%;" />
+              <div class="v-progress-linear__buffer" />
+              <div class="v-progress-linear__indeterminate v-progress-linear__indeterminate--active">
+                <div class="v-progress-linear__indeterminate long primary" />
+                <div class="v-progress-linear__indeterminate short primary" />
+              </div>
+            </div>
+          </tr>
         </thead>
         <thead v-else>
           <tr>
@@ -199,6 +214,7 @@
       </template>
       <template v-slot:item="{ expand, item, isExpanded }" class="registration-data-table">
         <table-row
+          :ref="isFirstItem(item) ? 'firstItem' : ''"
           :setDisableActionShadow="overrideWidth"
           :setHeaders="headers"
           :setIsExpanded="isExpanded"
@@ -220,6 +236,9 @@
           @freezeScroll="freezeTableScroll"
         />
       </template>
+      <template v-slot:[`body.append`]>
+        <table-observer @intersect="getNext()" />
+      </template>
     </v-data-table>
   </v-container>
 </template>
@@ -236,17 +255,19 @@ import {
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 import flushPromises from 'flush-promises'
+import _ from 'lodash'
 // local components
 import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
-import { TableRow } from './common'
+import { TableObserver, TableRow } from './common'
 // local types/helpers/etc.
 import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   AccountProductSubscriptionIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   BaseHeaderIF, // eslint-disable-line no-unused-vars
-  DraftResultIF // eslint-disable-line no-unused-vars
+  DraftResultIF, // eslint-disable-line no-unused-vars
+  RegistrationSortIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
   AccountProductCodes, // eslint-disable-line no-unused-vars
@@ -260,6 +281,7 @@ export default defineComponent({
   components: {
     DatePicker,
     RegistrationBarTypeAheadList,
+    TableObserver,
     TableRow
   },
   props: {
@@ -275,10 +297,16 @@ export default defineComponent({
     },
     setRegistrationHistory: {
       default: [] as (RegistrationSummaryIF | DraftResultIF)[]
+    },
+    setSort: {
+      type: Object as () => RegistrationSortIF,
+      default: null
     }
   },
   setup (props, { emit }) {
     // refs
+    const regTable = ref(null)
+    const firstItem = ref(null)
     const datePicker = ref(null)
     const tableHeaderRef = ref(null)
     const registrationNumberRef = ref(null)
@@ -315,31 +343,30 @@ export default defineComponent({
     ])
     // helpers
     const {
-      dateTxt,
+      // filters
       registrationNumber,
       registeredBy,
       registeringParty,
       securedParties,
       folioNumber,
-      shouldClearType,
       status,
       registrationType,
       submittedStartDate,
       submittedEndDate,
-      originalData,
-      tableData,
-      filterResults,
+      orderBy,
+      orderVal,
+      // other table stuff
+      shouldClearType,
+      dateTxt,
       clearFilters
-    } = useRegistration()
+    } = useRegistration(props.setSort)
 
     const localState = reactive({
-      currentOrder: 'asc',
       expanded: [],
       freezeTableScroll: false,
       loadingPDF: '',
       overrideWidth: false,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
-      selectedSort: 'createDateTime',
       showDatePicker: false,
       statusTypes: [...StatusTypes],
       hasRPPR: computed(() => {
@@ -405,28 +432,34 @@ export default defineComponent({
       return ''
     }
 
-    const selectAndSort = (col: string) => {
-      if (!localState.headers.find(c => c.value === col).sortable) {
-        return
+    const isFirstItem = (item: RegistrationSummaryIF | DraftResultIF) => {
+      const draftItem = item as DraftResultIF
+      const firstBaseReg = localState.registrationHistory[0].baseRegistrationNumber
+      const firstDocId = localState.registrationHistory[0].documentId
+      if (item.baseRegistrationNumber && item.baseRegistrationNumber === firstBaseReg) {
+        return true
       }
-      let direction = 'asc'
-      if (col === localState.selectedSort) {
-        if (localState.currentOrder === 'asc') {
-          direction = 'desc'
-        }
+      if (!item.baseRegistrationNumber && draftItem.documentId === firstDocId) {
+        return true
       }
+      return false
+    }
 
-      if (direction === 'desc') {
-        tableData.value.sort((a, b) =>
-          a[col] > b[col] ? 1 : b[col] > a[col] ? -1 : 0
-        )
+    const toggleOrderBy = (header: string, sortable: boolean) => {
+      if (!sortable) { return }
+
+      if (header === orderBy.value) {
+        // toggle asc vs desc
+        if (orderVal.value === 'desc') { orderVal.value = 'asc' } else { orderVal.value = 'desc' }
       } else {
-        tableData.value.sort((a, b) =>
-          a[col] < b[col] ? 1 : b[col] < a[col] ? -1 : 0
-        )
+        // set new order by
+        orderBy.value = header
+        orderVal.value = 'desc'
       }
-      localState.currentOrder = direction
-      localState.selectedSort = col
+      // const wrapper = tableHeader.value
+      if (firstItem?.value?.$el?.scrollIntoView) {
+        firstItem.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
     }
 
     const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
@@ -443,6 +476,13 @@ export default defineComponent({
       registrationType.value = val?.registrationTypeAPI || ''
     }
 
+    const getNext = _.throttle(() => {
+      // if not loading and reg history exists -- lodash throttle here too with {trailing:false} ?
+      if (!localState.loadingData && localState.registrationHistory?.length > 0) {
+        emit('getNext')
+      }
+    }, 3000, { trailing: false })
+
     watch(() => dateTxt.value, (val) => {
       if (!val) {
         submittedStartDate.value = null
@@ -453,11 +493,6 @@ export default defineComponent({
       }
     })
 
-    watch(() => localState.registrationHistory, (val) => {
-      originalData.value = [...val]
-      tableData.value = filterResults(originalData.value)
-    }, { deep: true, immediate: true })
-
     watch(() => localState.showDatePicker, async (val) => {
       if (val) {
         await flushPromises()
@@ -467,6 +502,42 @@ export default defineComponent({
         }
       }
     })
+
+    // filter watchers (triggers the sorting)
+    watch(
+      () => [
+        registeringParty.value,
+        registrationType.value,
+        registrationNumber.value,
+        folioNumber.value,
+        securedParties.value,
+        registeredBy.value,
+        status.value,
+        submittedStartDate.value,
+        submittedEndDate.value,
+        orderBy.value,
+        orderVal.value
+      ], _.debounce((
+        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]
+      ) => {
+        if (firstItem?.value?.$el?.scrollIntoView) {
+          firstItem.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+        emit('sort', {
+          endDate: endDate,
+          folNum: folNum,
+          orderBy: orderBy,
+          orderVal: orderVal,
+          regBy: regBy,
+          regNum: regNum,
+          regParty: regParty,
+          regType: regType,
+          secParty: secParty,
+          startDate: startDate,
+          status: status
+        } as RegistrationSortIF)
+      }, 1000)
+    )
 
     watch(() => localState.firstColWidth, (val) => {
       // needed to set overrideWidth back to false
@@ -486,22 +557,25 @@ export default defineComponent({
       datePicker,
       dateTxt,
       emitRowAction,
+      firstItem,
       getHeaderStyle,
+      getNext,
+      isFirstItem,
+      orderBy,
+      orderVal,
       registrationNumber,
       registrationType,
+      regTable,
       shouldClearType,
       selectRegistration,
+      toggleOrderBy,
       registeredBy,
       registeringParty,
       securedParties,
       folioNumber,
       status,
-      originalData,
-      tableData,
-      filterResults,
       updateDateRange,
       clearFilters,
-      selectAndSort,
       submittedEndDate,
       submittedStartDate,
       TableActions,

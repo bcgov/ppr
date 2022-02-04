@@ -29,7 +29,8 @@
         </v-col>
         <v-col style="padding-top: 2px;">
           <p v-if="isDraft(item)" :class="{ 'ma-0': true, 'pl-9': isChild }">Pending</p>
-          <div v-else-if="isChild" class="pl-9">
+          <!-- child drafts will sometimes show outside their base reg during the sort -->
+          <div v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)" :class="isChild ? 'pl-9' : ''">
             <p class="ma-0">{{ item.registrationNumber }}</p>
             <p class="ma-0" style="font-size: 0.75rem !important;">
               <b>Base Registration: {{ item.baseRegistrationNumber }}</b>
@@ -81,6 +82,9 @@
     >
       <div v-if="!isChild || isDraft(item)">
         {{ getStatusDescription(item.statusType) }}
+        <p v-if="!isChild && item.hasDraft" class="ma-0">
+          <i>* Draft Amendment</i>
+        </p>
       </div>
     </td>
     <td
@@ -313,7 +317,7 @@ export default defineComponent({
       registeringParty,
       hasRenewal,
       securedParties
-    } = useRegistration()
+    } = useRegistration(null)
 
     const localState = reactive({
       loadingPDF: '',

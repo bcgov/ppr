@@ -50,6 +50,7 @@
               <router-view
                 :appReady="appReady"
                 :isJestRunning="isJestRunning"
+                :loading="!haveData"
                 :saveDraftExit="saveDraftExitToggle"
                 :registryUrl="registryUrl"
                 @profileReady="profileReady = true"

@@ -44,6 +44,7 @@ import {
   mockedRegistration2,
   mockedUpdateRegTableUserSettingsResponse
 } from './test-data'
+import { setupIntersectionObserverMock } from './utils'
 
 Vue.use(Vuetify)
 
@@ -66,6 +67,7 @@ const myRegTblColSelection = '#column-selection'
 document.body.setAttribute('data-app', 'true')
 
 describe('Dashboard component', () => {
+  setupIntersectionObserverMock()
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
@@ -86,9 +88,9 @@ describe('Dashboard component', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getDraft = getStub.withArgs(`drafts/${draftDocId}`)
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
-    const getMyRegDrafts = getStub.withArgs('drafts')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
     const getRegistration = getStub.withArgs(`financing-statements/${regNum}`)
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
@@ -264,6 +266,7 @@ describe('Dashboard component', () => {
 })
 
 describe('Dashboard registration table tests', () => {
+  setupIntersectionObserverMock()
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
@@ -273,7 +276,6 @@ describe('Dashboard registration table tests', () => {
   // setup baseReg with added child draft
   const baseReg = { ...mockedRegistration1 }
   baseReg.changes = [{ ...mockedDraftAmend }]
-  baseReg.expand = false
   const myRegHistoryWithChildren = [baseReg]
   const newColumnSelection = [...registrationTableHeaders].slice(3)
 
@@ -286,9 +288,9 @@ describe('Dashboard registration table tests', () => {
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
     const getDebtorNames = getStub
       .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
@@ -341,7 +343,7 @@ describe('Dashboard registration table tests', () => {
 
   it('displays my registration header and content', () => {
     // myRegDrafts contains a child that will be put into a baseReg
-    expect(wrapper.vm.myRegDataDrafts).toEqual(parentDrafts)
+    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(parentDrafts)
     expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
@@ -396,7 +398,7 @@ describe('Dashboard registration table tests', () => {
   it('deletes parent drafts', async () => {
     const myRegDraftsCopy = [...parentDrafts]
     // check setup
-    expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
+    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
     // emit delete action
@@ -413,7 +415,7 @@ describe('Dashboard registration table tests', () => {
     await flushPromises()
     // draft is removed from table
     myRegDraftsCopy.shift()
-    expect(wrapper.vm.myRegDataDrafts).toEqual(myRegDraftsCopy)
+    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
   })
@@ -421,7 +423,7 @@ describe('Dashboard registration table tests', () => {
   it('deletes child drafts', async () => {
     const myRegDraftsCopy = myRegHistoryWithChildren[0].changes[0] as DraftResultIF
     // check setup
-    expect(wrapper.vm.myRegDataDrafts).toEqual(parentDrafts)
+    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(parentDrafts)
     expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
     expect(wrapper.vm.myRegDataHistory[0].changes[0]).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
@@ -476,6 +478,7 @@ describe('Dashboard registration table tests', () => {
 })
 
 describe('Dashboard add registration tests', () => {
+  setupIntersectionObserverMock()
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
@@ -488,9 +491,9 @@ describe('Dashboard add registration tests', () => {
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(
@@ -573,6 +576,7 @@ describe('Dashboard add registration tests', () => {
 
 
 describe('Dashboard error modal tests', () => {
+  setupIntersectionObserverMock()
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
@@ -585,9 +589,9 @@ describe('Dashboard error modal tests', () => {
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(

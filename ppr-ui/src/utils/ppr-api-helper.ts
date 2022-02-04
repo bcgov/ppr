@@ -19,11 +19,13 @@ import {
   RegistrationSummaryIF,
   RenewRegistrationIF,
   ErrorIF,
-  BaseHeaderIF
+  BaseHeaderIF,
+  RegistrationSortIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { ErrorCodes, SettingOptions } from '@/enums'
+import { SettingOptions } from '@/enums'
+import { getRegistrationNumber } from '@/store/getters'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -61,6 +63,18 @@ function staffPaymentParameters (staffPayment: StaffPaymentIF) {
     }
   }
   return paymentParams
+}
+
+const UIFilterToApiFilter = {
+  endDate: 'endDateTime',
+  folNum: 'clientReferenceId',
+  orderBy: 'sortCriteriaName',
+  orderVal: 'sortDirection',
+  regBy: 'registeringName',
+  regNum: 'regNumber',
+  regType: 'registrationType',
+  startDate: 'startDateTime',
+  status: 'statusType'
 }
 
 export const successfulPPRResponses = [
@@ -652,14 +666,22 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
 }
 
 // Get registration history
-export async function registrationHistory (): Promise<{
+export async function registrationHistory (sortOptions: RegistrationSortIF, page: number): Promise<{
   registrations: RegistrationSummaryIF[],
   error: ErrorIF
 }> {
-  const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  const baseURL = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
+  let url = `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`
+  const sortKeys = Object.keys(sortOptions)
+  // add all set filters as params to the call
+  for (const i in sortKeys) {
+    if (sortOptions[sortKeys[i]]) {
+      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
+    }
+  }
   return axios
-    .get('financing-statements/registrations?collapse=true', config)
+    .get(url, config)
     .then(response => {
       const data = response?.data as RegistrationSummaryIF[]
       if (!data) {
@@ -696,14 +718,22 @@ export async function registrationHistory (): Promise<{
 }
 
 // Get draft history
-export async function draftHistory (): Promise<{
+export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
   drafts: DraftResultIF[],
   error: ErrorIF
 }> {
-  const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  const baseURL = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
+  let url = 'drafts?fromUI=true'
+  const sortKeys = Object.keys(sortOptions)
+  // add all set filters as params to the call
+  for (const i in sortKeys) {
+    if (sortOptions[sortKeys[i]]) {
+      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
+    }
+  }
   return axios
-    .get('drafts', config)
+    .get(url, config)
     .then(response => {
       const data = response?.data as DraftResultIF[]
       if (!data) {

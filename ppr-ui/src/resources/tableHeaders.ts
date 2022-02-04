@@ -343,7 +343,7 @@ export const editTableHeaders: Array<BaseHeaderIF> = [
 
 export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'min-column-mds',
+    class: 'min-column-md',
     sortable: true,
     text: 'Registration Number',
     value: 'registrationNumber',
@@ -379,14 +379,14 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'min-column-mdl',
-    sortable: true,
+    sortable: false,
     text: 'Registering Party',
     value: 'registeringParty',
     display: false
   },
   {
     class: 'min-column-mdl',
-    sortable: true,
+    sortable: false,
     text: 'Secured Parties',
     value: 'securedParties',
     display: false

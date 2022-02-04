@@ -25,7 +25,7 @@ import {
   mockedRegistration1Collapsed,
   mockedRegistration2Collapsed
 } from './test-data'
-import { getLastEvent } from './utils'
+import { getLastEvent, setupIntersectionObserverMock } from './utils'
 
 Vue.use(Vuetify)
 
@@ -63,6 +63,7 @@ function createComponent (): Wrapper<any> {
 }
 
 describe('Test registration table with results', () => {
+  setupIntersectionObserverMock()
   let wrapper: Wrapper<any>
   const registrationHistory: RegistrationSummaryIF[] = [mockedRegistration1]
   const newRegistrationHistory: (RegistrationSummaryIF | DraftResultIF)[] = [
@@ -188,39 +189,43 @@ describe('Test registration table with results', () => {
     await flushPromises()
     // clear filters btn shows
     expect(wrapper.findAll('.v-btn.registration-action').length).toBe(1)
-    expect(wrapper.findAllComponents(TableRow).length).toBe(2)
-    for (let i = 0; i < wrapper.findAllComponents(TableRow).length; i++) {
-      expect(wrapper.findAllComponents(TableRow).at(i)
-        .vm.$props.setItem.baseRegistrationNumber).toContain(parentRegNumMatch)
-      expect(wrapper.findAllComponents(TableRow).at(i).vm.$props.setChild).toBe(false)
-      expect(wrapper.findAllComponents(TableRow).at(i).vm.$props.setIsExpanded).toBe(false)
-    }
-    // clear filters btn clears the filter
-    await wrapper.find('.v-btn.registration-action').trigger('click')
-    await flushPromises()
-    expect(wrapper.vm.registrationNumber).toBe('')
-    expect(wrapper.findAllComponents(TableRow).length).toBe(5)
-    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
-
-    // filter reg number child only match -> parent should show expanded
-    const childRegNumMatch = 'BC456789'
-    wrapper.vm.registrationNumber = childRegNumMatch
-    await flushPromises()
-    expect(wrapper.findAllComponents(TableRow).length).toBe(2)
-    // first item should be parent
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setChild).toBe(false)
-    expect(wrapper.findAllComponents(TableRow).at(0)
-      .vm.$props.setItem.baseRegistrationNumber).not.toContain(childRegNumMatch)
-    expect(wrapper.findAllComponents(TableRow).at(0)
-      .vm.$props.setItem.changes[0].registrationNumber).toContain(childRegNumMatch)
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setIsExpanded).toBe(true)
-    // second item should be child
-    const parentRegNum = wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem.baseRegistrationNumber
-    expect(wrapper.findAllComponents(TableRow).at(1).vm.$props.setChild).toBe(true)
-    expect(wrapper.findAllComponents(TableRow).at(1)
-      .vm.$props.setItem.baseRegistrationNumber).toBe(parentRegNum)
-    expect(wrapper.findAllComponents(TableRow).at(1)
-      .vm.$props.setItem.registrationNumber).toContain(childRegNumMatch)
+    // wait - sort will wait at least 1 second for debounce
+      setTimeout( async () => {
+        // emitted the new sort
+        expect(getLastEvent(wrapper, 'sort')).toEqual({
+          endDate: null,
+          folNum: '',
+          orderBy: '',
+          orderVal: '',
+          regBy: '',
+          regNum: '23',
+          regParty: '',
+          regType: '',
+          secParty: '',
+          startDate: null,
+          status: ''
+        })
+        // clear filters btn clears the filter
+        await wrapper.find('.v-btn.registration-action').trigger('click')
+        expect(wrapper.vm.registrationNumber).toBe('')
+        // need to wait 1 secs due to debounce
+        setTimeout(() => {
+          expect(getLastEvent(wrapper, 'sort')).toEqual({
+            endDate: null,
+            folNum: '',
+            orderBy: '',
+            orderVal: '',
+            regBy: '',
+            regNum: '',
+            regParty: '',
+            regType: '',
+            secParty: '',
+            startDate: null,
+            status: ''
+          })
+        }, 3000)
+        expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
+      }, 3000)
   })
 
   it('renders and displays the typeahead dropdown', async () => {
@@ -247,16 +252,20 @@ describe('Test registration table with results', () => {
     expect(wrapper.find(dateFilter).exists()).toBe(true)
     expect(wrapper.find(dateFilter).trigger('click'))
     await flushPromises()
+    await Vue.nextTick()
     expect(wrapper.vm.showDatePicker).toBe(true)
     expect(wrapper.findComponent(DatePicker).isVisible()).toBe(true)
     const startDate = '2021-10-24'
     const endDate = '2021-10-26'
     wrapper.findComponent(DatePicker).vm.$emit('submit', { endDate: endDate, startDate: startDate })
     await flushPromises()
-    expect(wrapper.vm.showDatePicker).toBe(false)
-    expect(wrapper.findComponent(DatePicker).isVisible()).toBe(false)
-    expect(wrapper.vm.submittedStartDate).toBe(startDate)
-    expect(wrapper.vm.submittedEndDate).toBe(endDate)
+    // wait for debounce
+    setTimeout( async () => {
+      expect(wrapper.vm.showDatePicker).toBe(false)
+      expect(wrapper.findComponent(DatePicker).isVisible()).toBe(false)
+      expect(wrapper.vm.submittedStartDate).toBe(startDate)
+      expect(wrapper.vm.submittedEndDate).toBe(endDate)
+    }, 2000)
   })
 
   it('emits button actions from TableRow', async () => {

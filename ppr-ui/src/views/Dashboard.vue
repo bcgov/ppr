@@ -137,7 +137,7 @@
             no-gutters
           >
             <v-col cols="auto">
-              <b>Registrations</b> ({{ myRegistrationsLength }})
+              <b>Registrations</b> ({{ myRegTotalBaseRegLength }})
             </v-col>
             <v-col>
               <v-row justify="end" no-gutters>
@@ -201,10 +201,14 @@
             <v-col cols="12">
               <registration-table
                 :setHeaders="myRegHeaders"
+                :setLoading="myRegDataLoading"
                 :setRegistrationHistory="myRegistrations"
                 :setSearch="myRegFilter"
+                :setSort="myRegSortOptions"
                 @action="myRegActionHandler($event)"
                 @error="emitError($event)"
+                @getNext="myRegGetNext()"
+                @sort="myRegSort($event)"
               />
             </v-col>
           </v-row>
@@ -230,6 +234,7 @@ import {
   DialogOptionsIF, // eslint-disable-line no-unused-vars
   DraftResultIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
+  RegistrationSortIF, // eslint-disable-line no-unused-vars
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, // eslint-disable-line no-unused-vars
@@ -323,6 +328,7 @@ export default class Dashboard extends Vue {
   private registryUrl: string
 
   private loading = false
+  // my reg table action stuff
   private myRegAction: TableActions = null
   private myRegActionDialog: DialogOptionsIF = dischargeConfirmationDialog
   private myRegActionDialogDisplay = false
@@ -335,15 +341,35 @@ export default class Dashboard extends Vue {
   private myRegAddDialogError: StatusCodes = null
   private myRegAddDialogDisplay = false
   private myRegErrDialogDisplay = false
-  private myRegDataDrafts: DraftResultIF[] = []
-  private myRegDataHistory: RegistrationSummaryIF[] = []
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
 
+  // my reg table items/headers/sort info
+  private myRegDataBaseRegDrafts: DraftResultIF[] = []
+  private myRegDataChildDrafts: DraftResultIF[] = []
+  private myRegDataHistory: RegistrationSummaryIF[] = []
+  private myRegDataLoading = false
   private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
   private myRegHeadersSelected = [...registrationTableHeaders]
+  private myRegNoMorePages = false
+  private myRegPage = 1
+  private myRegSortOptions: RegistrationSortIF = {
+    endDate: null,
+    folNum: '',
+    orderBy: 'createDateTime',
+    orderVal: 'desc',
+    regBy: '',
+    regNum: '',
+    regParty: '',
+    regType: '',
+    secParty: '',
+    startDate: null,
+    status: ''
+  }
+
+  private myRegTotalBaseRegLength = 0
 
   private payErrorDisplay = false
   private payErrorOptions: DialogOptionsIF = null
@@ -371,11 +397,7 @@ export default class Dashboard extends Vue {
   }
 
   private get myRegistrations () {
-    return [...this.myRegDataDrafts, ...this.myRegDataHistory]
-  }
-
-  private get myRegistrationsLength (): number {
-    return this.myRegistrations?.length || 0
+    return [...this.myRegDataBaseRegDrafts, ...this.myRegDataHistory]
   }
 
   private get myRegAddInvalid (): boolean {
@@ -639,6 +661,80 @@ export default class Dashboard extends Vue {
     this.myRegErrDialogDisplay = false
   }
 
+  private async myRegGetNext (): Promise<void> {
+    if (this.myRegDataLoading || !this.myRegNoMorePages) return
+    this.myRegDataLoading = true
+    this.myRegPage += 1
+    const nextRegs = await registrationHistory(this.myRegSortOptions, this.myRegPage)
+    if (nextRegs.error) {
+      this.emitError(nextRegs.error)
+    } else {
+      // add child drafts to new regs if applicable
+      const updatedRegs = this.myRegHistoryDraftCollapse(this.myRegDataChildDrafts, nextRegs.registrations, true)
+      this.myRegDataHistory = this.myRegDataHistory.concat(updatedRegs.registrations)
+    }
+    if (nextRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
+    this.myRegDataLoading = false
+  }
+
+  private myRegHistoryDraftCollapse (
+    drafts: DraftResultIF[],
+    registrations: RegistrationSummaryIF[],
+    sorting: boolean
+  ): { drafts: DraftResultIF[], registrations: RegistrationSummaryIF[] } {
+    // add child drafts to their base registration in registration history
+    const parentDrafts = [] as DraftResultIF[]
+    for (let i = 0; i < drafts.length; i++) {
+      // check if it has a parent reg
+      if (drafts[i].baseRegistrationNumber) {
+        // find parent reg
+        let found = false
+        for (let k = 0; k < registrations.length; k++) {
+          if (registrations[k].baseRegistrationNumber === drafts[i].baseRegistrationNumber) {
+            // add child draft to parent reg
+            if (!registrations[k].changes) registrations[k].changes = []
+            registrations[k].changes.unshift(drafts[i])
+            registrations[k].hasDraft = true
+            found = true
+            if (!sorting) this.myRegDataChildDrafts.push(drafts[i])
+          }
+        }
+        // if sorting and the base reg is not in the list, add the draft to the parent list
+        if (sorting && !found) {
+          parentDrafts.push(drafts[i])
+        }
+      } else {
+        // doesn't have a parent reg, this will be added to the normal draft results
+        parentDrafts.push(drafts[i])
+      }
+    }
+    return {
+      drafts: parentDrafts,
+      registrations: registrations
+    }
+  }
+
+  private async myRegSort (sortOptions: RegistrationSortIF): Promise<void> {
+    this.myRegDataLoading = true
+    this.myRegNoMorePages = false
+    this.myRegSortOptions = sortOptions
+    this.myRegPage = 1
+    const sortedDrafts = await draftHistory(this.myRegSortOptions)
+    const sortedRegs = await registrationHistory(this.myRegSortOptions, this.myRegPage)
+    // prioritize reg history error
+    const error = sortedRegs.error || sortedDrafts.error
+    if (error) {
+      this.emitError(error)
+    } else {
+      // add child drafts to their base registration in registration history
+      const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(sortedDrafts.drafts, sortedRegs.registrations, true)
+      // only add parent drafts to draft results
+      this.myRegDataBaseRegDrafts = histroyDraftsCollapsed.drafts
+      this.myRegDataHistory = histroyDraftsCollapsed.registrations
+    }
+    this.myRegDataLoading = false
+  }
+
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     window.location.assign(this.registryUrl)
@@ -654,7 +750,7 @@ export default class Dashboard extends Vue {
       // remove from table
       if (!regNum) {
         // is not a child
-        this.myRegDataDrafts = this.myRegDataDrafts.filter(reg => reg.documentId !== docId)
+        this.myRegDataBaseRegDrafts = this.myRegDataBaseRegDrafts.filter(reg => reg.documentId !== docId)
       } else {
         // is a child of another base registration
         for (let i = 0; i < this.myRegDataHistory.length; i++) {
@@ -716,6 +812,7 @@ export default class Dashboard extends Vue {
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
   private async onAppReady (val: boolean): Promise<void> {
+    this.loading = true
     // do not proceed if app is not ready
     if (!val) return
 
@@ -725,36 +822,27 @@ export default class Dashboard extends Vue {
       this.redirectRegistryHome()
       return
     }
-
+    // FUTURE: add loading for search history too
+    this.myRegDataLoading = true
     this.retrieveSearchHistory()
-
-    const myRegDrafts = await draftHistory()
-    const myRegHistory = await registrationHistory()
+    const myRegDrafts = await draftHistory(this.myRegSortOptions)
+    const myRegHistory = await registrationHistory(this.myRegSortOptions, 1)
 
     if (myRegDrafts?.error || myRegHistory?.error) {
-      this.emitError({ statusCode: StatusCodes.NOT_FOUND })
+      // prioritize reg error
+      const error = myRegHistory?.error || myRegDrafts?.error
+      this.emitError(error)
     } else {
       // add child drafts to their base registration in registration history
-      const parentDrafts = [] as DraftResultIF[]
-      for (let i = 0; i < myRegDrafts.drafts.length; i++) {
-        // check if it has a parent reg
-        if (myRegDrafts.drafts[i].baseRegistrationNumber) {
-          // find parent reg
-          for (let k = 0; k < myRegHistory.registrations.length; k++) {
-            if (myRegHistory.registrations[k].baseRegistrationNumber === myRegDrafts.drafts[i].baseRegistrationNumber) {
-              // add child draft to parent reg
-              if (!myRegHistory.registrations[k].changes) myRegHistory.registrations[k].changes = []
-              myRegHistory.registrations[k].changes.unshift(myRegDrafts.drafts[i])
-            }
-          }
-        } else {
-          // doesn't have a parent reg, this will be added to the normal draft results
-          parentDrafts.push(myRegDrafts.drafts[i])
-        }
-      }
+      const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(
+        myRegDrafts.drafts, myRegHistory.registrations, false)
       // only add parent drafts to draft results
-      this.myRegDataDrafts = parentDrafts
-      this.myRegDataHistory = myRegHistory.registrations
+      this.myRegDataBaseRegDrafts = histroyDraftsCollapsed.drafts
+      this.myRegDataHistory = histroyDraftsCollapsed.registrations
+      if (myRegHistory.registrations.length > 0) {
+        this.myRegTotalBaseRegLength = myRegHistory.registrations[0].totalRegistrationCount || 0
+      }
+      this.myRegTotalBaseRegLength += this.myRegDataBaseRegDrafts.length
     }
     // update columns selected with user settings
     if (this.getUserSettings?.[SettingOptions.REGISTRATION_TABLE]?.columns) {
@@ -769,8 +857,10 @@ export default class Dashboard extends Vue {
       }
       this.myRegHeadersSelected = headers
     }
+    this.myRegDataLoading = false
 
     // tell App that we're finished loading
+    this.loading = false
     this.emitHaveData(true)
   }
 
