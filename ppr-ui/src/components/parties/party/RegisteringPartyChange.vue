@@ -21,7 +21,7 @@
             :isAutoCompleteDisabled="addEditInProgress"
             :setIsRegisteringParty="true"
             @showSecuredPartyAdd="initAdd"
-            @hideSearch="openChangeScreen = false"
+            @hideSearch="resetData"
           />
           <div v-if="showAddRegisteringParty">
             <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
