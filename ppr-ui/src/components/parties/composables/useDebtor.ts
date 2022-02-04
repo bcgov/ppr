@@ -110,6 +110,9 @@ export const useDebtor = (props, context) => {
           'en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
       } else {
         localState.currentDebtor.birthDate = null
+        if (localState.originalDebtor && !localState.originalDebtor.birthDate) {
+          localState.originalDebtor.birthDate = null
+        }
       }
     }
 

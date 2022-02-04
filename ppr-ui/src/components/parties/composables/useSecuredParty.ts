@@ -94,6 +94,9 @@ export const useSecuredParty = (props, context) => {
   const addEditSecuredParty = async () => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
+    if (!localState.currentSecuredParty.businessName) {
+      delete localState.currentSecuredParty.businessName
+    }
     // if they didn't change anything, just exit
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
     isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
