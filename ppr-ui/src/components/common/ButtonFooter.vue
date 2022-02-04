@@ -1,5 +1,8 @@
 <template>
   <v-footer class="white pa-0">
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
     <staff-payment-dialog
       attach=""
       class="mt-10"
@@ -86,6 +89,7 @@ import {
   watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import _ from 'lodash'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
@@ -154,6 +158,7 @@ export default defineComponent({
       },
       errorDialogDisplay: false,
       errorOptions: registrationSaveDraftErrorDialog,
+      submitting: false,
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
       }),
@@ -200,7 +205,7 @@ export default defineComponent({
     /** Save the draft version from data stored in the state model. */
     const saveDraft = async () => {
       const stateModel: StateModelIF = getStateModel.value
-      const draft: DraftIF = await saveFinancingStatementDraft(stateModel)
+      const draft: DraftIF = await throttleSubmitStatementDraft(stateModel)
       setDraft(draft)
       if (draft.error !== undefined) {
         console.log(
@@ -291,7 +296,7 @@ export default defineComponent({
       const stateModel: StateModelIF = getStateModel.value
       if (checkValid()) {
         // API call here
-        const apiResponse: FinancingStatementIF = await saveFinancingStatement(stateModel)
+        const apiResponse: FinancingStatementIF = await throttleSubmitStatement(stateModel)
         if (apiResponse.error !== undefined) {
           // Emit error message.
           emit('error', apiResponse.error)
@@ -309,6 +314,22 @@ export default defineComponent({
         emit('registration-incomplete', error)
       }
     }
+
+    const throttleSubmitStatement = _.throttle(async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
+      // Prevents multiple submits (i.e. double click)
+      localState.submitting = true
+      const statement = await saveFinancingStatement(stateModel)
+      localState.submitting = false
+      return statement
+    }, 3000, { trailing: false })
+
+    const throttleSubmitStatementDraft = _.throttle(async (stateModel: StateModelIF): Promise<DraftIF> => {
+      // Prevents multiple submits (i.e. double click)
+      localState.submitting = true
+      const statement = await saveFinancingStatementDraft(stateModel)
+      localState.submitting = false
+      return statement
+    }, 3000, { trailing: false })
 
     watch(() => props.forceSave, (val: boolean) => {
       // on change (T/F doesn't matter), save and go back to dash

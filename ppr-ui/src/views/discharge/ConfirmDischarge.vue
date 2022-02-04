@@ -6,6 +6,9 @@
     fluid
     style="min-width: 960px;"
   >
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
     <base-dialog
       setAttach="#confirm-discharge"
       :setOptions="options"
@@ -111,6 +114,7 @@ import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { Throttle } from '@/decorators'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   DischargeRegistrationIF, // eslint-disable-line no-unused-vars
@@ -164,6 +168,7 @@ export default class ConfirmDischarge extends Vue {
   private options: DialogOptionsIF = dischargeCancelDialog
   private showCancelDialog = false
   private showErrors = false
+  private submitting = false
   private tooltipTxt = 'The default Registering Party is based on your BC ' +
     'Registries user account information. This information can be updated within ' +
     'your account settings. You can change to a different Registering Party by ' +
@@ -217,6 +222,7 @@ export default class ConfirmDischarge extends Vue {
       return
     }
     this.financingStatementDate = new Date()
+    this.submitting = true
     const financingStatement = await getFinancingStatement(
       true,
       this.registrationNumber
@@ -258,6 +264,7 @@ export default class ConfirmDischarge extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
     }
+    this.submitting = false
   }
 
   mounted () {
@@ -288,6 +295,7 @@ export default class ConfirmDischarge extends Vue {
     this.showCancelDialog = true
   }
 
+  @Throttle(2000)
   private async submitDischarge (): Promise<void> {
     if ((!this.validConfirm) || (!this.validFolio) || (!this.validCertify)) {
       this.showErrors = true
@@ -295,7 +303,9 @@ export default class ConfirmDischarge extends Vue {
     }
 
     const stateModel: StateModelIF = this.getStateModel
+    this.submitting = true
     const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
+    this.submitting = false
     if (apiResponse === undefined || apiResponse?.error !== undefined) {
       this.emitError(apiResponse?.error)
     } else {
@@ -337,10 +347,11 @@ export default class ConfirmDischarge extends Vue {
     try {
       await this.loadRegistration()
     } catch (error) {
-      console.error(error)
+      const errorMsg = error as string
+      console.error(errorMsg)
       this.emitError({
         statusCode: 500,
-        message: error
+        message: errorMsg
       })
     }
 

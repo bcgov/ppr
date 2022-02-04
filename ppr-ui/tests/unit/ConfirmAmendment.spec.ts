@@ -340,9 +340,11 @@ describe('Confirm Amendment for staff', () => {
     expect(wrapper.vm.collateralValid).toBe(true)
     expect(wrapper.vm.partiesValid).toBe(true)
     expect(wrapper.vm.courtOrderValid).toBe(true)
-
-    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    await flushPromises()
-    expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
+    // need to wait 2 secs so throttle is done
+    setTimeout(async () => {
+      await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+      await flushPromises()
+      expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
+    }, 2000)
   })
 })
