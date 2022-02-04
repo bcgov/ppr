@@ -274,7 +274,9 @@ export default defineComponent({
               collateral.addedDateTime === generalCollateral[i].addedDateTime
             )
             if (existsIndex !== -1) {
-              cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
+              if (!alreadyAdded) {
+                cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
+              }
             } else {
               if (!alreadyAdded) {
                 cleanedGeneralCollateral.push(generalCollateral[i])
