@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { computed, reactive, Ref } from '@vue/composition-api'
-import { uniqueId } from 'lodash'
+import { uniqueId, cloneDeep } from 'lodash'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
@@ -10,7 +10,7 @@ export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
   const country = computed((): string => {
     return addressLocal.value.country
   })
-  const schemaLocal = schema
+  const schemaLocal = cloneDeep(schema)
   const isSchemaRequired = (prop: string): boolean => {
     if (!schemaLocal || !schemaLocal.value[prop]) return false
 

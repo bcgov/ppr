@@ -36,7 +36,7 @@
             item-value="code"
             :items="getCountries()"
             :label="countryLabel"
-            :rules="[...schemaLocal.country]"
+            :rules="[...currentSchema.country]"
             v-model="addressLocal.country"
           />
           <!-- special field to select AddressComplete country, separate from our model field -->
@@ -55,7 +55,7 @@
             :label="streetLabel"
             :name="Math.random()"
             persistent-hint
-            :rules="[...schemaLocal.street]"
+            :rules="[...currentSchema.street]"
             v-model="addressLocal.street"
             @keypress.once="enableAddressComplete()"
             @click="enableAddressComplete()"
@@ -71,7 +71,7 @@
             :name="Math.random()"
             rows="1"
             v-model="addressLocal.streetAdditional"
-            :rules="[...schemaLocal.streetAdditional]"
+            :rules="[...currentSchema.streetAdditional]"
           />
         </div>
         <div class="form__row three-column">
@@ -82,7 +82,7 @@
             :label="cityLabel"
             :name="Math.random()"
             v-model="addressLocal.city"
-            :rules="[...schemaLocal.city]"
+            :rules="[...currentSchema.city]"
           />
           <v-autocomplete v-if="useCountryRegions(country)"
             autocomplete="new-password"
@@ -95,7 +95,7 @@
             :label="regionLabel"
             :menu-props="{ maxHeight: '14rem' }"
             :name="Math.random()"
-            :rules="[...schemaLocal.region]"
+            :rules="[...currentSchema.region]"
             v-model="addressLocal.region"
           />
           <v-text-field v-else
@@ -104,7 +104,7 @@
             :label="regionLabel"
             :name="Math.random()"
             v-model="addressLocal.region"
-            :rules="[...schemaLocal.region]"
+            :rules="[...currentSchema.region]"
           />
           <v-text-field
             filled
@@ -112,7 +112,7 @@
             :label="postalCodeLabel"
             :name="Math.random()"
             v-model="addressLocal.postalCode"
-            :rules="[...schemaLocal.postalCode]"
+            :rules="[...currentSchema.postalCode]"
           />
         </div>
         <div class="form__row">
@@ -124,7 +124,7 @@
             :name="Math.random()"
             rows="2"
             v-model="addressLocal.deliveryInstructions"
-            :rules="[...schemaLocal.deliveryInstructions]"
+            :rules="[...currentSchema.deliveryInstructions]"
           />
         </div>
       </v-form>
@@ -133,7 +133,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, onMounted, toRefs, watch, reactive } from '@vue/composition-api'
 
 import {
   baseRules,
@@ -186,9 +186,12 @@ export default defineComponent({
       isSchemaRequired,
       labels
     } = useAddress(toRefs(props).value, toRefs(props).schema)
+    const localState = reactive({
+      currentSchema: schemaLocal
+    })
 
-    const origPostalCodeRules = schemaLocal.value.postalCode
-    const origRegionRules = schemaLocal.value.region
+    const origPostalCodeRules = localState.currentSchema.postalCode
+    const origRegionRules = localState.currentSchema.region
 
     const { addressForm, validate } = useBaseValidations()
 
@@ -199,19 +202,15 @@ export default defineComponent({
     const countryChangeHandler = (val: string, oldVal: string) => {
       // do not trigger any changes if it is view only (summary instance)
       if (!props.editing) return
-
       if (val === 'CA') {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
-        schemaLocal.value.region = origRegionRules
+        localState.currentSchema.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
+        localState.currentSchema.region = origRegionRules
       } else if (val === 'US') {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
-        schemaLocal.value.region = origRegionRules
+        localState.currentSchema.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
+        localState.currentSchema.region = origRegionRules
       } else {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
-        for (let i = 0; i < schemaLocal.value.region.length; i++) {
-          schemaLocal.value.region.pop()
-        }
-        schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
+        localState.currentSchema.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
+        localState.currentSchema.region = [baseRules.maxLength(2), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
       if (oldVal) {
@@ -233,8 +232,8 @@ export default defineComponent({
        * NOTE: we don't want it to trigger error msgs yet which is why this does not call validate()
       */
       for (const key in val) {
-        for (const index in schemaLocal.value[key]) {
-          if (schemaLocal.value[key][index](val[key]) !== true) {
+        for (const index in localState.currentSchema[key]) {
+          if (localState.currentSchema[key][index](val[key]) !== true) {
             valid = false
             break
           }
@@ -265,7 +264,8 @@ export default defineComponent({
       schemaLocal,
       useCountryRegions,
       ...uniqueIds,
-      validate
+      validate,
+      ...toRefs(localState)
     }
   }
 })
