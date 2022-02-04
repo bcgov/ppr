@@ -5,47 +5,47 @@
       :class="cardClass"
       flat
     >
-      <v-row no-gutters class="py-6">
+      <v-row no-gutters class="py-4">
         <v-col class="generic-label">
           General Collateral
         </v-col>
       </v-row>
-      <v-row>
+      <v-row no-gutters>
         <v-col
           >Indicate the General Collateral to be deleted from or added to this
           registration.
         </v-col>
       </v-row>
-      <v-row>
+      <v-row no-gutters class="pt-8">
         <v-col class="generic-label">
           General Collateral to be Deleted
         </v-col>
       </v-row>
-      <v-row>
+      <v-row no-gutters>
         <v-col class="pr-4">
           <v-textarea
             v-model="delDesc"
             id="general-collateral-delete-desc"
             auto-grow
             filled
-            label="Enter the General Collateral to be deleted from this registration."
+            label="Enter the General Collateral to be deleted from this registration"
             class="white pt-2 text-input-field"
           />
         </v-col>
       </v-row>
-      <v-row>
+      <v-row no-gutters>
         <v-col class="generic-label">
           General Collateral to be Added
         </v-col>
       </v-row>
-      <v-row>
+      <v-row no-gutters>
         <v-col class="pr-4">
           <v-textarea
             v-model="addDesc"
             id="general-collateral-add-desc"
             auto-grow
             filled
-            label="Enter the General Collateral to be added to this registration."
+            label="Enter the General Collateral to be added to this registration"
             class="white pt-2 text-input-field"
           />
         </v-col>

@@ -76,7 +76,7 @@
             :setShowErrorBar="errorBar"
             class="mt-15"
           />
-          <amendment-description class="mt-15"
+          <amendment-description class="mt-12"
             :setShowErrors="showInvalid"
           />
           <court-order class="mt-15"
