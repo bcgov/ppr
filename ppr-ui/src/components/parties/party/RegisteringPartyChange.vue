@@ -34,7 +34,7 @@
               outlined
               color="primary"
               class="float-right"
-              @click="openChangeScreen = false"
+              @click="resetData"
             >
               Cancel
             </v-btn>
