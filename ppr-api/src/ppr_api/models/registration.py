@@ -22,7 +22,8 @@ from flask import current_app
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
-from ppr_api.services.authz import is_all_staff_account
+from ppr_api.models import registration_utils
+from ppr_api.models.registration_utils import AccountRegistrationParams
 
 from .db import db
 from .draft import Draft
@@ -90,7 +91,7 @@ class PPSATypes(str, Enum):
     SALE_GOODS = 'SG'
 
 
-class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
+class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
     """This class manages all statement registration information."""
 
     class RegistrationTypes(str, Enum):
@@ -370,7 +371,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
             try:
                 registration = cls.query.filter(Registration.registration_num == registration_num).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
-                current_app.logger.error('DB find_by_registration_number exception: ' + repr(db_exception))
+                current_app.logger.error('DB find_by_registration_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
         if not registration:
@@ -409,8 +410,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @classmethod
-    def find_all_by_account_id(  # pylint: disable=too-many-locals
-            cls, account_id: str, collapse: bool = False, account_name: str = None, sbc_staff: bool = False):
+    def get_account_reg_count(cls, account_id: str) -> int:
+        """Get the total number of eligible financing statements for an account."""
+        count: int = 0
+        result = db.session.execute(model_utils.QUERY_ACCOUNT_REG_TOTAL, {'query_account': account_id})
+        row = result.first()
+        count = int(row._mapping['reg_count'])  # pylint: disable=protected-access; follows documentation
+        return count
+
+    @classmethod
+    def find_all_by_account_id(cls, params: AccountRegistrationParams):  # pylint: disable=too-many-locals
         """Return a summary list of recent registrations belonging to an account.
 
         To access a verification statement report, one of the followng conditions must be true:
@@ -419,14 +428,17 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         3. The request account name matches one of the base registration secured party names.
         """
         results_json = []
-        if account_id is None:
+        if params is None or params.account_id is None:
             return results_json
 
         registrations_json = []
         try:
+            if params.from_ui:
+                return Registration.find_all_by_account_id_filter(params)
+
             results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
-                                         {'query_account': account_id,
-                                          'max_results_size': model_utils.get_max_registrations_size()})
+                                         {'query_account': params.account_id,
+                                          'max_results_size': model_utils.MAX_ACCOUNT_REGISTRATIONS_DEFAULT})
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:
@@ -454,39 +466,45 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                             'clientReferenceId': str(mapping['client_reference_id']),
                             'registeringName': registering_name
                         }
-                        reg_class = result['registrationClass']
-                        if model_utils.is_financing(reg_class):
-                            result['baseRegistrationNumber'] = reg_num
-                            result['path'] = FINANCING_PATH + reg_num
-                        elif reg_class == model_utils.REG_CLASS_DISCHARGE:
-                            result['path'] = FINANCING_PATH + base_reg_num + '/discharges/' + reg_num
-                        elif reg_class == model_utils.REG_CLASS_RENEWAL:
-                            result['path'] = FINANCING_PATH + base_reg_num + '/renewals/' + reg_num
-                        elif reg_class == model_utils.REG_CLASS_CHANGE:
-                            result['path'] = FINANCING_PATH + base_reg_num + '/changes/' + reg_num
-                        elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
-                            result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
+                        result = registration_utils.set_path(params, result, reg_num, base_reg_num)
+
                         if result['statusType'] == model_utils.STATE_ACTIVE and result['expireDays'] < 0 \
                                 and result['expireDays'] != -99:
                             result['statusType'] = model_utils.STATE_EXPIRED
 
-                        result = Registration.__update_summary_optional(result, account_id, sbc_staff)
-                        # Set if user can access verification statement.
-                        if not Registration.can_access_report(account_id, account_name, result, sbc_staff):
-                            result['path'] = ''
-
+                        result = registration_utils.update_summary_optional(result, params.account_id, params.sbc_staff)
                         if 'accountId' in result:
                             del result['accountId']  # Only use this for report access checking.
 
-                        if collapse and not model_utils.is_financing(reg_class):
+                        if params.collapse and not model_utils.is_financing(result['registrationClass']):
                             registrations_json.append(result)
                         else:
                             results_json.append(result)
-                if collapse:
-                    return Registration.__build_account_collapsed_json(results_json, registrations_json)
+                if params.collapse:
+                    return registration_utils.build_account_collapsed_json(results_json, registrations_json)
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB find_all_by_account_id exception: ' + repr(db_exception))
+            current_app.logger.error('DB find_all_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
+
+        return results_json
+
+    @classmethod
+    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams):  # pylint: disable=too-many-locals
+        """Return a summary list of registrations belonging to an account applying filters."""
+        results_json = []
+        count = Registration.get_account_reg_count(params.account_id)
+        query = registration_utils.build_account_reg_query(params)
+        query_params = registration_utils.build_account_query_params(params)
+        results = db.session.execute(query, query_params)
+        rows = results.fetchall()
+        results_json = registration_utils.build_account_base_reg_results(params, rows)
+        if results_json:
+            results_json[0]['totalRegistrationCount'] = count
+            # Get change registrations.
+            query = registration_utils.build_account_change_query(params)
+            results = db.session.execute(query, query_params)
+            rows = results.fetchall()
+            results_json = registration_utils.update_account_reg_results(params, rows, results_json)
 
         return results_json
 
@@ -553,13 +571,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
                     elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                         result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
                     # Set if user can access verification statement.
-                    if not Registration.can_access_report(account_id, account_name, result, sbc_staff):
+                    if not registration_utils.can_access_report(account_id, account_name, result, sbc_staff):
                         result['path'] = ''
-                    result = Registration.__update_summary_optional(result, account_id, sbc_staff)
+                    result = registration_utils.update_summary_optional(result, account_id, sbc_staff)
                     if not model_utils.is_financing(reg_class):
                         changes.append(result)
         except Exception as db_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('DB find_summary_by_reg_num exception: ' + repr(db_exception))
+            current_app.logger.error('DB find_summary_by_reg_num exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
         if not result:
@@ -567,49 +585,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if result and changes:
             result['changes'] = changes
         return result
-
-    @staticmethod
-    def can_access_report(account_id: str, account_name: str, reg_json, sbc_staff: bool = False) -> bool:
-        """Determine if request account can view the registration verification statement."""
-        # All staff roles can see any verification statement.
-        reg_account_id = reg_json['accountId']
-        if is_all_staff_account(account_id) or sbc_staff:
-            return True
-        if account_id == reg_account_id:
-            return True
-        if account_name:
-            if reg_json['registeringParty'] == account_name:
-                return True
-            sp_names = reg_json['securedParties']
-            if sp_names and account_name in sp_names:
-                return True
-        return False
-
-    @staticmethod
-    def __update_summary_optional(reg_json, account_id: str, sbc_staff: bool = False):
-        """Single summary result replace optional property 'None' with ''."""
-        if not reg_json['registeringName'] or reg_json['registeringName'].lower() == 'none':
-            reg_json['registeringName'] = ''
-        # Only staff role or matching account includes registeringName
-        elif not is_all_staff_account(account_id) and not sbc_staff and 'accountId' in reg_json and \
-                account_id != reg_json['accountId']:
-            reg_json['registeringName'] = ''
-
-        if not reg_json['clientReferenceId'] or reg_json['clientReferenceId'].lower() == 'none':
-            reg_json['clientReferenceId'] = ''
-        return reg_json
-
-    @staticmethod
-    def __build_account_collapsed_json(financing_json, registrations_json):
-        """Organize account registrations as parent/child financing statement/change registrations."""
-        for statement in financing_json:
-            changes = []
-            for registration in registrations_json:
-                if statement['registrationNumber'] == registration['baseRegistrationNumber']:
-                    changes.append(registration)
-            if changes:
-                statement['changes'] = changes
-        return financing_json
 
     def verification_json(self, reg_num_name: str):
         """Generate verification statement json for API response and verification reports."""
@@ -641,6 +616,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not draft:
             registration.document_number = reg_vals.document_number
             draft = Draft.create_from_registration(registration, json_data)
+        else:
+            draft.draft = json_data
         registration.draft = draft
         registration.registration_type_cl = registration_type_cl
         if registration_type_cl in (model_utils.REG_CLASS_AMEND,
@@ -774,6 +751,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not draft:
             registration.document_number = reg_vals.document_number
             draft = Draft.create_from_registration(registration, json_data, user_id)
+        else:
+            draft.draft = json_data
         registration.draft = draft
 
         return registration

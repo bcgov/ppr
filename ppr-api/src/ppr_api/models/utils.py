@@ -81,6 +81,7 @@ STATE_EXPIRED = 'HEX'
 LIFE_INFINITE = 99
 REPAIRER_LIEN_DAYS = 180
 REPAIRER_LIEN_YEARS = 0
+MAX_ACCOUNT_REGISTRATIONS_DEFAULT = 1000  # Use when not paging.
 
 # Legacy registration types not allowed with new financing statements.
 REG_TYPE_NEW_FINANCING_EXCLUDED = {
@@ -244,10 +245,15 @@ FETCH FIRST :max_results_size ROWS ONLY
 """
 
 QUERY_ACCOUNT_REGISTRATIONS = """
+WITH q AS (
+  SELECT (TO_TIMESTAMP(TO_CHAR(current_date, 'YYYY-MM-DD') || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
+      AS current_expire_ts
+)
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
        CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
+            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT)
+            END expire_days,
        (SELECT MAX(r2.registration_ts)
           FROM registrations r2
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
@@ -274,7 +280,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
         WHERE uer.registration_number = r.registration_number
           AND uer.account_id = r.account_id
           AND uer.removed_ind = 'Y') AS removed_count
-  FROM registrations r, registration_types rt, financing_statements fs
+  FROM registrations r, registration_types rt, financing_statements fs, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND fs.id IN (SELECT fs2.id
@@ -298,7 +304,8 @@ UNION (
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
        rt.registration_desc, r.base_reg_number, fs.state_type AS state,
        CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
+            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT)
+            END expire_days,
        (SELECT MAX(r2.registration_ts)
           FROM registrations r2
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
@@ -321,7 +328,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                             FROM users u
                            WHERE u.username = r.user_id) END) AS registering_name,
        0 AS removed_count
-  FROM registrations r, registration_types rt, financing_statements fs
+  FROM registrations r, registration_types rt, financing_statements fs, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND fs.id IN (SELECT fs2.id
@@ -450,6 +457,39 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
 ORDER BY d.create_ts DESC
 FETCH FIRST :max_results_size ROWS ONLY
+"""
+
+QUERY_ACCOUNT_REG_TOTAL = """
+SELECT COUNT(registration_id) AS reg_count
+  FROM account_registration_vw
+ WHERE account_id = :query_account
+   AND registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+"""
+
+QUERY_ACCOUNT_BASE_REG_BASE = """
+SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
+       registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
+       secured_party, client_reference_id, registering_name
+  FROM account_registration_vw arv
+ WHERE arv.account_id = :query_account
+   AND arv.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+"""
+
+QUERY_ACCOUNT_CHANGE_REG_BASE = """
+SELECT arv2.financing_id
+  FROM account_registration_vw arv2
+ WHERE arv2.account_id = :query_account
+   AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+"""
+
+QUERY_ACCOUNT_CHANGE_REG = """
+SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
+       registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
+       secured_party, client_reference_id, registering_name
+  FROM account_registration_vw
+ WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+   AND account_id = :query_account
+   AND financing_id IN (QUERY_ACCOUNT_CHANGE_REG_BASE)
 """
 
 # Error messages
