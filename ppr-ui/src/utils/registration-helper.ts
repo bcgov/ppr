@@ -145,18 +145,18 @@ function getIsStaff (stateModel:StateModelIF): boolean {
 function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF {
   const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
   let statement: AmendmentStatementIF = stateModel.registration.draft.amendmentStatement
-  // always add registering party
-  statement.registeringParty = stateModel.registration.parties.registeringParty
   if (!statement) {
     statement = {
       changeType: APIAmendmentTypes.AMENDMENT,
       baseRegistrationNumber: stateModel.registration.registrationNumber,
       description: stateModel.registration.amendmentDescription,
       debtorName: stateModel.registration.confirmDebtorName,
+      registeringParty: stateModel.registration.parties.registeringParty,
       authorizationReceived: true
     }
   } else {
     statement.description = stateModel.registration.amendmentDescription
+    statement.registeringParty = stateModel.registration.parties.registeringParty
   }
   const courtOrder = stateModel.registration.courtOrderInformation
   if (courtOrder && courtOrder.courtName !== '' && courtOrder.courtRegistry !== '' &&
