@@ -186,6 +186,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import _ from 'lodash'
 
 import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes } from '@/resources'
@@ -350,7 +351,7 @@ export default defineComponent({
         clientReferenceId: localState.folioNumber
       }
     }
-    const searchAction = async (proceed: boolean) => {
+    const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
         setSearching(true)
@@ -379,7 +380,7 @@ export default defineComponent({
         }
         setSearching(false)
       }
-    }
+    }, 2000, { trailing: false })
     const searchCheck = async () => {
       localState.validations = validateSearchAction(localState)
       if (localState.validations) {

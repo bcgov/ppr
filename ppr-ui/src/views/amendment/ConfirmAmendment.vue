@@ -1,11 +1,13 @@
 <template>
   <v-container
-    v-if="dataLoaded"
     id="confirm-amendment"
     class="view-container pa-15 pt-14"
     fluid
     style="min-width: 960px;"
   >
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
     <base-dialog
       setAttach="#confirm-amendment"
       :setOptions="options"
@@ -20,7 +22,7 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <div class="container pa-0" style="min-width: 960px;">
+    <div v-if="dataLoaded" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review and Confirm</h1>
@@ -185,6 +187,7 @@ import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
 
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { Throttle } from '@/decorators'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   AddCollateralIF, // eslint-disable-line no-unused-vars
@@ -298,6 +301,8 @@ export default class ConfirmAmendment extends Vue {
 
   private validFolio = true
   private feeType = FeeSummaryTypes.AMEND
+
+  private submitting = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -495,6 +500,7 @@ export default class ConfirmAmendment extends Vue {
     }
 
     this.financingStatementDate = new Date()
+    this.submitting = true
     const financingStatement = await getFinancingStatement(
       true,
       this.registrationNumber
@@ -520,6 +526,7 @@ export default class ConfirmAmendment extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
     }
+    this.submitting = false
   }
 
   mounted () {
@@ -534,6 +541,7 @@ export default class ConfirmAmendment extends Vue {
     this.emitHaveData(false)
   }
 
+  @Throttle(2000)
   private onStaffPaymentChanges (pay: boolean): void {
     if (pay) {
       this.submitAmendment()
@@ -555,9 +563,12 @@ export default class ConfirmAmendment extends Vue {
     this.showCancelDialog = true
   }
 
+  @Throttle(2000)
   private async saveDraft (): Promise<void> {
     const stateModel: StateModelIF = this.getStateModel
+    this.submitting = true
     const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
+    this.submitting = false
     if (draft.error !== undefined) {
       console.log(
         'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
@@ -569,6 +580,7 @@ export default class ConfirmAmendment extends Vue {
     this.emitHaveData(false)
   }
 
+  @Throttle(2000)
   private submitButton (): void {
     if (!this.validFolio || !this.certifyInformationValid || this.registeringOpen) {
       this.showErrors = true
@@ -586,7 +598,9 @@ export default class ConfirmAmendment extends Vue {
     // Incomplete validation check: all changes must be valid to submit registration.
     if (this.collateralValid && this.partiesValid && this.courtOrderValid) {
       const stateModel: StateModelIF = this.getStateModel
+      this.submitting = true
       const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
+      this.submitting = false
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
         this.emitError(apiResponse?.error)
       } else {
