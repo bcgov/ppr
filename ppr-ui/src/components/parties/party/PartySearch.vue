@@ -149,6 +149,7 @@ export default defineComponent({
 
     const selectItem = () => {
       localState.searchValue = ''
+      context.emit('selectItem')
       context.emit('hideSearch')
     }
 

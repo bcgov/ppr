@@ -37,7 +37,7 @@
           <h3 class="pt-6">Secured Parties</h3>
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
-            @setSecuredPartiesValid="securedPartiesValid = $event"
+            @setSecuredPartiesValid="setValidSecuredParties($event)"
             @securedPartyOpen="securedPartyOpen = $event"
             :setShowInvalid="showInvalid" class="pt-4"
             :setShowErrorBar="errorBar"
@@ -55,7 +55,7 @@
           <h3 class="pt-6">Debtors</h3>
           <debtors
             v-if="registrationType !== registrationTypeRL"
-            @setDebtorValid="debtorValid = $event"
+            @setDebtorValid="setValidDebtor($event)"
             @debtorOpen="debtorOpen = $event"
             :setShowInvalid="showInvalid"
             :setShowErrorBar="errorBar"
@@ -77,6 +77,7 @@
             class="mt-15"
           />
           <amendment-description class="mt-15"
+            @valid="detailsValid = $event"
             :setShowErrors="showInvalid"
           />
           <court-order class="mt-15"
@@ -228,6 +229,7 @@ export default class AmendRegistration extends Vue {
   private errorBar = false
   private collateralOpen = false
   private lengthTrustOpen = false
+  private detailsValid = false
   private amendErrMsg = ''
 
   private get asOfDateTime (): string {
@@ -568,10 +570,22 @@ export default class AmendRegistration extends Vue {
     this.dataLoaded = true
   }
 
-  @Watch('debtorValid')
-  @Watch('securedPartiesValid')
-  private showInvalidComponents (val: boolean): void {
-    this.showInvalid = true
+  private setValidSecuredParties (val: boolean) {
+    if (!val) {
+      this.showInvalid = true
+    } else {
+      this.amendErrMsg = ''
+    }
+    this.securedPartiesValid = val
+  }
+
+  private setValidDebtor (val: boolean) {
+    if (!val) {
+      this.showInvalid = true
+    } else {
+      this.amendErrMsg = ''
+    }
+    this.debtorValid = val
   }
 
   @Watch('securedPartyOpen')
@@ -580,6 +594,14 @@ export default class AmendRegistration extends Vue {
   @Watch('lengthTrustOpen')
   private resetOpenError (isOpen: boolean): void {
     if (!isOpen) {
+      this.errorBar = false
+      this.amendErrMsg = ''
+    }
+  }
+
+  @Watch('detailsValid')
+  private resetValidationError (isValid: boolean): void {
+    if (isValid) {
       this.errorBar = false
       this.amendErrMsg = ''
     }
