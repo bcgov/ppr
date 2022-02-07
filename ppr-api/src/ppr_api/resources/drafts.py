@@ -22,6 +22,7 @@ from flask_restx import Namespace, Resource, cors
 
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import Draft
+from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized
 from ppr_api.utils.auth import jwt
@@ -55,7 +56,12 @@ class DraftResource(Resource):
                 return resource_utils.unauthorized_error_response(account_id)
 
             # Try to fetch draft list for account ID
-            draft_list = Draft.find_all_by_account_id(account_id)
+            params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                          collapse=True,
+                                                                          account_name=None,
+                                                                          sbc_staff=False)
+            params = resource_utils.get_account_registration_params(request, params)
+            draft_list = Draft.find_all_by_account_id(account_id, params)
             return jsonify(draft_list), HTTPStatus.OK
 
         except DatabaseException as db_exception:

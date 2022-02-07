@@ -25,11 +25,12 @@ from ppr_api.services.authz import is_all_staff_account
 
 
 PARAM_TO_ORDER_BY = {
-    'registration_number': 'registration_number',
-    'registering_name': 'registering_name',
-    'client_reference_id': 'client_reference_id',
-    'start_date_time': 'registration_ts',
-    'end_date_time': 'registration_ts'
+    'registrationNumber': 'registration_number',
+    'registrationType': 'registration_type',
+    'registeringName': 'registering_name',
+    'clientReferenceId': 'client_reference_id',
+    'startDateTime': 'registration_ts',
+    'endDateTime': 'registration_ts'
 }
 
 FINANCING_PATH = '/ppr/api/v1/financing-statements/'

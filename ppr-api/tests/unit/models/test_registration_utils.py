@@ -33,12 +33,13 @@ TEST_REG_COUNT_DATA = [
 TEST_QUERY_ORDER_DATA = [
     (None, None, ' ORDER BY registration_ts DESC'),
     ('invalid', None, ' ORDER BY registration_ts DESC'),
-    ('registration_number', None, ' ORDER BY registration_number DESC'),
-    ('registration_number', 'asc', ' ORDER BY registration_number asc'),
-    ('registering_name', 'descending', ' ORDER BY registering_name descending'),
-    ('client_reference_id', 'asc', ' ORDER BY client_reference_id asc'),
-    ('start_date_time', 'ascending', ' ORDER BY registration_ts ascending'),
-    ('end_date_time', 'desc', ' ORDER BY registration_ts desc')
+    ('registrationNumber', None, ' ORDER BY registration_number DESC'),
+    ('registrationNumber', 'asc', ' ORDER BY registration_number asc'),
+    ('registrationType', 'ascending', ' ORDER BY registration_type ascending'),
+    ('registeringName', 'descending', ' ORDER BY registering_name descending'),
+    ('clientReferenceId', 'asc', ' ORDER BY client_reference_id asc'),
+    ('startDateTime', 'ascending', ' ORDER BY registration_ts ascending'),
+    ('endDateTime', 'desc', ' ORDER BY registration_ts desc')
 ]
 
 # testdata pattern is ({reg_num}, {reg_type}, {client_ref}, {registering_name}, {status}, {start_ts}, {end_ts})

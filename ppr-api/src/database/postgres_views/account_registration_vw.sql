@@ -1,6 +1,6 @@
 -- 10903 2022-02-04 Run this manually for now
---DROP VIEW account_registration_vw;
-CREATE OR REPLACE VIEW account_registration_vw AS
+--DROP VIEW public.account_registration_vw;
+CREATE OR REPLACE VIEW public.account_registration_vw AS
 WITH q AS (
   SELECT (TO_TIMESTAMP(TO_CHAR(current_date, 'YYYY-MM-DD') || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
       AS current_expire_ts

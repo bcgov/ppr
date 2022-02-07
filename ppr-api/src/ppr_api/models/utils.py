@@ -398,7 +398,18 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
 ORDER BY r.registration_ts DESC
 """
 
-QUERY_ACCOUNT_DRAFTS = """
+QUERY_ACCOUNT_DRAFTS_LIMIT = " FETCH FIRST :max_results_size ROWS ONLY"
+QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = " ORDER BY create_ts DESC"
+QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE = " AND document_number LIKE :doc_num || '%'"
+QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE :client_reference_id || '%'"
+QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE = " AND registering_name LIKE :registering_name || '%'"
+QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE = ' AND registration_type = :registration_type'
+QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE = """
+ AND create_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') AND
+                       (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+ """
+
+QUERY_ACCOUNT_DRAFTS_BASE = """
 SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_cl, rt.registration_desc,
        CASE WHEN d.registration_type_cl IN ('PPSALIEN', 'CROWNLIEN', 'MISCLIEN') THEN ''
             ELSE d.registration_number END base_reg_num,
@@ -450,14 +461,15 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
        (SELECT CASE WHEN d.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = d.user_id) END) AS registering_name
+                           WHERE u.username = d.user_id) END) AS registering_name, d.account_id
   FROM drafts d, registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
-ORDER BY d.create_ts DESC
-FETCH FIRST :max_results_size ROWS ONLY
 """
+
+QUERY_ACCOUNT_DRAFTS_FILTER = 'SELECT * FROM (' + QUERY_ACCOUNT_DRAFTS_BASE + ') AS q WHERE account_id = :query_account'
+QUERY_ACCOUNT_DRAFTS = QUERY_ACCOUNT_DRAFTS_BASE + QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER + QUERY_ACCOUNT_DRAFTS_LIMIT
 
 QUERY_ACCOUNT_REG_TOTAL = """
 SELECT COUNT(registration_id) AS reg_count
