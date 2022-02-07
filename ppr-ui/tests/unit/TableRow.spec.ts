@@ -194,7 +194,8 @@ describe('TableRow tests', () => {
         expect(rowData.exists()).toBe(true)
         expect(rowData.length).toBe(11)
         // reg num
-        expect(rowData.at(0).text()).toBe('Pending')
+        if (isChild) expect(rowData.at(0).text()).toBe(`Pending  Base Registration: ${baseReg.baseRegistrationNumber}`)
+        else expect(rowData.at(0).text()).toBe('Pending')
         // submitted date
         expect(rowData.at(2).text()).toBe('Not Registered')
         // status type
