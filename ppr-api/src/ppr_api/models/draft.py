@@ -321,7 +321,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def build_account_draft_query_params(params: AccountRegistrationParams) -> dict:
         """Build the account drafts query runtime parameter set from the provided parameters."""
-        max_results_size = int(current_app.config.get('ACCOUNT_DRAFTS_MAX_RESULTS'))
+        max_results_size = int(model_utils.MAX_ACCOUNT_REGISTRATIONS_DEFAULT)
         query_params = {
             'query_account': params.account_id,
             'max_results_size': max_results_size
