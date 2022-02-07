@@ -88,9 +88,9 @@ describe('Dashboard component', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getDraft = getStub.withArgs(`drafts/${draftDocId}`)
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
     const getRegistration = getStub.withArgs(`financing-statements/${regNum}`)
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
@@ -288,9 +288,9 @@ describe('Dashboard registration table tests', () => {
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
     const getDebtorNames = getStub
       .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
@@ -491,9 +491,9 @@ describe('Dashboard add registration tests', () => {
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(
@@ -589,9 +589,9 @@ describe('Dashboard error modal tests', () => {
     const getStub = sandbox.stub(axios, 'get')
     const getSearchHistory = getStub.withArgs('search-history')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
-    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=createDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(
