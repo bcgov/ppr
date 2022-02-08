@@ -405,8 +405,8 @@ QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE :client_
 QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE = " AND registering_name LIKE :registering_name || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE = ' AND registration_type = :registration_type'
 QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE = """
- AND create_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') AND
-                       (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+ AND create_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
+                       (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
  """
 
 QUERY_ACCOUNT_DRAFTS_BASE = """
