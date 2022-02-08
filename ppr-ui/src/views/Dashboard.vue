@@ -419,6 +419,7 @@ export default class Dashboard extends Vue {
       }
       // add to my registrations list
       this.myRegDataHistory.unshift(addReg)
+      this.myRegTotalBaseRegLength += 1
       this.snackbarMsg = 'Registration was successfully added to your table.'
       this.toggleSnackbar = !this.toggleSnackbar
     } else {
@@ -753,6 +754,7 @@ export default class Dashboard extends Vue {
       if (!regNum) {
         // is not a child
         this.myRegDataBaseRegDrafts = this.myRegDataBaseRegDrafts.filter(reg => reg.documentId !== docId)
+        this.myRegTotalBaseRegLength -= 1
       } else {
         // is a child of another base registration
         for (let i = 0; i < this.myRegDataHistory.length; i++) {
@@ -782,6 +784,7 @@ export default class Dashboard extends Vue {
     } else {
       // remove from table
       this.myRegDataHistory = this.myRegDataHistory.filter(reg => reg.baseRegistrationNumber !== regNum)
+      this.myRegTotalBaseRegLength -= 1
     }
     this.loading = false
   }
