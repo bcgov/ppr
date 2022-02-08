@@ -32,7 +32,7 @@ export default defineComponent({
 
     watch(() => localState.folioEditNumber, (val: string) => {
       if (val?.length > 15) {
-        localState.folioEditError = 'Maximum characters reached'
+        localState.folioEditError = 'Maximum 15 characters reached'
         emit('folio-error', true)
       } else {
         localState.folioEditError = ''
