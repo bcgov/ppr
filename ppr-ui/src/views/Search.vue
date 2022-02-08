@@ -169,9 +169,9 @@ export default class Search extends Vue {
       const business = searchResult.searchQuery?.criteria?.debtorName?.business
       if (first && last) {
         if (second) {
-          return `${first} ${second} ${last}`
+          return `${last}, ${first} ${second}`
         }
-        return `${first} ${last}`
+        return `${last}, ${first}`
       }
       return business || searchResult.searchQuery?.criteria?.value || ''
     }

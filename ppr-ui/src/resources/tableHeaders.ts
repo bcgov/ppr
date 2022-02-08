@@ -40,6 +40,10 @@ export const searchTableHeaders: TableHeadersIF = {
     {
       text: 'Birthdate',
       value: 'debtor.birthDate'
+    },
+    {
+      text: 'Base Registration Number',
+      value: 'baseRegistrationNumber'
     }
   ],
   [APISearchTypes.BUSINESS_DEBTOR]: [
