@@ -729,11 +729,13 @@ export default class Dashboard extends Vue {
       this.emitError(error)
     } else {
       if (sortedRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
-      // add child drafts to their base registration in registration history
-      const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(sortedDrafts.drafts, sortedRegs.registrations, true)
+      // parent drafts from sorted list
+      const draftsCollapsed = this.myRegHistoryDraftCollapse(sortedDrafts.drafts, sortedRegs.registrations, true)
+      // add child drafts from original list to sorted base registrations
+      const updatedRegs = this.myRegHistoryDraftCollapse(this.myRegDataChildDrafts, sortedRegs.registrations, true)
       // only add parent drafts to draft results
-      this.myRegDataBaseRegDrafts = histroyDraftsCollapsed.drafts
-      this.myRegDataHistory = histroyDraftsCollapsed.registrations
+      this.myRegDataBaseRegDrafts = draftsCollapsed.drafts
+      this.myRegDataHistory = updatedRegs.registrations
     }
     this.myRegDataLoading = false
   }
