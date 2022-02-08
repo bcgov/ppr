@@ -70,7 +70,8 @@ describe('Folio number tests', () => {
     expect(wrapper.findComponent(FolioNumber).exists()).toBe(true)
     expect(wrapper.vm.folioNumber).toBe(defaultFolio)
     expect(wrapper.vm.folioEditNumber).toBe(defaultFolio)
-    expect(wrapper.find(folioEditTxt).element.value).toBe('t123')
+    const folioInput = <HTMLInputElement>wrapper.find(folioEditTxt).element
+    expect(folioInput.value).toBe('t123')
   })
 
   it('allows the user to edit the folio', async () => {
