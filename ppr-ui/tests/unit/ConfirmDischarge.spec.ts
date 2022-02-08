@@ -157,9 +157,12 @@ describe('ConfirmDischarge registration view', () => {
 
   it('shows errors when folio is invalid', async () => {
     await wrapper.findComponent(FolioNumberSummary).vm.$emit('folioValid', false)
-    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    // turn show errors on when invalid
-    expect(wrapper.vm.$data.showErrors).toBe(true)
+    // need to wait 2 secs so throttle is done
+    setTimeout(async () => {
+      await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+      // turn show errors on when invalid
+      expect(wrapper.vm.$data.showErrors).toBe(true)
+    }, 2000)
   })
 
   it('processes submit button action', async () => {
@@ -173,8 +176,11 @@ describe('ConfirmDischarge registration view', () => {
 
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
-    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    // need to wait 2 secs so throttle is done
+    setTimeout(async () => {
+      await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+      await flushPromises()
+      expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    }, 2000)
   })
 })

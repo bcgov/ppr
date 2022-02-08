@@ -1,11 +1,13 @@
 <template>
   <v-container
-    v-if="dataLoaded"
     class="view-container pa-15 pt-14"
     fluid
     style="min-width: 960px;"
   >
-    <div class="container pa-0" style="min-width: 960px;">
+    <v-overlay v-model="loading">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
+    <div v-if="dataLoaded" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Renewal</h1>
@@ -163,6 +165,7 @@ export default class ReviewRegistration extends Vue {
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private financingStatementDate: Date = null
   private feeType = FeeSummaryTypes.RENEW
+  private loading = false
   private showInvalid = false
   private registrationValid = false
 
@@ -219,6 +222,7 @@ export default class ReviewRegistration extends Vue {
         return
       }
       this.financingStatementDate = new Date()
+      this.loading = true
       const financingStatement = await getFinancingStatement(true, this.registrationNumber)
       if (financingStatement.error) {
         this.emitError(financingStatement.error)
@@ -295,6 +299,7 @@ export default class ReviewRegistration extends Vue {
         this.setFolioOrReferenceNumber('')
         this.setCertifyInformation(certifyInfo)
       }
+      this.loading = false
     }
   }
 

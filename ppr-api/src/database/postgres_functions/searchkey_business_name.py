@@ -29,7 +29,7 @@ BEGIN
         v_search_key := REGEXP_REPLACE(SPLIT_PART(v_search_key,' ',1),'[A-Za-z]+','','g');
         v_search_key := REGEXP_REPLACE(v_search_key,'[^\w\s]+','','gi');
     END IF;
-    
+
     IF  array_length(string_to_array(v_search_key,''),1) is not null then
         RETURN v_search_key;
     ELSE
@@ -49,7 +49,7 @@ BEGIN
         v_search_key := TRIM(REGEXP_REPLACE(v_search_key, '\s+', ' ', 'gi'));
         v_search_key := REGEXP_REPLACE(v_search_key,'\y( S$)\y','','gi');
     END IF;
-    
+
     IF SUBSTR(v_search_key,2,1)=' ' AND SUBSTR(v_search_key,4,1)=' ' AND SUBSTR(v_search_key,6,1)!=' ' THEN
         v_search_key := TRIM(REGEXP_REPLACE(SUBSTR(v_search_key,1,3),'\s+', '', 'gi'))||SUBSTR(v_search_key,4,146);
     ELSIF SUBSTR(v_search_key,2,1)=' ' AND SUBSTR(v_search_key,4,1)=' ' AND SUBSTR(v_search_key,6,1)=' ' THEN 
@@ -66,25 +66,25 @@ BEGIN
     v_word_2 := (select word from common_word where word = v_name_3 );
     v_word_3 := (select word from common_word where word = v_name_4 );
     v_word_4 := (select word from common_word where word = v_name_5 );
-    
+
     IF v_word_1 is not null THEN
         v_search_key := regexp_replace(v_search_key,v_word_1, '', 'g');
     ELSE
         v_search_key := v_search_key;
     END IF;
-    
+
     IF v_word_2 is not null THEN
         v_search_key := regexp_replace(v_search_key,v_word_2,'','ig');
     ELSE    
         v_search_key := v_search_key;
     END IF;
-    
+
     IF v_word_3 is not null THEN
     v_search_key := regexp_replace(v_search_key,v_word_3,'','ig');
     ELSE
         v_search_key := v_search_key;
     END IF;
-    
+
     IF v_word_4 is not null THEN
         v_search_key := regexp_replace(v_search_key,v_word_4,'','ig');
     ELSE
@@ -97,7 +97,7 @@ BEGIN
         v_search_key := v_search_key;
     END IF;
 
-    v_search_key := REGEXP_REPLACE(v_search_key,'\y(BRITISH COLUMBIA|BRITISHCOLUMBIA|BC)\y','','gi');
+    v_search_key := REGEXP_REPLACE(v_search_key,'\y(BRITISH COLUMBIA|BRITISHCOLUMBIA|BC|B C)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(LIMITED|PARTNERSHIP|GP|LP)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(SOCIETY|ASSOCIATION|TRUST|TRUSTEE|SOCIETE)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(INCORPORATED|INCORPOREE|INCORPORATION|INCORP|INC)\y','','gi');
@@ -105,7 +105,7 @@ BEGIN
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(LIMITEE|LTEE|LTD|ULC)\y','','gi');
     v_search_key := trim(regexp_replace(v_search_key, '\s+', '', 'gi'));
     v_search_key := REGEXP_REPLACE(v_search_key, '(.)\1{1,}', '\1', 'g');
-    
+
     RETURN v_search_key;
 
 END

@@ -201,18 +201,4 @@ describe('Review Confirm new registration component', () => {
     
   })
 
-  it('displays error modals', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    wrapper = createComponent()
-    await flushPromises()
-    await wrapper.findComponent(ButtonFooter).vm.$emit('draft-save-error', {
-      statusCode: 404
-    })
-    expect(wrapper.find('#reviewDialog').exists()).toBe(true)
-    expect(wrapper.find('#reviewDialog').vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find('#reviewDialog').vm.$props.setOptions.title).toBe('Unable to save draft registration')
-    
-  })
-
 })

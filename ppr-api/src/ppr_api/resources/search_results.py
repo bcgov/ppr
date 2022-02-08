@@ -158,9 +158,9 @@ class SearchResultsResource(Resource):
             # If the request is for an async large report, fetch binary data from doc storage.
             if resource_utils.is_pdf(request) and search_detail.callback_url is not None:
                 if search_detail.doc_storage_url is None:
-                    error = f'Search report not yet available for {search_id}.'
-                    current_app.logger.info(error)
-                    return resource_utils.error_response(HTTPStatus.NOT_FOUND, error)
+                    error_msg = f'Search report not yet available for {search_id}.'
+                    current_app.logger.info(error_msg)
+                    return resource_utils.bad_request_response(error_msg)
                 doc_name = SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
                 current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
                 raw_data = GoogleStorageService.get_document(doc_name)

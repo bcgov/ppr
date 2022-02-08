@@ -1,11 +1,13 @@
 <template>
   <v-container
-    v-if="dataLoaded"
     class="view-container pa-15 pt-14"
     fluid
     style="min-width: 960px;"
   >
-    <div class="container pa-0" style="min-width: 960px;">
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
+    <div v-if="dataLoaded" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Amendment</h1>
@@ -37,7 +39,7 @@
           <h3 class="pt-6">Secured Parties</h3>
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
-            @setSecuredPartiesValid="securedPartiesValid = $event"
+            @setSecuredPartiesValid="setValidSecuredParties($event)"
             @securedPartyOpen="securedPartyOpen = $event"
             :setShowInvalid="showInvalid" class="pt-4"
             :setShowErrorBar="errorBar"
@@ -55,7 +57,7 @@
           <h3 class="pt-6">Debtors</h3>
           <debtors
             v-if="registrationType !== registrationTypeRL"
-            @setDebtorValid="debtorValid = $event"
+            @setDebtorValid="setValidDebtor($event)"
             @debtorOpen="debtorOpen = $event"
             :setShowInvalid="showInvalid"
             :setShowErrorBar="errorBar"
@@ -77,6 +79,7 @@
             class="mt-15"
           />
           <amendment-description class="mt-12"
+            @valid="detailsValid = $event"
             :setShowErrors="showInvalid"
           />
           <court-order class="mt-12"
@@ -114,6 +117,8 @@
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
+import { cloneDeep, isEqual } from 'lodash'
+import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
@@ -131,6 +136,7 @@ import {
   RegistrationFlowType // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { Throttle } from '@/decorators'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
@@ -152,8 +158,6 @@ import {
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
-import { cloneDeep, isEqual } from 'lodash'
-import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
@@ -228,7 +232,9 @@ export default class AmendRegistration extends Vue {
   private errorBar = false
   private collateralOpen = false
   private lengthTrustOpen = false
+  private detailsValid = false
   private amendErrMsg = ''
+  private submitting = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -286,6 +292,7 @@ export default class AmendRegistration extends Vue {
       return
     }
     this.financingStatementDate = new Date()
+    this.submitting = true
     const financingStatement = await getFinancingStatement(true, this.registrationNumber)
     if (financingStatement.error) {
       this.emitError(financingStatement.error)
@@ -377,6 +384,7 @@ export default class AmendRegistration extends Vue {
         }
       }
     }
+    this.submitting = false
   }
 
   mounted () {
@@ -465,8 +473,9 @@ export default class AmendRegistration extends Vue {
     if (!isEqual(this.getAddCollateral.vehicleCollateral, this.getOriginalAddCollateral.vehicleCollateral)) {
       hasChanged = true
     }
-
-    if (!isEqual(this.getAddCollateral.generalCollateral, this.getOriginalAddCollateral.generalCollateral)) {
+    const gcLength = this.getAddCollateral.generalCollateral?.length
+    const originalLength = this.getOriginalAddCollateral.generalCollateral?.length
+    if (gcLength !== originalLength) {
       hasChanged = true
     }
 
@@ -487,9 +496,12 @@ export default class AmendRegistration extends Vue {
     return hasChanged
   }
 
+  @Throttle(2000)
   private async saveDraft (): Promise<void> {
+    this.submitting = true
     const stateModel: StateModelIF = this.getStateModel
-    const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
+    const draft = await saveAmendmentStatementDraft(stateModel)
+    this.submitting = false
     if (draft.error !== undefined) {
       console.error(
         'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
@@ -552,7 +564,9 @@ export default class AmendRegistration extends Vue {
 
     // get registration data from api and load into store
     try {
+      this.submitting = true
       await this.loadRegistration()
+      this.submitting = false
     } catch (error) {
       const errorMsg = error as string
       console.error(errorMsg)
@@ -567,10 +581,22 @@ export default class AmendRegistration extends Vue {
     this.dataLoaded = true
   }
 
-  @Watch('debtorValid')
-  @Watch('securedPartiesValid')
-  private showInvalidComponents (val: boolean): void {
-    this.showInvalid = true
+  private setValidSecuredParties (val: boolean) {
+    if (!val) {
+      this.showInvalid = true
+    } else {
+      this.amendErrMsg = ''
+    }
+    this.securedPartiesValid = val
+  }
+
+  private setValidDebtor (val: boolean) {
+    if (!val) {
+      this.showInvalid = true
+    } else {
+      this.amendErrMsg = ''
+    }
+    this.debtorValid = val
   }
 
   @Watch('securedPartyOpen')
@@ -579,6 +605,14 @@ export default class AmendRegistration extends Vue {
   @Watch('lengthTrustOpen')
   private resetOpenError (isOpen: boolean): void {
     if (!isOpen) {
+      this.errorBar = false
+      this.amendErrMsg = ''
+    }
+  }
+
+  @Watch('detailsValid')
+  private resetValidationError (isValid: boolean): void {
+    if (isValid) {
       this.errorBar = false
       this.amendErrMsg = ''
     }

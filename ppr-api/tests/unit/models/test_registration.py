@@ -32,6 +32,8 @@ from registry_schemas.example_data.ppr import (
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import Draft, GeneralCollateralLegacy, FinancingStatement, Registration, utils as model_utils
+from ppr_api.models import registration_utils as registration_utils
+from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.services.authz import STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 
 
@@ -247,7 +249,10 @@ def test_find_by_id_cs_su(session):
                          TEST_ACCOUNT_REGISTRATION_DATA)
 def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_reg_num, user_removed_reg_num):
     """Assert that the financing statement summary list by account id first item contains all expected elements."""
-    statement_list = Registration.find_all_by_account_id(account_id, collapse, 'PH Testing PPR with PAD')
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=collapse,
+                                                                  account_name='PH Testing PPR with PAD')
+    statement_list = Registration.find_all_by_account_id(params)
     found_added: bool = False
     found_removed: bool = False
 
@@ -287,8 +292,10 @@ def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_
 
 def test_find_all_by_account_id_no_result(session):
     """Assert that the financing statement summary list by invalid account id works as expected."""
-    statement_list = Registration.find_all_by_account_id('XXXXX45')
-
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='XXXXX45',
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing')
+    statement_list = Registration.find_all_by_account_id(params)
     assert len(statement_list) == 0
 
 
@@ -865,7 +872,7 @@ def test_can_access_report(session, user_account_id, reg_account_id, account_nam
         'registeringParty': rp_name,
         'securedParties': sp_names
     }
-    test_access = Registration.can_access_report(user_account_id, account_name, json_data)
+    test_access = registration_utils.can_access_report(user_account_id, account_name, json_data)
     assert test_access == can_access
 
 
@@ -937,7 +944,11 @@ def test_create_from_json(session, change_type, is_general_collateral):
 def test_account_registering_name(session, reg_num, account_id, has_data):
     """Assert that account registrations conditional registering name value for staff works as expected."""
     sbc_staff = True if account_id == GOV_ACCOUNT_ROLE else False
-    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing', sbc_staff)
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=sbc_staff)
+    results = Registration.find_all_by_account_id(params)
     for result in results:
         if result['registrationNumber'] == reg_num:
             if has_data:
@@ -950,7 +961,11 @@ def test_account_registering_name(session, reg_num, account_id, has_data):
 def test_account_path(session, reg_num, account_id, has_data):
     """Assert that account registrations conditional verfiication statement value for staff works as expected."""
     sbc_staff = True if account_id == GOV_ACCOUNT_ROLE else False
-    results = Registration.find_all_by_account_id(account_id, True, 'Unit testing', sbc_staff)
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=sbc_staff)
+    results = Registration.find_all_by_account_id(params)
     for result in results:
         if result['registrationNumber'] == reg_num:
             if has_data:

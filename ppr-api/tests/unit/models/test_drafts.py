@@ -19,17 +19,48 @@ Test-Suite to ensure that the Draft Model is working as expected.
 import copy
 from http import HTTPStatus
 
+from flask import current_app
+
 import pytest
 from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT, DRAFT_CHANGE_STATEMENT
 
 from ppr_api.exceptions import BusinessException
-from ppr_api.models import Draft
+from ppr_api.models import Draft, utils as model_utils
 from ppr_api.models.utils import now_ts
+from ppr_api.models.registration_utils import AccountRegistrationParams
+
+
+# testdata pattern is ({sort_criteria}, {sort_order}, {expected_clause})
+TEST_QUERY_ORDER_DATA = [
+    (None, None, ' ORDER BY create_ts DESC'),
+    ('invalid', None, ' ORDER BY create_ts DESC'),
+    ('registrationNumber', None, ' ORDER BY document_number DESC'),
+    ('registrationNumber', 'asc', ' ORDER BY document_number asc'),
+    ('registrationType', 'ascending', ' ORDER BY registration_type ascending'),
+    ('registeringName', 'descending', ' ORDER BY registering_name descending'),
+    ('clientReferenceId', 'asc', ' ORDER BY client_reference_id asc'),
+    ('startDateTime', 'ascending', ' ORDER BY create_ts ascending'),
+    ('endDateTime', 'desc', ' ORDER BY create_ts desc')
+]
+
+# testdata pattern is ({doc_num}, {reg_type}, {client_ref}, {registering_name}, {start_ts}, {end_ts})
+TEST_QUERY_BASE_DATA = [
+    (None, None, None, None, None, None),
+    ('D-T', None, None, None, None, None),
+    (None, 'SA', None, None, None, None),
+    (None, 'AM', None, None, None, None),
+    (None, None, 'A-00000', None, None, None),
+    (None, None, None, 'TEST U', None, None),
+    (None, None, None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
+    ('D-T-', None, 'A-00000', None, None, None),
+    ('D-T-', None, None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
+    (None, 'SA', None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
+]
 
 
 def test_find_all_by_account_id(session):
     """Assert that the draft summary list items contains all expected elements."""
-    draft_list = Draft.find_all_by_account_id('PS12345')
+    draft_list = Draft.find_all_by_account_id('PS12345', None)
     # print(draft_list)
     assert draft_list
     for draft in draft_list:
@@ -202,3 +233,122 @@ def test_draft_create_from_json(session):
     assert draft.registration_type_cl == 'COURTORDER'
     assert draft.registration_type == 'CO'
     assert draft.registration_number == json_data['amendmentStatement']['baseRegistrationNumber']
+
+
+@pytest.mark.parametrize('sort_criteria,sort_order,value', TEST_QUERY_ORDER_DATA)
+def test_account_draft_order(session, sort_criteria, sort_order, value):
+    """Assert that account draft query order by clause is as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=False)
+    params.sort_criteria = sort_criteria
+    params.sort_direction = sort_order
+    clause = Draft.get_account_draft_query_order(params)
+    assert clause == value
+
+
+@pytest.mark.parametrize('doc_num,reg_type,client_ref,registering,start_ts,end_ts', TEST_QUERY_BASE_DATA)
+def test_account_draft_query(session, doc_num, reg_type, client_ref, registering, start_ts, end_ts):
+    """Assert that account draft query is as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=False)
+    params.registration_number = doc_num
+    params.registration_type = reg_type
+    params.client_reference_id = client_ref
+    params.registering_name = registering
+    params.start_date_time = start_ts
+    params.end_date_time = end_ts
+    query = Draft.build_account_draft_query(params)
+    # current_app.logger.info('\n' + query)
+    if params.registration_number:
+        assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE) != -1
+    if params.registration_type:
+        assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE) != -1
+    if params.client_reference_id:
+        assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE) != -1
+    if params.registering_name:
+        assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE) != -1
+    if params.start_date_time and params.end_date_time:
+        assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE) != -1
+    order_by = Draft.get_account_draft_query_order(params)
+    assert query.find(order_by) != -1
+    assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_LIMIT) != -1
+
+
+@pytest.mark.parametrize('doc_num,reg_type,client_ref,registering,start_ts,end_ts', TEST_QUERY_BASE_DATA)
+def test_account_draft_query_params(session, doc_num, reg_type, client_ref, registering, start_ts, end_ts):
+    """Assert that account registration dynamically built query params are as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=False)
+    params.registration_number = doc_num
+    params.registration_type = reg_type
+    params.client_reference_id = client_ref
+    params.registering_name = registering
+    params.start_date_time = start_ts
+    params.end_date_time = end_ts
+    query_params: dict = Draft.build_account_draft_query_params(params)
+    # current_app.logger.info(query_params)
+    assert query_params.get('query_account')
+    assert query_params.get('max_results_size')
+
+    if params.registration_number:
+        assert query_params.get('doc_num')
+    else:
+        assert 'doc_num' not in query_params
+    if params.registration_type:
+        assert query_params.get('registration_type')
+    else:
+        assert 'registration_type' not in query_params
+    if params.client_reference_id:
+        assert query_params.get('client_reference_id')
+    else:
+        assert 'client_reference_id' not in query_params
+    if params.registering_name:
+        assert query_params.get('registering_name')
+    else:
+        assert 'registering_name' not in query_params
+    if params.start_date_time and params.end_date_time:
+        assert query_params.get('start_date_time')
+        assert query_params.get('end_date_time')
+    else:
+        assert 'start_date_time' not in query_params
+        assert 'end_date_time' not in query_params
+
+
+@pytest.mark.parametrize('doc_num,reg_type,client_ref,registering,start_ts,end_ts', TEST_QUERY_BASE_DATA)
+def test_find_all_by_account_id_filter(session, doc_num, reg_type, client_ref, registering, start_ts, end_ts):
+    """Assert that account change registration query is as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=False)
+    params.from_ui = True
+    params.registration_number = doc_num
+    params.registration_type = reg_type
+    params.client_reference_id = client_ref
+    params.registering_name = registering
+    if start_ts and end_ts:
+        params.start_date_time = start_ts
+        params.end_date_time = model_utils.format_ts(model_utils.now_ts())
+    draft_list = Draft.find_all_by_account_id_filter(params)
+    assert draft_list
+    for draft in draft_list:
+        assert draft['type']
+        assert draft['documentId']
+        assert draft['registrationType']
+        assert draft['registrationDescription']
+        assert draft['createDateTime']
+        assert draft['lastUpdateDateTime']
+        assert 'clientReferenceId' in draft
+        assert draft['path']
+        assert 'registeringParty' in draft
+        assert 'securedParties' in draft
+        assert draft['registeringName']
+        if draft['type'] != 'FINANCING_STATEMENT':
+            assert draft['baseRegistrationNumber']
+        assert draft['documentId'] != 'D-T-0001'

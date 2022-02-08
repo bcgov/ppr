@@ -6,6 +6,7 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   clientReferenceId: 'ABC123',
   createDateTime: '2021-07-20T17:21:17+00:00',
   expireDays: 500, // Number of days until expiry
+  hasDraft: true,
   lastUpdateDateTime: '2021-10-04T18:26:11+00:00',
   path: '/path/to/doc',
   registeringName: 'Reg Name 1',
@@ -15,7 +16,8 @@ export const mockedRegistration1: RegistrationSummaryIF = {
   registrationNumber: 'GOV2343',
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
   securedParties: 'Bank of Nova Scotia',
-  statusType: APIStatusTypes.ACTIVE
+  statusType: APIStatusTypes.ACTIVE,
+  totalRegistrationCount: 1
 }
 
 export const mockedRegistration2: RegistrationSummaryIF = {

@@ -1,5 +1,8 @@
 <template>
   <v-footer class="white pa-0">
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
     <staff-payment-dialog
       attach=""
       class="mt-10"
@@ -7,6 +10,12 @@
       :setOptions="staffPaymentDialogOptions"
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
+    />
+    <base-dialog
+      id="draftErrorDialog"
+      :setDisplay="errorDialogDisplay"
+      :setOptions="errorOptions"
+      @proceed="handleError($event)"
     />
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
@@ -80,10 +89,13 @@ import {
   watch
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import _ from 'lodash'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
+import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
+import { registrationSaveDraftErrorDialog } from '@/resources/dialogOptions'
 
 import {
   ButtonConfigIF, // eslint-disable-line no-unused-vars
@@ -95,6 +107,7 @@ import {
 
 export default defineComponent({
   components: {
+    BaseDialog,
     StaffPaymentDialog
   },
   props: {
@@ -143,6 +156,9 @@ export default defineComponent({
         title: 'Staff Payment',
         label: ''
       },
+      errorDialogDisplay: false,
+      errorOptions: registrationSaveDraftErrorDialog,
+      submitting: false,
       isCertifyValid: computed((): boolean => {
         return props.certifyValid
       }),
@@ -189,7 +205,7 @@ export default defineComponent({
     /** Save the draft version from data stored in the state model. */
     const saveDraft = async () => {
       const stateModel: StateModelIF = getStateModel.value
-      const draft: DraftIF = await saveFinancingStatementDraft(stateModel)
+      const draft: DraftIF = await throttleSubmitStatementDraft(stateModel)
       setDraft(draft)
       if (draft.error !== undefined) {
         console.log(
@@ -199,7 +215,7 @@ export default defineComponent({
             draft.error.message
         )
         // Emit error message.
-        emit('save-draft-error', draft.error)
+        showDraftError(draft.error)
         return false
       }
       return true
@@ -267,12 +283,20 @@ export default defineComponent({
       localState.staffPaymentDialogDisplay = false
     }
 
+    const showDraftError = (val: ErrorIF): void => {
+      localState.errorDialogDisplay = true
+    }
+
+    const handleError = (stay: boolean): void => {
+      localState.errorDialogDisplay = false
+    }
+
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
     const submitFinancingStatement = async () => {
       const stateModel: StateModelIF = getStateModel.value
       if (checkValid()) {
         // API call here
-        const apiResponse: FinancingStatementIF = await saveFinancingStatement(stateModel)
+        const apiResponse: FinancingStatementIF = await throttleSubmitStatement(stateModel)
         if (apiResponse.error !== undefined) {
           // Emit error message.
           emit('error', apiResponse.error)
@@ -291,6 +315,22 @@ export default defineComponent({
       }
     }
 
+    const throttleSubmitStatement = _.throttle(async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
+      // Prevents multiple submits (i.e. double click)
+      localState.submitting = true
+      const statement = await saveFinancingStatement(stateModel)
+      localState.submitting = false
+      return statement
+    }, 2000, { trailing: false })
+
+    const throttleSubmitStatementDraft = _.throttle(async (stateModel: StateModelIF): Promise<DraftIF> => {
+      // Prevents multiple submits (i.e. double click)
+      localState.submitting = true
+      const statement = await saveFinancingStatementDraft(stateModel)
+      localState.submitting = false
+      return statement
+    }, 2000, { trailing: false })
+
     watch(() => props.forceSave, (val: boolean) => {
       // on change (T/F doesn't matter), save and go back to dash
       submitSaveResume()
@@ -303,6 +343,8 @@ export default defineComponent({
       submitNext,
       submitSave,
       onStaffPaymentChanges,
+      handleError,
+      showDraftError,
       submitSaveResume
     }
   }

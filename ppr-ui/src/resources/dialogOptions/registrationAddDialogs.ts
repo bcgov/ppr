@@ -48,7 +48,7 @@ export const registrationSaveDraftErrorDialog: DialogOptionsIF = {
   hasContactInfo: true,
   title: 'Unable to save draft registration',
   text: 'We are unable to save your draft registration at this time. ' +
-    'error. Please try this again later. If this issue persists, please contact us.'
+    'Please try this again later. If this issue persists, please contact us.'
 }
 
 export const registrationCompleteErrorDialog: DialogOptionsIF = {

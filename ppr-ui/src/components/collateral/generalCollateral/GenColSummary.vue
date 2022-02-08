@@ -235,7 +235,7 @@ export default defineComponent({
       generalCollateral: computed((): GeneralCollateralIF[] => {
         const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
         const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
-        for (const i in generalCollateral) {
+        for (let i = 0; i < generalCollateral.length; i++) {
           if (!generalCollateral[i].addedDateTime) {
             cleanedGeneralCollateral.push(generalCollateral[i])
             continue
@@ -273,7 +273,9 @@ export default defineComponent({
               collateral.addedDateTime === generalCollateral[i].addedDateTime
             )
             if (existsIndex !== -1) {
-              cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
+              if (!alreadyAdded) {
+                cleanedGeneralCollateral[existsIndex].descriptionDelete += generalCollateral[i].descriptionDelete
+              }
             } else {
               if (!alreadyAdded) {
                 cleanedGeneralCollateral.push(generalCollateral[i])

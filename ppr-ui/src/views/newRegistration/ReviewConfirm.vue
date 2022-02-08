@@ -103,7 +103,6 @@
           :router="this.$router"
           :certifyValid="validCertify"
           :forceSave="saveDraftExit"
-          @draft-save-error="saveDraftError"
           @registration-incomplete="registrationIncomplete"
           @error="handleSubmitError($event)"
         />
@@ -136,7 +135,6 @@ import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { BaseDialog } from '@/components/dialogs'
 import {
-  registrationSaveDraftErrorDialog,
   registrationCompleteErrorDialog
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
@@ -181,7 +179,7 @@ export default class ReviewConfirm extends Vue {
   private stepName = RouteNames.REVIEW_CONFIRM
   private validCertify = false
   private errorDialog = false
-  private errorOptions = registrationSaveDraftErrorDialog
+  private errorOptions = registrationCompleteErrorDialog
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
@@ -215,7 +213,6 @@ export default class ReviewConfirm extends Vue {
     if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
       this.emitError(error)
     } else {
-      this.errorOptions = { ...registrationCompleteErrorDialog }
       this.errorDialog = true
     }
   }
@@ -270,12 +267,6 @@ export default class ReviewConfirm extends Vue {
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
-  }
-
-  @Watch('saveDraftError')
-  private saveDraftError (val: ErrorIF): void {
-    this.errorOptions = { ...registrationSaveDraftErrorDialog }
-    this.errorDialog = true
   }
 
   @Watch('registrationIncomplete')

@@ -11,7 +11,6 @@
 """Module to manage the calls and content to the reporting service."""
 from http import HTTPStatus
 
-import fitz  # noqa: I001
 from flask import current_app, jsonify
 from flask_babel import _
 
@@ -60,42 +59,11 @@ def get_report_api_payload(report_data, account_id, report_type, account_name):
 
 
 def get_verification_mail(  # pylint: disable=too-many-locals
-        report_data, account_id, token, account_name, registration_id: int):
+        report_data, account_id, token, account_name, registration_id: int):  # pylint: disable=unused-argument
     """Event callback for verification surface mail: concatenate cover letter and verification statement."""
     try:
-        event_id = str(registration_id)
-        report_type = ReportTypes.COVER_PAGE_REPORT.value
-        cover_output, status_code, headers = Report(report_data,
-                                                    account_id,
-                                                    report_type,
-                                                    account_name).get_pdf(token=token)
-        if status_code != HTTPStatus.OK:
-            current_app.logger.error(f'Get mail cover letter report failed for id {event_id}: status=' +
-                                     str(status_code))
-            return cover_output, status_code, headers
-
-        report_type = ReportTypes.FINANCING_STATEMENT_REPORT.value
-        statement_output, status_code, headers = Report(report_data,
-                                                        account_id,
-                                                        report_type,
-                                                        account_name).get_pdf(token=token)
-        if status_code != HTTPStatus.OK:
-            current_app.logger.error(f'Get mail verification statement report failed for id {event_id}: status=' +
-                                     str(status_code))
-            return cover_output, status_code, headers
-
-        doc1 = fitz.open(stream=cover_output, filetype='pdf')
-        doc2 = fitz.open(stream=statement_output, filetype='pdf')
-        doc1.insert_pdf(doc2)
-        final_output = doc1.convert_to_pdf()
-        doc2.close()
-        doc1.close()
-        current_app.logger.info(f'Verification mail report generation successful for id={event_id}.')
-        return final_output, HTTPStatus.OK, headers
-    except FileNotFoundError:
-        # We don't have a template for it, so it must only be available on paper.
-        return jsonify({'message': _('No PDF report found.')}), HTTPStatus.NOT_FOUND
-    except Exception as err:   # noqa: B902; return nicer default error
-        msg = f'Get verification mail report failed for id {event_id}, type {report_type}: ' + repr(err)
+        raise NotImplementedError('Not implemented yet.')
+    except NotImplementedError as err:
+        msg = f'Get verification mail report failed for registration id {registration_id}'
         current_app.logger.error(msg)
-        raise BusinessException(error=msg, status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        raise BusinessException(error=msg, status_code=HTTPStatus.INTERNAL_SERVER_ERROR) from err

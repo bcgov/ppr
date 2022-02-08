@@ -124,7 +124,7 @@ describe('Amendment registration component', () => {
   })
 
   it('doesnt proceed if validation errors', async () => {
-    wrapper.vm.debtorValid = false
+    wrapper.vm.setValidDebtor(false)
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.showInvalid).toBe(true)

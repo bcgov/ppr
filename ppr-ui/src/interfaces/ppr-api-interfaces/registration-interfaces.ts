@@ -65,9 +65,9 @@ export interface RegistrationSummaryIF {
   changes?: (RegistrationSummaryIF | DraftResultIF) []
   createDateTime?: string, // Included in a successful response.
   error?: ErrorIF,
-  expand?: boolean, // used in UI table to toggle expansion. Updated by filter fn.
+  expand?: boolean, // used in UI table to toggle expansion.
   expireDays?: number, // Number of days until expiry
-  hide?: boolean, // FUTURE: take this out -- added by UI and is unnecessary
+  hasDraft?: boolean, // added by UI to show extra text
   inUserList?: boolean, // whether the registration is in their table or not
   lastUpdateDateTime?: string, // Included in a successful response. Timestamp of last draft update.
   new?: boolean, // used to prevent the collapse of a newly added base reg
@@ -79,7 +79,8 @@ export interface RegistrationSummaryIF {
   registrationNumber?: string, // Identifier for a child registration
   registrationType: APIRegistrationTypes | APIAmendmentTypes,
   securedParties: string,
-  statusType?: string
+  statusType?: string,
+  totalRegistrationCount?: number // Included by the api in the 1st item in the registration list
 }
 
 // Discharge Registration interface. Base registration number, debtor name, and registering party are required.

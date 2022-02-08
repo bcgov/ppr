@@ -6,6 +6,9 @@
     fluid
     style="min-width: 960px;"
   >
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
     <base-dialog
       setAttach="#confirm-renewal"
       :setOptions="options"
@@ -113,6 +116,7 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 // local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { Throttle } from '@/decorators'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   RenewRegistrationIF, // eslint-disable-line no-unused-vars
@@ -169,6 +173,7 @@ export default class ConfirmDischarge extends Vue {
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = renewCancelDialog
   private showCancelDialog = false
+  private submitting = false
 
   private staffPaymentDialogDisplay = false
   private staffPaymentDialogOptions: DialogOptionsIF = {
@@ -253,6 +258,7 @@ export default class ConfirmDischarge extends Vue {
       return
     }
     this.financingStatementDate = new Date()
+    this.submitting = true
     const financingStatement = await getFinancingStatement(
       true,
       this.registrationNumber
@@ -294,6 +300,7 @@ export default class ConfirmDischarge extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
     }
+    this.submitting = false
   }
 
   mounted () {
@@ -335,9 +342,12 @@ export default class ConfirmDischarge extends Vue {
     }
   }
 
+  @Throttle(2000)
   private async submitRenewal (): Promise<void> {
     const stateModel: StateModelIF = this.getStateModel
+    this.submitting = true
     const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
+    this.submitting = false
     if (apiResponse === undefined || apiResponse?.error !== undefined) {
       console.error(apiResponse?.error)
       this.emitError(apiResponse?.error)
@@ -386,7 +396,6 @@ export default class ConfirmDischarge extends Vue {
     } catch (error) {
       const errorMsg = error as string
       console.error(errorMsg)
-      console.error(error)
       this.emitError({
         statusCode: 500,
         message: errorMsg

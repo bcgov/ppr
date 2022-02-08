@@ -19,7 +19,7 @@ from flask import jsonify, current_app, request
 
 from ppr_api.exceptions import BusinessException, ResourceErrorCodes
 from ppr_api.models import EventTracking, Party, Registration, utils as model_utils
-from ppr_api.models.registration import CrownChargeTypes, MiscellaneousTypes, PPSATypes
+from ppr_api.models.registration import AccountRegistrationParams, CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
@@ -57,6 +57,18 @@ BCOL_NUMBER_PARAM = 'bcolAccountNumber'
 REG_STAFF_DESC = 'BC Registries Staff'
 SBC_STAFF_DESC = 'SBC Staff'
 BCOL_STAFF_DESC = 'BC Online Help'
+# Account registration request parameters
+FROM_UI_PARAM = 'fromUI'
+PAGE_NUM_PARAM = 'pageNumber'
+SORT_DIRECTION_PARAM = 'sortDirection'
+SORT_CRITERIA_PARAM = 'sortCriteriaName'
+REG_NUMBER_PARAM = 'registrationNumber'
+REG_TYPE_PARAM = 'registrationType'
+START_TS_PARAM = 'startDateTime'
+END_TS_PARAM = 'endDateTime'
+STATUS_PARAM = 'statusType'
+CLIENT_REF_PARAM = 'clientReferenceId'
+REGISTER_NAME_PARAM = 'registeringName'
 
 
 class CallbackExceptionCodes(str, Enum):
@@ -140,12 +152,12 @@ def db_exception_response(exception, account_id: str, context: str):
     """Build a database error response."""
     message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR, context=context, account_id=account_id)
     current_app.logger.error(message)
-    return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def business_exception_response(exception):
     """Build business exception error response."""
-    current_app.logger.error(repr(exception))
+    current_app.logger.error(str(exception))
     return jsonify({'message': exception.error}), exception.status_code
 
 
@@ -159,8 +171,8 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
         return jsonify({'message': message, 'status_code': status, 'type': err_type, 'detail': detail}),\
             HTTPStatus.PAYMENT_REQUIRED
 
-    current_app.logger.error(repr(exception))
-    return jsonify({'message': message, 'detail': repr(exception)}), HTTPStatus.PAYMENT_REQUIRED
+    current_app.logger.error(str(exception))
+    return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.PAYMENT_REQUIRED
 
 
 def default_exception_response(exception):
@@ -290,7 +302,7 @@ def get_account_name(token: str, account_id: str = None):  # pylint: disable=too
                     return org['name']
         return None
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        current_app.logger.error('get_account_name failed: ' + repr(err))
+        current_app.logger.error('get_account_name failed: ' + str(err))
         return None
 
 
@@ -471,7 +483,7 @@ def enqueue_verification_report(registration_id: int, party_id: int):
         GoogleQueueService().publish_verification_report(payload)
         current_app.logger.info(f'Enqueue verification report successful for id={registration_id}.')
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Enqueue verification report failed for id={registration_id}, party={party_id}: ' + repr(err)
+        msg = f'Enqueue verification report failed for id={registration_id}, party={party_id}: ' + str(err)
         current_app.logger.error(msg)
         EventTracking.create(registration_id,
                              EventTracking.EventTrackingTypes.SURFACE_MAIL,
@@ -505,5 +517,26 @@ def queue_secured_party_verification(registration: Registration):
         for party in parties:
             enqueue_verification_report(registration_id, party.id)
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Queue secured parties failed for id={registration_id}: ' + repr(err)
+        msg = f'Queue secured parties failed for id={registration_id}: ' + str(err)
         current_app.logger.error(msg)
+
+
+def get_account_registration_params(req: request, params: AccountRegistrationParams) -> AccountRegistrationParams:
+    """Extract account registration query parameters from the request."""
+    params.from_ui = req.args.get(FROM_UI_PARAM, False)
+    params.page_number = int(req.args.get(PAGE_NUM_PARAM, -1))
+    params.sort_direction = req.args.get(SORT_DIRECTION_PARAM, 'desc')
+    params.sort_criteria = req.args.get(SORT_CRITERIA_PARAM, None)
+    params.registration_number = req.args.get(REG_NUMBER_PARAM, None)
+    params.registration_type = req.args.get(REG_TYPE_PARAM, None)
+    params.status_type = req.args.get(STATUS_PARAM, None)
+    params.client_reference_id = req.args.get(CLIENT_REF_PARAM, None)
+    params.registering_name = req.args.get(REGISTER_NAME_PARAM, None)
+    start_ts = req.args.get(START_TS_PARAM, None)
+    end_ts = req.args.get(END_TS_PARAM, None)
+    if start_ts and end_ts:
+        params.start_date_time = start_ts
+        params.end_date_time = end_ts
+    if params.sort_direction is not None:
+        params.sort_direction = params.sort_direction.lower()
+    return params

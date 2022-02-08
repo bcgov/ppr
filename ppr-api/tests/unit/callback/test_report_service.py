@@ -14,7 +14,10 @@
 """Callback report-api service tests."""
 from http import HTTPStatus
 
+import pytest
+
 from ppr_api.callback.reports.report_service import get_search_report, get_mail_verification_statement
+from ppr_api.exceptions import BusinessException
 from ppr_api.models import Party, Registration, SearchResult, SearchRequest
 
 
@@ -65,14 +68,5 @@ def test_get_verification_mail_report(session):
             secured_party = party
 
     # test
-    raw_data, status_code, headers = get_mail_verification_statement(registration, secured_party, account_name)
-
-    # check
-    assert raw_data
-    assert status_code
-    assert headers
-    assert status_code == HTTPStatus.OK
-    assert len(raw_data) > 0
-    with open(TEST_VERIFICATION_MAIL_FILE, "wb") as pdf_file:
-        pdf_file.write(raw_data)
-        pdf_file.close()
+    with pytest.raises(BusinessException) as ex:
+        get_mail_verification_statement(registration, secured_party, account_name)

@@ -23,6 +23,7 @@ from registry_schemas import utils as schema_utils
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Party, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
+from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.reports import ReportTypes, get_pdf, get_report_api_payload
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_reg_staff_account, is_sbc_office_account, \
@@ -632,10 +633,12 @@ class GetRegistrationResource(Resource):
             # To access a registration report, use the account name to match on registering/secured parties.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
             sbc_staff: bool = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
-            statement_list = Registration.find_all_by_account_id(account_id,
-                                                                 collapse_param,
-                                                                 account_name,
-                                                                 sbc_staff)
+            params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                          collapse=collapse_param,
+                                                                          account_name=account_name,
+                                                                          sbc_staff=sbc_staff)
+            params = resource_utils.get_account_registration_params(request, params)
+            statement_list = Registration.find_all_by_account_id(params)
             return jsonify(statement_list), HTTPStatus.OK
         except DatabaseException as db_exception:   # noqa: B902; return nicer error
             return resource_utils.db_exception_response(db_exception, account_id,

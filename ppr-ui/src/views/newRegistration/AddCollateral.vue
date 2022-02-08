@@ -47,7 +47,7 @@
     <v-row no-gutters class='pt-10'>
       <v-col cols="12">
         <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                      :router="this.$router" @draft-save-error="saveDraftError"/>
+                      :router="this.$router"/>
       </v-col>
     </v-row>
   </v-container>
@@ -152,11 +152,6 @@ export default class AddCollateral extends Vue {
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
-  }
-
-  @Watch('draftSaveError')
-  private saveDraftError (val: ErrorIF): void {
-    alert('Error saving draft. Replace when design complete.')
   }
 }
 

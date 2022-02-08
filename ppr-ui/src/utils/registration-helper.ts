@@ -144,18 +144,19 @@ function getIsStaff (stateModel:StateModelIF): boolean {
 /** Setup the amendment registration for the API call. All data to be saved is in the store state model. */
 function setupAmendmentStatement (stateModel:StateModelIF): AmendmentStatementIF {
   const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
-  let statement:AmendmentStatementIF = stateModel.registration.draft.amendmentStatement
+  let statement: AmendmentStatementIF = stateModel.registration.draft.amendmentStatement
   if (!statement) {
     statement = {
       changeType: APIAmendmentTypes.AMENDMENT,
       baseRegistrationNumber: stateModel.registration.registrationNumber,
       description: stateModel.registration.amendmentDescription,
-      registeringParty: stateModel.registration.parties.registeringParty,
       debtorName: stateModel.registration.confirmDebtorName,
+      registeringParty: stateModel.registration.parties.registeringParty,
       authorizationReceived: true
     }
   } else {
     statement.description = stateModel.registration.amendmentDescription
+    statement.registeringParty = stateModel.registration.parties.registeringParty
   }
   const courtOrder = stateModel.registration.courtOrderInformation
   if (courtOrder && courtOrder.courtName !== '' && courtOrder.courtRegistry !== '' &&

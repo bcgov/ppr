@@ -19,11 +19,12 @@ import {
   RegistrationSummaryIF,
   RenewRegistrationIF,
   ErrorIF,
-  BaseHeaderIF
+  BaseHeaderIF,
+  RegistrationSortIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { ErrorCodes, SettingOptions } from '@/enums'
+import { SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -38,6 +39,65 @@ import { ErrorCodes, SettingOptions } from '@/enums'
  * 401 NOT_AUTHORIZED
  * 500 INTERNAL_SERVER_ERROR
  */
+
+const UIFilterToApiFilter = {
+  endDate: 'endDateTime',
+  folNum: 'clientReferenceId',
+  orderBy: 'sortCriteriaName',
+  orderVal: 'sortDirection',
+  regBy: 'registeringName',
+  regNum: 'registrationNumber',
+  regType: 'registrationType',
+  startDate: 'startDateTime',
+  status: 'statusType'
+}
+
+// add sorting params for registration history/draft api calls
+function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
+  const sortKeys = Object.keys(sortOptions)
+  // add all set filters as params to the call
+  for (const i in sortKeys) {
+    // convert to api expected value (too tied in with header logic to change earlier)
+    if (sortOptions[sortKeys[i]] === 'createDateTime') {
+      // sortKeys[i] === orderBy (only case this will happen)
+      sortOptions[sortKeys[i]] = 'startDateTime'
+    }
+    // add timestamp onto datetime param values
+    if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
+      // ensure its not already converted
+      if (sortOptions[sortKeys[i]].length < 11) {
+        sortOptions[sortKeys[i]] = sortOptions[sortKeys[i]]
+        // convert to local date object
+        const d = new Date(`${sortOptions[sortKeys[i]]}T00:00:00`)
+        // get the offset from utc in hours
+        let offset = `${d.getTimezoneOffset() / 60}`
+        let tzDiff = '-'
+        if (offset[0] === '-') {
+          // flip tzDiff and remove negative from offset
+          tzDiff = '+'
+          offset = offset.substring(1, offset.length)
+        }
+        // check if offset has minutes
+        const minsIndex = offset.indexOf('.')
+        if (minsIndex !== -1) {
+          // remove the minutes from the offset (not perfect but better than an error)
+          offset = offset.substring(0, minsIndex)
+        }
+        // add zero to offset if necessary
+        if (offset.length < 2) offset = `0${offset}`
+        // add desired timestamp
+        let time = '00:00:00'
+        if (UIFilterToApiFilter[sortKeys[i]] === 'endDateTime') time = '11:59:59'
+        // combine date, timestamp and tz info
+        sortOptions[sortKeys[i]] = `${d.toISOString().substring(0, 10)}T${time}${tzDiff}${offset}:00`
+      }
+    }
+    if (sortOptions[sortKeys[i]]) {
+      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
+    }
+  }
+  return url
+}
 
 // Create default request base URL and headers.
 function getDefaultConfig (): Object {
@@ -652,14 +712,18 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
 }
 
 // Get registration history
-export async function registrationHistory (): Promise<{
+export async function registrationHistory (sortOptions: RegistrationSortIF, page: number): Promise<{
   registrations: RegistrationSummaryIF[],
   error: ErrorIF
 }> {
-  const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  const baseURL = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
+  const url = addSortParams(
+    `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`,
+    sortOptions
+  )
   return axios
-    .get('financing-statements/registrations?collapse=true', config)
+    .get(url, config)
     .then(response => {
       const data = response?.data as RegistrationSummaryIF[]
       if (!data) {
@@ -696,14 +760,15 @@ export async function registrationHistory (): Promise<{
 }
 
 // Get draft history
-export async function draftHistory (): Promise<{
+export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
   drafts: DraftResultIF[],
   error: ErrorIF
 }> {
-  const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  const baseURL = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
+  const url = addSortParams('drafts?fromUI=true', sortOptions)
   return axios
-    .get('drafts', config)
+    .get(url, config)
     .then(response => {
       const data = response?.data as DraftResultIF[]
       if (!data) {

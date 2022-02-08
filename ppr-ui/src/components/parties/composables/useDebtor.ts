@@ -5,7 +5,7 @@ import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
 import { useParty } from '@/composables/useParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
-import { checkAddress } from '@/composables/address/factories/address-factory'
+import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -110,9 +110,21 @@ export const useDebtor = (props, context) => {
           'en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
       } else {
         localState.currentDebtor.birthDate = null
+        if (localState.originalDebtor && !localState.originalDebtor.birthDate) {
+          localState.originalDebtor.birthDate = null
+        }
       }
     }
-
+    // format the original address before the compare
+    if (localState.originalDebtor) {
+      localState.originalDebtor.address = formatAddress(localState.originalDebtor.address)
+    }
+    // format the original birthdate the exact same before the compare
+    if (localState.originalDebtor.birthDate && localState.originalDebtor.birthDate.length > 10) {
+      const originalDateOfBirth = new Date(localState.originalDebtor.birthDate)
+      localState.originalDebtor.birthDate = originalDateOfBirth.toLocaleDateString(
+        'en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
+    }
     // if they didn't change anything, just exit
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
     isEqual(localState.currentDebtor, localState.originalDebtor)) {

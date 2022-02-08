@@ -86,7 +86,9 @@
               :hide-details="hideDetails"
               persistent-hint
               :placeholder="selectedSearchType ? selectedSearchType.textLabel: 'Select a category first'"
-              v-model="searchValue"/>
+              v-model="searchValue"
+              @keypress.enter="searchCheck()"
+            />
           </template>
           <v-row v-for="(line, index) in searchPopUp" :key="index" class="pt-2 pl-3">
             {{ line }}
@@ -102,43 +104,54 @@
       <v-col v-else cols="7" class="pl-3">
         <v-row no-gutters>
           <v-col cols="4">
-            <v-text-field id="first-name-field"
-                          autocomplete="off"
-                          :error-messages="searchMessageFirst ? searchMessageFirst : ''"
-                          filled
-                          :hint="searchHintFirst"
-                          persistent-hint
-                          placeholder="First Name"
-                          v-model="searchValueFirst"/>
+            <v-text-field
+              id="first-name-field"
+              autocomplete="off"
+              :error-messages="searchMessageFirst ? searchMessageFirst : ''"
+              filled
+              :hint="searchHintFirst"
+              persistent-hint
+              placeholder="First Name"
+              v-model="searchValueFirst"
+              @keypress.enter="searchCheck()"
+          />
           </v-col>
           <v-col cols="4" class="pl-3">
-            <v-text-field id="second-name-field"
-                          autocomplete="off"
-                          :error-messages="searchMessageSecond ? searchMessageSecond : ''"
-                          filled
-                          :hint="searchHintSecond"
-                          persistent-hint
-                          placeholder="Middle Name (Optional)"
-                          v-model="searchValueSecond"/>
+            <v-text-field
+              id="second-name-field"
+              autocomplete="off"
+              :error-messages="searchMessageSecond ? searchMessageSecond : ''"
+              filled
+              :hint="searchHintSecond"
+              persistent-hint
+              placeholder="Middle Name (Optional)"
+              v-model="searchValueSecond"
+              @keypress.enter="searchCheck()"
+            />
           </v-col>
           <v-col cols="4" class="pl-3">
-            <v-text-field id="last-name-field"
-                          autocomplete="off"
-                          :error-messages="searchMessageLast ? searchMessageLast : ''"
-                          filled
-                          :hint="searchHintLast"
-                          persistent-hint
-                          placeholder="Last Name"
-                          v-model="searchValueLast"/>
+            <v-text-field
+              id="last-name-field"
+              autocomplete="off"
+              :error-messages="searchMessageLast ? searchMessageLast : ''"
+              filled
+              :hint="searchHintLast"
+              persistent-hint
+              placeholder="Last Name"
+              v-model="searchValueLast"
+              @keypress.enter="searchCheck()"
+            />
           </v-col>
         </v-row>
       </v-col>
       <v-col class="pl-3 pt-2" style="width: 250px;">
         <v-row no-gutters>
-          <v-btn :id="$style['search-btn']"
-                 class="search-bar-btn primary mr-2"
-                 :loading="searching"
-                 @click="searchCheck">
+          <v-btn
+            :id="$style['search-btn']"
+            class="search-bar-btn primary mr-2"
+            :loading="searching"
+            @click="searchCheck()"
+          >
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
 
@@ -173,6 +186,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import _ from 'lodash'
 
 import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes } from '@/resources'
@@ -337,7 +351,7 @@ export default defineComponent({
         clientReferenceId: localState.folioNumber
       }
     }
-    const searchAction = async (proceed: boolean) => {
+    const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
         setSearching(true)
@@ -366,7 +380,7 @@ export default defineComponent({
         }
         setSearching(false)
       }
-    }
+    }, 2000, { trailing: false })
     const searchCheck = async () => {
       localState.validations = validateSearchAction(localState)
       if (localState.validations) {

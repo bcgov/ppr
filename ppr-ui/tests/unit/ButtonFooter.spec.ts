@@ -343,3 +343,28 @@ describe('Step 4 for SBC staff', () => {
   })
 
 })
+
+describe('Button events', () => {
+  let wrapper: Wrapper<any>
+  
+  beforeEach(async () => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
+    const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
+    wrapper = createComponent(currentStatementType, currentStepName)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays error modal', async () => {
+
+    wrapper.vm.showDraftError()
+    await Vue.nextTick()
+    expect(wrapper.find('#draftErrorDialog').exists()).toBe(true)
+    expect(wrapper.find('#draftErrorDialog').vm.$props.setDisplay).toBe(true)
+    expect(wrapper.find('#draftErrorDialog').vm.$props.setOptions.title).toBe('Unable to save draft registration')
+    
+  })
+})

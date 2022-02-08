@@ -108,19 +108,19 @@ def authorized_token(  # pylint: disable=too-many-return-statements
         token = jwt.get_token_auth_header()
         headers = {'Authorization': 'Bearer ' + token}
         try:
-            http = Session()
-            retries = Retry(total=5,
-                            backoff_factor=0.1,
-                            status_forcelist=[500, 502, 503, 504])
-            http.mount('http://', HTTPAdapter(max_retries=retries))
-            rv = http.get(url=auth_url, headers=headers)
+            with Session() as http:
+                retries = Retry(total=5,
+                                backoff_factor=0.1,
+                                status_forcelist=[500, 502, 503, 504])
+                http.mount('http://', HTTPAdapter(max_retries=retries))
+                rv = http.get(url=auth_url, headers=headers)
 
-            if rv.status_code != HTTPStatus.OK \
-                    or not rv.json().get('roles'):
-                return False
+                if rv.status_code != HTTPStatus.OK \
+                        or not rv.json().get('roles'):
+                    return False
 
-            if all(elem.lower() in rv.json().get('roles') for elem in action):
-                return True
+                if all(elem.lower() in rv.json().get('roles') for elem in action):
+                    return True
 
         except (exceptions.ConnectionError,  # pylint: disable=broad-except
                 exceptions.Timeout,
@@ -149,16 +149,16 @@ def user_orgs(token: str) -> dict:
             'Content-Type': 'application/json'
         }
         # current_app.logger.debug('Auth get user orgs url=' + url)
-        http = Session()
-        retries = Retry(total=3,
-                        backoff_factor=0.1,
-                        status_forcelist=[500, 502, 503, 504])
-        http.mount('http://', HTTPAdapter(max_retries=retries))
-        ret_val = http.get(url=api_url, headers=headers)
-        current_app.logger.debug('Auth get user orgs response status: ' + str(ret_val.status_code))
-        # current_app.logger.debug('Auth get user orgs response data:')
-        response = ret_val.json()
-        # current_app.logger.debug(response)
+        with Session() as http:
+            retries = Retry(total=3,
+                            backoff_factor=0.1,
+                            status_forcelist=[500, 502, 503, 504])
+            http.mount('http://', HTTPAdapter(max_retries=retries))
+            ret_val = http.get(url=api_url, headers=headers)
+            current_app.logger.debug('Auth get user orgs response status: ' + str(ret_val.status_code))
+            # current_app.logger.debug('Auth get user orgs response data:')
+            response = ret_val.json()
+            # current_app.logger.debug(response)
     except (exceptions.ConnectionError,  # pylint: disable=broad-except
             exceptions.Timeout,
             ValueError,
@@ -184,16 +184,16 @@ def account_org(token: str, account_id: str) -> dict:
             'Content-Type': 'application/json'
         }
         # current_app.logger.debug('Auth get user orgs url=' + url)
-        http = Session()
-        retries = Retry(total=3,
-                        backoff_factor=0.1,
-                        status_forcelist=[500, 502, 503, 504])
-        http.mount('http://', HTTPAdapter(max_retries=retries))
-        ret_val = http.get(url=api_url, headers=headers)
-        current_app.logger.debug('Auth get user orgs response status: ' + str(ret_val.status_code))
-        # current_app.logger.debug('Auth get account org response data:')
-        response = ret_val.json()
-        # current_app.logger.debug(response)
+        with Session() as http:
+            retries = Retry(total=3,
+                            backoff_factor=0.1,
+                            status_forcelist=[500, 502, 503, 504])
+            http.mount('http://', HTTPAdapter(max_retries=retries))
+            ret_val = http.get(url=api_url, headers=headers)
+            current_app.logger.debug('Auth get user orgs response status: ' + str(ret_val.status_code))
+            # current_app.logger.debug('Auth get account org response data:')
+            response = ret_val.json()
+            # current_app.logger.debug(response)
     except (exceptions.ConnectionError,  # pylint: disable=broad-except
             exceptions.Timeout,
             ValueError,
