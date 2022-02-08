@@ -79,7 +79,7 @@
           <amendment-description class="mt-12"
             :setShowErrors="showInvalid"
           />
-          <court-order class="mt-15"
+          <court-order class="mt-12"
             :setShowErrors="showCourtInvalid"
             :setRequireCourtOrder="requireCourtOrder"
             @setCourtOrderValid="setCourtOrderValid($event)"

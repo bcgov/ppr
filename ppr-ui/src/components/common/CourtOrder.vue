@@ -56,15 +56,21 @@
     </v-row>
   </v-container>
   <v-container v-else fluid no-gutters class="pb-6  px-0 rounded">
+    <v-card
+      id="court-order"
+      class="rounded"
+      :class="showErrors && !valid ? 'border-error-left' : ''"
+      flat
+    >
     <v-row no-gutters class="summary-header pa-2 mb-8">
       <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-message-text</v-icon>
+        <v-icon color="darkBlue">mdi-gavel</v-icon>
         <label class="pl-3">
           <strong>Court Order</strong>
         </label>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pb-6">
+    <v-row no-gutters style="padding: 0 30px;">
       <v-col v-if="requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
         A court order is required to renew a Repairer's Lien. Enter the court
         order information below. A default Effect of Order is provided; you can
@@ -75,11 +81,6 @@
         information below, otherwise leave the Court Order information empty.
       </v-col>
     </v-row>
-    <v-card
-      id="court-order"
-      :class="showErrors && !valid ? 'border-error-left' : ''"
-      flat
-    >
       <v-form v-model="valid">
         <v-row no-gutters style="padding: 0 30px;">
           <v-col cols="3" class="generic-label pt-10">Court Name</v-col>
@@ -87,7 +88,7 @@
             <v-text-field
               filled
               id="txt-court-name"
-              label="Enter the court name"
+              label="Court Name"
               v-model="courtName"
               hint="For example: Supreme Court of British Columbia"
               persistent-hint
@@ -103,7 +104,7 @@
             <v-text-field
               filled
               id="txt-court-registry"
-              label="Enter the court registry"
+              label="Court Registry"
               v-model="courtRegistry"
               hint="The location (city) of the court. For example: Richmond"
               persistent-hint
@@ -119,7 +120,7 @@
             <v-text-field
               filled
               id="txt-court-file-number"
-              label="Enter the court file number"
+              label="Court File Number"
               v-model="fileNumber"
               persistent-hint
               :error-messages="
@@ -135,7 +136,7 @@
               id="court-date-text-field"
               nudge-right="40"
               ref="datePickerRef"
-              title="Select the date of the order"
+              title="Date of Order"
               clearable
               :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
               :initialValue="orderDate"
@@ -158,7 +159,7 @@
               auto-grow
               counter="512"
               filled
-              label="Enter the effect of order"
+              label="Effect of Order"
               class="white pt-2 text-input-field"
               :error-messages="
                 errors.effectOfOrder.message ? errors.effectOfOrder.message : effectOfOrderMessage
