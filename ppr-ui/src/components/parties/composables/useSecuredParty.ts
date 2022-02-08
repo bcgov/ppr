@@ -3,7 +3,7 @@ import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unus
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
-import { checkAddress } from '@/composables/address/factories/address-factory'
+import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
 
@@ -97,7 +97,12 @@ export const useSecuredParty = (props, context) => {
     if (!localState.currentSecuredParty.businessName) {
       delete localState.currentSecuredParty.businessName
     }
+
+    // first format the original address
     // if they didn't change anything, just exit
+    if (localState.originalSecuredParty) {
+      localState.originalSecuredParty.address = formatAddress(localState.originalSecuredParty.address)
+    }
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
     isEqual(localState.currentSecuredParty, localState.originalSecuredParty)) {
       resetFormAndData(true)

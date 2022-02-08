@@ -84,6 +84,7 @@
       <party-search
         :isAutoCompleteDisabled="addEditInProgress"
         :registeringPartyAdded="registeringPartyAdded"
+        @selectItem="getSecuredPartyValidity"
         @showSecuredPartyAdd="initAdd"
         @addRegisteringParty="addRegisteringParty"
         @removeRegisteringParty="removeRegisteringParty"
