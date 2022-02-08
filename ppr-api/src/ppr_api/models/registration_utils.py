@@ -58,8 +58,8 @@ QUERY_ACCOUNT_CHANGE_REG_NAME_CLAUSE = " AND arv2.registering_name LIKE :registe
 QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE = ' AND arv2.state = :status_type'
 QUERY_ACCOUNT_CHANGE_REG_TYPE_CLAUSE = ' AND arv2.registration_type = :registration_type'
 QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE = """
- AND arv2.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') AND
-                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+ AND arv2.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
+                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
  """
 
 
