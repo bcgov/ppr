@@ -62,6 +62,36 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
       // sortKeys[i] === orderBy (only case this will happen)
       sortOptions[sortKeys[i]] = 'startDateTime'
     }
+    // add timestamp onto datetime param values
+    if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
+      // ensure its not already converted
+      if (sortOptions[sortKeys[i]].length < 11) {
+        sortOptions[sortKeys[i]] = sortOptions[sortKeys[i]]
+        // convert to local date object
+        const d = new Date(`${sortOptions[sortKeys[i]]}T00:00:00`)
+        // get the offset from utc in hours
+        let offset = `${d.getTimezoneOffset() / 60}`
+        let tzDiff = '-'
+        if (offset[0] === '-') {
+          // flip tzDiff and remove negative from offset
+          tzDiff = '+'
+          offset = offset.substring(1, offset.length)
+        }
+        // check if offset has minutes
+        const minsIndex = offset.indexOf('.')
+        if (minsIndex !== -1) {
+          // remove the minutes from the offset (not perfect but better than an error)
+          offset = offset.substring(0, minsIndex)
+        }
+        // add zero to offset if necessary
+        if (offset.length < 2) offset = `0${offset}`
+        // add desired timestamp
+        let time = '00:00:00'
+        if (UIFilterToApiFilter[sortKeys[i]] === 'endDateTime') time = '11:59:59'
+        // combine date, timestamp and tz info
+        sortOptions[sortKeys[i]] = `${d.toISOString().substring(0, 10)}T${time}${tzDiff}${offset}:00`
+      }
+    }
     if (sortOptions[sortKeys[i]]) {
       url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
     }

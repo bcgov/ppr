@@ -401,7 +401,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'min-column-sm',
-    sortable: true,
+    sortable: false,
     text: 'Days to Expiry',
     value: 'expireDays',
     display: true
