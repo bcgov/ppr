@@ -49,8 +49,8 @@ QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE :registering_nam
 QUERY_ACCOUNT_STATUS_CLAUSE = ' AND arv.state = :status_type'
 QUERY_ACCOUNT_REG_TYPE_CLAUSE = ' AND arv.registration_type = :registration_type'
 QUERY_ACCOUNT_REG_DATE_CLAUSE = """
- AND arv.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') AND
-                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+ AND arv.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
+                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
  """
 QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE = " AND arv2.registration_number LIKE :reg_num || '%'"
 QUERY_ACCOUNT_CHANGE_CLIENT_REF_CLAUSE = " AND arv2.client_reference_id LIKE :client_reference_id || '%'"
@@ -253,7 +253,7 @@ def build_account_query_params(params: AccountRegistrationParams) -> dict:
         'page_offset': page_offset
     }
     if params.registration_number:
-        query_params['reg_num'] = params.registration_number
+        query_params['reg_num'] = params.registration_number.upper()
     if params.registration_type:
         query_params['registration_type'] = params.registration_type
     if params.client_reference_id:

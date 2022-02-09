@@ -327,7 +327,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             'max_results_size': max_results_size
         }
         if params.registration_number:
-            query_params['doc_num'] = params.registration_number
+            query_params['doc_num'] = params.registration_number.upper()
         if params.registration_type:
             query_params['registration_type'] = params.registration_type
         if params.client_reference_id:
