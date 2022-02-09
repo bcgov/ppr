@@ -41,8 +41,12 @@
           </v-tooltip>
         </span>
       </v-col>
-      <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="4">
-        <folio-number :defaultFolioNumber="folioNumber" @folio-number="updateFolioNumber"/>
+      <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
+        <folio-number
+          :defaultFolioNumber="folioNumber"
+          @folio-number="updateFolioNumber"
+          @folio-error="folioError = $event"
+        />
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
     </v-row>
@@ -251,6 +255,7 @@ export default defineComponent({
       autoCompleteSearchValue: '',
       confirmationDialog: false,
       folioNumber: props.defaultFolioNumber,
+      folioError: false,
       hideDetails: false,
       searchTypes: SearchTypes,
       searchValue: props.defaultSearchValue,
@@ -382,6 +387,9 @@ export default defineComponent({
       }
     }, 2000, { trailing: false })
     const searchCheck = async () => {
+      if (localState.folioError) {
+        return
+      }
       localState.validations = validateSearchAction(localState)
       if (localState.validations) {
         localState.autoCompleteIsActive = false

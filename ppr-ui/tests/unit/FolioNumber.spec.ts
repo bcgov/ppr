@@ -13,16 +13,9 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
-const searchError: string = 'search-error'
-const searchData: string = 'search-data'
 
 // Input field selectors / buttons
-const folioAddBtn: string = '#folio-add-btn'
-const folioEditBtn: string = '#folio-edit-btn'
-const folioCloseBtn: string = '#folio-close-btn'
-const folioDisplay: string = '#folio-display'
-const folioEdit: string = '#folio-edit'
+
 const folioEditTxt: string = '#folio-edit-txt'
 
 /**
@@ -77,54 +70,24 @@ describe('Folio number tests', () => {
     expect(wrapper.findComponent(FolioNumber).exists()).toBe(true)
     expect(wrapper.vm.folioNumber).toBe(defaultFolio)
     expect(wrapper.vm.folioEditNumber).toBe(defaultFolio)
-    expect(wrapper.vm.folioEdit).toBe(false)
-    expect(wrapper.find(folioAddBtn).exists()).toBe(false)
-    expect(wrapper.find(folioEditBtn).exists()).toBe(true)
-    expect(wrapper.find(folioEdit).exists()).toBe(false)
-    expect(wrapper.find(folioCloseBtn).exists()).toBe(false)
-    const folio = wrapper.findAll(folioDisplay)
-    expect(folio.length).toBe(1)
-    expect(folio.at(0).text()).toContain(defaultFolio)
+    const folioInput = <HTMLInputElement>wrapper.find(folioEditTxt).element
+    expect(folioInput.value).toBe('t123')
   })
 
   it('allows the user to edit the folio', async () => {
-    wrapper.find(folioEditBtn).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.folioEditNumber).toBe(defaultFolio)
-    const edit = wrapper.findAll(folioEditTxt)
-    expect(edit.length).toBe(1)
-    expect(wrapper.find(folioCloseBtn).exists()).toBe(true)
-    // test close btn
-    wrapper.find(folioCloseBtn).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.folioNumber).toBe(defaultFolio)
-    expect(wrapper.vm.folioEdit).toBe(false)
-    expect(wrapper.find(folioAddBtn).exists()).toBe(false)
-    expect(wrapper.find(folioEditBtn).exists()).toBe(true)
-    expect(wrapper.find(folioEdit).exists()).toBe(false)
-    expect(wrapper.find(folioCloseBtn).exists()).toBe(false)
-    wrapper.find(folioEditBtn).trigger('click')
-    await Vue.nextTick()
     const newFolio = '12'
     wrapper.vm.folioEditNumber = newFolio
     await Vue.nextTick()
     const newEdit = wrapper.findAll(folioEditTxt)
     expect(newEdit.length).toBe(1)
-    wrapper.trigger('keypress', {
-      key: 'enter'
-    })
-    await Vue.nextTick()
-    // not working will update later
-    // expect(wrapper.vm.folioNumber).toBe(newFolio)
-    // expect(wrapper.vm.folioEdit).toBe(false)
-    // expect(wrapper.find(folioAddBtn).exists()).toBe(false)
-    // expect(wrapper.find(folioEditBtn).exists()).toBe(true)
-    // expect(wrapper.find(folioEdit).exists()).toBe(false)
-    // expect(wrapper.find(folioCloseBtn).exists()).toBe(false)
-    // expect(getLastEvent(wrapper, 'folio-number')).toEqual(newFolio)
+
   })
 
   it('validates the folio number', async () => {
-    // tbd
+    wrapper.find(folioEditTxt).setValue('Test File Number that is too long')
+    await Vue.nextTick()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Maximum 15 characters reached')
   })
 })
