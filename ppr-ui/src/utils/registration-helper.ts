@@ -677,8 +677,9 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     registration.courtOrderInformation = stateModel.registration.courtOrderInformation
     if (registration.courtOrderInformation.orderDate.length === 10) {
-      // add time (latest possible time to avoid conflicts with creation date)
-      const d = new Date(registration.courtOrderInformation.orderDate + 'T23:59:59')
+      // add current time to date
+      const now = new Date()
+      const d = new Date(`${registration.courtOrderInformation.orderDate}T${now.toTimeString().substring(0, 8)}`)
       // convert back to UTC (required to pass api validation properly in some edge cases)
       let month = `${d.getUTCMonth() + 1}`
       let day = `${d.getUTCDate()}`
@@ -686,7 +687,7 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
       if (month.length < 2) month = `0${month}`
       if (day.length < 2) day = `0${day}`
       if (hours.length < 2) hours = `0${hours}`
-      const orderDateUTC = `${d.getUTCFullYear()}-${month}-${day}T${hours}:59:59+00:00`
+      const orderDateUTC = `${d.getUTCFullYear()}-${month}-${day}T${hours}:00:00+00:00`
       registration.courtOrderInformation.orderDate = orderDateUTC
     }
   } else if (trustLength.lifeInfinite) {
