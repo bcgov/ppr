@@ -376,6 +376,9 @@ export default class App extends Mixins(AuthMixin) {
         const isSbc = await getSbcFromAuth()
         this.setRoleSbc(isSbc)
       }
+      if (!authRoles.includes('ppr')) {
+        throw new Error('No access to PPR')
+      }
       this.setAuthRoles(authRoles)
     } else {
       throw new Error('Invalid auth roles')
