@@ -1,16 +1,8 @@
 <template>
   <div>
-    <div v-if="cancelBtn">
-        <v-btn
-          id="btn-stacked-cancel"
-          class="btn-stacked"
-          outlined
-          @click="cancel()"
-        >
-          {{ cancelBtn }}
-        </v-btn>
-    </div>
-    <div v-if="backBtn" :class="{ 'pt-4': cancelBtn }">
+    <div v-if="isDoubledUp">
+      <v-row no-gutters>
+      <v-col v-if="backBtn">
         <v-btn
           id="btn-stacked-back"
           class="btn-stacked"
@@ -22,6 +14,54 @@
           </v-icon>
           {{ backBtn }}
         </v-btn>
+      </v-col>
+      <v-col v-if="cancelBtn" :class="{ 'pl-3': backBtn }">
+        <v-btn
+          id="btn-stacked-cancel"
+          class="btn-stacked"
+          outlined
+          @click="cancel()"
+        >
+          {{ cancelBtn }}
+        </v-btn>
+      </v-col>
+    </v-row>
+    </div>
+    <div v-else>
+      <div v-if="cancelBtn">
+          <v-btn
+            id="btn-stacked-cancel"
+            class="btn-stacked"
+            outlined
+            @click="cancel()"
+          >
+            {{ cancelBtn }}
+          </v-btn>
+      </div>
+      <div v-if="backBtn" :class="{ 'pt-4': cancelBtn }">
+          <v-btn
+            id="btn-stacked-back"
+            class="btn-stacked"
+            outlined
+            @click="back()"
+          >
+            <v-icon v-if="backBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+              mdi-chevron-left
+            </v-icon>
+            {{ backBtn }}
+          </v-btn>
+      </div>
+    </div>
+    <div v-if="saveBtn" :class="{ 'pt-4': saveBtn }">
+      <v-btn
+        v-if="saveBtn"
+        id="btn-stacked-save"
+        class="btn-stacked"
+        outlined
+        @click="save"
+      >
+        {{ saveBtn }}
+      </v-btn>
     </div>
     <div class="pt-4">
       <v-btn
@@ -41,6 +81,7 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   reactive,
   toRefs
@@ -60,6 +101,9 @@ export default defineComponent({
     },
     setDisableSubmitBtn: {
       default: false
+    },
+    setSaveButton: {
+      default: ''
     }
   },
   setup (props, { emit, root }) {
@@ -67,7 +111,14 @@ export default defineComponent({
       backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
       submitBtn: props.setSubmitBtn,
-      disableSubmitBtn: props.setDisableSubmitBtn
+      saveBtn: props.setSaveButton,
+      disableSubmitBtn: props.setDisableSubmitBtn,
+      isDoubledUp: computed(() => {
+        if (localState.submitBtn !== 'Review and Complete') {
+          return true
+        }
+        return false
+      })
     })
     const back = () => {
       emit('back', true)
@@ -78,11 +129,15 @@ export default defineComponent({
     const submit = () => {
       emit('submit', true)
     }
+    const save = () => {
+      emit('save', true)
+    }
 
     return {
       back,
       cancel,
       submit,
+      save,
       ...toRefs(localState)
     }
   }
