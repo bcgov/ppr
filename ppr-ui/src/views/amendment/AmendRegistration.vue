@@ -78,11 +78,11 @@
             :setShowErrorBar="errorBar"
             class="mt-15"
           />
-          <amendment-description class="mt-15"
+          <amendment-description class="mt-12"
             @valid="detailsValid = $event"
             :setShowErrors="showInvalid"
           />
-          <court-order class="mt-15"
+          <court-order class="mt-12"
             :setShowErrors="showCourtInvalid"
             :setRequireCourtOrder="requireCourtOrder"
             @setCourtOrderValid="setCourtOrderValid($event)"

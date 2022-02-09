@@ -289,7 +289,7 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   margin: 0 10px;
 }
 
-.theme--light.v-label, .theme--light.v-messages {
+.theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
   color: $gray7;
 }
 
@@ -311,7 +311,12 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
 
 .theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
   border-color: rgba(0, 0, 0, 0.42);
+  opacity: 0.4;
   border-image: none;
+}
+
+.theme--light.v-text-field--filled > .v-input--is-disabled > .v-input__slot {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .v-data-table .v-data-table__wrapper table thead tr th.extra-indent {
