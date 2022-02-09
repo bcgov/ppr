@@ -526,6 +526,7 @@ export default class AmendRegistration extends Vue {
     this.courtOrderValid = valid
     if (valid) {
       this.showCourtInvalid = false
+      this.amendErrMsg = ''
     }
   }
 
