@@ -50,7 +50,15 @@
                 {% if cover.line3 %}
                   <div>{{ cover.line3 }}</div>
                 {% endif %}
-                <div>{{ cover.line4 }}</div>
+                <div>
+                  {% set breaks = cover.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
               </td>
             </tr>
           </table> 
