@@ -7,18 +7,18 @@
     <meta charset="UTF-8">
     <meta name="author" content="BC Registries and Online Services">
     {% if environment == '' %}
-      [[stylePage.html]]
+      [[stylePageMail.html]]
     {% else %}
       [[stylePageDraft.html]]
     {% endif %}
-    [[style.html]]
+    [[styleMail.html]]
   </head>
   <body>
   <article id="cover-page">
     <table class="header-cover-table" role="presentation">
       <tr class="no-page-break">
         <td>
-          [[logo.html]]
+          [[logoGrey.html]]
         </td>
         <td>
           <div class="report-type">{{ meta_title }}</div>
@@ -50,7 +50,15 @@
                 {% if cover.line3 %}
                   <div>{{ cover.line3 }}</div>
                 {% endif %}
-                <div>{{ cover.line4 }}</div>
+                <div>
+                  {% set breaks = cover.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
               </td>
             </tr>
           </table> 

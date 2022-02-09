@@ -207,9 +207,11 @@ class Report:  # pylint: disable=too-few-public-methods
             'footer',
             'style',
             'stylePage',
+            'styleMail',
             'stylePageDraft',
-            'stylePageCover',
+            'stylePageMail',
             'logo',
+            'logoGrey',
             'macros',
             'registration/securedParties',
             'registration/courtOrderInformation',
@@ -277,6 +279,9 @@ class Report:  # pylint: disable=too-few-public-methods
             line2: str = ''
             line3: str = ''
             line4: str = ''
+            address = cover_info['address']
+            country = address.get('country', '')
+            region = address.get('region', '')
             if 'businessName' in cover_info:
                 name = cover_info['businessName']
             elif 'personName' in cover_info:
@@ -285,13 +290,22 @@ class Report:  # pylint: disable=too-few-public-methods
                 line1 = name
                 if len(line1) > 40:
                     line1 = line1[0:40]
-            line4 = cover_info['address']['region'] + ' ' + cover_info['address']['postalCode']
-            if (len(cover_info['address']['city']) + len(line4)) < 40:
-                line4 = cover_info['address']['city'] + ' ' + line4
+            if country == 'CA':
+                postal_code: str = address.get('postalCode', '')
+                postal_code = postal_code.replace('-', ' ')
+                if len(postal_code) == 6:
+                    line4 = region + '\n' + postal_code[0:3] + ' ' + postal_code[3:]
+                else:
+                    line4 = region + '\n' + postal_code
             else:
-                line3 = cover_info['address']['city']
-            if 'street' in cover_info['address']:
-                street = cover_info['address']['street']
+                line4 = region + ' ' + address.get('postalCode', '')
+
+            if (len(address['city']) + len(line4)) < 40:
+                line4 = address['city'] + ' ' + line4
+            else:
+                line3 = address['city']
+            if 'street' in address:
+                street = address['street']
                 if not line2:
                     line2 = street
                     if len(street) > 40 and line3 == '':
@@ -299,18 +313,18 @@ class Report:  # pylint: disable=too-few-public-methods
                         line2 = street[0:40]
                 else:
                     line3 = street
-            if not line3 and 'streetAdditional' in cover_info['address']:
-                line3 = cover_info['address']['streetAdditional']
+            if not line3 and 'streetAdditional' in address:
+                line3 = address['streetAdditional']
             if line2 and len(line2) > 40:
                 line2 = line2[0:40]
             if line3 and len(line3) > 40:
                 line3 = line3[0:40]
-            if cover_info['address']['country'] != 'CA':
+            if country != 'CA':
                 if not line3:
                     line3 = line4
-                    line4 = cover_info['address']['country']
+                    line4 = country
                 else:
-                    line4 = line4 + ' ' + cover_info['address']['country']
+                    line4 = line4 + ' ' + country
             cover_info['line1'] = line1.strip()
             if line2:
                 cover_info['line2'] = line2.strip()
