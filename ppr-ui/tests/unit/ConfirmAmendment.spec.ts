@@ -128,9 +128,9 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Save and Resume Later')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Back')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Register and Pay')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Register Amendment and Pay')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.AMEND)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // dialog
@@ -138,12 +138,12 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
   })
 
-  it('allows back to dashboard page', async () => {
+  it('allows back to amend page', async () => {
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     await Vue.nextTick()
     await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
   it('navigate to amend registration', async () => {

@@ -111,7 +111,7 @@ describe('Renew registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Confirm and Complete')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Review and Complete')
   })
 
   it('processes cancel button action', async () => {
@@ -188,7 +188,7 @@ describe('Renew registration component for repairers lien', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Confirm and Complete')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Review and Complete')
   })
 
   it('proceeds if valid court order', async () => {
