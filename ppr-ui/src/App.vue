@@ -376,6 +376,9 @@ export default class App extends Mixins(AuthMixin) {
         const isSbc = await getSbcFromAuth()
         this.setRoleSbc(isSbc)
       }
+      if (!authRoles.includes('ppr')) {
+        throw new Error('No access to PPR')
+      }
       this.setAuthRoles(authRoles)
     } else {
       throw new Error('Invalid auth roles')
@@ -521,6 +524,10 @@ export default class App extends Mixins(AuthMixin) {
   private proceedAfterError (proceed: boolean): void {
     this.errorDialog = false
     // still need to fill this out more
+
+    if (this.dialogOptions === loginError) {
+      window.location.assign(this.registryUrl)
+    }
     // for now just refresh app
     if (proceed) this.initApp()
   }
