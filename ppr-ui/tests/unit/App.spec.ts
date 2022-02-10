@@ -34,7 +34,7 @@ describe('App component', () => {
   const authUrl = 'myhost/basePath/auth/'
   sessionStorage.setItem('AUTH_WEB_URL', authUrl)
   // dev token (need a real token to parse - expired is okay)
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJUbWdtZUk0MnVsdUZ0N3FQbmUtcTEzdDUwa0JDbjF3bHF6dHN0UGdUM1dFIn0.eyJleHAiOjE2MTI5MjM1MTEsImlhdCI6MTYxMjkwNTUxMSwiYXV0aF90aW1lIjoxNjEyODk4NDEwLCJqdGkiOiI0YzkyZmE1NC1jNDdkLTQ0MGQtYTU2ZC05ZjY4YmRhNmM3NTgiLCJpc3MiOiJodHRwczovL2Rldi5vaWRjLmdvdi5iYy5jYS9hdXRoL3JlYWxtcy9mY2Ywa3BxciIsImF1ZCI6WyJjb21tb24tc2VydmljZXMiLCJuYW1lLXJlcXVlc3RzLXdlYiIsImVudGl0eS1zZXJ2aWNlcyIsInNiYy1hdXRoLXdlYiIsImFjY291bnQtc2VydmljZXMiLCJhY2NvdW50Il0sInN1YiI6IjA5M2Q4M2RkLTY5NTYtNDVjYS04ODlmLTE3ZTNiMWJiZTY2YyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFjY291bnQtd2ViIiwibm9uY2UiOiI1NjhmMjY3NC04MTVmLTQ2MGEtOWMyOS05OGRkYmE2N2M5YjUiLCJzZXNzaW9uX3N0YXRlIjoiZjQyMDg0ZmQtMzcxZi00ZTY3LTk2NGUtYTJmYWZhZGY2Zjg1IiwiYWNyIjoiMCIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJodHRwczovL2Rldi5iY3JlZ2lzdHJ5LmNhIiwiaHR0cDovL2xvY2FsaG9zdDo4MDgyIiwiaHR0cDovL2xvY2FsaG9zdDo4MDgxIiwiKiIsImh0dHA6Ly9sb2NhbGhvc3Q6NDIwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsicHVibGljX3VzZXIiLCJlZGl0IiwiYWNjb3VudF9ob2xkZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQiLCJhY2NvdW50SWQiOiIxMjM0IiwiZmlyc3RuYW1lIjoiQkNSRUdURVNUIERhbGlhIiwicm9sZXMiOlsicHVibGljX3VzZXIiLCJlZGl0IiwiYWNjb3VudF9ob2xkZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl0sIm5hbWUiOiJCQ1JFR1RFU1QgRGFsaWEgT05FIiwiaWRwX3VzZXJpZCI6IkJIR1Y1MjVDQUFPNlVKSlZRVkM3UlFIUzJFRUEyT0QzIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYmNzYy9iaGd2NTI1Y2FhbzZ1amp2cXZjN3JxaHMyZWVhMm9kMyIsImxvZ2luU291cmNlIjoiQkNTQyIsInVzZXJuYW1lIjoiYmNzYy9iaGd2NTI1Y2FhbzZ1amp2cXZjN3JxaHMyZWVhMm9kMyIsImxhc3RuYW1lIjoiT05FIn0.LD72JvfJGabcFqispDZwk6-TEWVLCc7yHhl_xOEfww_FM2j_N26lZEIK0ix08SgBSxDiNil-ZyHglK0SYluKJUB0wb4lJvJwg7Q1_RWY7gq_thb7s5QWUn0djSGt5d3-EupGz1xrNz663nlcbAZKr8vWyHUmUXcu55mDmw3CSPFeTbkN5ijfqMTfEH5AMqqo-x32nbFBEK0BSY4MgJeCqPpBZMgCSBV0iTAxDGeQdYN22No9XM36IvdClheWgFhU-b-bcTihgecfzndT0HzKqNSCUpiVi5srR_u_Y3F7F2h0E9Bi6SSFeDNYtYy_b7A8h-oG9OJo4BAhC1exkVzqBA') // eslint-disable-line max-len
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJUbWdtZUk0MnVsdUZ0N3FQbmUtcTEzdDUwa0JDbjF3bHF6dHN0UGdUM1dFIn0.eyJleHAiOjE2NDQ1MzYxMzEsImlhdCI6MTY0NDUxODEzMSwiYXV0aF90aW1lIjoxNjQ0NTE2NTM0LCJqdGkiOiIxZjc5OTkyOC05ODQwLTRlNzktYTEwZS1jMmI5ZTJjZTE3ZWQiLCJpc3MiOiJodHRwczovL2Rldi5vaWRjLmdvdi5iYy5jYS9hdXRoL3JlYWxtcy9mY2Ywa3BxciIsImF1ZCI6WyJwcHItc2VydmljZXMiLCJhY2NvdW50LXNlcnZpY2VzIiwiYWNjb3VudCJdLCJzdWIiOiI3NWMzMzE5Ni0zOTk3LTRkOTctODBlNi01ZGQyYWE1YmU5N2IiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwcHItd2ViIiwibm9uY2UiOiIwNDRjYzAyOC01NTZmLTRmNDgtYWM0NS1jNzU5OGEwMWQ0YTgiLCJzZXNzaW9uX3N0YXRlIjoiOGFiNjZmMDktZWQyYi00ZGQ4LWE1YmYtM2NjYWI2MThlMzVhIiwiYWNyIjoiMCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJwdWJsaWNfdXNlciIsInBwciIsImVkaXQiLCJhY2NvdW50X2hvbGRlciIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCIsImZpcnN0bmFtZSI6IkJDUkVHMiBTdmV0bGFuYSIsInJvbGVzIjpbInB1YmxpY191c2VyIiwicHByIiwiZWRpdCIsImFjY291bnRfaG9sZGVyIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdLCJuYW1lIjoiQkNSRUcyIFN2ZXRsYW5hIEZPVVJURUVOIiwiaWRwX3VzZXJpZCI6IkhERjNEWVFFUUhQVU1VT01QUUMyQkFGSVJETFZPV0s2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYmNzYy9oZGYzZHlxZXFocHVtdW9tcHFjMmJhZmlyZGx2b3drNiIsImxvZ2luU291cmNlIjoiQkNTQyIsImxhc3RuYW1lIjoiRk9VUlRFRU4iLCJ1c2VybmFtZSI6ImJjc2MvaGRmM2R5cWVxaHB1bXVvbXBxYzJiYWZpcmRsdm93azYifQ.UUamIDN1LWms2oK5YG9yEmfen6ISFoY9AGw7ZJrsmDiElt0XwI_lj6DPYdMieXgXQ4Ji7jRVSMNhX4LfxpC1JipepUbI3kBLf0lelTudhZyD9MOg-VYaLAAEwAY57Z8h7EOCQp0PLS8NAMwNs90t4sJ449uZ3HprEMfMvkaZ0X3Cv495U0m5Qr-GDT7PHeLqkh3297gvxx3PdIGZIWcIwz-lFo8jNYxpEtY1LivZXnCsfrLDEW-vVK5kmnB1boIJksiUq8ATjF6F26B7ytBhE89SvolmA5nMkLiB-yusbSMY0ccxRWpPmX4MJ2yKuM6Sr6L6Dxrw_FWBHU1ThnnxUw') // eslint-disable-line max-len
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -45,17 +45,18 @@ describe('App component', () => {
     const getSettings = sinon.stub(axiosPPR, 'get')
 
     // GET current user
-    get.withArgs('users/@me')
+    await get.withArgs('users/@me')
       .returns(new Promise((resolve) => resolve({
         data:
         {
+          contacts: [],
           firstname: 'first',
           lastname: 'last',
           username: 'username'
         }
       })))
 
-    getSettings.withArgs('user-profile')
+    await getSettings.withArgs('user-profile')
       .returns(new Promise((resolve) => resolve({
         data: mockedDisableAllUserSettingsResponse
       })))
@@ -85,7 +86,9 @@ describe('App component', () => {
     expect(wrapper.findComponent(Breadcrumb).exists()).toBe(false)
   })
 
-  it('gets auth and user info/settings properly', () => {
+  it('gets auth and user info/settings properly', async () => {
+    expect(wrapper.vm.$store.state.stateModel.authorization.authRoles).toContain('ppr')
+    await Vue.nextTick()
     expect(wrapper.vm.$store.state.stateModel.userInfo).not.toBeNull()
     expect(wrapper.vm.$store.state.stateModel.userInfo.firstname).toBe('first')
     expect(wrapper.vm.$store.state.stateModel.userInfo.lastname).toBe('last')
