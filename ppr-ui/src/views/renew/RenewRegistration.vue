@@ -69,7 +69,7 @@
                 :setRegistrationLength="registrationLength"
                 :setRegistrationType="registrationTypeUI"
                 :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Confirm and Complete'"
+                :setSubmitBtn="'Review and Complete'"
                 @cancel="goToDashboard()"
                 @submit="confirmRenewal()"
               />

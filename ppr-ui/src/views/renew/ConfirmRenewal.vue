@@ -26,11 +26,10 @@
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
-          <h1>Renewal</h1>
+          <h1>Review and Complete Renewal</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Confirm and complete any additional information before submitting
-              this registration Renewal.
+              Review your renewal and complete the additional information before registering.
             </p>
           </div>
            <h2 class="pt-14">
@@ -82,7 +81,7 @@
                 :setRegistrationType="registrationTypeUI"
                 :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Submit Renewal'"
+                :setSubmitBtn="'Register Renewal and Pay'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="goToReviewRenewal()"
                 @cancel="showDialog()"

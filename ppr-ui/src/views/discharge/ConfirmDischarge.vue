@@ -18,11 +18,10 @@
     <div class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
-          <h1>Total Discharge</h1>
+          <h1>Confirm and Complete Total Discharge</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Confirm and complete any additional information before submitting
-              this Total Discharge.
+              Confirm your Total Discharge and complete the additional information before registering.
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
@@ -81,7 +80,7 @@
                 :setRegistrationType="registrationTypeUI"
                 :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Submit Total Discharge'"
+                :setSubmitBtn="'Register Total Discharge'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="goToReviewRegistration()"
                 @cancel="showDialog()"

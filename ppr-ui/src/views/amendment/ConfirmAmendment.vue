@@ -25,7 +25,7 @@
     <div v-if="dataLoaded" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
-          <h1>Review and Confirm</h1>
+          <h1>Review and Complete Amendment</h1>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
 
           <v-row no-gutters class="summary-header pa-2 mt-4">
@@ -148,11 +148,13 @@
                 :setFeeType="feeType"
                 :setRegistrationLength="registrationLength"
                 :setRegistrationType="registrationTypeUI"
-                :setBackBtn="'Save and Resume Later'"
+                :setSaveBtn="'Save and Resume Later'"
+                :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
-                :setSubmitBtn="'Register and Pay'"
+                :setSubmitBtn="'Register Amendment and Pay'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
-                @back="saveDraft()"
+                @back="goToReviewAmendment()"
+                @save="saveDraft()"
                 @cancel="showDialog()"
                 @submit="submitButton()"
               />

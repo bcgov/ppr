@@ -97,7 +97,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Back')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Submit Renewal')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Register Renewal and Pay')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.RENEW)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // dialog

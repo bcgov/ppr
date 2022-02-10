@@ -9,7 +9,7 @@
           <h1>Total Discharge</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
-              Review the current information for this registration as of
+              This is the current information for this registration as of
               <b>{{ asOfDateTime }}.</b><br/>
               If additional amendments including court orders are still required, ensure they are completed
               prior to performing this Total Discharge.

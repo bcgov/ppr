@@ -14,10 +14,12 @@
       :setBackBtn="backBtn"
       :setCancelBtn="cancelBtn"
       :setSubmitBtn="submitBtn"
+      :setSaveButton="saveBtn"
       :setDisableSubmitBtn="disableSubmitBtn"
       @back="back()"
       @cancel="cancel()"
       @submit="submit()"
+      @save="save()"
     />
     <div v-if="errMsg" class="err-msg pt-3">
       {{ errMsg }}
@@ -87,6 +89,9 @@ export default defineComponent({
     },
     setDisableSubmitBtn: {
       default: false
+    },
+    setSaveBtn: {
+      default: ''
     }
   },
   setup (props, { emit }) {
@@ -107,6 +112,7 @@ export default defineComponent({
       showButtons: props.setShowButtons,
       showFeeSummary: props.setShowFeeSummary,
       submitBtn: props.setSubmitBtn,
+      saveBtn: props.setSaveBtn,
       disableSubmitBtn: props.setDisableSubmitBtn,
       isStaffReg: computed(() => {
         return isRoleStaffReg.value as boolean
@@ -124,6 +130,9 @@ export default defineComponent({
     const submit = () => {
       emit('submit', true)
     }
+    const save = () => {
+      emit('save', true)
+    }
 
     watch(() => props.setErrMsg, (val: string) => {
       localState.errMsg = val
@@ -137,6 +146,7 @@ export default defineComponent({
       back,
       cancel,
       submit,
+      save,
       ...toRefs(localState)
     }
   }

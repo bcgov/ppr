@@ -101,7 +101,7 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Back')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Submit Total Discharge')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Register Total Discharge')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.DISCHARGE)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // folio
