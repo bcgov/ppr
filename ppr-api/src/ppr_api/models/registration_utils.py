@@ -305,7 +305,7 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
     if not registering_name:
         registering_name = ''
     result = {
-        'accountId': str(mapping['account_id']),
+        'accountId': str(mapping['orig_account_id']),
         'registrationNumber': reg_num,
         'baseRegistrationNumber': base_reg_num,
         'createDateTime': model_utils.format_ts(mapping['registration_ts']),

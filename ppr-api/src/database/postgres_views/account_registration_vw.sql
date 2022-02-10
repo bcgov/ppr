@@ -32,7 +32,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name
+                           WHERE u.username = r.user_id) END) AS registering_name,
+       r.account_id AS orig_account_id
   FROM registrations r, registration_types rt, financing_statements fs, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -75,7 +76,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name
+                           WHERE u.username = r.user_id) END) AS registering_name,
+       r.account_id AS orig_account_id
   FROM registrations r, registration_types rt, financing_statements fs, user_extra_registrations uer, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id

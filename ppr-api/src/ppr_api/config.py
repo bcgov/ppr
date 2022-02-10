@@ -188,6 +188,9 @@ class _Config():  # pylint: disable=too-few-public-methods
     # Storage of verification mail reports
     GCP_CS_BUCKET_ID_VERIFICATION = os.getenv('GCP_CS_BUCKET_ID_VERIFICATION', 'ppr_verification_report_dev')
 
+    # Search results data size threshold for real time reports.
+    MAX_SIZE_SEARCH_RT: int = int(os.getenv('MAX_SIZE_SEARCH_RT', '650000'))
+
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""

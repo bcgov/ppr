@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from http import HTTPStatus
+import json
 
 from flask import current_app
 
@@ -136,6 +137,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             self.account_name = account_name
         if callback_url:
             self.callback_url = callback_url
+        else:
+            results_length = len(json.dumps(new_results))
+            if results_length > current_app.config.get('MAX_SIZE_SEARCH_RT'):
+                current_app.logger.info('Search id=' + str(self.search_id) + ' async report results length=' +
+                                        str(results_length))
+                self.callback_url = current_app.config.get('UI_SEARCH_CALLBACK_URL')
         self.save()
 
     def set_search_selection(self, search_select):

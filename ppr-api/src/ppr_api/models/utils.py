@@ -481,7 +481,7 @@ SELECT COUNT(registration_id) AS reg_count
 QUERY_ACCOUNT_BASE_REG_BASE = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name
+       secured_party, client_reference_id, registering_name, orig_account_id
   FROM account_registration_vw arv
  WHERE arv.account_id = :query_account
    AND arv.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
@@ -497,7 +497,7 @@ SELECT arv2.financing_id
 QUERY_ACCOUNT_CHANGE_REG = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name
+       secured_party, client_reference_id, registering_name, orig_account_id
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND account_id = :query_account
