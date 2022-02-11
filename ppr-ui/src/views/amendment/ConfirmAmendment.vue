@@ -26,25 +26,13 @@
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review and Complete Amendment</h1>
-          <caution-box class="mt-9" :setMsg="cautionTxt" />
+          <caution-box class="mt-9" style="margin-bottom: 60px;" :setMsg="cautionTxt" />
 
-          <v-row no-gutters class="summary-header pa-2 mt-4">
-            <v-col cols="10" class="pa-2">
+          <v-row no-gutters class="summary-header pa-2 mt-4 rounded-top">
+            <v-col cols="12" class="pa-2">
               <label class="pl-3">
                 <strong>Amendment</strong>
               </label>
-            </v-col>
-            <v-col cols="2" class="pl-10">
-                <v-btn
-                  text
-                  color="primary"
-                  :class="[$style['smaller-button'], 'edit-btn']"
-                  id="confirm-amend-btn"
-                  @click="goToReviewAmendment()"
-                >
-                  <v-icon small>mdi-pencil</v-icon>
-                  <span>Amend</span>
-                </v-btn>
             </v-col>
           </v-row>
           <div class="white ma-0">
