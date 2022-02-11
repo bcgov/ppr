@@ -166,7 +166,7 @@
             <span>Edit</span>
           </v-btn>
           <v-btn
-            v-else-if="isRepairersLien(item) && !isDischarged(item)"
+            v-else-if="isRepairersLien(item) && isActive(item)"
             :class="$style['edit-btn']"
             style="flex:0"
             color="primary"
