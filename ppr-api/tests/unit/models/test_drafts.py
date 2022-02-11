@@ -47,6 +47,7 @@ TEST_QUERY_ORDER_DATA = [
 TEST_QUERY_BASE_DATA = [
     (None, None, None, None, None, None),
     ('D-T', None, None, None, None, None),
+    ('d-t', None, None, None, None, None),
     (None, 'SA', None, None, None, None),
     (None, 'AM', None, None, None, None),
     (None, None, 'A-00000', None, None, None),
@@ -119,7 +120,7 @@ def test_find_by_document_id_amendment(session):
 
 def test_find_by_account_id_no_result(session):
     """Assert that the find draft statement by invalid account ID returns the expected result."""
-    drafts = Draft.find_all_by_account_id('X12345X')
+    drafts = Draft.find_all_by_account_id('X12345X', None)
 
     # check
     assert len(drafts) == 0

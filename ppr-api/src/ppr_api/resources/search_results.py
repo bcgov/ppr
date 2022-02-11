@@ -104,6 +104,11 @@ class SearchResultsResource(Resource):
                 return resource_utils.unprocessable_error_response('search result details')
 
             response_data = search_detail.json
+            # Results data that is too large for real time report generation (small number of results) is also
+            # asynchronous.
+            if callback_url is None and search_detail.callback_url is not None:
+                callback_url = search_detail.callback_url
+                is_ui_pdf = True
             if resource_utils.is_pdf(request) or is_ui_pdf:
                 # If results over threshold return JSON with callbackURL, getReportURL
                 if callback_url is not None:

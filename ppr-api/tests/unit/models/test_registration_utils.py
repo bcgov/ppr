@@ -47,6 +47,7 @@ TEST_QUERY_BASE_DATA = [
     (None, None, None, None, None, None, None),
     ('TEST', None, None, None, None, None, None),
     ('TEST0018A', None, None, None, None, None, None),
+    ('test', None, None, None, None, None, None),
     (None, 'SA', None, None, None, None, None),
     (None, None, 'TEST-SA-00', None, None, None, None),
     (None, None, None, 'TEST U', None, None, None),

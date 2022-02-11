@@ -466,6 +466,10 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
+   AND NOT EXISTS (SELECT uer.id
+                     FROM user_extra_registrations uer
+                    WHERE uer.registration_number = d.registration_number
+                      AND uer.account_id = d.account_id)
 """
 
 QUERY_ACCOUNT_DRAFTS_FILTER = 'SELECT * FROM (' + QUERY_ACCOUNT_DRAFTS_BASE + ') AS q WHERE account_id = :query_account'
@@ -481,7 +485,7 @@ SELECT COUNT(registration_id) AS reg_count
 QUERY_ACCOUNT_BASE_REG_BASE = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name
+       secured_party, client_reference_id, registering_name, orig_account_id
   FROM account_registration_vw arv
  WHERE arv.account_id = :query_account
    AND arv.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
@@ -497,7 +501,7 @@ SELECT arv2.financing_id
 QUERY_ACCOUNT_CHANGE_REG = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name
+       secured_party, client_reference_id, registering_name, orig_account_id
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND account_id = :query_account

@@ -32,9 +32,18 @@ PARAM_TO_ORDER_BY = {
     'startDateTime': 'registration_ts',
     'endDateTime': 'registration_ts'
 }
+PARAM_TO_ORDER_BY_CHANGE = {
+    'registrationNumber': 'arv2.registration_number',
+    'registrationType': 'arv2.registration_type',
+    'registeringName': 'arv2.registering_name',
+    'clientReferenceId': 'arv2.client_reference_id',
+    'startDateTime': 'arv2.registration_ts',
+    'endDateTime': 'arv2.registration_ts'
+}
 
 FINANCING_PATH = '/ppr/api/v1/financing-statements/'
 QUERY_ACCOUNT_REG_DEFAULT_ORDER = ' ORDER BY registration_ts DESC'
+QUERY_ACCOUNT_CHANGE_DEFAULT_ORDER = ' ORDER BY arv2.registration_ts DESC'
 QUERY_ACCOUNT_REG_LIMIT = ' LIMIT :page_size OFFSET :page_offset'
 QUERY_ACCOUNT_REG_NUM_CLAUSE = """
  AND (arv.registration_number LIKE :reg_num || '%' OR
@@ -49,8 +58,8 @@ QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE :registering_nam
 QUERY_ACCOUNT_STATUS_CLAUSE = ' AND arv.state = :status_type'
 QUERY_ACCOUNT_REG_TYPE_CLAUSE = ' AND arv.registration_type = :registration_type'
 QUERY_ACCOUNT_REG_DATE_CLAUSE = """
- AND arv.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc') AND
-                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+ AND arv.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
+                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
  """
 QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE = " AND arv2.registration_number LIKE :reg_num || '%'"
 QUERY_ACCOUNT_CHANGE_CLIENT_REF_CLAUSE = " AND arv2.client_reference_id LIKE :client_reference_id || '%'"
@@ -185,6 +194,19 @@ def get_account_reg_query_order(params: AccountRegistrationParams) -> str:
     return order_by
 
 
+def get_account_change_query_order(params: AccountRegistrationParams) -> str:
+    """Get the account change registration query order by clause from the provided parameters."""
+    order_by: str = QUERY_ACCOUNT_CHANGE_DEFAULT_ORDER
+    if not params.sort_criteria:
+        return order_by
+    if param_order_by := PARAM_TO_ORDER_BY_CHANGE.get(params.sort_criteria, None):
+        sort_order = 'DESC'
+        if params.sort_direction and params.sort_direction in ('asc', 'ascending', 'desc', 'descending'):
+            sort_order = params.sort_direction
+        order_by = ' ORDER BY ' + param_order_by + ' ' + sort_order
+    return order_by
+
+
 def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
     """Build the account registration base query from the provided parameters."""
     base_query: str = model_utils.QUERY_ACCOUNT_BASE_REG_BASE
@@ -218,6 +240,8 @@ def build_account_change_base_query(params: AccountRegistrationParams) -> str:
         base_query += QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE
     if params.start_date_time and params.end_date_time:
         base_query += QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE
+    order_by: str = get_account_change_query_order(params)
+    base_query += order_by
     base_query += QUERY_ACCOUNT_REG_LIMIT
     return base_query
 
@@ -253,7 +277,7 @@ def build_account_query_params(params: AccountRegistrationParams) -> dict:
         'page_offset': page_offset
     }
     if params.registration_number:
-        query_params['reg_num'] = params.registration_number
+        query_params['reg_num'] = params.registration_number.upper()
     if params.registration_type:
         query_params['registration_type'] = params.registration_type
     if params.client_reference_id:
@@ -305,7 +329,7 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
     if not registering_name:
         registering_name = ''
     result = {
-        'accountId': str(mapping['account_id']),
+        'accountId': str(mapping['orig_account_id']),
         'registrationNumber': reg_num,
         'baseRegistrationNumber': base_reg_num,
         'createDateTime': model_utils.format_ts(mapping['registration_ts']),
@@ -318,7 +342,8 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
         'registeringParty': str(mapping['registering_party']),
         'securedParties': str(mapping['secured_party']),
         'clientReferenceId': str(mapping['client_reference_id']),
-        'registeringName': registering_name
+        'registeringName': registering_name,
+        'expand': False
     }
     result = set_path(params, result, reg_num, base_reg_num)
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
