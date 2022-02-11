@@ -1,6 +1,6 @@
 <template>
   <v-container class="pa-0">
-    <v-row no-gutters v-if="showConfirm">
+    <v-row no-gutters class="pb-4" v-if="showConfirm">
       <v-col cols="10">
         <h3 style="line-height: 1rem;">General Collateral</h3>
       </v-col>

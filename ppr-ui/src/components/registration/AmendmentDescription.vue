@@ -39,12 +39,11 @@
     </v-card>
   </v-container>
   <v-container v-else class="white pa-0" fluid no-gutters>
-    <h2 class="pl-3">Details Description</h2>
     <v-row no-gutters class="py-8">
-      <v-col cols="3" class="generic-label pl-5">
+      <v-col class="generic-label pl-3">
         Details Description
       </v-col>
-      <v-col cols="9" class="summary-text pr-4">
+      <v-col cols="9" class="summary-text pr-4 pl-5">
         <span style="white-space: pre-wrap">{{ detailDescription }}</span>
       </v-col>
     </v-row>
