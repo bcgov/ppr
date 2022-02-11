@@ -49,7 +49,7 @@ export async function getRegisteringPartyFromAuth (isPprStaff: boolean): Promise
     const accountInfo = JSON.parse(currentAccount)
     accountId = accountInfo.id
   } else {
-    accountId = 9990003
+    accountId = 2810
   }
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
