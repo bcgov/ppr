@@ -466,6 +466,10 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
+   AND NOT EXISTS (SELECT uer.id
+                     FROM user_extra_registrations uer
+                    WHERE uer.registration_number = d.registration_number
+                      AND uer.account_id = d.account_id)
 """
 
 QUERY_ACCOUNT_DRAFTS_FILTER = 'SELECT * FROM (' + QUERY_ACCOUNT_DRAFTS_BASE + ') AS q WHERE account_id = :query_account'
