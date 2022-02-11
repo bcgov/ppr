@@ -690,6 +690,8 @@ export default class Dashboard extends Vue {
   ): { drafts: DraftResultIF[], registrations: RegistrationSummaryIF[] } {
     // add child drafts to their base registration in registration history
     const parentDrafts = [] as DraftResultIF[]
+    // reset child drafts if not sorting
+    if (!sorting) this.myRegDataChildDrafts = []
     for (let i = 0; i < drafts.length; i++) {
       // check if it has a parent reg
       if (drafts[i].baseRegistrationNumber) {

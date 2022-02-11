@@ -538,8 +538,9 @@ export default defineComponent({
             startDate: startDate,
             status: status
           } as RegistrationSortIF,
-          clearingFilters: clearingFilters
+          clearingFilters: clearingFilters.value
         })
+        clearingFilters.value = false
       }, 1000)
     )
 
