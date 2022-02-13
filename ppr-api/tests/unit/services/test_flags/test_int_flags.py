@@ -23,7 +23,10 @@ from flask import Flask
 from ppr_api.models import User
 from ppr_api.services import Flags
 
+from tests import integration_ldarkly
 
+
+@integration_ldarkly
 @pytest.mark.parametrize('test_name,flag_name,expected', [
     ('ppr-test-boolean', 'ppr-test-boolean', True),
     ('ppr-test-number', 'ppr-test-number', 10),
