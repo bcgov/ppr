@@ -4,7 +4,7 @@ coverage
 freezegun
 hypothesis<=4.38.1
 pyhamcrest
-pytest<6
+pytest<7.0
 pytest-mock
 pytest-asyncio
 requests-mock

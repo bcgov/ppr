@@ -46,3 +46,34 @@ def test_flags_bool_value(test_name, flag_name, expected):
         val = flags.value(flag_name)
 
     assert val == expected
+
+@integration_ldarkly
+@pytest.mark.parametrize('test_name,flag_user,expected_bool,expected_val', [
+    ('valid-user',
+     User(username='bcregistries.devops@daxiom.ca', firstname='bcregistries', lastname='test', sub='bcregistries-test', iss='iss'),
+     True, 10),
+    ('invalid-user',
+     (User(username='bcregistries', firstname='x', lastname='y', sub='bcregistries', iss='iss')),
+     False, -1),
+])
+def test_flag_unique_user(test_name, flag_user, expected_bool, expected_val):
+    """Assert that a unique user can retrieve a flag, when using the local Flag.json file."""
+    app = Flask(__name__)
+    app.env = 'production'
+    app.config['LD_SDK_KEY'] = os.getenv('LD_SDK_KEY')
+
+    app_env = app.env
+    try:
+        with app.app_context():
+            flags = Flags()
+            flags.init_app(app)
+            val = flags.value('ppr-test-number', flag_user)
+            flag_on = flags.is_on('ppr-test-boolean', flag_user)
+
+        assert val == expected_val
+        assert flag_on == expected_bool
+    except:  # pylint: disable=bare-except; # noqa: B901, E722
+        # for tests we don't care
+        assert False
+    finally:
+        app.env = app_env
