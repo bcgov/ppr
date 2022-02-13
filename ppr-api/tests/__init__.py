@@ -17,6 +17,7 @@ from typing import Dict, List
 
 from .pytest_marks import (
     integration_authorization,
+    integration_ldarkly,
     integration_nats,
     integration_payment,
     integration_sentry,

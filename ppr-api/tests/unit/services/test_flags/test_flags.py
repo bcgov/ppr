@@ -114,7 +114,7 @@ def test_flags_bool():
 
 def test_flags_bool_missing_flag(app):
     """Assert that a boolean (False) is returned when flag doesn't exist, when using the local Flag.json file."""
-    from legal_api import flags
+    from ppr_api import flags
     app_env = app.env
     try:
         with app.app_context():
@@ -130,7 +130,7 @@ def test_flags_bool_missing_flag(app):
 
 def test_flags_bool_using_current_app():
     """Assert that a boolean (True) is returned, when using the local Flag.json file."""
-    from legal_api import flags
+    from ppr_api import flags
     app = Flask(__name__)
     app.env = 'development'
 
@@ -146,8 +146,11 @@ def test_flags_bool_using_current_app():
     ('integer flag', 'integer-flag', 10),
 ])
 def test_flags_bool_value(test_name, flag_name, expected):
-    """Assert that a boolean (True) is returned, when using the local Flag.json file."""
-    from legal_api import flags
+    """Assert that a boolean (True) is returned, when using the local Flag.json file.
+    
+    This requires the flags.json file at the root of the project.
+    """
+    from ppr_api import flags
     app = Flask(__name__)
     app.env = 'development'
 

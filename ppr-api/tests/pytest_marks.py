@@ -43,5 +43,8 @@ integration_payment = pytest.mark.skipif((os.getenv('RUN_PAYMENT_TESTS', False) 
 integration_sentry = pytest.mark.skipif((os.getenv('SENTRY_DSN', False) is False),
                                         reason='SENTRY tests run when SENTRY_DSN is set.')
 
+integration_ldarkly = pytest.mark.skipif((os.getenv('LD_SDK_KEY', False) is False),
+                                        reason='Launch Darkly integration tests run when LD_SDK_KEY is set.')
+
 not_github_ci = pytest.mark.skipif((os.getenv('NOT_GITHUB_CI', False) is False),
                                    reason='Does not pass on github ci.')

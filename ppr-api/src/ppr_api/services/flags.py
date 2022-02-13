@@ -18,7 +18,7 @@ from ldclient.config import Config  # noqa: I005
 from ldclient.impl.integrations.files.file_data_source import _FileDataSource
 from ldclient.interfaces import UpdateProcessor
 
-from ppr_api.models import User
+from ppr_api.models.user import User
 
 
 class FileDataSource(UpdateProcessor):
@@ -62,7 +62,12 @@ class Flags():
             self.init_app(app)
 
     def init_app(self, app):
-        """Initialize the Feature Flag environment."""
+        """Initialize the Feature Flag environment.
+        
+        This is called by Flask when the extension is loaded.
+
+        For non-production environments, the SDK key is read from the config file.
+        """
         self.app = app
         self.sdk_key = app.config.get('LD_SDK_KEY')
 
