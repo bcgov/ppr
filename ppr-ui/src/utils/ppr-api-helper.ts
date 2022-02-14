@@ -87,7 +87,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
         if (offset.length < 2) offset = `0${offset}`
         // add desired timestamp
         let time = '00:00:00'
-        if (UIFilterToApiFilter[sortKeys[i]] === 'endDateTime') time = '11:59:59'
+        if (UIFilterToApiFilter[sortKeys[i]] === 'endDateTime') time = '23:59:59'
         // combine date, timestamp and tz info
         sortOptions[sortKeys[i]] = `${d.toISOString().substring(0, 10)}T${time}${tzDiff}${offset}:00`
       }
