@@ -460,7 +460,7 @@ export default defineComponent({
       if (isRegisteringParty(localState.securedParties[index])) {
         localState.registeringPartyAdded = false
       }
-      const currentParty = localState.securedParties[index]
+      const currentParty = cloneDeep(localState.securedParties[index])
 
       if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentParty.action !== ActionTypes.ADDED)) {
         currentParty.action = ActionTypes.REMOVED
@@ -634,7 +634,7 @@ export default defineComponent({
         if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
           const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
           // original secured party must be shown as removed
-          const originalParty = originalParties.securedParties[0]
+          const originalParty = cloneDeep(originalParties.securedParties[0])
           originalParty.action = ActionTypes.REMOVED
           localState.securedParties = [localState.savedParty, originalParty]
         } else {
