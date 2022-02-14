@@ -15,7 +15,7 @@
       @proceed="onStaffPaymentChanges($event)"
     />
     <v-row no-gutters class="pt-2">
-      <v-col :class="[$style['search-info'], 'select-search-text']">
+      <v-col :class="[$style['search-info'], 'select-search-text', 'pt-4']">
         <span>
           Select a search category and then enter a value to search.
         </span>
@@ -492,7 +492,7 @@ export default defineComponent({
 }
 .search-info {
   color: $gray8;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 .search-title {
   color: $gray9;
