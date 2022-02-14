@@ -295,6 +295,8 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
             assert statement['registeringName']
             assert statement['clientReferenceId']
         assert statement['baseRegistrationNumber']
+        if reg_num == 'TEST0018A':
+            assert len(statement['changes']) > 0
         if 'changes' in statement:
             for change in statement['changes']:
                 assert change['registrationNumber']
