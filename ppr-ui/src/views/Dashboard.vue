@@ -223,10 +223,13 @@
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { StatusCodes } from 'http-status-codes'
+import { cloneDeep } from 'lodash'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
-import { ErrorCodes, RouteNames, SettingOptions, TableActions } from '@/enums' // eslint-disable-line no-unused-vars
+import {
+  APIStatusTypes, ErrorCodes, RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
+} from '@/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   BaseHeaderIF, // eslint-disable-line no-unused-vars
@@ -667,12 +670,13 @@ export default class Dashboard extends Vue {
     if (this.myRegDataLoading || this.myRegNoMorePages) return
     this.myRegDataLoading = true
     this.myRegPage += 1
-    const nextRegs = await registrationHistory(this.myRegSortOptions, this.myRegPage)
+    const nextRegs = await registrationHistory(cloneDeep(this.myRegSortOptions), this.myRegPage)
     if (nextRegs.error) {
       this.emitError(nextRegs.error)
     } else {
       // add child drafts to new regs if applicable
-      const updatedRegs = this.myRegHistoryDraftCollapse(this.myRegDataChildDrafts, nextRegs.registrations, true)
+      const updatedRegs = this.myRegHistoryDraftCollapse(
+        cloneDeep(this.myRegDataChildDrafts), cloneDeep(nextRegs.registrations), true)
       this.myRegDataHistory = this.myRegDataHistory.concat(updatedRegs.registrations)
     }
     if (nextRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
@@ -686,6 +690,8 @@ export default class Dashboard extends Vue {
   ): { drafts: DraftResultIF[], registrations: RegistrationSummaryIF[] } {
     // add child drafts to their base registration in registration history
     const parentDrafts = [] as DraftResultIF[]
+    // reset child drafts if not sorting
+    if (!sorting) this.myRegDataChildDrafts = []
     for (let i = 0; i < drafts.length; i++) {
       // check if it has a parent reg
       if (drafts[i].baseRegistrationNumber) {
@@ -716,13 +722,18 @@ export default class Dashboard extends Vue {
     }
   }
 
-  private async myRegSort (sortOptions: RegistrationSortIF): Promise<void> {
+  private async myRegSort (args: { sortOptions: RegistrationSortIF, clearingFilters: boolean }): Promise<void> {
     this.myRegDataLoading = true
     this.myRegNoMorePages = false
-    this.myRegSortOptions = sortOptions
+    this.myRegSortOptions = args.sortOptions
     this.myRegPage = 1
-    const sortedDrafts = await draftHistory(this.myRegSortOptions)
-    const sortedRegs = await registrationHistory(this.myRegSortOptions, this.myRegPage)
+    const sorting = !args.clearingFilters
+    let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
+    // all drafts return from the api no matter the status value so prevent it here
+    if (!this.myRegSortOptions.status || this.myRegSortOptions.status === APIStatusTypes.DRAFT) {
+      sortedDrafts = await draftHistory(cloneDeep(this.myRegSortOptions))
+    }
+    const sortedRegs = await registrationHistory(cloneDeep(this.myRegSortOptions), this.myRegPage)
     // prioritize reg history error
     const error = sortedRegs.error || sortedDrafts.error
     if (error) {
@@ -730,9 +741,11 @@ export default class Dashboard extends Vue {
     } else {
       if (sortedRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
       // parent drafts from sorted list
-      const draftsCollapsed = this.myRegHistoryDraftCollapse(sortedDrafts.drafts, sortedRegs.registrations, true)
+      const draftsCollapsed = this.myRegHistoryDraftCollapse(
+        cloneDeep(sortedDrafts.drafts), cloneDeep(sortedRegs.registrations), sorting)
       // add child drafts from original list to sorted base registrations
-      const updatedRegs = this.myRegHistoryDraftCollapse(this.myRegDataChildDrafts, sortedRegs.registrations, true)
+      const updatedRegs = this.myRegHistoryDraftCollapse(
+        cloneDeep(this.myRegDataChildDrafts), cloneDeep(sortedRegs.registrations), sorting)
       // only add parent drafts to draft results
       this.myRegDataBaseRegDrafts = draftsCollapsed.drafts
       this.myRegDataHistory = updatedRegs.registrations
@@ -832,8 +845,8 @@ export default class Dashboard extends Vue {
     // FUTURE: add loading for search history too
     this.myRegDataLoading = true
     this.retrieveSearchHistory()
-    const myRegDrafts = await draftHistory(this.myRegSortOptions)
-    const myRegHistory = await registrationHistory(this.myRegSortOptions, 1)
+    const myRegDrafts = await draftHistory(cloneDeep(this.myRegSortOptions))
+    const myRegHistory = await registrationHistory(cloneDeep(this.myRegSortOptions), 1)
 
     if (myRegDrafts?.error || myRegHistory?.error) {
       // prioritize reg error

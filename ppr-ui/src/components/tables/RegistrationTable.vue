@@ -355,6 +355,7 @@ export default defineComponent({
       submittedEndDate,
       orderBy,
       orderVal,
+      clearingFilters,
       // other table stuff
       shouldClearType,
       dateTxt,
@@ -524,18 +525,22 @@ export default defineComponent({
           firstItem.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
         emit('sort', {
-          endDate: endDate,
-          folNum: folNum,
-          orderBy: orderBy,
-          orderVal: orderVal,
-          regBy: regBy,
-          regNum: regNum,
-          regParty: regParty,
-          regType: regType,
-          secParty: secParty,
-          startDate: startDate,
-          status: status
-        } as RegistrationSortIF)
+          sortOptions: {
+            endDate: endDate,
+            folNum: folNum,
+            orderBy: orderBy,
+            orderVal: orderVal,
+            regBy: regBy,
+            regNum: regNum,
+            regParty: regParty,
+            regType: regType,
+            secParty: secParty,
+            startDate: startDate,
+            status: status
+          } as RegistrationSortIF,
+          clearingFilters: clearingFilters.value
+        })
+        clearingFilters.value = false
       }, 1000)
     )
 
