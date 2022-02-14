@@ -46,7 +46,7 @@
                 </td>
                 <td>
                   <v-btn
-                    v-if="item.selectedResultsSize < 76 || item.searchId !== 'PENDING'"
+                    v-if="item.searchId !== 'PENDING'"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     depressed
