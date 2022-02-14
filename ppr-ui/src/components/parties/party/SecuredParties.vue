@@ -139,7 +139,7 @@
                     </div>
                     <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                       <v-chip v-if="row.item.action === ActionTypes.REMOVED"
-                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          x-small label color="#grey lighten-2" text-color="$gray9">
                           {{ row.item.action }}
                       </v-chip>
                       <v-chip v-else x-small label color="#1669BB" text-color="white">
@@ -182,7 +182,7 @@
                     >
                       <v-list-item-subtitle>
                         <v-icon small>mdi-undo</v-icon>
-                        <span class="ml-1">Undo</span>
+                        <span class="ml-1 mr-3">Undo</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item
@@ -196,6 +196,7 @@
                         <span
                           v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                           && row.item.action !== ActionTypes.ADDED"
+                          class="mr-3"
                         >
                           Delete
                         </span>

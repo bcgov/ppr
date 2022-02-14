@@ -315,7 +315,7 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   border-image: none;
 }
 
-.theme--light.v-text-field--filled > .v-input--is-disabled > .v-input__slot {
+.theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
   background: rgba(0, 0, 0, 0.04);
 }
 

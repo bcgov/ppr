@@ -82,7 +82,7 @@
             @valid="detailsValid = $event"
             :setShowErrors="showInvalid"
           />
-          <court-order class="mt-12"
+          <court-order class="mt-8"
             :setShowErrors="showCourtInvalid"
             :setRequireCourtOrder="requireCourtOrder"
             @setCourtOrderValid="setCourtOrderValid($event)"

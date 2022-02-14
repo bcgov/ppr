@@ -35,7 +35,7 @@
                   "
                 >
                   <v-chip v-if="row.item.action === ActionTypes.REMOVED"
-                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          x-small label color="#grey lighten-2" text-color="$gray9">
                           {{ row.item.action }}
                   </v-chip>
                   <v-chip v-else x-small label color="#1669BB" text-color="white">
@@ -62,7 +62,7 @@
     :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'"
     fluid no-gutters
   >
-    <v-row no-gutters class="pb-4 pt-10" v-if="hasVehicleCollateral() && !isRepairersLienAmendment">
+    <v-row no-gutters class="pb-4 pt-10 pl-1" v-if="hasVehicleCollateral() && !isRepairersLienAmendment">
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -117,7 +117,7 @@
                 </div>
                 <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                   <v-chip v-if="row.item.action === ActionTypes.REMOVED"
-                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          x-small label color="#grey lighten-2" text-color="$gray9">
                           {{ row.item.action }}
                       </v-chip>
                   <v-chip v-else x-small label color="#1669BB" text-color="white">
