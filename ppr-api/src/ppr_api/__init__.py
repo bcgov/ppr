@@ -31,7 +31,7 @@ from ppr_api import config, errorhandlers, models
 from ppr_api.models import db
 from ppr_api.resources import API_BLUEPRINT, OPS_BLUEPRINT
 from ppr_api.schemas import rsbc_schemas
-# from legal_api.services import flags, queue
+from ppr_api.services import flags
 from ppr_api.translations import babel
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.logging import setup_logging
@@ -56,7 +56,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     errorhandlers.init_app(app)
     db.init_app(app)
     rsbc_schemas.init_app(app)
-#    flags.init_app(app)
+    flags.init_app(app)
 #    queue.init_app(app)
     babel.init_app(app)
 

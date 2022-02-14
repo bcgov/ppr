@@ -8,7 +8,7 @@ PyYAML==6.0
 SQLAlchemy==1.4.31
 Werkzeug==1.0.1
 aniso8601==9.0.1
-attrs==19.1.0
+attrs==21.4.0
 blinker==1.4
 cachelib==0.6.0
 cachetools==4.2.4

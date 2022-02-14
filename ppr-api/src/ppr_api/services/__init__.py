@@ -14,15 +14,15 @@
 """This module wraps the calls to external services used by the API."""
 
 from .authz import BASIC_USER, PPR_ROLE, STAFF_ROLE, SYSTEM_ROLE, authorized, is_staff
+from .flags import Flags
 
 
 # from .bootstrap import RegistrationBootstrapService
 # from .business_details_version import VersionedBusinessDetailsService
 # from .document_meta import DocumentMetaService
-# from .flags import Flags
 # from .queue import QueueService
 
-# flags = Flags()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
+flags = Flags()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
 
 # queue = QueueService()  # pylint: disable=invalid-name; shared variables are lower case by Flask convention.
 
