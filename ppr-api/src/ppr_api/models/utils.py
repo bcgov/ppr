@@ -495,7 +495,6 @@ QUERY_ACCOUNT_CHANGE_REG_BASE = """
 SELECT arv2.financing_id
   FROM account_registration_vw arv2
  WHERE arv2.account_id = :query_account
-   AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
 """
 
 QUERY_ACCOUNT_CHANGE_REG = """
