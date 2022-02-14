@@ -4,10 +4,10 @@
     fluid
     id="length-trust-amendment"
     no-gutters
-    class="white pb-6 pr-10 pl-8 rounded-bottom"
+    class="white pb-6 pr-4 pl-8 rounded-bottom"
     :class="{ 'border-error-left': showErrorBar && editInProgress }"
   >
-    <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10 rounded-top">
+    <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n4 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-calendar-clock</v-icon>
         <label class="pl-3">

@@ -199,7 +199,7 @@
                         >
                           Delete
                         </span>
-                        <span v-else class="ml-1">Remove</span>
+                        <span v-else class="ml-1 mr-3">Remove</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -267,6 +267,8 @@
                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                     && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
                     class="edit-button"
+                    :class="registrationFlowType === RegistrationFlowType.AMENDMENT
+                    && row.item.action === ActionTypes.EDITED ? '' : 'mr-10'"
                   >
                     <v-btn
                       text
