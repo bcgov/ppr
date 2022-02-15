@@ -600,9 +600,12 @@ def expiry_dt_repairer_lien(expiry_ts: _datetime = None):
         # Return as UTC
         return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
-    base_time = expiry_ts.timestamp()
-    offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
-    base_ts = expiry_ts + offset
+    # Simplify: existing registration current expiry is always 1 day ahead in utc.
+    # Works locally: remove commented out code when confirm it works in dev.
+    # base_time = expiry_ts.timestamp()
+    # offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
+    # base_ts = expiry_ts + offset
+    base_ts = expiry_ts - timedelta(days=1)
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
