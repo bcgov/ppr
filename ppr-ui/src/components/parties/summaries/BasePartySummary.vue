@@ -41,7 +41,7 @@
                       "
                     >
                       <v-chip v-if="row.item.action === ActionTypes.REMOVED"
-                          x-small label color="#grey lighten-2" text-color="grey darken-1">
+                          x-small label color="#grey lighten-2" text-color="$gray9">
                           {{ row.item.action }}
                       </v-chip>
                       <v-chip v-else x-small label color="primary" text-color="white">

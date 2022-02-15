@@ -70,7 +70,7 @@
         </label>
       </v-col>
     </v-row>
-    <v-row no-gutters style="padding: 0 30px;">
+    <v-row no-gutters class="summary-text" style="padding: 0 30px;">
       <v-col v-if="requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN">
         A court order is required to renew a Repairer's Lien. Enter the court
         order information below. A default Effect of Order is provided; you can

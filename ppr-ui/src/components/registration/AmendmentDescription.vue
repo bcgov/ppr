@@ -1,6 +1,6 @@
 <template>
-  <v-container v-if="!summaryView" fluid no-gutters class="pb-6  px-0 rounded">
-    <v-row no-gutters class="summary-header pa-2">
+  <v-container v-if="!summaryView" fluid no-gutters class="pb-6 px-0 rounded">
+    <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-message-text</v-icon>
         <label class="pl-3">
@@ -10,16 +10,17 @@
     </v-row>
     <v-card
       id="amendment-detail-description"
+      class="px-4"
       :class="{ 'invalid-message': showErrorComponent }"
       flat
     >
-      <v-row class="py-6">
-          <v-col class="pa-4 pl-8">
+      <v-row class="pt-6">
+          <v-col class="pa-4 pl-7 summary-text">
               If this registration is related to a Subordination, Transfer of Security, or Transfer of Collateral,
               you MUST enter a description of the registration below, otherwise the Details Description is optional.
           </v-col>
       </v-row>
-      <v-row no-gutters class="pt-6">
+      <v-row no-gutters>
         <v-col cols="3" class="generic-label pa-4">
           Details Description
         </v-col>

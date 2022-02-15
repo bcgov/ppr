@@ -51,7 +51,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col>
+        <v-col class="pr-7">
           <div class="form__row form__btns">
             <v-btn
               large

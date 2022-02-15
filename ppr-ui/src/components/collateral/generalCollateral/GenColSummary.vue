@@ -9,13 +9,12 @@
       <v-col cols="10">
         <h3 style="line-height: 1rem;">General Collateral</h3>
       </v-col>
-      <v-col style="margin-top: -5px">
+      <v-col style="margin-top: -5px; margin-right: 5px;">
         <div class="float-right">
         <span
           v-if="registrationFlowType === RegistrationFlowType.AMENDMENT &&
               generalCollateral.length > 0 &&
               generalCollateral[generalCollateral.length - 1].addedDateTime === undefined"
-          class="edit-button"
         >
           <v-btn
             text
@@ -80,10 +79,10 @@
               && lastGeneralCollateral
               && (showAmendLink || showConfirm)
               && !lastGeneralCollateral.addedDateTime"
-              class="pa-0"
+              class="pa-0 general-collateral-summary"
               :class="{'ps-6': !showViewLink}">
       <div v-if="lastGeneralCollateral.descriptionDelete" class="gc-description-delete pt-2">
-        <v-chip class="badge-delete" label color="#grey lighten-2" text-color="grey darken-1" x-small>
+        <v-chip class="badge-delete" label color="#grey lighten-2" text-color="$gray9" x-small>
           <b>DELETED</b>
         </v-chip>
         <p class="pt-3 ma-0">
@@ -126,10 +125,10 @@
               <b>{{ asOfDateTime(item.addedDateTime) }}</b>
             </div>
             <div v-if="item.descriptionDelete" class="gc-description-delete pt-5">
-              <v-chip class="badge-delete" color="#grey lighten-2" text-color="grey darken-1" label x-small>
+              <v-chip class="badge-delete" color="#grey lighten-2" text-color="$gray9" label x-small>
                 <b>DELETED</b>
               </v-chip>
-              <p class="pt-3 ma-0">
+              <p class="pt-3 ma-0 pr-6">
                 <span style="white-space: pre-wrap;">{{ item.descriptionDelete }}</span>
               </p>
             </div>
@@ -137,7 +136,7 @@
               <v-chip color="primary" label text-color="white" x-small>
                 <b>ADDED</b>
               </v-chip>
-              <p class="pt-3 ma-0">
+              <p class="pt-3 ma-0 pr-6">
                 <span style="white-space: pre-wrap;">{{ item.descriptionAdd }}</span>
               </p>
             </div>

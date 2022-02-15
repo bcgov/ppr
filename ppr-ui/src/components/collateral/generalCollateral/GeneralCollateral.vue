@@ -12,7 +12,7 @@
     >
       <gen-col-summary
         @initGenColAmend="amendMode = $event"
-        :setShowHistory="registrationFlowType === RegistrationFlowType.AMENDMENT"
+        :setShowHistory="false"
         :setShowAmendLink="!amendMode"
       />
     </v-container>
