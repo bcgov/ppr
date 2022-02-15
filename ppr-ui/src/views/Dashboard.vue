@@ -10,12 +10,6 @@
       @proceed="myRegAddDialogProceed($event)"
     />
     <base-dialog
-      id="myRegErrDialog"
-      :setDisplay="myRegErrDialogDisplay"
-      :setOptions="myRegErrDialog"
-      @proceed="myRegErrDialogProceed($event)"
-    />
-    <base-dialog
       id="myRegDeleteDialog"
       :setDisplay="myRegDeleteDialogDisplay"
       :setOptions="myRegDeleteDialog"
@@ -52,7 +46,7 @@
                         @searched-value="setSearchedValue"
                         @search-data="setSearchResults"
                         @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
-                        @search-error="searchError($event)"/>
+                        @search-error="emitError($event)"/>
           </v-row>
         </v-col>
       </v-row>
@@ -66,7 +60,7 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="historyError"/>
+            <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
           </v-row>
         </v-col>
       </v-row>
@@ -253,7 +247,6 @@ import {
 import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,
-  paymentErrorSearch,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
@@ -261,8 +254,6 @@ import {
   registrationRestrictedDialog,
   registrationOpenDraftErrorDialog,
   renewConfirmationDialog,
-  searchPdfError,
-  searchResultsError,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -342,10 +333,8 @@ export default class Dashboard extends Vue {
   private myRegActionRoute: RouteNames = null
   private myRegAdd = ''
   private myRegAddDialog: DialogOptionsIF = null
-  private myRegErrDialog: DialogOptionsIF = null
   private myRegAddDialogError: StatusCodes = null
   private myRegAddDialogDisplay = false
-  private myRegErrDialogDisplay = false
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
 
@@ -554,53 +543,6 @@ export default class Dashboard extends Vue {
     this.myRegAddDialogDisplay = true
   }
 
-  private searchError (error: ErrorIF): void {
-    console.error(error)
-    switch (error.type) {
-      case (
-        ErrorCodes.BCOL_ACCOUNT_CLOSED ||
-        ErrorCodes.BCOL_USER_REVOKED ||
-        ErrorCodes.BCOL_ACCOUNT_REVOKED ||
-        ErrorCodes.BCOL_UNAVAILABLE
-      ):
-        this.payErrorOptions = { ...paymentErrorSearch }
-        this.payErrorOptions.text += '<br/><br/>' + error.detail
-        this.payErrorDisplay = true
-        break
-      case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
-        this.payErrorOptions = { ...paymentErrorSearch }
-        this.payErrorOptions.text += '<br/><br/>' + error.detail +
-          '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
-        this.payErrorOptions.hasContactInfo = true
-        this.payErrorDisplay = true
-        break
-      default:
-        if (error.type && error.type?.includes('BCOL') && error.detail) {
-          // bcol generic
-          this.payErrorOptions = { ...paymentErrorSearch }
-          this.payErrorOptions.text += '<br/><br/>' + error.detail
-          this.payErrorDisplay = true
-        } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-          // generic pay error
-          this.payErrorOptions = { ...paymentErrorSearch }
-          this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
-            '<br/><br/>If this issue persists, please contact us.'
-          this.payErrorOptions.hasContactInfo = true
-          this.payErrorDisplay = true
-        } else {
-          // generic search error
-          this.myRegAddDialog = { ...searchResultsError }
-          this.myRegAddDialogDisplay = true
-        }
-    }
-  }
-
-  private historyError (error: ErrorIF): void {
-    console.error(error)
-    this.myRegAddDialog = { ...searchPdfError }
-    this.myRegAddDialogDisplay = true
-  }
-
   private myRegAddFoundSetDialog (searchedRegNum: string, reg: RegistrationSummaryIF): void {
     this.myRegAddDialog = Object.assign({ ...registrationFoundDialog })
     searchedRegNum = searchedRegNum?.trim()?.toUpperCase()
@@ -662,10 +604,6 @@ export default class Dashboard extends Vue {
     this.myRegActionDocId = ''
     this.myRegActionRegNum = ''
     this.myRegDeleteDialogDisplay = false
-  }
-
-  private myRegErrDialogProceed (val: boolean): void {
-    this.myRegErrDialogDisplay = false
   }
 
   private async myRegGetNext (): Promise<void> {

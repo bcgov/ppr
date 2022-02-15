@@ -24,7 +24,7 @@ import {
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { SettingOptions } from '@/enums'
+import { ErrorCategories, SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -177,7 +177,8 @@ export async function search (
         searchQuery: searchCriteria, // Echoes request
         results: [],
         error: {
-          statusCode: error?.response?.status,
+          category: ErrorCategories.SEARCH,
+          statusCode: StatusCodes.GATEWAY_TIMEOUT,
           message: error?.response?.data?.message,
           detail: error?.parsed?.rootCause?.detail,
           type: error?.parsed?.rootCause?.type
@@ -293,6 +294,7 @@ export async function submitSelected (
   return axios
     .post(`search-results/${searchId}${callback}`, selected, config)
     .then(response => {
+      throw new Error('error')
       return response.status
     })
     .catch(error => {
@@ -320,6 +322,7 @@ export async function searchPDF (searchId: string): Promise<any> {
     .catch(error => {
       return {
         error: {
+          category: ErrorCategories.REPORT_GENERATION,
           statusCode: error?.response?.status || StatusCodes.NOT_FOUND
         }
       }
@@ -358,6 +361,7 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
       return {
         searches: null,
         error: {
+          category: ErrorCategories.HISTORY_SEARCHES,
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.parsed?.rootCause?.detail,
@@ -402,6 +406,7 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
         defaultDropDowns: true,
         defaultTableFilters: true,
         error: {
+          category: ErrorCategories.ACCOUNT_SETTINGS,
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.parsed?.rootCause?.detail,
@@ -449,6 +454,7 @@ export async function updateUserSettings (
         defaultDropDowns: true,
         defaultTableFilters: true,
         error: {
+          category: ErrorCategories.ACCOUNT_SETTINGS,
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.parsed?.rootCause?.detail,
@@ -464,7 +470,7 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
     .post<DraftIF>('drafts', draft, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -486,7 +492,8 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
         }
       }
       draft.error = {
-        statusCode: error?.response?.status,
+        category: ErrorCategories.REGISTRATION_SAVE,
+        statusCode: 500,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
         type: error?.parsed?.rootCause?.type
@@ -505,6 +512,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
   }
   if (!documentId || documentId === '') {
     draft.error = {
+      category: ErrorCategories.REGISTRATION_SAVE,
       statusCode: StatusCodes.BAD_REQUEST,
       message:
         'Draft update request invalid: no document ID. Use createDraft instead.'
@@ -515,7 +523,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
     .put<DraftIF>('drafts/' + documentId, draft, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -537,7 +545,8 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
         }
       }
       draft.error = {
-        statusCode: error?.response?.status,
+        category: ErrorCategories.REGISTRATION_SAVE,
+        statusCode: 500,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
         type: error?.parsed?.rootCause?.type
@@ -561,7 +570,7 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
     .get<DraftIF>('drafts/' + documentId, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -583,6 +592,7 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
         }
       }
       draft.error = {
+        category: ErrorCategories.REGISTRATION_LOAD,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -750,6 +760,7 @@ export async function registrationHistory (sortOptions: RegistrationSortIF, page
       return {
         registrations: null,
         error: {
+          category: ErrorCategories.HISTORY_REGISTRATIONS,
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.errorMessage,
           detail: error?.parsed?.rootCause?.detail,
@@ -795,6 +806,7 @@ export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
       return {
         drafts: null,
         error: {
+          category: ErrorCategories.HISTORY_REGISTRATIONS,
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.errorMessage,
           detail: error?.parsed?.rootCause?.detail,
@@ -817,7 +829,7 @@ export async function createFinancingStatement (
     )
     .then(response => {
       const data: FinancingStatementIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -839,7 +851,8 @@ export async function createFinancingStatement (
         }
       }
       statement.error = {
-        statusCode: error?.response?.status,
+        category: ErrorCategories.REGISTRATION_CREATE,
+        statusCode: 500,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
         type: error?.parsed?.rootCause?.type
@@ -861,13 +874,14 @@ export async function createAmendmentStatement (
     )
     .then(response => {
       const data: AmendmentStatementIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
     })
     .catch(error => {
       statement.error = {
+        category: ErrorCategories.REGISTRATION_CREATE,
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -889,7 +903,7 @@ export async function createDischarge (
       getDefaultConfig())
     .then(response => {
       const data: DischargeRegistrationIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -911,6 +925,7 @@ export async function createDischarge (
         }
       }
       discharge.error = {
+        category: ErrorCategories.REGISTRATION_CREATE,
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -932,7 +947,7 @@ export async function createRenewal (
       getDefaultConfig())
     .then(response => {
       const data: RenewRegistrationIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -954,6 +969,7 @@ export async function createRenewal (
         }
       }
       renewal.error = {
+        category: ErrorCategories.REGISTRATION_CREATE,
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -975,7 +991,7 @@ export async function getFinancingStatement (
     )
     .then(response => {
       const data: FinancingStatementIF = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -1002,7 +1018,8 @@ export async function getFinancingStatement (
         securedParties: [],
         debtors: [],
         error: {
-          statusCode: error?.response?.status,
+          category: ErrorCategories.REGISTRATION_LOAD,
+          statusCode: 500,
           message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
           detail: error?.parsed?.rootCause?.detail,
           type: error?.parsed?.rootCause?.type
@@ -1163,7 +1180,7 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
     .get(pdfPath, config)
     .then(response => {
       const data = response?.data
-      if (!data) {
+      if (data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -1186,6 +1203,7 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
       }
       return {
         error: {
+          category: ErrorCategories.REPORT_GENERATION,
           statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
           message: error?.response?.data?.errorMessage,
           detail: error?.parsed?.rootCause?.detail,

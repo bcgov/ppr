@@ -1,6 +1,5 @@
 import { APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
-import { CourtOrderIF, DebtorNameIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
-import { ErrorIF } from './error-interface'
+import { CourtOrderIF, DebtorNameIF, ErrorIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {

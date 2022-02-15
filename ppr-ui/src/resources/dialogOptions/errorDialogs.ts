@@ -1,25 +1,30 @@
 import { DialogOptionsIF } from '@/interfaces'
 
-export const fetchError: DialogOptionsIF = {
-  acceptText: 'Retry',
-  cancelText: 'Continue',
-  title: 'Retrieve Data Error',
-  text: 'We were unable to retrieve your saved data. Please try again later.'
+export const historyRegError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to retrieve registration history',
+  text: 'We were unable to retrieve your registrations. Please try again later. ' +
+  'If this issue persists, please contact us.'
 }
 
 export const loginError: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',
+  hasContactInfo: true,
   title: 'Unable to retrieve user account information',
   text: 'We are unable to retrieve your Personal Property Registry account information. ' +
   'Please try again later. If this issue persists, please contact us.'
 }
 
-export const paymentError: DialogOptionsIF = {
-  acceptText: '',
-  cancelText: 'Okay',
-  title: 'Payment Error',
-  text: 'We are unable to process your payment at this time. Please try again later.'
+export const openDocError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  title: 'Unable to open document',
+  text: 'We are currently unable to open this document. ' +
+    'Please try again later. If this issue persists, please contact us.',
+  hasContactInfo: true
 }
 
 export const paymentErrorReg: DialogOptionsIF = {
@@ -38,9 +43,9 @@ export const paymentErrorSearch: DialogOptionsIF = {
 }
 
 export const saveSearchError: DialogOptionsIF = {
-  acceptText: '',
-  cancelText: 'Okay',
-  title: 'Search Error',
+  acceptText: 'OK',
+  cancelText: '',
+  title: 'Search Incomplete',
   text: 'We were unable to complete this search. Please try again later.'
 }
 
@@ -68,15 +73,6 @@ export const saveSelectionsError: DialogOptionsIF = {
   title: 'Unable to save your selections',
   text: 'We are unable to save your search results. Your search fee will be refunded. ' +
     'Please try this search again later. If this issue persists, please contact us.',
-  hasContactInfo: true
-}
-
-export const searchPdfError: DialogOptionsIF = {
-  acceptText: 'OK',
-  cancelText: '',
-  title: 'Unable to open document',
-  text: 'We are currently unable to open this document. ' +
-    'Please try again later. If this issue persists, please contact us.',
   hasContactInfo: true
 }
 

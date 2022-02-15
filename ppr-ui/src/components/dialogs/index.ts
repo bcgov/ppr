@@ -1,7 +1,6 @@
 export { default as BaseDialog } from './BaseDialog.vue'
 export { default as ChangeSecuredPartyDialog } from './ChangeSecuredPartyDialog.vue'
 export { default as ConfirmationDialog } from './ConfirmationDialog.vue'
-export { default as ErrorDialog } from './ErrorDialog.vue'
 export { default as RegistrationConfirmation } from './RegistrationConfirmation.vue'
 export { default as RegistrationOtherDialog } from './RegistrationOtherDialog.vue'
 export { default as SecuredPartyDialog } from './SecuredPartyDialog.vue'

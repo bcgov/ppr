@@ -1,6 +1,5 @@
 import { SettingOptions } from '@/enums'
-import { BaseHeaderIF } from '@/interfaces'
-import { ErrorIF } from '@/interfaces/ppr-api-interfaces'
+import { BaseHeaderIF, ErrorIF } from '@/interfaces'
 
 // user settings state model
 export interface UserSettingsIF {
