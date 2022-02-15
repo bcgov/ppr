@@ -342,7 +342,8 @@ export default defineComponent({
         currentParties.valid = isPartiesValid(currentParties)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
-      getDebtorValidity()
+      const isValid = getDebtorValidity()
+      emitDebtorValidity(isValid)
     }
 
     const initEdit = (index: number) => {
@@ -367,14 +368,16 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
-      getDebtorValidity()
+      const isValid = getDebtorValidity()
+      emitDebtorValidity(isValid)
       emit('debtorOpen', false)
     }
 
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
       localState.debtors.splice(index, 1, cloneDeep(originalParties.debtors[index]))
-      getDebtorValidity()
+      const isValid = getDebtorValidity()
+      emitDebtorValidity(isValid)
     }
 
     const getDebtorValidity = (): boolean => {
@@ -391,8 +394,11 @@ export default defineComponent({
           validity = true
         }
       }
-      emit('setDebtorValid', validity)
       return validity
+    }
+
+    const emitDebtorValidity = (validity: boolean): void => {
+      emit('setDebtorValid', validity)
     }
 
     watch(() => props.setShowInvalid, (val) => {
