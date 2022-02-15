@@ -25,8 +25,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     submittedStartDate: setSort?.startDate || null,
     submittedEndDate: setSort?.endDate || null,
     orderBy: setSort?.orderBy || '',
-    orderVal: setSort?.orderVal || '',
-    clearingFilters: false
+    orderVal: setSort?.orderVal || ''
   })
 
   const getFormattedDate = (dateStr: string): string => {
@@ -95,7 +94,6 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     localState.shouldClearType = true
     localState.orderBy = setSort?.orderBy || ''
     localState.orderVal = setSort?.orderVal || ''
-    localState.clearingFilters = true
   }
 
   const hasRenewal = (
