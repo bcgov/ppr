@@ -37,8 +37,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Input field selectors / buttons
-const amendButton: string = '#confirm-amend-btn'
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -148,8 +146,7 @@ describe('Confirm Amendment registration component', () => {
 
   it('navigate to amend registration', async () => {
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
-    expect(wrapper.find(amendButton).exists()).toBe(true)
-    await wrapper.find(amendButton).trigger('click')
+    await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     wrapper.vm.goToReviewAmendment()
     await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
