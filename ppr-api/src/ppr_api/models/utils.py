@@ -505,6 +505,7 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND account_id = :query_account
    AND financing_id IN (QUERY_ACCOUNT_CHANGE_REG_BASE)
+ORDER BY registration_ts DESC
 """
 
 # Error messages

@@ -539,4 +539,6 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
         params.end_date_time = end_ts
     if params.sort_direction is not None:
         params.sort_direction = params.sort_direction.lower()
+    if params.registration_number is not None:
+        params.registration_number = params.registration_number.strip().upper()
     return params

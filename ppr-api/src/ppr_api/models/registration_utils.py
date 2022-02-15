@@ -61,6 +61,7 @@ QUERY_ACCOUNT_REG_DATE_CLAUSE = """
  AND arv.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
                              (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
  """
+QUERY_ACCOUNT_CHANGE_REG_CLASS_CLAUSE = " AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')"
 QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE = " AND arv2.registration_number LIKE :reg_num || '%'"
 QUERY_ACCOUNT_CHANGE_CLIENT_REF_CLAUSE = " AND arv2.client_reference_id LIKE :client_reference_id || '%'"
 QUERY_ACCOUNT_CHANGE_REG_NAME_CLAUSE = " AND arv2.registering_name LIKE :registering_name || '%'"
@@ -228,6 +229,8 @@ def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
 def build_account_change_base_query(params: AccountRegistrationParams) -> str:
     """Build the account change registration base query from the provided parameters."""
     base_query: str = model_utils.QUERY_ACCOUNT_CHANGE_REG_BASE
+    if not params.registration_number and not params.client_reference_id:
+        base_query += QUERY_ACCOUNT_CHANGE_REG_CLASS_CLAUSE
     if params.registration_number:
         base_query += QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE
     if params.registration_type:
@@ -342,9 +345,10 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
         'registeringParty': str(mapping['registering_party']),
         'securedParties': str(mapping['secured_party']),
         'clientReferenceId': str(mapping['client_reference_id']),
-        'registeringName': registering_name,
-        'expand': False
+        'registeringName': registering_name
     }
+    if model_utils.is_financing(reg_class):
+        result['expand'] = False
     result = set_path(params, result, reg_num, base_reg_num)
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
     if 'accountId' in result:
