@@ -474,7 +474,8 @@ export default defineComponent({
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       localState.searchValue = { code: '', businessName: '' }
-      getSecuredPartyValidity()
+      const isValid = getSecuredPartyValidity()
+      emitSecuredPartyValidity(isValid)
     }
 
     const removeRegisteringParty = (): void => {
@@ -498,7 +499,8 @@ export default defineComponent({
       }
       currentParties.securedParties = localState.securedParties
       setAddSecuredPartiesAndDebtors(currentParties)
-      getSecuredPartyValidity()
+      const isValid = getSecuredPartyValidity()
+      emitSecuredPartyValidity(isValid)
     }
 
     const addRegisteringParty = () => {
@@ -542,7 +544,8 @@ export default defineComponent({
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties)
       setAddSecuredPartiesAndDebtors(currentParties)
-      getSecuredPartyValidity()
+      const isValid = getSecuredPartyValidity()
+      emitSecuredPartyValidity(isValid)
       context.emit('securedPartyOpen', false)
     }
 
@@ -586,8 +589,11 @@ export default defineComponent({
           validity = true
         }
       }
-      context.emit('setSecuredPartiesValid', validity)
       return validity
+    }
+
+    const emitSecuredPartyValidity = (validity: boolean): void => {
+      context.emit('setSecuredPartiesValid', validity)
     }
 
     const filterList = (
