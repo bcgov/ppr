@@ -26,32 +26,32 @@
     </v-container>
   </v-container>
   <v-container v-else-if="isSummary">
-    <v-row no-gutters class="pa-2">
-      <v-col cols="auto">
+    <v-row no-gutters class="py-2">
+      <v-col cols="auto" class="generic-label">
         <label>
           <strong>Court Order</strong>
         </label>
       </v-col>
     </v-row>
     <v-row no-gutters style="padding: 15px 30px;">
-          <v-col cols="3" class="generic-label">Court Name</v-col>
+          <v-col class="generic-label">Court Name</v-col>
           <v-col cols="9" id="court-name-display">{{ courtName }}</v-col>
     </v-row>
     <v-row no-gutters style="padding: 15px 30px;">
-          <v-col cols="3" class="generic-label">Court Registry</v-col>
+          <v-col class="generic-label">Court Registry</v-col>
           <v-col cols="9" id="court-registry-display">{{ courtRegistry }}</v-col>
     </v-row>
     <v-row no-gutters style="padding: 15px 30px;">
-          <v-col cols="3" class="generic-label">Court File Number</v-col>
+          <v-col class="generic-label">Court File Number</v-col>
           <v-col cols="9" id="file-number-display"> {{ fileNumber }}
           </v-col>
     </v-row>
     <v-row no-gutters style="padding: 15px 30px;">
-          <v-col cols="3" class="generic-label">Date of Order</v-col>
+          <v-col class="generic-label">Date of Order</v-col>
           <v-col cols="9" id="date-display">{{ computedDateFormatted }}</v-col>
     </v-row>
     <v-row no-gutters style="padding: 15px 30px;">
-          <v-col cols="3" class="generic-label">Effect of Order</v-col>
+          <v-col class="generic-label">Effect of Order</v-col>
           <v-col cols="9" id="effect-display"><span style="white-space: pre-wrap">{{ effectOfOrder }}</span></v-col>
     </v-row>
   </v-container>
@@ -426,6 +426,6 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 </style>

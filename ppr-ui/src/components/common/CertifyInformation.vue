@@ -57,7 +57,7 @@
             <v-col cols="3" class="generic-label pt-8">
               <span :class="showErrorComponent ? 'invalid-color': ''">Confirm<br/>Authorization</span>
             </v-col>
-            <v-col cols="9" class="pt-8">
+            <v-col cols="9" class="pt-8 ml-n1">
               <v-row no-gutters class="pa-0">
                 <v-col cols="12" class="summary-text">
                   <v-checkbox
@@ -68,7 +68,7 @@
                       <template v-slot:label>
                         <div class="pt-3">
                         <span :class="showErrorComponent ? 'invalid-color': ''">
-                          I, <span class="generic-label" :class="showErrorComponent ? 'invalid-color': ''">
+                          I, <span class="font-weight-bold" :class="showErrorComponent ? 'invalid-color': ''">
                                 {{ legalName }}
                              </span>, have relevant knowledge of, and am authorized to submit, this registration.
                         </span>
@@ -79,7 +79,7 @@
               </v-row>
               <v-row no-gutters class="pt-3 pb-8">
                   <v-col cols="12" class="pl-8 ma-0">
-                    <span class="generic-label">Date: </span><span class="summary-text">{{ currentDate }}</span>
+                    <span class="font-weight-bold">Date: </span><span class="summary-text">{{ currentDate }}</span>
                   </v-col>
               </v-row>
             </v-col>

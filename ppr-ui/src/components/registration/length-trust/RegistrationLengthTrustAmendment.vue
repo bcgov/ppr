@@ -74,9 +74,8 @@
     </div>
   </v-container>
   <v-container v-else class="white pa-0" fluid no-gutters>
-    <h2 class="pl-3">Trust Indenture</h2>
     <v-row no-gutters class="py-8">
-      <v-col cols="3" class="generic-label pl-5">
+      <v-col cols="3" class="generic-label pl-3">
         Trust Indenture
         <div v-if="trustIndentureModified">
           <v-chip x-small label color="primary" text-color="white">

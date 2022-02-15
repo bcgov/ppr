@@ -26,37 +26,26 @@
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review and Complete Amendment</h1>
-          <caution-box class="mt-9" :setMsg="cautionTxt" />
+          <caution-box class="mt-9" style="margin-bottom: 60px;" :setMsg="cautionTxt" />
 
-          <v-row no-gutters class="summary-header pa-2 mt-4">
-            <v-col cols="10" class="pa-2">
+          <v-row no-gutters class="summary-header pa-2 mt-4 rounded-top">
+            <v-col cols="12" class="pa-2">
               <label class="pl-3">
-                <strong>Amendment</strong>
+                <v-icon color="darkBlue">mdi-file-document-multiple</v-icon>
+                <span class="pl-3"><strong>Amendment</strong></span>
               </label>
             </v-col>
-            <v-col cols="2" class="pl-10">
-                <v-btn
-                  text
-                  color="primary"
-                  :class="[$style['smaller-button'], 'edit-btn']"
-                  id="confirm-amend-btn"
-                  @click="goToReviewAmendment()"
-                >
-                  <v-icon small>mdi-pencil</v-icon>
-                  <span>Amend</span>
-                </v-btn>
-            </v-col>
           </v-row>
-          <div class="white ma-0">
+          <div class="white ma-0 px-4">
             <div v-if="showLengthTrustIndenture">
-              <registration-length-trust-amendment class="pt-14" :isSummary="true" />
+              <registration-length-trust-amendment class="pt-4" :isSummary="true" />
             </div>
 
-            <div v-if="showSecuredParties" class="pa-4">
+            <div v-if="showSecuredParties">
               <v-divider v-if="showLengthTrustIndenture"></v-divider>
-              <h3 class="pt-6">Secured Parties</h3>
+              <h3 class="pt-6 px-3">Secured Parties</h3>
               <secured-party-summary
-                class="secured-party-summary"
+                class="secured-party-summary px-8"
                 :setEnableNoDataAction="true"
               />
             </div>
@@ -65,7 +54,7 @@
               <v-divider v-if="showSecuredParties || showLengthTrustIndenture"></v-divider>
               <h3 class="pt-6">Debtors</h3>
               <debtor-summary
-                class="debtor-summary"
+                class="debtor-summary px-4"
                 :setEnableNoDataAction="true"
               />
             </div>
@@ -79,10 +68,10 @@
                   :showInvalid="false"
                 />
               </div>
-              <div v-if="showGeneralCollateral" class="pt-4">
+              <div v-if="showGeneralCollateral" class="pt-6">
                 <v-divider v-if="showSecuredParties || showDebtors ||
                           showVehicleCollateral || showLengthTrustIndenture"></v-divider>
-                <gen-col-summary class="pa-4 pt-6"
+                <gen-col-summary class="py-6 px-4"
                   :setShowAmendLink="false"
                   :setShowHistory="false"
                   :setShowViewLink="false"
@@ -94,13 +83,13 @@
             <div class="pb-4" v-if="showDescription">
               <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
                                showGeneralCollateral || showLengthTrustIndenture"></v-divider>
-              <amendment-description class="pt-14" :isSummary="true" />
+              <amendment-description class="pt-4" :isSummary="true" />
             </div>
 
             <div v-if="showCourtOrder">
               <v-divider v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
                               showGeneralCollateral || showDescription || showLengthTrustIndenture"></v-divider>
-              <court-order :setSummary="true" />
+              <court-order class="py-8" :setSummary="true" />
             </div>
 
           </div>
