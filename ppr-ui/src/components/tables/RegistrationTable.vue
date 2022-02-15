@@ -355,7 +355,6 @@ export default defineComponent({
       submittedEndDate,
       orderBy,
       orderVal,
-      clearingFilters,
       // other table stuff
       shouldClearType,
       dateTxt,
@@ -538,9 +537,8 @@ export default defineComponent({
             startDate: startDate,
             status: status
           } as RegistrationSortIF,
-          clearingFilters: clearingFilters.value
+          sorting: localState.tableFiltersActive
         })
-        clearingFilters.value = false
       }, 1000)
     )
 

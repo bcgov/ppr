@@ -722,12 +722,12 @@ export default class Dashboard extends Vue {
     }
   }
 
-  private async myRegSort (args: { sortOptions: RegistrationSortIF, clearingFilters: boolean }): Promise<void> {
+  private async myRegSort (args: { sortOptions: RegistrationSortIF, sorting: boolean }): Promise<void> {
     this.myRegDataLoading = true
     this.myRegNoMorePages = false
     this.myRegSortOptions = args.sortOptions
     this.myRegPage = 1
-    const sorting = !args.clearingFilters
+    const sorting = args.sorting
     let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
     // all drafts return from the api no matter the status value so prevent it here
     if (!this.myRegSortOptions.status || this.myRegSortOptions.status === APIStatusTypes.DRAFT) {
@@ -766,9 +766,10 @@ export default class Dashboard extends Vue {
       console.error('Failed to delete draft. Please try again later.')
     } else {
       // remove from table
+      this.myRegDataBaseRegDrafts = this.myRegDataBaseRegDrafts.filter(reg => reg.documentId !== docId)
+      this.myRegDataChildDrafts = this.myRegDataChildDrafts.filter(reg => reg.documentId !== docId)
       if (!regNum) {
         // is not a child
-        this.myRegDataBaseRegDrafts = this.myRegDataBaseRegDrafts.filter(reg => reg.documentId !== docId)
         this.myRegTotalBaseRegLength -= 1
       } else {
         // is a child of another base registration
