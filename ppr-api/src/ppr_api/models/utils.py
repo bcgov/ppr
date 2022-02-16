@@ -469,7 +469,8 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
    AND NOT EXISTS (SELECT uer.id
                      FROM user_extra_registrations uer
                     WHERE uer.registration_number = d.registration_number
-                      AND uer.account_id = d.account_id)
+                      AND uer.account_id = d.account_id
+                      AND uer.removed_ind = 'Y')
 """
 
 QUERY_ACCOUNT_DRAFTS_FILTER = 'SELECT * FROM (' + QUERY_ACCOUNT_DRAFTS_BASE + ') AS q WHERE account_id = :query_account'
