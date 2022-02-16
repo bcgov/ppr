@@ -90,7 +90,14 @@ import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
 import { fetchError, loginError, paymentErrorReg, saveSearchError } from '@/resources/dialogOptions'
-import { getKeycloakRoles, getProductSubscription, getPPRUserSettings, updateLdUser, getSbcFromAuth } from '@/utils'
+import {
+  getKeycloakRoles,
+  getProductSubscription,
+  getPPRUserSettings,
+  updateLdUser,
+  getSbcFromAuth,
+  navigate
+} from '@/utils'
 // local Enums, Constants, Interfaces
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
@@ -526,7 +533,7 @@ export default class App extends Mixins(AuthMixin) {
     // still need to fill this out more
 
     if (this.dialogOptions === loginError) {
-      window.location.assign(this.registryUrl)
+      navigate(this.registryUrl)
     }
     // for now just refresh app
     if (proceed) this.initApp()

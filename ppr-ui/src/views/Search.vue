@@ -88,7 +88,7 @@ import {
   saveResultsError,
   saveSelectionsError
 } from '@/resources/dialogOptions'
-import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected } from '@/utils'
+import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate } from '@/utils'
 
 @Component({
   components: {
@@ -243,7 +243,7 @@ export default class Search extends Vue {
 
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
-    window.location.assign(this.registryUrl)
+    navigate(this.registryUrl)
   }
 
   private submitCheck (): void {
