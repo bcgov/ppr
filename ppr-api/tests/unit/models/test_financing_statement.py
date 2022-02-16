@@ -75,14 +75,14 @@ TEST_LIFE_EXPIRY_DATA = [
 TEST_VERIFICATION_EXPIRY_DATA = [
     ('TEST0016', 'SA', False, '2026-09-04T06:59:59+00:00', 5),
     ('TEST0016', 'SA', True, '2041-09-04T06:59:59+00:00', 20),
-    ('TEST0017', 'RL', False, '2022-02-28T07:59:59+00:00', 0),
+    ('TEST0017', 'RL', False, '2022-02-27T07:59:59+00:00', 0),
     ('TEST0017', 'RL', True, '2023-02-23T07:59:59+00:00', 0)
 ]
 
 # testdata pattern is ({reg_num}, {reg_type}, {expiry_ts}, {renewal2_ts}, {renewal1_ts})
 TEST_HISTORY_EXPIRY_DATA = [
     ('TEST0016', 'SA', '2041-09-04T06:59:59+00:00', '2036-09-04T06:59:59+00:00', '2041-09-04T06:59:59+00:00'),
-    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00', '2022-08-27T06:59:59+00:00', '2023-02-23T07:59:59+00:00')
+    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00', '2022-08-26T06:59:59+00:00', '2023-02-22T07:59:59+00:00')
 ]
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)

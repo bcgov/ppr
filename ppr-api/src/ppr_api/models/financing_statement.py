@@ -13,7 +13,7 @@
 # limitations under the License.
 """This module holds model data and database operations for financing statements."""
 # flake8: noqa E127
-# pylint: disable=too-many-statements, too-many-branches
+# pylint: disable=too-many-statements, too-many-branches, too-many-nested-blocks; not working at method scope
 
 from __future__ import annotations
 
@@ -262,8 +262,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         collateral_json = self.__build_general_collateral_json(registration_id, collateral_json, True)
         return collateral_json
 
-    def __build_general_collateral_json(self,  # pylint: disable=too-many-nested-blocks
-                                        registration_id, collateral_json, legacy: bool):
+    def __build_general_collateral_json(self, registration_id, collateral_json,
+                                        legacy: bool):  # pylint: disable=too-many-nested-blocks
         """Build general collateral JSON for a financing statement from either the API or legacy table."""
         collateral_list = None
         if (not legacy and not self.general_collateral) or (legacy and not self.general_collateral_legacy):
@@ -273,7 +273,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         else:
             collateral_list = reversed(self.general_collateral_legacy)
 
-        for collateral in collateral_list:  # pylint: disable=too-many-nested-blocks
+        for collateral in collateral_list:
             if collateral.registration_id == registration_id or not collateral.status:
                 gc_json = collateral.json
                 collateral_json.append(gc_json)
@@ -430,11 +430,13 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         statement = None
         if registration_num:
             try:
+                current_app.logger.error('find_by_registration_number query on ' + registration_num)
                 statement = db.session.query(FinancingStatement).\
                             filter(FinancingStatement.id == Registration.financing_id,
                                    Registration.registration_num == registration_num,
                                    Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
                                    one_or_none()
+                current_app.logger.error('find_by_registration_number have result for' + registration_num)
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_registration_number exception: ' + repr(db_exception))
                 raise DatabaseException(db_exception)

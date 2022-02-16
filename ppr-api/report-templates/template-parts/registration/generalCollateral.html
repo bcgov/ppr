@@ -22,18 +22,6 @@
             {% endfor %}
          </div>
       {% else %}
-         {% if collateral.descriptionAdd is defined %}
-            <div class="pb-1"><span class="label">ADDED</span></div>
-            <div class="section-data page-break-inside : auto">
-               {% set list1 = collateral.descriptionAdd.split('\n') %}
-               {% for item in list1 %}
-                  {{ item }}
-                  {% if not loop.last %}
-                     <br/>
-                  {% endif %}
-               {% endfor %}   
-            </div>
-         {% endif %}
          {% if collateral.descriptionDelete is defined %}
             {% if collateral.descriptionAdd is defined %}
                <div class="pt-3 pb-1"><span class="label">DELETED</span></div>
@@ -50,6 +38,18 @@
                {% endfor %}
             </div>
          {% endif %}
+         {% if collateral.descriptionAdd is defined %}
+            <div class="pb-1"><span class="label">ADDED</span></div>
+            <div class="section-data page-break-inside : auto">
+               {% set list1 = collateral.descriptionAdd.split('\n') %}
+               {% for item in list1 %}
+                  {{ item }}
+                  {% if not loop.last %}
+                     <br/>
+                  {% endif %}
+               {% endfor %}   
+            </div>
+         {% endif %}
       {% endif %}
       {% if not loop.last %}
          <div class="separator-section mt-4 mb-1"></div>
@@ -57,24 +57,6 @@
    {% endfor %}
 {% elif change is not defined and (addGeneralCollateral is defined or deleteGeneralCollateral is defined) %}
    <div class="section-data-bold pt-3 pb-2">{{ createDateTime }}</div>
-   {% if addGeneralCollateral is defined %}
-      {% for collateral in addGeneralCollateral %}
-         <div class="pt-3 pb-1"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
-         <div class="section-data page-break-inside : auto">
-            {% set list1 = collateral.description.split('\n') %}
-            {% for item in list1 %}
-               {{ item }}
-               {% if not loop.last %}
-                  <br/>
-               {% endif %}
-            {% endfor %}
-        </div>
-         {% if loop.last == false  %}
-            <div class="separator-section mt-4 mb-1"></div>
-         {% endif %}
-      {% endfor %}
-   {% endif %}
-
    {% if deleteGeneralCollateral is defined %}
       {% for collateral in deleteGeneralCollateral %}
          {% if collateral.edit is not defined %}
@@ -94,10 +76,8 @@
          {% endif %}
       {% endfor %}
    {% endif %}
-{% elif change is defined and (change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined) %}
-   <div class="section-data-bold pt-3 pb-2">{{ change.createDateTime }}</div>
-   {% if change.addGeneralCollateral is defined %}
-      {% for collateral in change.addGeneralCollateral %}
+   {% if addGeneralCollateral is defined %}
+      {% for collateral in addGeneralCollateral %}
          <div class="pt-3 pb-1"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
          <div class="section-data page-break-inside : auto">
             {% set list1 = collateral.description.split('\n') %}
@@ -107,12 +87,14 @@
                   <br/>
                {% endif %}
             {% endfor %}
-         </div>
+        </div>
          {% if loop.last == false  %}
             <div class="separator-section mt-4 mb-1"></div>
          {% endif %}
       {% endfor %}
    {% endif %}
+{% elif change is defined and (change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined) %}
+   <div class="section-data-bold pt-3 pb-2">{{ change.createDateTime }}</div>
    {% if change.deleteGeneralCollateral is defined %}
       {% for collateral in change.deleteGeneralCollateral %}
          {% if collateral.edit is not defined %}
@@ -129,6 +111,23 @@
             {% if loop.last == false  %}
                <div class="separator-section mt-4 mb-1"></div>
             {% endif %}
+         {% endif %}
+      {% endfor %}
+   {% endif %}
+   {% if change.addGeneralCollateral is defined %}
+      {% for collateral in change.addGeneralCollateral %}
+         <div class="pt-3 pb-1"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
+         <div class="section-data page-break-inside : auto">
+            {% set list1 = collateral.description.split('\n') %}
+            {% for item in list1 %}
+               {{ item }}
+               {% if not loop.last %}
+                  <br/>
+               {% endif %}
+            {% endfor %}
+         </div>
+         {% if loop.last == false  %}
+            <div class="separator-section mt-4 mb-1"></div>
          {% endif %}
       {% endfor %}
    {% endif %}
