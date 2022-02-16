@@ -99,24 +99,3 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
   AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
 )
 ;
-
-SELECT a.registration_number, a.registration_ts, a.registration_type, a.registration_type_cl, a.account_id,
-       a.registration_desc, a.base_reg_number, a.state, a.expire_days, a.last_update_ts, a.registering_party,
-       a.secured_party, a.client_reference_id, a.registering_name, a.orig_account_id
-  FROM account_registration_vw a, registrations r
- WHERE a.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-   AND a.financing_id = r.financing_id
-   AND r.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-   AND (a.account_id = '2523' OR r.account_id = '2753')
-   AND a.financing_id IN 
-(
-SELECT arv2.financing_id
-  FROM account_registration_vw arv2
- WHERE arv2.account_id = '2523'
-   AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-   AND arv2.state = 'HDC'
- ORDER BY arv2.registration_ts desc 
-LIMIT 100 OFFSET 0
-)
-ORDER BY a.registration_ts DESC
-;
