@@ -271,10 +271,13 @@ export default defineComponent({
 
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
     const submitFinancingStatement = async () => {
+      console.log('submitting')
       const stateModel: StateModelIF = getStateModel.value
       if (checkValid()) {
         // API call here
+        console.log('valid')
         const apiResponse: FinancingStatementIF = await throttleSubmitStatement(stateModel)
+        console.log('success')
         if (apiResponse.error !== undefined) {
           // Emit error message.
           emit('error', apiResponse.error)

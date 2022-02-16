@@ -14,6 +14,7 @@ export default class AuthMixin extends Vue {
   async fetchCurrentUser (): Promise<any> {
     const authUrl = sessionStorage.getItem('AUTH_API_URL')
     const config = { baseURL: authUrl }
+    console.log(config)
     return axios.get('users/@me', config)
   }
 }

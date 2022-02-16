@@ -6,6 +6,7 @@ const axios = Axios.create()
 
 axios.interceptors.request.use(
   config => {
+    console.log('here')
     config.headers.common.Authorization = `Bearer ${sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)}`
     return config
   },
