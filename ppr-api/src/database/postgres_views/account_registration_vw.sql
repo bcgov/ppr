@@ -33,8 +33,9 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
                            WHERE u.username = r.user_id) END) AS registering_name,
-       r.account_id AS orig_account_id
-  FROM registrations r, registration_types rt, financing_statements fs, q
+       r.account_id AS orig_account_id,
+       r2.account_id AS base_account_id
+ FROM registrations r, registration_types rt, financing_statements fs, registrations r2, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND (fs.expire_date IS NULL OR (fs.expire_date at time zone 'utc') > ((now() at time zone 'utc') - interval '30 days'))
@@ -48,6 +49,9 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                    WHERE uer.registration_number = r2.registration_number
                      AND r2.financing_id = r.financing_id
                      AND uer.removed_ind = 'Y')
+  AND r2.financing_id = fs.id
+  AND r2.financing_id = r.financing_id
+  AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
 UNION (
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, uer.account_id,
        rt.registration_desc, r.base_reg_number, r.id AS registration_id, fs.id AS financing_id,
@@ -77,8 +81,9 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
                            WHERE u.username = r.user_id) END) AS registering_name,
-       r.account_id AS orig_account_id
-  FROM registrations r, registration_types rt, financing_statements fs, user_extra_registrations uer, q
+       r.account_id AS orig_account_id,
+       r2.account_id AS base_account_id
+  FROM registrations r, registration_types rt, financing_statements fs, user_extra_registrations uer, registrations r2, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND (fs.expire_date IS NULL OR (fs.expire_date at time zone 'utc') > ((now() at time zone 'utc') - interval '30 days'))
@@ -89,5 +94,29 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+  AND r2.financing_id = fs.id
+  AND r2.financing_id = r.financing_id
+  AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
 )
+;
+
+SELECT a.registration_number, a.registration_ts, a.registration_type, a.registration_type_cl, a.account_id,
+       a.registration_desc, a.base_reg_number, a.state, a.expire_days, a.last_update_ts, a.registering_party,
+       a.secured_party, a.client_reference_id, a.registering_name, a.orig_account_id
+  FROM account_registration_vw a, registrations r
+ WHERE a.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+   AND a.financing_id = r.financing_id
+   AND r.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+   AND (a.account_id = '2523' OR r.account_id = '2753')
+   AND a.financing_id IN 
+(
+SELECT arv2.financing_id
+  FROM account_registration_vw arv2
+ WHERE arv2.account_id = '2523'
+   AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+   AND arv2.state = 'HDC'
+ ORDER BY arv2.registration_ts desc 
+LIMIT 100 OFFSET 0
+)
+ORDER BY a.registration_ts DESC
 ;
