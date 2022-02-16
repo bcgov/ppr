@@ -420,7 +420,6 @@ export default class App extends Mixins(AuthMixin) {
       }
     } else {
       message = 'Unable to get user info.'
-      // TODO: add error code for fetch user from auth
     }
     const resp: ErrorIF = {
       category: ErrorCategories.ACCOUNT_SETTINGS,
