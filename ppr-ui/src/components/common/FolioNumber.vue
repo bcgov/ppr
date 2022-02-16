@@ -50,7 +50,7 @@ export default defineComponent({
     const shiftFocus = () => {
       if (!document.getElementById('search-bar-field')?.getAttribute('disabled')) {
         document.getElementById('search-bar-field').focus()
-      } else if (document.querySelector(".search-bar-btn")) {
+      } else if (document.querySelector('.search-bar-btn')) {
         document.querySelector<HTMLElement>(".search-bar-btn").focus()
       }
     }
