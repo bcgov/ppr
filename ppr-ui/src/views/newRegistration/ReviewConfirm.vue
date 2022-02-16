@@ -1,11 +1,5 @@
 <template>
   <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <base-dialog
-      id="reviewDialog"
-      :setDisplay="errorDialog"
-      :setOptions="errorOptions"
-      @proceed="handleError($event)"
-    />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -104,7 +98,7 @@
           :certifyValid="validCertify && validFolio"
           :forceSave="saveDraftExit"
           @registration-incomplete="registrationIncomplete"
-          @error="handleSubmitError($event)"
+          @error="emitError($event)"
         />
       </v-col>
     </v-row>
@@ -133,11 +127,7 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
-import { BaseDialog } from '@/components/dialogs'
-import {
-  registrationCompleteErrorDialog
-} from '@/resources/dialogOptions'
-import { StatusCodes } from 'http-status-codes'
+
 @Component({
   components: {
     ButtonFooter,
@@ -147,7 +137,6 @@ import { StatusCodes } from 'http-status-codes'
     RegistrationLengthTrustSummary,
     Stepper,
     CertifyInformation,
-    BaseDialog,
     StickyContainer
   }
 })
@@ -179,8 +168,7 @@ export default class ReviewConfirm extends Vue {
   private stepName = RouteNames.REVIEW_CONFIRM
   private validCertify = false
   private validFolio = true
-  private errorDialog = false
-  private errorOptions = registrationCompleteErrorDialog
+
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
@@ -203,25 +191,11 @@ export default class ReviewConfirm extends Vue {
     return this.getRegistrationType?.registrationTypeAPI || ''
   }
 
-  private handleError (stay: boolean): void {
-    this.errorDialog = false
-    if (!stay) {
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
-  private handleSubmitError (error: ErrorIF): void {
-    if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-      this.emitError(error)
-    } else {
-      this.errorDialog = true
-    }
-  }
-
   mounted () {
     this.onAppReady(this.appReady)
   }
 
+  /** Emits error to app.vue for handling */
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)

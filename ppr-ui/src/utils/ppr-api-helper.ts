@@ -24,7 +24,7 @@ import {
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { ErrorCategories, SettingOptions } from '@/enums'
+import { DraftTypes, ErrorCategories, SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -294,7 +294,6 @@ export async function submitSelected (
   return axios
     .post(`search-results/${searchId}${callback}`, selected, config)
     .then(response => {
-      throw new Error('error')
       return response.status
     })
     .catch(error => {
@@ -470,7 +469,7 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
     .post<DraftIF>('drafts', draft, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -523,7 +522,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
     .put<DraftIF>('drafts/' + documentId, draft, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -557,7 +556,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
 
 // Get an existing draft (any type) by documentId.
 export async function getDraft (documentId: string): Promise<DraftIF> {
-  var draft:DraftIF
+  const draft: DraftIF = {}
   if (documentId === undefined || documentId === '') {
     draft.error = {
       statusCode: StatusCodes.BAD_REQUEST,
@@ -570,7 +569,7 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
     .get<DraftIF>('drafts/' + documentId, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -592,7 +591,7 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
         }
       }
       draft.error = {
-        category: ErrorCategories.REGISTRATION_LOAD,
+        category: ErrorCategories.DRAFT_LOAD,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -627,6 +626,7 @@ export async function deleteDraft (documentId: string): Promise<ErrorIF> {
         }
       }
       return {
+        category: ErrorCategories.DRAFT_DELETE,
         statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -829,7 +829,7 @@ export async function createFinancingStatement (
     )
     .then(response => {
       const data: FinancingStatementIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -874,7 +874,7 @@ export async function createAmendmentStatement (
     )
     .then(response => {
       const data: AmendmentStatementIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -903,7 +903,7 @@ export async function createDischarge (
       getDefaultConfig())
     .then(response => {
       const data: DischargeRegistrationIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -947,7 +947,7 @@ export async function createRenewal (
       getDefaultConfig())
     .then(response => {
       const data: RenewRegistrationIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -991,7 +991,7 @@ export async function getFinancingStatement (
     )
     .then(response => {
       const data: FinancingStatementIF = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data
@@ -1158,6 +1158,7 @@ export async function deleteRegistrationSummary (
         }
       }
       return {
+        category: ErrorCategories.REGISTRATION_DELETE,
         statusCode: error?.response?.status,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
@@ -1180,7 +1181,7 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
     .get(pdfPath, config)
     .then(response => {
       const data = response?.data
-      if (data) {
+      if (!data) {
         throw new Error('Invalid API response')
       }
       return data

@@ -1,5 +1,23 @@
 import { DialogOptionsIF } from '@/interfaces'
 
+export const authError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unauthorized access to PPR',
+  text: 'This account does not have access to the Personal Property Registry. ' +
+  'Please contact us for more information.'
+}
+
+export const draftDeleteError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to delete draft registration',
+  text: 'We are unable to delete your draft registration at this time. Please try again later. ' +
+  'If this issue persists, please contact us.'
+}
+
 export const historyRegError: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',
@@ -42,11 +60,49 @@ export const paymentErrorSearch: DialogOptionsIF = {
   text: 'The search could not be completed for the following reason:'
 }
 
-export const saveSearchError: DialogOptionsIF = {
+export const registrationCompleteError: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',
-  title: 'Search Incomplete',
-  text: 'We were unable to complete this search. Please try again later.'
+  hasContactInfo: true,
+  title: 'Unable to complete registration',
+  text: 'We are unable to complete your registration at this time. Please try to complete this registration later. ' +
+    'If this issue persists, please contact us.'
+}
+
+export const registrationDeleteError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to remove registration',
+  text: 'We are unable to remove your registration at this time. Please try again later. ' +
+    'If this issue persists, please contact us.'
+}
+
+export const registrationLoadError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to retrieve registration.',
+  text: 'Current registration information could not be retrieved. ' +
+  'Please try again later. If this issue persists, please contact us.'
+}
+
+export const registrationOpenDraftError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to open draft registration',
+  text: 'We are currently unable to open your draft registration. ' +
+    'Please try again later. If this issue persists, please contact us.'
+}
+
+export const registrationSaveDraftError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to save draft registration',
+  text: 'We are unable to save your draft registration at this time. ' +
+    'Please try this again later. If this issue persists, please contact us.'
 }
 
 export const searchResultsError: DialogOptionsIF = {

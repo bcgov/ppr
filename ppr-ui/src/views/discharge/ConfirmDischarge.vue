@@ -1,6 +1,5 @@
 <template>
   <v-container
-    v-if="dataLoaded"
     id="confirm-discharge"
     class="view-container pa-15 pt-14"
     fluid
@@ -15,7 +14,7 @@
       :setDisplay="showCancelDialog"
       @proceed="cancel($event)"
     />
-    <div class="container pa-0" style="min-width: 960px;">
+    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
@@ -162,6 +161,7 @@ export default class ConfirmDischarge extends Vue {
     'will receive a copy of the Total Discharge Verification Statement.'
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
+  private dataLoadError = false
   private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
   private options: DialogOptionsIF = dischargeCancelDialog
@@ -221,12 +221,12 @@ export default class ConfirmDischarge extends Vue {
       return
     }
     this.financingStatementDate = new Date()
-    this.submitting = true
     const financingStatement = await getFinancingStatement(
       true,
       this.registrationNumber
     )
     if (financingStatement.error) {
+      this.dataLoadError = true
       this.emitError(financingStatement.error)
     } else {
       // set collateral summary
@@ -263,7 +263,6 @@ export default class ConfirmDischarge extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
     }
-    this.submitting = false
   }
 
   mounted () {
@@ -324,6 +323,7 @@ export default class ConfirmDischarge extends Vue {
   @Emit('haveData')
   private emitHaveData (haveData: Boolean = true): void {}
 
+  /** Emits error to app.vue for handling */
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
@@ -343,16 +343,9 @@ export default class ConfirmDischarge extends Vue {
     }
 
     // get registration data from api and load into store
-    try {
-      await this.loadRegistration()
-    } catch (error) {
-      const errorMsg = error as string
-      console.error(errorMsg)
-      this.emitError({
-        statusCode: 500,
-        message: errorMsg
-      })
-    }
+    this.submitting = true
+    await this.loadRegistration()
+    this.submitting = false
 
     // page is ready to view
     this.emitHaveData(true)

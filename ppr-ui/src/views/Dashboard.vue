@@ -252,7 +252,6 @@ import {
   registrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog,
-  registrationOpenDraftErrorDialog,
   renewConfirmationDialog,
   tableDeleteDialog,
   tableRemoveDialog
@@ -436,9 +435,8 @@ export default class Dashboard extends Vue {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     // Get draft details and setup store for editing the draft financing statement.
     const stateModel:StateModelIF = await setupFinancingStatementDraft(this.getStateModel, documentId)
-    if (stateModel.registration.draft === undefined || stateModel.registration.draft.error !== undefined) {
-      this.myRegAddDialog = { ...registrationOpenDraftErrorDialog }
-      this.myRegAddDialogDisplay = true
+    if (stateModel.registration.draft.error) {
+      this.emitError(stateModel.registration.draft.error)
     } else {
       this.setLengthTrust(stateModel.registration.lengthTrust)
       this.setAddCollateral(stateModel.registration.collateral)
@@ -702,8 +700,7 @@ export default class Dashboard extends Vue {
     this.loading = true
     const deletion = await deleteDraft(docId)
     if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
-      // FUTURE: set dialog options / show dialog for error
-      console.error('Failed to delete draft. Please try again later.')
+      this.emitError(deletion)
     } else {
       // remove from table
       this.myRegDataBaseRegDrafts = this.myRegDataBaseRegDrafts.filter(reg => reg.documentId !== docId)
@@ -735,8 +732,7 @@ export default class Dashboard extends Vue {
     this.loading = true
     const removal = await deleteRegistrationSummary(regNum)
     if (removal.statusCode !== StatusCodes.NO_CONTENT) {
-      // FUTURE: set dialog options / show dialog for error
-      console.error('Failed to remove registration. Please try again later.')
+      this.emitError(removal)
     } else {
       // remove from table
       this.myRegDataHistory = this.myRegDataHistory.filter(reg => reg.baseRegistrationNumber !== regNum)
@@ -870,6 +866,7 @@ export default class Dashboard extends Vue {
     this.setUserSettings(settings)
   }
 
+  /** Emits error to app.vue for handling */
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)

@@ -360,8 +360,8 @@ export default defineComponent({
     const downloadPDF = async (path: string): Promise<any> => {
       localState.loadingPDF = path
       const pdf = await registrationPDF(path)
-      if (!pdf || pdf?.error) {
-        emit('error', { statusCode: 404 })
+      if (pdf.error) {
+        emit('error', pdf.error)
       } else {
         /* solution from https://github.com/axios/axios/issues/1392 */
 

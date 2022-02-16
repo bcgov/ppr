@@ -7,7 +7,7 @@
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <div v-if="dataLoaded" class="container pa-0" style="min-width: 960px;">
+    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Amendment</h1>
@@ -123,7 +123,6 @@
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { cloneDeep, isEqual } from 'lodash'
-import { StatusCodes } from 'http-status-codes'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
@@ -152,7 +151,6 @@ import {
   LengthTrustIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   DebtorNameIF, // eslint-disable-line no-unused-vars
-  DraftIF, // eslint-disable-line no-unused-vars
   CourtOrderIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
@@ -221,6 +219,7 @@ export default class AmendRegistration extends Vue {
     'Secured Parties in this registration ' +
     'will receive a copy of the Amendment Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
+  private dataLoadError = false
   private feeType = FeeSummaryTypes.AMEND
   private financingStatementDate: Date = null
   private debtorValid = true
@@ -300,6 +299,7 @@ export default class AmendRegistration extends Vue {
     this.submitting = true
     const financingStatement = await getFinancingStatement(true, this.registrationNumber)
     if (financingStatement.error) {
+      this.dataLoadError = true
       this.emitError(financingStatement.error)
     } else {
       // load data into the store
@@ -372,9 +372,6 @@ export default class AmendRegistration extends Vue {
       if (this.documentId) {
         const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
         if (stateModel.registration.draft.error) {
-          console.error('loadRegistration setupAmendmentStatementFromDraft error: status: ' +
-                        stateModel.registration.draft.error.statusCode + ' message: ' +
-                        stateModel.registration.draft.error.message)
           this.emitError(stateModel.registration.draft.error)
         } else {
           this.setAddCollateral(stateModel.registration.collateral)
@@ -389,7 +386,6 @@ export default class AmendRegistration extends Vue {
         }
       }
     }
-    this.submitting = false
   }
 
   mounted () {
@@ -507,7 +503,7 @@ export default class AmendRegistration extends Vue {
     const stateModel: StateModelIF = this.getStateModel
     const draft = await saveAmendmentStatementDraft(stateModel)
     this.submitting = false
-    if (draft.error !== undefined) {
+    if (draft.error) {
       console.error(
         'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
       )
@@ -535,25 +531,15 @@ export default class AmendRegistration extends Vue {
     }
   }
 
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void {}
-
+  /** Emits error to app.vue for handling */
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) {
-      alert('This registration does not exist.')
-    } else if (error.statusCode === StatusCodes.BAD_REQUEST) {
-      alert('You do not have access to this registration.')
-    } else {
-      alert('There was an internal error loading this registration. Please try again later.')
-    }
-    this.emitHaveData(true)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
   }
+
+  /** Emits Have Data event. */
+  @Emit('haveData')
+  private emitHaveData (haveData: Boolean = true): void {}
 
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
@@ -569,18 +555,9 @@ export default class AmendRegistration extends Vue {
     }
 
     // get registration data from api and load into store
-    try {
-      this.submitting = true
-      await this.loadRegistration()
-      this.submitting = false
-    } catch (error) {
-      const errorMsg = error as string
-      console.error(errorMsg)
-      this.emitError({
-        statusCode: 500,
-        message: errorMsg
-      })
-    }
+    this.submitting = true
+    await this.loadRegistration()
+    this.submitting = false
 
     // page is ready to view
     this.emitHaveData(true)

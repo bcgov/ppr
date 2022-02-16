@@ -35,7 +35,7 @@ export interface FinancingStatementIF {
 
 // Draft interface. Change statement draft is out of scope.
 export interface DraftIF {
-  type: DraftTypes, // One of enum DraftTypes.
+  type?: DraftTypes, // One of enum DraftTypes.
   financingStatement?: FinancingStatementIF, // Include if draft is for a financing statement.
   amendmentStatement?: AmendmentStatementIF, // Include if draft is for an amendment statement.
   createDateTime?: string, // Included in a successful response. Generated on first draft save.

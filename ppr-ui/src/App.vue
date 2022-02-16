@@ -89,7 +89,7 @@ import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { historyRegError, loginError, openDocError, paymentErrorReg, paymentErrorSearch, saveSearchError, searchResultsError } from '@/resources/dialogOptions' // eslint-disable-line
+import { authError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg, paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError, registrationOpenDraftError, registrationSaveDraftError, searchResultsError } from '@/resources/dialogOptions' // eslint-disable-line
 import {
   getKeycloakRoles,
   getProductSubscription,
@@ -300,7 +300,6 @@ export default class App extends Mixins(AuthMixin) {
     if (authResp.statusCode !== StatusCodes.OK) {
       console.error(authResp.message)
       this.handleError(authResp)
-      // this.haveData = true
       // show stopper so return
       return
     }
@@ -310,7 +309,6 @@ export default class App extends Mixins(AuthMixin) {
     if (userInfoResp.statusCode !== StatusCodes.OK) {
       console.error(userInfoResp.message)
       this.handleError(userInfoResp)
-      // this.haveData = true
       // show stopper so return
       return
     }
@@ -474,10 +472,19 @@ export default class App extends Mixins(AuthMixin) {
   private handleError (error: ErrorIF): void {
     switch (error.category) {
       case ErrorCategories.ACCOUNT_ACCESS:
-        console.log('no access')
+        this.errorOptions = authError
+        this.errorDisplay = true
         break
       case ErrorCategories.ACCOUNT_SETTINGS:
         this.errorOptions = loginError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.DRAFT_DELETE:
+        this.errorOptions = draftDeleteError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.DRAFT_LOAD:
+        this.errorOptions = registrationOpenDraftError
         this.errorDisplay = true
         break
       case ErrorCategories.HISTORY_REGISTRATIONS:
@@ -485,16 +492,23 @@ export default class App extends Mixins(AuthMixin) {
         this.errorDisplay = true
         break
       case ErrorCategories.HISTORY_SEARCHES:
-        // handled elsewhere
+        // handled inline
         break
       case ErrorCategories.REGISTRATION_CREATE:
         this.handleErrorRegCreate(error)
         break
+      case ErrorCategories.REGISTRATION_DELETE:
+        this.errorOptions = registrationDeleteError
+        this.errorDisplay = true
+        break
       case ErrorCategories.REGISTRATION_LOAD:
-        console.log('load reg')
+        this.errorOptions = registrationLoadError
+        this.errorDisplay = true
+        this.$router.push({ name: RouteNames.DASHBOARD })
         break
       case ErrorCategories.REGISTRATION_SAVE:
-        console.log('save reg')
+        this.errorOptions = registrationSaveDraftError
+        this.errorDisplay = true
         break
       case ErrorCategories.REPORT_GENERATION:
         this.errorOptions = openDocError
@@ -504,10 +518,10 @@ export default class App extends Mixins(AuthMixin) {
         this.handleErrorSearch(error)
         break
       case ErrorCategories.SEARCH_COMPLETE:
-        console.log('complete search')
+        // handled in search comp
         break
       case ErrorCategories.SEARCH_UPDATE:
-        console.log('update search')
+        // handled in search comp
         break
       default:
         console.error('Unhandled error: ', error)
@@ -571,7 +585,8 @@ export default class App extends Mixins(AuthMixin) {
           this.payErrorOptions.hasContactInfo = true
           this.payErrorDisplay = true
         } else {
-          console.log('create reg non payment issue')
+          this.errorOptions = registrationCompleteError
+          this.errorDisplay = true
         }
     }
   }
@@ -621,10 +636,14 @@ export default class App extends Mixins(AuthMixin) {
     // still need to fill this out more
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (this.dialogOptions === loginError) {
       navigate(this.registryUrl)
 =======
     if (this.errorOptions === loginError) {
+=======
+    if (this.errorOptions === loginError || this.errorOptions === authError) {
+>>>>>>> error handling finished
       window.location.assign(this.registryUrl)
 >>>>>>> working through errors
     }

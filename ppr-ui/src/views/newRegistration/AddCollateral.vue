@@ -46,8 +46,12 @@
     </div>
     <v-row no-gutters class='pt-10'>
       <v-col cols="12">
-        <button-footer :currentStatementType="statementType" :currentStepName="stepName"
-                      :router="this.$router"/>
+        <button-footer
+          :currentStatementType="statementType"
+          :currentStepName="stepName"
+          :router="this.$router"
+          @error="emitError($event)"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -122,6 +126,12 @@ export default class AddCollateral extends Vue {
 
   mounted () {
     this.onAppReady(this.appReady)
+  }
+
+  /** Emits error to app.vue for handling */
+  @Emit('error')
+  private emitError (error: ErrorIF): void {
+    console.error(error)
   }
 
   /** Emits Have Data event. */

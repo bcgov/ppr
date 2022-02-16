@@ -263,14 +263,9 @@ export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Pro
     draftResponse = await createDraft(draft)
   }
 
-  if (draftResponse && !draftResponse.error) {
+  if (!draftResponse.error) {
     console.log('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
                 draftResponse.amendmentStatement.documentId)
-  } else if (draftResponse) {
-    console.error('saveAmendmentStatementDraft failed: ' + draftResponse.error.statusCode + ': ' +
-                  draftResponse.error.message)
-  } else {
-    console.error('saveAmendmentStatementDraft failed: no API response.')
   }
   return draftResponse
 }
@@ -308,7 +303,9 @@ export async function saveAmendmentStatement (stateModel:StateModelIF): Promise<
 /** Save or update the current financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
   const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
-  const draft:DraftIF = stateModel.registration.draft
+  const draft: DraftIF = stateModel.registration.draft
+  // remove any previous error info
+  delete draft.error
   draft.type = DraftTypes.FINANCING_STATEMENT
   let statement:FinancingStatementIF = draft.financingStatement
   if (statement === undefined || statement === null) {
@@ -371,14 +368,9 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
     draftResponse = await createDraft(draft)
   }
 
-  if (draftResponse && !draftResponse.error) {
+  if (!draftResponse.error) {
     console.log('saveFinancingStatementDraft ' + apiCall + ' draft successful for documentId ' +
                 draftResponse.financingStatement.documentId)
-  } else if (draftResponse) {
-    console.error('saveFinancingStatementDraft failed: ' + draftResponse.error.statusCode + ': ' +
-                  draftResponse.error.message)
-  } else {
-    console.error('saveFinancingStatementDraft failed: no API response.')
   }
   return draftResponse
 }
@@ -488,18 +480,11 @@ export async function saveDischarge (stateModel:StateModelIF): Promise<Discharge
 
 /** Setup a financing statement draft for editing. Get the previously saved draft and hydrate the state model. */
 export async function setupFinancingStatementDraft (stateModel:StateModelIF, documentId:string): Promise<StateModelIF> {
-  const draft:DraftIF = await getDraft(documentId)
+  const draft: DraftIF = await getDraft(documentId)
   stateModel.registration.draft = draft
-  if (draft === undefined) {
-    console.error('getDraft failed: response null.')
-    return stateModel
-  }
-  if (draft !== undefined && draft.error !== undefined) {
-    console.error('getDraft failed: ' + draft.error.statusCode + ': ' + draft.error.message)
-    return stateModel
-  }
+  if (draft.error) return stateModel
 
-  const registrationType:RegistrationTypeIF = RegistrationTypes.find(obj => {
+  const registrationType: RegistrationTypeIF = RegistrationTypes.find(obj => {
     return obj.registrationTypeAPI === draft.financingStatement.type
   })
 
@@ -706,7 +691,7 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
     apiResponse = await createRenewal(registration, '')
   }
 
-  if (apiResponse !== undefined && apiResponse.error !== undefined) {
+  if (apiResponse.error) {
     console.error('save renewal failed: ' + apiResponse.error.statusCode + ': ' +
                   apiResponse.error.message)
   }

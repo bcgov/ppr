@@ -3,7 +3,7 @@
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <div v-if="dataLoaded" class="container pa-0" style="min-width: 960px;">
+    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Total Discharge</h1>
@@ -84,7 +84,6 @@ import {
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
-import { StatusCodes } from 'http-status-codes'
 
 @Component({
   components: {
@@ -123,6 +122,7 @@ export default class ReviewRegistration extends Vue {
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
+  private dataLoadError = false
   private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
   private loading = false
@@ -165,9 +165,9 @@ export default class ReviewRegistration extends Vue {
       return
     }
     this.financingStatementDate = new Date()
-    this.loading = true
     const financingStatement = await getFinancingStatement(true, this.registrationNumber)
     if (financingStatement.error) {
+      this.dataLoadError = true
       this.emitError(financingStatement.error)
     } else {
       // load data into the store
@@ -219,7 +219,6 @@ export default class ReviewRegistration extends Vue {
       this.setFolioOrReferenceNumber('')
       this.setCertifyInformation(certifyInfo)
     }
-    this.loading = false
   }
 
   mounted () {
@@ -241,21 +240,15 @@ export default class ReviewRegistration extends Vue {
     this.emitHaveData(false)
   }
 
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
-
+  /** Emits error to app.vue for handling */
   @Emit('error')
   private emitError (error: ErrorIF): void {
     console.error(error)
-    if (error.statusCode === StatusCodes.NOT_FOUND) alert('This registration does not exist.')
-    else if (error.statusCode === StatusCodes.BAD_REQUEST) alert('You do not have access to this registration.')
-    else alert('There was an internal error loading this registration. Please try again later.')
-    this.emitHaveData(true)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
   }
+
+  /** Emits Have Data event. */
+  @Emit('haveData')
+  private emitHaveData (haveData: Boolean = true): void { }
 
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
@@ -271,17 +264,9 @@ export default class ReviewRegistration extends Vue {
     }
 
     // get registration data from api and load into store
-    try {
-      await this.loadRegistration()
-    } catch (error) {
-      console.error(error)
-      const errorMsg = error as string
-      console.error(errorMsg)
-      this.emitError({
-        statusCode: 500,
-        message: errorMsg
-      })
-    }
+    this.loading = true
+    await this.loadRegistration()
+    this.loading = false
 
     // page is ready to view
     this.emitHaveData(true)
