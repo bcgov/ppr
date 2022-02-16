@@ -51,7 +51,7 @@ export default defineComponent({
       if (!document.getElementById('search-bar-field')?.getAttribute('disabled')) {
         document.getElementById('search-bar-field').focus()
       } else if (document.querySelector('.search-bar-btn')) {
-        document.querySelector<HTMLElement>(".search-bar-btn").focus()
+        document.querySelector<HTMLElement>('.search-bar-btn').focus()
       }
     }
 
