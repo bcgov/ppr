@@ -492,6 +492,7 @@ export default class ConfirmAmendment extends Vue {
     }
 
     this.financingStatementDate = new Date()
+    this.submitting = true
     const financingStatement = await getFinancingStatement(
       true,
       this.registrationNumber
@@ -518,6 +519,7 @@ export default class ConfirmAmendment extends Vue {
       this.setRegistrationType(registrationType)
       this.setAddSecuredPartiesAndDebtors(parties)
     }
+    this.submitting = false
   }
 
   mounted () {
@@ -640,9 +642,7 @@ export default class ConfirmAmendment extends Vue {
     }
 
     // get registration data from api and load into store
-    this.submitting = true
     await this.loadRegistration()
-    this.submitting = false
 
     // page is ready to view
     this.emitHaveData(true)
