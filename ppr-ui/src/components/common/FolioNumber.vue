@@ -7,6 +7,7 @@
                           persistent-hint
                           filled
                           v-model="folioEditNumber"
+                          @keypress.enter="shiftFocus()"
                           />
   </div>
 </template>
@@ -45,7 +46,17 @@ export default defineComponent({
       emit('folio-number', val)
     })
 
+    // when enter pressed on the folio number, either focus on the input or the button if the input is disabled
+    const shiftFocus = () => {
+      if (!document.getElementById('search-bar-field')?.getAttribute('disabled')) {
+        document.getElementById('search-bar-field').focus()
+      } else if (document.querySelector(".search-bar-btn")) {
+        document.querySelector<HTMLElement>(".search-bar-btn").focus()
+      }
+    }
+
     return {
+      shiftFocus,
       ...toRefs(localState)
     }
   }
