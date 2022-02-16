@@ -406,7 +406,6 @@ export default class App extends Mixins(AuthMixin) {
   private async loadUserInfo (): Promise<ErrorIF> {
     // auth api user info
     const response = await this.fetchCurrentUser()
-    console.log(response)
     let message = ''
     let statusCode = response.status
     const userInfo: UserInfoIF = response?.data
