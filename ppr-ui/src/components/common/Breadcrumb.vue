@@ -5,7 +5,7 @@
         <v-col cols="auto">
           <v-row no-gutters>
             <v-col cols="auto">
-              <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact :href="backUrl" icon small>
+              <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact :href="buildHref(backUrl)" icon small>
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
             </v-col>
@@ -16,7 +16,7 @@
         </v-col>
         <v-col cols="auto" class="pl-3" style="padding-top: 6px;">
           <v-breadcrumbs class="pa-0" :items="breadcrumbs">
-            <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="item.href">
+            <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="buildHref(item.href)">
               <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
                 {{ handleStaff(item.text) }}
               </span>
@@ -33,7 +33,7 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, watch, Ref } from '@vue/composition-api' // eslint-disable-line
+import { computed, defineComponent, reactive, toRefs, Ref } from '@vue/composition-api' // eslint-disable-line
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
@@ -107,8 +107,19 @@ export default defineComponent({
       return breadcrumbText
     }
 
+    const buildHref = (href: string): string => {
+      return `${href}${getParams()}`
+    }
+
+    /** Returns URL param string with Account ID if present, else empty string. */
+    const getParams = (): string => {
+      const accountId = sessionStorage.getItem('ACCOUNT_ID')
+      return accountId ? `?accountid=${accountId}` : ''
+    }
+
     return {
       handleStaff,
+      buildHref,
       ...toRefs(localState)
     }
   }

@@ -276,7 +276,8 @@ import {
   registrationHistory,
   searchHistory,
   setupFinancingStatementDraft,
-  updateUserSettings
+  updateUserSettings,
+  navigate
 } from '@/utils'
 // local components
 import { BaseSnackbar } from '@/components/common'
@@ -755,7 +756,7 @@ export default class Dashboard extends Vue {
 
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
-    window.location.assign(this.registryUrl)
+    navigate(this.registryUrl)
   }
 
   private async removeDraft (regNum: string, docId: string): Promise<void> {

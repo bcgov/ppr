@@ -5,6 +5,7 @@
 <script lang="ts">
 // Libraries
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
+import { navigate } from '@/utils'
 
 // Components
 import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
@@ -36,7 +37,7 @@ export default class Signin extends Vue {
     } else {
       console.error('Signin page missing redirect param') // eslint-disable-line no-console
       // redirect to PPR home page
-      window.location.assign(this.registryUrl)
+      navigate(this.registryUrl)
     }
   }
 

@@ -13,6 +13,7 @@ export async function fetchConfig (): Promise<any> {
   const processEnvBaseUrl = process.env.BASE_URL
   const windowLocationPathname = window.location.pathname // eg, /basePath/...
   const windowLocationOrigin = window.location.origin // eg, http://localhost:8080
+  const windowLocationSearch = window.location.search
 
   if (!origin || !processEnvVueAppPath || !processEnvBaseUrl || !windowLocationPathname || !windowLocationOrigin) {
     return Promise.reject(new Error('Missing environment variables'))
@@ -75,6 +76,13 @@ export async function fetchConfig (): Promise<any> {
   const authWebUrl: string = response.data.AUTH_WEB_URL
   sessionStorage.setItem('AUTH_WEB_URL', authWebUrl)
   console.log('Set Auth Web URL to: ' + authWebUrl)
+
+  // get and store account id, if present
+  const accountId = new URLSearchParams(windowLocationSearch).get('accountid')
+  if (accountId) {
+    sessionStorage.setItem('ACCOUNT_ID', accountId)
+    console.log('Set Account ID to: ' + accountId)
+  }
 
   const ldClientId: string = response.data.PPR_LD_CLIENT_ID
   if (ldClientId) {
