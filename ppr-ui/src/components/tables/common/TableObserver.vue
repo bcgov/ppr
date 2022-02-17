@@ -1,5 +1,5 @@
 <template>
-  <tr class="observer" style="height: 40px;"/>
+  <div class="observer" />
 </template>
 
 <script>
@@ -16,14 +16,10 @@ export default {
         this.$emit('intersect', entry)
       }
     }, options)
-    console.log('starting observer..')
     this.observer?.observe(this.$el) // eslint-disable-line no-unused-expressions
-    console.log('done')
   },
   destroyed () {
-    console.log('disconnecting observer..')
     this.observer?.disconnect() // eslint-disable-line no-unused-expressions
-    console.log('done')
   }
 }
 </script>
