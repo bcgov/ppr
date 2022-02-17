@@ -477,11 +477,13 @@ export default defineComponent({
     }
 
     const getNext = _.throttle(() => {
-      // if not loading and reg history exists -- lodash throttle here too with {trailing:false} ?
+      // if not loading and reg history exists
+      console.log('observer triggered call')
       if (!localState.loadingData && localState.registrationHistory?.length > 0) {
+        console.log('observer event emitted')
         emit('getNext')
       }
-    }, 3000, { trailing: false })
+    }, 1000, { trailing: false })
 
     watch(() => dateTxt.value, (val) => {
       if (!val) {

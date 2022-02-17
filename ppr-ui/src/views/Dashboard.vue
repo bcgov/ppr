@@ -668,9 +668,11 @@ export default class Dashboard extends Vue {
   }
 
   private async myRegGetNext (): Promise<void> {
+    console.log(this.myRegDataLoading, this.myRegNoMorePages)
     if (this.myRegDataLoading || this.myRegNoMorePages) return
     this.myRegDataLoading = true
     this.myRegPage += 1
+    console.log('calling next regs')
     const nextRegs = await registrationHistory(cloneDeep(this.myRegSortOptions), this.myRegPage)
     if (nextRegs.error) {
       this.emitError(nextRegs.error)
@@ -680,6 +682,7 @@ export default class Dashboard extends Vue {
         cloneDeep(this.myRegDataChildDrafts), cloneDeep(nextRegs.registrations), true)
       this.myRegDataHistory = this.myRegDataHistory.concat(updatedRegs.registrations)
     }
+    console.log(nextRegs.registrations?.length)
     if (nextRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
     this.myRegDataLoading = false
   }
