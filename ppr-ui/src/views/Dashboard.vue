@@ -682,8 +682,7 @@ export default class Dashboard extends Vue {
         cloneDeep(this.myRegDataChildDrafts), cloneDeep(nextRegs.registrations), true)
       this.myRegDataHistory = this.myRegDataHistory.concat(updatedRegs.registrations)
     }
-    console.log(nextRegs.registrations?.length)
-    if (nextRegs.registrations?.length < 100) { this.myRegNoMorePages = true }
+    if (nextRegs.registrations?.length < 1) { this.myRegNoMorePages = true }
     this.myRegDataLoading = false
   }
 
