@@ -6,7 +6,8 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 // Interfaces, Enums
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
-import { AccountProductSubscriptionIF, AddressIF, PartyIF } from '@/interfaces'
+import { AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF } from '@/interfaces'
+import { partyCodeSearch } from '@/utils'
 
 /** Gets Keycloak JWT and parses it. */
 function getJWT (): any {
@@ -48,44 +49,57 @@ export async function getRegisteringPartyFromAuth (isPprStaff: boolean): Promise
     const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
     const accountInfo = JSON.parse(currentAccount)
     accountId = accountInfo.id
-  } else {
-    accountId = 2810
-  }
 
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`orgs/${accountId}`, config)
-    .then(
-      response => {
-        const data = response?.data
-        if (!data) {
-          throw new Error('Unable to obtain Registering Party from Account Information.')
+    const config = { baseURL: url, headers: { Accept: 'application/json' } }
+    return axios.get(`orgs/${accountId}`, config)
+      .then(
+        response => {
+          const data = response?.data
+          if (!data) {
+            throw new Error('Unable to obtain Registering Party from Account Information.')
+          }
+          // If no api address registering party validation should fail.
+          const address: AddressIF = {
+            street: data?.mailingAddress?.street || '',
+            streetAdditional: data?.mailingAddress?.streetAdditional,
+            city: data?.mailingAddress?.city || '',
+            region: data?.mailingAddress?.region || '',
+            postalCode: data?.mailingAddress?.postalCode || '',
+            country: data?.mailingAddress?.country || '',
+            deliveryInstructions: '' // Not used by PPR or returned by the api.
+          }
+          // Auth API account name is always business name.
+          // No client party code or email is available via the auth api.
+          const party: PartyIF = {
+            businessName: data.businessName || data.name,
+            emailAddress: '',
+            code: '',
+            address: address
+          }
+          return party
         }
-        // If no api address registering party validation should fail.
-        const address: AddressIF = {
-          street: data?.mailingAddress?.street || '',
-          streetAdditional: data?.mailingAddress?.streetAdditional,
-          city: data?.mailingAddress?.city || '',
-          region: data?.mailingAddress?.region || '',
-          postalCode: data?.mailingAddress?.postalCode || '',
-          country: data?.mailingAddress?.country || '',
-          deliveryInstructions: '' // Not used by PPR or returned by the api.
+      ).catch(
+        error => {
+          throw new Error('Auth API error getting Registering Party: status code = ' +
+                          error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
         }
-        // Auth API account name is always business name.
-        // No client party code or email is available via the auth api.
-        const party: PartyIF = {
-          businessName: data.businessName || data.name,
-          emailAddress: '',
-          code: '',
-          address: address
-        }
-        return party
-      }
-    ).catch(
-      error => {
-        throw new Error('Auth API error getting Registering Party: status code = ' +
-                        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
-      }
+      )
+  } else {
+    const response: [SearchPartyIF] = await partyCodeSearch(
+      '99990008',
+      true
     )
+    if (response?.length > 0) {
+      const party: PartyIF = {
+        businessName: response[0].businessName,
+        emailAddress: response[0].emailAddress,
+        code: response[0].code,
+        address: response[0].address
+      }
+      return party
+    }
+    throw new Error('Auth API error getting Registering Party: status code = ' + StatusCodes.NOT_FOUND.toString())
+  }
 }
 
 // Get SBC info from auth api /api/v1/orgs/{org_id}
