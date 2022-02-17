@@ -501,7 +501,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         if results_json:
             results_json[0]['totalRegistrationCount'] = count
             # Get change registrations.
-            query = registration_utils.build_account_change_query(params)
+            query = registration_utils.build_account_change_query(params, results_json)
             results = db.session.execute(query, query_params)
             rows = results.fetchall()
             results_json = registration_utils.update_account_reg_results(params, rows, results_json)
@@ -921,7 +921,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         for registration in self.financing_statement.registration:
             if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
                                                      model_utils.REG_CLASS_PPSA):
-                expiry_ts = model_utils.expiry_dt_repairer_lien(registration.registration_ts)
+                expiry_ts = model_utils.expiry_dt_from_registration_rl(registration.registration_ts)
 
         for registration in self.financing_statement.registration:
             if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:

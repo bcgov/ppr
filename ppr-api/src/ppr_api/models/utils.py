@@ -492,6 +492,27 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
    AND arv.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
 """
 
+QUERY_ACCOUNT_BASE_REG_SUBQUERY = """
+SELECT arv.financing_id
+  FROM account_registration_vw arv
+ WHERE (arv.account_id = :query_account OR arv.base_account_id = :query_account)
+"""
+
+QUERY_ACCOUNT_BASE_REG_FILTER = """
+SELECT * FROM (
+SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
+       registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
+       secured_party, client_reference_id, registering_name, orig_account_id
+  FROM account_registration_vw arv1
+ WHERE arv1.account_id = :query_account
+   AND arv1.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+   AND arv1.financing_id IN
+    (
+        QUERY_ACCOUNT_BASE_REG_SUBQUERY
+    )
+ ) AS q
+"""
+
 QUERY_ACCOUNT_CHANGE_REG_BASE = """
 SELECT arv2.financing_id
   FROM account_registration_vw arv2
@@ -508,6 +529,18 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
    AND financing_id IN (QUERY_ACCOUNT_CHANGE_REG_BASE)
 ORDER BY registration_ts DESC
 """
+
+QUERY_ACCOUNT_CHANGE_REG_FILTER = """
+SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
+       registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
+       secured_party, client_reference_id, registering_name, orig_account_id
+  FROM account_registration_vw
+ WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+   AND (account_id = :query_account OR base_account_id = :query_account)
+   AND base_reg_number IN (BASE_REG_LIST)
+ORDER BY registration_ts DESC
+"""
+
 
 # Error messages
 ERR_FINANCING_NOT_FOUND = '{code}: no Financing Statement found for registration number {registration_num}.'
@@ -585,10 +618,7 @@ def expiry_dt_from_years(life_years: int, iso_date: str = None):
 
 
 def expiry_dt_repairer_lien(expiry_ts: _datetime = None):
-    """Create a date representing the date at 23:59:59 local time as UTC.
-
-    Adjusted by the life_years number of years in the future. Current date if no iso_date
-    """
+    """Create a date representing the date at 23:59:59 local time as UTC from the current expiry date."""
     if not expiry_ts:
         # Naive date
         today = now_ts().astimezone(LOCAL_TZ)
@@ -603,11 +633,22 @@ def expiry_dt_repairer_lien(expiry_ts: _datetime = None):
         return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
     # Simplify: existing registration current expiry is always 1 day ahead in utc.
-    # Works locally: remove commented out code when confirm it works in dev.
-    # base_time = expiry_ts.timestamp()
-    # offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
-    # base_ts = expiry_ts + offset
     base_ts = expiry_ts - timedelta(days=1)
+    base_date = date(base_ts.year, base_ts.month, base_ts.day)
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    future_ts = _datetime.combine(base_date, expiry_time) + timedelta(days=REPAIRER_LIEN_DAYS)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(future_ts)
+    # Return as UTC
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+
+def expiry_dt_from_registration_rl(expiry_ts: _datetime = None):
+    """Create a date representing the date at 23:59:59 local time as UTC from the registration timestamp."""
+    base_time = expiry_ts.timestamp()
+    offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
+    base_ts = expiry_ts + offset
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
