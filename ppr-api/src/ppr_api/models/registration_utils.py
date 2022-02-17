@@ -211,6 +211,9 @@ def get_account_change_query_order(params: AccountRegistrationParams) -> str:
 def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
     """Build the account registration base query from the provided parameters."""
     base_query: str = model_utils.QUERY_ACCOUNT_BASE_REG_BASE
+    if params.start_date_time and params.end_date_time:
+        base_query = model_utils.QUERY_ACCOUNT_BASE_REG_SUBQUERY
+        base_query += QUERY_ACCOUNT_REG_DATE_CLAUSE
     if params.registration_number:
         base_query += QUERY_ACCOUNT_REG_NUM_CLAUSE
     if params.registration_type:
@@ -221,8 +224,6 @@ def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
         base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE
     if params.status_type:
         base_query += QUERY_ACCOUNT_STATUS_CLAUSE
-    if params.start_date_time and params.end_date_time:
-        base_query += QUERY_ACCOUNT_REG_DATE_CLAUSE
     return base_query
 
 
@@ -253,14 +254,28 @@ def build_account_reg_query(params: AccountRegistrationParams) -> str:
     """Build the account registration query from the provided parameters."""
     base_query: str = build_account_reg_base_query(params)
     order_by: str = get_account_reg_query_order(params)
-    query: str = 'SELECT * FROM (' + base_query + ') AS q '
+    query: str
+    if params.start_date_time and params.end_date_time:
+        query = model_utils.QUERY_ACCOUNT_BASE_REG_FILTER.replace('QUERY_ACCOUNT_BASE_REG_SUBQUERY', base_query)
+    else:
+        query = 'SELECT * FROM (' + base_query + ') AS q '
     query += order_by
     query += QUERY_ACCOUNT_REG_LIMIT
     return query
 
 
-def build_account_change_query(params: AccountRegistrationParams) -> str:
+def build_account_change_query(params: AccountRegistrationParams, base_json: dict = None) -> str:
     """Build the account registration change query from the provided parameters."""
+    if base_json and params.start_date_time and params.end_date_time:
+        reg_nums: str = None
+        for reg in base_json:
+            if reg_nums is None:
+                reg_nums = "'" + reg['registrationNumber'] + "'"
+            else:
+                reg_nums += ",'" + reg['registrationNumber'] + "'"
+        query: str = model_utils.QUERY_ACCOUNT_CHANGE_REG_FILTER.replace('BASE_REG_LIST', reg_nums)
+        return query
+
     base_query: str = build_account_change_base_query(params)
     query: str = model_utils.QUERY_ACCOUNT_CHANGE_REG.replace('QUERY_ACCOUNT_CHANGE_REG_BASE', base_query)
     return query

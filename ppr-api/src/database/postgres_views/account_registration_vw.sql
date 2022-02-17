@@ -87,7 +87,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
    AND (fs.expire_date IS NULL OR (fs.expire_date at time zone 'utc') > ((now() at time zone 'utc') - interval '30 days'))
-   AND r.registration_number = uer.registration_number
+   AND (r.registration_number = uer.registration_number OR r.base_reg_number = uer.registration_number)
    AND uer.removed_ind IS NULL
    AND NOT EXISTS (SELECT r3.id
                      FROM registrations r3
