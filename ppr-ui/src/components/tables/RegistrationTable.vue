@@ -483,7 +483,7 @@ export default defineComponent({
         console.log('observer event emitted')
         emit('getNext')
       }
-    }, 1000, { trailing: false })
+    }, 500, { trailing: false })
 
     watch(() => dateTxt.value, (val) => {
       if (!val) {
