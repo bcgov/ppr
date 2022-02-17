@@ -696,6 +696,7 @@ export default class Dashboard extends Vue {
     for (let i = 0; i < drafts.length; i++) {
       // check if it has a parent reg
       if (drafts[i].baseRegistrationNumber) {
+        if (!sorting) this.myRegDataChildDrafts.push(drafts[i])
         // find parent reg
         let found = false
         for (let k = 0; k < registrations.length; k++) {
@@ -705,7 +706,6 @@ export default class Dashboard extends Vue {
             registrations[k].changes.unshift(drafts[i])
             registrations[k].hasDraft = true
             found = true
-            if (!sorting) this.myRegDataChildDrafts.push(drafts[i])
           }
         }
         // if sorting and the base reg is not in the list, add the draft to the parent list
