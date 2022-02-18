@@ -92,16 +92,7 @@
             </td>
           </template>
           <template v-slot:[`item.vehicleCollateral.type`]="{ item }">
-            <span v-if="item.vehicleCollateral.type === 'MV'">
-              Motor Vehicle
-            </span>
-            <span v-else-if="item.vehicleCollateral.type === 'MH'">
-              Manufactured Home
-            </span>
-            <span v-else-if="item.vehicleCollateral.type === 'AC'">
-              Aircraft
-            </span>
-            ({{ item.vehicleCollateral.type }})
+            {{ getVehicleDescription(item.vehicleCollateral.type) }}
           </template>
           <template v-slot:[`item.vehicleCollateral.make`]="{ item }">
             {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
@@ -137,7 +128,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
-import { searchTableHeaders } from '@/resources'
+import { searchTableHeaders, VehicleTypes } from '@/resources'
 import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
@@ -209,6 +200,10 @@ export default defineComponent({
       if (item.matchType === MatchTypes.EXACT) return 'exact-match'
       return 'normal-match'
     }
+    const getVehicleDescription = (code: string): string => {
+      const vehicle = VehicleTypes.find(obj => obj.value === code)
+      return vehicle.text
+    }
     const selectAll = (props: { items:Array<SearchResultIF>, value:boolean }):void => {
       // ensures exact matches are never deselected
       if (!props.value) {
@@ -254,6 +249,7 @@ export default defineComponent({
       displayDate,
       emit,
       getClass,
+      getVehicleDescription,
       selectAll
     }
   }

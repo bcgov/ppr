@@ -405,6 +405,7 @@ export default defineComponent({
     const setSearchValue = (searchValue: string) => {
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValue
+      document.getElementById('search-bar-field').focus()
     }
     const togglePaymentConfirmation = (showDialog: boolean) => {
       emit('togglePaymentDialog', showDialog)
