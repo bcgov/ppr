@@ -12,7 +12,6 @@ export default {
     const options = this.options || {}
     this.observer = new IntersectionObserver(([entry]) => {
       if (entry && entry.isIntersecting) {
-        console.log('emitting intersect event')
         this.$emit('intersect', entry)
       }
     }, options)
