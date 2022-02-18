@@ -132,7 +132,7 @@
         <span class="pl-1">PDF</span>
       </v-btn>
       <v-tooltip
-        v-else-if="!isDraft(item)"
+        v-else-if="!isDraft(item) && !item.registeringParty"
         class="pa-2"
         content-class="top-tooltip"
         nudge-right="2"
@@ -144,6 +144,23 @@
         </template>
         <div class="pt-2 pb-2">
           {{ tooltipTxtPdf }}
+        </div>
+      </v-tooltip>
+      <v-tooltip
+        v-else-if="!isDraft(item) && item.registeringParty"
+        class="pa-2"
+        content-class="top-tooltip"
+        nudge-right="2"
+        top
+        transition="fade-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+        </template>
+        <div class="pt-2 pb-2">
+          This is a large document that may take up to 20 minutes to generate. The PDF version of this
+          document will appear here once it's available. You may need to refresh this page to display
+          the PDF download icon.
         </div>
       </v-tooltip>
     </td>
