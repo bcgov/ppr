@@ -585,6 +585,7 @@ export default class AmendRegistration extends Vue {
   private setValidSecuredParties (val: boolean) {
     if (!val) {
       this.showInvalid = true
+      this.amendErrMsg = '< Please make any required changes'
     } else {
       this.amendErrMsg = ''
     }
@@ -594,6 +595,7 @@ export default class AmendRegistration extends Vue {
   private setValidDebtor (val: boolean) {
     if (!val) {
       this.showInvalid = true
+      this.amendErrMsg = '< Please make any required changes'
     } else {
       this.amendErrMsg = ''
     }
@@ -607,6 +609,7 @@ export default class AmendRegistration extends Vue {
       const collateral = this.getAddCollateral
       collateral.showInvalid = true
       this.setAddCollateral(collateral)
+      this.amendErrMsg = '< Please make any required changes'
     } else {
       this.amendErrMsg = ''
       this.errorBar = false
