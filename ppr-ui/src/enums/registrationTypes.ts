@@ -100,6 +100,13 @@ export enum StatementTypes {
 
 export enum APIAmendmentTypes {
     AMENDMENT = 'AM', // Default, use if multiple changes or only description.
+    CHANGE_COLLATERAL_ADDITION = 'AC', // legacy change filing
+    CHANGE_COLLATERAL_SUBSTITUTION = 'SU', // legacy change filing
+    CHANGE_DEBTOR_RELEASE = 'DR', // legacy change filing
+    CHANGE_DEBTOR_TRANSFER = 'DT', // legacy change filing
+    CHANGE_PARTIAL_DISCHARGE = 'PD', // legacy change filing
+    CHANGE_REGISTRY_CORRECTION = 'RC', // legacy change filing
+    CHANGE_SECURED_PARTY_TRANSFER = 'ST', // legacy change filing
     COURT_ORDER = 'CO', // Use if including court order information.
     COLLATERAL_ADDITION = 'AA', // Only adding collateral.
     COLLATERAL_SUBSTITUTION = 'AU', // Only adding and removing collateral.
@@ -113,6 +120,13 @@ export enum APIAmendmentTypes {
 
 export enum UIAmendmentTypes {
     AMENDMENT = 'Amendment',
+    CHANGE_COLLATERAL_ADDITION = 'Collateral Addition',
+    CHANGE_COLLATERAL_SUBSTITUTION = 'Collateral Substitution',
+    CHANGE_DEBTOR_RELEASE = 'Debtor Release',
+    CHANGE_DEBTOR_TRANSFER = 'Debtor Transfer',
+    CHANGE_PARTIAL_DISCHARGE = 'Partial Discharge',
+    CHANGE_REGISTRY_CORRECTION = 'Registry Correction',
+    CHANGE_SECURED_PARTY_TRANSFER = 'Secured Party Transfer',
     COURT_ORDER = 'Court Order',
     COLLATERAL_ADDITION = 'Collateral Addition',
     COLLATERAL_SUBSTITUTION = 'Collateral Substitution',

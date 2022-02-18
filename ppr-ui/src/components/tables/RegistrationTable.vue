@@ -237,7 +237,12 @@
         />
       </template>
       <template v-slot:[`body.append`]>
-        <table-observer @intersect="getNext()" />
+        <tr v-if="morePages">
+          <td :colspan="tableLiteralWidth">
+            <table-observer @intersect="getNext()" />
+            <v-skeleton-loader class="ma-0" :style="`width: ${tableLiteralWidth - 180}px`" type="list-item" />
+          </td>
+        </tr>
       </template>
     </v-data-table>
   </v-container>
@@ -289,6 +294,9 @@ export default defineComponent({
       default: [] as BaseHeaderIF[]
     },
     setLoading: {
+      default: false
+    },
+    setMorePages: {
       default: false
     },
     setSearch: {
@@ -383,6 +391,9 @@ export default defineComponent({
       loadingData: computed(() => {
         return props.setLoading
       }),
+      morePages: computed(() => {
+        return props.setMorePages
+      }),
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
@@ -399,6 +410,9 @@ export default defineComponent({
         const width = tableHeaderRef?.value?.clientWidth || 0
         if (width > 1360) return 1360
         return width
+      }),
+      tableLiteralWidth: computed(() => {
+        return regTable?.value?.$el?.clientWidth || 0
       }),
       firstColRef: computed(() => {
         if (props.setHeaders?.length < 1) return null
@@ -478,9 +492,7 @@ export default defineComponent({
 
     const getNext = _.throttle(() => {
       // if not loading and reg history exists
-      console.log('observer triggered call')
       if (!localState.loadingData && localState.registrationHistory?.length > 0) {
-        console.log('observer event emitted')
         emit('getNext')
       }
     }, 500, { trailing: false })
