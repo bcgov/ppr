@@ -73,7 +73,7 @@
             :setEnableNoDataAction="false"
           />
           <collateral
-            @setCollateralValid="collateralValid = $event"
+            @setCollateralValid="setValidCollateral($event)"
             @collateralOpen="collateralOpen = $event"
             :setShowErrorBar="errorBar"
             class="mt-15"
@@ -598,6 +598,20 @@ export default class AmendRegistration extends Vue {
       this.amendErrMsg = ''
     }
     this.debtorValid = val
+  }
+
+  private setValidCollateral (val: boolean) {
+    if (!val) {
+      this.showInvalid = true
+      this.errorBar = true
+      const collateral = this.getAddCollateral
+      collateral.showInvalid = true
+      this.setAddCollateral(collateral)
+    } else {
+      this.amendErrMsg = ''
+      this.errorBar = false
+    }
+    this.collateralValid = val
   }
 
   @Watch('securedPartyOpen')
