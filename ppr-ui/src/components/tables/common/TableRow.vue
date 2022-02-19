@@ -451,7 +451,7 @@ export default defineComponent({
       if (isExpired(item) || isDischarged(item)) return '—'
 
       const days = item.expireDays
-      if (!days) {
+      if (days === null || days === undefined) {
         return 'N/A'
       }
       if (days === -99) {
