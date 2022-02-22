@@ -24,6 +24,12 @@ export const useDebtorValidation = () => {
           succeeded: false,
           message: 'Please enter a business name'
         }
+      } else if (form.businessName.length > 150) {
+        errors.value.businessName = {
+          type: 'NAME',
+          succeeded: false,
+          message: 'Maximum 150 characters'
+        }
       } else {
         resetError('businessName')
       }
@@ -36,6 +42,12 @@ export const useDebtorValidation = () => {
           succeeded: false,
           message: 'Please enter a first name'
         }
+      } else if (form.personName.first.length > 50) {
+        errors.value.first = {
+          type: 'NAME',
+          succeeded: false,
+          message: 'Maximum 50 characters'
+        }
       } else {
         resetError('first')
       }
@@ -44,6 +56,12 @@ export const useDebtorValidation = () => {
           type: 'NAME',
           succeeded: false,
           message: 'Please enter a last name'
+        }
+      } else if (form.personName.last.length > 50) {
+        errors.value.last = {
+          type: 'NAME',
+          succeeded: false,
+          message: 'Maximum 50 characters'
         }
       } else {
         resetError('last')

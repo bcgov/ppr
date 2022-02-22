@@ -60,7 +60,7 @@
               <v-container fluid class="ps-1 pt-8">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
-                    <folio-number-summary />
+                    <folio-number-summary :setShowErrors="showStepErrors" @folioValid="validFolio = $event" />
                   </v-col>
                 </v-row>
               </v-container>
@@ -101,7 +101,7 @@
           :currentStatementType="statementType"
           :currentStepName="stepName"
           :router="this.$router"
-          :certifyValid="validCertify"
+          :certifyValid="validCertify && validFolio"
           :forceSave="saveDraftExit"
           @registration-incomplete="registrationIncomplete"
           @error="handleSubmitError($event)"
@@ -178,6 +178,7 @@ export default class ReviewConfirm extends Vue {
   private statementType = StatementTypes.FINANCING_STATEMENT
   private stepName = RouteNames.REVIEW_CONFIRM
   private validCertify = false
+  private validFolio = true
   private errorDialog = false
   private errorOptions = registrationCompleteErrorDialog
   private get isAuthenticated (): boolean {

@@ -16,7 +16,7 @@ const store = getVuexStore()
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
 
-describe('Folio number on the summarty page', () => {
+describe('Folio number on the summary page', () => {
   let wrapper: any
 
   beforeEach(async () => {
@@ -54,8 +54,8 @@ describe('Folio number on the summarty page', () => {
     expect(wrapper.vm.$data.isValid).toBeTruthy()
   })
 
-  it('sets the validity to false for > 15 characters', async () => {
-    wrapper.find('#txt-folio').setValue('MY TEST THAT IS VERY LONG IN FACT TOO LONG')
+  it('sets the validity to false for > 50 characters', async () => {
+    wrapper.find('#txt-folio').setValue('MY TEST THAT IS VERY LONG IN FACT TOO LONG SKDJFA ASKDJFL ASDKFJL ASDKJFL ALKSJDFLKJ ALSDKFJ AKSDJF')
     await Vue.nextTick()
     await Vue.nextTick()
     await Vue.nextTick()
