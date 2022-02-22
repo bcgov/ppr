@@ -368,7 +368,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'min-column-sm',
+    class: 'min-column-mdxs',
     sortable: true,
     text: 'Status',
     value: 'statusType',
