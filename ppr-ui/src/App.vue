@@ -637,18 +637,8 @@ export default class App extends Mixins(AuthMixin) {
   private proceedAfterError (proceed: boolean): void {
     this.errorDisplay = false
     // still need to fill this out more
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (this.dialogOptions === loginError) {
-      navigate(this.registryUrl)
-=======
-    if (this.errorOptions === loginError) {
-=======
     if (this.errorOptions === loginError || this.errorOptions === authError) {
->>>>>>> error handling finished
-      window.location.assign(this.registryUrl)
->>>>>>> working through errors
+      navigate(this.registryUrl)
     }
     // for now just refresh app
     if (!proceed) this.initApp()
