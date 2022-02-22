@@ -89,7 +89,11 @@ import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { authError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg, paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError, registrationOpenDraftError, registrationSaveDraftError, searchResultsError } from '@/resources/dialogOptions' // eslint-disable-line
+import {
+  authError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
+  paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
+  registrationOpenDraftError, registrationSaveDraftError, searchResultsError
+} from '@/resources/dialogOptions'
 import {
   getKeycloakRoles,
   getProductSubscription,
