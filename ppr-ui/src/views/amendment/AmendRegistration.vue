@@ -78,6 +78,11 @@
             :setShowErrorBar="errorBar"
             class="mt-15"
           />
+          <div class="pt-4" v-if="!collateralValid">
+          <span class="invalid-message">
+            Your registration must include at least one form of Collateral
+          </span>
+          </div>
           <amendment-description class="mt-12"
             @valid="detailsValid = $event"
             :setShowErrors="showInvalid"
