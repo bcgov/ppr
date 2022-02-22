@@ -492,7 +492,7 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
       }
       draft.error = {
         category: ErrorCategories.REGISTRATION_SAVE,
-        statusCode: 500,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
         type: error?.parsed?.rootCause?.type
@@ -545,7 +545,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
       }
       draft.error = {
         category: ErrorCategories.REGISTRATION_SAVE,
-        statusCode: 500,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
         type: error?.parsed?.rootCause?.type
@@ -852,7 +852,7 @@ export async function createFinancingStatement (
       }
       statement.error = {
         category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: 500,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
         detail: error?.parsed?.rootCause?.detail,
         type: error?.parsed?.rootCause?.type
@@ -1019,7 +1019,7 @@ export async function getFinancingStatement (
         debtors: [],
         error: {
           category: ErrorCategories.REGISTRATION_LOAD,
-          statusCode: 500,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
           detail: error?.parsed?.rootCause?.detail,
           type: error?.parsed?.rootCause?.type
