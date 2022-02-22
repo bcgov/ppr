@@ -27,6 +27,7 @@ import { RegistrationTypes } from '@/resources'
 // unit test helpers/data
 import mockRouter from './MockRouter'
 import { mockedSelectSecurityAgreement } from './test-data'
+import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -187,18 +188,16 @@ describe('Review Confirm new registration component', () => {
     }
   })
 
-  it('displays error modals', async () => {
+  it('emits error', async () => {
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
-    await wrapper.findComponent(ButtonFooter).vm.$emit('error', {
-      statusCode: 404
-    })
-    expect(wrapper.find('#reviewDialog').exists()).toBe(true)
-    expect(wrapper.find('#reviewDialog').vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find('#reviewDialog').vm.$props.setOptions.title).toBe('Unable to complete registration')
-    
+    const error = { statusCode: 404 }
+    expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
+    await wrapper.findComponent(ButtonFooter).vm.$emit('error', error)
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'error')).toEqual(error)
   })
 
 })

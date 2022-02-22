@@ -1,10 +1,10 @@
 <template>
   <v-app class="app-container" id="app">
     <!-- Dialogs -->
-    <error-dialog
-      attach="#app"
-      :display="errorDialog"
-      :options="dialogOptions"
+    <base-dialog
+      id="errorDialogApp"
+      :setDisplay="errorDisplay"
+      :setOptions="errorOptions"
       @proceed="proceedAfterError"
     />
     <base-dialog
@@ -21,7 +21,7 @@
       />
 
     <div class="app-body">
-      <main v-if="!isErrorDialog">
+      <main>
         <v-row
           v-if="!isProd"
           no-gutters
@@ -89,7 +89,11 @@ import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
-import { fetchError, loginError, paymentErrorReg, saveSearchError } from '@/resources/dialogOptions'
+import {
+  authError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
+  paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
+  registrationOpenDraftError, registrationSaveDraftError, searchResultsError
+} from '@/resources/dialogOptions'
 import {
   getKeycloakRoles,
   getProductSubscription,
@@ -101,6 +105,7 @@ import {
 // local Enums, Constants, Interfaces
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
+  ErrorCategories,
   ErrorCodes, RegistrationFlowType, RouteNames
 } from '@/enums'
 import {
@@ -147,8 +152,8 @@ export default class App extends Mixins(AuthMixin) {
   // Local Properties
   private currentPath = ''
   private currentPathName: RouteNames = null
-  private errorDialog = false
-  private dialogOptions: DialogOptionsIF = loginError
+  private errorDisplay = false
+  private errorOptions: DialogOptionsIF = loginError
   private saveDraftExitToggle = false
   private payErrorDisplay = false
   private payErrorOptions: DialogOptionsIF = null
@@ -190,11 +195,6 @@ export default class App extends Mixins(AuthMixin) {
     const systemMessageType = sessionStorage.getItem('SYSTEM_MESSAGE_TYPE')
     if (systemMessageType) return systemMessageType
     return null
-  }
-
-  /** True if an error dialog is displayed. */
-  private get isErrorDialog (): boolean {
-    return this.errorDialog
   }
 
   /** True if Jest is running the code. */
@@ -299,32 +299,34 @@ export default class App extends Mixins(AuthMixin) {
     // reset errors in case of retry
     this.resetFlags()
 
-    // ensure user is authorized for this profile (kept this in just in case)
-    try {
-      await this.loadAuth()
-    } catch (error) {
-      console.log('Auth error =', error)
-      this.haveData = true
-      this.handleError({ statusCode: StatusCodes.UNAUTHORIZED })
+    // ensure user is authorized for this profile
+    const authResp = await this.loadAuth()
+    if (authResp.statusCode !== StatusCodes.OK) {
+      console.error(authResp.message)
+      this.handleError(authResp)
+      // show stopper so return
       return
     }
 
     // load user info
-    try {
-      await this.loadUserInfo()
-    } catch (error) {
-      console.log('User info error =', error)
-      this.haveData = true
-      this.handleError({ statusCode: StatusCodes.NOT_FOUND })
+    const userInfoResp = await this.loadUserInfo()
+    if (userInfoResp.statusCode !== StatusCodes.OK) {
+      console.error(userInfoResp.message)
+      this.handleError(userInfoResp)
+      // show stopper so return
       return
     }
 
     try {
       await this.loadAccountProductSubscriptions()
     } catch (error) {
-      // may want to do something about this later, for now just log the error and let user continue
-      console.log('Auth product subscription error =', error)
-      return
+      console.error('Auth product subscription error = ', error)
+      // not a show stopper so continue
+      // this.handleError({
+      //   message: String(error),
+      //   statusCode: StatusCodes.INTERNAL_SERVER_ERROR
+      //   // TODO: add error code for get subscriptions error
+      // })
     }
 
     // update Launch Darkly
@@ -333,7 +335,7 @@ export default class App extends Mixins(AuthMixin) {
         await this.updateLaunchDarkly()
       } catch (error) {
         // just log the error -- no need to halt app
-        console.log('Launch Darkly update error =', error)
+        console.error('Launch Darkly update error = ', error)
       }
     }
 
@@ -369,46 +371,66 @@ export default class App extends Mixins(AuthMixin) {
   private resetFlags (): void {
     this.appReady = false
     this.haveData = false
-    this.errorDialog = false
+    this.errorDisplay = false
     this.payErrorDisplay = false
   }
 
   /** Fetches authorizations and verifies and stores roles. */
-  private async loadAuth (): Promise<any> {
+  private async loadAuth (): Promise<ErrorIF> {
     // save roles from the keycloak token
-    const authRoles = getKeycloakRoles()
-    if (authRoles && authRoles.length > 0) {
-      if (authRoles.includes('gov_account_user')) {
-        // if staff make call to check for sbc
-        const isSbc = await getSbcFromAuth()
-        this.setRoleSbc(isSbc)
+    let message = ''
+    let statusCode = StatusCodes.OK
+    try {
+      const authRoles = getKeycloakRoles()
+      if (authRoles && authRoles.length > 0) {
+        if (authRoles.includes('gov_account_user')) {
+          // if staff make call to check for sbc
+          const isSbc = await getSbcFromAuth()
+          this.setRoleSbc(isSbc)
+        }
+        if (!authRoles.includes('ppr')) {
+          throw new Error('No access to PPR')
+        }
+        this.setAuthRoles(authRoles)
+      } else {
+        throw new Error('Invalid auth roles')
       }
-      if (!authRoles.includes('ppr')) {
-        throw new Error('No access to PPR')
-      }
-      this.setAuthRoles(authRoles)
-    } else {
-      throw new Error('Invalid auth roles')
+    } catch (error) {
+      message = String(error)
+      statusCode = StatusCodes.UNAUTHORIZED
+    }
+    return {
+      category: ErrorCategories.ACCOUNT_ACCESS,
+      message: message,
+      statusCode: statusCode
     }
   }
 
   /** Fetches current user info and stores it. */
-  private async loadUserInfo (): Promise<any> {
+  private async loadUserInfo (): Promise<ErrorIF> {
     // auth api user info
     const response = await this.fetchCurrentUser()
+    let message = ''
+    let statusCode = response.status
     const userInfo: UserInfoIF = response?.data
-    if (userInfo) {
+    if (userInfo && statusCode === StatusCodes.OK) {
       // ppr api user settings
       const settings: UserSettingsIF = await getPPRUserSettings()
       userInfo.settings = settings
       this.setUserInfo(userInfo)
-      if (!settings || settings?.error) {
-        // error popup -> user may still continue
-        throw new Error('Invalid user settings')
+      if (settings?.error) {
+        message = 'Unable to get user settings.'
+        statusCode = settings.error.statusCode
       }
     } else {
-      throw new Error('Invalid user info')
+      message = 'Unable to get user info.'
     }
+    const resp: ErrorIF = {
+      category: ErrorCategories.ACCOUNT_SETTINGS,
+      message: message,
+      statusCode: statusCode
+    }
+    return resp
   }
 
   /** Gets account information (e.g. Premium account) and stores it. */
@@ -451,24 +473,104 @@ export default class App extends Mixins(AuthMixin) {
   }
 
   private handleError (error: ErrorIF): void {
-    if (!this.loggedOut && this.$route?.path !== `/${RouteNames.SIGN_OUT}`) {
-      // cases are for different payment errors, other errors caught at bottom
-      let filing = this.registrationTypeUI
-      if (this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
-        filing = this.getRegistrationFlowType?.toLowerCase() || 'registration'
-      }
-      this.payErrorOptions = { ...paymentErrorReg }
-      if (this.registrationTypeUI) {
-        this.payErrorOptions.text = this.payErrorOptions.text.replace('filing_type', filing)
-      }
-      switch (error.type) {
-        case (
-          ErrorCodes.BCOL_ACCOUNT_CLOSED ||
-          ErrorCodes.BCOL_USER_REVOKED ||
-          ErrorCodes.BCOL_ACCOUNT_REVOKED ||
-          ErrorCodes.BCOL_UNAVAILABLE
-        ):
-          // bcol expected errors
+    switch (error.category) {
+      case ErrorCategories.ACCOUNT_ACCESS:
+        this.errorOptions = authError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.ACCOUNT_SETTINGS:
+        this.errorOptions = loginError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.DRAFT_DELETE:
+        this.errorOptions = draftDeleteError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.DRAFT_LOAD:
+        this.errorOptions = registrationOpenDraftError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.HISTORY_REGISTRATIONS:
+        this.errorOptions = historyRegError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.HISTORY_SEARCHES:
+        // handled inline
+        break
+      case ErrorCategories.REGISTRATION_CREATE:
+        this.handleErrorRegCreate(error)
+        break
+      case ErrorCategories.REGISTRATION_DELETE:
+        this.errorOptions = registrationDeleteError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.REGISTRATION_LOAD:
+        this.errorOptions = registrationLoadError
+        this.errorDisplay = true
+        this.$router.push({ name: RouteNames.DASHBOARD })
+        break
+      case ErrorCategories.REGISTRATION_SAVE:
+        this.errorOptions = registrationSaveDraftError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.REPORT_GENERATION:
+        this.errorOptions = openDocError
+        this.errorDisplay = true
+        break
+      case ErrorCategories.SEARCH:
+        this.handleErrorSearch(error)
+        break
+      case ErrorCategories.SEARCH_COMPLETE:
+        // handled in search comp
+        break
+      case ErrorCategories.SEARCH_UPDATE:
+        // handled in search comp
+        break
+      default:
+        console.error('Unhandled error: ', error)
+    }
+  }
+
+  private handleErrorRegCreate (error: ErrorIF) {
+    // prep for registration payment issues
+    let filing = this.registrationTypeUI
+    if (this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
+      filing = this.getRegistrationFlowType?.toLowerCase() || 'registration'
+    }
+    this.payErrorOptions = { ...paymentErrorReg }
+    if (this.registrationTypeUI) {
+      this.payErrorOptions.text = this.payErrorOptions.text.replace('filing_type', filing)
+    }
+    // errors with a 'type' are payment issues, other errors handles in 'default' logic
+    switch (error.type) {
+      case (
+        ErrorCodes.BCOL_ACCOUNT_CLOSED ||
+        ErrorCodes.BCOL_USER_REVOKED ||
+        ErrorCodes.BCOL_ACCOUNT_REVOKED ||
+        ErrorCodes.BCOL_UNAVAILABLE
+      ):
+        // bcol expected errors
+        if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
+          this.payErrorOptions.text += '<br/><br/>' + error.detail +
+            `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
+            'once the issue has been resolved.'
+        } else {
+          this.payErrorOptions.acceptText = 'Return to Dashboard'
+          this.payErrorOptions.text += '<br/><br/>' + error.detail +
+            'You can retry your payment once the issue has been resolved.'
+        }
+        this.payErrorDisplay = true
+        break
+      case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
+        // pad expected errors
+        this.payErrorOptions.text += '<br/><br/>' + error.detail +
+          '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+        this.payErrorOptions.hasContactInfo = true
+        this.payErrorDisplay = true
+        break
+      default:
+        if (error.type && error.type?.includes('BCOL') && error.detail) {
+          // generic catch all bcol
           if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
             this.payErrorOptions.text += '<br/><br/>' + error.detail +
               `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
@@ -479,64 +581,67 @@ export default class App extends Mixins(AuthMixin) {
               'You can retry your payment once the issue has been resolved.'
           }
           this.payErrorDisplay = true
-          break
-        case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
-          // pad expected errors
-          this.payErrorOptions.text += '<br/><br/>' + error.detail +
-            '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+        } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+          // generic cath all pay error
+          this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
+            '<br/><br/>If this issue persists, please contact us.'
           this.payErrorOptions.hasContactInfo = true
           this.payErrorDisplay = true
-          break
-        default:
-          if (error.type && error.type?.includes('BCOL') && error.detail) {
-            // generic catch all bcol
-            if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
-              this.payErrorOptions.text += '<br/><br/>' + error.detail +
-                `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
-                'once the issue has been resolved.'
-            } else {
-              this.payErrorOptions.acceptText = 'Return to Dashboard'
-              this.payErrorOptions.text += '<br/><br/>' + error.detail +
-                'You can retry your payment once the issue has been resolved.'
-            }
-            this.payErrorDisplay = true
-          } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-            // generic cath all pay error
-            this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
-              '<br/><br/>If this issue persists, please contact us.'
-            this.payErrorOptions.hasContactInfo = true
-            this.payErrorDisplay = true
-          } else {
-            // for other errors:
-            const saveErrorCodes = [StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.BAD_REQUEST]
-            if (saveErrorCodes.includes(error.statusCode)) {
-              this.dialogOptions = saveSearchError
-              this.errorDialog = true
-            } else if (error.statusCode === StatusCodes.NOT_FOUND) {
-              this.dialogOptions = fetchError
-              this.errorDialog = true
-            } else if (error.statusCode === StatusCodes.UNAUTHORIZED) {
-              this.dialogOptions = loginError
-              this.errorDialog = true
-            } else {
-              // temporary catch all (should be a more generic dialogue)
-              this.dialogOptions = saveSearchError
-              this.errorDialog = true
-            }
-          }
-      }
+        } else {
+          this.errorOptions = registrationCompleteError
+          this.errorDisplay = true
+        }
+    }
+  }
+
+  private handleErrorSearch (error: ErrorIF) {
+    switch (error.type) {
+      case (
+        ErrorCodes.BCOL_ACCOUNT_CLOSED ||
+        ErrorCodes.BCOL_USER_REVOKED ||
+        ErrorCodes.BCOL_ACCOUNT_REVOKED ||
+        ErrorCodes.BCOL_UNAVAILABLE
+      ):
+        this.payErrorOptions = { ...paymentErrorSearch }
+        this.payErrorOptions.text += '<br/><br/>' + error.detail
+        this.payErrorDisplay = true
+        break
+      case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
+        this.payErrorOptions = { ...paymentErrorSearch }
+        this.payErrorOptions.text += '<br/><br/>' + error.detail +
+          '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+        this.payErrorOptions.hasContactInfo = true
+        this.payErrorDisplay = true
+        break
+      default:
+        if (error.type && error.type?.includes('BCOL') && error.detail) {
+          // bcol generic
+          this.payErrorOptions = { ...paymentErrorSearch }
+          this.payErrorOptions.text += '<br/><br/>' + error.detail
+          this.payErrorDisplay = true
+        } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+          // generic pay error
+          this.payErrorOptions = { ...paymentErrorSearch }
+          this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
+            '<br/><br/>If this issue persists, please contact us.'
+          this.payErrorOptions.hasContactInfo = true
+          this.payErrorDisplay = true
+        } else {
+          // generic search error
+          this.errorOptions = { ...searchResultsError }
+          this.errorDisplay = true
+        }
     }
   }
 
   private proceedAfterError (proceed: boolean): void {
-    this.errorDialog = false
+    this.errorDisplay = false
     // still need to fill this out more
-
-    if (this.dialogOptions === loginError) {
+    if (this.errorOptions === loginError || this.errorOptions === authError) {
       navigate(this.registryUrl)
     }
     // for now just refresh app
-    if (proceed) this.initApp()
+    if (!proceed) this.initApp()
   }
 }
 </script>

@@ -53,6 +53,7 @@
           :currentStatementType="statementType"
           :currentStepName="stepName"
           :router="this.$router"
+          @error="emitError($event)"
         />
       </v-col>
     </v-row>
@@ -197,6 +198,12 @@ export default class LengthTrust extends Vue {
 
   mounted () {
     this.onAppReady(this.appReady)
+  }
+
+  /** Emits error to app.vue for handling */
+  @Emit('error')
+  private emitError (error: ErrorIF): void {
+    console.error(error)
   }
 
   /** Emits Have Data event. */

@@ -119,7 +119,6 @@ import { useGetters } from 'vuex-composition-helpers'
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF } from '@/utils'
-import { StatusCodes } from 'http-status-codes'
 import { ErrorContact } from '../common'
 
 export default defineComponent({
@@ -196,8 +195,8 @@ export default defineComponent({
     const downloadPDF = async (searchId: string): Promise<any> => {
       localState.loadingPDF = searchId
       const pdf = await searchPDF(searchId)
-      if (!pdf || pdf?.error) {
-        emit('error', { statusCode: StatusCodes.NOT_FOUND })
+      if (pdf.error) {
+        emit('error', pdf.error)
       } else {
         /* solution from https://github.com/axios/axios/issues/1392 */
 

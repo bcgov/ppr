@@ -44,7 +44,7 @@ import {
   mockedRegistration2,
   mockedUpdateRegTableUserSettingsResponse
 } from './test-data'
-import { setupIntersectionObserverMock } from './utils'
+import { getLastEvent, setupIntersectionObserverMock } from './utils'
 
 Vue.use(Vuetify)
 
@@ -626,21 +626,19 @@ describe('Dashboard error modal tests', () => {
     wrapper.destroy()
   })
 
-  it('displays error for search', async () => {
-    await wrapper.findComponent(SearchBar).vm.$emit('search-error', {
-      statusCode: 404
-    })
-    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
-    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.title).toBe('Unable to retrieve search results')
+  it('emits error for search', async () => {
+    const error = { statusCode: 404 }
+    expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
+    wrapper.findComponent(SearchBar).vm.$emit('search-error', error)
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'error')).toEqual(error)
   })
 
-  it('displays error for search pdf', async () => {
-    await wrapper.findComponent(SearchHistory).vm.$emit('error', {
-      statusCode: 404
-    })
-    expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
-    expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.title).toBe('Unable to open document')
+  it('emits error for search pdf', async () => {
+    const error = { statusCode: 404 }
+    expect(getLastEvent(wrapper, 'error')).not.toEqual(error)
+    wrapper.findComponent(SearchHistory).vm.$emit('error', error)
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'error')).toEqual(error)
   })
 })

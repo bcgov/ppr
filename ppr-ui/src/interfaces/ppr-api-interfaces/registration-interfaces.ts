@@ -1,6 +1,5 @@
 import { APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
-import { CourtOrderIF, DebtorNameIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
-import { ErrorIF } from './error-interface'
+import { CourtOrderIF, DebtorNameIF, ErrorIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {
@@ -36,7 +35,7 @@ export interface FinancingStatementIF {
 
 // Draft interface. Change statement draft is out of scope.
 export interface DraftIF {
-  type: DraftTypes, // One of enum DraftTypes.
+  type?: DraftTypes, // One of enum DraftTypes.
   financingStatement?: FinancingStatementIF, // Include if draft is for a financing statement.
   amendmentStatement?: AmendmentStatementIF, // Include if draft is for an amendment statement.
   createDateTime?: string, // Included in a successful response. Generated on first draft save.

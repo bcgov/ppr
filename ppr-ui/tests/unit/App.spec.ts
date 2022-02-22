@@ -8,6 +8,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { axios } from '@/utils/axios-auth'
 import { axios as axiosPPR } from '@/utils/axios-ppr'
 import sinon from 'sinon'
+import { StatusCodes } from 'http-status-codes'
 
 // Components
 import App from '@/App.vue'
@@ -30,6 +31,7 @@ document.body.setAttribute('data-app', 'true')
 
 describe('App component', () => {
   let wrapper: any
+  let sandbox
   const { assign } = window.location
   const authUrl = 'myhost/basePath/auth/'
   sessionStorage.setItem('AUTH_WEB_URL', authUrl)
@@ -41,25 +43,27 @@ describe('App component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
 
-    const get = sinon.stub(axios, 'get')
-    const getSettings = sinon.stub(axiosPPR, 'get')
+    sandbox = sinon.createSandbox()
+
+    const get = sandbox.stub(axios, 'get')
+    const getSettings = sandbox.stub(axiosPPR,'get')
 
     // GET current user
-    await get.withArgs('users/@me')
-      .returns(new Promise((resolve) => resolve({
+    get.withArgs('users/@me').returns(new Promise((resolve) => resolve(
+      {
         data:
         {
           contacts: [],
           firstname: 'first',
           lastname: 'last',
           username: 'username'
-        }
+        },
+        status: StatusCodes.OK
       })))
 
-    await getSettings.withArgs('user-profile')
-      .returns(new Promise((resolve) => resolve({
-        data: mockedDisableAllUserSettingsResponse
-      })))
+    getSettings.withArgs('user-profile').returns(new Promise((resolve) => resolve({
+        data: mockedDisableAllUserSettingsResponse, status: StatusCodes.OK
+    })))
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -74,7 +78,7 @@ describe('App component', () => {
 
   afterEach(() => {
     window.location.assign = assign
-    sinon.restore()
+    sandbox.restore()
     wrapper.destroy()
   })
 

@@ -5,6 +5,8 @@ import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
+import sinon from 'sinon'
 
 // Components
 import { ButtonFooter } from '@/components/common'
@@ -15,6 +17,8 @@ import { getLastEvent } from './utils'
 // Other
 import mockRouter from './MockRouter'
 import { RouteNames, StatementTypes } from '@/enums'
+import { axios } from '@/utils/axios-ppr'
+import { mockedModelAmendmdmentAdd } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -346,25 +350,33 @@ describe('Step 4 for SBC staff', () => {
 
 describe('Button events', () => {
   let wrapper: Wrapper<any>
+  let sandbox
   
   beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    const post = sandbox.stub(axios, 'post')
+    post.returns(new Promise(resolve => resolve({ data: null })))
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
     const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
     wrapper = createComponent(currentStatementType, currentStepName)
+    await flushPromises()
   })
   afterEach(() => {
     wrapper.destroy()
+    sandbox.restore()
   })
 
-  it('displays error modal', async () => {
-
-    wrapper.vm.showDraftError()
-    await Vue.nextTick()
-    expect(wrapper.find('#draftErrorDialog').exists()).toBe(true)
-    expect(wrapper.find('#draftErrorDialog').vm.$props.setDisplay).toBe(true)
-    expect(wrapper.find('#draftErrorDialog').vm.$props.setOptions.title).toBe('Unable to save draft registration')
-    
+  it('emits error', async () => {
+    wrapper.vm.$store.state.stateModel.registration = mockedModelAmendmdmentAdd.registration
+    wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid = true
+    wrapper.vm.$store.state.stateModel.registration.parties.valid = true
+    wrapper.vm.$store.state.stateModel.registration.collateral.valid  = true
+    wrapper.vm.$props.certifyValid = true
+    expect(getLastEvent(wrapper, 'error')).toBeNull()
+    await wrapper.vm.submitNext()
+    await flushPromises()
+    expect(getLastEvent(wrapper, 'error')).not.toBeNull()
   })
 })

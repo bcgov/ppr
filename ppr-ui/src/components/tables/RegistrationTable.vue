@@ -220,6 +220,7 @@
           :setIsExpanded="isExpanded"
           :setItem="item"
           @action="emitRowAction($event)"
+          @error="emitError($event)"
           @freezeScroll="freezeTableScroll = $event"
           @toggleExpand="item.expand = !isExpanded, expand(!isExpanded)"
         />
@@ -233,7 +234,7 @@
           :setHeaders="headers"
           :setItem="change"
           @action="emitRowAction($event)"
-          @freezeScroll="freezeTableScroll"
+          @freezeScroll="freezeTableScroll = $event"
         />
       </template>
       <template v-slot:[`body.append`]>
@@ -272,7 +273,8 @@ import {
   RegistrationTypeIF, // eslint-disable-line no-unused-vars
   BaseHeaderIF, // eslint-disable-line no-unused-vars
   DraftResultIF, // eslint-disable-line no-unused-vars
-  RegistrationSortIF // eslint-disable-line no-unused-vars
+  RegistrationSortIF, // eslint-disable-line no-unused-vars
+  ErrorIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
   AccountProductCodes, // eslint-disable-line no-unused-vars
@@ -428,6 +430,10 @@ export default defineComponent({
       })
     })
 
+    const emitError = (error: ErrorIF): void => {
+      emit('error', error)
+    }
+
     const emitRowAction = ({ action, docId, regNum }): void => {
       emit('action', {
         action: action as TableActions,
@@ -573,6 +579,7 @@ export default defineComponent({
     return {
       datePicker,
       dateTxt,
+      emitError,
       emitRowAction,
       firstItem,
       getHeaderStyle,
