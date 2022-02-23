@@ -142,7 +142,7 @@ import { RegistrationFlowType, ActionTypes } from '@/enums'
 import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
-import { getRegisteringPartyFromAuth } from '@/utils'
+import { getRegisteringPartyFromAuth, getStaffegisteringParty } from '@/utils'
 import { ErrorContact } from '@/components/common'
 
 export default defineComponent({
@@ -159,12 +159,14 @@ export default defineComponent({
       getAddSecuredPartiesAndDebtors,
       getRegistrationFlowType,
       isRoleStaffSbc,
-      isRoleStaffReg
+      isRoleStaffReg,
+      isRoleStaffBcol
     } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors',
       'getRegistrationFlowType',
       'isRoleStaffSbc',
-      'isRoleStaffReg'
+      'isRoleStaffReg',
+      'isRoleStaffBcol'
     ])
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value
@@ -214,14 +216,17 @@ export default defineComponent({
     }
 
     const getRegisteringParty = async () => {
+      let regParty = null
       var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-      if (!isRoleStaffSbc.value) {
-        const regParty = await getRegisteringPartyFromAuth(isRoleStaffReg.value)
-        parties.registeringParty = regParty
-        setAddSecuredPartiesAndDebtors(parties)
-      } else {
+      if (isRoleStaffBcol.value || isRoleStaffReg.value) {
+        regParty = await getStaffegisteringParty(isRoleStaffBcol.value)
+      } else if (isRoleStaffSbc.value) {
         parties.registeringParty = null
+      } else {
+        regParty = await getRegisteringPartyFromAuth()
       }
+      parties.registeringParty = regParty
+      setAddSecuredPartiesAndDebtors(parties)
     }
 
     return {
