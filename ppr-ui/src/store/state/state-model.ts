@@ -91,6 +91,7 @@ export const stateModel: StateModelIF = {
   },
   userInfo: {
     contacts: [],
+    feeSettings: null,
     firstname: '',
     lastname: '',
     username: '',

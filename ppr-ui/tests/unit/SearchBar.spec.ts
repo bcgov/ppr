@@ -48,23 +48,20 @@ const searchTextField: string = '.search-bar-text-field'
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent (
-  attachDialog: string,
-  searchTypes: Array<SearchTypeIF>
-): Wrapper<any> {
+function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(SearchBar, {
     localVue,
-    propsData: { attachDialog, searchTypes },
+    propsData: {},
     store,
     vuetify
   })
 }
 
-describe('SearchBar component', () => {
+describe('SearchBar component basic tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -74,7 +71,7 @@ describe('SearchBar component', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     wrapper.destroy()
@@ -83,10 +80,17 @@ describe('SearchBar component', () => {
   it('renders SearchBar Component with basic elements', async () => {
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumber).exists()).toBe(true)
-    expect(wrapper.vm.$data.searchTypes).toStrictEqual(SearchTypes)
     expect(wrapper.find(searchDropDown).exists()).toBe(true)
     expect(wrapper.find(searchTextField).exists()).toBe(true)
     expect(wrapper.find(searchButtonSelector).exists()).toBe(true)
+    // check the default is the regular fee
+    expect(wrapper.vm.$props.isNonBillable).toBe(false)
+    expect(wrapper.vm.$data.fee).toBe('8.50')
+    // update to non billable and see fee change
+    await wrapper.setProps({ isNonBillable: true, serviceFee: 3 })
+    expect(wrapper.vm.$props.isNonBillable).toBe(true)
+    expect(wrapper.vm.$props.serviceFee).toBe(3)
+    expect(wrapper.vm.$data.fee).toBe('3.00')
   })
 })
 
@@ -103,7 +107,7 @@ describe('Payment confirmation popup', () => {
       username: 'user',
       settings: mockedDefaultUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     wrapper.destroy()
@@ -156,7 +160,7 @@ describe('Serial number search', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     sandbox.restore()
@@ -246,7 +250,7 @@ describe('Individual debtor search', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     sandbox.restore()
@@ -341,7 +345,7 @@ describe('Business debtor search', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     sandbox.restore()
@@ -430,7 +434,7 @@ describe('MHR search', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     sandbox.restore()
@@ -479,7 +483,7 @@ describe('Aircraft search', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     sandbox.restore()
@@ -528,7 +532,7 @@ describe('Registration number search', () => {
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = createComponent('', SearchTypes)
+    wrapper = createComponent()
   })
   afterEach(() => {
     sandbox.restore()

@@ -190,7 +190,12 @@ export const getUserRoles = (state: StateIF): Array<string> => {
   return state.stateModel.authorization?.authRoles
 }
 
-/** The current user's roles. */
+/** The current user's service fee (applicable for non billable users). */
+export const getUserServiceFee = (state: StateIF): number => {
+  return state.stateModel.userInfo?.feeSettings?.serviceFee || 1.50
+}
+
+/** All the current user info. */
 export const getUserSettings = (state: StateIF): UserSettingsIF => {
   return state.stateModel.userInfo?.settings
 }
@@ -203,6 +208,11 @@ export const getUserUsername = (state: StateIF): string => {
 /** The list of registration vehicle collateral */
 export const getVehicleCollateral = (state: StateIF): VehicleCollateralIF[] => {
   return state.stateModel.registration.collateral.vehicleCollateral
+}
+
+/** Whether the current account is a non billable account. */
+export const isNonBillable = (state: StateIF): boolean => {
+  return state.stateModel.userInfo?.feeSettings?.isNonBillable || false
 }
 
 /** Whether the current account is a premium account. */

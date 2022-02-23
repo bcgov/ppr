@@ -66,6 +66,10 @@ describe('TombstoneDefault component tests', () => {
         phoneExtension: ''
       }
     ],
+    feeSettings: {
+      isNonBillable: false,
+      serviceFee: 1.50
+    },
     firstname: 'test',
     lastname: 'tester',
     username: '123d3crr3',

@@ -519,6 +519,10 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   },
   userInfo: {
     contacts: [],
+    feeSettings: {
+      isNonBillable: false,
+      serviceFee: 1.50
+    },
     firstname: '',
     lastname: '',
     username: '',
@@ -618,6 +622,10 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   },
   userInfo: {
     contacts: [],
+    feeSettings: {
+      isNonBillable: false,
+      serviceFee: 1.50
+    },
     firstname: '',
     lastname: '',
     username: '',
@@ -718,6 +726,10 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   },
   userInfo: {
     contacts: [],
+    feeSettings: {
+      isNonBillable: false,
+      serviceFee: 1.50
+    },
     firstname: '',
     lastname: '',
     username: '',
@@ -817,6 +829,10 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
   },
   userInfo: {
     contacts: [],
+    feeSettings: {
+      isNonBillable: false,
+      serviceFee: 1.50
+    },
     firstname: '',
     lastname: '',
     username: '',

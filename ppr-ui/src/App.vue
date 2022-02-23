@@ -95,14 +95,16 @@ import {
   registrationOpenDraftError, registrationSaveDraftError, searchResultsError
 } from '@/resources/dialogOptions'
 import {
+  getFees,
   getKeycloakRoles,
   getProductSubscription,
   getPPRUserSettings,
-  updateLdUser,
   getSbcFromAuth,
-  navigate
+  navigate,
+  updateLdUser
 } from '@/utils'
 // local Enums, Constants, Interfaces
+import { FeeCodes } from '@/composables/fees/enums'
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
   ErrorCategories,
@@ -414,14 +416,27 @@ export default class App extends Mixins(AuthMixin) {
     let statusCode = response.status
     const userInfo: UserInfoIF = response?.data
     if (userInfo && statusCode === StatusCodes.OK) {
-      // ppr api user settings
+      // set ppr api user settings
       const settings: UserSettingsIF = await getPPRUserSettings()
       userInfo.settings = settings
-      this.setUserInfo(userInfo)
       if (settings?.error) {
         message = 'Unable to get user settings.'
         statusCode = settings.error.statusCode
+      } else if (!this.isRoleStaff) {
+        // check if non-billable
+        userInfo.feeSettings = null
+        const fees = await getFees(FeeCodes.SEARCH)
+        if (fees.error) {
+          message = 'Unable to check if user is non billable.'
+          statusCode = fees.error.statusCode
+        } else if (fees?.filingFees === 0) {
+          userInfo.feeSettings = {
+            isNonBillable: true,
+            serviceFee: fees?.serviceFees || 1.50
+          }
+        }
       }
+      this.setUserInfo(userInfo)
     } else {
       message = 'Unable to get user info.'
     }

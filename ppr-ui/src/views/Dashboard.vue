@@ -40,13 +40,17 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-bar class="soft-corners-bottom"
-                        @debtor-name="setSearchDebtorName"
-                        @searched-type="setSearchedType"
-                        @searched-value="setSearchedValue"
-                        @search-data="setSearchResults"
-                        @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
-                        @search-error="emitError($event)"/>
+            <search-bar
+              class="soft-corners-bottom"
+              :isNonBillable="isNonBillable"
+              :serviceFee="getUserServiceFee"
+              @debtor-name="setSearchDebtorName"
+              @searched-type="setSearchedType"
+              @searched-value="setSearchedValue"
+              @search-data="setSearchResults"
+              @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
+              @search-error="emitError($event)"
+            />
           </v-row>
         </v-col>
       </v-row>
@@ -296,7 +300,9 @@ export default class Dashboard extends Vue {
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter getUserServiceFee!: Number
   @Getter getUserSettings: UserSettingsIF
+  @Getter isNonBillable!: Boolean
 
   @Action resetNewRegistration: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF

@@ -104,6 +104,10 @@ import { getFeeSummary, getFeeHint } from './factories'
 export default defineComponent({
   name: 'FeeSummary',
   props: {
+    setFeeOverride: {
+      default: null,
+      type: Object as () => FeeSummaryI
+    },
     setFeeType: {
       type: String as () => FeeSummaryTypes
     },
@@ -145,17 +149,25 @@ export default defineComponent({
         if (localState.feeType === FeeSummaryTypes.RENEW) {
           feeSummary.processingFee = 5
         }
+        if (props.setFeeOverride) {
+          feeSummary.feeAmount = props.setFeeOverride.feeAmount
+        }
+        if (props.setFeeOverride && feeSummary.serviceFee !== 0) {
+          feeSummary.serviceFee = props.setFeeOverride.serviceFee
+        }
         return feeSummary
       }),
       hasProcessingFee: computed(() => {
         return props.setStaffReg || props.setStaffSBC
       }),
       hintFee: computed((): string => {
-        return getFeeHint(
+        const hint = getFeeHint(
           localState.feeType,
           localState.registrationType,
           localState.registrationLength
         )
+        if (props.setFeeOverride) return hint.replace('$5', '$0')
+        return hint
       }),
       isComplete: computed((): boolean => {
         return localState.feeSummary.quantity > 0 && localState.isValid
