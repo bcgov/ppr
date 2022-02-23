@@ -12,61 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """API endpoints for maintaining financing statements and updates to financing statements."""
-
-# pylint: disable=too-many-return-statements, too-many-lines
+# pylint: disable=too-many-return-statements
 from http import HTTPStatus
 
-from flask import jsonify, request, current_app, g
+from flask import jsonify, request, current_app
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Party, Registration, UserExtraRegistration
+from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
-from ppr_api.reports import ReportTypes, get_pdf, get_report_api_payload
-from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_reg_staff_account, is_sbc_office_account, \
+from ppr_api.reports import ReportTypes
+from ppr_api.resources import utils as resource_utils, financing_utils as fs_utils
+from ppr_api.services.authz import authorized, is_sbc_office_account, \
                                    is_staff_account, is_bcol_help, is_all_staff_account
-from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
-from ppr_api.services.payment.payment import Payment
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.callback.utils.exceptions import ReportDataException
 
 
 API = Namespace('financing-statements', description='Endpoints for maintaining financing statements and updates.')
-
-VAL_ERROR = 'Financing Statement request data validation errors.'  # Default validation error prefix
-VAL_ERROR_AMEND = 'Amendment Statement request data validation errors.'  # Amendment validation error prefix
-VAL_ERROR_CHANGE = 'Change Statement request data validation errors.'  # Change validation error prefix
-VAL_ERROR_RENEWAL = 'Renewal Statement request data validation errors.'  # Renewal validation error prefix
-VAL_ERROR_DISCHARGE = 'Discharge Statement request data validation errors.'  # Discharge validation error prefix
-SAVE_ERROR_MESSAGE = 'Account {0} create {1} statement db save failed: {2}'
-PAY_REFUND_MESSAGE = 'Account {0} create {1} statement refunding payment for invoice {2}.'
-PAY_REFUND_ERROR = 'Account {0} create {1} statement payment refund failed for invoice {2}: {3}.'
-DUPLICATE_REGISTRATION_ERROR = 'Registration {0} is already available to the account.'
-# Payment detail/transaction description by registration.
-REG_CLASS_TO_STATEMENT_TYPE = {
-    'AMENDMENT': 'Register an Amendment Statement',
-    'COURTORDER': 'Register an Amendment Statement',
-    'CHANGE': 'Register a Change Statement',
-    'RENEWAL': 'Register a Renewal Statement',
-    'DISCHARGE': 'Register a Discharge Statement'
-}
-COLLAPSE_PARAM = 'collapse'
-CURRENT_PARAM = 'current'
-CALLBACK_MESSAGES = {
-    resource_utils.CallbackExceptionCodes.UNKNOWN_ID: '01: no registration data found for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.MAX_RETRIES: '02: maximum retries reached for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.INVALID_ID: '03: no registration found for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.DEFAULT: '04: default error for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR: '05: report data error for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.REPORT_ERR: '06: generate report failed for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.FILE_TRANSFER_ERR: '09: SFTP failed for id={key_id}.',
-    resource_utils.CallbackExceptionCodes.SETUP_ERR: '10: setup failed for id={key_id}.'
-}
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -116,14 +83,18 @@ class FinancingResource(Resource):
             valid_format, errors = schema_utils.validate(request_json, 'financingStatement', 'ppr')
             extra_validation_msg = resource_utils.validate_financing(request_json)
             if not valid_format or extra_validation_msg != '':
-                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
+                return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
             # Set up the financing statement registration, pay, and save the data.
-            statement = pay_and_save_financing(request, request_json, account_id)
+            statement = fs_utils.pay_and_save_financing(request, request_json, account_id)
+            response_json = statement.json
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
-            return statement.json, HTTPStatus.CREATED
+                return fs_utils.get_registration_report(statement.registration[0], response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header(), HTTPStatus.CREATED)
+            resource_utils.enqueue_registration_report(statement.registration[0], response_json,
+                                                       ReportTypes.FINANCING_STATEMENT_REPORT.value)
+            return response_json, HTTPStatus.CREATED
         except DatabaseException as db_exception:
             return resource_utils.db_exception_response(db_exception, account_id, 'POST financing statement')
         except SBCPaymentException as pay_exception:
@@ -166,7 +137,7 @@ class GetFinancingResource(Resource):
             # Set to false to exclude change history.
             statement.include_changes_json = False
             # Set to false as default to generate json with original financing statement data.
-            current_param = request.args.get(CURRENT_PARAM)
+            current_param = request.args.get(fs_utils.CURRENT_PARAM)
             if current_param is None or not isinstance(current_param, (bool, str)):
                 statement.current_view_json = False
             elif isinstance(current_param, str) and current_param.lower() in ['true', '1', 'y', 'yes']:
@@ -177,8 +148,9 @@ class GetFinancingResource(Resource):
                 statement.current_view_json = current_param
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(statement.json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(statement.registration[0], statement.json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header())
             return statement.json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -214,7 +186,7 @@ class AmendmentResource(Resource):
             valid_format, errors = schema_utils.validate(request_json, 'amendmentStatement', 'ppr')
             extra_validation_msg = resource_utils.validate_registration(request_json)
             if not valid_format or extra_validation_msg != '':
-                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
+                return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
                 return resource_utils.path_data_mismatch_error_response(registration_num,
@@ -230,21 +202,22 @@ class AmendmentResource(Resource):
             # Verify delete party and collateral ID's
             resource_utils.validate_delete_ids(request_json, statement)
             # Set up the registration, pay, and save the data.
-            registration = pay_and_save(request,
-                                        request_json,
-                                        model_utils.REG_CLASS_AMEND,
-                                        statement,
-                                        registration_num,
-                                        account_id)
+            registration = fs_utils.pay_and_save(request,
+                                                 request_json,
+                                                 model_utils.REG_CLASS_AMEND,
+                                                 statement,
+                                                 registration_num,
+                                                 account_id)
             response_json = registration.verification_json('amendmentRegistrationNumber')
             # If get to here request was successful, enqueue verification statements for secured parties.
             resource_utils.queue_secured_party_verification(registration)
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json,
-                               account_id,
-                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(registration, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header(), HTTPStatus.CREATED)
+            resource_utils.enqueue_registration_report(registration, response_json,
+                                                       ReportTypes.FINANCING_STATEMENT_REPORT.value)
             return response_json, HTTPStatus.CREATED
         except DatabaseException as db_exception:
             return resource_utils.db_exception_response(db_exception, account_id,
@@ -291,8 +264,9 @@ class GetAmendmentResource(Resource):
             response_json = statement.verification_json('amendmentRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(statement, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header())
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -337,8 +311,9 @@ class GetChangeResource(Resource):
             response_json = statement.verification_json('changeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(statement, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header())
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -373,7 +348,7 @@ class RenewalResource(Resource):
             # Validate request data against the schema.
             valid_format, errors = schema_utils.validate(request_json, 'renewalStatement', 'ppr')
             if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR)
+                return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR)
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
                 return resource_utils.path_data_mismatch_error_response(registration_num,
@@ -385,22 +360,25 @@ class RenewalResource(Resource):
                                                                        is_staff_account(account_id), True)
             extra_validation_msg = resource_utils.validate_renewal(request_json, statement)
             if extra_validation_msg != '':
-                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
+                return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
             # Verify base debtor (bypassed for staff)
             if not statement.validate_debtor_name(request_json['debtorName'], is_staff_account(account_id)):
                 return resource_utils.base_debtor_invalid_response()
             # Set up the registration, pay, and save the data.
-            registration = pay_and_save(request,
-                                        request_json,
-                                        model_utils.REG_CLASS_RENEWAL,
-                                        statement,
-                                        registration_num,
-                                        account_id)
+            registration = fs_utils.pay_and_save(request,
+                                                 request_json,
+                                                 model_utils.REG_CLASS_RENEWAL,
+                                                 statement,
+                                                 registration_num,
+                                                 account_id)
             response_json = registration.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(registration, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header(), HTTPStatus.CREATED)
+            resource_utils.enqueue_registration_report(registration, response_json,
+                                                       ReportTypes.FINANCING_STATEMENT_REPORT.value)
             return response_json, HTTPStatus.CREATED
         except DatabaseException as db_exception:
             return resource_utils.db_exception_response(db_exception, account_id,
@@ -447,8 +425,9 @@ class GetRenewalResource(Resource):
             response_json = statement.verification_json('renewalRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json, account_id, ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(statement, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header())
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -484,7 +463,7 @@ class DischargeResource(Resource):
             valid_format, errors = schema_utils.validate(request_json, 'dischargeStatement', 'ppr')
             extra_validation_msg = resource_utils.validate_registration(request_json)
             if not valid_format or extra_validation_msg != '':
-                return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
+                return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
             # payload base registration number must match path registration number
             if registration_num != request_json['baseRegistrationNumber']:
                 return resource_utils.path_data_mismatch_error_response(registration_num,
@@ -499,21 +478,22 @@ class DischargeResource(Resource):
                 return resource_utils.base_debtor_invalid_response()
             # No fee for a discharge but create a payment transaction record.
             # Set up the registration, pay, and save the data.
-            registration = pay_and_save(request,
-                                        request_json,
-                                        model_utils.REG_CLASS_DISCHARGE,
-                                        statement,
-                                        registration_num,
-                                        account_id)
+            registration = fs_utils.pay_and_save(request,
+                                                 request_json,
+                                                 model_utils.REG_CLASS_DISCHARGE,
+                                                 statement,
+                                                 registration_num,
+                                                 account_id)
             response_json = registration.verification_json('dischargeRegistrationNumber')
             # If get to here request was successful, enqueue verification statements for secured parties.
             resource_utils.queue_secured_party_verification(registration)
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json,
-                               account_id,
-                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(registration, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header(), HTTPStatus.CREATED)
+            resource_utils.enqueue_registration_report(registration, response_json,
+                                                       ReportTypes.FINANCING_STATEMENT_REPORT.value)
             return response_json, HTTPStatus.CREATED
         except DatabaseException as db_exception:
             return resource_utils.db_exception_response(db_exception, account_id,
@@ -560,10 +540,9 @@ class GetDischargeResource(Resource):
             response_json = statement.verification_json('dischargeRegistrationNumber')
             if resource_utils.is_pdf(request):
                 # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_json,
-                               account_id,
-                               ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                               jwt.get_token_auth_header())
+                return fs_utils.get_registration_report(statement, response_json,
+                                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+                                                        jwt.get_token_auth_header())
             return response_json, HTTPStatus.OK
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
@@ -622,7 +601,7 @@ class GetRegistrationResource(Resource):
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-            collapse_param = request.args.get(COLLAPSE_PARAM)
+            collapse_param = request.args.get(fs_utils.COLLAPSE_PARAM)
             if collapse_param is None or not isinstance(collapse_param, (bool, str)):
                 collapse_param = False
             elif isinstance(collapse_param, str) and collapse_param.lower() in ['true', '1', 'y', 'yes']:
@@ -680,7 +659,8 @@ class AccountRegistrationResource(Resource):
                 UserExtraRegistration.delete(base_reg_num, account_id)
             # Check if duplicate.
             elif registration['accountId'] == account_id or registration['existsCount'] > 0:
-                return resource_utils.duplicate_error_response(DUPLICATE_REGISTRATION_ERROR.format(registration_num))
+                message = fs_utils.DUPLICATE_REGISTRATION_ERROR.format(registration_num)
+                return resource_utils.duplicate_error_response(message)
             # Restricted access check for crown charge class of registration types.
             if not is_all_staff_account(account_id) and \
                     registration['registrationClass'] == model_utils.REG_CLASS_CROWN and \
@@ -789,9 +769,9 @@ class VerificationResource(Resource):
                 return resource_utils.error_response(HTTPStatus.BAD_REQUEST,
                                                      'Mail verification statement no registration ID.')
             if party_id < 0:
-                return callback_error(resource_utils.CallbackExceptionCodes.SETUP_ERR, registration_id,
-                                      HTTPStatus.BAD_REQUEST, party_id,
-                                      'No required partyId in message payload.')
+                return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.SETUP_ERR, registration_id,
+                                               HTTPStatus.BAD_REQUEST, party_id,
+                                               'No required partyId in message payload.')
             # If exceeded max retries we're done.
             event_count: int = 0
             events = EventTracking.find_by_key_id_type(registration_id,
@@ -800,206 +780,77 @@ class VerificationResource(Resource):
             if events:
                 event_count = len(events)
             if event_count > current_app.config.get('EVENT_MAX_RETRIES'):
-                return callback_error(resource_utils.CallbackExceptionCodes.MAX_RETRIES, registration_id,
-                                      HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                      f'Max retries reached for party={party_id}.')
+                return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.MAX_RETRIES, registration_id,
+                                               HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
+                                               f'Max retries reached for party={party_id}.')
             registration = Registration.find_by_id(registration_id)
             if not registration:
-                return callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, registration_id,
-                                      HTTPStatus.NOT_FOUND, party_id)
+                return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, registration_id,
+                                               HTTPStatus.NOT_FOUND, party_id)
             # Verify party ID.
             party = resource_utils.find_secured_party(registration, party_id)
             if not party:
-                return callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, registration_id,
-                                      HTTPStatus.NOT_FOUND, party_id,
-                                      f'No party found for id={party_id}')
+                return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, registration_id,
+                                               HTTPStatus.NOT_FOUND, party_id,
+                                               f'No party found for id={party_id}')
             # Generate the verification json data with the cover letter info for the secured party.
-            json_data = get_mail_verification_data(registration_id, registration, party)
-            report_data = get_verification_report_data(registration_id, json_data, registration.account_id, None)
+            json_data = fs_utils.get_mail_verification_data(registration_id, registration, party)
+            report_data = fs_utils.get_verification_report_data(registration_id, json_data, registration.account_id,
+                                                                None)
             current_app.logger.info(f'Generated the mail report data for id={registration_id}, party={party_id}')
             return jsonify(report_data), HTTPStatus.CREATED
 
         except ReportDataException as report_data_err:
-            return callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
-                                  registration_id,
-                                  HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                  f'Party={party_id}. ' + repr(report_data_err))
+            return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
+                                           registration_id,
+                                           HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
+                                           f'Party={party_id}. ' + str(report_data_err))
         except Exception as default_err:  # noqa: B902; return nicer default error
-            return callback_error(resource_utils.CallbackExceptionCodes.DEFAULT,
-                                  registration_id,
-                                  HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
-                                  f'Party={party_id}. ' + repr(default_err))
+            return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                           registration_id,
+                                           HTTPStatus.INTERNAL_SERVER_ERROR, party_id,
+                                           f'Party={party_id}. ' + str(default_err))
 
 
-def pay_and_save(req: request,  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
-                 request_json, registration_class, financing_statement, registration_num, account_id):
-    """Set up the registration, pay if there is an account id, and save the data."""
-    token: dict = g.jwt_oidc_token_info
-    registration = Registration.create_from_json(request_json,
-                                                 registration_class,
-                                                 financing_statement,
-                                                 registration_num,
-                                                 account_id)
-    registration.user_id = token.get('username', None)
-    pay_trans_type = TransactionTypes.CHANGE.value
-    fee_quantity = 1
-    pay_ref = None
-    if registration_class == model_utils.REG_CLASS_AMEND:
-        pay_trans_type = TransactionTypes.AMENDMENT.value
-        if resource_utils.no_fee_amendment(financing_statement.registration[0].registration_type):
-            pay_trans_type = TransactionTypes.AMENDMENT_NO_FEE.value
-    elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
-        pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
-    elif registration_class == model_utils.REG_CLASS_RENEWAL:
-        fee_quantity = registration.life
-        pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
-    elif registration_class == model_utils.REG_CLASS_DISCHARGE:
-        pay_trans_type = TransactionTypes.DISCHARGE.value
-    processing_fee = None
-    is_dicharge = pay_trans_type == TransactionTypes.DISCHARGE.value
-    if not is_reg_staff_account(account_id):
-        # if sbc staff and not 'no fee' then add processing fee
-        if not is_dicharge and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
-            processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
-        pay_account_id: str = account_id
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=pay_account_id,
-                          details=resource_utils.get_payment_details(registration))
-        pay_ref = payment.create_payment(
-            pay_trans_type, fee_quantity, None, registration.client_reference_id, processing_fee)
-    else:
-        # if not discharge add process fee
-        if not is_dicharge:
-            processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
-        payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=None,
-                          details=resource_utils.get_payment_details(registration))
-        pay_ref = payment.create_payment_staff_registration(
-            payment_info, registration.client_reference_id, processing_fee)
-    invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
-    # Try to save the registration: failure will rollback the payment if one was made.
-    try:
-        registration.save()
-    except BusinessException as bus_exception:
-        # just pass it along
-        raise bus_exception
-    except Exception as db_exception:   # noqa: B902; handle all db related errors.
-        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, repr(db_exception)))
-        if account_id and invoice_id is not None:
-            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, registration_class, invoice_id))
-            try:
-                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-                payment.cancel_payment(invoice_id)
-            except SBCPaymentException as cancel_exception:
-                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id,
-                                                                 repr(cancel_exception)))
-        raise DatabaseException(db_exception)
-    return registration
+@cors_preflight('POST,OPTIONS')
+@API.route('/registration-report-callback/<path:registration_id>', methods=['POST', 'OPTIONS'])
+class RegistrationReportResource(Resource):
+    """Resource to handle a registration report (verification) api request for a callback/aysnchronous event."""
 
-
-def pay_and_save_financing(req: request, request_json, account_id):  # pylint: disable=too-many-locals
-    """Set up the financing statement, pay if there is an account id, and save the data."""
-    # Charge a fee.
-    token: dict = g.jwt_oidc_token_info
-    statement = FinancingStatement.create_from_json(request_json, account_id, token.get('username', None))
-    invoice_id = None
-    registration = statement.registration[0]
-    pay_trans_type, fee_quantity = resource_utils.get_payment_type_financing(registration)
-    pay_ref = None
-    processing_fee = None
-    is_no_fee = pay_trans_type == TransactionTypes.FINANCING_NO_FEE.value
-    if not is_reg_staff_account(account_id):
-        # if sbc staff and not 'no fee' then add processing fee
-        if not is_no_fee and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
-            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
-        pay_account_id: str = account_id
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=pay_account_id,
-                          details=resource_utils.get_payment_details_financing(registration))
-        pay_ref = payment.create_payment(
-            pay_trans_type, fee_quantity, None, registration.client_reference_id, processing_fee)
-    else:
-        # if not 'no fee' then add processing fee
-        if not is_no_fee:
-            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
-        payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
-        payment = Payment(jwt=jwt.get_token_auth_header(),
-                          account_id=None,
-                          details=resource_utils.get_payment_details_financing(registration))
-        pay_ref = payment.create_payment_staff_registration(
-            payment_info, registration.client_reference_id, processing_fee)
-    invoice_id = pay_ref['invoiceId']
-    registration.pay_invoice_id = int(invoice_id)
-    registration.pay_path = pay_ref['receipt']
-    # Try to save the financing statement: failure throws an exception.
-    try:
-        statement.save()
-    except Exception as db_exception:   # noqa: B902; handle all db related errors.
-        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'financing', repr(db_exception)))
-        if account_id and invoice_id is not None:
-            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'financing', invoice_id))
-            try:
-                payment.cancel_payment(invoice_id)
-            except SBCPaymentException as cancel_exception:
-                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'financing', invoice_id,
-                                                                 repr(cancel_exception)))
-        raise DatabaseException(db_exception)
-    return statement
-
-
-def callback_error(code: str, registration_id: int, status_code, party_id: int, message: str = None):
-    """Return the event listener callback error response based on the code."""
-    error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
-    if message:
-        error += ' ' + message
-    # Track event here.
-    EventTracking.create(registration_id, EventTracking.EventTrackingTypes.SURFACE_MAIL, status_code, message)
-    if status_code != HTTPStatus.BAD_REQUEST and code not in (resource_utils.CallbackExceptionCodes.MAX_RETRIES,
-                                                              resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
-                                                              resource_utils.CallbackExceptionCodes.SETUP_ERR):
-        # set up retry
-        resource_utils.enqueue_verification_report(registration_id, party_id)
-    return resource_utils.error_response(status_code, error)
-
-
-def get_mail_verification_data(registration_id: int, registration: Registration, party: Party):
-    """Generate json for a surface mail verification statement report."""
-    try:
-        statement_type = model_utils.REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl]
-        reg_num_key = 'dischargeRegistrationNumber'
-        if statement_type == model_utils.DRAFT_TYPE_AMENDMENT:
-            reg_num_key = 'amendmentRegistrationNumber'
-        report_data = registration.verification_json(reg_num_key)
-        cover_data = party.json
-        cover_data['statementType'] = statement_type
-        cover_data['partyType'] = party.party_type
-        cover_data['createDateTime'] = report_data['createDateTime']
-        cover_data['registrationNumber'] = registration.registration_num
-        report_data['cover'] = cover_data
-        return report_data
-    except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        msg = f'Mail verification json data generation failed for id={registration_id}: ' + repr(err)
-        # current_app.logger.error(msg)
-        raise ReportDataException(msg)
-
-
-def get_verification_report_data(registration_id: int, json_data, account_id: str, account_name: str = None):
-    """Generate report data json for a surface mail verification statement report."""
-    try:
-        cover_data = get_report_api_payload(json_data, account_id, ReportTypes.COVER_PAGE_REPORT.value, account_name)
-        verification_data = get_report_api_payload(json_data,
-                                                   account_id,
-                                                   ReportTypes.FINANCING_STATEMENT_REPORT.value,
-                                                   account_name)
-        report_data = {
-            'coverLetterData': cover_data,
-            'verificationData': verification_data
-        }
-        return report_data
-    except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        msg = f'Mail verification report data generation failed for id={registration_id}: ' + repr(err)
-        # current_app.logger.error(msg)
-        raise ReportDataException(msg)
+    @staticmethod
+    @cors.crossdomain(origin='*')
+    def post(registration_id):
+        """Generate, store report, record request status and possibly retry."""
+        try:
+            if registration_id is None:
+                return resource_utils.path_param_error_response('search ID')
+            # If exceeded max retries we're done.
+            event_count: int = 0
+            events = EventTracking.find_by_key_id_type(registration_id,
+                                                       EventTracking.EventTrackingTypes.REGISTRATION_REPORT)
+            if events:
+                event_count = len(events)
+            if event_count > current_app.config.get('EVENT_MAX_RETRIES'):
+                return fs_utils.registration_callback_error(resource_utils.CallbackExceptionCodes.MAX_RETRIES,
+                                                            registration_id,
+                                                            HTTPStatus.INTERNAL_SERVER_ERROR,
+                                                            'Max retries reached.')
+            # Verify the registration ID and request.
+            registration: Registration = Registration.find_by_id(registration_id)
+            if not registration:
+                return fs_utils.registration_callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
+                                                            registration_id,
+                                                            HTTPStatus.NOT_FOUND)
+            if not registration.verification_report:
+                return fs_utils.registration_callback_error(resource_utils.CallbackExceptionCodes.SETUP_ERR,
+                                                            registration_id,
+                                                            HTTPStatus.BAD_REQUEST,
+                                                            'No verification report data found for the registration.')
+            return fs_utils.get_registration_callback_report(registration)
+        except DatabaseException as db_exception:
+            return resource_utils.db_exception_response(db_exception, None, 'POST registration report event')
+        except Exception as default_err:  # noqa: B902; return nicer default error
+            return fs_utils.registration_callback_error(resource_utils.CallbackExceptionCodes.DEFAULT,
+                                                        registration_id,
+                                                        HTTPStatus.INTERNAL_SERVER_ERROR,
+                                                        str(default_err))

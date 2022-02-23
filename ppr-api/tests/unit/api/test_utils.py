@@ -19,12 +19,14 @@ Test-Suite to ensure that the /party-codes endpoint is working as expected.
 import copy
 from http import HTTPStatus
 import json
+from ppr_api.utils.validators.party_validator import validate_registration_parties
 
 import pytest
 from flask import current_app
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from ppr_api.models import Registration
+from ppr_api.models import Registration, VerificationReport
+from ppr_api.reports import ReportTypes
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import PPR_ROLE
 from ppr_api.services.payment.exceptions import SBCPaymentException
@@ -320,3 +322,18 @@ def test_debtor(session, client, jwt):
     assert status == HTTPStatus.BAD_REQUEST
     data = json.loads(body.get_data(as_text=True))
     assert str(data['message']).startswith(ResourceErrorCodes.DEBTOR_NAME_ERR)
+
+
+def test_queue_reg_report(session, client, jwt):
+    """Assert that queueing a registration report works as expected."""
+    # setup
+    registration = Registration.find_by_id(200000012)
+    
+    # test
+    resource_utils.enqueue_registration_report(registration,
+                                               registration.json,
+                                               ReportTypes.FINANCING_STATEMENT_REPORT.value)
+    v_report: VerificationReport = VerificationReport.find_by_registration_id(registration.id)
+    assert v_report
+    assert v_report.id
+    assert v_report.registration_id == registration.id

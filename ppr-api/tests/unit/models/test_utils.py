@@ -18,7 +18,7 @@ from datetime import timedelta as _timedelta
 import pytest
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT
 
-from ppr_api.models import utils as model_utils
+from ppr_api.models import utils as model_utils, Registration
 
 
 # testdata pattern is ({registration_ts}, {years}, {expiry_ts})
@@ -117,6 +117,14 @@ TEST_DATA_AMENDMENT_CHANGE_TYPE = [
     (model_utils.REG_TYPE_AMEND_DEBTOR_TRANSFER, False),
     (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
     (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
+]
+# testdata pattern is ({desc}, {reg_num}, {doc_name})
+TEST_DATA_DOC_STORAGE_NAME = [
+    ('Financing', 'TEST0001', 'ppsalien-200000000-TEST0001.pdf'),
+    ('Discharge', 'TEST00D4', 'discharge-200000004-TEST00D4.pdf'),
+    ('Renewal', 'TEST00R5', 'renewal-200000006-TEST00R5.pdf'),
+    ('Change', 'TEST0008', 'change-200000009-TEST0008.pdf'),
+    ('Amendment', 'TEST0007', 'amendment-200000008-TEST0007.pdf')
 ]
 
 
@@ -413,3 +421,14 @@ def test_valid_court_order_date(session, financing_ts, renewal_ts, today_offset,
     test_valid = model_utils.valid_court_order_date(reg_ts, test_renew_ts)
     # print(financing_ts + ' ' + test_renew_ts)
     assert test_valid == valid
+
+
+@pytest.mark.parametrize('desc,reg_num,doc_name', TEST_DATA_DOC_STORAGE_NAME)
+def test_doc_storage_name(session, desc, reg_num, doc_name):
+    """Assert that building a storage document name works as expected."""
+    registration: Registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
+    test_name = registration.registration_ts.isoformat()[:10]
+    test_name = test_name.replace('-', '/') + '/' + registration.registration_type_cl.lower() + \
+                '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
+    name = model_utils.get_doc_storage_name(registration)
+    assert test_name == name

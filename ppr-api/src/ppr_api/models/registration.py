@@ -145,6 +145,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     draft = db.relationship('Draft', foreign_keys=[draft_id], uselist=False)
     trust_indenture = db.relationship('TrustIndenture', back_populates='registration', uselist=False)
     court_order = db.relationship('CourtOrder', back_populates='registration', uselist=False)
+    verification_report = db.relationship('VerificationReport', back_populates='registration', uselist=False)
 
     document_number: str = None
 

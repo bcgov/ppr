@@ -21,6 +21,9 @@ TEST_SAVE_DOC_NAME = 'search-results-report-200000008.pdf'
 TEST_VERIFICATION_DOC_NAME = 'verification-mail-discharge-example.pdf'
 TEST_VERIFICATION_DATAFILE = 'tests/unit/callback/verification-mail-discharge-example.pdf'
 TEST_VERIFICATION_SAVE_DOC_NAME = 'PPRVER.999999.111111.04.01.2022.PDF'
+TEST_REGISTRATION_DOC_NAME = '2022/02/financing-200000000-TEST0001.pdf'
+TEST_REGISTRATION_DATAFILE = 'tests/unit/callback/ut-financing-200000000-TEST0001.pdf'
+TEST_REGISTRATION_SAVE_DOC_NAME = '2022/02/16/ut-verification-financing.pdf'
 
 
 def test_cs_get_document(session):
@@ -47,7 +50,7 @@ def test_cs_save_document(session):
 
 
 def test_cs_get_verification_document(session):
-    """Assert that getting a verification statement document from google cloud storage works as expected."""
+    """Assert that getting a mail verification statement document from google cloud storage works as expected."""
     raw_data = GoogleStorageService.get_document(TEST_VERIFICATION_DOC_NAME, DocumentTypes.VERIFICATION_MAIL)
     assert raw_data
     assert len(raw_data) > 0
@@ -57,7 +60,7 @@ def test_cs_get_verification_document(session):
 
 
 def test_cs_save_verification_document(session):
-    """Assert that saving a verification statement document to google cloud storage works as expected."""
+    """Assert that saving a mail verification statement document to google cloud storage works as expected."""
     raw_data = None
     with open(TEST_VERIFICATION_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -68,3 +71,27 @@ def test_cs_save_verification_document(session):
     print(response)
     assert response
     assert response['name'] == TEST_VERIFICATION_SAVE_DOC_NAME
+
+
+def test_cs_get_registration_document(session):
+    """Assert that getting a registration verification statement from google cloud storage works as expected."""
+    raw_data = GoogleStorageService.get_document(TEST_REGISTRATION_DOC_NAME, DocumentTypes.REGISTRATION)
+    assert raw_data
+    assert len(raw_data) > 0
+    with open(TEST_REGISTRATION_DATAFILE, "wb") as pdf_file:
+        pdf_file.write(raw_data)
+        pdf_file.close()
+
+
+def test_cs_save_registration_document(session):
+    """Assert that saving a registration verification statement to google cloud storage works as expected."""
+    raw_data = None
+    with open(TEST_REGISTRATION_DATAFILE, 'rb') as data_file:
+        raw_data = data_file.read()
+        data_file.close()
+
+    response = GoogleStorageService.save_document(TEST_REGISTRATION_SAVE_DOC_NAME, raw_data,
+                                                  DocumentTypes.REGISTRATION)
+    print(response)
+    assert response
+    assert response['name'] == TEST_REGISTRATION_SAVE_DOC_NAME

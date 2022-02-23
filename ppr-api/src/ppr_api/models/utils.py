@@ -718,6 +718,14 @@ def today_local():
     return now_ts().astimezone(LOCAL_TZ)
 
 
+def get_doc_storage_name(registration):
+    """Get a document storage name from the registration in the format YYYY/MM/DD/reg_class-reg_id-reg_num.pdf."""
+    name = registration.registration_ts.isoformat()[:10]
+    name = name.replace('-', '/') + '/' + registration.registration_type_cl.lower()
+    name += '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
+    return name
+
+
 def is_historical(financing_statement, create: bool):
     """Check if a financing statement is in a historical, non-viewable state."""
     if financing_statement.state_type == STATE_ACTIVE and financing_statement.expire_date and \

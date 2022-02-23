@@ -458,6 +458,10 @@ def test_create(session, client, jwt, requests_mock, desc, json_data, roles, sta
 
     # check
     assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        registration: Registration = Registration.find_by_registration_number(response.json['baseRegistrationNumber'],
+                                                                             'PS12345', True)
+        assert registration.verification_report
 
 
 @pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_CREATE_DATA)

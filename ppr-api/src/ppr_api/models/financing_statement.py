@@ -436,7 +436,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                                    Registration.registration_num == registration_num,
                                    Registration.registration_type_cl.in_(['PPSALIEN', 'MISCLIEN', 'CROWNLIEN'])).\
                                    one_or_none()
-                current_app.logger.error('find_by_registration_number have result for' + registration_num)
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_registration_number exception: ' + repr(db_exception))
                 raise DatabaseException(db_exception)
