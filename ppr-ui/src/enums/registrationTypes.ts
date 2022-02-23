@@ -120,20 +120,20 @@ export enum APIAmendmentTypes {
 
 export enum UIAmendmentTypes {
     AMENDMENT = 'Amendment',
-    CHANGE_COLLATERAL_ADDITION = 'Collateral Addition',
-    CHANGE_COLLATERAL_SUBSTITUTION = 'Collateral Substitution',
-    CHANGE_DEBTOR_RELEASE = 'Debtor Release',
-    CHANGE_DEBTOR_TRANSFER = 'Debtor Transfer',
-    CHANGE_PARTIAL_DISCHARGE = 'Partial Discharge',
+    CHANGE_COLLATERAL_ADDITION = 'Amendment - Collateral Added',
+    CHANGE_COLLATERAL_SUBSTITUTION = 'Amendment - Collateral Amended',
+    CHANGE_DEBTOR_RELEASE = 'Amendment - Debtors Deletede',
+    CHANGE_DEBTOR_TRANSFER = 'Amendment - Debtors Amended',
+    CHANGE_PARTIAL_DISCHARGE = 'Amendment - Collateral Deleted',
     CHANGE_REGISTRY_CORRECTION = 'Registry Correction',
-    CHANGE_SECURED_PARTY_TRANSFER = 'Secured Party Transfer',
-    COURT_ORDER = 'Court Order',
-    COLLATERAL_ADDITION = 'Collateral Addition',
-    COLLATERAL_SUBSTITUTION = 'Collateral Substitution',
-    DEBTOR_TRANSFER = 'Debtor Transfer',
-    DEBTOR_RELEASE = 'Debtor Release',
+    CHANGE_SECURED_PARTY_TRANSFER = 'Amendment - Secured Parties Amended',
+    COURT_ORDER = 'Amendment - Court Order',
+    COLLATERAL_ADDITION = 'Amendment - Collateral Added',
+    COLLATERAL_SUBSTITUTION = 'Amendment - Collateral Amended',
+    DEBTOR_TRANSFER = 'Amendment - Debtors Amended',
+    DEBTOR_RELEASE = 'Amendment - Debtors Deleted',
     DISCHARGE = 'Discharge',
     RENEWAL = 'Renewal',
-    PARTIAL_DISCHARGE = 'Partial Discharge',
-    SECURED_PARTY_TRANSFER = 'Secured Party Transfer'
+    PARTIAL_DISCHARGE = 'Amendment - Collateral Deleted',
+    SECURED_PARTY_TRANSFER = 'Amendment - Secured Parties Amended'
 }
