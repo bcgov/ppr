@@ -291,9 +291,12 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''
         elif statement['registrationNumber'] not in ('TEST0019', 'TEST0021'):
-            assert statement['path']
             assert statement['registeringName']
             assert statement['clientReferenceId']
+        if statement['registrationNumber'] in ('TEST0001', 'TEST0019', 'TEST0021'):
+            assert not statement['path']
+        else:
+            assert statement['path']
         assert statement['baseRegistrationNumber']
         if reg_num == 'TEST0018A':
             assert len(statement['changes']) > 0
@@ -308,6 +311,13 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
                 assert change['registeringParty']
                 assert change['securedParties']
                 if change['baseRegistrationNumber'] not in ('TEST0019', 'TEST0021'):
-                    assert change['path']
                     assert change['registeringName']
                     assert change['clientReferenceId']
+                if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
+                    assert not change['path']
+                elif change.get('registrationNumber', '') == 'TEST00R5' or \
+                        change.get('registrationNumber', '') == 'TEST00D4' or \
+                        change.get('registrationNumber', '') == 'TEST0007':
+                    assert not change['path']
+                else:
+                    assert change['path']

@@ -161,7 +161,7 @@ def build_account_collapsed_filter_json(financing_json, registrations_json, para
     return financing_json
 
 
-def set_path(params: AccountRegistrationParams, result, reg_num: str, base_reg_num: str):
+def set_path(params: AccountRegistrationParams, result, reg_num: str, base_reg_num: str, pending_count: int = 0):
     """Set path to the verification statement."""
     reg_class = result['registrationClass']
     if model_utils.is_financing(reg_class):
@@ -176,7 +176,7 @@ def set_path(params: AccountRegistrationParams, result, reg_num: str, base_reg_n
     elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
         result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
-    if not can_access_report(params.account_id, params.account_name, result, params.sbc_staff):
+    if pending_count > 0 or not can_access_report(params.account_id, params.account_name, result, params.sbc_staff):
         result['path'] = ''
 
     return result
@@ -364,7 +364,7 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
     }
     if model_utils.is_financing(reg_class):
         result['expand'] = False
-    result = set_path(params, result, reg_num, base_reg_num)
+    result = set_path(params, result, reg_num, base_reg_num, int(mapping['pending_count']))
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
     if 'accountId' in result:
         del result['accountId']  # Only use this for report access checking.
