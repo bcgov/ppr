@@ -42,9 +42,9 @@ export function getKeycloakRoles (): Array<string> {
 }
 
 export async function getStaffegisteringParty (isBcOnline: boolean): Promise<PartyIF> {
-  let partyCode = '99990008'
+  let partyCode = sessionStorage.getItem(SessionStorageKeys.PprStaffPartyCode)
   if (isBcOnline) {
-    partyCode = '99980001'
+    partyCode = sessionStorage.getItem(SessionStorageKeys.BcolStaffPartyCode)
   }
   const response: [SearchPartyIF] = await partyCodeSearch(
     partyCode,

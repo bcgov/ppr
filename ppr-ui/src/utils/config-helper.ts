@@ -90,6 +90,16 @@ export async function fetchConfig (): Promise<any> {
     console.info('Set Launch Darkly Client ID.')
   }
 
+  const pprStaffPartyCode: string = response.data.PPR_STAFF_PARTY_CODE
+  if (pprStaffPartyCode) {
+    sessionStorage.setItem('PPR_STAFF_PARTY_CODE', pprStaffPartyCode)
+  }
+
+  const bcolStaffPartyCode: string = response.data.BCOL_STAFF_PARTY_CODE
+  if (bcolStaffPartyCode) {
+    sessionStorage.setItem('BCOL_STAFF_PARTY_CODE', bcolStaffPartyCode)
+  }
+
   const sentryEnable = response.data.SENTRY_ENABLE;
   (<any>window).sentryEnable = sentryEnable
 
