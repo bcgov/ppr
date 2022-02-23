@@ -25,7 +25,7 @@
     "http-status-codes": "^2.1.4",
     "material-design-icons": "^3.0.1",
     "moment": "^2.29.1",
-    "sbc-common-components": "2.4.38",
+    "sbc-common-components": "2.4.4",
     "sinon": "^9.2.4",
     "vue": "^2.6.12",
     "vue-affix": "^0.5.2",
