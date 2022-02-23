@@ -2,8 +2,10 @@ import Axios from 'axios'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import * as Sentry from '@sentry/browser'
 
+// Create the axios instance for the pay-api
 const axios = Axios.create()
 
+// Set the request headers for all pay-api requests: Authorization, Account-Id
 axios.interceptors.request.use(
   config => {
     config.headers.common.Authorization = `Bearer ${sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)}`
