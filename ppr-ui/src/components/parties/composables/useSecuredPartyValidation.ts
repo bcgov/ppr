@@ -30,7 +30,7 @@ export const useSecuredPartyValidation = () => {
       form.personName.last = form.personName.last.trim()
     }
     if (isBusiness === true) {
-      if (form.businessName.length === 0) {
+      if (!form.businessName || form.businessName.length === 0) {
         errors.value.businessName = {
           type: 'NAME',
           succeeded: false,
@@ -40,7 +40,7 @@ export const useSecuredPartyValidation = () => {
         errors.value = resetError('businessName', errors.value)
       }
     } else {
-      if (form.personName.first.length === 0) {
+      if (!form.personName || form.personName.first.length === 0) {
         errors.value.first = {
           type: 'NAME',
           succeeded: false,
@@ -49,7 +49,7 @@ export const useSecuredPartyValidation = () => {
       } else {
         errors.value = resetError('first', errors.value)
       }
-      if (form.personName.last.length === 0) {
+      if (!form.personName || form.personName.last.length === 0) {
         errors.value.last = {
           type: 'NAME',
           succeeded: false,
