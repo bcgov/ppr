@@ -129,12 +129,24 @@ describe('Dashboard component', () => {
     wrapper.destroy()
   })
 
-  it('renders Dashboard View with child components', () => {
+  it('renders Dashboard View with child components', async () => {
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     expect(wrapper.findComponent(SearchBar).exists()).toBe(true)
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    // fee settings set correctly based on store
+    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBeNull()
+    expect(wrapper.findComponent(SearchBar).vm.$props.isNonBillable).toBe(false)
+    expect(wrapper.findComponent(SearchBar).vm.$props.serviceFee).toBe(1.50)
+    // update fee settings and check search bar updates
+    wrapper.vm.$store.state.stateModel.userInfo.feeSettings = {
+      isNonBillable: true,
+      serviceFee: 1
+    }
+    await flushPromises()
+    expect(wrapper.findComponent(SearchBar).vm.$props.isNonBillable).toBe(true)
+    expect(wrapper.findComponent(SearchBar).vm.$props.serviceFee).toBe(1)
     // dialogs
     expect(wrapper.find(myRegAddDialog).exists()).toBe(true)
     expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(false)

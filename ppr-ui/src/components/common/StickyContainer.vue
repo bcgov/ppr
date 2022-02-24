@@ -2,6 +2,7 @@
   <div>
     <fee-summary
       v-if="showFeeSummary"
+      :setFeeOverride="feeOverride"
       :setFeeType="feeType"
       :setRegistrationLength="registrationLength"
       :setRegistrationType="registrationType"
@@ -42,7 +43,7 @@ import { FeeSummary } from '@/composables/fees'
 // local enums/interfaces/etc.
 import { UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums' // eslint-disable-line no-unused-vars
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'StickyContainer',
@@ -96,9 +97,10 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      isRoleStaffReg,
-      isRoleStaffSbc
-    } = useGetters<any>(['isRoleStaffReg', 'isRoleStaffSbc'])
+      getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc
+    } = useGetters<any>(
+      ['getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc']
+    )
 
     const localState = reactive({
       backBtn: props.setBackBtn,
@@ -114,6 +116,17 @@ export default defineComponent({
       submitBtn: props.setSubmitBtn,
       saveBtn: props.setSaveBtn,
       disableSubmitBtn: props.setDisableSubmitBtn,
+      feeOverride: computed(() => {
+        if (isNonBillable.value) {
+          return {
+            feeAmount: 0,
+            processingFee: null, // not used in override
+            quantity: null, // not used in override
+            serviceFee: getUserServiceFee.value as number
+          } as FeeSummaryI
+        }
+        return null
+      }),
       isStaffReg: computed(() => {
         return isRoleStaffReg.value as boolean
       }),

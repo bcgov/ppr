@@ -229,7 +229,9 @@ export default defineComponent({
     },
     defaultSearchValue: {
       type: String
-    }
+    },
+    isNonBillable: { default: false },
+    serviceFee: { default: 1.50 }
   },
   setup (props, { emit }) {
     const { setSearching, setStaffPayment } = useActions<any>(['setSearching', 'setStaffPayment'])
@@ -279,6 +281,18 @@ export default defineComponent({
       }),
       fee: computed((): string => {
         if (isRoleStaffSbc.value) return '10.00'
+        if (props.isNonBillable) {
+          const serviceFee = `${props.serviceFee}`
+          if (serviceFee.includes('.')) {
+            // the right side of the decimal
+            const decimalStr = serviceFee.substring(serviceFee.indexOf('.') + 1)
+            if (decimalStr.length === 2) return serviceFee
+            // else add zero
+            return serviceFee + '0'
+          }
+          // add decimal
+          return serviceFee + '.00'
+        }
         return '8.50'
       }),
       isIndividualDebtor: computed((): boolean => {

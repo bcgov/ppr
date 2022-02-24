@@ -107,6 +107,13 @@ describe('Sticky Container component tests', () => {
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(registrationLength)
     expect(wrapper.vm.$data.registrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+    // default has no fee override
+    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBe(null)
+    expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeOverride).toBeNull()
+    // updates fee summary when user is non billable
+    await wrapper.vm.$store.dispatch('setUserInfo', { feeSettings: { isNonBillable: true, serviceFee: 2.5 } })
+    const expectedFeeOveride = { feeAmount: 0, processingFee: null, quantity: null, serviceFee: 2.5 }
+    expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeOverride).toEqual(expectedFeeOveride)
 
     // updates fee summary with registration length chages
     const newRegistrationLength: RegistrationLengthI = {
