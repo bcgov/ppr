@@ -553,18 +553,22 @@ class Report:  # pylint: disable=too-few-public-methods
                             add_party['businessName'] != delete_party['businessName']:
                         add_party['name_change'] = True
                         delete_party['edit'] = True
+                        break
                     elif 'personName' in add_party and 'personName' in delete_party and \
                             add_party['personName'] != delete_party['personName']:
                         add_party['name_change'] = True
                         delete_party['edit'] = True
+                        break
                 elif 'businessName' in add_party and 'businessName' in delete_party and \
                         add_party['businessName'] == delete_party['businessName']:
                     add_party['address_change'] = True
                     delete_party['edit'] = True
+                    break
                 elif 'personName' in add_party and 'personName' in delete_party and \
                         add_party['personName'] == delete_party['personName']:
                     add_party['address_change'] = True
                     delete_party['edit'] = True
+                    break
 
     def _set_modified_parties(self, statement):
         """Replace amendment or change address country code with description. Set if party edited."""

@@ -910,10 +910,29 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     elif party.business_name:
                         former_name = party.business_name
                     else:
-                        former_name = party.last_name + ', ' + party.first_name
-                        if party.middle_initial:
-                            former_name += ' ' + party.middle_initial
-                    return former_name
+                        # match if only 1 name is different in addition to same address.
+                        former_name = self.__get_matching_party_name(new_party, party)
+                    if former_name:
+                        return former_name
+        return former_name
+
+    def __get_matching_party_name(self, new_party: Party, party: Party):
+        """Match name only if one name part has changed (addresses already match."""
+        former_name: str = ''
+        found: bool = False
+        if new_party.last_name == party.last_name and new_party.first_name != party.first_name:
+            found = True
+        elif new_party.last_name != party.last_name and new_party.first_name == party.first_name:
+            found = True
+        elif new_party.last_name == party.last_name and new_party.first_name == party.first_name:
+            if (new_party.middle_initial is None and party.middle_initial is not None) or \
+                    (new_party.middle_initial is not None and party.middle_initial is None) or \
+                    (new_party.middle_initial != party.middle_initial):
+                found = True
+        if found:
+            former_name = party.last_name + ', ' + party.first_name
+            if party.middle_initial:
+                former_name += ' ' + party.middle_initial
         return former_name
 
     def __get_renewal_rl_expiry(self):
