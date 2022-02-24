@@ -25,6 +25,10 @@ TEST_PAYLOAD_VERIFICATION = {
     'registrationId': 9999999,
     'partyId': 9999999
 }
+TEST_PAYLOAD_REGISTRATION = {
+    'registrationId': 9999999,
+    'partyId': 9999999
+}
 
 
 def test_publish_search_report(session):
@@ -52,3 +56,12 @@ def test_publish_verification_mail(session):
     if apikey:
         payload['apikey'] = apikey
     GoogleQueueService().publish_verification_report(payload)
+
+
+def test_publish_registration_report(session):
+    """Assert that enqueuing/publishing a registration report event works as expected."""
+    payload = TEST_PAYLOAD_REGISTRATION
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if apikey:
+        payload['apikey'] = apikey
+    GoogleQueueService().publish_registration_report(payload)

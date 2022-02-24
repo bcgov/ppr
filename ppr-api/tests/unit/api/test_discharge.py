@@ -23,6 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
+from ppr_api.models import Registration
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
@@ -212,6 +213,10 @@ def test_create_discharge(session, client, jwt, requests_mock, desc, json_data, 
 
     # check
     assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        reg_num = response.json['dischargeRegistrationNumber']
+        registration: Registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
+        assert registration.verification_report
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)

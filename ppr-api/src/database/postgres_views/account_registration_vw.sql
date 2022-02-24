@@ -34,7 +34,11 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                             FROM users u
                            WHERE u.username = r.user_id) END) AS registering_name,
        r.account_id AS orig_account_id,
-       r2.account_id AS base_account_id
+       r2.account_id AS base_account_id,
+       (SELECT COUNT(vr.id)
+          FROM verification_reports vr
+         WHERE vr.registration_id = r.id
+           AND vr.doc_storage_url IS NULL) AS pending_count          
  FROM registrations r, registration_types rt, financing_statements fs, registrations r2, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -82,7 +86,11 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                             FROM users u
                            WHERE u.username = r.user_id) END) AS registering_name,
        r.account_id AS orig_account_id,
-       r2.account_id AS base_account_id
+       r2.account_id AS base_account_id,
+       (SELECT COUNT(vr.id)
+          FROM verification_reports vr
+         WHERE vr.registration_id = r.id
+           AND vr.doc_storage_url IS NULL) AS pending_count          
   FROM registrations r, registration_types rt, financing_statements fs, user_extra_registrations uer, registrations r2, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id

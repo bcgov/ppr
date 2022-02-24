@@ -49,6 +49,7 @@ from .user import User
 from .user_extra_registration import UserExtraRegistration
 from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
+from .verification_report import VerificationReport
 
 
 __all__ = ('db',
@@ -56,4 +57,5 @@ __all__ = ('db',
            'FinancingStatement', 'GeneralCollateral', 'GeneralCollateralLegacy', 'Party', 'PartyType',
            'PreviousFinancingStatement', 'ProvinceType', 'Registration', 'RegistrationType', 'RegistrationTypeClass',
            'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType', 'TestSearchBatch', 'TestSearch',
-           'TestSearchResult', 'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile', 'VehicleCollateral')
+           'TestSearchResult', 'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile', 'VehicleCollateral',
+           'VerificationReport')

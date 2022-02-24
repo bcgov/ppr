@@ -17,8 +17,8 @@ from http import HTTPStatus
 
 from flask import jsonify, current_app, request
 
-from ppr_api.exceptions import BusinessException, ResourceErrorCodes
-from ppr_api.models import EventTracking, Party, Registration, utils as model_utils
+from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
+from ppr_api.models import EventTracking, Party, Registration, utils as model_utils, VerificationReport
 from ppr_api.models.registration import AccountRegistrationParams, CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from ppr_api.services.payment import TransactionTypes
@@ -471,7 +471,7 @@ def get_payment_details_financing(registration):
 
 
 def enqueue_verification_report(registration_id: int, party_id: int):
-    """Add the mail verification report request to the queue."""
+    """Add the mail verification report request to the mail verification queue."""
     try:
         payload = {
             'registrationId': registration_id,
@@ -481,12 +481,44 @@ def enqueue_verification_report(registration_id: int, party_id: int):
         if apikey:
             payload['apikey'] = apikey
         GoogleQueueService().publish_verification_report(payload)
-        current_app.logger.info(f'Enqueue verification report successful for id={registration_id}.')
+        current_app.logger.info(f'Enqueue mail verification report successful for id={registration_id}.')
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Enqueue verification report failed for id={registration_id}, party={party_id}: ' + str(err)
+        msg = f'Enqueue mail verification report failed for id={registration_id}, party={party_id}: ' + str(err)
         current_app.logger.error(msg)
         EventTracking.create(registration_id,
                              EventTracking.EventTrackingTypes.SURFACE_MAIL,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             msg)
+
+
+def enqueue_registration_report(registration: Registration, json_data: dict, report_type: str):
+    """Add the registration verification report request to the registration queue."""
+    try:
+        if json_data and report_type:
+            # Signal registration report request is pending: record exists but no doc_storage_url.
+            verification_report: VerificationReport = VerificationReport(create_ts=registration.registration_ts,
+                                                                         registration_id=registration.id,
+                                                                         report_data=json_data,
+                                                                         report_type=report_type)
+            verification_report.save()
+
+        payload = {
+            'registrationId': registration.id
+        }
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_registration_report(payload)
+        current_app.logger.info(f'Enqueue registration report successful for id={registration.id}.')
+    except DatabaseException as db_err:
+        # Just log, do not return an error response.
+        msg = f'Enqueue registration report db error for id={registration.id}: ' + str(db_err)
+        current_app.logger.error(msg)
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f'Enqueue registration report failed for id={registration.id}: ' + str(err)
+        current_app.logger.error(msg)
+        EventTracking.create(registration.id,
+                             EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
                              int(HTTPStatus.INTERNAL_SERVER_ERROR),
                              msg)
 

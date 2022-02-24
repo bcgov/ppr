@@ -486,7 +486,7 @@ SELECT COUNT(registration_id) AS reg_count
 QUERY_ACCOUNT_BASE_REG_BASE = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count
   FROM account_registration_vw arv
  WHERE arv.account_id = :query_account
    AND arv.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
@@ -502,7 +502,7 @@ QUERY_ACCOUNT_BASE_REG_FILTER = """
 SELECT * FROM (
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count
   FROM account_registration_vw arv1
  WHERE arv1.account_id = :query_account
    AND arv1.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
@@ -522,7 +522,7 @@ SELECT arv2.financing_id
 QUERY_ACCOUNT_CHANGE_REG = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND (account_id = :query_account OR base_account_id = :query_account)
@@ -533,7 +533,7 @@ ORDER BY registration_ts DESC
 QUERY_ACCOUNT_CHANGE_REG_FILTER = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND (account_id = :query_account OR base_account_id = :query_account)
@@ -716,6 +716,14 @@ def to_local_timestamp(utc_ts):
 def today_local():
     """Return today in the local timezone."""
     return now_ts().astimezone(LOCAL_TZ)
+
+
+def get_doc_storage_name(registration):
+    """Get a document storage name from the registration in the format YYYY/MM/DD/reg_class-reg_id-reg_num.pdf."""
+    name = registration.registration_ts.isoformat()[:10]
+    name = name.replace('-', '/') + '/' + registration.registration_type_cl.lower()
+    name += '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
+    return name
 
 
 def is_historical(financing_statement, create: bool):

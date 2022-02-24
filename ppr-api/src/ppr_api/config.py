@@ -179,6 +179,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_PS_SEARCH_REPORT_TOPIC = os.getenv('GCP_PS_SEARCH_REPORT_TOPIC')
     GCP_PS_NOTIFICATION_TOPIC = os.getenv('GCP_PS_NOTIFICATION_TOPIC')
     GCP_PS_VERIFICATION_REPORT_TOPIC = os.getenv('GCP_PS_VERIFICATION_REPORT_TOPIC')
+    GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv('GCP_PS_REGISTRATION_REPORT_TOPIC')
 
     GATEWAY_URL = os.getenv('GATEWAY_URL', 'https://bcregistry-dev.apigee.net')
     SUBSCRIPTION_API_KEY = os.getenv('SUBSCRIPTION_API_KEY')
@@ -187,6 +188,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     SURFACE_MAIL_TARGET_PATH = os.getenv('SURFACE_MAIL_TARGET_PATH', 'FIN_PPR/TEST')
     # Storage of verification mail reports
     GCP_CS_BUCKET_ID_VERIFICATION = os.getenv('GCP_CS_BUCKET_ID_VERIFICATION', 'ppr_verification_report_dev')
+    # Storage of registration verification reports
+    GCP_CS_BUCKET_ID_REGISTRATION = os.getenv('GCP_CS_BUCKET_ID_REGISTRATION', 'ppr_registration_report_dev')
 
     # Search results data size threshold for real time reports.
     MAX_SIZE_SEARCH_RT: int = int(os.getenv('MAX_SIZE_SEARCH_RT', '650000'))

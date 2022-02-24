@@ -34,16 +34,18 @@ class GoogleQueueService():
         self.search_report_topic = str(current_app.config.get('GCP_PS_SEARCH_REPORT_TOPIC'))
         self.notification_topic = str(current_app.config.get('GCP_PS_NOTIFICATION_TOPIC'))
         self.verification_report_topic = str(current_app.config.get('GCP_PS_VERIFICATION_REPORT_TOPIC'))
+        self.registration_report_topic = str(current_app.config.get('GCP_PS_REGISTRATION_REPORT_TOPIC'))
         self.search_report_topic_name = f'projects/{self.project_id}/topics/{self.search_report_topic}'
         self.notification_topic_name = f'projects/{self.project_id}/topics/{self.notification_topic}'
         self.verification_report_topic_name = f'projects/{self.project_id}/topics/{self.verification_report_topic}'
+        self.registration_report_topic_name = f'projects/{self.project_id}/topics/{self.registration_report_topic}'
 
     def publish_search_report(self, payload):
         """Publish the search report request json payload to the Queue Service."""
         try:
             self.publish(self.search_report_topic_name, payload)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            current_app.logger.error('Error: ' + repr(err))
+            current_app.logger.error('Error publish_search_report: ' + str(err))
             raise err
 
     def publish_notification(self, payload):
@@ -51,15 +53,23 @@ class GoogleQueueService():
         try:
             self.publish(self.notification_topic_name, payload)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            current_app.logger.error('Error: ' + repr(err))
+            current_app.logger.error('Erro publish_notification: ' + str(err))
             raise err
 
     def publish_verification_report(self, payload):
-        """Publish the registration verification request json payload to the Queue Service."""
+        """Publish the BCMail+ registration verification request json payload to the Queue Service."""
         try:
             self.publish(self.verification_report_topic_name, payload)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            current_app.logger.error('Error: ' + repr(err))
+            current_app.logger.error('Error publish_verification_report: ' + str(err))
+            raise err
+
+    def publish_registration_report(self, payload):
+        """Publish the API registration verification request json payload to the Queue Service."""
+        try:
+            self.publish(self.registration_report_topic_name, payload)
+        except Exception as err:  # pylint: disable=broad-except # noqa F841;
+            current_app.logger.error('Error publish_registration_report: ' + str(err))
             raise err
 
     def publish(self, topic_name, payload_json):

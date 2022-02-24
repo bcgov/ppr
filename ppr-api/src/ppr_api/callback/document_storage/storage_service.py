@@ -14,6 +14,7 @@
 """This class is a wrapper for document storage API calls."""
 import os
 import json
+import urllib.parse
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -34,6 +35,7 @@ class DocumentTypes(str, Enum):
 
     SEARCH_RESULTS = 'SEARCH_RESULTS'
     VERIFICATION_MAIL = 'VERIFICATION_MAIL'
+    REGISTRATION = 'REGISTRATION'
 
 
 class StorageService(ABC):  # pylint: disable=too-few-public-methods
@@ -59,6 +61,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     # Google cloud storage configuration.
     GCP_BUCKET_ID = str(os.getenv('GCP_CS_BUCKET_ID'))
     GCP_BUCKET_ID_VERIFICATION = str(os.getenv('GCP_CS_BUCKET_ID_VERIFICATION'))
+    GCP_BUCKET_ID_REGISTRATION = str(os.getenv('GCP_CS_BUCKET_ID_REGISTRATION'))
     GCP_URL = str(os.getenv('GCP_CS_URL', 'https://storage.googleapis.com'))
     DOC_URL = GCP_URL + '/storage/v1/b/{bucket_id}/o/{name}'
     GET_DOC_URL = DOC_URL + '?alt=media'
@@ -70,7 +73,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         """Fetch the uniquely named document from cloud storage as binary data."""
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
-            url = cls.GET_DOC_URL.format(bucket_id=bucket_id, name=name)
+            url = cls.GET_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=""))
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Fetching doc with GET ' + url)
             return cls.__call_api(HTTP_GET, url, token)
@@ -86,7 +89,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         """Delete the uniquely named document from cloud storage (unit testing only)."""
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
-            url = cls.DOC_URL.format(bucket_id=bucket_id, name=name)
+            url = cls.DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=""))
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Deleting doc with DELETE ' + url)
             return cls.__call_api(HTTP_DELETE, url, token)
@@ -99,7 +102,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         """Save or replace the named document in cloud storage with the binary data as the file contents."""
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
-            url = cls.UPLOAD_DOC_URL.format(bucket_id=bucket_id, name=name)
+            url = cls.UPLOAD_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=""))
             token = GoogleStorageTokenService.get_token()
             current_app.logger.info('Saving doc with POST ' + url)
             return cls.__call_api(HTTP_POST, url, token, raw_data)
@@ -117,6 +120,8 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             return cls.GCP_BUCKET_ID
         if doc_type == DocumentTypes.VERIFICATION_MAIL:
             return cls.GCP_BUCKET_ID_VERIFICATION
+        if doc_type == DocumentTypes.REGISTRATION:
+            return cls.GCP_BUCKET_ID_REGISTRATION
         return cls.GCP_BUCKET_ID
 
     @classmethod

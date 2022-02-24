@@ -307,6 +307,10 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
 
     # check
     assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        reg_num = response.json['renewalRegistrationNumber']
+        registration: Registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
+        assert registration.verification_report
 
 
 @pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_CREATE_DATA)
