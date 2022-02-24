@@ -200,7 +200,7 @@ export default defineComponent({
       let email = ''
       if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
         update = true
-        const regParty = await getRegisteringPartyFromAuth(false)
+        const regParty = await getRegisteringPartyFromAuth()
         if (regParty) {
           certifyInfo.registeringParty = regParty
         }

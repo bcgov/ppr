@@ -41,65 +41,68 @@ export function getKeycloakRoles (): Array<string> {
   throw new Error('Error getting Keycloak roles')
 }
 
-// Get registering party from auth api /api/v1/orgs/{org_id}
-export async function getRegisteringPartyFromAuth (isPprStaff: boolean): Promise<PartyIF> {
-  let accountId
-  const url = sessionStorage.getItem('AUTH_API_URL')
-  if (!isPprStaff) {
-    const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
-    const accountInfo = JSON.parse(currentAccount)
-    accountId = accountInfo.id
-
-    const config = { baseURL: url, headers: { Accept: 'application/json' } }
-    return axios.get(`orgs/${accountId}`, config)
-      .then(
-        response => {
-          const data = response?.data
-          if (!data) {
-            throw new Error('Unable to obtain Registering Party from Account Information.')
-          }
-          // If no api address registering party validation should fail.
-          const address: AddressIF = {
-            street: data?.mailingAddress?.street || '',
-            streetAdditional: data?.mailingAddress?.streetAdditional,
-            city: data?.mailingAddress?.city || '',
-            region: data?.mailingAddress?.region || '',
-            postalCode: data?.mailingAddress?.postalCode || '',
-            country: data?.mailingAddress?.country || '',
-            deliveryInstructions: '' // Not used by PPR or returned by the api.
-          }
-          // Auth API account name is always business name.
-          // No client party code or email is available via the auth api.
-          const party: PartyIF = {
-            businessName: data.businessName || data.name,
-            emailAddress: '',
-            code: '',
-            address: address
-          }
-          return party
-        }
-      ).catch(
-        error => {
-          throw new Error('Auth API error getting Registering Party: status code = ' +
-                          error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
-        }
-      )
-  } else {
-    const response: [SearchPartyIF] = await partyCodeSearch(
-      '99990008',
-      true
-    )
-    if (response?.length > 0) {
-      const party: PartyIF = {
-        businessName: response[0].businessName,
-        emailAddress: response[0].emailAddress,
-        code: response[0].code,
-        address: response[0].address
-      }
-      return party
-    }
-    throw new Error('Auth API error getting Registering Party: status code = ' + StatusCodes.NOT_FOUND.toString())
+export async function getStaffegisteringParty (isBcOnline: boolean): Promise<PartyIF> {
+  let partyCode = sessionStorage.getItem('PPR_STAFF_PARTY_CODE')
+  if (isBcOnline) {
+    partyCode = sessionStorage.getItem('BCOL_STAFF_PARTY_CODE')
   }
+  const response: [SearchPartyIF] = await partyCodeSearch(
+    partyCode,
+    true
+  )
+  if (response?.length > 0) {
+    const party: PartyIF = {
+      businessName: response[0].businessName,
+      emailAddress: response[0].emailAddress,
+      code: response[0].code,
+      address: response[0].address
+    }
+    return party
+  }
+  throw new Error('Auth API error getting Registering Party: status code = ' + StatusCodes.NOT_FOUND.toString())
+}
+
+// Get registering party from auth api /api/v1/orgs/{org_id}
+export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
+  const url = sessionStorage.getItem('AUTH_API_URL')
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountInfo = JSON.parse(currentAccount)
+  const accountId = accountInfo.id
+
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios.get(`orgs/${accountId}`, config)
+    .then(
+      response => {
+        const data = response?.data
+        if (!data) {
+          throw new Error('Unable to obtain Registering Party from Account Information.')
+        }
+        // If no api address registering party validation should fail.
+        const address: AddressIF = {
+          street: data?.mailingAddress?.street || '',
+          streetAdditional: data?.mailingAddress?.streetAdditional,
+          city: data?.mailingAddress?.city || '',
+          region: data?.mailingAddress?.region || '',
+          postalCode: data?.mailingAddress?.postalCode || '',
+          country: data?.mailingAddress?.country || '',
+          deliveryInstructions: '' // Not used by PPR or returned by the api.
+        }
+        // Auth API account name is always business name.
+        // No client party code or email is available via the auth api.
+        const party: PartyIF = {
+          businessName: data.businessName || data.name,
+          emailAddress: '',
+          code: '',
+          address: address
+        }
+        return party
+      }
+    ).catch(
+      error => {
+        throw new Error('Auth API error getting Registering Party: status code = ' +
+                        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+      }
+    )
 }
 
 // Get SBC info from auth api /api/v1/orgs/{org_id}
