@@ -132,7 +132,7 @@
         <span class="pl-1">PDF</span>
       </v-btn>
       <v-tooltip
-        v-else-if="!isDraft(item) && !item.registeringParty"
+        v-else-if="!isDraft(item) && !item.registeringName"
         class="pa-2"
         content-class="top-tooltip"
         nudge-right="2"
@@ -147,7 +147,7 @@
         </div>
       </v-tooltip>
       <v-tooltip
-        v-else-if="!isDraft(item) && item.registeringParty"
+        v-else-if="!isDraft(item) && item.registeringName"
         class="pa-2"
         content-class="top-tooltip"
         nudge-right="2"
