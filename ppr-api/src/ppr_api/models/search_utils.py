@@ -72,22 +72,25 @@ SELECT r2.registration_type, r2.registration_ts AS base_registration_ts,
 """
 
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
-MHR_NUM_QUERY = SERIAL_SEARCH_BASE + \
-    " AND sc.serial_type = 'MH' " + \
-     "AND sc.mhr_number = (SELECT searchkey_mhr(:query_value)) " + \
-"ORDER BY match_type, r.registration_ts ASC "
+MHR_NUM_QUERY = SERIAL_SEARCH_BASE + """
+   AND sc.serial_type = 'MH' 
+   AND sc.mhr_number = (SELECT searchkey_mhr(:query_value)) 
+ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
+"""
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
-SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + \
-    " AND sc.serial_type NOT IN ('AC', 'AF', 'AP') " + \
-     "AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value)) " + \
-"ORDER BY match_type, sc.serial_number "
+SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + """
+   AND sc.serial_type NOT IN ('AC', 'AF', 'AP')
+   AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value)) 
+ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
+"""
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
-AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + \
-    " AND sc.serial_type IN ('AC', 'AF', 'AP') " + \
-     "AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value)) " + \
-"ORDER BY match_type, sc.serial_number "
+AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + """
+   AND sc.serial_type IN ('AC', 'AF', 'AP')
+   AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value)) 
+ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
+"""
 
 BUSINESS_NAME_QUERY = """
 WITH q AS (
@@ -122,7 +125,7 @@ WHERE r.financing_id = fs.id
           OR (LENGTH(search_key) >= 3 AND LEVENSHTEIN(search_key, p.business_srch_key) <= 1) AND 
               p.bus_name_key_char1 = search_key_char1
     )
-ORDER BY match_type, p.business_name
+ORDER BY match_type, p.business_name ASC, r.registration_ts ASC
 """
 
 INDIVIDUAL_NAME_QUERY = """
@@ -156,7 +159,7 @@ WHERE r.financing_id = fs.id
    AND p.party_type = 'DI'
    AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
                                                            :query_first_quotient, :query_default_quotient))) 
-ORDER BY match_type, p.last_name, p.first_name
+ORDER BY match_type, p.last_name ASC, p.first_name ASC, p.middle_initial ASC, p.birth_date ASC,  r.registration_ts ASC
 """
 
 INDIVIDUAL_NAME_MIDDLE_QUERY = """
@@ -195,7 +198,7 @@ WHERE r.financing_id = fs.id
    AND p.party_type = 'DI'
    AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
                                                            :query_first_quotient, :query_default_quotient))) 
-ORDER BY match_type, p.last_name, p.first_name
+ORDER BY match_type, p.last_name ASC, p.first_name ASC, p.middle_initial ASC, p.birth_date ASC,  r.registration_ts ASC
 """
 
 # Total result count queries for serial number, debtor name searches:
