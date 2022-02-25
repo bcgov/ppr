@@ -14,7 +14,7 @@ import { FinancingStatementIF } from '@/interfaces'
 import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
-import { convertDate } from '@/utils'
+import { convertDate, pacificDate } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -87,9 +87,9 @@ describe('Tombstone component', () => {
     const extraInfo = wrapper.findAll(tombstoneInfo)
     expect(extraInfo.length).toBe(2)
     expect(extraInfo.at(0).text()).toContain('Base Registration Date and Time: ')
-    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true)?.trim())
+    expect(extraInfo.at(0).text()).toContain(pacificDate(new Date(registration.createDateTime))?.trim())
     expect(extraInfo.at(1).text()).toContain('Current Expiry Date and Time: ')
-    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true)?.trim())
+    expect(extraInfo.at(1).text()).toContain(pacificDate(new Date(registration.expiryDate))?.trim())
   })
 
   it('renders Tombstone component properly for Renewal', async () => {
@@ -104,9 +104,9 @@ describe('Tombstone component', () => {
     const extraInfo = wrapper.findAll(tombstoneInfo)
     expect(extraInfo.length).toBe(2)
     expect(extraInfo.at(0).text()).toContain('Base Registration Date and Time: ')
-    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true)?.trim())
+    expect(extraInfo.at(0).text()).toContain(pacificDate(new Date(registration.createDateTime))?.trim())
     expect(extraInfo.at(1).text()).toContain('Current Expiry Date and Time: ')
-    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true)?.trim())
+    expect(extraInfo.at(1).text()).toContain(pacificDate(new Date(registration.expiryDate))?.trim())
   })
 
   it('renders Tombstone component properly for Amendment', async () => {
@@ -121,8 +121,8 @@ describe('Tombstone component', () => {
     const extraInfo = wrapper.findAll(tombstoneInfo)
     expect(extraInfo.length).toBe(2)
     expect(extraInfo.at(0).text()).toContain('Base Registration Date and Time: ')
-    expect(extraInfo.at(0).text()).toContain(convertDate(new Date(registration.createDateTime), true, true)?.trim())
+    expect(extraInfo.at(0).text()).toContain(pacificDate(new Date(registration.createDateTime))?.trim())
     expect(extraInfo.at(1).text()).toContain('Current Expiry Date and Time: ')
-    expect(extraInfo.at(1).text()).toContain(convertDate(new Date(registration.expiryDate), true, true)?.trim())
+    expect(extraInfo.at(1).text()).toContain(pacificDate(new Date(registration.expiryDate))?.trim())
   })
 })

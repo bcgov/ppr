@@ -37,7 +37,7 @@
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
-import { convertDate } from '@/utils'
+import { pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 
 export default defineComponent({
@@ -58,14 +58,14 @@ export default defineComponent({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {
           const date = new Date(getRegistrationCreationDate.value)
-          return convertDate(date, true, true)
+          return pacificDate(date)
         }
         return ''
       }),
       expiryDate: computed((): string => {
         if (getRegistrationExpiryDate.value) {
           const date = new Date(getRegistrationExpiryDate.value)
-          return convertDate(date, true, true)
+          return pacificDate(date)
         }
         return 'No Expiry'
       }),

@@ -155,9 +155,9 @@ import {
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import {
-  convertDate,
   getFeatureFlag,
   getFinancingStatement,
+  pacificDate,
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
@@ -243,9 +243,9 @@ export default class AmendRegistration extends Vue {
   private get asOfDateTime (): string {
     // return formatted date
     if (this.financingStatementDate) {
-      return `${convertDate(this.financingStatementDate, true, true)}`
+      return `${pacificDate(this.financingStatementDate)}`
     }
-    return `${convertDate(new Date(), true, true)}`
+    return `${pacificDate(new Date())}`
   }
 
   private get isAuthenticated (): boolean {
