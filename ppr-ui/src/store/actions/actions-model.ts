@@ -9,6 +9,7 @@ import {
   DraftIF,
   LengthTrustIF,
   IndividualNameIF,
+  RegTableDataI,
   RegistrationTypeIF,
   SearchResponseIF,
   SearchTypeIF,
@@ -194,4 +195,8 @@ export const setFolioOrReferenceNumber: ActionIF = ({ commit }, refNumber: strin
 
 export const setShowStepErrors: ActionIF = ({ commit }, show: boolean): void => {
   commit('mutateShowStepErrors', show)
+}
+
+export const setRegTableData: ActionIF = ({ commit }, regTableData: RegTableDataI): void => {
+  commit('mutateRegistrationTable', regTableData)
 }

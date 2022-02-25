@@ -245,6 +245,7 @@ export default class ConfirmAmendment extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
+  @Action setRegTableData: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -562,15 +563,19 @@ export default class ConfirmAmendment extends Vue {
     this.submitting = true
     const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
     this.submitting = false
-    if (draft.error !== undefined) {
-      console.log(
-        'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
-      )
+    if (draft.error) {
+      this.emitError(draft.error)
+    } else {
+      // set new added reg
+      this.setRegTableData({
+        addedReg: draft.amendmentStatement.documentId,
+        addedRegParent: draft.amendmentStatement.baseRegistrationNumber
+      })
+      this.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      this.emitHaveData(false)
     }
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
   }
 
   @Throttle(2000)
@@ -597,6 +602,11 @@ export default class ConfirmAmendment extends Vue {
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
         this.emitError(apiResponse?.error)
       } else {
+        // set new added reg
+        this.setRegTableData({
+          addedReg: apiResponse.amendmentRegistrationNumber,
+          addedRegParent: apiResponse.baseRegistrationNumber
+        })
         // On success return to dashboard
         this.goToDashboard()
       }

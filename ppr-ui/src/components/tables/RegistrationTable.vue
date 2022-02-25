@@ -214,10 +214,11 @@
       </template>
       <template v-slot:item="{ expand, item, isExpanded }" class="registration-data-table">
         <table-row
-          :ref="isFirstItem(item) ? 'firstItem' : ''"
+          :ref="setRowRef(item)"
+          :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
           :setDisableActionShadow="overrideWidth"
           :setHeaders="headers"
-          :setIsExpanded="isExpanded"
+          :setIsExpanded="isExpanded || isNewRegParentItem(item)"
           :setItem="item"
           @action="emitRowAction($event)"
           @error="emitError($event)"
@@ -228,7 +229,9 @@
       <template v-slot:expanded-item="{ item }" class="registration-data-table">
         <table-row
           v-for="change in item.changes"
-          :key="change.documentId"
+          :key="`change-${change.documentId || change.registrationNumber}`"
+          :ref="setRowRef(change)"
+          :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(change))"
           :setDisableActionShadow="overrideWidth"
           :setChild="true"
           :setHeaders="headers"
@@ -274,7 +277,8 @@ import {
   BaseHeaderIF, // eslint-disable-line no-unused-vars
   DraftResultIF, // eslint-disable-line no-unused-vars
   RegistrationSortIF, // eslint-disable-line no-unused-vars
-  ErrorIF // eslint-disable-line no-unused-vars
+  ErrorIF, // eslint-disable-line no-unused-vars
+  RegTableDataI // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
   AccountProductCodes, // eslint-disable-line no-unused-vars
@@ -301,6 +305,10 @@ export default defineComponent({
     setMorePages: {
       default: false
     },
+    setNewRegData: {
+      default: { addedReg: '', addedRegParent: '' },
+      type: Object as () => RegTableDataI
+    },
     setSearch: {
       type: String,
       default: ''
@@ -316,8 +324,12 @@ export default defineComponent({
   setup (props, { emit }) {
     // refs
     const regTable = ref(null)
-    const firstItem = ref(null)
+    // refs for scrolling
     const datePicker = ref(null)
+    const firstItem = ref(null) // first item in table
+    const newRegItem = ref(null) // new item in table
+    const newAndFirstItem = ref(null) // new item and first item in table
+    // refs for setting header widths dynamically
     const tableHeaderRef = ref(null)
     const registrationNumberRef = ref(null)
     const registrationTypeRef = ref(null)
@@ -396,6 +408,7 @@ export default defineComponent({
       morePages: computed(() => {
         return props.setMorePages
       }),
+      newRegData: computed(() => { return props.setNewRegData }),
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
@@ -452,7 +465,7 @@ export default defineComponent({
       return ''
     }
 
-    const isFirstItem = (item: RegistrationSummaryIF | DraftResultIF) => {
+    const isFirstItem = (item: RegistrationSummaryIF | DraftResultIF): boolean => {
       const draftItem = item as DraftResultIF
       const firstBaseReg = localState.registrationHistory[0].baseRegistrationNumber
       const firstDocId = localState.registrationHistory[0].documentId
@@ -463,6 +476,46 @@ export default defineComponent({
         return true
       }
       return false
+    }
+
+    const isNewRegItem = (item: RegistrationSummaryIF | DraftResultIF): boolean => {
+      const draftItem = item as DraftResultIF
+      const regItem = item as RegistrationSummaryIF
+      if (regItem.registrationNumber && regItem.registrationNumber === localState.newRegData?.addedReg) {
+        // reg num is not blank and equals newly added reg num
+        return true
+      } else if (draftItem.documentId && draftItem.documentId === localState.newRegData?.addedReg) {
+        // doc id is not blank and equals newly added doc id
+        return true
+      }
+      return false
+    }
+
+    const isNewRegParentItem = (item: RegistrationSummaryIF): boolean => {
+      if (item.expand === undefined && item.changes !== undefined) item.expand = false
+      return (
+        localState.newRegData.addedRegParent !== '' &&
+        localState.newRegData.addedRegParent === item.registrationNumber
+      )
+    }
+
+    const scrollToRef = (ref: any): void => {
+      if (ref?.value?.$el?.scrollIntoView) {
+        ref.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      // if a child row it will be an array
+      if (ref?.value?.length > 0 && ref?.value[0].$el?.scrollIntoView) {
+        ref.value[0].$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }
+
+    const setRowRef = (item: RegistrationSummaryIF | DraftResultIF): string => {
+      const isFirst = isFirstItem(item)
+      const isNewReg = isNewRegItem(item)
+      if (isFirst && isNewReg) return 'newAndFirstItem'
+      if (isFirst) return 'firstItem'
+      if (isNewReg) return 'newRegItem'
+      return ''
     }
 
     const toggleOrderBy = (header: string, sortable: boolean) => {
@@ -476,10 +529,9 @@ export default defineComponent({
         orderBy.value = header
         orderVal.value = 'desc'
       }
-      // const wrapper = tableHeader.value
-      if (firstItem?.value?.$el?.scrollIntoView) {
-        firstItem.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+      // need both (only one ref will scroll)
+      scrollToRef(firstItem)
+      scrollToRef(newAndFirstItem)
     }
 
     const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
@@ -540,9 +592,10 @@ export default defineComponent({
       ], _.debounce((
         [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal]
       ) => {
-        if (firstItem?.value?.$el?.scrollIntoView) {
-          firstItem.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
+        // need both (only one ref will scroll)
+        scrollToRef(firstItem)
+        scrollToRef(newAndFirstItem)
+
         emit('sort', {
           sortOptions: {
             endDate: endDate,
@@ -574,6 +627,13 @@ export default defineComponent({
           localState.overrideWidth = true
         }
       }
+
+      // if new reg -> scroll to new reg
+      if (localState.newRegData?.addedReg) {
+        // need both (only one ref will scroll)
+        scrollToRef(newRegItem)
+        scrollToRef(newAndFirstItem)
+      }
     })
 
     return {
@@ -584,12 +644,17 @@ export default defineComponent({
       firstItem,
       getHeaderStyle,
       getNext,
-      isFirstItem,
+      isNewRegItem,
+      isNewRegParentItem,
+      newRegItem,
+      newAndFirstItem,
       orderBy,
       orderVal,
       registrationNumber,
       registrationType,
       regTable,
+      scrollToRef,
+      setRowRef,
       shouldClearType,
       selectRegistration,
       toggleOrderBy,

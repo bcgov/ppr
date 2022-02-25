@@ -18,7 +18,7 @@ import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
 import { RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF, RegTableDataI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   amendConfirmationDialog,
@@ -165,7 +165,7 @@ describe('Dashboard component', () => {
   })
 
   it('displays default search history header', () => {
-    expect(wrapper.vm.getSearchHistory).toBeNull // eslint-disable-line no-unused-expressions
+    expect(wrapper.vm.getSearchHistory).toEqual({ searches: [] })
     expect(wrapper.vm.searchHistoryLength).toBe(0)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
@@ -288,6 +288,7 @@ describe('Dashboard registration table tests', () => {
   // setup baseReg with added child draft
   const baseReg = { ...mockedRegistration1 }
   baseReg.changes = [{ ...mockedDraftAmend }]
+  baseReg.expand = false
   const myRegHistoryWithChildren = [baseReg]
   const newColumnSelection = [...registrationTableHeaders].slice(3)
 
@@ -583,6 +584,16 @@ describe('Dashboard add registration tests', () => {
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.setMessage).toBe(
       'Registration was successfully added to your table.'
     )
+    // reg table data updated with new reg
+    const expectedRegTableData: RegTableDataI = { addedReg: myRegAdd.registrationNumber, addedRegParent: '' }
+    expect(wrapper.vm.$store.state.stateModel.registrationTable).toEqual(expectedRegTableData)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegData).toEqual(expectedRegTableData)
+    // reg table data updated with blank values after 5 sec
+    const emptyRegTableData: RegTableDataI = { addedReg: '', addedRegParent: '' }
+    setTimeout(() => {
+      expect(wrapper.vm.$store.state.stateModel.registrationTable).toEqual(emptyRegTableData)
+      expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegData).toEqual(emptyRegTableData)
+    }, 5100)
   })
 })
 
