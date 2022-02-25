@@ -103,7 +103,7 @@
               <td>{{ getFormattedBirthdate(row.item) }}</td>
               <!-- Action Btns -->
               <td class="actions-width actions-cell px-0">
-                <div class="actions-up actions float-right">
+                <div class="actions-up actions float-right pr-4">
                   <span
                     v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                     || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
@@ -165,7 +165,7 @@
                   <span
                     v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                     && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
-                    class="undo-button mr-3"
+                    class="undo-button"
                   >
                     <v-btn
                       text
@@ -433,7 +433,7 @@ td {
 }
 
 .undo-button {
-  padding-right: 30px;
+  padding-right: 0px;
 }
 
 </style>

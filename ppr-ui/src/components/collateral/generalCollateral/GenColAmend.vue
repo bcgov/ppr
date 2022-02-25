@@ -11,7 +11,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col
+        <v-col class="summary-text"
           >Indicate the General Collateral to be deleted from or added to this
           registration.
         </v-col>
@@ -183,7 +183,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .border-error-left
 {
-  margin-left: -20px;
+  margin-left: -31px;
 }
 .border-over
 {

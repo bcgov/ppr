@@ -76,7 +76,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters v-if="hasVehicleCollateral()">
+    <v-row :class="showErrorBar ? 'error-margin' : ''" no-gutters v-if="hasVehicleCollateral()">
       <v-col>
         <div>
           <v-expand-transition>
@@ -545,6 +545,10 @@ td {
 
 .vehicle-cell {
   text-transform: uppercase;
+}
+
+.error-margin {
+  margin-left: -25px;
 }
 
 ::v-deep .v-chip .v-chip__content {
