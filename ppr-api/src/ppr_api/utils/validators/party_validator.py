@@ -34,7 +34,7 @@ INVALID_COUNTRY_SECURED = 'Secured Party country {} is invalid. '
 INVALID_REGION_SECURED = 'Secured Party region {} is invalid. '
 INVALID_COUNTRY_DEBTOR = 'Debtor country {} is invalid. '
 INVALID_REGION_DEBTOR = 'Debtor region {} is invalid. '
-CHARACTER_SET_UNSUPPORTED = 'The charcter set is not supported for name {}.\n'
+CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for name {}.\n'
 
 
 def validate_financing_parties(json_data):
