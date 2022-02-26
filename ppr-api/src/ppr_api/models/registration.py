@@ -911,12 +911,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         former_name = party.business_name
                     else:
                         # match if only 1 name is different in addition to same address.
-                        former_name = self.__get_matching_party_name(new_party, party)
+                        former_name = Registration.__get_matching_party_name(new_party, party)
                     if former_name:
                         return former_name
         return former_name
 
-    def __get_matching_party_name(self, new_party: Party, party: Party):
+    @staticmethod
+    def __get_matching_party_name(new_party: Party, party: Party):
         """Match name only if one name part has changed (addresses already match."""
         former_name: str = ''
         found: bool = False

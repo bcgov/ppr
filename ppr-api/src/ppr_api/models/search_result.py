@@ -25,6 +25,7 @@ from ppr_api.models import utils as model_utils
 
 from .db import db
 from .financing_statement import FinancingStatement
+from .search_request import SearchRequest
 from .search_utils import GET_DETAIL_DAYS_LIMIT
 
 
@@ -163,6 +164,79 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 if original['matchType'] != model_utils.SEARCH_MATCH_EXACT and \
                         original['baseRegistrationNumber'] == reg_num:
                     update_select.append(original)
+
+        # Now sort by search type.
+        if self.search.search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
+            return SearchResult.__sort_debtor_ind(update_select)
+        if self.search.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
+            return SearchResult.__sort_debtor_bus(update_select)
+        if self.search.search_type != SearchRequest.SearchTypes.REGISTRATION_NUM.value:
+            return SearchResult.__sort_serial_num(update_select)
+        return update_select
+
+    @classmethod
+    def __select_sort_ts(cls, item):
+        """Sort the match list by registration timestamp."""
+        return item['createDateTime']
+
+    @classmethod
+    def __select_sort_birth_date(cls, item):
+        """Sort the match list by individual debtor birthdate."""
+        return item['debtor'].get('birthDate', None)
+
+    @classmethod
+    def __select_sort_middle_name(cls, item):
+        """Sort the match list by individual debtor middle name."""
+        return item['debtor']['personName'].get(['middle'], None)
+
+    @classmethod
+    def __select_sort_first_name(cls, item):
+        """Sort the match list by individual debtor first name."""
+        return item['debtor']['personName']['first']
+
+    @classmethod
+    def __select_sort_last_name(cls, item):
+        """Sort the match list by individual debtor last name."""
+        return item['debtor']['personName']['last']
+
+    @classmethod
+    def __select_sort_bus_name(cls, item):
+        """Sort the match list by business debtor name."""
+        return item['debtor']['businessName']
+
+    @classmethod
+    def __select_sort_year(cls, item):
+        """Sort the match list by serial collateral year."""
+        return item['vehicleCollateral'].get('year', 0)
+
+    @classmethod
+    def __select_sort_serial_num(cls, item):
+        """Sort the match list by serial collateral serial number."""
+        return item['vehicleCollateral']['serialNumber']
+
+    @classmethod
+    def __sort_debtor_ind(cls, update_select):
+        """Sort selected individual debtor names."""
+        update_select.sort(key=SearchResult.__select_sort_birth_date)
+        update_select.sort(key=SearchResult.__select_sort_middle_name)
+        update_select.sort(key=SearchResult.__select_sort_first_name)
+        update_select.sort(key=SearchResult.__select_sort_last_name)
+        update_select.sort(key=SearchResult.__select_sort_ts)
+        return update_select
+
+    @classmethod
+    def __sort_debtor_bus(cls, update_select):
+        """Sort selected business debtor names."""
+        update_select.sort(key=SearchResult.__select_sort_bus_name)
+        update_select.sort(key=SearchResult.__select_sort_ts)
+        return update_select
+
+    @classmethod
+    def __sort_serial_num(cls, update_select):
+        """Sort selected serial numbers."""
+        update_select.sort(key=SearchResult.__select_sort_year)
+        update_select.sort(key=SearchResult.__select_sort_serial_num)
+        update_select.sort(key=SearchResult.__select_sort_ts)
         return update_select
 
     @classmethod

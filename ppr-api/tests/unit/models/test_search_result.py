@@ -44,33 +44,34 @@ SINGLE_RENEWAL_JSON = [{
     'registrationType': 'SA'
 }]
 SET_SELECT = [
-    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT', 'createDateTime': '2021-12-16T01:18:38+00:00',
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT', 'createDateTime': '2018-12-18T01:18:38+00:00',
      'registrationType': 'SA',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2018, 'make': 'HONDA',
-                           'model': 'CIVIC'}},
-    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT', 'createDateTime': '2021-12-16T01:18:38+00:00',
+                           'model': 'Sort 2'}},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT', 'createDateTime': '2019-12-18T01:18:38+00:00',
      'registrationType': 'SA',
-     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2014, 'make': 'BMW', 'model': 'Z4'}},
-    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-03T00:31:40+00:00',
-     'registrationType': 'SA',
-     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
-                           'model': 'TUCSON'}},
-    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2014, 'make': 'BMW',
+                           'model': 'Sort 4'}},
+    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR', 'createDateTime': '2020-12-03T00:31:40+00:00',
      'registrationType': 'SA',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
-                           'model': 'TUSCON'}},
+                           'model': 'Sort 5'}},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR', 'createDateTime': '2021-10-08T00:02:33+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'Sort 7'}},
     {'baseRegistrationNumber': '103838B', 'matchType': 'SIMILAR', 'createDateTime': '2021-10-08T00:02:33+00:00',
      'registrationType': 'RL',
-     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
-                           'model': 'TUCSON'}},
-    {'baseRegistrationNumber': 'TEST0002', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'Sort 6'}},
+    {'baseRegistrationNumber': 'TEST0002', 'matchType': 'SIMILAR', 'createDateTime': '2019-12-16T01:18:38+00:00',
      'registrationType': 'RL',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KX8J3CA46JU622994', 'year': 2014, 'make': 'HYUNDAI',
-                           'model': 'TUSCON'}},
-    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+                           'model': 'Sort 3'}},
+    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR', 'createDateTime': '2018-12-16T01:18:38+00:00',
      'registrationType': 'SA',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'YJ46JU622994', 'year': 2018, 'make': 'TESLA',
-                           'model': 'MODEL 3'}}
+                           'model': 'Sort 1'}}
 ]
 SEARCH_SELECT_1 = [
     {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT'},
@@ -113,6 +114,11 @@ TEST_SEARCH_SELECT_DATA = [
     ('EXACT missing 1 selection', SEARCH_SELECT_2, 2),
     ('Just 1 SIMILAR selection', SEARCH_SELECT_3, 3),
     ('All exact, 2 SIMILAR selection', SEARCH_SELECT_4, 4)
+]
+
+# testdata pattern is ({description}, {select_data}, {select_count}, {orig_data}, {search_type})
+TEST_SEARCH_SORT_DATA = [
+    ('Serial Number', SEARCH_SELECT_1, 7, SET_SELECT, SearchRequest.SearchTypes.SERIAL_NUM.value)
 ]
 
 
@@ -268,7 +274,8 @@ def test_search_history_sort(session, client, jwt):
 def test_set_search_select(session, client, jwt, desc, select_data, select_count):
     """Assert that submitting a new search selection with minimal data works as expected."""
     # setup
-    search_request: SearchRequest = SearchRequest(search_response=SET_SELECT)
+    search_request: SearchRequest = SearchRequest(search_response=SET_SELECT,
+                                                  search_type=SearchRequest.SearchTypes.SERIAL_NUM.value)
     search_result: SearchResult = SearchResult()
     search_result.search = search_request
 
@@ -289,3 +296,27 @@ def test_set_search_select(session, client, jwt, desc, select_data, select_count
         assert select['vehicleCollateral']['year']
         assert select['vehicleCollateral']['make']
         assert select['vehicleCollateral']['model']
+
+
+@pytest.mark.parametrize('desc,select_data,select_count,orig_data,search_type', TEST_SEARCH_SORT_DATA)
+def test_search_sort(session, client, jwt, desc, select_data, select_count, orig_data, search_type):
+    """Assert that submitting a new search selection is sorted as expected."""
+    # setup
+    search_request: SearchRequest = SearchRequest(search_response=orig_data, search_type=search_type)
+    search_result: SearchResult = SearchResult()
+    search_result.search = search_request
+
+    # test
+    selection = search_result.set_search_selection(select_data)
+
+    # check
+    assert selection
+    assert len(selection) == select_count
+    if search_type == SearchRequest.SearchTypes.SERIAL_NUM.value:
+        assert selection[0]['vehicleCollateral']['model'] == 'Sort 1'
+        assert selection[1]['vehicleCollateral']['model'] == 'Sort 2'
+        assert selection[2]['vehicleCollateral']['model'] == 'Sort 3'
+        assert selection[3]['vehicleCollateral']['model'] == 'Sort 4'
+        assert selection[4]['vehicleCollateral']['model'] == 'Sort 5'
+        assert selection[5]['vehicleCollateral']['model'] == 'Sort 6'
+        assert selection[6]['vehicleCollateral']['model'] == 'Sort 7'
