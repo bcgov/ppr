@@ -396,6 +396,9 @@ export default defineComponent({
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
       }),
+      containerClass: computed((): string => {
+        registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'
+      }),
       summaryView: props.isSummary,
       getMH: computed(function () {
         const vc = getVehicleCollateral.value as VehicleCollateralIF[]
@@ -553,7 +556,7 @@ td {
 
 .box-shadow-left {
   margin-left: -25px;
-  padding-left: 15px;
+  padding-left: 20px;
   box-shadow: -2px 0 0 #D3272C;
 }
 ::v-deep .v-chip .v-chip__content {
