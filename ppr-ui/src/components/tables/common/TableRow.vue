@@ -144,7 +144,7 @@
           <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
         </template>
         <div class="pt-2 pb-2">
-          {{ tooltipTxtPdf }}
+          {{ tooltipTxtPdf(item) }}
         </div>
       </v-tooltip>
     </td>
@@ -362,6 +362,18 @@ export default defineComponent({
       })
     }
 
+    const tooltipTxtPdf = (item: DraftResultIF): string => {
+      if (!item.registeringName) {
+        return 'Verification Statements are only available ' +
+      'to Secured Parties or the Registering Party of this filing. To ' +
+      'view the details of this registration you must conduct a search.'
+      } else {
+        return 'This is a large document that may take up to 20 minutes to generate. ' +
+        'The PDF version of this document will appear here once it\'s available. You may ' +
+        'need to refresh this page to display the PDF download icon.'
+      }
+    }
+
     const downloadPDF = async (path: string): Promise<any> => {
       localState.loadingPDF = path
       const pdf = await registrationPDF(path)
@@ -509,10 +521,6 @@ export default defineComponent({
     const toggleExpand = (val: any) => {
       emit('toggleExpand', val)
     }
-
-    const tooltipTxtPdf = 'Verification Statements are only available ' +
-      'to Secured Parties or the Registering Party of this filing. To ' +
-      'view the details of this registration you must conduct a search.'
 
     watch(() => props.setItem, (val) => {
     }, { deep: true, immediate: true })
