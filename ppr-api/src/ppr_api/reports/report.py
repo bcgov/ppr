@@ -664,6 +664,7 @@ class Report:  # pylint: disable=too-few-public-methods
             new_selected = []
             exact_match_count = 0
             length = len(self._report_data['selected'])
+            reg_count: int = 0  # Only count first match if duplicates.
             for index, result in enumerate(self._report_data['selected'], start=0):
                 # Use these for formatting.
                 if (index + 1) < length and result['baseRegistrationNumber'] == \
@@ -676,6 +677,8 @@ class Report:  # pylint: disable=too-few-public-methods
                     result['duplicate'] = True
                 else:
                     result['duplicate'] = False
+                    reg_count += 1
+                    result['index'] = reg_count
                 result['createDateTime'] = Report._to_report_datetime(result['createDateTime'], False)
                 if result['matchType'] == 'EXACT' or 'selected' not in result or result['selected']:
                     if result['matchType'] == 'EXACT':
@@ -688,6 +691,7 @@ class Report:  # pylint: disable=too-few-public-methods
                     new_selected.append(result)
             self._report_data['selected'] = new_selected
             self._report_data['exactMatchCount'] = exact_match_count
+            self._report_data['totalResultsSize'] = reg_count  # Number of selected distinct registrations.
 
     @staticmethod
     def _format_address(address):

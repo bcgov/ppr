@@ -182,12 +182,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def __select_sort_birth_date(cls, item):
         """Sort the match list by individual debtor birthdate."""
-        return item['debtor'].get('birthDate', None)
+        return item['debtor'].get('birthDate', '')
 
     @classmethod
     def __select_sort_middle_name(cls, item):
         """Sort the match list by individual debtor middle name."""
-        return item['debtor']['personName'].get(['middle'], None)
+        return item['debtor']['personName'].get('middle', '')
 
     @classmethod
     def __select_sort_first_name(cls, item):

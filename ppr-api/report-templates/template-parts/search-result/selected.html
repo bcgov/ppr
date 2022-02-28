@@ -16,15 +16,12 @@
          <td class="top-align">Page</td>
         </tr>
         {% for result in selected %}
-{#
-        {% if result.matchType == 'EXACT' %}
-        <tr class="no-page-break bold">
-        {% else %}
         <tr class="no-page-break">
-        {% endif %}
-#}
-        <tr class="no-page-break">
-            <td>{{loop.index}}</td>
+            <td>
+                {% if result.index is defined %}
+                    {{result.index}}
+                {% endif %}
+            </td>
             <td>
                 {% if not result.duplicate %}
                     <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
@@ -100,7 +97,11 @@
         </tr>
         {% for result in selected %}
             <tr class="no-page-break">
-                <td>{{loop.index}}</td>
+                <td>
+                    {% if result.index is defined %}
+                        {{result.index}}
+                    {% endif %}
+                </td>
                 <td>
                     {% if not result.duplicate %}
                         <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
@@ -148,7 +149,11 @@
         </tr>
         {% for result in selected %}
             <tr class="no-page-break">
-                <td>{{loop.index}}</td>
+                <td>
+                    {% if result.index is defined %}
+                        {{result.index}}
+                    {% endif %}
+                </td>
                 <td>
                     {% if not result.duplicate %}
                         <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
