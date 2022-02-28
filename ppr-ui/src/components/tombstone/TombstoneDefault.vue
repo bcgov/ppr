@@ -7,7 +7,7 @@
           <b>{{ header }}</b>
         </span>
         <v-row id="tombstone-user-info" class="tombstone-sub-header" no-gutters>
-          <v-col cols="10">
+          <v-col cols="7">
             <v-row no-gutters>
               <v-col
                 cols="auto"
@@ -21,9 +21,9 @@
               </v-col>
             </v-row>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="5">
             <v-row no-gutters justify="end">
-              {{ date }}
+              <span class="font-weight-bold pr-2">Registry Time:</span>{{ date }}
             </v-row>
           </v-col>
         </v-row>
@@ -42,7 +42,7 @@ import {
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
-import { convertDate } from '@/utils'
+import { pacificDate } from '@/utils'
 
 export default defineComponent({
   name: 'TombstoneDefault',
@@ -91,7 +91,7 @@ export default defineComponent({
     })
     onMounted(() => {
       const newDate = new Date()
-      localState.date = convertDate(newDate, false, false)
+      localState.date = pacificDate(newDate)
     })
 
     return {

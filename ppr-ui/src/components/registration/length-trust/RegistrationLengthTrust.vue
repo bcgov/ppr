@@ -131,7 +131,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, isInt } from '@/utils'
+import { isInt, pacificDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
@@ -197,7 +197,7 @@ export default defineComponent({
             const numYears = parseInt(localState.lifeYearsEdit)
             const newExpDate = new Date(expiryDate)
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
-            return convertDate(newExpDate, true, true)
+            return pacificDate(newExpDate)
           }
           return '-'
         }
