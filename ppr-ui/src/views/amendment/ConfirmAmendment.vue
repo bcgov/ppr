@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="confirm-amendment"
-    class="view-container pa-15 pt-14"
+    class="view-container pa-15 pt-4"
     fluid
     style="min-width: 960px;"
   >
@@ -26,6 +26,11 @@
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review and Complete Amendment</h1>
+          <div style="padding-top: 25px; max-width: 875px;">
+            <p class="ma-0">
+              Review your Amendment and complete the additional information before registering.
+            </p>
+          </div>
           <caution-box class="mt-9" style="margin-bottom: 60px;" :setMsg="cautionTxt" />
 
           <v-row no-gutters class="summary-header pa-2 mt-4 rounded-top">
@@ -36,7 +41,7 @@
               </label>
             </v-col>
           </v-row>
-          <div class="white ma-0 px-4">
+          <div class="white ma-0 px-4 rounded-bottom">
             <div v-if="showLengthTrustIndenture">
               <registration-length-trust-amendment class="pt-4" :isSummary="true" />
             </div>
