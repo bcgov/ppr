@@ -230,7 +230,7 @@ export const vehicleTableHeaders: Array<BaseHeaderIF> = [
     value: 'vehicle.year'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Make',
     value: 'vehicle.make'

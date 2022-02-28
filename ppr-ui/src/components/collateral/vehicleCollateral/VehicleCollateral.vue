@@ -59,7 +59,7 @@
     </v-row>
   </v-container>
   <v-container v-else
-    :class="registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'"
+    :class="containerClass"
     fluid no-gutters
   >
     <v-row no-gutters class="pb-4 pt-10 pl-1" v-if="hasVehicleCollateral() && !isRepairersLienAmendment">
@@ -174,7 +174,7 @@
                     <v-btn
                       text
                       color="primary"
-                      class="edit-btn smaller-button"
+                      class="edit-btn smaller-button even-smaller"
                       :id="'class-' + row.index + '-change-added-btn'"
                       @click="initEdit(row.index)"
                       :disabled="addEditInProgress"
@@ -397,7 +397,10 @@ export default defineComponent({
         return props.showInvalid
       }),
       containerClass: computed((): string => {
-        registrationFlowType === RegistrationFlowType.AMENDMENT ? 'px-6 py-0': 'pa-0'
+        if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
+          return 'px-6 py-0'
+        }
+        return 'pa-0'
       }),
       summaryView: props.isSummary,
       getMH: computed(function () {
@@ -554,9 +557,15 @@ td {
   margin-left: -25px;
 }
 
+.even-smaller
+{
+  padding-left: 0px !important;
+  padding-right: 8px !important;
+}
+
 .box-shadow-left {
-  margin-left: -25px;
-  padding-left: 20px;
+  margin-left: -23px;
+  padding-left: 25px;
   box-shadow: -2px 0 0 #D3272C;
 }
 ::v-deep .v-chip .v-chip__content {
