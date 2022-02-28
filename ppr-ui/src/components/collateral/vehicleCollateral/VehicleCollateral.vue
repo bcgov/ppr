@@ -93,7 +93,7 @@
       </v-col>
     </v-row>
     <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral()">
-      <v-col>
+      <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
         <v-data-table
           class="collateral-table"
           :class="{ 'invalid-message': showErrorComponent }"
@@ -551,6 +551,11 @@ td {
   margin-left: -25px;
 }
 
+.box-shadow-left {
+  margin-left: -25px;
+  padding-left: 15px;
+  box-shadow: -2px 0 0 #D3272C;
+}
 ::v-deep .v-chip .v-chip__content {
   font-weight: 700;
 }

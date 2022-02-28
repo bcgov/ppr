@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-vehicle" class="white py-8" :class="{ 'border-error-left': showErrorBar }">
+  <div id="edit-vehicle" class="white py-8" :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }">
     <v-expand-transition>
       <v-row no-gutters :class="{ 'border-over': showErrorBar }">
         <v-col cols="3">
