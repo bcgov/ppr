@@ -2,7 +2,7 @@
 --DROP VIEW public.account_registration_vw;
 CREATE OR REPLACE VIEW public.account_registration_vw AS
 WITH q AS (
-  SELECT (TO_TIMESTAMP(TO_CHAR(current_date, 'YYYY-MM-DD') || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
+  SELECT (current_date)
       AS current_expire_ts
 )
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
@@ -11,7 +11,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                  (fs.expire_date at time zone 'utc') < (now() at time zone 'utc') THEN 'HEX'
             ELSE fs.state_type END AS state,
        CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT) END expire_days,
+            ELSE (DATE((fs.expire_date at time zone 'pst')) - current_expire_ts - 1) END expire_days,
        (SELECT MAX(r2.registration_ts)
           FROM registrations r2
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
@@ -63,7 +63,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                  (fs.expire_date at time zone 'utc') < (now() at time zone 'utc') THEN 'HEX'
             ELSE fs.state_type END AS state,
        CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT) END expire_days,
+            ELSE (DATE((fs.expire_date at time zone 'pst')) - current_expire_ts - 1) END expire_days,
        (SELECT MAX(r2.registration_ts)
           FROM registrations r2
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,

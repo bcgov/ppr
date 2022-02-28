@@ -140,9 +140,9 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             self.callback_url = callback_url
         else:
             results_length = len(json.dumps(new_results))
+            current_app.logger.debug(f'Search id= {self.search_id} results size={results_length}.')
             if results_length > current_app.config.get('MAX_SIZE_SEARCH_RT'):
-                current_app.logger.info('Search id=' + str(self.search_id) + ' async report results length=' +
-                                        str(results_length))
+                current_app.logger.info(f'Search id={self.search_id} size exceeds RT max, setting up async report.')
                 self.callback_url = current_app.config.get('UI_SEARCH_CALLBACK_URL')
         self.save()
 
