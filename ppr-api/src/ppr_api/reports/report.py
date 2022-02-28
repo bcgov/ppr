@@ -213,6 +213,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'logo',
             'logoGrey',
             'macros',
+            'registrarSignature',
             'registration/securedParties',
             'registration/courtOrderInformation',
             'registration/debtors',
@@ -662,18 +663,35 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'selected' in self._report_data:
             new_selected = []
             exact_match_count = 0
-            for result in self._report_data['selected']:
+            length = len(self._report_data['selected'])
+            reg_count: int = 0  # Only count first match if duplicates.
+            for index, result in enumerate(self._report_data['selected'], start=0):
+                # Use these for formatting.
+                if (index + 1) < length and result['baseRegistrationNumber'] == \
+                        self._report_data['selected'][(index + 1)]['baseRegistrationNumber']:
+                    result['has_duplicate'] = True
+                else:
+                    result['has_duplicate'] = False
+                if index != 0 and result['baseRegistrationNumber'] == \
+                        self._report_data['selected'][(index - 1)]['baseRegistrationNumber']:
+                    result['duplicate'] = True
+                else:
+                    result['duplicate'] = False
+                    reg_count += 1
+                    result['index'] = reg_count
+                result['createDateTime'] = Report._to_report_datetime(result['createDateTime'], False)
                 if result['matchType'] == 'EXACT' or 'selected' not in result or result['selected']:
                     if result['matchType'] == 'EXACT':
                         exact_match_count += 1
-                    if 'vehicleCollateral' in result:
-                        code = result['vehicleCollateral']['type']
-                        result['vehicleCollateral']['type'] = TO_VEHICLE_TYPE_DESCRIPTION[code]
-                    elif 'debtor' in result and 'birthDate' in result['debtor']:
+                    # if 'vehicleCollateral' in result:
+                    #    code = result['vehicleCollateral']['type']
+                    #    result['vehicleCollateral']['type'] = TO_VEHICLE_TYPE_DESCRIPTION[code]
+                    if 'debtor' in result and 'birthDate' in result['debtor']:
                         result['debtor']['birthDate'] = Report._to_report_datetime(result['debtor']['birthDate'], False)
                     new_selected.append(result)
             self._report_data['selected'] = new_selected
             self._report_data['exactMatchCount'] = exact_match_count
+            self._report_data['totalResultsSize'] = reg_count  # Number of selected distinct registrations.
 
     @staticmethod
     def _format_address(address):

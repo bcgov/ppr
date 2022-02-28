@@ -44,34 +44,180 @@ SINGLE_RENEWAL_JSON = [{
     'registrationType': 'SA'
 }]
 SET_SELECT = [
-    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT', 'createDateTime': '2021-12-16T01:18:38+00:00',
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT', 'createDateTime': '2018-12-18T01:18:38+00:00',
      'registrationType': 'SA',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2018, 'make': 'HONDA',
-                           'model': 'CIVIC'}},
-    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT', 'createDateTime': '2021-12-16T01:18:38+00:00',
+                           'model': 'Sort 2'}},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT', 'createDateTime': '2019-12-18T01:18:38+00:00',
      'registrationType': 'SA',
-     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2014, 'make': 'BMW', 'model': 'Z4'}},
-    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-03T00:31:40+00:00',
-     'registrationType': 'SA',
-     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
-                           'model': 'TUCSON'}},
-    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JU622994', 'year': 2014, 'make': 'BMW',
+                           'model': 'Sort 4'}},
+    {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR', 'createDateTime': '2020-12-03T00:31:40+00:00',
      'registrationType': 'SA',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
-                           'model': 'TUSCON'}},
+                           'model': 'Sort 5'}},
+    {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR', 'createDateTime': '2021-10-08T00:02:33+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'Sort 7'}},
     {'baseRegistrationNumber': '103838B', 'matchType': 'SIMILAR', 'createDateTime': '2021-10-08T00:02:33+00:00',
      'registrationType': 'RL',
-     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
-                           'model': 'TUCSON'}},
-    {'baseRegistrationNumber': 'TEST0002', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+     'vehicleCollateral': {'type': 'MV', 'serialNumber': 'JM8J3CA46JU622994', 'year': 2018, 'make': 'HYUNDAI',
+                           'model': 'Sort 6'}},
+    {'baseRegistrationNumber': 'TEST0002', 'matchType': 'SIMILAR', 'createDateTime': '2019-12-16T01:18:38+00:00',
      'registrationType': 'RL',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'KX8J3CA46JU622994', 'year': 2014, 'make': 'HYUNDAI',
-                           'model': 'TUSCON'}},
-    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR', 'createDateTime': '2021-12-16T01:18:38+00:00',
+                           'model': 'Sort 3'}},
+    {'baseRegistrationNumber': 'TEST0005', 'matchType': 'SIMILAR', 'createDateTime': '2018-12-16T01:18:38+00:00',
      'registrationType': 'SA',
      'vehicleCollateral': {'type': 'MV', 'serialNumber': 'YJ46JU622994', 'year': 2018, 'make': 'TESLA',
-                           'model': 'MODEL 3'}}
+                           'model': 'Sort 1'}}
 ]
+SET_SELECT_RG = [
+    {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT', 'createDateTime': '2018-12-18T01:18:38+00:00',
+     'registrationType': 'SA'}
+]
+SET_SELECT_BS = [
+  {
+    'baseRegistrationNumber': '595228L', 'matchType': 'EXACT', 'createDateTime': '2015-06-26T13:09:55+00:00',
+    'registrationType': 'SA',
+    'debtor': { 'businessName': 'WESTERRA EQUIPMENT LTD. 5' }
+  },
+  { 'baseRegistrationNumber': '261910M', 'matchType': 'EXACT', 'createDateTime': '2011-06-08T13:54:40+00:00',
+    'registrationType': 'SA',
+    'debtor': { 'businessName': 'WESTERRA EQUIPMENT LTD. 2' }
+  },
+  { 'baseRegistrationNumber': '043654M', 'matchType': 'EXACT', 'createDateTime': '2012-02-05T15:03:55+00:00',
+    'registrationType': 'SA',
+    'debtor': { 'businessName': 'WESTERRA EQUIPMENT LTD. 3' }
+  },
+  {
+    'baseRegistrationNumber': '736651A', 'matchType': 'SIMILAR', 'createDateTime': '2013-11-21T15:13:42+00:00',
+    'registrationType': 'ET',
+    'debtor': { 'businessName': 'WESTERRA LANDSCAPE CO. LTD. 4' }
+  },
+  { 'baseRegistrationNumber': '061185N', 'matchType': 'SIMILAR', 'createDateTime': '2021-06-23T13:33:56+00:00',
+    'registrationType': 'SA',
+    'debtor': { 'businessName': 'WEST TERRA XPROJECT INC. 7' }
+  },
+  {
+    'baseRegistrationNumber': '348431H', 'matchType': 'SIMILAR', 'createDateTime': '2021-06-23T13:33:56+00:00',
+    'registrationType': 'SA',
+    'debtor': { 'businessName': 'WEST TERRA PROJECT INC. 6' }
+  },
+  { 'baseRegistrationNumber': '348431N', 'matchType': 'SIMILAR', 'createDateTime': '2010-05-15T20:21:03+00:00',
+    'registrationType': 'SA',
+    'debtor': { 'businessName': 'WEST TERRA PROJECTS INC. 1' }
+  }
+]
+SET_SELECT_IS = [
+    { 'baseRegistrationNumber': '555180M', 'createDateTime': '2020-10-27T15:26:26+00:00',
+      'debtor': {
+        'birthDate': '1971-12-18T12:59:59+00:00',
+        'partyId': 5,
+        'personName': { 'first': 'LISA', 'last': 'SMITH', 'middle': 'MARTHA'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '555180M', 'createDateTime': '2020-10-27T15:26:26+00:00',
+      'debtor': {
+        'birthDate': '1971-12-18T12:59:59+00:00',
+        'partyId': 6,
+        'personName': { 'first': 'LISA', 'last': 'SMITH', 'middle': 'TINA'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '376149M', 'createDateTime': '2011-10-10T18:52:09+00:00',
+      'debtor': {
+        'birthDate': '1985-07-31T12:59:59+00:00',
+        'partyId': 3,
+        'personName': { 'first': 'LISE', 'last': 'SMITH', 'middle': 'MARIE'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '823474L', 'createDateTime': '2011-10-10T18:52:09+00:00',
+      'debtor': {
+        'birthDate': '1998-01-22T12:59:59+00:00',
+        'partyId': 2,
+        'personName': { 'first': 'LISA', 'last': 'SMITH', 'middle': 'NANCY'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '619305L', 'createDateTime': '2019-07-08T13:45:06+00:00',
+      'debtor': {
+        'partyId': 4,
+        'personName': { 'first': 'LISA', 'last': 'SMITH', 'middle': 'KAREN'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '189655L', 'createDateTime': '2009-12-04T14:38:46+00:00',
+      'debtor': {
+        'birthDate': '1973-02-12T12:59:59+00:00',
+        'partyId': 0,
+        'personName': { 'first': 'LISA', 'last': 'SMITH', 'middle': 'MARIA'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '189655L', 'createDateTime': '2021-12-04T14:38:46+00:00',
+      'debtor': {
+        'birthDate': '1973-02-12T12:59:59+00:00',
+        'partyId': 7,
+        'personName': { 'first': 'LISA', 'last': 'SMITH' }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    },
+    { 'baseRegistrationNumber': '091737N', 'createDateTime': '2010-07-06T21:21:54+00:00',
+      'debtor': {
+        'partyId': 1,
+        'personName': { 'first': 'LISA', 'last': 'SMITH', 'middle': 'S'
+        }
+      },
+      'matchType': 'EXACT', 'registrationType': 'SA'
+    }
+]
+SET_SELECT_MH = [
+    {'baseRegistrationNumber': '533380F', 'matchType': 'EXACT', 'createDateTime': '2018-12-18T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MH', 'serialNumber': '771437', 'year': 2018, 'make': '"HOMESTEAD NORCOM HOMES',
+                           'model': 'Sort 2', 'manufacturedHomeRegistrationNumber': '062285'}},
+    {'baseRegistrationNumber': '633380F', 'matchType': 'EXACT', 'createDateTime': '2019-12-18T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MH', 'serialNumber': '771439', 'year': 2014, 'make': '"HOMESTEAD NORCOM HOMES',
+                           'model': 'Sort 4', 'manufacturedHomeRegistrationNumber': '062287'}},
+   {'baseRegistrationNumber': '733380F', 'matchType': 'SIMILAR', 'createDateTime': '2019-12-18T01:18:38+00:00',
+     'registrationType': 'RL',
+     'vehicleCollateral': {'type': 'MH', 'serialNumber': '771438', 'year': 2014, 'make': '"HOMESTEAD NORCOM HOMES',
+                           'model': 'Sort 3', 'manufacturedHomeRegistrationNumber': '062286'}},
+    {'baseRegistrationNumber': '833380F', 'matchType': 'SIMILAR', 'createDateTime': '2018-12-16T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'MH', 'serialNumber': '771436', 'year': 2018, 'make': '"HOMESTEAD NORCOM HOMES',
+                           'model': 'Sort 1', 'manufacturedHomeRegistrationNumber': '062284'}}
+]
+SET_SELECT_AC = [
+    {'baseRegistrationNumber': '3737983', 'matchType': 'EXACT', 'createDateTime': '2018-12-18T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'AC', 'serialNumber': 'C-GFCC', 'year': 1980, 'make': 'BELL TEXTRON 222',
+                           'model': 'Sort 2'}},
+    {'baseRegistrationNumber': '3737942', 'matchType': 'EXACT', 'createDateTime': '2019-12-18T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'AC', 'serialNumber': 'C-GFCC', 'year': 1980, 'make': 'BELL TEXTRON 222',
+                           'model': 'Sort 4'}},
+   {'baseRegistrationNumber': '3737996', 'matchType': 'SIMILAR', 'createDateTime': '2019-12-18T01:18:38+00:00',
+     'registrationType': 'RL',
+     'vehicleCollateral': {'type': 'AC', 'serialNumber': 'C-GFCB', 'year': 1980, 'make': 'BELL TEXTRON 222',
+                           'model': 'Sort 3'}},
+    {'baseRegistrationNumber': '3738005', 'matchType': 'SIMILAR', 'createDateTime': '2018-12-16T01:18:38+00:00',
+     'registrationType': 'SA',
+     'vehicleCollateral': {'type': 'AC', 'serialNumber': 'C-GFCB', 'year': 1980, 'make': 'BELL TEXTRON 222',
+                           'model': 'Sort 1'}}
+]
+
 SEARCH_SELECT_1 = [
     {'baseRegistrationNumber': 'TEST0004', 'matchType': 'EXACT'},
     {'baseRegistrationNumber': 'TEST0001', 'matchType': 'EXACT'},
@@ -93,6 +239,37 @@ SEARCH_SELECT_4 = [
     {'baseRegistrationNumber': '107169B', 'matchType': 'SIMILAR'},
     {'baseRegistrationNumber': 'TEST0001', 'matchType': 'SIMILAR'},
 ]
+SEARCH_SELECT_BS = [
+    {'baseRegistrationNumber': '595228L', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '261910M', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '043654M', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '736651A', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': '061185N', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': '348431H', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': '348431N', 'matchType': 'SIMILAR'}
+]
+SEARCH_SELECT_IS = [
+    {'baseRegistrationNumber': '555180M', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '555180M', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '376149M', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '823474L', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '619305L', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '189655L', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '189655L', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '091737N', 'matchType': 'EXACT'}
+]
+SEARCH_SELECT_MH = [
+    {'baseRegistrationNumber': '533380F', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '633380F', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '733380F', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': '833380F', 'matchType': 'SIMILAR'},
+]
+SEARCH_SELECT_AC = [
+    {'baseRegistrationNumber': '3737983', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '3737942', 'matchType': 'EXACT'},
+    {'baseRegistrationNumber': '3737996', 'matchType': 'SIMILAR'},
+    {'baseRegistrationNumber': '3738005', 'matchType': 'SIMILAR'},
+]
 
 # testdata pattern is ({description}, {JSON data}, {search id}, {has history}, {first statement type})
 TEST_VALID_DATA = [
@@ -113,6 +290,16 @@ TEST_SEARCH_SELECT_DATA = [
     ('EXACT missing 1 selection', SEARCH_SELECT_2, 2),
     ('Just 1 SIMILAR selection', SEARCH_SELECT_3, 3),
     ('All exact, 2 SIMILAR selection', SEARCH_SELECT_4, 4)
+]
+
+# testdata pattern is ({description}, {select_data}, {select_count}, {orig_data}, {search_type})
+TEST_SEARCH_SORT_DATA = [
+    ('Serial Number', SEARCH_SELECT_1, 7, SET_SELECT, SearchRequest.SearchTypes.SERIAL_NUM.value),
+    ('Registration Number', SEARCH_SELECT_2, 1, SET_SELECT_RG, SearchRequest.SearchTypes.REGISTRATION_NUM.value),
+    ('Bus Debtor', SEARCH_SELECT_BS, 7, SET_SELECT_BS, SearchRequest.SearchTypes.BUSINESS_DEBTOR.value),
+    ('Ind Debtor', SEARCH_SELECT_IS, 8, SET_SELECT_IS, SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value),
+    ('MHR Number', SEARCH_SELECT_MH, 4, SET_SELECT_MH, SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value),
+    ('Aircraft DOT', SEARCH_SELECT_AC, 4, SET_SELECT_AC, SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value)
 ]
 
 
@@ -268,7 +455,8 @@ def test_search_history_sort(session, client, jwt):
 def test_set_search_select(session, client, jwt, desc, select_data, select_count):
     """Assert that submitting a new search selection with minimal data works as expected."""
     # setup
-    search_request: SearchRequest = SearchRequest(search_response=SET_SELECT)
+    search_request: SearchRequest = SearchRequest(search_response=SET_SELECT,
+                                                  search_type=SearchRequest.SearchTypes.SERIAL_NUM.value)
     search_result: SearchResult = SearchResult()
     search_result.search = search_request
 
@@ -289,3 +477,51 @@ def test_set_search_select(session, client, jwt, desc, select_data, select_count
         assert select['vehicleCollateral']['year']
         assert select['vehicleCollateral']['make']
         assert select['vehicleCollateral']['model']
+
+
+@pytest.mark.parametrize('desc,select_data,select_count,orig_data,search_type', TEST_SEARCH_SORT_DATA)
+def test_search_sort(session, client, jwt, desc, select_data, select_count, orig_data, search_type):
+    """Assert that submitting a new search selection is sorted as expected."""
+    # setup
+    search_request: SearchRequest = SearchRequest(search_response=orig_data, search_type=search_type)
+    search_result: SearchResult = SearchResult()
+    search_result.search = search_request
+
+    # test
+    selection = search_result.set_search_selection(select_data)
+
+    # check
+    assert selection
+    assert len(selection) == select_count
+    if search_type == SearchRequest.SearchTypes.SERIAL_NUM.value:
+        assert selection[0]['vehicleCollateral']['model'] == 'Sort 1'
+        assert selection[1]['vehicleCollateral']['model'] == 'Sort 2'
+        assert selection[2]['vehicleCollateral']['model'] == 'Sort 3'
+        assert selection[3]['vehicleCollateral']['model'] == 'Sort 4'
+        assert selection[4]['vehicleCollateral']['model'] == 'Sort 5'
+        assert selection[5]['vehicleCollateral']['model'] == 'Sort 6'
+        assert selection[6]['vehicleCollateral']['model'] == 'Sort 7'
+    elif search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
+        assert selection[0]['baseRegistrationNumber'] == 'TEST0004'
+        assert selection[0]['matchType'] == 'EXACT'
+    elif search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
+        assert str(selection[0]['debtor']['businessName']).endswith('1')
+        assert str(selection[1]['debtor']['businessName']).endswith('2')
+        assert str(selection[2]['debtor']['businessName']).endswith('3')
+        assert str(selection[3]['debtor']['businessName']).endswith('4')
+        assert str(selection[4]['debtor']['businessName']).endswith('5')
+        assert str(selection[5]['debtor']['businessName']).endswith('6')
+        assert str(selection[6]['debtor']['businessName']).endswith('7')
+    elif search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
+        for index, result in enumerate(selection, start=0):
+            assert index == result['debtor']['partyId']
+    elif search_type == SearchRequest.SearchTypes.MANUFACTURED_HOME_NUM.value:
+        assert selection[0]['vehicleCollateral']['model'] == 'Sort 1'
+        assert selection[1]['vehicleCollateral']['model'] == 'Sort 2'
+        assert selection[2]['vehicleCollateral']['model'] == 'Sort 3'
+        assert selection[3]['vehicleCollateral']['model'] == 'Sort 4'
+    elif search_type == SearchRequest.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value:
+        assert selection[0]['vehicleCollateral']['model'] == 'Sort 1'
+        assert selection[1]['vehicleCollateral']['model'] == 'Sort 2'
+        assert selection[2]['vehicleCollateral']['model'] == 'Sort 3'
+        assert selection[3]['vehicleCollateral']['model'] == 'Sort 4'
