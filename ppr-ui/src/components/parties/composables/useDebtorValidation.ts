@@ -1,5 +1,6 @@
 import { ref } from '@vue/composition-api'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
+import { useValidation } from '@/utils/validators/use-validation'
 
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
@@ -12,62 +13,12 @@ const createEmptyErrors = () => ({
   address: createDefaultValidationResult()
 })
 
+const {
+  validateName
+} = useValidation()
+
 export const useDebtorValidation = () => {
   const errors = ref(createEmptyErrors())
-
-  const validateName = (isBusiness, form) => {
-    if (isBusiness === true) {
-      form.businessName = form.businessName.trim()
-      if (form.businessName.length === 0) {
-        errors.value.businessName = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Please enter a business name'
-        }
-      } else if (form.businessName.length > 150) {
-        errors.value.businessName = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Maximum 150 characters'
-        }
-      } else {
-        resetError('businessName')
-      }
-    } else {
-      form.personName.first = form.personName.first.trim()
-      form.personName.last = form.personName.last.trim()
-      if (form.personName.first.length === 0) {
-        errors.value.first = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Please enter a first name'
-        }
-      } else if (form.personName.first.length > 50) {
-        errors.value.first = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Maximum 50 characters'
-        }
-      } else {
-        resetError('first')
-      }
-      if (form.personName.last.length === 0) {
-        errors.value.last = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Please enter a last name'
-        }
-      } else if (form.personName.last.length > 50) {
-        errors.value.last = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Maximum 50 characters'
-        }
-      } else {
-        resetError('last')
-      }
-    }
-  }
 
   const validateBirthdate = (year, month, day) => {
     // reset errors before validation
@@ -129,7 +80,7 @@ export const useDebtorValidation = () => {
     day
   ): boolean => {
     validateBirthdate(year.value, month.value, day.value)
-    validateName(currentIsBusiness.value, currentDebtor.value)
+    validateName(currentIsBusiness.value, currentDebtor.value, errors)
     validateEmail(currentDebtor.value.emailAddress)
     if (currentIsBusiness.value === true) {
       return (

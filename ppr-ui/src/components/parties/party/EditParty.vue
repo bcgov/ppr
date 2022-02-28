@@ -81,6 +81,7 @@
                       filled
                       id="txt-name-party"
                       label="Business Legal Name"
+                      @keyup="validateNameField()"
                       v-model="searchValue"
                       :error-messages="
                         errors.businessName.message
@@ -106,6 +107,7 @@
                       label="First Name"
                       id="txt-first-party"
                       v-model="currentSecuredParty.personName.first"
+                      @keyup="validateNameField()"
                       persistent-hint
                       @blur="onBlur('first')"
                       :error-messages="
@@ -129,6 +131,7 @@
                       id="txt-last-party"
                       v-model="currentSecuredParty.personName.last"
                       persistent-hint
+                      @keyup="validateNameField()"
                       @blur="onBlur('last')"
                       :error-messages="
                         errors.last.message ? errors.last.message : ''
@@ -244,6 +247,7 @@ import { useSecuredPartyValidation } from '@/components/parties/composables/useS
 import { formatAddress } from '@/composables/address/factories'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
+import { useValidation } from '@/utils/validators/use-validation'
 
 export default defineComponent({
   components: {
@@ -293,6 +297,12 @@ export default defineComponent({
       validateSecuredPartyForm,
       validateInput
     } = useSecuredPartyValidation()
+
+    const {
+      validateFirstName,
+      validateLastName,
+      validateBusinessName
+    } = useValidation()
 
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -376,6 +386,18 @@ export default defineComponent({
       }
     }
 
+    const validateNameField = () => {
+      if (!errors.value.first.succeeded || currentSecuredParty.value.personName.first.length > 50) {
+        validateFirstName(currentSecuredParty.value, errors.value)
+      }
+      if (!errors.value.last.succeeded || currentSecuredParty.value.personName.last.length > 50) {
+        validateLastName(currentSecuredParty.value, errors.value)
+      }
+      if (!errors.value.businessName.succeeded || currentSecuredParty.value.businessName.length > 150) {
+        validateBusinessName(currentSecuredParty.value, errors.value)
+      }
+    }
+
     const setSearchValue = (searchValueTyped: string) => {
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
@@ -416,6 +438,7 @@ export default defineComponent({
       addressSchema,
       updateAddress,
       updateValidity,
+      validateNameField,
       setSearchValue,
       setHideDetails,
       setCloseAutoComplete,

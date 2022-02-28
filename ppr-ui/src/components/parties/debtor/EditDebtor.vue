@@ -42,6 +42,7 @@
                   id="txt-name-debtor"
                   label="Business Legal Name"
                   v-model="searchValue"
+                  @keyup="validateNameField()"
                   :error-messages="
                     errors.businessName.message
                       ? errors.businessName.message
@@ -67,6 +68,7 @@
                   label="First Name"
                   id="txt-first-debtor"
                   v-model="currentDebtor.personName.first"
+                  @keyup="validateNameField()"
                   persistent-hint
                   :error-messages="
                     errors.first.message ? errors.first.message : ''
@@ -89,6 +91,7 @@
                   label="Last Name"
                   id="txt-last-debtor"
                   v-model="currentDebtor.personName.last"
+                  @keyup="validateNameField()"
                   persistent-hint
                   :error-messages="
                     errors.last.message ? errors.last.message : ''
@@ -248,6 +251,7 @@ import { BaseAddress } from '@/composables/address'
 import { useDebtor } from '@/components/parties/composables/useDebtor'
 import { useDebtorValidation } from '@/components/parties/composables/useDebtorValidation'
 import { formatAddress } from '@/composables/address/factories'
+import { useValidation } from '@/utils/validators/use-validation'
 
 export default defineComponent({
   components: {
@@ -300,6 +304,12 @@ export default defineComponent({
       validateEmail
     } = useDebtorValidation()
 
+    const {
+      validateFirstName,
+      validateLastName,
+      validateBusinessName
+    } = useValidation()
+
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -329,6 +339,18 @@ export default defineComponent({
         addDebtor()
       } else {
         localState.showAllAddressErrors = true
+      }
+    }
+
+    const validateNameField = () => {
+      if (!errors.value.first.succeeded || currentDebtor.value.personName.first.length > 50) {
+        validateFirstName(currentDebtor.value, errors.value)
+      }
+      if (!errors.value.last.succeeded || currentDebtor.value.personName.last.length > 50) {
+        validateLastName(currentDebtor.value, errors.value)
+      }
+      if (!errors.value.businessName.succeeded || currentDebtor.value.businessName.length > 150) {
+        validateBusinessName(currentDebtor.value, errors.value)
       }
     }
 
@@ -402,6 +424,7 @@ export default defineComponent({
       addressSchema,
       updateValidity,
       validateEmail,
+      validateNameField,
       errors,
       RegistrationFlowType,
       registrationFlowType,
