@@ -132,7 +132,7 @@
         <span class="pl-1">PDF</span>
       </v-btn>
       <v-tooltip
-        v-else-if="!isDraft(item) && !item.registeringName"
+        v-else-if="!isDraft(item)"
         class="pa-2"
         content-class="top-tooltip"
         nudge-right="2"
@@ -143,24 +143,7 @@
           <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
         </template>
         <div class="pt-2 pb-2">
-          {{ tooltipTxtPdf }}
-        </div>
-      </v-tooltip>
-      <v-tooltip
-        v-else-if="!isDraft(item) && item.registeringName"
-        class="pa-2"
-        content-class="top-tooltip"
-        nudge-right="2"
-        top
-        transition="fade-transition"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
-        </template>
-        <div class="pt-2 pb-2">
-          This is a large document that may take up to 20 minutes to generate. The PDF version of this
-          document will appear here once it's available. You may need to refresh this page to display
-          the PDF download icon.
+          {{ tooltipTxtPdf(item) }}
         </div>
       </v-tooltip>
     </td>
@@ -374,6 +357,18 @@ export default defineComponent({
       })
     }
 
+    const tooltipTxtPdf = (item: DraftResultIF): string => {
+      if (!item.registeringName) {
+        return 'Verification Statements are only available ' +
+      'to Secured Parties or the Registering Party of this filing. To ' +
+      'view the details of this registration you must conduct a search.'
+      } else {
+        return 'This is a large document that may take up to 20 minutes to generate. ' +
+        'The PDF version of this document will appear here once it\'s available. You may ' +
+        'need to refresh this page to display the PDF download icon.'
+      }
+    }
+
     const downloadPDF = async (path: string): Promise<any> => {
       localState.loadingPDF = path
       const pdf = await registrationPDF(path)
@@ -521,10 +516,6 @@ export default defineComponent({
     const toggleExpand = (val: any) => {
       emit('toggleExpand', val)
     }
-
-    const tooltipTxtPdf = 'Verification Statements are only available ' +
-      'to Secured Parties or the Registering Party of this filing. To ' +
-      'view the details of this registration you must conduct a search.'
 
     watch(() => props.setItem, (val) => {
     }, { deep: true, immediate: true })
