@@ -127,18 +127,20 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       getFinancingButtons,
+      getStateModel,
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc
     } = useGetters<any>([
       'getFinancingButtons',
+      'getStateModel',
       'isRoleStaffBcol',
       'isRoleStaffReg',
       'isRoleStaffSbc'
     ])
-    const { getStateModel } = useGetters<any>(['getStateModel'])
-    const { setDraft } = useActions<any>(['setDraft'])
-    const { resetNewRegistration } = useActions<any>(['resetNewRegistration'])
+    const { resetNewRegistration, setDraft, setRegTableData } =
+      useActions<any>(['resetNewRegistration', 'setDraft', 'setRegTableData'])
+
     const localState = reactive({
       statementType: props.currentStatementType,
       stepName: props.currentStepName,
@@ -203,6 +205,7 @@ export default defineComponent({
         return false
       } else {
         setDraft(draft)
+        setRegTableData({ addedReg: draft.financingStatement.documentId, addedRegParent: '' })
         return true
       }
     }
@@ -279,6 +282,7 @@ export default defineComponent({
           // Emit error message.
           emit('error', apiResponse.error)
         } else {
+          setRegTableData({ addedReg: apiResponse.baseRegistrationNumber, addedRegParent: '' })
           props.router.push({
             name: localState.buttonConfig.nextRouteName
           })

@@ -181,6 +181,9 @@ describe('ConfirmDischarge registration view', () => {
       await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
       await flushPromises()
       expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+      // new dishcarge registration is in store regTableData
+      expect(wrapper.vm.$store.state.stateModel.regTableData.addedReg).toBe(mockedDischargeResponse.dischargeRegistrationNumber)
+      expect(wrapper.vm.$store.state.stateModel.regTableData.addedRegParent).toBe(mockedDischargeResponse.baseRegistrationNumber)
     }, 2000)
   })
 })

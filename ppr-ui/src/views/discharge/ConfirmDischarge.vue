@@ -149,6 +149,7 @@ export default class ConfirmDischarge extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
+  @Action setRegTableData: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -307,6 +308,11 @@ export default class ConfirmDischarge extends Vue {
     if (apiResponse === undefined || apiResponse?.error !== undefined) {
       this.emitError(apiResponse?.error)
     } else {
+      // set new added reg
+      this.setRegTableData({
+        addedReg: apiResponse.dischargeRegistrationNumber,
+        addedRegParent: apiResponse.baseRegistrationNumber
+      })
       // On success return to dashboard
       this.goToDashboard()
     }

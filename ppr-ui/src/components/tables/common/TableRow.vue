@@ -4,7 +4,8 @@
       'rollover-effect': applyRolloverEffect,
       'base-registration-row': !isChild && !isDraft(item),
       'draft-registration-row': isDraft(item) && !isChild,
-      'font-italic': isDraft(item)
+      'font-italic': isDraft(item),
+      'added-reg-effect': applyAddedRegEffect,
     }"
   >
     <td
@@ -300,6 +301,7 @@ import { useRegistration } from '@/composables/useRegistration'
 export default defineComponent({
   name: 'TableRow',
   props: {
+    setAddRegEffect: { default: false },
     setDisableActionShadow: { default: false },
     setChild: { default: false },
     setHeaders: { default: [] as BaseHeaderIF[] },
@@ -322,6 +324,9 @@ export default defineComponent({
     const localState = reactive({
       loadingPDF: '',
       rollover: false,
+      applyAddedRegEffect: computed((): boolean => {
+        return props.setAddRegEffect
+      }),
       applyRolloverEffect: computed((): boolean => {
         return localState.rollover || localState.isExpanded
       }),

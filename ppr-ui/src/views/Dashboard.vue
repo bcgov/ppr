@@ -15,12 +15,6 @@
       :setOptions="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed($event)"
     />
-    <base-dialog
-      id="payErrorDialogDash"
-      :setDisplay="payErrorDisplay"
-      :setOptions="payErrorOptions"
-      @proceed="payErrorDisplay=false"
-    />
     <registration-confirmation
       attach=""
       :options="myRegActionDialog"
@@ -201,6 +195,7 @@
                 :setHeaders="myRegHeaders"
                 :setLoading="myRegDataLoading"
                 :setMorePages="!myRegNoMorePages"
+                :setNewRegData="getRegTableData"
                 :setRegistrationHistory="myRegistrations"
                 :setSearch="myRegFilter"
                 :setSort="myRegSortOptions"
@@ -227,7 +222,7 @@ import { cloneDeep } from 'lodash'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import {
-  APIStatusTypes, ErrorCodes, RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
+  APIStatusTypes, RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
 } from '@/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
@@ -238,7 +233,7 @@ import {
   ErrorIF, // eslint-disable-line no-unused-vars
   RegistrationSortIF, // eslint-disable-line no-unused-vars
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, RegTableDataI, // eslint-disable-line no-unused-vars
   SearchResponseIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
@@ -295,6 +290,7 @@ import { RegistrationBar } from '@/components/registration'
   }
 })
 export default class Dashboard extends Vue {
+  @Getter getRegTableData: RegTableDataI
   @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchHistoryLength: Number
   @Getter getSearchResults: SearchResponseIF
@@ -305,6 +301,7 @@ export default class Dashboard extends Vue {
   @Getter isNonBillable!: Boolean
 
   @Action resetNewRegistration: ActionBindingIF
+  @Action setRegTableData: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
@@ -370,9 +367,6 @@ export default class Dashboard extends Vue {
 
   private myRegTotalBaseRegLength = 0
 
-  private payErrorDisplay = false
-  private payErrorOptions: DialogOptionsIF = null
-
   private snackbarMsg = ''
   private toggleSnackbar = false
   private tooltipTxtRegSrch = 'Retrieve existing registrations you would like to ' +
@@ -410,19 +404,19 @@ export default class Dashboard extends Vue {
   private async addRegistration (regNum: string): Promise<void> {
     this.loading = true
     const addReg = await addRegistrationSummary(regNum)
-    if (!addReg.error) {
-      // set expand if its not a base reg
-      if (regNum !== addReg.registrationNumber) {
-        addReg.new = true
-        addReg.expand = true
-      }
+    if (addReg.error) {
+      this.myRegAddErrSetDialog(addReg.error)
+    } else {
       // add to my registrations list
       this.myRegDataHistory.unshift(addReg)
       this.myRegTotalBaseRegLength += 1
-      this.snackbarMsg = 'Registration was successfully added to your table.'
-      this.toggleSnackbar = !this.toggleSnackbar
-    } else {
-      this.myRegAddErrSetDialog(addReg.error)
+
+      let parentRegNum = ''
+      if (regNum.toUpperCase() !== addReg.registrationNumber.toUpperCase()) {
+        // not a base registration so add parent reg num
+        parentRegNum = addReg.registrationNumber.toUpperCase()
+      }
+      this.setRegTableData({ addedReg: regNum.toUpperCase(), addedRegParent: parentRegNum })
     }
     this.loading = false
   }
@@ -826,6 +820,23 @@ export default class Dashboard extends Vue {
     // tell App that we're finished loading
     this.loading = false
     this.emitHaveData(true)
+    // trigger handler for a new added reg
+    this.handleRegTableDataUpdate(this.getRegTableData)
+  }
+
+  @Watch('getRegTableData')
+  private handleRegTableDataUpdate (val: RegTableDataI) {
+    if (val.addedReg) {
+      this.snackbarMsg = 'Registration was successfully added to your table.'
+      this.toggleSnackbar = !this.toggleSnackbar
+      // set to empty strings after 5 seconds
+      setTimeout(() => {
+        // only reset if it hasn't changed since
+        if (val.addedReg === this.getRegTableData.addedReg) {
+          this.setRegTableData({ addedReg: '', addedRegParent: '' })
+        }
+      }, 5000)
+    }
   }
 
   @Watch('getSearchHistoryLength')

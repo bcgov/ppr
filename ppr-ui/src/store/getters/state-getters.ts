@@ -13,6 +13,7 @@ import {
   IndividualNameIF,
   LengthTrustIF,
   RegistrationTypeIF,
+  RegTableDataI,
   SearchResponseIF,
   SearchTypeIF,
   StateIF,
@@ -391,4 +392,11 @@ export const isBusySaving = (state: any): boolean => {
 export const isRegistrationValid = (state: any): boolean => {
   return (state.stateModel.registration.lengthTrust.valid && state.stateModel.registration.parties.valid &&
     state.stateModel.registration.collateral.valid)
+}
+
+/** Return values used for the registration table.
+ * - currently only used for newly added registrations/drafts
+*/
+export const getRegTableData = (state: StateIF): RegTableDataI => {
+  return state.stateModel.registrationTable
 }

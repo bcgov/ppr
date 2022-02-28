@@ -1,7 +1,7 @@
 import { RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF,
-  SearchTypeIF, UserInfoIF
+  SearchTypeIF, RegTableDataI, UserInfoIF
 } from '@/interfaces'
 import { AccountProductSubscriptionIF } from '../account-interfaces'
 import { CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF } from '../ppr-api-interfaces'
@@ -13,9 +13,14 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
   authorization: AuthorizationIF
-  folioOrReferenceNumber: string
   certifyInformation: CertifyIF
-  staffPayment: StaffPaymentIF
+  folioOrReferenceNumber: string
+  // for amendments only
+  originalRegistration: {
+    collateral: AddCollateralIF
+    lengthTrust: LengthTrustIF
+    parties: AddPartiesIF
+  }
   registration: {
     amendmentDescription: string // amendments only
     collateral: AddCollateralIF
@@ -32,12 +37,7 @@ export interface StateModelIF {
     registrationTypeOtherDesc: string
     showStepErrors: boolean
   }
-  // for amendments only
-  originalRegistration: {
-    collateral: AddCollateralIF
-    lengthTrust: LengthTrustIF
-    parties: AddPartiesIF
-  }
+  registrationTable: RegTableDataI
   search: {
     searchDebtorName: IndividualNameIF
     searchHistory: Array<SearchResponseIF>
@@ -48,5 +48,6 @@ export interface StateModelIF {
     searching: boolean
     searchCertified: boolean
   }
+  staffPayment: StaffPaymentIF
   userInfo: UserInfoIF
 }

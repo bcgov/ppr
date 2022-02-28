@@ -147,6 +147,9 @@ describe('Confirm Renewal new registration component', () => {
     await Vue.nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    // new renew registration is in store regTableData
+    expect(wrapper.vm.$store.state.stateModel.registrationTable.addedReg).toBe(mockedRenewalResponse.renewalRegistrationNumber)
+    expect(wrapper.vm.$store.state.stateModel.registrationTable.addedRegParent).toBe(mockedRenewalResponse.baseRegistrationNumber)
   })
 })
 

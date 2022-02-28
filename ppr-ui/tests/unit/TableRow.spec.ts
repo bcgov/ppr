@@ -49,6 +49,8 @@ function createComponent (item: DraftResultIF | RegistrationSummaryIF): Wrapper<
     localVue,
     store,
     propsData: {
+      setAddRegEffect: false,
+      setDisableActionShadow: false,
       setChild: false,
       setHeaders: [...registrationTableHeaders],
       setIsExpanded: false,
@@ -114,6 +116,17 @@ describe('TableRow tests', () => {
       })
       expect(wrapper.vm.isChild).toBe(isChild)
       expect(wrapper.vm.item).toEqual(baseReg)
+
+      // it sets addRegEffect when given
+      const applyAddedRegEffect = '.added-reg-effect'
+      expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
+      await wrapper.setProps({ setAddRegEffect: true })
+      expect(wrapper.vm.applyAddedRegEffect).toBe(true)
+      expect(wrapper.findAll(applyAddedRegEffect).length).toBe(1)
+      // changes when updated
+      await wrapper.setProps({ setAddRegEffect: false })
+      expect(wrapper.vm.applyAddedRegEffect).toBe(false)
+      expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
 
       // check things specific to state / heirarchy of the item
       if (!draftReg.type) {

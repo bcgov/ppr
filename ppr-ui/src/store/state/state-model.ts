@@ -18,6 +18,29 @@ export const stateModel: StateModelIF = {
     certified: false,
     legalName: ''
   },
+  folioOrReferenceNumber: '',
+  // orig reg party used for discharge/renew/amend, other for amend only
+  originalRegistration: {
+    collateral: {
+      valid: true,
+      vehicleCollateral: [],
+      generalCollateral: []
+    },
+    lengthTrust: {
+      valid: true,
+      lifeYears: 0,
+      lifeInfinite: false,
+      trustIndenture: false,
+      lienAmount: '',
+      surrenderDate: ''
+    },
+    parties: {
+      valid: true,
+      registeringParty: null,
+      securedParties: [],
+      debtors: []
+    }
+  },
   registration: {
     amendmentDescription: '',
     collateral: {
@@ -57,27 +80,9 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
-  // orig reg party used for discharge/renew/amend, other for amend only
-  originalRegistration: {
-    collateral: {
-      valid: true,
-      vehicleCollateral: [],
-      generalCollateral: []
-    },
-    lengthTrust: {
-      valid: true,
-      lifeYears: 0,
-      lifeInfinite: false,
-      trustIndenture: false,
-      lienAmount: '',
-      surrenderDate: ''
-    },
-    parties: {
-      valid: true,
-      registeringParty: null,
-      securedParties: [],
-      debtors: []
-    }
+  registrationTable: {
+    addedReg: '',
+    addedRegParent: ''
   },
   search: {
     searchDebtorName: null,
@@ -89,6 +94,7 @@ export const stateModel: StateModelIF = {
     searching: false,
     searchCertified: false
   },
+  staffPayment: null,
   userInfo: {
     contacts: [],
     feeSettings: null,
@@ -101,7 +107,5 @@ export const stateModel: StateModelIF = {
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
-  },
-  folioOrReferenceNumber: '',
-  staffPayment: null
+  }
 }

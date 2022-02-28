@@ -17,7 +17,8 @@ import {
   UserSettingsIF,
   AccountProductSubscriptionIF,
   GeneralCollateralIF,
-  VehicleCollateralIF
+  VehicleCollateralIF,
+  RegTableDataI
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -227,4 +228,8 @@ export const mutateFolioOrReferenceNumber = (state: StateIF, refNumber: string) 
 
 export const mutateShowStepErrors = (state: StateIF, show: boolean) => {
   state.stateModel.registration.showStepErrors = show
+}
+
+export const mutateRegistrationTable = (state: StateIF, regTableData: RegTableDataI) => {
+  state.stateModel.registrationTable = regTableData
 }

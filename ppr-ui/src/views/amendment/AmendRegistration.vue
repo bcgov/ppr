@@ -207,6 +207,7 @@ export default class AmendRegistration extends Vue {
   @Action setRegistrationFlowType: ActionBindingIF
   @Action setCertifyInformation: ActionBindingIF
   @Action setCollateralShowInvalid: ActionBindingIF
+  @Action setRegTableData: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -504,14 +505,18 @@ export default class AmendRegistration extends Vue {
     const draft = await saveAmendmentStatementDraft(stateModel)
     this.submitting = false
     if (draft.error) {
-      console.error(
-        'saveDraft error status: ' + draft.error.statusCode + ' message: ' + draft.error.message
-      )
+      this.emitError(draft.error)
+    } else {
+      // set new added reg
+      this.setRegTableData({
+        addedReg: draft.amendmentStatement.documentId,
+        addedRegParent: draft.amendmentStatement.baseRegistrationNumber
+      })
+      this.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      this.emitHaveData(false)
     }
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
   }
 
   private goToDashboard (): void {

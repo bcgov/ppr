@@ -559,6 +559,17 @@ tr.registration-row.draft-registration-row td.actions-cell,
   // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
   background: #f8f9fa !important;
 }
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+#registration-table.v-data-table .v-data-table__wrapper table tbody tr.registration-row.added-reg-effect td.actions-cell,
+.registration-row.added-reg-effect,
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.draft-registration-row.added-reg-effect:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+#registration-table.v-data-table .v-data-table__wrapper table tbody
+tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
+.registration-row.draft-registration-row.added-reg-effect {
+  background-color: $greenSelected !important;
+}
 
 #registration-table.v-data-table tr.v-data-table__empty-wrapper td {
   text-align: left;
