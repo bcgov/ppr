@@ -143,7 +143,7 @@ describe('Collateral edit tests', () => {
   })
 
   it('shows error bar', async () => {
-    await wrapper.setProps({ setShowErrorBar: true })
+    await wrapper.setProps({ setShowErrorBar: true, activeIndex: -1 })
     await Vue.nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
