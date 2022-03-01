@@ -2,6 +2,9 @@ import { ref } from '@vue/composition-api'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'
+const {
+  validateName
+} = useValidation()
 
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
@@ -13,7 +16,6 @@ const createEmptyErrors = () => ({
 
 export const useSecuredPartyValidation = () => {
   const errors = ref(createEmptyErrors())
-  const { resetError } = useValidation()
 
   const validateInput = (fieldName, value) => {
     formValidation.validateField(fieldName, value).then(validationResult => {
@@ -21,49 +23,9 @@ export const useSecuredPartyValidation = () => {
     })
   }
 
-  const validateName = (isBusiness, form) => {
-    if (form.businessName) {
-      form.businessName = form.businessName.trim()
-    }
-    if (form.personName) {
-      form.personName.first = form.personName.first.trim()
-      form.personName.last = form.personName.last.trim()
-    }
-    if (isBusiness === true) {
-      if (!form.businessName || form.businessName.length === 0) {
-        errors.value.businessName = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Please enter a business name'
-        }
-      } else {
-        errors.value = resetError('businessName', errors.value)
-      }
-    } else {
-      if (!form.personName || form.personName.first.length === 0) {
-        errors.value.first = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Please enter a first name'
-        }
-      } else {
-        errors.value = resetError('first', errors.value)
-      }
-      if (!form.personName || form.personName.last.length === 0) {
-        errors.value.last = {
-          type: 'NAME',
-          succeeded: false,
-          message: 'Please enter a last name'
-        }
-      } else {
-        errors.value = resetError('last', errors.value)
-      }
-    }
-  }
-
   const validateSecuredPartyForm = (partyBusiness, currentParty, isRegisteringParty): boolean => {
     const currentIsBusiness = partyBusiness === 'B'
-    validateName(currentIsBusiness, currentParty.value)
+    validateName(currentIsBusiness, currentParty.value, errors)
     if (isRegisteringParty) {
       if (currentParty.value.emailAddress.length === 0) {
         errors.value.emailAddress = {
