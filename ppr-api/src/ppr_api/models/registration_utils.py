@@ -360,7 +360,8 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
         'registeringParty': str(mapping['registering_party']),
         'securedParties': str(mapping['secured_party']),
         'clientReferenceId': str(mapping['client_reference_id']),
-        'registeringName': registering_name
+        'registeringName': registering_name,
+        'vehicleCount': int(mapping['vehicle_count'])
     }
     if model_utils.is_financing(reg_class):
         result['expand'] = False

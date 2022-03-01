@@ -287,6 +287,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
         assert statement['expireDays']
         assert statement['registeringParty']
         assert statement['securedParties']
+        assert 'vehicleCount' in statement
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''
