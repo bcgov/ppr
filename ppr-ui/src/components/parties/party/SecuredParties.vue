@@ -161,7 +161,7 @@
               <!-- Action Btns -->
               <td class="actions-cell actions-width px-0">
                 <div
-                  class="actions float-right actions-up"
+                  class="actions float-right actions-up pr-4"
                   v-if="
                     isRegisteringParty(row.item) ||
                       isSecuredPartyRestrictedList(registrationType) ||
@@ -182,7 +182,7 @@
                     >
                       <v-list-item-subtitle>
                         <v-icon small>mdi-undo</v-icon>
-                        <span class="ml-1 mr-3">Undo</span>
+                        <span class="ml-1 mr-2">Undo</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                     <v-list-item
@@ -196,11 +196,11 @@
                         <span
                           v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                           && row.item.action !== ActionTypes.ADDED"
-                          class="mr-3"
+                          class="mr-2"
                         >
                           Delete
                         </span>
-                        <span v-else class="ml-1 mr-3">Remove</span>
+                        <span v-else class="ml-1 mr-2">Remove</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -697,7 +697,7 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .v-remove {
-  padding-right: 40px;
+  padding-right: 2px;
 }
 .v-remove:hover {
   background-color: white important;

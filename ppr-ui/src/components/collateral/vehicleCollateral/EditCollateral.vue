@@ -1,7 +1,7 @@
 <template>
-  <div id="edit-vehicle" class="white py-8" :class="{ 'border-error-left': showErrorBar }">
+  <div id="edit-vehicle" class="white py-8" :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }">
     <v-expand-transition>
-      <v-row no-gutters :class="{ 'border-over': showErrorBar }">
+      <v-row no-gutters>
         <v-col cols="3">
           <label
             class="add-vehicle-header generic-label"
@@ -328,9 +328,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.border-error-left
+.container .v-card > .border-error-left
 {
-  margin-left: -20px;
+  border-top-left-radius: unset;
+  border-bottom-left-radius: unset;
+  margin-left: 0px;
 }
 .border-over
 {
