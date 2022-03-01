@@ -221,12 +221,30 @@
               </v-list-item>
             </v-list>
             <v-list v-else class="actions__more-actions registration-actions">
-               <v-list-item v-if="isRepairersLien(item)" @click="handleAction(item, TableActions.AMEND)">
-                <v-list-item-subtitle>
-                  <v-icon small>mdi-pencil</v-icon>
-                  <span class="ml-1">Amend</span>
-                </v-list-item-subtitle>
-              </v-list-item>
+              <v-tooltip
+                left
+                content-class="left-tooltip pa-2 mr-2"
+                transition="fade-transition"
+                :disabled="!isRepairersLienAmendDisabled(item)"
+              >
+                <template v-slot:activator="{ on: onTooltip }">
+                  <div v-on="onTooltip">
+                    <v-list-item
+                      v-if="isRepairersLien(item)"
+                      :disabled="isRepairersLienAmendDisabled(item)"
+                      @click="handleAction(item, TableActions.AMEND)"
+                    >
+                      <v-list-item-subtitle>
+                        <v-icon small>mdi-pencil</v-icon>
+                        <span class="ml-1">Amend</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </div>
+                </template>
+                <span>
+                  This lien has only one item of vehicle collateral and cannot be amended.
+                </span>
+              </v-tooltip>
               <v-list-item
                 v-if="isActive(item) && !isExpired(item) && !isDischarged(item) && !isRepairersLien(item)"
                 @click="handleAction(item, TableActions.DISCHARGE)"
@@ -450,6 +468,10 @@ export default defineComponent({
       return (item.expireDays === -99)
     }
 
+    const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
+      return (item.vehicleCount === 1)
+    }
+
     const isDraft = (item: any): boolean => {
       // RegistrationSummaryIF | DraftResultIF
       return item.type !== undefined
@@ -544,6 +566,7 @@ export default defineComponent({
       isExpired,
       isRepairersLien,
       isRenewalDisabled,
+      isRepairersLienAmendDisabled,
       hasRenewal,
       downloadPDF,
       inSelectedHeaders,
