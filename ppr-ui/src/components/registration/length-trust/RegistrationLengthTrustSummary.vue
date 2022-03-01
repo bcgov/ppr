@@ -231,9 +231,15 @@ export default defineComponent({
             false
           )
         }
-        if (getLengthTrust.value.surrenderDate?.length >= 10) {
+        if (getLengthTrust.value.surrenderDate?.length === 10) {
           return convertDate(
             new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'),
+            false,
+            false
+          )
+        } else if (getLengthTrust.value.surrenderDate?.length > 10) {
+          return convertDate(
+            new Date(getLengthTrust.value.surrenderDate),
             false,
             false
           )
