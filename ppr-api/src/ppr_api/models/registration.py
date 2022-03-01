@@ -138,7 +138,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                                           back_populates='registration', cascade='all, delete', uselist=False)
     reg_type = db.relationship('RegistrationType', foreign_keys=[registration_type],
                                back_populates='registration', cascade='all, delete', uselist=False)
-    parties = db.relationship('Party', back_populates='registration')
+    parties = db.relationship('Party', order_by='asc(Party.id)', back_populates='registration')
     general_collateral = db.relationship('GeneralCollateral', back_populates='registration')
     general_collateral_legacy = db.relationship('GeneralCollateralLegacy', back_populates='registration')
     vehicle_collateral = db.relationship('VehicleCollateral', back_populates='registration')
