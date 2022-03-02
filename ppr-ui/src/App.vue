@@ -39,7 +39,7 @@
           v-bind:type="systemMessageType"
           v-bind:message="systemMessage"
           icon=" "
-          class="white--text text-lg-h5 font-weight-bold"
+          class="black--text text-lg-h5"
           align="center"
         ></sbc-system-banner>
         <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
@@ -672,5 +672,9 @@ export default class App extends Mixins(AuthMixin) {
   text-align: center;
   color: #212529;
   background-color: #FCBA19;
+}
+
+.v-application .warning {
+  background-color: #FCBA19 !important;
 }
 </style>
