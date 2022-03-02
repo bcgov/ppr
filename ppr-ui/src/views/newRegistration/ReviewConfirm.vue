@@ -147,10 +147,14 @@ export default class ReviewConfirm extends Vue {
   @Getter getRegistrationFlowType: RegistrationFlowType
   @Getter getRegistrationOther: string
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter hasUnsavedChanges: Boolean
+
   @Action setAddCollateral: ActionBindingIF
   @Action setLengthTrust: ActionBindingIF
   @Action setShowStepErrors: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
+
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
@@ -224,6 +228,7 @@ export default class ReviewConfirm extends Vue {
       })
       return
     }
+    const unsavedChanges = this.hasUnsavedChanges
     const collateral = this.getAddCollateral
     if (!collateral.valid) {
       collateral.showInvalid = true
@@ -239,6 +244,8 @@ export default class ReviewConfirm extends Vue {
       parties.showInvalid = true
       this.setAddSecuredPartiesAndDebtors(parties)
     }
+    // set unsavedChanges back to what it was
+    this.setUnsavedChanges(unsavedChanges)
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true

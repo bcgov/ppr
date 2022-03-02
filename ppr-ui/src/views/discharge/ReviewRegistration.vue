@@ -3,6 +3,11 @@
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
     <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -46,7 +51,7 @@
                 :setRegistrationType="registrationTypeUI"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Confirm and Complete'"
-                @cancel="goToDashboard()"
+                @cancel="showCancelDialog = true"
                 @submit="confirmDischarge()"
               />
             </affix>
@@ -65,6 +70,7 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
@@ -79,14 +85,15 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   ActionBindingIF, ErrorIF, AddPartiesIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, AddCollateralIF, LengthTrustIF, // eslint-disable-line no-unused-vars
-  CertifyIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF // eslint-disable-line no-unused-vars
+  CertifyIF, DebtorNameIF, DialogOptionsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
+import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
 
 @Component({
   components: {
+    BaseDialog,
     CautionBox,
     RegistrationLengthTrustSummary,
     Collateral,
@@ -111,6 +118,7 @@ export default class ReviewRegistration extends Vue {
   @Action setRegistrationFlowType: ActionBindingIF
   @Action setCertifyInformation: ActionBindingIF
   @Action setFolioOrReferenceNumber: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -126,6 +134,8 @@ export default class ReviewRegistration extends Vue {
   private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
   private loading = false
+  private options: DialogOptionsIF = notCompleteDialog
+  private showCancelDialog = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -150,6 +160,14 @@ export default class ReviewRegistration extends Vue {
 
   private get registrationType (): APIRegistrationTypes {
     return this.getRegistrationType?.registrationTypeAPI || null
+  }
+
+  private handleDialogResp (val: boolean): void {
+    this.showCancelDialog = false
+    if (!val) {
+      this.setRegistrationNumber(null)
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
   }
 
   private async loadRegistration (): Promise<void> {
@@ -230,14 +248,6 @@ export default class ReviewRegistration extends Vue {
       name: RouteNames.CONFIRM_DISCHARGE,
       query: { 'reg-num': this.registrationNumber }
     })
-    this.emitHaveData(false)
-  }
-
-  private goToDashboard (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
   }
 
   /** Emits error to app.vue for handling */

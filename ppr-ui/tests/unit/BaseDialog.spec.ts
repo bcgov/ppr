@@ -9,15 +9,15 @@ import { BaseDialog } from '@/components/dialogs'
 import { DialogButtons, DialogContent } from '@/components/dialogs/common'
 import { DialogOptionsIF } from '@/interfaces'
 import {
-  dischargeCancelDialog,
+  notCompleteDialog,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog,
-  renewCancelDialog,
   tableDeleteDialog,
-  tableRemoveDialog
+  tableRemoveDialog,
+  unsavedChangesDialog
 } from '@/resources/dialogOptions'
 import { getLastEvent } from './utils'
 
@@ -40,13 +40,13 @@ describe('Base Dialog tests', () => {
   let wrapper: Wrapper<any>
 
   const optionsList = [
-    { ...dischargeCancelDialog },
+    { ...notCompleteDialog },
     { ...registrationAddErrorDialog },
     { ...registrationAlreadyAddedDialog },
     { ...registrationFoundDialog },
     { ...registrationNotFoundDialog },
     { ...registrationRestrictedDialog },
-    { ...renewCancelDialog },
+    { ...unsavedChangesDialog },
     { ...tableDeleteDialog },
     { ...tableRemoveDialog }
   ]

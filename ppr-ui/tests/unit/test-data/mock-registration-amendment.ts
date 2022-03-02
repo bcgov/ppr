@@ -534,7 +534,8 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
-  folioOrReferenceNumber: 'UT-AM-001-ADD'
+  folioOrReferenceNumber: 'UT-AM-001-ADD',
+  unsavedChanges: false
 }
 
 export const mockedModelAmendmdmentDelete: StateModelIF = {
@@ -638,7 +639,8 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
-  folioOrReferenceNumber: 'UT-AM-002-DELETE'
+  folioOrReferenceNumber: 'UT-AM-002-DELETE',
+  unsavedChanges: false
 }
 
 export const mockedModelAmendmdmentEdit: StateModelIF = {
@@ -743,7 +745,8 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
-  folioOrReferenceNumber: 'UT-AM-003-EDIT'
+  folioOrReferenceNumber: 'UT-AM-003-EDIT',
+  unsavedChanges: false
 }
 
 export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
@@ -847,5 +850,6 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
-  folioOrReferenceNumber: 'UT-AM-004-COURT-ORDER'
+  folioOrReferenceNumber: 'UT-AM-004-COURT-ORDER',
+  unsavedChanges: false
 }

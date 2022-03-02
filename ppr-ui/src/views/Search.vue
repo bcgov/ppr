@@ -221,6 +221,23 @@ export default class Search extends Vue {
     return similarCount
   }
 
+  private created (): void {
+    window.onbeforeunload = (event) => {
+      // unsaved selections if app is ready, search results exist, and on the search page
+      const isSearchReportUnsaved = (
+        this.$router.currentRoute.name === RouteNames.SEARCH &&
+        this.appReady &&
+        !!this.getSearchResults
+      )
+      if (isSearchReportUnsaved) {
+        event.preventDefault()
+        // NB: custom text is no longer supported by newest versions of all browsers since 2021 for security reasons
+        // the event.returnValue is now only treated as a flag (added text in case this ever changes)
+        event.returnValue = 'You have not saved your search result report. Are you sure you want to leave?'
+      }
+    }
+  }
+
   private handleReportError (stayOnSearchResults: boolean): void {
     this.errorDialog = false
     if (!stayOnSearchResults || (this.errorOptions !== searchReportError &&

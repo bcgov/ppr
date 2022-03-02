@@ -7,6 +7,11 @@
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
     <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -70,7 +75,7 @@
                 :setRegistrationType="registrationTypeUI"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Review and Complete'"
-                @cancel="goToDashboard()"
+                @cancel="showCancelDialog = true"
                 @submit="confirmRenewal()"
               />
             </affix>
@@ -89,6 +94,7 @@ import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import {
@@ -112,15 +118,18 @@ import {
   AddCollateralIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
   DebtorNameIF, // eslint-disable-line no-unused-vars
-  CourtOrderIF // eslint-disable-line no-unused-vars
+  CourtOrderIF, // eslint-disable-line no-unused-vars
+  DialogOptionsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { AllRegistrationTypes } from '@/resources'
+import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
 
 @Component({
   components: {
+    BaseDialog,
     CautionBox,
     RegistrationLengthTrust,
     RegistrationRepairersLien,
@@ -153,6 +162,7 @@ export default class ReviewRegistration extends Vue {
   @Action setCourtOrderInformation: ActionBindingIF
   @Action setCertifyInformation: ActionBindingIF
   @Action setFolioOrReferenceNumber: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -166,8 +176,10 @@ export default class ReviewRegistration extends Vue {
   private financingStatementDate: Date = null
   private feeType = FeeSummaryTypes.RENEW
   private loading = false
-  private showInvalid = false
   private registrationValid = false
+  private options: DialogOptionsIF = notCompleteDialog
+  private showCancelDialog = false
+  private showInvalid = false
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -203,6 +215,14 @@ export default class ReviewRegistration extends Vue {
 
   private get registrationTypeRL (): string {
     return APIRegistrationTypes.REPAIRERS_LIEN
+  }
+
+  private handleDialogResp (val: boolean): void {
+    this.showCancelDialog = false
+    if (!val) {
+      this.setRegistrationNumber(null)
+      this.$router.push({ name: RouteNames.DASHBOARD })
+    }
   }
 
   private async loadRegistration (): Promise<void> {
@@ -312,19 +332,9 @@ export default class ReviewRegistration extends Vue {
         name: RouteNames.CONFIRM_RENEWAL,
         query: { 'reg-num': this.registrationNumber }
       })
-      this.emitHaveData(false)
     } else {
       this.showInvalid = true
     }
-  }
-
-  private goToDashboard (): void {
-    // unset registration number
-    this.setRegistrationNumber(null)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
   }
 
   /** Emits Have Data event. */

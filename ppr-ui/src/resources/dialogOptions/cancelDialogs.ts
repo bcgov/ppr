@@ -1,20 +1,19 @@
 import { DialogOptionsIF } from '@/interfaces'
 
-export const dischargeCancelDialog: DialogOptionsIF = {
-  acceptText: 'Cancel Total Discharge',
-  cancelText: 'Close',
-  title: 'Cancel',
+export const unsavedChangesDialog: DialogOptionsIF = {
+  acceptText: 'Return to My Registration',
+  cancelText: 'Exit Without Saving',
+  title: 'Unsaved Changes',
   label: '',
-  text: 'This will discard all changes made and return you to My Personal Property ' +
-    'Registry dashboard.'
+  text: 'You have unsaved changes. Do you want to return to your registration to ' +
+    'save your changes, or exit your registration without saving your changes?'
 }
 
-// discharge cancel
-export const renewCancelDialog: DialogOptionsIF = {
-  acceptText: 'Cancel Renewal',
-  cancelText: 'Close',
-  title: 'Cancel',
+export const notCompleteDialog: DialogOptionsIF = {
+  acceptText: 'Return to My Registration',
+  cancelText: 'Exit and Discard',
+  title: 'Registration Not Complete',
   label: '',
-  text: 'This will discard all changes made and return you to My Personal Property ' +
-    'Registry dashboard.'
+  text: 'Your registration has not been completed. Do you want to exit and discard ' +
+    'this registration, or return to your registration and complete it?'
 }

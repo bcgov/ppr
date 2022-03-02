@@ -7,6 +7,11 @@
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
     <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
@@ -112,7 +117,7 @@
                 :setBackBtn="'Save and Resume Later'"
                 :setSubmitBtn="'Review and Complete'"
                 :setErrMsg="amendErrMsg"
-                @cancel="goToDashboard()"
+                @cancel="cancel()"
                 @submit="confirmAmendment()"
                 @back="saveDraft()"
               />
@@ -133,6 +138,7 @@ import { cloneDeep, isEqual } from 'lodash'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import { Debtors } from '@/components/parties/debtor'
 import { SecuredParties } from '@/components/parties/party'
 import {
@@ -161,9 +167,12 @@ import {
   LengthTrustIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   DebtorNameIF, // eslint-disable-line no-unused-vars
-  CourtOrderIF // eslint-disable-line no-unused-vars
+  CourtOrderIF, // eslint-disable-line no-unused-vars
+  DialogOptionsIF, // eslint-disable-line no-unused-vars
+  FinancingStatementIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
+import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import {
   getFeatureFlag,
   getFinancingStatement,
@@ -175,6 +184,7 @@ import {
 @Component({
   components: {
     AmendmentDescription,
+    BaseDialog,
     CautionBox,
     CourtOrder,
     Collateral,
@@ -200,6 +210,7 @@ export default class AmendRegistration extends Vue {
   @Getter getOriginalLengthTrust: LengthTrustIF
   @Getter getAddCollateral: AddCollateralIF
   @Getter getCourtOrderInformation: CourtOrderIF
+  @Getter hasUnsavedChanges: Boolean
 
   @Action setAddCollateral: ActionBindingIF
   @Action setStaffPayment: ActionBindingIF
@@ -219,6 +230,7 @@ export default class AmendRegistration extends Vue {
   @Action setCertifyInformation: ActionBindingIF
   @Action setCollateralShowInvalid: ActionBindingIF
   @Action setRegTableData: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -250,6 +262,8 @@ export default class AmendRegistration extends Vue {
   private lengthTrustOpen = false
   private detailsValid = false
   private amendErrMsg = ''
+  private options: DialogOptionsIF = unsavedChangesDialog
+  private showCancelDialog = false
   private submitting = false
 
   private get asOfDateTime (): string {
@@ -291,6 +305,16 @@ export default class AmendRegistration extends Vue {
     return APIRegistrationTypes.REPAIRERS_LIEN
   }
 
+  private cancel (): void {
+    if (this.hasUnsavedChanges) this.showCancelDialog = true
+    else this.goToDashboard()
+  }
+
+  private handleDialogResp (val: boolean): void {
+    this.showCancelDialog = false
+    if (!val) this.goToDashboard()
+  }
+
   private async loadRegistration (): Promise<void> {
     if (!this.registrationNumber || (!this.getConfirmDebtorName && !this.documentId)) {
       if (!this.registrationNumber) {
@@ -314,87 +338,95 @@ export default class AmendRegistration extends Vue {
       this.dataLoadError = true
       this.emitError(financingStatement.error)
     } else {
-      // load data into the store
-      const registrationType = AllRegistrationTypes.find((reg, index) => {
-        if (reg.registrationTypeAPI === financingStatement.type) {
-          return true
+      await this.setStore(financingStatement)
+      // give time for setStore to finish
+      setTimeout(() => {
+        this.setUnsavedChanges(false)
+      }, 200)
+    }
+  }
+
+  private async setStore (financingStatement: FinancingStatementIF): Promise<void> {
+    // load data into the store
+    const registrationType = AllRegistrationTypes.find((reg, index) => {
+      if (reg.registrationTypeAPI === financingStatement.type) {
+        return true
+      }
+    })
+    const collateral = {
+      valid: true,
+      vehicleCollateral: financingStatement.vehicleCollateral || null,
+      generalCollateral: financingStatement.generalCollateral
+    } as AddCollateralIF
+    const lengthTrust = {
+      valid: true,
+      trustIndenture: financingStatement.trustIndenture || false,
+      lifeInfinite: financingStatement.lifeInfinite || false,
+      lifeYears: financingStatement.lifeYears || null,
+      surrenderDate: financingStatement.surrenderDate || null,
+      lienAmount: financingStatement.lienAmount || null
+    } as LengthTrustIF
+    const parties = {
+      valid: true,
+      registeringParty: null, // will be taken from account info
+      securedParties: financingStatement.securedParties,
+      debtors: financingStatement.debtors
+    } as AddPartiesIF
+    const origParties = {
+      registeringParty: financingStatement.registeringParty, // will be used for summary
+      securedParties: financingStatement.securedParties,
+      debtors: financingStatement.debtors
+    } as AddPartiesIF
+    const courtOrder: CourtOrderIF = {
+      courtRegistry: '',
+      courtName: '',
+      fileNumber: '',
+      effectOfOrder: '',
+      orderDate: ''
+    }
+    const certifyInfo: CertifyIF = {
+      valid: false,
+      certified: false,
+      legalName: '',
+      registeringParty: null
+    }
+    this.setRegistrationCreationDate(financingStatement.createDateTime)
+    this.setRegistrationExpiryDate(financingStatement.expiryDate)
+    this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
+    this.setRegistrationType(registrationType)
+    this.setAddCollateral(collateral)
+    this.setLengthTrust(lengthTrust)
+    this.setAddSecuredPartiesAndDebtors(cloneDeep(parties))
+    this.setOriginalAddCollateral(cloneDeep(collateral))
+    this.setOriginalLengthTrust(cloneDeep(lengthTrust))
+    this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(origParties))
+    this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+    // Reset anything left in the store that is amendment registration related.
+    this.setAmendmentDescription('')
+    this.setCourtOrderInformation(courtOrder)
+    this.setFolioOrReferenceNumber('')
+    this.setCertifyInformation(certifyInfo)
+    this.setStaffPayment({
+      option: -1,
+      routingSlipNumber: '',
+      bcolAccountNumber: '',
+      datNumber: '',
+      folioNumber: '',
+      isPriority: false
+    })
+    if (this.documentId) {
+      const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
+      if (stateModel.registration.draft.error) {
+        this.emitError(stateModel.registration.draft.error)
+      } else {
+        this.setAddCollateral(stateModel.registration.collateral)
+        this.setLengthTrust(stateModel.registration.lengthTrust)
+        this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+        if (stateModel.registration.amendmentDescription) {
+          this.setAmendmentDescription(stateModel.registration.amendmentDescription)
         }
-      })
-      const collateral = {
-        valid: true,
-        vehicleCollateral: financingStatement.vehicleCollateral || null,
-        generalCollateral: financingStatement.generalCollateral
-      } as AddCollateralIF
-      const lengthTrust = {
-        valid: true,
-        trustIndenture: financingStatement.trustIndenture || false,
-        lifeInfinite: financingStatement.lifeInfinite || false,
-        lifeYears: financingStatement.lifeYears || null,
-        surrenderDate: financingStatement.surrenderDate || null,
-        lienAmount: financingStatement.lienAmount || null
-      } as LengthTrustIF
-      const parties = {
-        valid: true,
-        registeringParty: null, // will be taken from account info
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      const origParties = {
-        registeringParty: financingStatement.registeringParty, // will be used for summary
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      const courtOrder: CourtOrderIF = {
-        courtRegistry: '',
-        courtName: '',
-        fileNumber: '',
-        effectOfOrder: '',
-        orderDate: ''
-      }
-      const certifyInfo: CertifyIF = {
-        valid: false,
-        certified: false,
-        legalName: '',
-        registeringParty: null
-      }
-      this.setRegistrationCreationDate(financingStatement.createDateTime)
-      this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      this.setRegistrationType(registrationType)
-      this.setAddCollateral(collateral)
-      this.setLengthTrust(lengthTrust)
-      this.setAddSecuredPartiesAndDebtors(cloneDeep(parties))
-      this.setOriginalAddCollateral(cloneDeep(collateral))
-      this.setOriginalLengthTrust(cloneDeep(lengthTrust))
-      this.setOriginalAddSecuredPartiesAndDebtors(cloneDeep(origParties))
-      this.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-      // Reset anything left in the store that is amendment registration related.
-      this.setAmendmentDescription('')
-      this.setCourtOrderInformation(courtOrder)
-      this.setFolioOrReferenceNumber('')
-      this.setCertifyInformation(certifyInfo)
-      this.setStaffPayment({
-        option: -1,
-        routingSlipNumber: '',
-        bcolAccountNumber: '',
-        datNumber: '',
-        folioNumber: '',
-        isPriority: false
-      })
-      if (this.documentId) {
-        const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
-        if (stateModel.registration.draft.error) {
-          this.emitError(stateModel.registration.draft.error)
-        } else {
-          this.setAddCollateral(stateModel.registration.collateral)
-          this.setLengthTrust(stateModel.registration.lengthTrust)
-          this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
-          if (stateModel.registration.amendmentDescription) {
-            this.setAmendmentDescription(stateModel.registration.amendmentDescription)
-          }
-          if (stateModel.registration.courtOrderInformation) {
-            this.setCourtOrderInformation(stateModel.registration.courtOrderInformation)
-          }
+        if (stateModel.registration.courtOrderInformation) {
+          this.setCourtOrderInformation(stateModel.registration.courtOrderInformation)
         }
       }
     }
@@ -518,6 +550,7 @@ export default class AmendRegistration extends Vue {
     if (draft.error) {
       this.emitError(draft.error)
     } else {
+      this.setUnsavedChanges(false)
       // set new added reg
       this.setRegTableData({
         addedReg: draft.amendmentStatement.documentId,
@@ -533,10 +566,7 @@ export default class AmendRegistration extends Vue {
   private goToDashboard (): void {
     // unset registration number
     this.setRegistrationNumber(null)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
+    this.$router.push({ name: RouteNames.DASHBOARD })
   }
 
   private setCourtOrderValid (valid): void {

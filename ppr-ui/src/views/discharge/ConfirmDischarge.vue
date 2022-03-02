@@ -12,7 +12,7 @@
       setAttach="#confirm-discharge"
       :setOptions="options"
       :setDisplay="showCancelDialog"
-      @proceed="cancel($event)"
+      @proceed="handleDialogResp($event)"
     />
     <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
@@ -124,7 +124,7 @@ import {
   DebtorNameIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
-import { dischargeCancelDialog } from '@/resources/dialogOptions'
+import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 
 @Component({
@@ -150,6 +150,7 @@ export default class ConfirmDischarge extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegTableData: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -165,7 +166,7 @@ export default class ConfirmDischarge extends Vue {
   private dataLoadError = false
   private feeType = FeeSummaryTypes.DISCHARGE
   private financingStatementDate: Date = null
-  private options: DialogOptionsIF = dischargeCancelDialog
+  private options: DialogOptionsIF = notCompleteDialog
   private showCancelDialog = false
   private showErrors = false
   private submitting = false
@@ -262,9 +263,9 @@ export default class ConfirmDischarge extends Vue {
     this.onAppReady(this.appReady)
   }
 
-  private cancel (val: boolean): void {
+  private handleDialogResp (val: boolean): void {
     this.showCancelDialog = false
-    if (val) {
+    if (!val) {
       this.setRegistrationNumber(null)
       this.$router.push({ name: RouteNames.DASHBOARD })
     }

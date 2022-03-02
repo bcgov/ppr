@@ -125,6 +125,7 @@ export default class App extends Mixins(AuthMixin) {
   @Getter getUserLastName!: string
   @Getter getUserRoles!: string
   @Getter getUserUsername!: string
+  @Getter hasUnsavedChanges: Boolean
   @Getter isPremiumAccount!: boolean
   @Getter isRoleStaff!: boolean
   @Getter isRoleStaffBcol!: boolean
@@ -230,12 +231,26 @@ export default class App extends Mixins(AuthMixin) {
       this.loggedOut = false
       // before unloading this page, if there are changes then prompt user
       window.onbeforeunload = (event) => {
-        // add condition once we know what to look for
-        if (false) { // eslint-disable-line no-constant-condition
-          // cancel closing the page
+        const changeRoutes = [
+          RouteNames.RENEW_REGISTRATION,
+          RouteNames.CONFIRM_RENEWAL,
+          RouteNames.REVIEW_DISCHARGE,
+          RouteNames.CONFIRM_DISCHARGE
+        ]
+        const newAmendRoutes = [
+          RouteNames.AMEND_REGISTRATION,
+          RouteNames.CONFIRM_AMENDMENT,
+          RouteNames.LENGTH_TRUST,
+          RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+          RouteNames.ADD_COLLATERAL,
+          RouteNames.REVIEW_CONFIRM
+        ]
+        const routeName = this.$router.currentRoute.name as RouteNames
+        if (changeRoutes.includes(routeName) || (newAmendRoutes.includes(routeName) && this.hasUnsavedChanges)) {
+          // browser popup
           event.preventDefault()
-          // pop up confirmation dialog
-          // NB: custom text is not supported in all browsers
+          // NB: custom text is no longer supported in any major browsers due to security reasons.
+          // 'event.returnValue' is treated as a flag
           event.returnValue = 'You have unsaved changes. Are you sure you want to leave?'
         }
       }

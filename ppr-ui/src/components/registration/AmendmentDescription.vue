@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed, onMounted } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
@@ -72,7 +72,7 @@ export default defineComponent({
     const { setAmendmentDescription } = useActions<any>(['setAmendmentDescription'])
 
     const localState = reactive({
-      detailDescription: '',
+      detailDescription: getAmendmentDescription.value || '',
       summaryView: computed((): boolean => {
         return props.isSummary
       }),
@@ -85,10 +85,6 @@ export default defineComponent({
       valid: computed((): boolean => {
         return (localState.detailDescription?.length || 0) <= 4000
       })
-    })
-
-    onMounted(() => {
-      localState.detailDescription = localState.amendmentDescription
     })
 
     watch(() => localState.detailDescription, (val: string) => {

@@ -3,6 +3,11 @@
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
     <staff-payment-dialog
       attach=""
       class="mt-10"
@@ -19,7 +24,7 @@
               id="reg-cancel-btn"
               outlined
               color="primary"
-              @click="submitCancel"
+              @click="cancel()"
             >
               Cancel
             </v-btn>
@@ -38,7 +43,7 @@
             id="reg-save-btn"
             outlined
             color="primary"
-            @click="submitSave"
+            @click="saveDraft()"
             v-if="buttonConfig.showSave"
           >
             Save
@@ -87,7 +92,7 @@ import _ from 'lodash'
 // local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
-import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 
 import {
@@ -97,6 +102,7 @@ import {
   FinancingStatementIF, // eslint-disable-line no-unused-vars
   StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { unsavedChangesDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   components: {
@@ -128,20 +134,24 @@ export default defineComponent({
     const {
       getFinancingButtons,
       getStateModel,
+      hasUnsavedChanges,
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc
     } = useGetters<any>([
       'getFinancingButtons',
       'getStateModel',
+      'hasUnsavedChanges',
       'isRoleStaffBcol',
       'isRoleStaffReg',
       'isRoleStaffSbc'
     ])
-    const { resetNewRegistration, setDraft, setRegTableData } =
-      useActions<any>(['resetNewRegistration', 'setDraft', 'setRegTableData'])
+    const { setUnsavedChanges, resetNewRegistration, setDraft, setRegTableData } =
+      useActions<any>(['setUnsavedChanges', 'resetNewRegistration', 'setDraft', 'setRegTableData'])
 
     const localState = reactive({
+      options: unsavedChangesDialog,
+      showCancelDialog: false,
       statementType: props.currentStatementType,
       stepName: props.currentStepName,
       staffPaymentDialogDisplay: false,
@@ -187,16 +197,21 @@ export default defineComponent({
         }
       )
     })
-    const submitCancel = () => {
+    const cancel = () => {
+      if (hasUnsavedChanges.value) localState.showCancelDialog = true
+      else goToDashboard()
+    }
+    const goToDashboard = () => {
       // clear all state set data
       resetNewRegistration(null)
-      // navigate to dashboard
-      props.router.push({
-        name: RouteNames.DASHBOARD
-      })
+      props.router.push({ name: RouteNames.DASHBOARD })
+    }
+    const handleDialogResp = (val: boolean) => {
+      localState.showCancelDialog = false
+      if (!val) goToDashboard()
     }
     /** Save the draft version from data stored in the state model. */
-    const saveDraft = async () => {
+    const saveDraft = async (): Promise<Boolean> => {
       const stateModel: StateModelIF = getStateModel.value
       const draft: DraftIF = await throttleSubmitStatementDraft(stateModel)
       if (draft.error) {
@@ -204,20 +219,17 @@ export default defineComponent({
         emit('error', draft.error)
         return false
       } else {
-        setDraft(draft)
-        setRegTableData({ addedReg: draft.financingStatement.documentId, addedRegParent: '' })
+        await setDraft(draft)
+        await setRegTableData({ addedReg: draft.financingStatement.documentId, addedRegParent: '' })
+        await setUnsavedChanges(false)
         return true
       }
-    }
-    /** Save and stay in flow. */
-    const submitSave = () => {
-      saveDraft()
     }
     /* Save and return to dashboard */
     const submitSaveResume = async (): Promise<void> => {
       const success = await saveDraft()
       if (success) {
-        submitCancel()
+        goToDashboard()
       }
     }
     const submitBack = () => {
@@ -320,10 +332,11 @@ export default defineComponent({
 
     return {
       ...toRefs(localState),
+      cancel,
+      handleDialogResp,
+      saveDraft,
       submitBack,
-      submitCancel,
       submitNext,
-      submitSave,
       onStaffPaymentChanges,
       submitSaveResume
     }

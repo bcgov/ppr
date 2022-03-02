@@ -123,7 +123,13 @@ export const mutateNewRegistration = (state: StateIF) => {
   }
   state.stateModel.registration.registrationFlowType = RegistrationFlowType.NEW
   state.stateModel.registration.confirmDebtorName = null
-  state.stateModel.registration.courtOrderInformation = null
+  state.stateModel.registration.courtOrderInformation = {
+    orderDate: '',
+    effectOfOrder: '',
+    courtName: '',
+    courtRegistry: '',
+    fileNumber: ''
+  }
   state.stateModel.registration.amendmentDescription = ''
   state.stateModel.certifyInformation = {
     valid: false,
@@ -139,6 +145,7 @@ export const mutateNewRegistration = (state: StateIF) => {
     folioNumber: '',
     isPriority: false
   }
+  state.stateModel.unsavedChanges = false
 }
 
 export const mutateRegistrationConfirmDebtorName = (state: StateIF, debtorName: DebtorNameIF) => {
@@ -232,4 +239,8 @@ export const mutateShowStepErrors = (state: StateIF, show: boolean) => {
 
 export const mutateRegistrationTable = (state: StateIF, regTableData: RegTableDataI) => {
   state.stateModel.registrationTable = regTableData
+}
+
+export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) => {
+  state.stateModel.unsavedChanges = unsavedChanges
 }
