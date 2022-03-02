@@ -86,7 +86,6 @@ export const setCollateralValid = ({ commit }, valid: boolean): void => {
 
 export const setCourtOrderInformation: ActionIF = ({ commit }, courtOrderInformation: CourtOrderIF): void => {
   commit('mutateCourtOrderInformation', courtOrderInformation)
-  console.log('co')
   commit('mutateUnsavedChanges', true)
 }
 
@@ -96,13 +95,11 @@ export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {
 
 export const setGeneralCollateral: ActionIF = ({ commit }, generalCollateral: GeneralCollateralIF[]): void => {
   commit('mutateGeneralCollateral', generalCollateral)
-  console.log('gcol')
   commit('mutateUnsavedChanges', true)
 }
 
 export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
   commit('mutateLengthTrust', lengthTrust)
-  console.log('lt')
   commit('mutateUnsavedChanges', true)
 }
 
@@ -184,7 +181,6 @@ export const setUserSettings: ActionIF = ({ commit }, settings: UserSettingsIF):
 
 export const setVehicleCollateral: ActionIF = ({ commit }, vCollateral: VehicleCollateralIF[]): void => {
   commit('mutateVehicleCollateral', vCollateral)
-  console.log('vcol')
   commit('mutateUnsavedChanges', true)
 }
 
@@ -202,7 +198,6 @@ export const setLengthTrustStepValidity = ({ commit }, validity) => {
 
 export const setFolioOrReferenceNumber: ActionIF = ({ commit }, refNumber: string): void => {
   commit('mutateFolioOrReferenceNumber', refNumber)
-  console.log('fol')
   commit('mutateUnsavedChanges', true)
 }
 
