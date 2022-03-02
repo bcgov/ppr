@@ -5,6 +5,7 @@ import { useValidation } from '@/utils/validators/use-validation'
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
   first: createDefaultValidationResult(),
+  middle: createDefaultValidationResult(),
   last: createDefaultValidationResult(),
   year: createDefaultValidationResult(),
   month: createDefaultValidationResult(),
@@ -91,6 +92,7 @@ export const useDebtorValidation = () => {
     } else {
       return (
         errors.value.first.succeeded &&
+        errors.value.middle.succeeded &&
         errors.value.last.succeeded &&
         errors.value.year.succeeded &&
         errors.value.month.succeeded &&
