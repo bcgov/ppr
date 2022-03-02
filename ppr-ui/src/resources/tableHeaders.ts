@@ -363,7 +363,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'min-column-md',
     sortable: true,
-    text: 'Registration Date',
+    text: 'Date (Pacific Time)',
     value: 'createDateTime',
     display: true
   },
@@ -406,7 +406,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'min-column-sm',
     sortable: false,
-    text: 'Days to Expiry',
+    text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
     display: true
   },
