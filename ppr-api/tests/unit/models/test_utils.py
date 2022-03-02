@@ -18,7 +18,7 @@ from datetime import timedelta as _timedelta
 import pytest
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT
 
-from ppr_api.models import utils as model_utils, Registration
+from ppr_api.models import utils as model_utils, Registration, SearchRequest
 
 
 # testdata pattern is ({registration_ts}, {years}, {expiry_ts})
@@ -431,4 +431,13 @@ def test_doc_storage_name(session, desc, reg_num, doc_name):
     test_name = test_name.replace('-', '/') + '/' + registration.registration_type_cl.lower() + \
                 '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
     name = model_utils.get_doc_storage_name(registration)
+    assert test_name == name
+
+
+def test_search_doc_storage_name(session):
+    """Assert that building a search storage document name works as expected."""
+    search: SearchRequest = SearchRequest(id=2000, search_ts=model_utils.now_ts())
+    test_name = search.search_ts.isoformat()[:10]
+    test_name = test_name.replace('-', '/') + '/search-results-report-2000.pdf'
+    name = model_utils.get_search_doc_storage_name(search)
     assert test_name == name

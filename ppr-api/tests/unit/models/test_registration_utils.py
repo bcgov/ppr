@@ -58,6 +58,18 @@ TEST_QUERY_BASE_DATA = [
     (None, 'SA', None, None, None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
 ]
 
+# testdata pattern is ({reg_num}, {client_ref}, {start_ts}, {end_ts})
+TEST_FILTER_API_DATA = [
+    (None, None, None, None),
+    ('TEST', None, None, None),
+    ('TEST0018A', None, None, None),
+    ('test', None, None, None),
+    (None, 'TEST-SA-00', None, None),
+    (None, None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
+    ('TEST0', 'TEST-SA-00', None, None),
+    ('TEST0', None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
+]
+
 
 @pytest.mark.parametrize('desc,account_id,result_count,valid', TEST_REG_COUNT_DATA)
 def test_get_account_reg_count(session, desc, account_id, result_count, valid):
@@ -260,7 +272,7 @@ def test_account_query_params(session, reg_num, reg_type, client_ref, registerin
 
 @pytest.mark.parametrize('reg_num,reg_type,client_ref,registering,status,start_ts,end_ts', TEST_QUERY_BASE_DATA)
 def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, registering, status, start_ts, end_ts):
-    """Assert that account change registration query is as expected."""
+    """Assert that the account registration filter works is as expected."""
     params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
                                                                   collapse=True,
                                                                   account_name='Unit Testing',
@@ -288,6 +300,70 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
         assert statement['registeringParty']
         assert statement['securedParties']
         assert 'vehicleCount' in statement
+        if statement['registrationNumber'] == ('TEST0016'):
+            assert statement['registeringName'] == ''
+            assert statement['clientReferenceId'] == ''
+        elif statement['registrationNumber'] not in ('TEST0019', 'TEST0021'):
+            assert statement['registeringName']
+            assert statement['clientReferenceId']
+        if statement['registrationNumber'] in ('TEST0001', 'TEST0019', 'TEST0021'):
+            assert not statement['path']
+        else:
+            assert statement['path']
+        assert statement['baseRegistrationNumber']
+        if reg_num == 'TEST0018A':
+            assert len(statement['changes']) > 0
+        if 'changes' in statement:
+            for change in statement['changes']:
+                assert change['registrationNumber']
+                assert change['baseRegistrationNumber']
+                assert change['registrationType']
+                assert change['registrationClass']
+                assert change['registrationDescription']
+                assert change['createDateTime']
+                assert change['registeringParty']
+                assert change['securedParties']
+                if change['baseRegistrationNumber'] not in ('TEST0019', 'TEST0021'):
+                    assert change['registeringName']
+                    assert change['clientReferenceId']
+                if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
+                    assert not change['path']
+                elif change.get('registrationNumber', '') == 'TEST00R5' or \
+                        change.get('registrationNumber', '') == 'TEST00D4' or \
+                        change.get('registrationNumber', '') == 'TEST0007':
+                    assert not change['path']
+                else:
+                    assert change['path']
+
+
+@pytest.mark.parametrize('reg_num,client_ref,start_ts,end_ts', TEST_FILTER_API_DATA)
+def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_ts, end_ts):
+    """Assert that the api account registration filter works is as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  collapse=True,
+                                                                  account_name='Unit Testing',
+                                                                  sbc_staff=False)
+    params.from_ui = False
+    params.registration_number = reg_num
+    params.client_reference_id = client_ref
+    if start_ts and end_ts:
+        params.start_date_time = start_ts
+        params.end_date_time = model_utils.format_ts(model_utils.now_ts())
+    statement_list = Registration.find_all_by_account_id_api_filter(params)
+    assert statement_list
+    assert 'totalRegistrationCount' not in statement_list[0]
+    for statement in statement_list:
+        assert statement['registrationNumber']
+        assert statement['registrationType']
+        assert statement['registrationClass']
+        assert statement['registrationDescription']
+        assert statement['statusType']
+        assert statement['createDateTime']
+        assert statement['lastUpdateDateTime']
+        assert statement['expireDays']
+        assert statement['registeringParty']
+        assert statement['securedParties']
+        assert 'vehicleCount' not in statement
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''

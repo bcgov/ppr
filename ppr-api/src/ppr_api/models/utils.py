@@ -541,7 +541,6 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
 ORDER BY registration_ts DESC
 """
 
-
 # Error messages
 ERR_FINANCING_NOT_FOUND = '{code}: no Financing Statement found for registration number {registration_num}.'
 ERR_REGISTRATION_NOT_FOUND = '{code}: no registration found for registration number {registration_num}.'
@@ -555,6 +554,8 @@ ERR_DRAFT_USED = '{code}: Draft Statement for Document ID {document_number} has 
 ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
 ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
+
+SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
 
 
 def get_max_registrations_size():
@@ -723,6 +724,13 @@ def get_doc_storage_name(registration):
     name = registration.registration_ts.isoformat()[:10]
     name = name.replace('-', '/') + '/' + registration.registration_type_cl.lower()
     name += '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
+    return name
+
+
+def get_search_doc_storage_name(search_request):
+    """Get a search document storage name in the format YYYY/MM/DD/search-results-report-search_id.pdf."""
+    name = search_request.search_ts.isoformat()[:10]
+    name = name.replace('-', '/') + '/' + SEARCH_RESULTS_DOC_NAME.format(search_id=search_request.id)
     return name
 
 
