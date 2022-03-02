@@ -17,6 +17,22 @@ export function getVueRouter () {
     routes,
     scrollBehavior (to, from, savedPosition) {
       // see https://router.vuejs.org/guide/advanced/scroll-behavior.html
+      const scrollToTableRoutes = [
+        RouteNames.ADD_COLLATERAL,
+        RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+        RouteNames.LENGTH_TRUST,
+        RouteNames.REVIEW_CONFIRM,
+        RouteNames.REVIEW_DISCHARGE,
+        RouteNames.CONFIRM_DISCHARGE,
+        RouteNames.RENEW_REGISTRATION,
+        RouteNames.CONFIRM_RENEWAL,
+        RouteNames.AMEND_REGISTRATION,
+        RouteNames.CONFIRM_AMENDMENT
+      ]
+      const fromRouteName = from.name as RouteNames
+      if (to.name === RouteNames.DASHBOARD && scrollToTableRoutes.includes(fromRouteName)) {
+        return { x: 0, y: 1000 }
+      }
       return { x: 0, y: 0 }
     }
   })

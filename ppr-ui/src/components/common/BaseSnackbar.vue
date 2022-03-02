@@ -1,7 +1,7 @@
 <template>
   <v-snackbar
     class="my-reg-snackbar"
-    timeout="5000"
+    timeout="4000"
     v-model="showSnackbar"
   >
     <v-row no-gutters>
