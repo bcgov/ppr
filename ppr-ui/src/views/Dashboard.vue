@@ -835,7 +835,7 @@ export default class Dashboard extends Vue {
         if (val.addedReg === this.getRegTableData.addedReg) {
           this.setRegTableData({ addedReg: '', addedRegParent: '' })
         }
-      }, 5000)
+      }, 4000)
     }
   }
 
