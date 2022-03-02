@@ -117,7 +117,7 @@ import {
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { AllRegistrationTypes } from '@/resources'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { convertDate, getFeatureFlag, getFinancingStatement } from '@/utils'
+import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
 
 @Component({
   components: {
@@ -172,9 +172,9 @@ export default class ReviewRegistration extends Vue {
   private get asOfDateTime (): string {
     // return formatted date
     if (this.financingStatementDate) {
-      return `${convertDate(this.financingStatementDate, true, true)}`
+      return `${pacificDate(this.financingStatementDate)}`
     }
-    return `${convertDate(new Date(), true, true)}`
+    return `${pacificDate(new Date())}`
   }
 
   private get isAuthenticated (): boolean {

@@ -204,7 +204,6 @@ import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-di
 import { AllRegistrationTypes } from '@/resources'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
-  convertDate,
   getFeatureFlag,
   getFinancingStatement,
   saveAmendmentStatement,
@@ -301,14 +300,6 @@ export default class ConfirmAmendment extends Vue {
   private feeType = FeeSummaryTypes.AMEND
 
   private submitting = false
-
-  private get asOfDateTime (): string {
-    // return formatted date
-    if (this.financingStatementDate) {
-      return `${convertDate(this.financingStatementDate, true, true)}`
-    }
-    return ''
-  }
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))

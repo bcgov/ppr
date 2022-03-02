@@ -129,7 +129,7 @@ import {
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { AllRegistrationTypes } from '@/resources'
 import { renewCancelDialog } from '@/resources/dialogOptions'
-import { convertDate, getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
+import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 
 @Component({
   components: {
@@ -193,14 +193,6 @@ export default class ConfirmDischarge extends Vue {
   private validFolio = true
   private validCertify = false
   private feeType = FeeSummaryTypes.RENEW
-
-  private get asOfDateTime (): string {
-    // return formatted date
-    if (this.financingStatementDate) {
-      return `${convertDate(this.financingStatementDate, true, true)}`
-    }
-    return ''
-  }
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))

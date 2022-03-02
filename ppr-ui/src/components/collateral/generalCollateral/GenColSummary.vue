@@ -175,7 +175,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { pacificDate } from '@/utils'
 import { cloneDeep } from 'lodash'
 
 export default defineComponent({
@@ -323,7 +323,7 @@ export default defineComponent({
 
     const asOfDateTime = (dateString: string) => {
       const asOfDate = new Date(dateString)
-      return convertDate(asOfDate, true, true)
+      return pacificDate(asOfDate)
     }
 
     return {
