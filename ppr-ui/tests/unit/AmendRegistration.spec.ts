@@ -118,8 +118,10 @@ describe('Amendment registration component', () => {
   })
 
   it('processes cancel button action', async () => {
-    wrapper.find(StickyContainer).vm.$emit('cancel', true)
+    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    await wrapper.find(StickyContainer).vm.$emit('cancel', true)
     await flushPromises()
+    await Vue.nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
