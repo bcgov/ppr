@@ -11,7 +11,7 @@ import {
 // Components
 import { GenColSummary } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
-import { convertDate } from '@/utils'
+import { pacificDate } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -99,7 +99,7 @@ describe('GenColSummary tests', () => {
       expect(deleteCount < descriptionDeleteAll.length)
       if (mockedGeneralCollateral2[i].addedDateTime) {
         const date = new Date(mockedGeneralCollateral2[i].addedDateTime)
-        expect(wrapper.find(generalCollateralSummary).text()).toContain(convertDate(date, true, true))
+        expect(wrapper.find(generalCollateralSummary).text()).toContain(pacificDate(date))
       }
       if (mockedGeneralCollateral2[i].descriptionAdd) {
         expect(descriptionAddAll.at(addCount).text()).toContain('ADDED')

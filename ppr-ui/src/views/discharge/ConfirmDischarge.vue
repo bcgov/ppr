@@ -125,7 +125,7 @@ import {
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import { dischargeCancelDialog } from '@/resources/dialogOptions'
-import { convertDate, getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
+import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 
 @Component({
   components: {
@@ -176,14 +176,6 @@ export default class ConfirmDischarge extends Vue {
   private validConfirm = false // eslint-disable-line lines-between-class-members
   private validFolio = true
   private validCertify = false
-
-  private get asOfDateTime (): string {
-    // return formatted date
-    if (this.financingStatementDate) {
-      return `${convertDate(this.financingStatementDate, true, true)}`
-    }
-    return ''
-  }
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))

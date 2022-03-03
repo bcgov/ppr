@@ -88,7 +88,7 @@ import {
   saveResultsError,
   saveSelectionsError
 } from '@/resources/dialogOptions'
-import { convertDate, getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate } from '@/utils'
+import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate, pacificDate } from '@/utils'
 
 @Component({
   components: {
@@ -150,7 +150,7 @@ export default class Search extends Vue {
     const searchResult = this.getSearchResults
     if (searchResult) {
       const searchDate = new Date(searchResult.searchDateTime)
-      return ` as of ${convertDate(searchDate, true, true)}`
+      return ` as of ${pacificDate(searchDate)}`
     }
     return ''
   }

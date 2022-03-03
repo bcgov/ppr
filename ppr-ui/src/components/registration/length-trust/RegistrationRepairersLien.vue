@@ -147,7 +147,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { convertDate, pacificDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
@@ -222,7 +222,7 @@ export default defineComponent({
           const expiryDate = getRegistrationExpiryDate.value
           const newExpDate = new Date(expiryDate)
           newExpDate.setDate(newExpDate.getDate() + 180)
-          return convertDate(newExpDate, true, true)
+          return pacificDate(newExpDate)
         }
       }),
       lengthTrust: computed((): LengthTrustIF => {
