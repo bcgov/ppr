@@ -176,7 +176,10 @@ export default defineComponent({
       ) {
         if (hasGeneralCollateral(registrationType)) {
           if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
-            setGeneralCollateral([{ description: 'All the personal property of the debtor' }])
+            setGeneralCollateral([{
+              description: 'All the personal property of the debtor, ' +
+            'including money due or accruing due'
+            }])
           }
           if (hasGeneralCollateralText(registrationType)) {
             setGeneralCollateral([{
@@ -189,7 +192,8 @@ export default defineComponent({
     })
 
     const getCollateralDescription = (): string => {
-      if (hasVehicleCollateral() && hasGeneralCollateral(registrationType)) {
+      if (hasVehicleCollateral() && hasGeneralCollateral(registrationType) &&
+        (registrationType !== APIRegistrationTypes.LIEN_UNPAID_WAGES)) {
         return 'At least one form of collateral (vehicle or general)'
       }
       if (mustHaveManufacturedHomeCollateral()) {

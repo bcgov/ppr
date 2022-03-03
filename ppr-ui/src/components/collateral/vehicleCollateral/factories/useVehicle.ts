@@ -124,7 +124,22 @@ export const useVehicle = (props, context) => {
       APIRegistrationTypes.TRANSITION_FINANCING_STATEMENT,
       APIRegistrationTypes.TRANSITION_SALE_OF_GOODS,
       APIRegistrationTypes.TRANSITION_TAX_LIEN,
-      APIRegistrationTypes.TRANSITION_MH
+      APIRegistrationTypes.TRANSITION_MH,
+      APIRegistrationTypes.LIEN_UNPAID_WAGES
+    ]
+    return vhArray.includes(registrationType)
+  }
+
+  const hasOptionalVehicleCollateral = (): boolean => {
+    const vhArray = [
+      APIRegistrationTypes.CARBON_TAX,
+      APIRegistrationTypes.EXCISE_TAX,
+      APIRegistrationTypes.FOREST,
+      APIRegistrationTypes.INCOME_TAX,
+      APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+      APIRegistrationTypes.LOGGING_TAX,
+      APIRegistrationTypes.MOTOR_FUEL_TAX,
+      APIRegistrationTypes.MAINTENANCE_LIEN
     ]
     return vhArray.includes(registrationType)
   }
@@ -150,6 +165,7 @@ export const useVehicle = (props, context) => {
     resetFormAndData,
     removeVehicle,
     hasVehicleCollateral,
+    hasOptionalVehicleCollateral,
     mustHaveManufacturedHomeCollateral,
     excludesManufacturedHomeCollateral,
     ActionTypes,
