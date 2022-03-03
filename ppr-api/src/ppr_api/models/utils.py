@@ -664,16 +664,19 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
 
     Adjust the registration timestamp by the life_years number of years in the future.
     """
-    base_time = registration_ts.timestamp()
+    reg_local_ts = registration_ts.astimezone(LOCAL_TZ)
+    base_time = reg_local_ts.timestamp()
     offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
-    base_ts = registration_ts + offset
+    base_ts = reg_local_ts + offset
+    current_app.logger.info(f'Adjusted local expiry Date: {base_ts.year}-{base_ts.month}-{base_ts.day} ')
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
-    future_ts = _datetime.combine(base_date, expiry_time)
+    future_ts: _datetime = _datetime.combine(base_date, expiry_time)
     future_ts = future_ts + datedelta(years=life_years)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
+    current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     # Return as UTC before formatting
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
