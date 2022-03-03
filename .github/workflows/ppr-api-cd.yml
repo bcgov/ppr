@@ -3,7 +3,7 @@ name: PPR API CD
 on:
   push:
     branches:
-      - main
+      - 2022-03-03-patch-release
     paths:
       - "ppr-api/**"
   workflow_dispatch:
