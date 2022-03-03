@@ -22,24 +22,12 @@
 
     <div class="app-body">
       <main>
-        <v-row
-          v-if="!isProd"
-          no-gutters
-          style="height: 40px; background-color: #FCBA19;"
-          align="center"
-          justify="center"
-        >
-          <v-col class="env-info">
-            This application is for test purposes only. Data contained here is TEST DATA - NOT FOR OFFICIAL USE.
-          </v-col>
-        </v-row>
         <sbc-system-banner
           v-if="systemMessage != null"
           v-bind:show="systemMessage != null"
           v-bind:type="systemMessageType"
           v-bind:message="systemMessage"
           icon=" "
-          class="white--text text-lg-h5 font-weight-bold"
           align="center"
         ></sbc-system-banner>
         <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
@@ -672,5 +660,13 @@ export default class App extends Mixins(AuthMixin) {
   text-align: center;
   color: #212529;
   background-color: #FCBA19;
+}
+
+.v-application .warning {
+  background-color: #FCBA19 !important;
+  color: #212529;
+}
+::v-deep .v-alert .v-alert__wrapper {
+  padding: 8px 10px 10px 10px !important;
 }
 </style>
