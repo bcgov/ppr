@@ -667,6 +667,6 @@ export default class App extends Mixins(AuthMixin) {
   color: #212529;
 }
 ::v-deep .v-alert .v-alert__wrapper {
-  padding: 12px 12px !important;
+  padding: 8px 10px 10px 10px !important;
 }
 </style>
