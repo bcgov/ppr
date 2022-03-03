@@ -5,7 +5,7 @@
       :class="registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''"
       v-if="vehicleCollateral && vehicleCollateral.length > 0"
     >
-      <v-col cols="3" class="pt-4 generic-label">
+      <v-col cols="12" class="pt-4 generic-label">
         Vehicle Collateral
       </v-col>
       <v-col
