@@ -664,32 +664,19 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
 
     Adjust the registration timestamp by the life_years number of years in the future.
     """
-    current_app.logger.info('registration_ts=' + registration_ts.isoformat())
-    # current_app.logger.info('registration format=' + format_ts(registration_ts))
     reg_local_ts = registration_ts.astimezone(LOCAL_TZ)
-    current_app.logger.info('reg_local_ts=' + reg_local_ts.isoformat())
-    reg_utc_ts = registration_ts.replace(tzinfo=pytz.UTC)
-    current_app.logger.info('reg_utc_ts=' + reg_utc_ts.isoformat())
-    test_time = reg_local_ts.timestamp()
-    offset = _datetime.fromtimestamp(test_time) - _datetime.utcfromtimestamp(test_time)
-    test_ts = reg_local_ts + offset
-    current_app.logger.info(f'test {offset} {test_ts.year} {test_ts.month} {test_ts.day} ')
-
-    base_time = registration_ts.timestamp()
+    base_time = reg_local_ts.timestamp()
     offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
-    base_ts = registration_ts + offset
-    current_app.logger.info(f'{offset} {base_ts.year} {base_ts.month} {base_ts.day} ')
+    base_ts = reg_local_ts + offset
+    current_app.logger.info(f'Adjusted local expiry Date: {base_ts.year}-{base_ts.month}-{base_ts.day} ')
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
     future_ts: _datetime = _datetime.combine(base_date, expiry_time)
     future_ts = future_ts + datedelta(years=life_years)
-    # current_app.logger.info('future_ts=' + future_ts.isoformat())
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
-    current_app.logger.info('local_ts=' + local_ts.isoformat())
-    utc_ts = _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
-    current_app.logger.info('utc_ts=' + utc_ts.isoformat())
+    current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     # Return as UTC before formatting
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
