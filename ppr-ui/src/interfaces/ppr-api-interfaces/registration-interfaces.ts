@@ -79,7 +79,8 @@ export interface RegistrationSummaryIF {
   registrationType: APIRegistrationTypes | APIAmendmentTypes,
   securedParties: string,
   statusType?: string,
-  totalRegistrationCount?: number // Included by the api in the 1st item in the registration list
+  totalRegistrationCount?: number, // Included by the api in the 1st item in the registration list
+  vehicleCount?: number // Number of vehicle collateral in the registration
 }
 
 // Discharge Registration interface. Base registration number, debtor name, and registering party are required.
