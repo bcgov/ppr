@@ -13,8 +13,10 @@ export const useValidation = () => {
       validateBusinessName(form, localErrors.value)
     } else {
       form.personName.first = form.personName.first.trim()
+      form.personName.middle = form.personName.middle.trim()
       form.personName.last = form.personName.last.trim()
       validateFirstName(form, localErrors.value)
+      validateMiddleName(form, localErrors.value)
       validateLastName(form, localErrors.value)
     }
   }
@@ -64,6 +66,22 @@ export const useValidation = () => {
     }
   }
 
+  const validateMiddleName = (form, localErrors) => {
+    if (form.personName.middle.length > 50) {
+      localErrors.middle = {
+        type: 'NAME',
+        succeeded: false,
+        message: 'Maximum 50 characters'
+      }
+    } else {
+      localErrors.middle = {
+        type: '',
+        succeeded: true,
+        message: ''
+      }
+    }
+  }
+
   const validateLastName = (form, localErrors) => {
     if (form.personName.last.length === 0) {
       localErrors.last = {
@@ -91,6 +109,7 @@ export const useValidation = () => {
     validateName,
     validateBusinessName,
     validateFirstName,
+    validateMiddleName,
     validateLastName
   }
 }

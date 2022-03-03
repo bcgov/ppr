@@ -9,6 +9,7 @@ const {
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
   first: createDefaultValidationResult(),
+  middle: createDefaultValidationResult(),
   last: createDefaultValidationResult(),
   emailAddress: createDefaultValidationResult(),
   address: createDefaultValidationResult()
@@ -44,6 +45,7 @@ export const useSecuredPartyValidation = () => {
     } else {
       return (
         errors.value.first.succeeded &&
+        errors.value.middle.succeeded &&
         errors.value.last.succeeded &&
         errors.value.emailAddress.succeeded &&
         errors.value.address.succeeded

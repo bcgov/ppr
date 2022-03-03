@@ -109,7 +109,6 @@
                       v-model="currentSecuredParty.personName.first"
                       @keyup="validateNameField()"
                       persistent-hint
-                      @blur="onBlur('first')"
                       :error-messages="
                         errors.first.message ? errors.first.message : ''
                       "
@@ -120,8 +119,12 @@
                       filled
                       label="Middle Name (Optional)"
                       id="txt-middle-party"
+                      @keyup="validateNameField()"
                       v-model="currentSecuredParty.personName.middle"
                       persistent-hint
+                      :error-messages="
+                      errors.middle.message ? errors.middle.message : ''
+                      "
                     />
                   </v-col>
                   <v-col cols="4">
@@ -132,7 +135,6 @@
                       v-model="currentSecuredParty.personName.last"
                       persistent-hint
                       @keyup="validateNameField()"
-                      @blur="onBlur('last')"
                       :error-messages="
                         errors.last.message ? errors.last.message : ''
                       "
@@ -300,6 +302,7 @@ export default defineComponent({
 
     const {
       validateFirstName,
+      validateMiddleName,
       validateLastName,
       validateBusinessName
     } = useValidation()
@@ -389,6 +392,9 @@ export default defineComponent({
     const validateNameField = () => {
       if (!errors.value.first.succeeded || currentSecuredParty.value.personName.first.length > 50) {
         validateFirstName(currentSecuredParty.value, errors.value)
+      }
+      if (!errors.value.middle.succeeded || currentSecuredParty.value.personName.middle.length > 50) {
+        validateMiddleName(currentSecuredParty.value, errors.value)
       }
       if (!errors.value.last.succeeded || currentSecuredParty.value.personName.last.length > 50) {
         validateLastName(currentSecuredParty.value, errors.value)

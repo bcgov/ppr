@@ -81,8 +81,12 @@
                   label="Middle Name"
                   id="txt-middle-debtor"
                   hint="Required if person has middle name"
+                  @keyup="validateNameField()"
                   v-model="currentDebtor.personName.middle"
                   persistent-hint
+                  :error-messages="
+                    errors.middle.message ? errors.middle.message : ''
+                  "
                 />
               </v-col>
               <v-col cols="4">
@@ -306,6 +310,7 @@ export default defineComponent({
 
     const {
       validateFirstName,
+      validateMiddleName,
       validateLastName,
       validateBusinessName
     } = useValidation()
@@ -348,6 +353,9 @@ export default defineComponent({
       }
       if (!errors.value.last.succeeded || currentDebtor.value.personName.last.length > 50) {
         validateLastName(currentDebtor.value, errors.value)
+      }
+      if (!errors.value.middle.succeeded || currentDebtor.value.personName.middle.length > 50) {
+        validateMiddleName(currentDebtor.value, errors.value)
       }
       if (!errors.value.businessName.succeeded || currentDebtor.value.businessName.length > 150) {
         validateBusinessName(currentDebtor.value, errors.value)
