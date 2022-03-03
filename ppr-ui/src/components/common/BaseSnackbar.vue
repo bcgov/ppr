@@ -2,6 +2,7 @@
   <v-snackbar
     class="my-reg-snackbar"
     timeout="4000"
+    transition="fade"
     v-model="showSnackbar"
   >
     <v-row no-gutters>
