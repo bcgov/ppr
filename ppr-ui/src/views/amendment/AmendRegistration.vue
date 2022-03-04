@@ -281,7 +281,7 @@ export default class AmendRegistration extends Vue {
   }
 
   private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber && (!this.getConfirmDebtorName || !this.documentId)) {
+    if (!this.registrationNumber || (!this.getConfirmDebtorName && !this.documentId)) {
       if (!this.registrationNumber) {
         console.error('No registration number given to amend. Redirecting to dashboard...')
       } else {
