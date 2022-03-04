@@ -6,10 +6,13 @@ import { ValidationRule } from '@/composables/address/enums'
 export function useBaseValidations () {
   /* this variable must be named the same as your ref=___ in your form */
   const addressForm = ref(null)
+  const resetValidation = () => {
+    addressForm.value.resetValidation()
+  }
   const validate = () => {
     addressForm.value.validate()
   }
-  return { addressForm, validate }
+  return { addressForm, resetValidation, validate }
 }
 
 /* Rules used in most schemas */

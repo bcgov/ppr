@@ -385,7 +385,8 @@ export default defineComponent({
           addEditSecuredParty()
         }
       } else {
-        localState.showAllAddressErrors = true
+        // trigger show validation
+        localState.showAllAddressErrors = !localState.showAllAddressErrors
       }
     }
 

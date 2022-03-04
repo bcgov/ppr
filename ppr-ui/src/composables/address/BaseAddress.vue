@@ -185,12 +185,12 @@ export default defineComponent({
       schemaLocal,
       isSchemaRequired,
       labels
-    } = useAddress(toRefs(props).value, toRefs(props).schema)
+    } = useAddress(toRefs(props).value, props.schema)
 
     const origPostalCodeRules = schemaLocal.value.postalCode
     const origRegionRules = schemaLocal.value.region
 
-    const { addressForm, validate } = useBaseValidations()
+    const { addressForm, resetValidation, validate } = useBaseValidations()
 
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
@@ -208,9 +208,6 @@ export default defineComponent({
         schemaLocal.value.region = origRegionRules
       } else {
         schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
-        for (let i = 0; i < schemaLocal.value.region.length; i++) {
-          schemaLocal.value.region.pop()
-        }
         schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
@@ -221,6 +218,7 @@ export default defineComponent({
         addressLocal.value.region = ''
         addressLocal.value.postalCode = ''
       }
+      resetValidation()
     }
 
     onMounted(() => {
@@ -248,10 +246,8 @@ export default defineComponent({
       countryChangeHandler(val, oldVal)
     })
 
-    watch(() => props.triggerErrors, (val) => {
-      if (val) {
-        validate()
-      }
+    watch(() => props.triggerErrors, () => {
+      validate()
     })
 
     return {

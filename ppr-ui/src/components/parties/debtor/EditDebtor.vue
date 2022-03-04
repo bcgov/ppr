@@ -343,7 +343,8 @@ export default defineComponent({
       ) {
         addDebtor()
       } else {
-        localState.showAllAddressErrors = true
+        // trigger show validation
+        localState.showAllAddressErrors = !localState.showAllAddressErrors
       }
     }
 
