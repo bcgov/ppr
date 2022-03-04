@@ -128,9 +128,10 @@ export default defineComponent({
   setup (props, { emit }) {
     const { getSearchHistory, isRoleStaff } = useGetters<any>(['getSearchHistory', 'isRoleStaff'])
     const tooltipTxtPdf =
-      'Large search result reports (over 75 registrations) ' +
-      'can take up to 20 minutes to generate. The PDF will appear here once it ' +
-      'is available. You may need to refresh this page to display the PDF download icon.'
+      'This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
+        ' icon to see if your PDF is ready for download. <br>' +
+        'Note: large documents take up to 20 minutes to generate.'
     const localState = reactive({
       loadingPDF: '',
       headers: computed((): Array<any> => {

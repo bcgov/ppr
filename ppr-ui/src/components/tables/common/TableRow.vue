@@ -144,7 +144,7 @@
           <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
         </template>
         <div class="pt-2 pb-2">
-          {{ tooltipTxtPdf(item) }}
+          <span v-html="tooltipTxtPdf(item)"></span>
         </div>
       </v-tooltip>
     </td>
@@ -386,9 +386,10 @@ export default defineComponent({
       'to Secured Parties or the Registering Party of this filing. To ' +
       'view the details of this registration you must conduct a search.'
       } else {
-        return 'This is a large document that may take up to 20 minutes to generate. ' +
-        'The PDF version of this document will appear here once it\'s available. You may ' +
-        'need to refresh this page to display the PDF download icon.'
+        return 'This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
+        ' icon to see if your PDF is ready for download. <br>' +
+        'Note: large documents take up to 20 minutes to generate.'
       }
     }
 
