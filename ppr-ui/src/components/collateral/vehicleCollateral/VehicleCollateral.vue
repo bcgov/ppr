@@ -579,4 +579,9 @@ td {
 ::v-deep .v-chip .v-chip__content {
   font-weight: 700;
 }
+
+::v-deep .primary--text.v-btn.v-btn--disabled > .v-btn__content > span {
+  color: #1669bb !important;
+  opacity: 0.4 !important;
+}
 </style>
