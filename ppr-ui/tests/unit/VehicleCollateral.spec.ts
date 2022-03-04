@@ -9,7 +9,9 @@ import {
   mockedSelectSecurityAgreement,
   mockedVehicleCollateralAmendment,
   mockedRepairersLien,
-  mockedVehicleCollateralAmendment2
+  mockedVehicleCollateralAmendment2,
+  mockedOtherCarbon,
+  mockedForestrySubcontractor
 } from './test-data'
 
 // Components
@@ -232,5 +234,51 @@ describe('Vehicle Collateral repairers lien amendment tests', () => {
     const item2 = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row')[1]
     expect(item1.querySelectorAll('td')[5].textContent).toContain('Delete')
     expect(item2.querySelectorAll('td')[5].textContent).toContain('Undo')
+  })
+})
+
+
+describe('Vehicle Collateral crown charge tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment2)
+    await store.dispatch('setRegistrationType', mockedOtherCarbon())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent(false, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the add button and the vehicles', () => {
+    expect(wrapper.find(addButtonSelector).exists()).toBe(true)
+    const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row').length
+    expect(vehicleRowCount).toEqual(2)
+  })
+
+  it('displays the data for the amendment', async () => {
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row').length
+    expect(vehicleRowCount).toEqual(2)
+  })
+})
+
+describe('Vehicle Collateral forestry subcontractor tests', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment2)
+    await store.dispatch('setRegistrationType', mockedForestrySubcontractor())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    wrapper = createComponent(false, false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays no vehicle data for the forestry subcontractor', async () => {
+    expect(wrapper.find(addButtonSelector).exists()).toBe(false)
+    expect(wrapper.find('.vehicle-row').exists()).toBe(false)
   })
 })

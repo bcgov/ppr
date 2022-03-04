@@ -56,6 +56,12 @@ export const mockedLienUnpaid = (): RegistrationTypeIF => {
   })
 }
 
+export const mockedForestrySubcontractor = (): RegistrationTypeIF => {
+  return RegistrationTypesStandard.find(obj => {
+    return obj.registrationTypeAPI === APIRegistrationTypes.FORESTRY_SUBCONTRACTOR_LIEN
+  })
+}
+
 export const mockedError: ErrorIF = {
   statusCode: 500,
   message: 'mock error'

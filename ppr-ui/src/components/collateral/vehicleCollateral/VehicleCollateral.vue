@@ -62,7 +62,11 @@
     :class="containerClass"
     fluid no-gutters
   >
-    <v-row no-gutters class="pb-4 pt-10 pl-1" v-if="hasVehicleCollateral() && !isRepairersLienAmendment">
+    <v-row
+      no-gutters
+      class="pb-4 pt-10 pl-1"
+      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) && !isRepairersLienAmendment"
+    >
       <v-col>
         <v-btn
           id="btn-add-collateral"
@@ -76,7 +80,10 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row :class="showErrorBar ? 'error-margin' : ''" no-gutters v-if="hasVehicleCollateral()">
+    <v-row
+      :class="showErrorBar ? 'error-margin' : ''" no-gutters
+      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
+    >
       <v-col>
         <div>
           <v-expand-transition>
@@ -92,7 +99,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-row no-gutters class="pt-4" v-if="hasVehicleCollateral()">
+    <v-row no-gutters class="pt-4" v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())">
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
         <v-data-table
           class="collateral-table"
@@ -358,7 +365,7 @@ export default defineComponent({
     ])
     const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
 
-    const { hasVehicleCollateral } = useVehicle(props, context)
+    const { hasVehicleCollateral, hasOptionalVehicleCollateral } = useVehicle(props, context)
 
     const registrationFlowType = getRegistrationFlowType.value
     const registrationType = getRegistrationType.value.registrationTypeAPI
@@ -523,6 +530,7 @@ export default defineComponent({
       resetData,
       getVehicleDescription,
       hasVehicleCollateral,
+      hasOptionalVehicleCollateral,
       registrationFlowType,
       RegistrationFlowType,
       registrationType,
