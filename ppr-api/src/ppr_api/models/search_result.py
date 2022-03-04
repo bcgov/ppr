@@ -103,33 +103,23 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
         results = self.search_response
         new_results = []
-        exact_count = 0
         similar_count = 0
         self.search_select = self.set_search_selection(search_select)
-        for result in results:
-            # Always include exact matches.
-            if result['matchType'] == model_utils.SEARCH_MATCH_EXACT:
-                new_results.append(result)
-                exact_count += 1
-            else:
-                found = False
-                reg_num = result['financingStatement']['baseRegistrationNumber']
-                for select in search_select:
-                    # Verified: have to explicitly select a similar result to include.
-                    if select['baseRegistrationNumber'] == reg_num and \
-                       ('selected' not in select or select['selected']):
-                        found = True
-                        similar_count += 1
-                        break
-                if found:
-                    new_results.append(result)
+        # Use the same order as the search selection match list in the registration list.
+        for select in self.search_select:
+            if select['matchType'] == model_utils.SEARCH_MATCH_EXACT or \
+                    ('selected' not in select or select['selected']):
+                reg_num = select['baseRegistrationNumber']
+                for result in results:
+                    if reg_num == result['financingStatement']['baseRegistrationNumber']:
+                        new_results.append(result)
+                        if result['matchType'] == model_utils.SEARCH_MATCH_SIMILAR:
+                            similar_count += 1
+                            break
 
-        # current_app.logger.debug('exact_count=' + str(exact_count) + ' similar_count=' + str(similar_count))
-        self.exact_match_count = exact_count
         self.similar_match_count = similar_count
         # current_app.logger.debug('saving updates')
         # Update summary information and save.
-        detail_response['exactResultsSize'] = self.exact_match_count
         detail_response['similarResultsSize'] = self.similar_match_count
         detail_response['totalResultsSize'] = (self.exact_match_count + self.similar_match_count)
         detail_response['details'] = new_results
