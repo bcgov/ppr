@@ -166,7 +166,8 @@ class SearchResultsResource(Resource):
                     error_msg = f'Search report not yet available for {search_id}.'
                     current_app.logger.info(error_msg)
                     return resource_utils.bad_request_response(error_msg)
-                doc_name = SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
+                doc_name = search_detail.doc_storage_url if not search_detail.doc_storage_url.startswith('http') \
+                    else SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
                 current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
                 raw_data = GoogleStorageService.get_document(doc_name)
                 return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
@@ -242,14 +243,11 @@ class PatchSearchResultsResource(Resource):
                                       HTTPStatus.INTERNAL_SERVER_ERROR,
                                       message)
 
-            doc_name = SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
+            doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
             current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
             response = GoogleStorageService.save_document(doc_name, raw_data)
             current_app.logger.info('Save document storage response: ' + json.dumps(response))
-            if response and 'selfLink' in response:
-                search_detail.doc_storage_url = response['selfLink']
-            else:
-                search_detail.doc_storage_url = doc_name
+            search_detail.doc_storage_url = doc_name
             search_detail.save()
 
             # Track success event.

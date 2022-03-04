@@ -18,7 +18,7 @@ from datetime import timedelta as _timedelta
 import pytest
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT
 
-from ppr_api.models import utils as model_utils, Registration
+from ppr_api.models import utils as model_utils, Registration, SearchRequest
 
 
 # testdata pattern is ({registration_ts}, {years}, {expiry_ts})
@@ -87,10 +87,12 @@ TEST_DATA_EXPIRY_RL_DAYS = [
     ('3 renewals', 3, 720)
 ]
 
-# testdata pattern is ({desc}, {registration_ts}, {life_years}, {hour})
+# testdata pattern is ({desc}, {registration_ts}, {life_years}, {hour}, {expiry_ts})
 TEST_DATA_EXPIRY_REGISTRATION = [
-    ('Daylight savings', '2021-08-31T12:00:01-07:00', 5, 6),
-    ('No daylight savings', '2021-01-31T13:00:01-07:00', 10, 7)
+    ('Daylight savings', '2021-08-31T12:00:01-07:00', 5, 6, '2026-09-01T06:59:59+00:00'),
+    ('Daylight savings after 5 PM', '2021-08-31T17:00:01-07:00', 5, 6, '2026-09-01T06:59:59+00:00'),
+    ('No daylight savings', '2021-01-31T13:00:01-08:00', 10, 7, '2031-02-01T07:59:59+00:00'),
+    ('No daylight savings after 4 PM', '2021-01-31T16:00:01-08:00', 10, 7, '2031-02-01T07:59:59+00:00')
 ]
 # testdata pattern is ({desc}, {utc_ts}, {local_ts})
 TEST_DATA_LOCAL_TIMEZONE = [
@@ -296,16 +298,18 @@ def test_expiry_dt_repairer_lien_now():
     assert test_ts.second == 59
 
 
-@pytest.mark.parametrize('desc,registration_ts,life_years,hour', TEST_DATA_EXPIRY_REGISTRATION)
-def test_expiry_dt_from_registration(session, desc, registration_ts, life_years, hour):
+@pytest.mark.parametrize('desc,registration_ts,life_years,hour,expiry', TEST_DATA_EXPIRY_REGISTRATION)
+def test_expiry_dt_from_registration(session, desc, registration_ts, life_years, hour, expiry):
     """Assert that creating an expiry timestamp from a registration timestamp is performing as expected."""
     test_ts = model_utils.ts_from_iso_format(registration_ts)
     expiry_ts = model_utils.expiry_dt_from_registration(test_ts, life_years)
-    print(model_utils.format_ts(expiry_ts))
+    new_expiry = model_utils.format_ts(expiry_ts)
+    print(new_expiry)
     assert expiry_ts.year - test_ts.year == life_years
     assert expiry_ts.hour == hour
     assert expiry_ts.minute == 59
     assert expiry_ts.second == 59
+    assert new_expiry == expiry
 
 
 @pytest.mark.parametrize('desc,utc_ts,local_ts', TEST_DATA_LOCAL_TIMEZONE)
@@ -431,4 +435,13 @@ def test_doc_storage_name(session, desc, reg_num, doc_name):
     test_name = test_name.replace('-', '/') + '/' + registration.registration_type_cl.lower() + \
                 '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
     name = model_utils.get_doc_storage_name(registration)
+    assert test_name == name
+
+
+def test_search_doc_storage_name(session):
+    """Assert that building a search storage document name works as expected."""
+    search: SearchRequest = SearchRequest(id=2000, search_ts=model_utils.now_ts())
+    test_name = search.search_ts.isoformat()[:10]
+    test_name = test_name.replace('-', '/') + '/search-results-report-2000.pdf'
+    name = model_utils.get_search_doc_storage_name(search)
     assert test_name == name

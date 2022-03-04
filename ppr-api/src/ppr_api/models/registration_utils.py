@@ -143,17 +143,20 @@ def build_account_collapsed_json(financing_json, registrations_json):
     return financing_json
 
 
-def build_account_collapsed_filter_json(financing_json, registrations_json, params: AccountRegistrationParams):
+def build_account_collapsed_filter_json(financing_json,
+                                        registrations_json,
+                                        params: AccountRegistrationParams,
+                                        api_filter: bool = False):
     """Organize account registrations as parent/child financing statement/change registrations."""
     for statement in financing_json:
         changes = []
         for registration in registrations_json:
             if statement['registrationNumber'] == registration['baseRegistrationNumber']:
                 changes.append(registration)
-                if params.registration_number and \
+                if not api_filter and params.registration_number and \
                         registration['registrationNumber'].startswith(params.registration_number):
                     statement['expand'] = True
-                elif params.client_reference_id and \
+                elif not api_filter and params.client_reference_id and \
                         registration['clientReferenceId'].startswith(params.client_reference_id):
                     statement['expand'] = True
         if changes:
@@ -281,9 +284,10 @@ def build_account_change_query(params: AccountRegistrationParams, base_json: dic
     return query
 
 
-def build_account_query_params(params: AccountRegistrationParams) -> dict:
+def build_account_query_params(params: AccountRegistrationParams, api_filter: bool = False) -> dict:
     """Build the account query runtime parameter set from the provided parameters."""
-    page_size: int = model_utils.get_max_registrations_size()
+    page_size: int = model_utils.MAX_ACCOUNT_REGISTRATIONS_DEFAULT if api_filter \
+        else model_utils.get_max_registrations_size()
     page_offset: int = params.page_number
     if page_offset <= 1:
         page_offset = 0
@@ -312,7 +316,7 @@ def build_account_query_params(params: AccountRegistrationParams) -> dict:
     return query_params
 
 
-def build_account_base_reg_results(params, rows) -> dict:
+def build_account_base_reg_results(params, rows, api_filter: bool = False) -> dict:
     """Build the account query base registration results from the query result set."""
     results_json = []
     if rows is not None:
@@ -320,12 +324,12 @@ def build_account_base_reg_results(params, rows) -> dict:
             mapping = row._mapping  # pylint: disable=protected-access; follows documentation
             reg_class = str(mapping['registration_type_cl'])
             if model_utils.is_financing(reg_class):
-                results_json.append(__build_account_reg_result(params, mapping, reg_class))
+                results_json.append(__build_account_reg_result(params, mapping, reg_class, api_filter))
 
     return results_json
 
 
-def update_account_reg_results(params, rows, results_json) -> dict:
+def update_account_reg_results(params, rows, results_json, api_filter: bool = False) -> dict:
     """Build the account query base registration results from the query result set."""
     if results_json and rows is not None:
         changes_json = []
@@ -333,13 +337,13 @@ def update_account_reg_results(params, rows, results_json) -> dict:
             mapping = row._mapping  # pylint: disable=protected-access; follows documentation
             reg_class = str(mapping['registration_type_cl'])
             if not model_utils.is_financing(reg_class):
-                changes_json.append(__build_account_reg_result(params, mapping, reg_class))
+                changes_json.append(__build_account_reg_result(params, mapping, reg_class, api_filter))
         if changes_json:
-            return build_account_collapsed_filter_json(results_json, changes_json, params)
+            return build_account_collapsed_filter_json(results_json, changes_json, params, api_filter)
     return results_json
 
 
-def __build_account_reg_result(params, mapping, reg_class) -> dict:
+def __build_account_reg_result(params, mapping, reg_class, api_filter: bool = False) -> dict:
     """Build a registration result from a query result set row."""
     reg_num = str(mapping['registration_number'])
     base_reg_num = str(mapping['base_reg_number'])
@@ -360,13 +364,25 @@ def __build_account_reg_result(params, mapping, reg_class) -> dict:
         'registeringParty': str(mapping['registering_party']),
         'securedParties': str(mapping['secured_party']),
         'clientReferenceId': str(mapping['client_reference_id']),
-        'registeringName': registering_name,
-        'vehicleCount': int(mapping['vehicle_count'])
+        'registeringName': registering_name
     }
-    if model_utils.is_financing(reg_class):
+    if not api_filter:
+        result['vehicleCount'] = int(mapping['vehicle_count'])
+    if model_utils.is_financing(reg_class) and not api_filter:
         result['expand'] = False
     result = set_path(params, result, reg_num, base_reg_num, int(mapping['pending_count']))
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
     if 'accountId' in result:
         del result['accountId']  # Only use this for report access checking.
     return result
+
+
+def api_account_reg_filter(params: AccountRegistrationParams) -> bool:
+    """Check if api account registration summary request includes filter parameters.
+
+    Filter parameters may be a client reference ID, a timestamp range, or a registration number.
+    """
+    if not params.from_ui and (params.client_reference_id or params.registration_number or
+                               (params.start_date_time and params.end_date_time)):
+        return True
+    return False

@@ -436,6 +436,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         try:
             if params.from_ui:
                 return Registration.find_all_by_account_id_filter(params)
+            if registration_utils.api_account_reg_filter(params):
+                return Registration.find_all_by_account_id_api_filter(params)
 
             results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
                                          {'query_account': params.account_id,
@@ -506,6 +508,31 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             results = db.session.execute(query, query_params)
             rows = results.fetchall()
             results_json = registration_utils.update_account_reg_results(params, rows, results_json)
+
+        return results_json
+
+    @classmethod
+    def find_all_by_account_id_api_filter(cls, params: AccountRegistrationParams):
+        """Return a summary list of registrations belonging to an api account applying filters."""
+        results_json = []
+        # Restrict filter to client ref id, reg number, or timestamp range.
+        params.page_number = 1
+        params.sort_direction = 'desc'
+        params.sort_criteria = None
+        params.registration_type = None
+        params.status_type = None
+        params.registering_name = None
+        query = registration_utils.build_account_reg_query(params)
+        query_params = registration_utils.build_account_query_params(params, True)
+        results = db.session.execute(query, query_params)
+        rows = results.fetchall()
+        results_json = registration_utils.build_account_base_reg_results(params, rows, True)
+        if results_json:
+            # Get change registrations.
+            query = registration_utils.build_account_change_query(params, results_json)
+            results = db.session.execute(query, query_params)
+            rows = results.fetchall()
+            results_json = registration_utils.update_account_reg_results(params, rows, results_json, True)
 
         return results_json
 
