@@ -6,23 +6,20 @@ searchkey_business_name = PGFunction(
     schema="public",
     signature="searchkey_business_name(actual_name IN VARCHAR)",
     definition="""
-    RETURNS VARCHAR
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-    LANGUAGE plpgsql
-    AS
-    $$
+ RETURNS character varying
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
     v_search_key VARCHAR(150);
-    v_name_2 VARCHAR(150);
-    v_name_3 VARCHAR(150);
-    v_name_4 VARCHAR(150);
-    v_name_5 VARCHAR(150);
-    v_word_1 VARCHAR(150);
-    v_word_2 VARCHAR(150);
-    v_word_3 VARCHAR(150);
-    v_word_4 VARCHAR(150);
-
+    v_name_2  VARCHAR(150);
+    v_name_3  VARCHAR(150);
+    v_name_4  VARCHAR(150);
+    v_name_5  VARCHAR(150);
+    v_word_1  VARCHAR(150);
+    v_word_2  VARCHAR(150);
+    v_word_3  VARCHAR(150);
+    v_word_4  VARCHAR(150);
+	
 BEGIN
     IF LENGTH(SPLIT_PART(REGEXP_REPLACE(actual_name,'[A-Z]+','','g'),' ',1))>=5 then
         v_search_key := REGEXP_REPLACE(actual_name,'^0000|^000|^00|^0','','g');
@@ -33,16 +30,14 @@ BEGIN
     IF  array_length(string_to_array(v_search_key,''),1) is not null then
         RETURN v_search_key;
     ELSE
-        v_search_key := split_part(actual_name, '\', 1);
-        v_search_key := split_part(v_search_key, '/', 1);
-        v_search_key := split_part(upper(v_search_key), 'INC', 1);
+        v_search_key := split_part(upper(actual_name), 'INC', 1);
         v_search_key := split_part(upper(v_search_key), 'LTD', 1);
         v_search_key := split_part(upper(v_search_key), 'LTEE', 1);
         v_search_key := split_part(upper(v_search_key), 'LIMITED', 1);
         v_search_key := split_part(upper(v_search_key), 'INCORPORATED', 1);
         v_search_key := split_part(upper(v_search_key), 'INCORPORATEE', 1);
         v_search_key := split_part(upper(v_search_key), 'INCORPORATION', 1);
-        v_search_key := regexp_replace(v_search_key, '\([^()]*\)', '', 'gi');
+		v_search_key := regexp_replace(v_search_key, '\([^()]*\)', '', 'gi');
         v_search_key := regexp_replace(v_search_key,'^THE','','gi');
         v_search_key := regexp_replace(v_search_key,'\y(AND|DBA)\y', '', 'g');
         v_search_key := REGEXP_REPLACE(v_search_key,'[^\w\s]+',' ','gi');
@@ -67,11 +62,7 @@ BEGIN
     v_word_3 := (select word from common_word where word = v_name_4 );
     v_word_4 := (select word from common_word where word = v_name_5 );
 
-    IF v_word_1 is not null THEN
-        v_search_key := regexp_replace(v_search_key,v_word_1, '', 'g');
-    ELSE
-        v_search_key := v_search_key;
-    END IF;
+   
 
     IF v_word_2 is not null THEN
         v_search_key := regexp_replace(v_search_key,v_word_2,'','ig');
@@ -90,26 +81,31 @@ BEGIN
     ELSE
         v_search_key := v_search_key;
     END IF;
-
-    IF v_search_key is null or LENGTH(TRIM(v_search_key)) = 0 THEN
+    
+    IF  v_search_key is null or LENGTH(TRIM(v_search_key)) = 0 THEN
         v_search_key := actual_name;
     ELSE
         v_search_key := v_search_key;
     END IF;
 
-    v_search_key := REGEXP_REPLACE(v_search_key,'\y(BRITISH COLUMBIA|BRITISHCOLUMBIA|BC|B C)\y','','gi');
-    v_search_key := REGEXP_REPLACE(v_search_key,'\y(LIMITED|PARTNERSHIP|GP|LP)\y','','gi');
+    v_search_key := REGEXP_REPLACE(v_search_key,'\y(BRITISH COLUMBIA|BRITISHCOLUMBIA)\y','BC','gi');
+    v_search_key := REGEXP_REPLACE(v_search_key,'\y(LIMITED|PARTNERSHIP|GP|LLP|LP)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(SOCIETY|ASSOCIATION|TRUST|TRUSTEE|SOCIETE)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(INCORPORATED|INCORPOREE|INCORPORATION|INCORP|INC)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(COMPANY|CORPORATIONS|CORPORATION|CORPS|CORP|CO)\y','','gi');
     v_search_key := REGEXP_REPLACE(v_search_key,'\y(LIMITEE|LTEE|LTD|ULC)\y','','gi');
+	v_search_key := regexp_replace(v_search_key,'\y(AND)\y','AN','gi');
+	v_search_key := regexp_replace(v_search_key,'&','AN','gi');
+	v_search_key := regexp_replace(v_search_key, '\([^()]*\)', '', 'gi');
+    v_search_key := regexp_replace(v_search_key,'^THE','','gi');
+    v_search_key := regexp_replace(v_search_key,'\y(DBA)\y', '', 'g');
+	v_search_key := REGEXP_REPLACE(v_search_key,'[^\w\s]+','','gi');
     v_search_key := trim(regexp_replace(v_search_key, '\s+', '', 'gi'));
-    v_search_key := REGEXP_REPLACE(v_search_key, '(.)\1{1,}', '\1', 'g');
-
+	
     RETURN v_search_key;
 
 END
     ; 
-    $$;
+$function$;
     """
 )

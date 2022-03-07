@@ -462,10 +462,11 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'deleteVehicleCollateral' in statement and 'addVehicleCollateral' in statement:
             for add in statement['addVehicleCollateral']:
                 for delete in statement['deleteVehicleCollateral']:
-                    if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id'] and \
-                            add['type'] == delete['type'] and add['serialNumber'] == delete['serialNumber']:
-                        add['edit'] = True
-                        delete['edit'] = True
+                    if 'serialNumber' in add and 'serialNumber' in delete:
+                        if 'reg_id' in add and 'reg_id' in delete and add['reg_id'] == delete['reg_id'] and \
+                                add['type'] == delete['type'] and add['serialNumber'] == delete['serialNumber']:
+                            add['edit'] = True
+                            delete['edit'] = True
 
     def _set_vehicle_collateral(self):
         """Replace vehicle collateral type codes with descriptions."""
