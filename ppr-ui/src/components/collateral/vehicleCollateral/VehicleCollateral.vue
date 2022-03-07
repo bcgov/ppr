@@ -150,7 +150,7 @@
                   <span v-if="isRepairersLienAmendment && !row.item.action">
                     <v-tooltip
                       top
-                      content-class="top-tooltip pa-2 mr-2"
+                      content-class="top-tooltip pa-4 mr-2"
                       transition="fade-transition"
                       :disabled="!isLastDelete"
                     >
@@ -159,7 +159,7 @@
                           <v-btn
                             text
                             color="primary"
-                            class="smaller-button dlt-btn"
+                            class="smaller-button dlt-btn primary--text"
                             :id="'class-' + row.index + '-dlt-btn'"
                             @click="removeVehicle(row.index)"
                             :disabled="isLastDelete"
@@ -578,5 +578,10 @@ td {
 }
 ::v-deep .v-chip .v-chip__content {
   font-weight: 700;
+}
+
+::v-deep .primary--text.v-btn.v-btn--disabled > .v-btn__content > span {
+  color: #1669bb !important;
+  opacity: 0.4 !important;
 }
 </style>

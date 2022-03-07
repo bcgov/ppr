@@ -8,7 +8,7 @@ import sinon from 'sinon'
 // Components
 import { AmendRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
-import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
+import { AmendmentDescription, RegistrationLengthTrustAmendment, RegistrationLengthTrustSummary } from '@/components/registration'
 import { StickyContainer } from '@/components/common'
 import { Debtors } from '@/components/parties/debtor'
 import { SecuredParties } from '@/components/parties/party'
@@ -239,7 +239,8 @@ describe('Amendment for repairers lien component', () => {
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(1)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
-    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(false)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check amendment description
     expect(state.registration.amendmentDescription).toBe('')
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)

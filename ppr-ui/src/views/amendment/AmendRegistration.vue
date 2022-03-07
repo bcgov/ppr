@@ -17,14 +17,20 @@
               <b>{{ asOfDateTime }}.</b><br /><br />
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
+              <span v-if="registrationType === registrationTypeRL">
+                <br /><br />The only amendment allowed for a Repairer's Lien is the removal
+                of some (but not all) of the vehicle collateral.
+              </span>
             </p>
           </div>
           <caution-box class="mt-9" :setMsg="cautionTxt" />
           <registration-length-trust-amendment
+            v-if="registrationType !== registrationTypeRL"
             :setShowErrorBar="errorBar"
             @lengthTrustOpen="lengthTrustOpen = $event"
             class="mt-15"
           />
+          <registration-length-trust-summary class="mt-15" v-else />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
             <label class="pl-3">
@@ -129,7 +135,11 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { Debtors } from '@/components/parties/debtor'
 import { SecuredParties } from '@/components/parties/party'
-import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
+import {
+  AmendmentDescription,
+  RegistrationLengthTrustAmendment,
+  RegistrationLengthTrustSummary
+} from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 // local helpers/enums/interfaces/resources
@@ -170,6 +180,7 @@ import {
     Collateral,
     Debtors,
     RegistrationLengthTrustAmendment,
+    RegistrationLengthTrustSummary,
     RegisteringPartySummary,
     SecuredParties,
     SecuredPartySummary,
