@@ -43,7 +43,7 @@ export const useSecuredParty = (props, context) => {
     const securedParties: PartyIF[] =
       getAddSecuredPartiesAndDebtors.value.securedParties
     const registeringParty: PartyIF = getAddSecuredPartiesAndDebtors.value.registeringParty
-    if (isRegisteringParty && registeringParty.action && !registeringParty.code) {
+    if (isRegisteringParty && registeringParty && registeringParty.action && !registeringParty.code) {
       // copy the existing registering party
       localState.currentSecuredParty = JSON.parse(JSON.stringify(registeringParty))
       localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
@@ -128,6 +128,7 @@ export const useSecuredParty = (props, context) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     registeringParty.action = ActionTypes.EDITED
     parties.registeringParty = registeringParty
+    parties.valid = isPartiesValid(parties)
     setAddSecuredPartiesAndDebtors(parties)
   }
 
