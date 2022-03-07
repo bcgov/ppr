@@ -779,6 +779,7 @@ export default class Dashboard extends Vue {
       this.redirectRegistryHome()
       return
     }
+    this.resetNewRegistration(null) // Clear store data from any previous registration.
     // FUTURE: add loading for search history too
     this.myRegDataLoading = true
     this.retrieveSearchHistory()
