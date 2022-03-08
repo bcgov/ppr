@@ -433,6 +433,13 @@ export default class AmendRegistration extends Vue {
         await component.scrollIntoView({ behavior: 'smooth' })
       }
     }
+
+    if (!this.courtOrderValid) {
+      const component = document.getElementById('court-order')
+      if (component) {
+        await component.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
   }
 
   private confirmAmendment (): void {
@@ -466,6 +473,9 @@ export default class AmendRegistration extends Vue {
       this.showCourtInvalid = true
       if (!this.collateralValid) {
         this.setCollateralShowInvalid(true)
+      }
+      if (!this.courtOrderValid) {
+        this.amendErrMsg = '< You have unfinished changes'
       }
       this.scrollToInvalid()
     }
