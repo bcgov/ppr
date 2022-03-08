@@ -10,7 +10,7 @@ searchkey_individual = PGFunction(
     LANGUAGE plpgsql
     AS $function$
 DECLARE
-        v_ind_key VARCHAR(50);
+        v_ind_key VARCHAR(100);
 		v_last_name VARCHAR(50);
 		v_first_name VARCHAR(50);
     BEGIN

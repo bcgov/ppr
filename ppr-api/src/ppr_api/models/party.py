@@ -65,7 +65,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     email_id = db.Column('email_address', db.String(250), nullable=True)
 
     # Search keys
-    first_name_key = db.Column('first_name_key', db.String(50), nullable=True, index=True)
+    first_name_key = db.Column('first_name_key', db.String(100), nullable=True, index=True)
     last_name_key = db.Column('last_name_key', db.String(50), nullable=True, index=True)
     business_search_key = db.Column('business_srch_key', db.String(150), nullable=True, index=True)
 
