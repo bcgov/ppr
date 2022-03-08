@@ -23,7 +23,7 @@ export const useValidation = () => {
 
   const validateBusinessName = (form, localErrors) => {
     form.businessName = form.businessName.trim()
-    if (form.businessName || form.businessName.length === 0) {
+    if (!form.businessName || form.businessName.length === 0) {
       localErrors.businessName = {
         type: 'NAME',
         succeeded: false,
