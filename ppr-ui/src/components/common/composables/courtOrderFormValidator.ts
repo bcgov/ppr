@@ -9,6 +9,11 @@ const validationSchema = {
         customArgs: { trim: true }
       },
       {
+        validator: Validators.minLength.validator,
+        message: 'Minimum 5 characters',
+        customArgs: { length: 5 }
+      },
+      {
         validator: Validators.maxLength.validator,
         message: 'Maximum 256 characters',
         customArgs: { length: 256 }
@@ -21,6 +26,11 @@ const validationSchema = {
         customArgs: { trim: true }
       },
       {
+        validator: Validators.minLength.validator,
+        message: 'Minimum 5 characters',
+        customArgs: { length: 5 }
+      },
+      {
         validator: Validators.maxLength.validator,
         message: 'Maximum 64 characters',
         customArgs: { length: 64 }
@@ -31,6 +41,11 @@ const validationSchema = {
         validator: Validators.required.validator,
         message: 'This field is required',
         customArgs: { trim: true }
+      },
+      {
+        validator: Validators.minLength.validator,
+        message: 'Minimum 5 characters',
+        customArgs: { length: 5 }
       },
       {
         validator: Validators.maxLength.validator,
