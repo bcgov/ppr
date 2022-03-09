@@ -223,7 +223,7 @@
             <v-list v-else class="actions__more-actions registration-actions">
               <v-tooltip
                 left
-                content-class="left-tooltip pa-2 mr-2"
+                content-class="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
