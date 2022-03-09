@@ -104,7 +104,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, isInt } from '@/utils'
+import { convertDate, isInt, pacificDate } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 
@@ -170,14 +170,14 @@ export default defineComponent({
             const expiryDate = getRegistrationExpiryDate.value
             const newExpDate = new Date(expiryDate)
             newExpDate.setDate(newExpDate.getDate() + 180)
-            return convertDate(newExpDate, true, true)
+            return pacificDate(newExpDate)
           }
           if ((getRegistrationExpiryDate.value) && (getLengthTrust.value.lifeYears > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
             const numYears = getLengthTrust.value.lifeYears
             const newExpDate = new Date(expiryDate)
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
-            return convertDate(newExpDate, true, true)
+            return pacificDate(newExpDate)
           }
           return '-'
         }
