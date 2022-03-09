@@ -258,8 +258,8 @@ describe('Confirm Amendment registration save registration', () => {
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
     // new amend registration is in store regTableData
-    expect(wrapper.vm.$store.state.stateModel.registrationTable.addedReg).toBe(mockedAmendmentResponse.amendmentRegistrationNumber)
-    expect(wrapper.vm.$store.state.stateModel.registrationTable.addedRegParent).toBe(mockedAmendmentResponse.baseRegistrationNumber)
+    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem.addedReg).toBe(mockedAmendmentResponse.amendmentRegistrationNumber)
+    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem.addedRegParent).toBe(mockedAmendmentResponse.baseRegistrationNumber)
   })
 })
 

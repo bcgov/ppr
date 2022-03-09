@@ -10,6 +10,8 @@ import {
   LengthTrustIF,
   IndividualNameIF,
   RegTableDataI,
+  RegTableNewItemI,
+  RegistrationSortIF,
   RegistrationTypeIF,
   SearchResponseIF,
   SearchTypeIF,
@@ -17,7 +19,9 @@ import {
   UserSettingsIF,
   AccountProductSubscriptionIF,
   GeneralCollateralIF,
-  VehicleCollateralIF
+  VehicleCollateralIF,
+  RegistrationSummaryIF,
+  DraftResultIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -209,6 +213,41 @@ export const setRegTableData: ActionIF = ({ commit }, regTableData: RegTableData
   commit('mutateRegistrationTable', regTableData)
 }
 
+export const setRegTableBaseRegs: ActionIF = ({ commit }, baseRegs: RegistrationSummaryIF[]): void => {
+  commit('mutateRegistrationTableBaseRegs', baseRegs)
+}
+
+export const setRegTableCollapsed: ActionIF = ({ commit }): void => {
+  commit('mutateRegistrationTableCollapseAll')
+}
+
+export const setRegTableDraftsBaseReg: ActionIF = ({ commit }, drafts: DraftResultIF[]): void => {
+  commit('mutateRegistrationTableDraftsBaseReg', drafts)
+}
+
+export const setRegTableDraftsChildReg: ActionIF = ({ commit }, drafts: DraftResultIF[]): void => {
+  commit('mutateRegistrationTableDraftsChildReg', drafts)
+}
+
+export const setRegTableNewItem: ActionIF = ({ commit }, newItem: RegTableNewItemI): void => {
+  commit('mutateRegistrationTableNewItem', newItem)
+}
+
+export const setRegTableSortHasMorePages: ActionIF = ({ commit }, hasMorePages: boolean): void => {
+  commit('mutateRegistrationTableSortHasMorePages', hasMorePages)
+}
+
+export const setRegTableSortOptions: ActionIF = ({ commit }, options: RegistrationSortIF): void => {
+  commit('mutateRegistrationTableSortOptions', options)
+}
+
+export const setRegTableSortPage: ActionIF = ({ commit }, page: number): void => {
+  commit('mutateRegistrationTableSortPage', page)
+}
+
+export const setRegTableTotalRowCount: ActionIF = ({ commit }, count: number): void => {
+  commit('mutateRegistrationTableTotalRowCount', count)
+}
+
 export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean): void => {
   commit('mutateUnsavedChanges', unsavedChanges)
-}

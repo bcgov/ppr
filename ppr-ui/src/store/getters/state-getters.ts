@@ -9,11 +9,15 @@ import {
   CourtOrderIF,
   DebtorNameIF,
   DraftIF,
+  DraftResultIF,
   GeneralCollateralIF,
   IndividualNameIF,
   LengthTrustIF,
+  RegistrationSortIF,
+  RegistrationSummaryIF,
   RegistrationTypeIF,
   RegTableDataI,
+  RegTableNewItemI,
   SearchResponseIF,
   SearchTypeIF,
   StateIF,
@@ -404,9 +408,46 @@ export const isRegistrationValid = (state: any): boolean => {
     state.stateModel.registration.collateral.valid)
 }
 
-/** Return values used for the registration table.
- * - currently only used for newly added registrations/drafts
-*/
+/** Return values used for the registration table. */
 export const getRegTableData = (state: StateIF): RegTableDataI => {
   return state.stateModel.registrationTable
+}
+
+/** Returns registration table base regs */
+export const getRegTableBaseRegs = (state: StateIF): RegistrationSummaryIF[] => {
+  return state.stateModel.registrationTable.baseRegs
+}
+
+/** Returns registration table base reg drafts */
+export const getRegTableDraftsBaseReg = (state: StateIF): DraftResultIF[] => {
+  return state.stateModel.registrationTable.draftsBaseReg
+}
+
+/** Returns registration table child reg drafts */
+export const getRegTableDraftsChildReg = (state: StateIF): DraftResultIF[] => {
+  return state.stateModel.registrationTable.draftsChildReg
+}
+
+/** Returns registration table new item info */
+export const getRegTableNewItem = (state: StateIF): RegTableNewItemI => {
+  return state.stateModel.registrationTable.newItem
+}
+
+/** Returns user session registration table sort options */
+export const getRegTableSortOptions = (state: StateIF): RegistrationSortIF => {
+  return state.stateModel.registrationTable.sortOptions
+}
+
+/** Returns registration table sort page number */
+export const getRegTableSortPage = (state: StateIF): number => {
+  return state.stateModel.registrationTable.sortPage
+}
+
+/** Returns registration table total base reg rows, including base reg drafts */
+export const getRegTableTotalRowCount = (state: StateIF): number => {
+  return state.stateModel.registrationTable.totalRowCount
+}
+
+export const hasMorePages = (state: StateIF): boolean => {
+  return state.stateModel.registrationTable.sortHasMorePages
 }

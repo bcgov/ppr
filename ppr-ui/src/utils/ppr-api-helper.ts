@@ -775,6 +775,22 @@ export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
   drafts: DraftResultIF[],
   error: ErrorIF
 }> {
+  if (!sortOptions) {
+    // set it to empty sort options
+    sortOptions = {
+      endDate: null,
+      folNum: '',
+      orderBy: '',
+      orderVal: '',
+      regBy: '',
+      regNum: '',
+      regParty: '',
+      regType: '',
+      secParty: '',
+      startDate: null,
+      status: ''
+    }
+  }
   const baseURL = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: baseURL, headers: { Accept: 'application/json' } }
   const url = addSortParams('drafts?fromUI=true', sortOptions)
@@ -1124,6 +1140,7 @@ export async function getRegistrationSummary (
         registrationType: null,
         securedParties: '',
         error: {
+          category: ErrorCategories.HISTORY_REGISTRATIONS,
           statusCode: error?.response?.status,
           message: error?.response?.data?.errorMessage + ' ' + error?.response?.data?.rootCause,
           detail: error?.parsed?.rootCause?.detail,

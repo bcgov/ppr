@@ -197,7 +197,8 @@ import {
   DialogOptionsIF, // eslint-disable-line no-unused-vars
   DebtorNameIF, // eslint-disable-line no-unused-vars
   DraftIF, // eslint-disable-line no-unused-vars
-  FinancingStatementIF // eslint-disable-line no-unused-vars
+  FinancingStatementIF, // eslint-disable-line no-unused-vars
+  RegTableNewItemI // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
@@ -251,7 +252,7 @@ export default class ConfirmAmendment extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
-  @Action setRegTableData: ActionBindingIF
+  @Action setRegTableNewItem: ActionBindingIF
   @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
@@ -566,11 +567,15 @@ export default class ConfirmAmendment extends Vue {
       this.emitError(draft.error)
     } else {
       this.setUnsavedChanges(false)
+      const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
       // set new added reg
-      this.setRegTableData({
+      const newItem: RegTableNewItemI = {
         addedReg: draft.amendmentStatement.documentId,
-        addedRegParent: draft.amendmentStatement.baseRegistrationNumber
-      })
+        addedRegParent: draft.amendmentStatement.baseRegistrationNumber,
+        addedRegSummary: null,
+        prevDraft: prevDraftId
+      }
+      this.setRegTableNewItem(newItem)
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
@@ -602,11 +607,15 @@ export default class ConfirmAmendment extends Vue {
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
         this.emitError(apiResponse?.error)
       } else {
+        const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
         // set new added reg
-        this.setRegTableData({
+        const newItem: RegTableNewItemI = {
           addedReg: apiResponse.amendmentRegistrationNumber,
-          addedRegParent: apiResponse.baseRegistrationNumber
-        })
+          addedRegParent: apiResponse.baseRegistrationNumber,
+          addedRegSummary: null,
+          prevDraft: prevDraftId
+        }
+        this.setRegTableNewItem(newItem)
         // On success return to dashboard
         this.goToDashboard()
       }

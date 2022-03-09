@@ -48,6 +48,7 @@ export interface DraftResultIF {
   clientReferenceId: string,
   createDateTime: string, // Generated on first draft save.
   documentId: string, // identifier for the draft
+  error?: ErrorIF
   lastUpdateDateTime: string, // Timestamp of last draft update.
   path: string,
   registeringName?: string,

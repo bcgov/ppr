@@ -100,6 +100,7 @@ import {
   DraftIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   FinancingStatementIF, // eslint-disable-line no-unused-vars
+  RegTableNewItemI, // eslint-disable-line no-unused-vars
   StateModelIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
@@ -146,8 +147,9 @@ export default defineComponent({
       'isRoleStaffReg',
       'isRoleStaffSbc'
     ])
-    const { setUnsavedChanges, resetNewRegistration, setDraft, setRegTableData } =
-      useActions<any>(['setUnsavedChanges', 'resetNewRegistration', 'setDraft', 'setRegTableData'])
+
+    const { resetNewRegistration, setDraft, setRegTableNewItem, setUnsavedChanges } =
+      useActions<any>(['resetNewRegistration', 'setDraft', 'setRegTableNewItem', 'setUnsavedChanges'])
 
     const localState = reactive({
       options: unsavedChangesDialog,
@@ -214,14 +216,21 @@ export default defineComponent({
     const saveDraft = async (): Promise<Boolean> => {
       const stateModel: StateModelIF = getStateModel.value
       const draft: DraftIF = await throttleSubmitStatementDraft(stateModel)
+      const prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
       if (draft.error) {
         // Emit error message.
         emit('error', draft.error)
         return false
       } else {
-        await setDraft(draft)
-        await setRegTableData({ addedReg: draft.financingStatement.documentId, addedRegParent: '' })
         await setUnsavedChanges(false)
+        await setDraft(draft)
+        const newItem: RegTableNewItemI = {
+          addedReg: draft.financingStatement.documentId,
+          addedRegParent: '',
+          addedRegSummary: null,
+          prevDraft: prevDraftId
+        }
+        await setRegTableNewItem(newItem)
         return true
       }
     }
@@ -294,7 +303,14 @@ export default defineComponent({
           // Emit error message.
           emit('error', apiResponse.error)
         } else {
-          setRegTableData({ addedReg: apiResponse.baseRegistrationNumber, addedRegParent: '' })
+          const prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
+          const newItem: RegTableNewItemI = {
+            addedReg: apiResponse.baseRegistrationNumber,
+            addedRegParent: '',
+            addedRegSummary: null,
+            prevDraft: prevDraftId
+          }
+          setRegTableNewItem(newItem)
           props.router.push({
             name: localState.buttonConfig.nextRouteName
           })

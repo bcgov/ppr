@@ -1,6 +1,6 @@
 <template>
   <v-container id="dashboard" class="view-container px-15 py-10 ma-0" fluid>
-    <v-overlay v-model="loading">
+    <v-overlay :value="pageLoader">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog
@@ -129,7 +129,7 @@
             no-gutters
           >
             <v-col cols="auto">
-              <b>Registrations</b> ({{ myRegTotalBaseRegLength }})
+              <b>Registrations</b> ({{ getRegTableTotalRowCount }})
             </v-col>
             <v-col>
               <v-row justify="end" no-gutters>
@@ -193,12 +193,12 @@
             <v-col cols="12">
               <registration-table
                 :setHeaders="myRegHeaders"
-                :setLoading="myRegDataLoading"
-                :setMorePages="!myRegNoMorePages"
-                :setNewRegData="getRegTableData"
+                :setLoading="myRegDataLoading || myRegDataAdding"
+                :setMorePages="hasMorePages"
+                :setNewRegItem="getRegTableNewItem"
                 :setRegistrationHistory="myRegistrations"
                 :setSearch="myRegFilter"
-                :setSort="myRegSortOptions"
+                :setSort="getRegTableSortOptions"
                 @action="myRegActionHandler($event)"
                 @error="emitError($event)"
                 @getNext="myRegGetNext()"
@@ -222,7 +222,7 @@ import { cloneDeep } from 'lodash'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import {
-  APIStatusTypes, RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
+  APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
 } from '@/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
@@ -233,7 +233,7 @@ import {
   ErrorIF, // eslint-disable-line no-unused-vars
   RegistrationSortIF, // eslint-disable-line no-unused-vars
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, RegTableDataI, // eslint-disable-line no-unused-vars
+  RegistrationTypeIF, RegTableDataI, RegTableNewItemI, // eslint-disable-line no-unused-vars
   SearchResponseIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
@@ -290,18 +290,33 @@ import { RegistrationBar } from '@/components/registration'
   }
 })
 export default class Dashboard extends Vue {
-  @Getter getRegTableData: RegTableDataI
+  @Getter getRegTableBaseRegs: RegistrationSummaryIF[]
+  @Getter getRegTableDraftsBaseReg: DraftResultIF[]
+  @Getter getRegTableDraftsChildReg: DraftResultIF[]
+  @Getter getRegTableNewItem: RegTableNewItemI
+  @Getter getRegTableSortOptions: RegistrationSortIF
+  @Getter getRegTableSortPage: number
+  @Getter getRegTableTotalRowCount: number
   @Getter getSearchHistory: Array<SearchResponseIF>
-  @Getter getSearchHistoryLength: Number
+  @Getter getSearchHistoryLength: number
   @Getter getSearchResults: SearchResponseIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
-  @Getter getUserServiceFee!: Number
+  @Getter getUserServiceFee!: number
   @Getter getUserSettings: UserSettingsIF
-  @Getter isNonBillable!: Boolean
+  @Getter hasMorePages: boolean
+  @Getter isNonBillable!: boolean
 
   @Action resetNewRegistration: ActionBindingIF
-  @Action setRegTableData: ActionBindingIF
+  @Action setRegTableBaseRegs: ActionBindingIF
+  @Action setRegTableCollapsed: ActionBindingIF
+  @Action setRegTableDraftsBaseReg: ActionBindingIF
+  @Action setRegTableDraftsChildReg: ActionBindingIF
+  @Action setRegTableNewItem: ActionBindingIF
+  @Action setRegTableSortHasMorePages: ActionBindingIF
+  @Action setRegTableSortOptions: ActionBindingIF
+  @Action setRegTableSortPage: ActionBindingIF
+  @Action setRegTableTotalRowCount: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
@@ -341,32 +356,12 @@ export default class Dashboard extends Vue {
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
 
-  // my reg table items/headers/sort info
-  private myRegDataBaseRegDrafts: DraftResultIF[] = []
-  private myRegDataChildDrafts: DraftResultIF[] = []
-  private myRegDataHistory: RegistrationSummaryIF[] = []
   private myRegDataLoading = false
+  private myRegDataAdding = false
   private myRegFilter = ''
   private myRegHeaders = [...registrationTableHeaders]
   private myRegHeadersSelectable = [...registrationTableHeaders].slice(0, -1) // remove actions
   private myRegHeadersSelected = [...registrationTableHeaders]
-  private myRegNoMorePages = false
-  private myRegPage = 1
-  private myRegSortOptions: RegistrationSortIF = {
-    endDate: null,
-    folNum: '',
-    orderBy: 'createDateTime',
-    orderVal: 'desc',
-    regBy: '',
-    regNum: '',
-    regParty: '',
-    regType: '',
-    secParty: '',
-    startDate: null,
-    status: ''
-  }
-
-  private myRegTotalBaseRegLength = 0
 
   private snackbarMsg = ''
   private toggleSnackbar = false
@@ -391,11 +386,18 @@ export default class Dashboard extends Vue {
   }
 
   private get myRegistrations () {
-    return [...this.myRegDataBaseRegDrafts, ...this.myRegDataHistory]
+    if (!!this.getRegTableDraftsBaseReg && !!this.getRegTableBaseRegs) {
+      return [...this.getRegTableDraftsBaseReg, ...this.getRegTableBaseRegs]
+    }
+    return []
   }
 
   private get myRegAddInvalid (): boolean {
     return ![0, 7].includes(this.myRegAdd?.trim().length || 0) || (this.myRegAdd && !this.myRegAdd?.trim())
+  }
+
+  private get pageLoader (): boolean {
+    return this.loading || this.myRegDataAdding
   }
 
   private get searchHistoryLength (): number {
@@ -408,16 +410,19 @@ export default class Dashboard extends Vue {
     if (addReg.error) {
       this.myRegAddErrSetDialog(addReg.error)
     } else {
-      // add to my registrations list
-      this.myRegDataHistory.unshift(addReg)
-      this.myRegTotalBaseRegLength += 1
-
+      // set new item (watcher will add it etc.)
       let parentRegNum = ''
       if (regNum.toUpperCase() !== addReg.registrationNumber.toUpperCase()) {
         // not a base registration so add parent reg num
         parentRegNum = addReg.registrationNumber.toUpperCase()
       }
-      this.setRegTableData({ addedReg: regNum.toUpperCase(), addedRegParent: parentRegNum })
+      const newRegItem: RegTableNewItemI = {
+        addedReg: regNum.toUpperCase(),
+        addedRegParent: parentRegNum,
+        addedRegSummary: addReg,
+        prevDraft: ''
+      }
+      this.setRegTableNewItem(newRegItem)
     }
     this.loading = false
   }
@@ -425,6 +430,7 @@ export default class Dashboard extends Vue {
   private editDraftAmend (docId: string, regNum: string): void {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     // Go to the Amendment first step which loads the base registration and draft data.
+    this.setRegTableCollapsed(null)
     this.$router.replace({
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': regNum, 'document-id': docId }
@@ -445,6 +451,7 @@ export default class Dashboard extends Vue {
       // reset unsaved changes
       this.setUnsavedChanges(false)
       // Go to the first step.
+      this.setRegTableCollapsed(null)
       this.$router.replace({ name: RouteNames.LENGTH_TRUST })
     }
   }
@@ -608,19 +615,21 @@ export default class Dashboard extends Vue {
   }
 
   private async myRegGetNext (): Promise<void> {
-    if (this.myRegDataLoading || this.myRegNoMorePages) return
+    if (this.myRegDataLoading || !this.hasMorePages) return
     this.myRegDataLoading = true
-    this.myRegPage += 1
-    const nextRegs = await registrationHistory(cloneDeep(this.myRegSortOptions), this.myRegPage)
+    const page = this.getRegTableSortPage + 1
+    this.setRegTableSortPage(page)
+    const nextRegs = await registrationHistory(cloneDeep(this.getRegTableSortOptions), page)
     if (nextRegs.error) {
       this.emitError(nextRegs.error)
     } else {
       // add child drafts to new regs if applicable
       const updatedRegs = this.myRegHistoryDraftCollapse(
-        cloneDeep(this.myRegDataChildDrafts), cloneDeep(nextRegs.registrations), true)
-      this.myRegDataHistory = this.myRegDataHistory.concat(updatedRegs.registrations)
+        cloneDeep(this.getRegTableDraftsChildReg), cloneDeep(nextRegs.registrations), true)
+      const newBaseRegs = this.getRegTableBaseRegs.concat(updatedRegs.registrations)
+      this.setRegTableBaseRegs(newBaseRegs)
     }
-    if (nextRegs.registrations?.length < 1) { this.myRegNoMorePages = true }
+    if (nextRegs.registrations?.length < 1) this.setRegTableSortHasMorePages(false)
     this.myRegDataLoading = false
   }
 
@@ -631,22 +640,23 @@ export default class Dashboard extends Vue {
   ): { drafts: DraftResultIF[], registrations: RegistrationSummaryIF[] } {
     // add child drafts to their base registration in registration history
     const parentDrafts = [] as DraftResultIF[]
+    let childDrafts = this.getRegTableDraftsChildReg
     // reset child drafts if not sorting
-    if (!sorting) this.myRegDataChildDrafts = []
+    if (!sorting) childDrafts = []
     for (let i = 0; i < drafts.length; i++) {
       // check if it has a parent reg
       if (drafts[i].baseRegistrationNumber) {
-        if (!sorting) this.myRegDataChildDrafts.push(drafts[i])
+        if (!sorting) childDrafts.push(drafts[i])
         // find parent reg
         let found = false
-        for (let k = 0; k < registrations.length; k++) {
-          if (registrations[k].baseRegistrationNumber === drafts[i].baseRegistrationNumber) {
-            // add child draft to parent reg
-            if (!registrations[k].changes) registrations[k].changes = []
-            registrations[k].changes.unshift(drafts[i])
-            registrations[k].hasDraft = true
-            found = true
-          }
+        const parentIndex = registrations.findIndex(
+          reg => reg.baseRegistrationNumber === drafts[i].baseRegistrationNumber)
+        if (parentIndex !== -1) {
+          // add child draft to parent reg
+          if (!registrations[parentIndex].changes) registrations[parentIndex].changes = []
+          registrations[parentIndex].changes.unshift(drafts[i])
+          registrations[parentIndex].hasDraft = true
+          found = true
         }
         // if sorting and the base reg is not in the list, add the draft to the parent list
         if (sorting && !found) {
@@ -657,6 +667,8 @@ export default class Dashboard extends Vue {
         parentDrafts.push(drafts[i])
       }
     }
+    // set store child drafts to new list
+    this.setRegTableDraftsChildReg(childDrafts)
     return {
       drafts: parentDrafts,
       registrations: registrations
@@ -665,31 +677,31 @@ export default class Dashboard extends Vue {
 
   private async myRegSort (args: { sortOptions: RegistrationSortIF, sorting: boolean }): Promise<void> {
     this.myRegDataLoading = true
-    this.myRegNoMorePages = false
-    this.myRegSortOptions = args.sortOptions
-    this.myRegPage = 1
+    this.setRegTableSortHasMorePages(true)
+    this.setRegTableSortOptions(args.sortOptions)
+    this.setRegTableSortPage(1)
     const sorting = args.sorting
     let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
     // all drafts return from the api no matter the status value so prevent it here
-    if (!this.myRegSortOptions.status || this.myRegSortOptions.status === APIStatusTypes.DRAFT) {
-      sortedDrafts = await draftHistory(cloneDeep(this.myRegSortOptions))
+    if (!args.sortOptions.status || args.sortOptions.status === APIStatusTypes.DRAFT) {
+      sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
     }
-    const sortedRegs = await registrationHistory(cloneDeep(this.myRegSortOptions), this.myRegPage)
+    const sortedRegs = await registrationHistory(cloneDeep(args.sortOptions), 1)
     // prioritize reg history error
     const error = sortedRegs.error || sortedDrafts.error
     if (error) {
       this.emitError(error)
     } else {
-      if (sortedRegs.registrations?.length < 1) { this.myRegNoMorePages = true }
+      if (sortedRegs.registrations?.length < 1) this.setRegTableSortHasMorePages(false)
       // parent drafts from sorted list
       const draftsCollapsed = this.myRegHistoryDraftCollapse(
         cloneDeep(sortedDrafts.drafts), cloneDeep(sortedRegs.registrations), sorting)
       // add child drafts from original list to sorted base registrations
       const updatedRegs = this.myRegHistoryDraftCollapse(
-        cloneDeep(this.myRegDataChildDrafts), cloneDeep(sortedRegs.registrations), sorting)
+        cloneDeep(this.getRegTableDraftsChildReg), cloneDeep(sortedRegs.registrations), sorting)
       // only add parent drafts to draft results
-      this.myRegDataBaseRegDrafts = draftsCollapsed.drafts
-      this.myRegDataHistory = updatedRegs.registrations
+      this.setRegTableDraftsBaseReg(draftsCollapsed.drafts)
+      this.setRegTableBaseRegs(updatedRegs.registrations)
     }
     this.myRegDataLoading = false
   }
@@ -706,26 +718,24 @@ export default class Dashboard extends Vue {
       this.emitError(deletion)
     } else {
       // remove from table
-      this.myRegDataBaseRegDrafts = this.myRegDataBaseRegDrafts.filter(reg => reg.documentId !== docId)
-      this.myRegDataChildDrafts = this.myRegDataChildDrafts.filter(reg => reg.documentId !== docId)
+      this.setRegTableDraftsBaseReg(this.getRegTableDraftsBaseReg.filter(reg => reg.documentId !== docId))
+      this.setRegTableDraftsChildReg(this.getRegTableDraftsChildReg.filter(reg => reg.documentId !== docId))
       if (!regNum) {
         // is not a child
-        this.myRegTotalBaseRegLength -= 1
+        this.setRegTableTotalRowCount(this.getRegTableTotalRowCount - 1)
       } else {
         // is a child of another base registration
-        for (let i = 0; i < this.myRegDataHistory.length; i++) {
-          // find base registration and filter draft out of changes array
-          if (this.myRegDataHistory[i].baseRegistrationNumber === regNum) {
-            const changes = this.myRegDataHistory[i].changes as any
-            this.myRegDataHistory[i].changes = changes.filter(reg => reg.documentId !== docId)
-            if (this.myRegDataHistory[i].changes.length === 0) {
-              // remove now irrelevant fields
-              delete this.myRegDataHistory[i].changes
-              delete this.myRegDataHistory[i].expand
-            }
-            break
-          }
+        const baseRegs = this.getRegTableBaseRegs
+        // find parent base registration and filter draft out of changes array
+        const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === regNum)
+        const changes = baseRegs[parentIndex].changes as any
+        baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== docId)
+        if (baseRegs[parentIndex].changes.length === 0) {
+          // no longer a parent reg so remove irrelevant fields
+          delete baseRegs[parentIndex].changes
+          delete baseRegs[parentIndex].expand
         }
+        this.setRegTableBaseRegs(baseRegs)
       }
     }
     this.loading = false
@@ -738,13 +748,14 @@ export default class Dashboard extends Vue {
       this.emitError(removal)
     } else {
       // remove from table
-      this.myRegDataHistory = this.myRegDataHistory.filter(reg => reg.baseRegistrationNumber !== regNum)
-      this.myRegTotalBaseRegLength -= 1
+      this.setRegTableBaseRegs(this.getRegTableBaseRegs.filter(reg => reg.baseRegistrationNumber !== regNum))
+      this.setRegTableTotalRowCount(this.getRegTableTotalRowCount - 1)
     }
     this.loading = false
   }
 
   private startNewChildDraft (regNum: string, routeName: RouteNames): void {
+    this.setRegTableCollapsed(null)
     this.$router.replace({
       name: routeName,
       query: { 'reg-num': regNum }
@@ -756,6 +767,7 @@ export default class Dashboard extends Vue {
   private startNewRegistration (selectedRegistration: RegistrationTypeIF): void {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     this.setRegistrationType(selectedRegistration)
+    this.setRegTableCollapsed(null)
     this.$router.replace({ name: RouteNames.LENGTH_TRUST })
   }
 
@@ -786,25 +798,32 @@ export default class Dashboard extends Vue {
     // FUTURE: add loading for search history too
     this.myRegDataLoading = true
     this.retrieveSearchHistory()
-    const myRegDrafts = await draftHistory(cloneDeep(this.myRegSortOptions))
-    const myRegHistory = await registrationHistory(cloneDeep(this.myRegSortOptions), 1)
-
-    if (myRegDrafts?.error || myRegHistory?.error) {
-      // prioritize reg error
-      const error = myRegHistory?.error || myRegDrafts?.error
-      this.emitError(error)
+    if (this.getRegTableNewItem?.addedReg) {
+      // new reg was added so don't reload the registrations + trigger new item handler
+      this.handleRegTableNewItem(this.getRegTableNewItem)
     } else {
-      if (myRegHistory.registrations?.length < 1) { this.myRegNoMorePages = true }
-      // add child drafts to their base registration in registration history
-      const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(
-        myRegDrafts.drafts, myRegHistory.registrations, false)
-      // only add parent drafts to draft results
-      this.myRegDataBaseRegDrafts = histroyDraftsCollapsed.drafts
-      this.myRegDataHistory = histroyDraftsCollapsed.registrations
-      if (myRegHistory.registrations.length > 0) {
-        this.myRegTotalBaseRegLength = myRegHistory.registrations[0].totalRegistrationCount || 0
+      // load in registrations from scratch
+      const myRegDrafts = await draftHistory(cloneDeep(this.getRegTableSortOptions))
+      const myRegHistory = await registrationHistory(cloneDeep(this.getRegTableSortOptions), 1)
+
+      if (myRegDrafts?.error || myRegHistory?.error) {
+        // prioritize reg error
+        const error = myRegHistory?.error || myRegDrafts?.error
+        this.emitError(error)
+      } else {
+        if (myRegHistory.registrations?.length < 1) this.setRegTableSortHasMorePages(false)
+        // add child drafts to their base registration in registration history
+        const histroyDraftsCollapsed = this.myRegHistoryDraftCollapse(
+          myRegDrafts.drafts, myRegHistory.registrations, false)
+        // only add parent drafts to draft results
+        this.setRegTableDraftsBaseReg(histroyDraftsCollapsed.drafts)
+        this.setRegTableBaseRegs(histroyDraftsCollapsed.registrations)
+        if (myRegHistory.registrations.length > 0) {
+          this.setRegTableTotalRowCount(myRegHistory.registrations[0].totalRegistrationCount || 0)
+        }
+        // add base reg drafts length to total reg length
+        this.setRegTableTotalRowCount(this.getRegTableTotalRowCount + histroyDraftsCollapsed.drafts.length)
       }
-      this.myRegTotalBaseRegLength += this.myRegDataBaseRegDrafts.length
     }
     // update columns selected with user settings
     if (this.getUserSettings?.[SettingOptions.REGISTRATION_TABLE]?.columns) {
@@ -824,20 +843,114 @@ export default class Dashboard extends Vue {
     // tell App that we're finished loading
     this.loading = false
     this.emitHaveData(true)
-    // trigger handler for a new added reg
-    this.handleRegTableDataUpdate(this.getRegTableData)
   }
 
-  @Watch('getRegTableData')
-  private handleRegTableDataUpdate (val: RegTableDataI) {
+  @Watch('getRegTableNewItem')
+  private async handleRegTableNewItem (val: RegTableNewItemI) {
     if (val.addedReg) {
+      this.myRegDataAdding = true
+      if (!val.addedRegSummary) {
+        // atttempt to get the summary info from the api
+        if (val.addedReg[0] !== 'D') {
+          // its a normal reg - get reg summary
+          const regSummary = await getRegistrationSummary(val.addedReg, true)
+          if (regSummary.error) {
+            this.emitError(regSummary.error) // dialog and will reload the dash after
+            this.myRegDataAdding = false
+            return
+          }
+          val.addedRegSummary = regSummary
+        } else {
+          // its a draft - get draft summary
+          const drafts = await draftHistory(null)
+          if (drafts.error) {
+            this.emitError(drafts.error) // dialog and will reload the dash after
+            this.myRegDataAdding = false
+            return
+          } else {
+            val.addedRegSummary = drafts.drafts.find(d => d.documentId === val.addedReg)
+            if (!val.addedRegSummary) {
+              this.emitError({
+                category: ErrorCategories.HISTORY_REGISTRATIONS,
+                statusCode: StatusCodes.NOT_FOUND,
+                message: 'Error finding new draft summary.'
+              })
+              this.myRegDataAdding = false
+              return
+            }
+          }
+        }
+      }
+
+      const baseRegs = this.getRegTableBaseRegs
+      if (val.prevDraft) {
+        // remove previous draft item from the store (child drafts also exist under parent - removed later)
+        this.setRegTableDraftsBaseReg(this.getRegTableDraftsBaseReg.filter(reg => reg.documentId !== val.prevDraft))
+        this.setRegTableDraftsChildReg(this.getRegTableDraftsChildReg.filter(reg => reg.documentId !== val.prevDraft))
+      }
+      // for masking the type of the new summary
+      const newDraftSummary = val.addedRegSummary as DraftResultIF
+      const newRegSummary = val.addedRegSummary as RegistrationSummaryIF
+      if (val.addedRegParent) {
+        // new child reg. Find parent + update it with new summary
+        const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === val.addedRegParent)
+        if (val.prevDraft) {
+          // remove draft
+          const changes = baseRegs[parentIndex].changes as DraftResultIF[]
+          if (changes) baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== val.prevDraft)
+          // update hasDraft value if removed draft was the only child draft
+          const draftIndex = changes.findIndex(
+            reg => reg.documentId !== val.prevDraft && reg.documentId !== undefined)
+          if (!draftIndex) baseRegs[parentIndex].hasDraft = false
+        }
+        if (newDraftSummary.documentId) {
+          // slot draft into parent changes
+          if (!baseRegs[parentIndex].changes) baseRegs[parentIndex].changes = []
+          baseRegs[parentIndex].changes.unshift(newDraftSummary)
+        } else {
+          // replace with new summary + then add drafts back on
+          const changes = baseRegs[parentIndex].changes as DraftResultIF[]
+          baseRegs[parentIndex] = newRegSummary
+          if (changes) {
+            const drafts = changes.filter(draft => !!draft.documentId)
+            for (let i = drafts.length; i > 0; i--) {
+              baseRegs[parentIndex].changes.unshift(drafts[i - 1])
+              baseRegs[parentIndex].hasDraft = true
+            }
+          }
+        }
+        // expand row
+        baseRegs[parentIndex].expand = true
+        // update store
+        this.setRegTableBaseRegs(cloneDeep(baseRegs))
+      } else if (newDraftSummary.documentId) {
+        // new draft base reg
+        const draftBaseRegs = this.getRegTableDraftsBaseReg
+        draftBaseRegs.unshift(newDraftSummary)
+        this.setRegTableDraftsBaseReg(draftBaseRegs)
+        if (!val.prevDraft) {
+          // new draft so increase
+          this.setRegTableTotalRowCount(this.getRegTableTotalRowCount + 1)
+        }
+      } else {
+        // new base reg
+        baseRegs.unshift(newRegSummary)
+        this.setRegTableBaseRegs([...baseRegs])
+        if (!val.prevDraft) {
+          // not from a draft so increase
+          this.setRegTableTotalRowCount(this.getRegTableTotalRowCount + 1)
+        }
+      }
+      this.myRegDataAdding = false
+      // trigger snackbar
       this.snackbarMsg = 'Registration was successfully added to your table.'
       this.toggleSnackbar = !this.toggleSnackbar
       // set to empty strings after 5 seconds
       setTimeout(() => {
         // only reset if it hasn't changed since
-        if (val.addedReg === this.getRegTableData.addedReg) {
-          this.setRegTableData({ addedReg: '', addedRegParent: '' })
+        if (val.addedReg === this.getRegTableNewItem.addedReg) {
+          const emptyItem: RegTableNewItemI = { addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: '' }
+          this.setRegTableNewItem(emptyItem)
         }
       }, 4000)
     }

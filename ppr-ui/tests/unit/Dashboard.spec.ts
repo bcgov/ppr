@@ -18,7 +18,7 @@ import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
 import { RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableDataI } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   amendConfirmationDialog,
@@ -356,8 +356,8 @@ describe('Dashboard registration table tests', () => {
 
   it('displays my registration header and content', () => {
     // myRegDrafts contains a child that will be put into a baseReg
-    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(parentDrafts)
-    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
+    expect(wrapper.vm.getRegTableDraftsBaseReg).toEqual(parentDrafts)
+    expect(wrapper.vm.getRegTableBaseRegs).toEqual(myRegHistoryWithChildren)
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain(`Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`)
@@ -411,7 +411,7 @@ describe('Dashboard registration table tests', () => {
   it('deletes parent drafts', async () => {
     const myRegDraftsCopy = [...parentDrafts]
     // check setup
-    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(myRegDraftsCopy)
+    expect(wrapper.vm.getRegTableDraftsBaseReg).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
     // emit delete action
@@ -428,7 +428,7 @@ describe('Dashboard registration table tests', () => {
     await flushPromises()
     // draft is removed from table
     myRegDraftsCopy.shift()
-    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(myRegDraftsCopy)
+    expect(wrapper.vm.getRegTableDraftsBaseReg).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...myRegDraftsCopy, ...myRegHistoryWithChildren])
   })
@@ -436,9 +436,9 @@ describe('Dashboard registration table tests', () => {
   it('deletes child drafts', async () => {
     const myRegDraftsCopy = myRegHistoryWithChildren[0].changes[0] as DraftResultIF
     // check setup
-    expect(wrapper.vm.myRegDataBaseRegDrafts).toEqual(parentDrafts)
-    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryWithChildren)
-    expect(wrapper.vm.myRegDataHistory[0].changes[0]).toEqual(myRegDraftsCopy)
+    expect(wrapper.vm.getRegTableDraftsBaseReg).toEqual(parentDrafts)
+    expect(wrapper.vm.getRegTableBaseRegs).toEqual(myRegHistoryWithChildren)
+    expect(wrapper.vm.getRegTableBaseRegs[0].changes[0]).toEqual(myRegDraftsCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...parentDrafts, ...myRegHistoryWithChildren])
     // emit delete action
@@ -466,7 +466,7 @@ describe('Dashboard registration table tests', () => {
   it('removes complete registrations', async () => {
     const myRegHistoryCopy = [...myRegHistoryWithChildren]
     // check setup
-    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryCopy)
+    expect(wrapper.vm.getRegTableBaseRegs).toEqual(myRegHistoryCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...parentDrafts, ...myRegHistoryCopy])
     // emit delete action
@@ -484,7 +484,7 @@ describe('Dashboard registration table tests', () => {
     await flushPromises()
     // registration is removed from table
     myRegHistoryCopy.shift()
-    expect(wrapper.vm.myRegDataHistory).toEqual(myRegHistoryCopy)
+    expect(wrapper.vm.getRegTableBaseRegs).toEqual(myRegHistoryCopy)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setRegistrationHistory)
       .toEqual([...parentDrafts, ...myRegHistoryCopy])
   })
@@ -572,10 +572,10 @@ describe('Dashboard add registration tests', () => {
     expect(wrapper.find(myRegAddDialog).vm.$props.setOptions.text)
       .toContain(registrationFoundDialog.text)
     expect(wrapper.vm.myRegAddDialogError).toBe(null)
-    expect(wrapper.vm.myRegDataHistory).toEqual([mockedRegistration2])
+    expect(wrapper.vm.getRegTableBaseRegs).toEqual([mockedRegistration2])
     wrapper.find(myRegAddDialog).vm.$emit('proceed', true)
     await flushPromises()
-    expect(wrapper.vm.myRegDataHistory).toEqual([myRegAdd, mockedRegistration2])
+    expect(wrapper.vm.getRegTableBaseRegs).toEqual([myRegAdd, mockedRegistration2])
     expect(wrapper.find(myRegAddDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.myRegAdd).toBe('')
     // see snackbar
@@ -585,14 +585,14 @@ describe('Dashboard add registration tests', () => {
       'Registration was successfully added to your table.'
     )
     // reg table data updated with new reg
-    const expectedRegTableData: RegTableDataI = { addedReg: myRegAdd.registrationNumber, addedRegParent: '' }
-    expect(wrapper.vm.$store.state.stateModel.registrationTable).toEqual(expectedRegTableData)
-    expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegData).toEqual(expectedRegTableData)
+    const expectedRegTableData: RegTableNewItemI = { addedReg: myRegAdd.registrationNumber, addedRegParent: '', addedRegSummary: myRegAdd, prevDraft: '' }
+    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem).toEqual(expectedRegTableData)
+    expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegItem).toEqual(expectedRegTableData)
     // reg table data updated with blank values after 5 sec
-    const emptyRegTableData: RegTableDataI = { addedReg: '', addedRegParent: '' }
+    const emptyRegTableData: RegTableNewItemI = { addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: '' }
     setTimeout(() => {
-      expect(wrapper.vm.$store.state.stateModel.registrationTable).toEqual(emptyRegTableData)
-      expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegData).toEqual(emptyRegTableData)
+      expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem).toEqual(emptyRegTableData)
+      expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegItem).toEqual(emptyRegTableData)
     }, 5100)
   })
 })

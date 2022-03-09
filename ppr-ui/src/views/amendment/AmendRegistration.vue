@@ -169,7 +169,8 @@ import {
   DebtorNameIF, // eslint-disable-line no-unused-vars
   CourtOrderIF, // eslint-disable-line no-unused-vars
   DialogOptionsIF, // eslint-disable-line no-unused-vars
-  FinancingStatementIF // eslint-disable-line no-unused-vars
+  FinancingStatementIF, // eslint-disable-line no-unused-vars
+  RegTableNewItemI // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { AllRegistrationTypes } from '@/resources'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
@@ -229,7 +230,7 @@ export default class AmendRegistration extends Vue {
   @Action setRegistrationFlowType: ActionBindingIF
   @Action setCertifyInformation: ActionBindingIF
   @Action setCollateralShowInvalid: ActionBindingIF
-  @Action setRegTableData: ActionBindingIF
+  @Action setRegTableNewItem: ActionBindingIF
   @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
@@ -561,11 +562,15 @@ export default class AmendRegistration extends Vue {
       this.emitError(draft.error)
     } else {
       this.setUnsavedChanges(false)
+      const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
       // set new added reg
-      this.setRegTableData({
+      const newItem: RegTableNewItemI = {
         addedReg: draft.amendmentStatement.documentId,
-        addedRegParent: draft.amendmentStatement.baseRegistrationNumber
-      })
+        addedRegParent: draft.amendmentStatement.baseRegistrationNumber,
+        addedRegSummary: null,
+        prevDraft: prevDraftId
+      }
+      this.setRegTableNewItem(newItem)
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
