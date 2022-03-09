@@ -16,7 +16,7 @@
             class="add-party-header generic-label ml"
             :class="{ 'error-text': invalidSection }"
           >
-            <span v-if="activeIndex === -1 && !currentSecuredParty.action" class="">Add</span>
+            <span v-if="activeIndex === -1 && (!currentSecuredParty || !currentSecuredParty.action)" class="">Add</span>
             <span v-else>
               <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
                         && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">

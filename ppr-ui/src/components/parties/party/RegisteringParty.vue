@@ -182,7 +182,7 @@ export default defineComponent({
         }
       }
     })
-    const { getName, isBusiness } = useParty()
+    const { getName, isBusiness, isPartiesValid } = useParty()
     const localState = reactive({
       addEditInProgress: false,
       showEditParty: false,
@@ -222,6 +222,7 @@ export default defineComponent({
         regParty = await getStaffegisteringParty(isRoleStaffBcol.value)
       } else if (isRoleStaffSbc.value) {
         parties.registeringParty = null
+        parties.valid = isPartiesValid(parties)
       } else {
         regParty = await getRegisteringPartyFromAuth()
       }

@@ -62,6 +62,7 @@ export const useParty = () => {
   const isPartiesValid = (parties: AddPartiesIF): boolean => {
     let debtorValid = false
     let securedPartyValid = false
+    let registeringPartyValid = false
     for (let i = 0; i < parties.debtors.length; i++) {
       // is valid if there is at least one debtor
       if (parties.debtors[i].action !== ActionTypes.REMOVED) {
@@ -75,8 +76,11 @@ export const useParty = () => {
         securedPartyValid = true
       }
     }
+    if (parties.registeringParty) {
+      registeringPartyValid = true
+    }
 
-    return debtorValid && securedPartyValid
+    return debtorValid && securedPartyValid && registeringPartyValid
   }
 
   return {

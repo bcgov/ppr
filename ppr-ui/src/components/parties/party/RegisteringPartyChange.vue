@@ -119,7 +119,7 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddRegisteringParty = false
       localState.openChangeScreen = false
-      if ((isRoleStaffSbc.value) && (!localState.registeringParty.action)) {
+      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty.action))) {
         localState.openChangeScreen = true
       }
       context.emit('registeringPartyOpen', false)
