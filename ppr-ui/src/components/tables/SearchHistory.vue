@@ -70,7 +70,7 @@
                       >
                     </template>
                     <div class="pt-2 pb-2">
-                      <span v-html="tooltipTxtPdf(item)"></span>
+                      <span v-html="tooltipTxtPdf"></span>
                     </div>
                   </v-tooltip>
                 </td>

@@ -41,7 +41,7 @@
               <v-list-item-action
                 :class="[$style['auto-complete-action'], 'mt-n1']"
               >
-                <span v-if="!resultAdded[i]" @click="addResult(result, i)">
+                <span v-if="!resultAdded[i] && !isExistingSecuredParty(result.code)" @click="addResult(result, i)">
                   <v-icon :class="$style['icon-bump']">mdi-plus</v-icon>Add
                 </span>
                 <span class="auto-complete-added" v-else>
@@ -98,7 +98,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { addSecuredParty, setRegisteringParty } = useSecuredParty(props, context)
+    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
       searchValue: '',
@@ -165,6 +165,7 @@ export default defineComponent({
     return {
       addResult,
       closeAutoComplete,
+      isExistingSecuredParty,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }
