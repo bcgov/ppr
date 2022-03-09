@@ -1,16 +1,16 @@
 /* eslint-disable */
-import { computed, reactive, Ref } from '@vue/composition-api'
+import { computed, reactive, ref, Ref } from '@vue/composition-api'
 import { uniqueId } from 'lodash'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
-export function useAddress (address: Ref<AddressIF>, schema: Ref<SchemaIF>) {
+export function useAddress (address: Ref<AddressIF>, schema: SchemaIF) {
   const addressLocal = address
   /** The Address Country, to simplify the template and so we can watch it directly. */
   const country = computed((): string => {
     return addressLocal.value.country
   })
-  const schemaLocal = schema
+  const schemaLocal = ref(schema)
   const isSchemaRequired = (prop: string): boolean => {
     if (!schemaLocal || !schemaLocal.value[prop]) return false
 
