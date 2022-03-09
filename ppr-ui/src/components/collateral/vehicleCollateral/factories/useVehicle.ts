@@ -30,9 +30,9 @@ export const useVehicle = (props, context) => {
         case 'BO':
           return 'Serial Number'
         case 'AF':
-          return 'D.O.T or Serial Number'
+          return 'D.O.T. or Serial Number'
         case 'AC':
-          return 'D.O.T Number'
+          return 'D.O.T. Number'
         case 'OB':
           return 'Serial Number'
         case 'TR':

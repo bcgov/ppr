@@ -23,7 +23,7 @@ export const useValidation = () => {
 
   const validateBusinessName = (form, localErrors) => {
     form.businessName = form.businessName.trim()
-    if (form.businessName.length === 0) {
+    if (!form.businessName || form.businessName.length === 0) {
       localErrors.businessName = {
         type: 'NAME',
         succeeded: false,
@@ -45,7 +45,7 @@ export const useValidation = () => {
   }
 
   const validateFirstName = (form, localErrors) => {
-    if (form.personName.first.length === 0) {
+    if (!form.personName || form.personName.first.length === 0) {
       localErrors.first = {
         type: 'NAME',
         succeeded: false,
@@ -67,7 +67,7 @@ export const useValidation = () => {
   }
 
   const validateMiddleName = (form, localErrors) => {
-    if (form.personName.middle.length > 50) {
+    if (!form.personName || form.personName.middle.length > 50) {
       localErrors.middle = {
         type: 'NAME',
         succeeded: false,
@@ -83,7 +83,7 @@ export const useValidation = () => {
   }
 
   const validateLastName = (form, localErrors) => {
-    if (form.personName.last.length === 0) {
+    if (!form.personName || form.personName.last.length === 0) {
       localErrors.last = {
         type: 'NAME',
         succeeded: false,

@@ -14,6 +14,11 @@
         <v-col class="summary-text"
           >Indicate the General Collateral to be deleted from or added to this
           registration.
+          <p class="pt-2 mb-0 mr-2">
+            Note: If you are pasting text, we recommend pasting plain text to avoid formatting and font issues
+            with PDF and printed registrations. If you have pasted text other than plain text, verify that your
+            documents are correct. If they are not correct, they will need to be amended.
+          </p>
         </v-col>
       </v-row>
       <v-row no-gutters class="pt-8">
