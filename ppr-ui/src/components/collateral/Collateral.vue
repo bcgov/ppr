@@ -242,7 +242,8 @@ export default defineComponent({
     })
 
     watch(() => localState.collateral.vehicleCollateral, (val: VehicleCollateralIF[]) => {
-      if (vehiclesValid() || localState.collateral?.generalCollateral?.length > 0) {
+      if (vehiclesValid() || localState.collateral?.generalCollateral?.length > 0 ||
+      registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {
@@ -251,7 +252,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     watch(() => localState.collateral.generalCollateral, (val: GeneralCollateralIF[]) => {
-      if (val?.length > 0 || vehiclesValid()) {
+      if (val?.length > 0 || vehiclesValid() || registrationType === APIRegistrationTypes.TRANSITION_TAX_LIEN) {
         setCollateralValidAndEmit(true)
         setCollateralShowInvalid(false)
       } else {
