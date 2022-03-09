@@ -27,7 +27,7 @@ export interface StateModelIF {
     confirmDebtorName: DebtorNameIF // Required for actions on existing registrations.
     courtOrderInformation: CourtOrderIF
     creationDate: string
-    draft: DraftIF,
+    draft: DraftIF
     expiryDate: string
     registrationFlowType: RegistrationFlowType
     lengthTrust: LengthTrustIF
@@ -49,5 +49,6 @@ export interface StateModelIF {
     searchCertified: boolean
   }
   staffPayment: StaffPaymentIF
+  unsavedChanges: Boolean // used for cancel flows
   userInfo: UserInfoIF
 }

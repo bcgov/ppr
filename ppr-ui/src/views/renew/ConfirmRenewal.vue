@@ -12,7 +12,7 @@
       setAttach="#confirm-renewal"
       :setOptions="options"
       :setDisplay="showCancelDialog"
-      @proceed="cancel($event)"
+      @proceed="handleDialogResp($event)"
     />
     <staff-payment-dialog
       attach=""
@@ -83,7 +83,7 @@
                 :setSubmitBtn="'Register Renewal and Pay'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="goToReviewRenewal()"
-                @cancel="showDialog()"
+                @cancel="showCancelDialog = true"
                 @submit="submitButton()"
               />
             </affix>
@@ -128,7 +128,7 @@ import {
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { AllRegistrationTypes } from '@/resources'
-import { renewCancelDialog } from '@/resources/dialogOptions'
+import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 
 @Component({
@@ -159,6 +159,7 @@ export default class ConfirmDischarge extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegTableData: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -171,7 +172,7 @@ export default class ConfirmDischarge extends Vue {
   private dataLoaded = false
   private dataLoadError = false
   private financingStatementDate: Date = null
-  private options: DialogOptionsIF = renewCancelDialog
+  private options: DialogOptionsIF = notCompleteDialog
   private showCancelDialog = false
   private submitting = false
 
@@ -229,9 +230,9 @@ export default class ConfirmDischarge extends Vue {
     return (this.getRegistrationType && this.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
   }
 
-  private cancel (val: boolean): void {
+  private handleDialogResp (val: boolean): void {
     this.showCancelDialog = false
-    if (val) {
+    if (!val) {
       this.setRegistrationNumber(null)
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
@@ -308,10 +309,6 @@ export default class ConfirmDischarge extends Vue {
 
   private setFolioValid (valid: boolean): void {
     this.validFolio = valid
-  }
-
-  private showDialog (): void {
-    this.showCancelDialog = true
   }
 
   private onStaffPaymentChanges (pay: boolean): void {

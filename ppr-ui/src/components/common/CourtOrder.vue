@@ -183,6 +183,7 @@ import {
   onMounted
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import { isEqual } from 'lodash'
 // bcregistry
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 // local
@@ -211,11 +212,13 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setCourtOrderInformation } = useActions<any>([
-      'setCourtOrderInformation'
+    const { setCourtOrderInformation, setUnsavedChanges } = useActions<any>([
+      'setCourtOrderInformation', 'setUnsavedChanges'
     ])
-    const { getCourtOrderInformation, getRegistrationType, getRegistrationCreationDate } = useGetters<any>([
-      'getCourtOrderInformation', 'getRegistrationType', 'getRegistrationCreationDate'
+    const {
+      getCourtOrderInformation, getRegistrationType, getRegistrationCreationDate, hasUnsavedChanges
+    } = useGetters<any>([
+      'getCourtOrderInformation', 'getRegistrationType', 'getRegistrationCreationDate', 'hasUnsavedChanges'
     ])
     const {
       errors,
@@ -373,21 +376,21 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      // initialize to blanks
-      if (localState.courtOrderInfo === null) {
-        const newCourtOrderInfo = {
-          orderDate: '',
-          effectOfOrder: '',
-          courtName: '',
-          courtRegistry: '',
-          fileNumber: ''
-        }
+      const blankCourtOrder: CourtOrderIF = {
+        courtName: '',
+        courtRegistry: '',
+        effectOfOrder: '',
+        fileNumber: '',
+        orderDate: ''
+      }
+      if (isEqual(localState.courtOrderInfo, blankCourtOrder)) {
         if (localState.requireCourtOrder && registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
                                       ' an additional 180 days.'
         }
-        setCourtOrderInformation(newCourtOrderInfo)
       } else {
+        // get unsavedChanges to reset it after court order setup
+        const unsavedChanges = hasUnsavedChanges.value as Boolean
         if (localState.courtOrderInfo.orderDate?.length > 10) {
           // convert back to local iso date string
           const orderDate = new Date(localState.courtOrderInfo.orderDate)
@@ -399,18 +402,12 @@ export default defineComponent({
         localState.courtName = localState.courtOrderInfo.courtName
         localState.courtRegistry = localState.courtOrderInfo.courtRegistry
         localState.fileNumber = localState.courtOrderInfo.fileNumber
-        if (localState.requireCourtOrder &&
-            registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
-            localState.orderDate === '' &&
-            localState.effectOfOrder === '' &&
-            localState.courtName === '' &&
-            localState.courtRegistry === '' &&
-            localState.fileNumber === '') {
-          localState.effectOfOrder = 'Order directs the effective period of the Repairer\'s Lien be extended' +
-                                      ' an additional 180 days.'
-        }
         // rerender date-picker
         localState.datePickerKey = Math.random()
+        // reset unsaved changes to what it was before setting up court order
+        setTimeout(() => {
+          setUnsavedChanges(unsavedChanges)
+        }, 100)
       }
     })
 

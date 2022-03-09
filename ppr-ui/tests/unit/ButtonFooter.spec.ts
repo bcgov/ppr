@@ -95,15 +95,16 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Add Secured Parties and Debtors')
   })
   it('Step 1 cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
+    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    await wrapper.find(cancelBtn).trigger('click')
+    expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   it('Step 1 next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
   })
   it('Step 1 submitCancel', async () => {
-    wrapper.vm.submitCancel()
+    wrapper.vm.cancel()
     await Vue.nextTick()
   })
   it('Step 1 submitNext', async () => {
@@ -146,8 +147,9 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Add Collateral')
   })
   it('Step 2 cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
+    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    await wrapper.find(cancelBtn).trigger('click')
+    expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   
   it('Step 2 back button event', async () => {
@@ -160,7 +162,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
   })
 
   it('Step 2 submitCancel', async () => {
-    wrapper.vm.submitCancel()
+    wrapper.vm.cancel()
     await Vue.nextTick()
   })
   it('Step 2 submitBack', async () => {
@@ -208,8 +210,9 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Review and Confirm')
   })
   it('Step 3 cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
+    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    await wrapper.find(cancelBtn).trigger('click')
+    expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   it('Step 3 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
@@ -221,7 +224,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
   })
 
   it('Step 3 submitCancel', async () => {
-    wrapper.vm.submitCancel()
+    wrapper.vm.cancel()
     await Vue.nextTick()
   })
   it('Step 3 submitBack', async () => {
@@ -269,8 +272,9 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Register and Pay')
   })
   it('Step 4 cancel button event', async () => {
-    wrapper.find(cancelBtn).trigger('click')
-    await Vue.nextTick()
+    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    await wrapper.find(cancelBtn).trigger('click')
+    expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   it('Step 4 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
@@ -282,7 +286,7 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
   })
 
   it('Step 4 submitCancel', async () => {
-    wrapper.vm.submitCancel()
+    wrapper.vm.cancel()
     await Vue.nextTick()
   })
   it('Step 4 submitBack', async () => {

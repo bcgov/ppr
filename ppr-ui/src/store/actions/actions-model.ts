@@ -39,6 +39,7 @@ export const setAccountInformation: ActionIF = ({ commit }, account: AccountInfo
 
 export const setAddCollateral: ActionIF = ({ commit }, addCollateral: AddCollateralIF): void => {
   commit('mutateAddCollateral', addCollateral)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setOriginalAddCollateral: ActionIF = ({ commit }, addCollateral: AddCollateralIF): void => {
@@ -47,6 +48,7 @@ export const setOriginalAddCollateral: ActionIF = ({ commit }, addCollateral: Ad
 
 export const setAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, addParties: AddPartiesIF): void => {
   commit('mutateAddSecuredPartiesAndDebtors', addParties)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setOriginalAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, addParties: AddPartiesIF): void => {
@@ -55,6 +57,7 @@ export const setOriginalAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, add
 
 export const setAmendmentDescription: ActionIF = ({ commit }, description: string): void => {
   commit('mutateAmendmentDescription', description)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setAuthRoles: ActionIF = ({ commit }, authRoles: Array<string>): void => {
@@ -83,6 +86,7 @@ export const setCollateralValid = ({ commit }, valid: boolean): void => {
 
 export const setCourtOrderInformation: ActionIF = ({ commit }, courtOrderInformation: CourtOrderIF): void => {
   commit('mutateCourtOrderInformation', courtOrderInformation)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {
@@ -91,10 +95,12 @@ export const setDraft: ActionIF = ({ commit }, draft: DraftIF): void => {
 
 export const setGeneralCollateral: ActionIF = ({ commit }, generalCollateral: GeneralCollateralIF[]): void => {
   commit('mutateGeneralCollateral', generalCollateral)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
   commit('mutateLengthTrust', lengthTrust)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setOriginalLengthTrust: ActionIF = ({ commit }, lengthTrust: LengthTrustIF): void => {
@@ -175,6 +181,7 @@ export const setUserSettings: ActionIF = ({ commit }, settings: UserSettingsIF):
 
 export const setVehicleCollateral: ActionIF = ({ commit }, vCollateral: VehicleCollateralIF[]): void => {
   commit('mutateVehicleCollateral', vCollateral)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setAddSecuredPartiesAndDebtorsStepValidity = ({ commit }, validity) => {
@@ -191,6 +198,7 @@ export const setLengthTrustStepValidity = ({ commit }, validity) => {
 
 export const setFolioOrReferenceNumber: ActionIF = ({ commit }, refNumber: string): void => {
   commit('mutateFolioOrReferenceNumber', refNumber)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setShowStepErrors: ActionIF = ({ commit }, show: boolean): void => {
@@ -199,4 +207,8 @@ export const setShowStepErrors: ActionIF = ({ commit }, show: boolean): void => 
 
 export const setRegTableData: ActionIF = ({ commit }, regTableData: RegTableDataI): void => {
   commit('mutateRegistrationTable', regTableData)
+}
+
+export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean): void => {
+  commit('mutateUnsavedChanges', unsavedChanges)
 }

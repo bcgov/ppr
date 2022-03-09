@@ -9,10 +9,9 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog
-      setAttach="#confirm-amendment"
       :setOptions="options"
       :setDisplay="showCancelDialog"
-      @proceed="cancel($event)"
+      @proceed="handleDialogResp($event)"
     />
     <staff-payment-dialog
       attach=""
@@ -149,7 +148,7 @@
                 :setDisableSubmitBtn="isRoleStaffBcol"
                 @back="goToReviewAmendment()"
                 @save="saveDraft()"
-                @cancel="showDialog()"
+                @cancel="cancel()"
                 @submit="submitButton()"
               />
             </affix>
@@ -197,11 +196,13 @@ import {
   LengthTrustIF, // eslint-disable-line no-unused-vars
   DialogOptionsIF, // eslint-disable-line no-unused-vars
   DebtorNameIF, // eslint-disable-line no-unused-vars
-  DraftIF // eslint-disable-line no-unused-vars
+  DraftIF, // eslint-disable-line no-unused-vars
+  FinancingStatementIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
 import { AllRegistrationTypes } from '@/resources'
+import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   getFeatureFlag,
@@ -239,6 +240,7 @@ export default class ConfirmAmendment extends Vue {
   @Getter getRegistrationNumber: string
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
+  @Getter hasUnsavedChanges: Boolean
   @Getter isRoleStaffBcol: boolean
   @Getter isRoleStaffReg: boolean
   @Getter isRoleStaffSbc: boolean
@@ -250,6 +252,7 @@ export default class ConfirmAmendment extends Vue {
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setRegTableData: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -266,13 +269,7 @@ export default class ConfirmAmendment extends Vue {
   private dataLoadError = false
   private registeringOpen = false
   private financingStatementDate: Date = null
-  private options: DialogOptionsIF = {
-    acceptText: 'Cancel Amendment',
-    cancelText: 'Close',
-    title: 'Cancel',
-    label: '',
-    text: 'This will discard all changes made and return you to My Personal Property Registry dashboard.'
-  }
+  private options: DialogOptionsIF = unsavedChangesDialog
 
   private staffPaymentDialogDisplay = false
 
@@ -442,6 +439,16 @@ export default class ConfirmAmendment extends Vue {
     return ''
   }
 
+  private cancel (): void {
+    if (this.hasUnsavedChanges) this.showCancelDialog = true
+    else this.goToDashboard()
+  }
+
+  private handleDialogResp (val: boolean): void {
+    this.showCancelDialog = false
+    if (!val) this.goToDashboard()
+  }
+
   private async scrollToInvalid (): Promise<void> {
     if (!this.validFolio) {
       const component = document.getElementById('folio-summary')
@@ -461,14 +468,6 @@ export default class ConfirmAmendment extends Vue {
     if (!this.certifyInformationValid) {
       const component = document.getElementById('certify-information')
       await component.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  private cancel (val: boolean): void {
-    this.showCancelDialog = false
-    if (val) {
-      this.setRegistrationNumber(null)
-      this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
 
@@ -498,25 +497,33 @@ export default class ConfirmAmendment extends Vue {
       this.dataLoadError = true
       this.emitError(financingStatement.error)
     } else {
-      // load data into the store
-      const registrationType = AllRegistrationTypes.find((reg, index) => {
-        if (reg.registrationTypeAPI === financingStatement.type) {
-          return true
-        }
-      })
-      const parties = {
-        valid: true,
-        registeringParty: null, // will be taken from account info
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      this.setRegistrationCreationDate(financingStatement.createDateTime)
-      this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      this.setRegistrationType(registrationType)
-      this.setAddSecuredPartiesAndDebtors(parties)
+      await this.setStore(financingStatement)
+      // give time for setStore to finish
+      setTimeout(() => {
+        this.setUnsavedChanges(false)
+      }, 200)
     }
     this.submitting = false
+  }
+
+  private async setStore (financingStatement: FinancingStatementIF) {
+    // load data into the store
+    const registrationType = AllRegistrationTypes.find((reg, index) => {
+      if (reg.registrationTypeAPI === financingStatement.type) {
+        return true
+      }
+    })
+    const parties = {
+      valid: true,
+      registeringParty: null, // will be taken from account info
+      securedParties: financingStatement.securedParties,
+      debtors: financingStatement.debtors
+    } as AddPartiesIF
+    this.setRegistrationCreationDate(financingStatement.createDateTime)
+    this.setRegistrationExpiryDate(financingStatement.expiryDate)
+    this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
+    this.setRegistrationType(registrationType)
+    this.setAddSecuredPartiesAndDebtors(parties)
   }
 
   mounted () {
@@ -549,10 +556,6 @@ export default class ConfirmAmendment extends Vue {
     this.showErrors = false
   }
 
-  private showDialog (): void {
-    this.showCancelDialog = true
-  }
-
   @Throttle(2000)
   private async saveDraft (): Promise<void> {
     const stateModel: StateModelIF = this.getStateModel
@@ -562,6 +565,7 @@ export default class ConfirmAmendment extends Vue {
     if (draft.error) {
       this.emitError(draft.error)
     } else {
+      this.setUnsavedChanges(false)
       // set new added reg
       this.setRegTableData({
         addedReg: draft.amendmentStatement.documentId,

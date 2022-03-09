@@ -136,6 +136,11 @@ export const getRegistrationOther = (state: StateIF): string => {
   return state.stateModel.registration.registrationTypeOtherDesc
 }
 
+/** The . */
+export const getRegistration = (state: StateIF): string => {
+  return state.stateModel.registration.registrationTypeOtherDesc
+}
+
 /** The search value for ppr search when search type is individual debtor. */
 export const getSearchDebtorName = (state: StateIF): IndividualNameIF => {
   return state.stateModel.search.searchDebtorName
@@ -209,6 +214,11 @@ export const getUserUsername = (state: StateIF): string => {
 /** The list of registration vehicle collateral */
 export const getVehicleCollateral = (state: StateIF): VehicleCollateralIF[] => {
   return state.stateModel.registration.collateral.vehicleCollateral
+}
+
+/** Whether the user has unsaved changes in their current flow or not. */
+export const hasUnsavedChanges = (state: StateIF): Boolean => {
+  return state.stateModel.unsavedChanges
 }
 
 /** Whether the current account is a non billable account. */

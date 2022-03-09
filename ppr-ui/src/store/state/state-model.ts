@@ -49,7 +49,13 @@ export const stateModel: StateModelIF = {
       generalCollateral: []
     },
     confirmDebtorName: null,
-    courtOrderInformation: null,
+    courtOrderInformation: {
+      orderDate: '',
+      effectOfOrder: '',
+      courtName: '',
+      courtRegistry: '',
+      fileNumber: ''
+    },
     creationDate: '',
     draft: {
       type: null,
@@ -95,6 +101,7 @@ export const stateModel: StateModelIF = {
     searchCertified: false
   },
   staffPayment: null,
+  unsavedChanges: false,
   userInfo: {
     contacts: [],
     feeSettings: null,

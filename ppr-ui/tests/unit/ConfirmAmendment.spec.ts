@@ -153,18 +153,20 @@ describe('Confirm Amendment registration component', () => {
   })
 
   it('processes cancel button action', async () => {
+    // setup
+    await wrapper.vm.$store.dispatch('setUnsavedChanges', true)
     // dialog doesn't start visible
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     // pressing cancel triggers dialog
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(true)
     // if dialog emits proceed false it closes + stays on page
-    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
+    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', true)
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
     // if dialog emits proceed true it goes to dashboard
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
-    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', true)
+    await wrapper.findComponent(BaseDialog).vm.$emit('proceed', false)
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })

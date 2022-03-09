@@ -11,6 +11,7 @@ import { ReviewRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { CautionBox, StickyContainer } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
 import {
   DebtorSummary,
   RegisteringPartySummary,
@@ -113,6 +114,10 @@ describe('ReviewConfirm new registration component', () => {
 
   it('processes cancel button action', async () => {
     wrapper.find(StickyContainer).vm.$emit('cancel', true)
+    await flushPromises()
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
+    expect(wrapper.find(BaseDialog).exists()).toBe(true)
+    wrapper.find(BaseDialog).vm.$emit('proceed', false)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })

@@ -118,8 +118,8 @@ describe('Amendment registration component', () => {
   })
 
   it('processes cancel button action', async () => {
-    wrapper.find(StickyContainer).vm.$emit('cancel', true)
-    await flushPromises()
+    await wrapper.vm.$store.dispatch('setUnsavedChanges', false)
+    await wrapper.find(StickyContainer).vm.$emit('cancel', true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 

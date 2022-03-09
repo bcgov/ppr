@@ -313,6 +313,7 @@ export default class Dashboard extends Vue {
   @Action setLengthTrust: ActionBindingIF
   @Action setAddCollateral: ActionBindingIF
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
   @Action setUserSettings: ActionBindingIF
 
   /** Whether App is ready. */
@@ -424,7 +425,7 @@ export default class Dashboard extends Vue {
   private editDraftAmend (docId: string, regNum: string): void {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     // Go to the Amendment first step which loads the base registration and draft data.
-    this.$router.push({
+    this.$router.replace({
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': regNum, 'document-id': docId }
     })
@@ -441,8 +442,10 @@ export default class Dashboard extends Vue {
       this.setLengthTrust(stateModel.registration.lengthTrust)
       this.setAddCollateral(stateModel.registration.collateral)
       this.setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
+      // reset unsaved changes
+      this.setUnsavedChanges(false)
       // Go to the first step.
-      this.$router.push({ name: RouteNames.LENGTH_TRUST })
+      this.$router.replace({ name: RouteNames.LENGTH_TRUST })
     }
   }
 
@@ -742,7 +745,7 @@ export default class Dashboard extends Vue {
   }
 
   private startNewChildDraft (regNum: string, routeName: RouteNames): void {
-    this.$router.push({
+    this.$router.replace({
       name: routeName,
       query: { 'reg-num': regNum }
     })
@@ -753,7 +756,7 @@ export default class Dashboard extends Vue {
   private startNewRegistration (selectedRegistration: RegistrationTypeIF): void {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     this.setRegistrationType(selectedRegistration)
-    this.$router.push({ name: RouteNames.LENGTH_TRUST })
+    this.$router.replace({ name: RouteNames.LENGTH_TRUST })
   }
 
   private async retrieveSearchHistory (): Promise<void> {
@@ -853,7 +856,8 @@ export default class Dashboard extends Vue {
   private onSearch (val: SearchResponseIF): void {
     // navigate to search page if not null/reset
     if (val) {
-      this.$router.push({
+      // 'replace' resets the state so window.onbeforeunload event is fired when the browser 'back' btn is pressed
+      this.$router.replace({
         name: RouteNames.SEARCH
       })
     }
