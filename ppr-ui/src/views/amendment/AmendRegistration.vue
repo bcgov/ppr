@@ -418,6 +418,7 @@ export default class AmendRegistration extends Vue {
       const stateModel: StateModelIF = await setupAmendmentStatementFromDraft(this.getStateModel, this.documentId)
       if (stateModel.registration.draft.error) {
         this.emitError(stateModel.registration.draft.error)
+        this.$router.push({ name: RouteNames.DASHBOARD })
       } else {
         this.setAddCollateral(stateModel.registration.collateral)
         this.setLengthTrust(stateModel.registration.lengthTrust)

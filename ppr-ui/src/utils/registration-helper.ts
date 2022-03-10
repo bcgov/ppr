@@ -548,7 +548,6 @@ export async function setupFinancingStatementDraft (stateModel:StateModelIF, doc
 }
 
 export function setupStateModelFromAmendmentDraft (stateModel:StateModelIF, draft:DraftIF): StateModelIF {
-  stateModel.registration.draft = draft
   const draftAmendment:AmendmentStatementIF = draft.amendmentStatement
   stateModel.registration.amendmentDescription = draftAmendment.description
   if (!stateModel.registration.parties.registeringParty) {
@@ -624,18 +623,15 @@ export function setupStateModelFromAmendmentDraft (stateModel:StateModelIF, draf
  * Setup an amendment from draft for editing. Get the previously saved draft and hydrate the state model.
  * Assumes a separate, previous call to load the base registration data.
  */
-export async function setupAmendmentStatementFromDraft (stateModel:StateModelIF,
-  documentId:string): Promise<StateModelIF> {
-  const draft:DraftIF = await getDraft(documentId)
-  if (!draft) {
-    console.error('getDraft failed: response null.')
-    return stateModel
-  }
-  if (draft.error) {
-    console.error('getDraft failed: ' + draft.error.statusCode + ': ' + draft.error.message)
-    return stateModel
-  }
+export async function setupAmendmentStatementFromDraft (
+  stateModel:StateModelIF,
+  documentId:string
+): Promise<StateModelIF> {
+  const draft: DraftIF = await getDraft(documentId)
+  stateModel.registration.draft = draft
+  if (draft.error) return stateModel
   if (!draft.amendmentStatement) {
+    // user will continue with a blank amendment (should never happen)
     console.error('getDraft failed: no draft amendment data found.')
     return stateModel
   }
