@@ -19,8 +19,9 @@
             class="white pt-2 text-input-field"
           />
           <p class="summary-text">
-            Note: If you are pasting text, <strong>we recommend pasting plain text</strong> to avoid formatting and font issues
-            with PDF and printed registrations. If you have pasted text other than plain text, verify that your
+            Note: If you are pasting text, <strong>we recommend pasting plain text</strong>
+            to avoid formatting and font issues with PDF and printed registrations.
+            If you have pasted text other than plain text, verify that your
             documents are correct. If they are not correct, they will need to be amended.
           </p>
         </v-col>

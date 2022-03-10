@@ -487,14 +487,29 @@ export default defineComponent({
     }
 
     const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
-      // should only ever be a base registration
+      // could be base reg or child reg
       if (item.registeringName) {
+        // will always return base reg
         const resp = await getRegistrationSummary(item.registrationNumber, true)
         if (resp.error) {
           // log error, but otherwise ignore it
           console.error('Refreshing registration failed: ', resp.error)
         } else {
-          item.path = resp.path
+          if (item.registrationNumber === resp.registrationNumber) item.path = resp.path
+          else {
+            // find child in changes and set path to that
+            const changes = resp?.changes as RegistrationSummaryIF[]
+            const child = changes.find(reg => reg.registrationNumber === item.registrationNumber)
+            if (!child) {
+              // log error, but otherwise ignore it
+              console.error(
+                `Could not find registration ${item.registrationNumber} within base reg changes: `,
+                resp.changes
+              )
+            } else {
+              item.path = child.path
+            }
+          }
         }
       }
     }
