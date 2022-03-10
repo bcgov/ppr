@@ -58,8 +58,7 @@ QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE :registering_nam
 QUERY_ACCOUNT_STATUS_CLAUSE = ' AND arv.state = :status_type'
 QUERY_ACCOUNT_REG_TYPE_CLAUSE = ' AND arv.registration_type = :registration_type'
 QUERY_ACCOUNT_REG_DATE_CLAUSE = """
- AND arv.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
-                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
+ AND arv.registration_ts BETWEEN TO_TIMESTAMP(start_ts) AND TO_TIMESTAMP(end_ts)
  """
 QUERY_ACCOUNT_CHANGE_REG_CLASS_CLAUSE = " AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')"
 QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE = " AND arv2.registration_number LIKE :reg_num || '%'"
@@ -68,8 +67,7 @@ QUERY_ACCOUNT_CHANGE_REG_NAME_CLAUSE = " AND arv2.registering_name LIKE :registe
 QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE = ' AND arv2.state = :status_type'
 QUERY_ACCOUNT_CHANGE_REG_TYPE_CLAUSE = ' AND arv2.registration_type = :registration_type'
 QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE = """
- AND arv2.registration_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
-                             (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
+ AND arv2.registration_ts BETWEEN TO_TIMESTAMP(start_ts) AND TO_TIMESTAMP(end_ts)
  """
 
 
@@ -216,7 +214,7 @@ def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
     base_query: str = model_utils.QUERY_ACCOUNT_BASE_REG_BASE
     if params.start_date_time and params.end_date_time:
         base_query = model_utils.QUERY_ACCOUNT_BASE_REG_SUBQUERY
-        base_query += QUERY_ACCOUNT_REG_DATE_CLAUSE
+        base_query += build_reg_date_clause(params, True)
     if params.registration_number:
         base_query += QUERY_ACCOUNT_REG_NUM_CLAUSE
     if params.registration_type:
@@ -228,6 +226,16 @@ def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
     if params.status_type:
         base_query += QUERY_ACCOUNT_STATUS_CLAUSE
     return base_query
+
+
+def build_reg_date_clause(params: AccountRegistrationParams, base_query: bool) -> str:
+    """Build the account registration base query date range clause from the provided parameters."""
+    clause: str = QUERY_ACCOUNT_REG_DATE_CLAUSE if base_query else QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE
+    start_ts: str = str(model_utils.ts_from_iso_format(params.start_date_time).timestamp())
+    end_ts: str = str(model_utils.ts_from_iso_format(params.end_date_time).timestamp())
+    clause = clause.replace('start_ts', start_ts)
+    clause = clause.replace('end_ts', end_ts)
+    return clause
 
 
 def build_account_change_base_query(params: AccountRegistrationParams) -> str:
@@ -246,7 +254,7 @@ def build_account_change_base_query(params: AccountRegistrationParams) -> str:
     if params.status_type:
         base_query += QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE
     if params.start_date_time and params.end_date_time:
-        base_query += QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE
+        base_query += build_reg_date_clause(params, False)
     order_by: str = get_account_change_query_order(params)
     base_query += order_by
     base_query += QUERY_ACCOUNT_REG_LIMIT
@@ -308,11 +316,6 @@ def build_account_query_params(params: AccountRegistrationParams, api_filter: bo
         query_params['registering_name'] = params.registering_name
     if params.status_type:
         query_params['status_type'] = params.status_type
-    if params.start_date_time and params.end_date_time:
-        start_ts: str = params.start_date_time.replace('T', ' ')
-        end_ts: str = params.end_date_time.replace('T', ' ')
-        query_params['start_date_time'] = start_ts
-        query_params['end_date_time'] = end_ts
     return query_params
 
 
