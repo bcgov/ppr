@@ -4,8 +4,8 @@ export const registrationAddErrorDialog: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',
   hasContactInfo: true,
-  title: 'Unable to retrieve existing registrations',
-  text: 'We are unable to retrieve existing registrations due to an application ' +
+  title: 'Unable to add registration to your table',
+  text: 'We are unable to add this registration to your table due to an application ' +
     'error. Please try again later. If this issue persists, please contact us.'
 }
 

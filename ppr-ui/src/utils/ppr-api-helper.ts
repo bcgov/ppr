@@ -559,9 +559,9 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
   const draft: DraftIF = {}
   if (documentId === undefined || documentId === '') {
     draft.error = {
+      category: ErrorCategories.DRAFT_LOAD,
       statusCode: StatusCodes.BAD_REQUEST,
-      message:
-        'Draft lookup request invalid: no document ID.'
+      message: 'Draft lookup request invalid: no document ID.'
     }
     return draft
   }
