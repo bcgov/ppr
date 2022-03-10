@@ -221,12 +221,12 @@ export default defineComponent({
       if (isRoleStaffBcol.value || isRoleStaffReg.value) {
         regParty = await getStaffegisteringParty(isRoleStaffBcol.value)
       } else if (isRoleStaffSbc.value) {
-        parties.registeringParty = null
-        parties.valid = isPartiesValid(parties)
+        // do nothing (keep regParty null)
       } else {
         regParty = await getRegisteringPartyFromAuth()
       }
       parties.registeringParty = regParty
+      parties.valid = isPartiesValid(parties)
       setAddSecuredPartiesAndDebtors(parties)
     }
 
