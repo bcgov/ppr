@@ -1,3 +1,5 @@
+import { PartyIF } from '@/interfaces'
+
 export const useValidation = () => {
   const resetError = (fieldName, errors) => {
     errors[fieldName] = {
@@ -8,16 +10,18 @@ export const useValidation = () => {
     return errors
   }
 
-  const validateName = (isBusiness, form, localErrors) => {
+  const validateName = (isBusiness: boolean, form: PartyIF, localErrors) => {
     if (isBusiness === true) {
       validateBusinessName(form, localErrors.value)
     } else {
       form.personName.first = form.personName.first.trim()
-      form.personName.middle = form.personName.middle.trim()
       form.personName.last = form.personName.last.trim()
       validateFirstName(form, localErrors.value)
-      validateMiddleName(form, localErrors.value)
       validateLastName(form, localErrors.value)
+      if (form.personName.middle) {
+        form.personName.middle = form.personName.middle.trim()
+        validateMiddleName(form, localErrors.value)
+      }
     }
   }
 
