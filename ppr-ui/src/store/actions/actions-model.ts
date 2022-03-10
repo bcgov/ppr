@@ -251,3 +251,4 @@ export const setRegTableTotalRowCount: ActionIF = ({ commit }, count: number): v
 
 export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean): void => {
   commit('mutateUnsavedChanges', unsavedChanges)
+}
