@@ -502,11 +502,11 @@ export default class AmendRegistration extends Vue {
       this.emitHaveData(false)
     } else {
       this.showInvalid = true
-      this.showCourtInvalid = true
       if (!this.collateralValid) {
         this.setCollateralShowInvalid(true)
       }
       if (!this.courtOrderValid) {
+        this.showCourtInvalid = true
         this.amendErrMsg = '< You have unfinished changes'
       }
       this.scrollToInvalid()

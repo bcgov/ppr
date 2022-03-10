@@ -67,6 +67,11 @@ const validationSchema = {
         customArgs: { trim: true }
       },
       {
+        validator: Validators.minLength.validator,
+        message: 'Minimum 5 characters',
+        customArgs: { length: 5 }
+      },
+      {
         validator: Validators.maxLength.validator,
         message: 'Maximum 512 characters',
         customArgs: { length: 512 }
