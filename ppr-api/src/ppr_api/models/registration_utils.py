@@ -277,7 +277,7 @@ def build_account_reg_query(params: AccountRegistrationParams) -> str:
 
 def build_account_change_query(params: AccountRegistrationParams, base_json: dict = None) -> str:
     """Build the account registration change query from the provided parameters."""
-    if base_json and params.start_date_time and params.end_date_time:
+    if base_json:  # and params.start_date_time and params.end_date_time:
         reg_nums: str = None
         for reg in base_json:
             if reg_nums is None:
@@ -336,11 +336,19 @@ def update_account_reg_results(params, rows, results_json, api_filter: bool = Fa
     """Build the account query base registration results from the query result set."""
     if results_json and rows is not None:
         changes_json = []
+        last_reg_num: str = ''
         for row in rows:
             mapping = row._mapping  # pylint: disable=protected-access; follows documentation
             reg_class = str(mapping['registration_type_cl'])
             if not model_utils.is_financing(reg_class):
-                changes_json.append(__build_account_reg_result(params, mapping, reg_class, api_filter))
+                # This is faster than eliminating duplicates in the db query.
+                reg_summary = __build_account_reg_result(params, mapping, reg_class, api_filter)
+                if not last_reg_num:
+                    last_reg_num = reg_summary['registrationNumber']
+                    changes_json.append(reg_summary)
+                elif last_reg_num != reg_summary['registrationNumber']:
+                    last_reg_num = reg_summary['registrationNumber']
+                    changes_json.append(reg_summary)
         if changes_json:
             return build_account_collapsed_filter_json(results_json, changes_json, params, api_filter)
     return results_json
