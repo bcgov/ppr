@@ -16,8 +16,9 @@
     >
       <v-row class="pt-6">
           <v-col class="pa-4 pl-7 summary-text">
-              If this registration is related to a Subordination, Transfer of Security, or Transfer of Collateral,
-              you MUST enter a description of the registration below, otherwise the Details Description is optional.
+              If this registration is related to a Subordination, Partial secured party transfer, or
+              Partial transfer of collateral to a new debtor, you MUST enter the prescribed information below,
+              otherwise the Details Description is optional.
           </v-col>
       </v-row>
       <v-row no-gutters>

@@ -86,6 +86,15 @@ export const useSecuredParty = (props, context) => {
       context.emit('resetEvent')
     }
   }
+
+  const isExistingSecuredParty = (partyCode: string): boolean => {
+    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    const idx = parties.securedParties.findIndex(party =>
+      party.code === partyCode
+    )
+    return idx !== -1
+  }
+
   const removeSecuredParty = (): void => {
     context.emit('removeSecuredParty', props.activeIndex)
     resetFormAndData(true)
@@ -194,6 +203,7 @@ export const useSecuredParty = (props, context) => {
     updateAddress,
     addSecuredParty,
     isSecuredPartyRestrictedList,
+    isExistingSecuredParty,
     RegistrationFlowType,
     ActionTypes,
     setRegisteringParty,
