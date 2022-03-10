@@ -89,7 +89,7 @@
               filled
               id="txt-court-name"
               label="Court Name"
-              v-model="courtName"
+              v-model.trim="courtName"
               hint="For example: Supreme Court of British Columbia"
               persistent-hint
               :error-messages="
@@ -105,7 +105,7 @@
               filled
               id="txt-court-registry"
               label="Court Registry"
-              v-model="courtRegistry"
+              v-model.trim="courtRegistry"
               hint="The location (city) of the court. For example: Richmond"
               persistent-hint
               :error-messages="
@@ -121,7 +121,7 @@
               filled
               id="txt-court-file-number"
               label="Court File Number"
-              v-model="fileNumber"
+              v-model.trim="fileNumber"
               persistent-hint
               :error-messages="
                 errors.fileNumber.message ? errors.fileNumber.message : fileNumberMessage
@@ -154,7 +154,7 @@
           <v-col cols="3" class="generic-label pt-6">Effect of Order</v-col>
           <v-col cols="9" class="pt-4">
             <v-textarea
-              v-model="effectOfOrder"
+              v-model.trim="effectOfOrder"
               id="effect-of-order"
               auto-grow
               counter="512"
