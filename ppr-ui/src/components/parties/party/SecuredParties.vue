@@ -635,6 +635,7 @@ export default defineComponent({
         setAddSecuredPartiesAndDebtors(parties)
         localState.securedParties = [newParty]
       }
+      emitSecuredPartyValidity(true)
     }
 
     const dialogSubmit = (proceed: boolean) => {
