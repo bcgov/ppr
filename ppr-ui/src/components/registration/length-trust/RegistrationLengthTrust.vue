@@ -131,9 +131,10 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { isInt, pacificDate } from '@/utils'
+import { format12HourTime, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
+import moment from 'moment'
 
 export default defineComponent({
   props: {
@@ -195,9 +196,10 @@ export default defineComponent({
           if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
             const numYears = parseInt(localState.lifeYearsEdit)
-            const newExpDate = new Date(expiryDate)
+            const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
-            return pacificDate(newExpDate)
+            const datetime = format12HourTime(newExpDate)
+            return moment(newExpDate).format('MMMM D, Y') + ` at ${datetime} Pacific time`
           }
           return '-'
         }
