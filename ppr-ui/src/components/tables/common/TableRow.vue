@@ -141,7 +141,7 @@
         transition="fade-transition"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-icon color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+          <v-icon color="primary" v-bind="attrs" v-on="on" @click="refresh(item)">mdi-information-outline</v-icon>
         </template>
         <div class="pt-2 pb-2">
           <span v-html="tooltipTxtPdf(item)"></span>
@@ -300,7 +300,7 @@ import {
   computed,
   watch
 } from '@vue/composition-api'
-import { registrationPDF } from '@/utils' // eslint-disable-line
+import { getRegistrationSummary, registrationPDF } from '@/utils' // eslint-disable-line
 
 // local types/helpers/etc.
 import {
@@ -486,6 +486,19 @@ export default defineComponent({
       return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
     }
 
+    const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
+      // should only ever be a base registration
+      if (item.registeringName) {
+        const resp = await getRegistrationSummary(item.registrationNumber, true)
+        if (resp.error) {
+          // log error, but otherwise ignore it
+          console.error('Refreshing registration failed: ', resp.error)
+        } else {
+          item.path = resp.path
+        }
+      }
+    }
+
     const showExpireDays = (item: RegistrationSummaryIF): string => {
       if (localState.isChild) return ''
       if (isExpired(item) || isDischarged(item)) return '—'
@@ -558,6 +571,7 @@ export default defineComponent({
       deleteDraft,
       editDraft,
       handleAction,
+      refresh,
       registrationNumber,
       registeringParty,
       securedParties,

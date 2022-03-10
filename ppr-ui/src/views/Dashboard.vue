@@ -455,7 +455,7 @@ export default class Dashboard extends Vue {
     this.loading = true
     this.myRegAddDialog = null
     regNum = regNum.trim()
-    const reg = await getRegistrationSummary(regNum)
+    const reg = await getRegistrationSummary(regNum, false)
     if (!reg.error) {
       this.myRegAddFoundSetDialog(regNum, reg)
     } else {

@@ -1080,7 +1080,8 @@ export async function addRegistrationSummary (
 
 // Get registration summary information
 export async function getRegistrationSummary (
-  registrationNum: string
+  registrationNum: string,
+  refreshing: boolean
 ): Promise<(RegistrationSummaryIF)> {
   registrationNum = registrationNum?.toUpperCase()
   return axios
@@ -1088,7 +1089,7 @@ export async function getRegistrationSummary (
     .then(response => {
       const data = response?.data as RegistrationSummaryIF
       if (!data) throw new Error('Invalid API response')
-      if (data.inUserList) {
+      if (!refreshing && data.inUserList) {
         data.error = {
           statusCode: StatusCodes.CONFLICT,
           message: 'Registration is already added to this account.'
