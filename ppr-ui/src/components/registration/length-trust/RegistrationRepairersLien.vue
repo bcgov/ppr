@@ -147,8 +147,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, pacificDate } from '@/utils'
+import { convertDate, format12HourTime } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
+import moment from 'moment'
 
 export default defineComponent({
   components: {
@@ -220,9 +221,10 @@ export default defineComponent({
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
           const expiryDate = getRegistrationExpiryDate.value
-          const newExpDate = new Date(expiryDate)
+          const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
           newExpDate.setDate(newExpDate.getDate() + 180)
-          return pacificDate(newExpDate)
+          const datetime = format12HourTime(newExpDate)
+          return moment(newExpDate).format('MMMM D, Y') + ` at ${datetime} Pacific time`
         }
       }),
       lengthTrust: computed((): LengthTrustIF => {
