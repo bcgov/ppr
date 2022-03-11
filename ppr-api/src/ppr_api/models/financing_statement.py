@@ -430,7 +430,6 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         statement = None
         if registration_num:
             try:
-                current_app.logger.error('find_by_registration_number query on ' + registration_num)
                 statement = db.session.query(FinancingStatement).\
                             filter(FinancingStatement.id == Registration.financing_id,
                                    Registration.registration_num == registration_num,
