@@ -16,6 +16,8 @@ import copy
 
 import pytest
 
+from flask import current_app
+
 from ppr_api.models import FinancingStatement
 from ppr_api.utils.validators import party_validator as validator
 
@@ -85,11 +87,22 @@ FINANCING_INVALID = {
             'address': {
                 'street': '3720 BEACON AVENUE',
                 'city': 'SIDNEY',
-                'region': 'BX',
+                'region': 'BC',
                 'country': 'XX',
                 'postalCode': 'V7R 1R7'
             },
             'partyId': 1321095
+        },
+        {
+            'businessName': 'BANK OF BRITISH COLUMBIA',
+            'address': {
+                'street': '3720 BEACON AVENUE',
+                'city': 'SIDNEY',
+                'region': 'BX',
+                'country': 'CA',
+                'postalCode': 'V7R 1R7'
+            },
+            'partyId': 1321096
         },
         {
             'code': '300000000'
@@ -539,6 +552,7 @@ def test_validate_party_addresses_registration(session, desc, json_data, valid, 
 def test_validate_registration_parties(session, desc, json_data, valid, message_content):
     """Assert that registration statement party validation works as expected."""
     error_msg = validator.validate_registration_parties(json_data)
+    current_app.logger.info(error_msg)
     if valid:
         assert error_msg == ''
     elif message_content:
