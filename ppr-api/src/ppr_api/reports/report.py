@@ -587,9 +587,10 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _set_financing_date_time(statement):
         """Replace financing statement API ISO UTC strings with local report format strings."""
+        create_date_time = statement['createDateTime']
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'expiryDate' in statement and len(statement['expiryDate']) > 10:
-            statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
+            statement['expiryDate'] = Report._to_report_datetime_expiry(statement['expiryDate'], create_date_time)
         if 'surrenderDate' in statement:
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'dischargedDateTime' in statement:
@@ -612,7 +613,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 statement['lienAmount'] = '$' + '{:0,.2f}'.format(float(lien_amount))
 
     @staticmethod
-    def _set_change_date_time(statement):   # pylint: disable=too-many-branches
+    def _set_change_date_time(statement, create_date_time: str):   # pylint: disable=too-many-branches
         """Replace non-financing statement API ISO UTC strings with local report format strings."""
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
@@ -621,7 +622,10 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'changeType' in statement:
             statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
         if 'expiryDate' in statement and len(statement['expiryDate']) > 10:
-            statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
+            if create_date_time:
+                statement['expiryDate'] = Report._to_report_datetime_expiry(statement['expiryDate'], create_date_time)
+            else:
+                statement['expiryDate'] = Report._to_report_datetime(statement['expiryDate'], expiry=True)
         if 'surrenderDate' in statement:
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'deleteDebtors' in statement:
@@ -647,17 +651,19 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_data['searchDateTime'] = Report._to_report_datetime(self._report_data['searchDateTime'])
             if self._report_data['totalResultsSize'] > 0:
                 for detail in self._report_data['details']:
+                    create_date_time = detail['financingStatement']['createDateTime']
                     Report._set_financing_date_time(detail['financingStatement'])
                     if 'changes' in detail['financingStatement']:
                         for change in detail['financingStatement']['changes']:
-                            Report._set_change_date_time(change)
+                            Report._set_change_date_time(change, create_date_time)
         elif self._report_key == ReportTypes.FINANCING_STATEMENT_REPORT.value:
+            create_date_time = self._report_data['createDateTime']
             Report._set_financing_date_time(self._report_data)
             if 'changes' in self._report_data:
                 for change in self._report_data['changes']:
-                    Report._set_change_date_time(change)
+                    Report._set_change_date_time(change, create_date_time)
         else:
-            Report._set_change_date_time(self._report_data)
+            Report._set_change_date_time(self._report_data, None)
 
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""
@@ -767,6 +773,18 @@ class Report:  # pylint: disable=too-few-public-methods
             return timestamp.replace(' PM ', ' pm ')
 
         return local_datetime.strftime('%B %-d, %Y')
+
+    @staticmethod
+    def _to_report_datetime_expiry(date_time: str, create_date_time: str):
+        """Convert ISO formatted date time or date string to report expiry date format."""
+        # current_app.logger.info(model_utils.ts_from_iso_format(date_time).isoformat())
+        local_datetime = model_utils.to_local_timestamp_report(date_time, create_date_time)
+        # current_app.logger.info(local_datetime.isoformat())
+        if local_datetime.hour != 23:  # Expiry dates 15+ years in the future are not ajdusting for DST.
+            offset = 23 - local_datetime.hour
+            local_datetime = local_datetime + timedelta(hours=offset)
+        timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
+        return timestamp.replace(' PM ', ' pm ')
 
 
 class ReportMeta:  # pylint: disable=too-few-public-methods
