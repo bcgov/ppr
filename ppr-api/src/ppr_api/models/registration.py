@@ -965,15 +965,17 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
 
     def __get_renewal_rl_expiry(self):
         """Build a repairer's lien expiry date as the sum of previous registrations."""
-        expiry_ts = self.financing_statement.expire_date
-        renew_count = 0
-        for registration in reversed(self.financing_statement.registration):
-            if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id >= self.id:
-                renew_count += 1
-        if renew_count == 1:  # Last renewal identical to current expiry
-            return model_utils.format_ts(expiry_ts)
-        days_adjust = 180 * (renew_count - 1)
-        return model_utils.format_ts(model_utils.expiry_dt_subract_days(expiry_ts, days_adjust))
+        expiry_ts = None
+        for registration in self.financing_statement.registration:
+            if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
+                                                     model_utils.REG_CLASS_PPSA):
+                expiry_ts = model_utils.expiry_dt_from_registration_rl(registration.registration_ts)
+
+        for registration in self.financing_statement.registration:
+            if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
+                expiry_ts = model_utils.expiry_dt_repairer_lien(expiry_ts)
+
+        return model_utils.format_ts(expiry_ts)
 
     def __get_renewal_expiry(self):
         """Build a non-repairer's lien expiry date as the sum of previous registrations."""
