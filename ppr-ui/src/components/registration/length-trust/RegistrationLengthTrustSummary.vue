@@ -104,9 +104,10 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, isInt, pacificDate } from '@/utils'
+import { convertDate, format12HourTime, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
+import moment from 'moment'
 
 export default defineComponent({
   props: {
@@ -168,16 +169,18 @@ export default defineComponent({
           }
           if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
             const expiryDate = getRegistrationExpiryDate.value
-            const newExpDate = new Date(expiryDate)
+            const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setDate(newExpDate.getDate() + 180)
-            return pacificDate(newExpDate)
+            const datetime = format12HourTime(newExpDate)
+            return moment(newExpDate).format('MMMM D, Y') + ` at ${datetime} Pacific time`
           }
           if ((getRegistrationExpiryDate.value) && (getLengthTrust.value.lifeYears > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
             const numYears = getLengthTrust.value.lifeYears
-            const newExpDate = new Date(expiryDate)
+            const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
-            return pacificDate(newExpDate)
+            const datetime = format12HourTime(newExpDate)
+            return moment(newExpDate).format('MMMM D, Y') + ` at ${datetime} Pacific time`
           }
           return '-'
         }

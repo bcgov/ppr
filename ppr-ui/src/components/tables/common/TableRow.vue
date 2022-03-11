@@ -315,6 +315,7 @@ import {
   TableActions // eslint-disable-line no-unused-vars
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import moment from 'moment'
 
 export default defineComponent({
   name: 'TableRow',
@@ -437,14 +438,6 @@ export default defineComponent({
       }
     }
 
-    const getDayOfYear = (dateOfYear: Date) => {
-      var start = new Date(dateOfYear.getFullYear(), 0, 0)
-      var diff = (dateOfYear.valueOf() - start.valueOf()) +
-        ((start.getTimezoneOffset() - dateOfYear.getTimezoneOffset()) * 60 * 1000)
-      var oneDay = 1000 * 60 * 60 * 24
-      return Math.floor(diff / oneDay)
-    }
-
     const freezeScrolling = (isMenuOpen: boolean) => {
       emit('freezeScroll', isMenuOpen)
     }
@@ -528,29 +521,29 @@ export default defineComponent({
         if (days > 364) {
           const today = new Date()
           const expireDate = new Date()
-          expireDate.setDate(expireDate.getDate() + days)
-          var dateExpiry = new Date(
+          // expireDate.setDate(expireDate.getDate() + days)
+          var dateExpiry = moment(new Date(
             Date.UTC(
               expireDate.getUTCFullYear(),
               expireDate.getUTCMonth(),
               expireDate.getUTCDate()
             )
-          )
-          var dateToday = new Date(
+          )).add(days, 'days')
+          var dateToday = moment(new Date(
             Date.UTC(
               today.getUTCFullYear(),
               today.getUTCMonth(),
               today.getUTCDate()
             )
-          )
-          const currentDayOfYear = getDayOfYear(dateToday)
-          const expDayOfYear = getDayOfYear(dateExpiry)
-          let daysDiff = expDayOfYear - currentDayOfYear
-          if (daysDiff < 0) {
-            dateExpiry.setFullYear(dateExpiry.getFullYear() - 1)
-            daysDiff = 365 + daysDiff
+          ))
+
+          // year difference
+          const years = dateExpiry.diff(dateToday, 'years')
+          if (years > 0) {
+            dateExpiry.subtract(years, 'year')
           }
-          const years = dateExpiry.getFullYear() - dateToday.getFullYear()
+          // day difference
+          const daysDiff = dateExpiry.diff(dateToday, 'days')
           let yearText = ' years '
           if (years === 1) {
             yearText = ' year '
