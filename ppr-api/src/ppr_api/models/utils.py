@@ -689,13 +689,6 @@ def expiry_dt_add_years(current_expiry, add_years: int):
     return current_expiry
 
 
-def expiry_dt_subract_days(current_expiry, offset_days: int):
-    """For renewals add years to the existing expiry timestamp."""
-    if current_expiry and offset_days and offset_days > 0:
-        return current_expiry - datedelta(days=offset_days)
-    return current_expiry
-
-
 def ts_from_iso_format(timestamp_iso: str):
     """Create a datetime object from a timestamp string in the ISO format."""
     time_stamp = _datetime.fromisoformat(timestamp_iso).timestamp()
@@ -725,6 +718,16 @@ def to_local_timestamp(utc_ts):
 
 
 def to_local_timestamp_report(date_time: str, create_date_time: str):
+    """Create a timestamp adjusted from UTC to the local timezone using the create ts to get the offset."""
+    utc_ts: _datetime = ts_from_iso_format(date_time)
+    offset: int = 7 if utc_ts.hour == 6 else 8
+    current_app.logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
+    local_ts =  utc_ts - timedelta(hours=offset)
+    current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
+    return local_ts
+
+
+def to_local_timestamp_report_last(date_time: str, create_date_time: str):
     """Create a timestamp adjusted from UTC to the local timezone using the create ts to get the offset."""
     # get offset from create_date_time
     # registration_ts = ts_from_iso_format(create_date_time)
