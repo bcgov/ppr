@@ -34,7 +34,7 @@ INVALID_COUNTRY_SECURED = 'Secured Party country {} is invalid. '
 INVALID_REGION_SECURED = 'Secured Party region {} is invalid. '
 INVALID_COUNTRY_DEBTOR = 'Debtor country {} is invalid. '
 INVALID_REGION_DEBTOR = 'Debtor region {} is invalid. '
-CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for name {}.\n'
+CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for name {}. '
 
 
 def validate_financing_parties(json_data):
@@ -189,7 +189,7 @@ def validate_address(json_party, country_message: str, region_message: str):
                 country_prefix = country.alpha_2 + '-' if country else 'CA-'
                 # test_code = country_prefix + json_address['region'].strip().upper()
                 region_code = pycountry.subdivisions.get(code=(country_prefix + json_address['region'].strip().upper()))
-            if not region_code and country in ('CA', 'US'):
+            if not region_code and json_country in ('CA', 'US'):
                 error_msg += region_message.format(json_address['region'])
             # not checking region validity for outside CA + US but still must be under 2 chars
             if len(json_address['region'].strip()) > 2:

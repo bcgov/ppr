@@ -23,29 +23,29 @@ from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
 
 
 # Error messages
-AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration.\n'
-TYPE_NOT_ALLOWED = 'A new Financing Statement cannot be created with the submitted registration type.\n'
-GC_NOT_ALLOWED = 'General Collateral is not allowed with this registration type.\n'
-GC_REQUIRED = 'General Collateral is required with this registration type.\n'
-LA_NOT_ALLOWED = 'Lien Amount is not allowed with this registration type.\n'
-LY_NOT_ALLOWED = 'Life years is not allowed with this registration type.\n'
-LI_NOT_ALLOWED = 'Life Infinite is not allowed with this registration type.\n'
-LI_INVALID = 'Life Infinite must be true with this registration type.\n'
-LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type.\n'
-LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed.\n'
-OT_MISSING_DESCRIPTION = 'When type is OT Other Type Description is required.\n'
-OT_NOT_ALLOWED = 'Other Type Description is not allowed with this registration type.\n'
-RL_AMOUNT_REQUIRED = "Lien Amount is required with a Repairer's Lien.\n"
-RL_AMOUNT_INVALID = 'The Lien Amount must be a number greater than 0.\n'
-RL_DATE_REQUIRED = "Surrender Date is required with a Repairer's Lien.\n"
-RL_DATE_INVALID = 'The Surrender Date cannot be more than 21 days in the past.\n'
-SD_NOT_ALLOWED = 'Surrender Date is not allowed with this registration type.\n'
-TI_NOT_ALLOWED = 'Trust Indendure is not allowed with this registration type.\n'
-VC_NOT_ALLOWED = 'Vehicle Collateral is not allowed with this registration type.\n'
-VC_REQUIRED = 'Vehicle Collateral is required with this registration type.\n'
-VC_MH_ONLY = 'Only Vehicle Collateral type MH is allowed with this registration type.\n'
-VC_MH_NOT_ALLOWED = 'Vehicle Collateral type MH is not allowed with this registration type.\n'
-VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed.\n'
+AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration. '
+TYPE_NOT_ALLOWED = 'A new Financing Statement cannot be created with the submitted registration type. '
+GC_NOT_ALLOWED = 'General Collateral is not allowed with this registration type. '
+GC_REQUIRED = 'General Collateral is required with this registration type. '
+LA_NOT_ALLOWED = 'Lien Amount is not allowed with this registration type. '
+LY_NOT_ALLOWED = 'Life years is not allowed with this registration type. '
+LI_NOT_ALLOWED = 'Life Infinite is not allowed with this registration type. '
+LI_INVALID = 'Life Infinite must be true with this registration type. '
+LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type. '
+LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed. '
+OT_MISSING_DESCRIPTION = 'When type is OT Other Type Description is required. '
+OT_NOT_ALLOWED = 'Other Type Description is not allowed with this registration type. '
+RL_AMOUNT_REQUIRED = "Lien Amount is required with a Repairer's Lien. "
+RL_AMOUNT_INVALID = 'The Lien Amount must be a number greater than 0. '
+RL_DATE_REQUIRED = "Surrender Date is required with a Repairer's Lien. "
+RL_DATE_INVALID = 'The Surrender Date cannot be more than 21 days in the past. '
+SD_NOT_ALLOWED = 'Surrender Date is not allowed with this registration type. '
+TI_NOT_ALLOWED = 'Trust Indendure is not allowed with this registration type. '
+VC_NOT_ALLOWED = 'Vehicle Collateral is not allowed with this registration type. '
+VC_REQUIRED = 'Vehicle Collateral is required with this registration type. '
+VC_MH_ONLY = 'Only Vehicle Collateral type MH is allowed with this registration type. '
+VC_MH_NOT_ALLOWED = 'Vehicle Collateral type MH is not allowed with this registration type. '
+VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed. '
 
 GC_NOT_ALLOWED_LIST = [MiscellaneousTypes.MH_NOTICE.value,
                        PPSATypes.MARRIAGE_SEPARATION.value,
