@@ -717,33 +717,14 @@ def to_local_timestamp(utc_ts):
     return utc_ts.astimezone(LOCAL_TZ)
 
 
-def to_local_timestamp_report(date_time: str, create_date_time: str):
-    """Create a timestamp adjusted from UTC to the local timezone using the create ts to get the offset."""
-    utc_ts: _datetime = ts_from_iso_format(date_time)
+def to_local_expiry_report(expiry_date_time: str):
+    """Create an expiry timestamp adjusted from UTC to the local timezone."""
+    utc_ts: _datetime = ts_from_iso_format(expiry_date_time)
     offset: int = 7 if utc_ts.hour == 6 else 8
-    current_app.logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
-    local_ts =  utc_ts - timedelta(hours=offset)
+    # current_app.logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
+    local_ts = utc_ts - timedelta(hours=offset)
     current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     return local_ts
-
-
-def to_local_timestamp_report_last(date_time: str, create_date_time: str):
-    """Create a timestamp adjusted from UTC to the local timezone using the create ts to get the offset."""
-    # get offset from create_date_time
-    # registration_ts = ts_from_iso_format(create_date_time)
-    # reg_local_ts = registration_ts.astimezone(LOCAL_TZ)
-    # base_time = reg_local_ts.timestamp()
-    # offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
-    # current_app.logger.info(registration_ts.isoformat() + ' local=' + reg_local_ts.isoformat())
-    # current_app.logger.info(offset)
-    local_ts = ts_from_iso_format(date_time)
-    current_app.logger.info('Local ts: ' + local_ts.isoformat())
-    base_time = local_ts.timestamp()
-    adjusted_ts = LOCAL_TZ.localize(_datetime.fromtimestamp(base_time))
-    current_app.logger.info('Local expiry timestamp: ' + adjusted_ts.isoformat())
-    #test_ts = local_ts + offset
-    # current_app.logger.info('Test ts: ' + test_ts.isoformat())
-    return adjusted_ts
 
 
 def today_local():
