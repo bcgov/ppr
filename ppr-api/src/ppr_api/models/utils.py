@@ -727,8 +727,12 @@ def to_local_timestamp(utc_ts):
 def to_local_timestamp_report(date_time: str, create_date_time: str):
     """Create a timestamp adjusted from UTC to the local timezone using the create ts to get the offset."""
     # get offset from create_date_time
-    base_time = ts_from_iso_format(create_date_time).timestamp()
+    registration_ts = ts_from_iso_format(create_date_time)
+    reg_local_ts = registration_ts.astimezone(LOCAL_TZ)
+    base_time = reg_local_ts.timestamp()
     offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
+    current_app.logger.info(registration_ts.isoformat() + ' local=' + reg_local_ts.isoformat())
+    current_app.logger.info(offset)
     local_ts = ts_from_iso_format(date_time)
     return local_ts + offset
 
