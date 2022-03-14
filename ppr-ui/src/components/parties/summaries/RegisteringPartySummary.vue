@@ -14,6 +14,7 @@ import {
   defineComponent,
   reactive,
   computed,
+  onMounted,
   toRefs
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
@@ -23,6 +24,7 @@ import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // es
 
 import { registeringTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
+import { useRegisteringParty } from '@/composables/useRegisteringParty'
 
 export default defineComponent({
   name: 'RegisteringPartySummary',
@@ -50,16 +52,23 @@ export default defineComponent({
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
     ])
+    const { getRegisteringParty } = useRegisteringParty()
     const router = context.root.$router
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    let regParty: PartyIF = parties?.registeringParty
-    if (getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
-      regParty = getOriginalAddSecuredPartiesAndDebtors.value?.registeringParty
-    }
 
     const localState = reactive({
-      registeringParty:
-        regParty !== null ? [regParty] : [],
+      registeringParty: computed((): Array<PartyIF> => {
+        let regParty: PartyIF = parties?.registeringParty
+        if (getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+          regParty = getOriginalAddSecuredPartiesAndDebtors.value?.registeringParty
+        } else {
+          regParty = getAddSecuredPartiesAndDebtors.value?.registeringParty
+        }
+        if (regParty !== null) {
+          return [regParty]
+        }
+        return []
+      }),
       registeringPartyHeaders: computed(function () {
         const headersToShow = [...registeringTableHeaders]
         return headersToShow
@@ -72,6 +81,17 @@ export default defineComponent({
         enableNoDataAction: props.setEnableNoDataAction,
         isRegisteringParty: true
       } as PartySummaryOptionsI
+    })
+
+    onMounted(async () => {
+      const regParty = parties?.registeringParty
+      if (regParty === null) {
+        try {
+          await getRegisteringParty()
+        } catch (e) {
+          console.error('RegisteringParty.vue onMounted error: ' + ((e as Error).message))
+        }
+      }
     })
 
     const goToParties = (): void => {
