@@ -64,7 +64,8 @@ export default defineComponent({
       }),
       expiryDate: computed((): string => {
         if (getRegistrationExpiryDate.value) {
-          return formatExpiryDate(new Date(getRegistrationExpiryDate.value))
+          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate.value)
+            .toLocaleString('en-US', { timeZone: 'America/Vancouver' })))
         }
         return 'No Expiry'
       }),

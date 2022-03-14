@@ -22,7 +22,7 @@ export function format12HourTimeMoment (date: Moment): string {
 }
 
 export function formatExpiryDate (expDate: Date) {
-  const date = moment(expDate).tz('America/Vancouver')
+  const date = moment(expDate)
   // if savings time in future is different, adjust
   if (date.format('h') === '12') {
     date.subtract(1, 'hour')
