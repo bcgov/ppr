@@ -170,14 +170,14 @@ export default defineComponent({
             const expiryDate = getRegistrationExpiryDate.value
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setDate(newExpDate.getDate() + 180)
-            return formatExpiryDate(new Date(getRegistrationExpiryDate.value))
+            return formatExpiryDate(newExpDate)
           }
           if ((getRegistrationExpiryDate.value) && (getLengthTrust.value.lifeYears > 0)) {
             const expiryDate = getRegistrationExpiryDate.value
             const numYears = getLengthTrust.value.lifeYears
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
-            return formatExpiryDate(new Date(getRegistrationExpiryDate.value))
+            return formatExpiryDate(newExpDate)
           }
           return '-'
         }

@@ -92,7 +92,3 @@ export default defineComponent({
   font-weight: bold;
 }
 </style>
-
-function format12HourTimeMoment(date: moment.Moment) {
-  throw new Error('Function not implemented.')
-}
