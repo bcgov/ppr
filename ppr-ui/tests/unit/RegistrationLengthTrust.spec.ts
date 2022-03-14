@@ -195,7 +195,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
       lienAmount: ''
     })
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationExpiryDate', '2021-03-31T07:00:00+00:00')
+    await store.dispatch('setRegistrationExpiryDate', '2021-03-31T06:59:59+00:00')
 
     wrapper = createComponent(true)
   })
@@ -209,7 +209,7 @@ describe('RegistrationLengthTrust SA renewal test', () => {
     // set renewal length to 1 year
     wrapper.vm.$data.lifeYearsEdit = '1'
     await Vue.nextTick()
-    expect(wrapper.find('#new-expiry').text()).toContain('March 31, 2022')
+    expect(wrapper.find('#new-expiry').text()).toContain('March 30, 2022')
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.lifeYears).toBe(1)
     expect(wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid).toBe(true)
     // also emits if valid

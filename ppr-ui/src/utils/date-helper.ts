@@ -18,7 +18,7 @@ export function format12HourTime (date: Date): string {
 }
 
 export function format12HourTimeMoment (date: Moment): string {
-  return date.format('h:m:s a')
+  return date.format('h:mm:ss a')
 }
 
 export function formatExpiryDate (expDate: Date) {

@@ -13,7 +13,7 @@ export const mockedFinancingStatementComplete: FinancingStatementIF = {
   baseRegistrationNumber: '123456B',
   clientReferenceId: 'UT-100001',
   createDateTime: '2021-07-20T17:21:17+00:00',
-  expiryDate: '2026-07-20T17:21:17+00:00',
+  expiryDate: '2026-07-20T06:59:59+00:00',
   type: APIRegistrationTypes.SECURITY_AGREEMENT,
   registeringParty: mockedRegisteringParty1,
   securedParties: mockedSecuredParties1,
@@ -40,6 +40,6 @@ export const mockedRenewalResponse: RenewRegistrationIF = {
   clientReferenceId: 'UT-100001',
   createDateTime: '2021-07-20T17:21:17+00:00',
   registeringParty: mockedRegisteringParty1,
-  expiryDate: '2025-08-01T17:21:17+00:00',
+  expiryDate: '2025-08-01T06:59:59+00:00',
   renewalRegistrationNumber: '123457B'
 }
