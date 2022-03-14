@@ -150,7 +150,8 @@ export default defineComponent({
           return 'No Expiry'
         }
         if ((getRegistrationExpiryDate.value)) {
-          return formatExpiryDate(new Date(getRegistrationExpiryDate.value))
+          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate.value)
+            .toLocaleString('en-US', { timeZone: 'America/Vancouver' })))
         }
         return ''
       }),
