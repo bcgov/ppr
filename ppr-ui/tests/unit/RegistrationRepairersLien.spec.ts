@@ -84,7 +84,7 @@ describe('RegistrationLengthTrust RL renewal test', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedRepairersLien())
-    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T08:00:00+00:00')
+    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:59:59+00:00')
     await store.dispatch('setLengthTrust', {
       valid: true,
       trustIndenture: false,
@@ -105,7 +105,7 @@ describe('RegistrationLengthTrust RL renewal test', () => {
     expect(wrapper.findComponent(RegistrationRepairersLien).exists()).toBe(true)
     expect(wrapper.find('#length-in-years').exists()).toBe(false)
     // new expiry date (180 days)
-    expect(wrapper.find('#new-expiry-rl').text()).toContain('January 24, 2022')
+    expect(wrapper.find('#new-expiry-rl').text()).toContain('January 23, 2022')
     // surrender date
     expect(wrapper.find('#surrender-date').text()).toContain('January 21, 2021')
   })
