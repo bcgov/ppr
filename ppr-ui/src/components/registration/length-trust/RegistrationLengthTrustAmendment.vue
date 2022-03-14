@@ -105,7 +105,7 @@ import EditTrustIndenture from './EditTrustIndenture.vue'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { pacificDate } from '@/utils'
+import { formatExpiryDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
@@ -150,7 +150,7 @@ export default defineComponent({
           return 'No Expiry'
         }
         if ((getRegistrationExpiryDate.value)) {
-          return pacificDate(new Date(getRegistrationExpiryDate.value))
+          return formatExpiryDate(new Date(getRegistrationExpiryDate.value))
         }
         return ''
       }),

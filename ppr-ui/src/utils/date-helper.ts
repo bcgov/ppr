@@ -1,4 +1,5 @@
-import moment from 'moment'
+import moment, { Moment } from 'moment'
+import 'moment-timezone'
 
 /** returns timstamp string in 12 hour format */
 export function format12HourTime (date: Date): string {
@@ -14,6 +15,23 @@ export function format12HourTime (date: Date): string {
   if (sec.length > 2) sec = sec.slice(1)
 
   return `${hours}:${min}:${sec} ${ampm}`
+}
+
+export function format12HourTimeMoment (date: Moment): string {
+  return date.format('h:m:s a')
+}
+
+export function formatExpiryDate (expDate: Date) {
+  const date = moment(expDate).tz('America/Vancouver')
+  // if savings time in future is different, adjust
+  if (date.format('h') === '12') {
+    date.subtract(1, 'hour')
+  }
+  if (date.format('h') === '10') {
+    date.add(1, 'hour')
+  }
+  const datetime = format12HourTimeMoment(date)
+  return moment(date).format('MMMM D, Y') + ` at ${datetime} Pacific time`
 }
 
 /** Converts date to display format. */

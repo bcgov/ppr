@@ -37,7 +37,7 @@
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
-import { pacificDate } from '@/utils'
+import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 
 export default defineComponent({
@@ -64,8 +64,7 @@ export default defineComponent({
       }),
       expiryDate: computed((): string => {
         if (getRegistrationExpiryDate.value) {
-          const date = new Date(getRegistrationExpiryDate.value)
-          return pacificDate(date)
+          return formatExpiryDate(new Date(getRegistrationExpiryDate.value))
         }
         return 'No Expiry'
       }),
@@ -93,3 +92,7 @@ export default defineComponent({
   font-weight: bold;
 }
 </style>
+
+function format12HourTimeMoment(date: moment.Moment) {
+  throw new Error('Function not implemented.')
+}
