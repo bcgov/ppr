@@ -11,7 +11,7 @@ import { PartyAutocomplete } from '@/components/parties/party'
 
 // Other
 import { SearchPartyIF } from '@/interfaces'
-import { mockedPartyCodeSearchResults } from './test-data'
+import { mockedPartyCodeSearchResults, mockedSelectSecurityAgreement } from './test-data'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
@@ -48,6 +48,8 @@ describe('Secured Party search autocomplete tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    const registrationType = mockedSelectSecurityAgreement()
+    await store.dispatch('setRegistrationType', registrationType)
     wrapper = createComponent(mockedPartyCodeSearchResults)
   })
   afterEach(() => {
