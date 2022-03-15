@@ -22,6 +22,8 @@ import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 import { partyTableHeaders } from '@/resources'
+import { isSecuredPartyRestrictedList } from '@/utils'
+import { RegistrationFlowType } from '@/enums'
 
 export default defineComponent({
   name: 'SecuredPartySummary',
@@ -37,8 +39,14 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const {
+      getAddSecuredPartiesAndDebtors,
+      getRegistrationType,
+      getRegistrationFlowType
+    } = useGetters<any>([
+      'getAddSecuredPartiesAndDebtors',
+      'getRegistrationType',
+      'getRegistrationFlowType'
     ])
     const { setAddSecuredPartiesAndDebtors } = useActions<any>([
       'setAddSecuredPartiesAndDebtors'
@@ -47,7 +55,15 @@ export default defineComponent({
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 
     const localState = reactive({
-      securedParties: parties.securedParties,
+      securedParties: computed(function () {
+        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+          if (isSecuredPartyRestrictedList(getRegistrationType.value.registrationTypeAPI) &&
+            parties.securedParties.length > 1) {
+            return []
+          }
+        }
+        return parties.securedParties
+      }),
       securedPartyHeaders: computed(function () {
         const headersToShow = [...partyTableHeaders]
         return headersToShow

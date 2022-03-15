@@ -19,7 +19,7 @@
     <v-row
       no-gutters
       class="pb-4 pt-6"
-      v-if="isSecuredPartyRestrictedList(registrationType)"
+      v-if="isSecuredPartyRestrictedList(registrationType) && !isStaffReg"
     >
       <v-col cols="12" class="party-search">
         <v-autocomplete
@@ -79,12 +79,12 @@
     <v-row
       no-gutters
       class="pb-4 pt-6"
-      v-if="!isSecuredPartyRestrictedList(registrationType)"
+      v-if="!isSecuredPartyRestrictedList(registrationType) || isStaffReg"
     >
       <party-search
         :isAutoCompleteDisabled="addEditInProgress"
         :registeringPartyAdded="registeringPartyAdded"
-        @selectItem="getSecuredPartyValidity"
+        @selectItem="addItem()"
         @showSecuredPartyAdd="initAdd"
         @addRegisteringParty="addRegisteringParty"
         @removeRegisteringParty="removeRegisteringParty"
@@ -376,12 +376,11 @@ import { BaseAddress } from '@/composables/address'
 // local helpers / types / etc.
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useParty } from '@/composables/useParty'
-import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
-import { partyCodeAccount } from '@/utils'
+import { isSecuredPartyRestrictedList, partyCodeAccount } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -413,12 +412,14 @@ export default defineComponent({
       getAddSecuredPartiesAndDebtors,
       getRegistrationType,
       getOriginalAddSecuredPartiesAndDebtors,
-      getRegistrationFlowType
+      getRegistrationFlowType,
+      isRoleStaffReg
     } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors',
       'getRegistrationType',
       'getOriginalAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType'
+      'getRegistrationFlowType',
+      'isRoleStaffReg'
     ])
     const registrationType = getRegistrationType.value.registrationTypeAPI
     const registrationFlowType = getRegistrationFlowType.value
@@ -426,7 +427,6 @@ export default defineComponent({
 
     const addressSchema = PartyAddressSchema
     const { getName, isPartiesValid, isBusiness } = useParty()
-    const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
 
     const localState = reactive({
       summaryView: props.isSummary,
@@ -442,6 +442,9 @@ export default defineComponent({
       loading: false,
       parties: computed((): AddPartiesIF => {
         return getAddSecuredPartiesAndDebtors.value
+      }),
+      isStaffReg: computed((): boolean => {
+        return isRoleStaffReg.value
       }),
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       registeringPartyAdded: false,
@@ -473,7 +476,7 @@ export default defineComponent({
       } else {
         localState.securedParties.splice(index, 1)
         currentParties.securedParties = localState.securedParties
-        currentParties.valid = isPartiesValid(currentParties)
+        currentParties.valid = isPartiesValid(currentParties, registrationType)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       localState.searchValue = { code: '', businessName: '' }
@@ -488,6 +491,11 @@ export default defineComponent({
           localState.registeringPartyAdded = false
         }
       }
+    }
+
+    const addItem = (): void => {
+      const isValid = getSecuredPartyValidity()
+      emitSecuredPartyValidity(isValid)
     }
 
     const undo = (index: number): void => {
@@ -514,7 +522,7 @@ export default defineComponent({
       newList.push(registeringParty)
 
       parties.securedParties = newList
-      parties.valid = isPartiesValid(parties)
+      parties.valid = isPartiesValid(parties, registrationType)
       setAddSecuredPartiesAndDebtors(parties)
       localState.registeringPartyAdded = true
     }
@@ -545,7 +553,7 @@ export default defineComponent({
       localState.showAddSecuredParty = false
       localState.showEditParty = [false]
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties)
+      currentParties.valid = isPartiesValid(currentParties, registrationType)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getSecuredPartyValidity()
       emitSecuredPartyValidity(isValid)
@@ -573,26 +581,31 @@ export default defineComponent({
         }
       }
 
-      if (isSecuredPartyRestrictedList(registrationType)) {
+      if (isSecuredPartyRestrictedList(registrationType) && !localState.isStaffReg) {
         fetchOtherSecuredParties()
       }
     })
 
     const getSecuredPartyValidity = (): boolean => {
-      let validity = false
+      let partyCount = 0
       if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
         for (let i = 0; i < localState.securedParties.length; i++) {
           // is valid if there is at least one debtor
           if (localState.securedParties[i].action !== ActionTypes.REMOVED) {
-            validity = true
+            partyCount++
           }
         }
       } else {
-        if (localState.securedParties.length > 0) {
-          validity = true
-        }
+        partyCount = localState.securedParties.length
       }
-      return validity
+      if (isSecuredPartyRestrictedList(registrationType)) {
+        if (partyCount === 1) {
+          return true
+        }
+        return false
+      } else {
+        return partyCount >= 1
+      }
     }
 
     const emitSecuredPartyValidity = (validity: boolean): void => {
@@ -631,7 +644,7 @@ export default defineComponent({
         localState.showDialog = true
       } else {
         parties.securedParties = [newParty]
-        parties.valid = isPartiesValid(parties)
+        parties.valid = isPartiesValid(parties, registrationType)
         setAddSecuredPartiesAndDebtors(parties)
         localState.securedParties = [newParty]
       }
@@ -651,7 +664,7 @@ export default defineComponent({
           localState.securedParties = [localState.savedParty]
         }
         parties.securedParties = localState.securedParties
-        parties.valid = isPartiesValid(parties)
+        parties.valid = isPartiesValid(parties, registrationType)
         setAddSecuredPartiesAndDebtors(parties)
       } else {
         localState.searchValue = {
@@ -687,6 +700,7 @@ export default defineComponent({
       getSecuredPartyValidity,
       filterList,
       dialogSubmit,
+      addItem,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }

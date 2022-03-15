@@ -102,8 +102,8 @@ import {
 } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
 // local helpers / types / etc.
-import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { isSecuredPartyRestrictedList } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -125,7 +125,6 @@ export default defineComponent({
     ])
     const { getRegistrationType, isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
     const registrationType = getRegistrationType.value.registrationTypeAPI
-    const { isSecuredPartyRestrictedList } = useSecuredParty(props, context)
     const localState = reactive({
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,

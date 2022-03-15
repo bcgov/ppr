@@ -1,5 +1,7 @@
 import { ActionTypes } from '@/enums'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { isSecuredPartyRestrictedList } from '@/utils'
+
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
     if (party.businessName) {
@@ -59,23 +61,35 @@ export const useParty = () => {
     }
   }
 
-  const isPartiesValid = (parties: AddPartiesIF): boolean => {
+  const isPartiesValid = (parties: AddPartiesIF, regType: string): boolean => {
     let debtorValid = false
     let securedPartyValid = false
     let registeringPartyValid = false
+    let securedPartyCount = 0
     for (let i = 0; i < parties.debtors.length; i++) {
       // is valid if there is at least one debtor
       if (parties.debtors[i].action !== ActionTypes.REMOVED) {
         debtorValid = true
       }
     }
-
     for (let i = 0; i < parties.securedParties.length; i++) {
       // is valid if there is at least one secured party
       if (parties.securedParties[i].action !== ActionTypes.REMOVED) {
+        securedPartyCount++
+      }
+    }
+
+    // if the registration is a crown registration, we can only have one secured party
+    if (isSecuredPartyRestrictedList(regType)) {
+      if (securedPartyCount === 1) {
+        securedPartyValid = true
+      }
+    } else {
+      if (securedPartyCount >= 1) {
         securedPartyValid = true
       }
     }
+
     if (parties.registeringParty) {
       registeringPartyValid = true
     }
