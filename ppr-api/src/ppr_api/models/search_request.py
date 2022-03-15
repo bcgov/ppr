@@ -366,7 +366,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return search
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str = None):
+    def find_all_by_account_id(cls, account_id: str = None, from_ui: bool = False):
         """Return a search history summary list of searches executed by an account."""
         history_list = []
         if account_id:
@@ -409,6 +409,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     else:
                         search['selectedResultsSize'] = 0
                     history_list.append(search)
+                    if from_ui:
+                        # if api_result is null then the selections have not been finished
+                        search['inprogress'] = not mapping['api_result']
 
         return history_list
 

@@ -285,7 +285,7 @@ ACCOUNT_SEARCH_HISTORY_DATE_QUERY = \
                     'ELSE (SELECT COUNT(*) ' + \
                             'FROM json_array_elements(sr.api_result) sr2 ' + \
                            "WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count, " + \
-       'sr.similar_match_count, sr.callback_url, sr.doc_storage_url, ' + \
+       'sr.similar_match_count, sr.callback_url, sr.doc_storage_url, sr.api_result ' + \
        'json_array_length(sr.api_result) as selected_match_count, ' + \
        "(SELECT CASE WHEN sc.user_id IS NULL THEN '' " + \
                     "ELSE (SELECT u.firstname || ' ' || u.lastname " + \
@@ -304,7 +304,7 @@ ACCOUNT_SEARCH_HISTORY_QUERY = \
                     'ELSE (SELECT COUNT(*) ' + \
                             'FROM json_array_elements(sr.api_result) sr2 ' + \
                            "WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count, " + \
-       'sr.similar_match_count, sr.callback_url, sr.doc_storage_url, ' + \
+       'sr.similar_match_count, sr.callback_url, sr.doc_storage_url, sr.api_result ' + \
        'json_array_length(sr.api_result) as selected_match_count, ' + \
        "(SELECT CASE WHEN sc.user_id IS NULL THEN '' " + \
                     "ELSE (SELECT u.firstname || ' ' || u.lastname " + \
