@@ -6,12 +6,12 @@
   min-height: 100vh;
 }
 
-.app-header {
+.v-application--wrap .app-header {
   position: -webkit-sticky; // Safari
   position: sticky;
   top: 0;
   width: 100%;
-  z-index: 2;
+  z-index: 8 !important;
 }
 
 .app-body {
