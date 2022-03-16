@@ -601,6 +601,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     # Set if user can access verification statement.
                     if not registration_utils.can_access_report(account_id, account_name, result, sbc_staff):
                         result['path'] = ''
+                    if not str(mapping['doc_storage_url']):
+                        # doc is not generated yet
+                        result['path'] = ''
                     result = registration_utils.update_summary_optional(result, account_id, sbc_staff)
                     if not model_utils.is_financing(reg_class):
                         changes.append(result)

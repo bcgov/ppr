@@ -352,7 +352,7 @@ FETCH FIRST :max_results_size ROWS ONLY
 
 QUERY_ACCOUNT_ADD_REGISTRATION = """
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
-       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state, vr.doc_storage_url,
        CASE WHEN fs.life = 99 THEN -99
             ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
        (SELECT MAX(r2.registration_ts)
@@ -382,9 +382,10 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          WHERE uer.account_id = :query_account
            AND (uer.registration_number = :query_reg_num OR
                 uer.registration_number = r.registration_number)) AS exists_count
-  FROM registrations r, registration_types rt, financing_statements fs
+  FROM registrations r, registration_types rt, financing_statements fs, verification_reports vr
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
+   AND vr.registration_id = r.id
    AND fs.id IN (SELECT fs2.id
                    FROM financing_statements fs2, registrations r2
                   WHERE fs2.id = r2.financing_id
