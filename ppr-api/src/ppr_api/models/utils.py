@@ -645,21 +645,6 @@ def expiry_dt_repairer_lien(expiry_ts: _datetime = None):
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
-def expiry_dt_from_registration_rl(expiry_ts: _datetime = None):
-    """Create a date representing the date at 23:59:59 local time as UTC from the registration timestamp."""
-    base_time = expiry_ts.timestamp()
-    offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
-    base_ts = expiry_ts + offset
-    base_date = date(base_ts.year, base_ts.month, base_ts.day)
-    # Naive time
-    expiry_time = time(23, 59, 59, tzinfo=None)
-    future_ts = _datetime.combine(base_date, expiry_time) + timedelta(days=REPAIRER_LIEN_DAYS)
-    # Explicitly set to local timezone which will adjust for daylight savings.
-    local_ts = LOCAL_TZ.localize(future_ts)
-    # Return as UTC
-    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
-
-
 def expiry_dt_from_registration(registration_ts, life_years: int):
     """Create a date representing the expiry date for a registration.
 
@@ -674,7 +659,11 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
     future_ts: _datetime = _datetime.combine(base_date, expiry_time)
-    future_ts = future_ts + datedelta(years=life_years)
+    if life_years:
+        future_ts = future_ts + datedelta(years=life_years)
+    else:
+        # is RL
+        future_ts = future_ts + timedelta(days=REPAIRER_LIEN_DAYS)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
     current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
