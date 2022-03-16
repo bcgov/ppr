@@ -969,7 +969,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         for registration in self.financing_statement.registration:
             if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
                                                      model_utils.REG_CLASS_PPSA):
-                expiry_ts = model_utils.expiry_dt_from_registration_rl(registration.registration_ts)
+                expiry_ts = model_utils.expiry_dt_from_registration(registration.registration_ts, None)
 
         for registration in self.financing_statement.registration:
             if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
