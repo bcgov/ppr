@@ -77,6 +77,12 @@ export const useVehicle = (props, context) => {
 
   const addVehicle = () => {
     let newList = getVehicleCollateral.value as VehicleCollateralIF[] || []// eslint-disable-line
+
+    // if they blanked out the mhr number, take it out, so api does not bomb
+    if (localState.currentVehicle.manufacturedHomeRegistrationNumber?.trim() === '') {
+      delete localState.currentVehicle.manufacturedHomeRegistrationNumber
+    }
+
     // New vehicle
     if (props.activeIndex === -1) {
       localState.currentVehicle.action = ActionTypes.ADDED
