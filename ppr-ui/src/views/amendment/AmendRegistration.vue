@@ -56,7 +56,10 @@
             :setShowErrorBar="errorBar"
           />
           <div v-if="!securedPartiesValid">
-          <span class="invalid-message">
+          <span v-if="isCrownError()" class="invalid-message">
+            Your registration can only include one secured party
+          </span>
+          <span v-else class="invalid-message">
             Your registration must include at least one Secured Party
           </span>
           </div>
@@ -153,7 +156,8 @@ import {
   APIRegistrationTypes, // eslint-disable-line no-unused-vars
   RouteNames, // eslint-disable-line no-unused-vars
   UIRegistrationTypes, // eslint-disable-line no-unused-vars
-  RegistrationFlowType // eslint-disable-line no-unused-vars
+  RegistrationFlowType, // eslint-disable-line no-unused-vars
+  ActionTypes
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Throttle } from '@/decorators'
@@ -177,6 +181,7 @@ import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import {
   getFeatureFlag,
   getFinancingStatement,
+  isSecuredPartyRestrictedList,
   pacificDate,
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
@@ -644,6 +649,23 @@ export default class AmendRegistration extends Vue {
       this.amendErrMsg = ''
     }
     this.debtorValid = val
+  }
+
+  private isCrownError (): boolean {
+    const sp = this.getAddSecuredPartiesAndDebtors.securedParties
+    let securedPartyCount = 0
+    if (isSecuredPartyRestrictedList(this.registrationType)) {
+      for (let i = 0; i < sp.length; i++) {
+      // is valid if there is at least one secured party
+        if (sp[i].action !== ActionTypes.REMOVED) {
+          securedPartyCount++
+        }
+      }
+      if (securedPartyCount > 1) {
+        return true
+      }
+    }
+    return false
   }
 
   private setValidCollateral (val: boolean) {

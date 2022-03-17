@@ -1,17 +1,19 @@
-import { AddPartiesIF } from '@/interfaces'
 import { useGetters, useActions } from 'vuex-composition-helpers'
-import { getRegisteringPartyFromAuth, getStaffegisteringParty } from '@/utils'
 import { useParty } from './useParty'
+import { AddPartiesIF } from '@/interfaces'
+import { getStaffegisteringParty, getRegisteringPartyFromAuth } from '@/utils'
 
 export const useRegisteringParty = () => {
   const { isPartiesValid } = useParty()
   const {
     getAddSecuredPartiesAndDebtors,
+    getRegistrationType,
     isRoleStaffReg,
     isRoleStaffBcol,
     isRoleStaffSbc
   } = useGetters<any>([
     'getAddSecuredPartiesAndDebtors',
+    'getRegistrationType',
     'isRoleStaffReg',
     'isRoleStaffBcol',
     'isRoleStaffSbc'
@@ -31,7 +33,7 @@ export const useRegisteringParty = () => {
       regParty = await getRegisteringPartyFromAuth()
     }
     parties.registeringParty = regParty
-    parties.valid = isPartiesValid(parties)
+    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 

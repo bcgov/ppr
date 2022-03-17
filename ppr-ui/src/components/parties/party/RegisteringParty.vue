@@ -157,10 +157,7 @@ export default defineComponent({
       getRegistrationFlowType
     } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType',
-      'isRoleStaffSbc',
-      'isRoleStaffReg',
-      'isRoleStaffBcol'
+      'getRegistrationFlowType'
     ])
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value

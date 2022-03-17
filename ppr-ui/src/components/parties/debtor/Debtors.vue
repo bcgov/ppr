@@ -291,10 +291,12 @@ export default defineComponent({
     const {
       getAddSecuredPartiesAndDebtors,
       getRegistrationFlowType,
+      getRegistrationType,
       getOriginalAddSecuredPartiesAndDebtors
     } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors',
       'getRegistrationFlowType',
+      'getRegistrationType',
       'getOriginalAddSecuredPartiesAndDebtors'
     ])
 
@@ -339,7 +341,7 @@ export default defineComponent({
       } else {
         localState.debtors.splice(index, 1)
         currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties)
+        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       const isValid = getDebtorValidity()
@@ -366,7 +368,7 @@ export default defineComponent({
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
       let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties)
+      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)

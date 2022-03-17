@@ -1,4 +1,4 @@
-import { UISearchTypes } from '@/enums'
+import { APIRegistrationTypes, UISearchTypes } from '@/enums'
 import { IndividualNameIF, SearchTypeIF, SearchValidationIF } from '@/interfaces'
 
 // subset of the localState that includes what the validator needs
@@ -185,4 +185,40 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
   }
   if (Object.keys(validation.searchValue)?.length || Object.keys(validation.category)?.length) return validation
   else return null
+}
+
+export function isSecuredPartyRestrictedList (regType: string): boolean {
+  const restrictedList = [
+    APIRegistrationTypes.LIEN_UNPAID_WAGES,
+    APIRegistrationTypes.PROCEEDS_CRIME_NOTICE,
+    APIRegistrationTypes.HERITAGE_CONSERVATION_NOTICE,
+    APIRegistrationTypes.INSURANCE_PREMIUM_TAX,
+    APIRegistrationTypes.PETROLEUM_NATURAL_GAS_TAX,
+    APIRegistrationTypes.FOREST,
+    APIRegistrationTypes.LOGGING_TAX,
+    APIRegistrationTypes.CARBON_TAX,
+    APIRegistrationTypes.PROVINCIAL_SALES_TAX,
+    APIRegistrationTypes.RURAL_PROPERTY_TAX,
+    APIRegistrationTypes.INCOME_TAX,
+    APIRegistrationTypes.MOTOR_FUEL_TAX,
+    APIRegistrationTypes.EXCISE_TAX,
+    APIRegistrationTypes.MAINTENANCE_LIEN,
+    APIRegistrationTypes.MANUFACTURED_HOME_NOTICE,
+    APIRegistrationTypes.OTHER,
+    APIRegistrationTypes.MINERAL_LAND_TAX,
+    APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
+    APIRegistrationTypes.SCHOOL_ACT,
+    APIRegistrationTypes.MISC_MINERAL_RESOURCE,
+    APIRegistrationTypes.CROWN_MINING_TAX,
+    APIRegistrationTypes.CROWN_CORP_CAPITAL_TAX,
+    APIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
+    APIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
+    APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
+    APIRegistrationTypes.TRANSITION_TAX_LIEN
+  ]
+  // @ts-ignore - it doesn't like the string comparison for some reason
+  if (restrictedList.includes(regType)) {
+    return true
+  }
+  return false
 }
