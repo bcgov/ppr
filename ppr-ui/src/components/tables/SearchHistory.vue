@@ -130,8 +130,8 @@ export default defineComponent({
     const tooltipTxtPdf =
       'This document PDF is still being generated. Click the ' +
         '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
-        ' icon to see if your PDF is ready for download. <br>' +
-        'Note: large documents take up to 20 minutes to generate.'
+        ' icon to see if your PDF is ready to download. <br>' +
+        'Note: Large documents may take up to 20 minutes to generate.'
     const localState = reactive({
       loadingPDF: '',
       headers: computed((): Array<any> => {
