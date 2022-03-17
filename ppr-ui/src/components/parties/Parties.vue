@@ -19,7 +19,7 @@
         <ul v-else>
           <li>The Registering Party</li>
         </ul>
-        <div v-if="securedParties.length > 0">
+        <div v-if="isSecuredPartyChecked">
           <v-icon color="green darken-2" class="agreement-valid-icon"
             >mdi-check</v-icon
           >
@@ -140,6 +140,18 @@ export default defineComponent({
         } else {
           return 'At least one Secured Party'
         }
+      }),
+      isSecuredPartyChecked: computed((): boolean => {
+        if (isSecuredPartyRestrictedList(registrationType)) {
+          if (localState.securedParties.length === 1) {
+            return true
+          }
+          return false
+        }
+        if (localState.securedParties.length > 0) {
+          return true
+        }
+        return false
       }),
       securedPartyTitle: computed((): string => {
         if (isSecuredPartyRestrictedList(registrationType)) {
