@@ -382,17 +382,17 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          WHERE uer.account_id = :query_account
            AND (uer.registration_number = :query_reg_num OR
                 uer.registration_number = r.registration_number)) AS exists_count
-  FROM registrations r, registration_types rt, financing_statements fs, verification_reports vr
- WHERE r.registration_type = rt.registration_type
-   AND fs.id = r.financing_id
-   AND vr.registration_id = r.id
-   AND fs.id IN (SELECT fs2.id
-                   FROM financing_statements fs2, registrations r2
-                  WHERE fs2.id = r2.financing_id
-                    AND r2.registration_number = :query_reg_num)
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id
-                     FROM registrations r3
+  FROM registrations r
+    INNER JOIN registration_types rt
+    ON r.registration_type = rt.registration_type
+    INNER JOIN financing_statements fs
+    ON fs.id = r.financing_id
+        AND fs.id IN (SELECT fs2.id
+                    FROM financing_statements fs2, registrations r2
+                    WHERE fs2.id = r2.financing_id AND r2.registration_number = :query_reg_num)
+        AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+    LEFT OUTER JOIN verification_reports vr ON r.id=vr.registration_id
+ WHERE NOT EXISTS (SELECT r3.id FROM registrations r3
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
