@@ -87,8 +87,31 @@ export const stateModel: StateModelIF = {
     }
   },
   registrationTable: {
-    addedReg: '',
-    addedRegParent: ''
+    baseRegs: [],
+    draftsBaseReg: [],
+    draftsChildReg: [],
+    newItem: {
+      addedReg: '',
+      addedRegParent: '',
+      addedRegSummary: null,
+      prevDraft: ''
+    },
+    sortHasMorePages: true,
+    sortOptions: {
+      endDate: null,
+      folNum: '',
+      orderBy: 'createDateTime',
+      orderVal: 'desc',
+      regBy: '',
+      regNum: '',
+      regParty: '',
+      regType: '',
+      secParty: '',
+      startDate: null,
+      status: ''
+    },
+    sortPage: 1,
+    totalRowCount: 0
   },
   search: {
     searchDebtorName: null,

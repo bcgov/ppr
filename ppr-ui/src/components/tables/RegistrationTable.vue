@@ -278,7 +278,7 @@ import {
   DraftResultIF, // eslint-disable-line no-unused-vars
   RegistrationSortIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
-  RegTableDataI // eslint-disable-line no-unused-vars
+  RegTableNewItemI // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
   AccountProductCodes, // eslint-disable-line no-unused-vars
@@ -305,9 +305,9 @@ export default defineComponent({
     setMorePages: {
       default: false
     },
-    setNewRegData: {
-      default: { addedReg: '', addedRegParent: '' },
-      type: Object as () => RegTableDataI
+    setNewRegItem: {
+      default: null,
+      type: Object as () => RegTableNewItemI
     },
     setSearch: {
       type: String,
@@ -408,7 +408,7 @@ export default defineComponent({
       morePages: computed(() => {
         return props.setMorePages
       }),
-      newRegData: computed(() => { return props.setNewRegData }),
+      newReg: computed(() => { return props.setNewRegItem }),
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
@@ -481,10 +481,10 @@ export default defineComponent({
     const isNewRegItem = (item: RegistrationSummaryIF | DraftResultIF): boolean => {
       const draftItem = item as DraftResultIF
       const regItem = item as RegistrationSummaryIF
-      if (regItem.registrationNumber && regItem.registrationNumber === localState.newRegData?.addedReg) {
+      if (regItem.registrationNumber && regItem.registrationNumber === localState.newReg?.addedReg) {
         // reg num is not blank and equals newly added reg num
         return true
-      } else if (draftItem.documentId && draftItem.documentId === localState.newRegData?.addedReg) {
+      } else if (draftItem.documentId && draftItem.documentId === localState.newReg?.addedReg) {
         // doc id is not blank and equals newly added doc id
         return true
       }
@@ -494,8 +494,9 @@ export default defineComponent({
     const isNewRegParentItem = (item: RegistrationSummaryIF): boolean => {
       if (item.expand === undefined && item.changes !== undefined) item.expand = false
       return (
-        localState.newRegData.addedRegParent !== '' &&
-        localState.newRegData.addedRegParent === item.registrationNumber
+        !!localState.newReg?.addedRegParent &&
+        localState.newReg.addedRegParent !== '' &&
+        localState.newReg.addedRegParent === item.registrationNumber
       )
     }
 
@@ -629,7 +630,7 @@ export default defineComponent({
       }
 
       // if new reg -> scroll to new reg
-      if (localState.newRegData?.addedReg) {
+      if (localState.newReg?.addedReg) {
         // need both (only one ref will scroll)
         scrollToRef(newRegItem)
         scrollToRef(newAndFirstItem)

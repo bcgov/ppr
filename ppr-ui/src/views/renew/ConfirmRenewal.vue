@@ -124,7 +124,8 @@ import {
   StateModelIF, // eslint-disable-line no-unused-vars
   LengthTrustIF, // eslint-disable-line no-unused-vars
   DialogOptionsIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF // eslint-disable-line no-unused-vars
+  DebtorNameIF, // eslint-disable-line no-unused-vars
+  RegTableNewItemI // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { AllRegistrationTypes } from '@/resources'
@@ -158,7 +159,7 @@ export default class ConfirmDischarge extends Vue {
   @Action setRegistrationExpiryDate: ActionBindingIF
   @Action setRegistrationNumber: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
-  @Action setRegTableData: ActionBindingIF
+  @Action setRegTableNewItem: ActionBindingIF
   @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
@@ -343,10 +344,13 @@ export default class ConfirmDischarge extends Vue {
       // unset registration number
       this.setRegistrationNumber(null)
       // set new added reg
-      this.setRegTableData({
+      const newItem: RegTableNewItemI = {
         addedReg: apiResponse.renewalRegistrationNumber,
-        addedRegParent: apiResponse.baseRegistrationNumber
-      })
+        addedRegParent: apiResponse.baseRegistrationNumber,
+        addedRegSummary: null,
+        prevDraft: ''
+      }
+      this.setRegTableNewItem(newItem)
       // On success return to dashboard
       this.goToDashboard()
     }

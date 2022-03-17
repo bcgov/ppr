@@ -13,7 +13,7 @@ import { TableRow } from '@/components/tables/common'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 // local types/helpers/etc.
 import { AccountProductCodes, AccountProductMemberships, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableDataI } from '@/interfaces'
+import { DraftResultIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 // unit test data/helpers
 import {
@@ -322,17 +322,17 @@ describe('Test registration table with results', () => {
     const childRegItem = (newRegistrationHistory[3] as RegistrationSummaryIF).changes[0] as RegistrationSummaryIF
     const testItems = [ firstItem, baseRegItem, childDraftItem, childRegItem  ]
 
-    const newRegFirstItem: RegTableDataI = { addedReg: firstItem.documentId, addedRegParent: '' }
-    const newRegBaseItem: RegTableDataI = { addedReg: baseRegItem.registrationNumber, addedRegParent: '' }
-    const newRegChildDraftItem: RegTableDataI = { addedReg: childDraftItem.documentId, addedRegParent: childDraftItem.baseRegistrationNumber }
-    const newRegChildItem: RegTableDataI = { addedReg: childRegItem.registrationNumber, addedRegParent: childRegItem.baseRegistrationNumber }
+    const newRegFirstItem: RegTableNewItemI = { addedReg: firstItem.documentId, addedRegParent: '', addedRegSummary: firstItem, prevDraft: '' }
+    const newRegBaseItem: RegTableNewItemI = { addedReg: baseRegItem.registrationNumber, addedRegParent: '', addedRegSummary: baseRegItem, prevDraft: '' }
+    const newRegChildDraftItem: RegTableNewItemI = { addedReg: childDraftItem.documentId, addedRegParent: childDraftItem.baseRegistrationNumber, addedRegSummary: childDraftItem, prevDraft: '' }
+    const newRegChildItem: RegTableNewItemI = { addedReg: childRegItem.registrationNumber, addedRegParent: childRegItem.baseRegistrationNumber, addedRegSummary: childRegItem, prevDraft: '' }
 
-    const emptyNewReg: RegTableDataI = { addedReg: '', addedRegParent: '' }
+    const emptyNewReg: RegTableNewItemI = { addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: '' }
 
     await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
 
     // verify setup
-    expect(wrapper.vm.newRegData).toEqual(emptyNewReg)
+    expect(wrapper.vm.newReg).toBe(null)
     for (const i in testItems) {
       expect(wrapper.vm.isNewRegItem(testItems[i])).toBe(false)
       expect(wrapper.vm.isNewRegParentItem(testItems[i])).toBe(false)
@@ -341,22 +341,22 @@ describe('Test registration table with results', () => {
     }
 
     // test updating the new reg (draft + first)
-    await wrapper.setProps({ setNewRegData: newRegFirstItem })
-    expect(wrapper.vm.newRegData).toEqual(newRegFirstItem)
+    await wrapper.setProps({ setNewRegItem: newRegFirstItem })
+    expect(wrapper.vm.newReg).toEqual(newRegFirstItem)
     expect(wrapper.vm.isNewRegItem(firstItem)).toBe(true)
     expect(wrapper.vm.isNewRegParentItem(firstItem)).toBe(false)
     expect(wrapper.vm.setRowRef(firstItem)).toBe('newAndFirstItem')
 
     // test base reg + middle
-    await wrapper.setProps({ setNewRegData: newRegBaseItem })
-    expect(wrapper.vm.newRegData).toEqual(newRegBaseItem)
+    await wrapper.setProps({ setNewRegItem: newRegBaseItem })
+    expect(wrapper.vm.newReg).toEqual(newRegBaseItem)
     expect(wrapper.vm.isNewRegItem(baseRegItem)).toBe(true)
     expect(wrapper.vm.isNewRegParentItem(baseRegItem)).toBe(false)
     expect(wrapper.vm.setRowRef(baseRegItem)).toBe('newRegItem')
 
     // test child reg
-    await wrapper.setProps({ setNewRegData: newRegChildItem })
-    expect(wrapper.vm.newRegData).toEqual(newRegChildItem)
+    await wrapper.setProps({ setNewRegItem: newRegChildItem })
+    expect(wrapper.vm.newReg).toEqual(newRegChildItem)
     const val = wrapper.vm.isNewRegItem(childRegItem)
     await Vue.nextTick()
     expect(val).toBe(true)
@@ -365,16 +365,16 @@ describe('Test registration table with results', () => {
     expect(wrapper.vm.setRowRef(childRegItem)).toBe('newRegItem')
 
     // test child draft reg
-    await wrapper.setProps({ setNewRegData: newRegChildDraftItem })
-    expect(wrapper.vm.newRegData).toEqual(newRegChildDraftItem)
+    await wrapper.setProps({ setNewRegItem: newRegChildDraftItem })
+    expect(wrapper.vm.newReg).toEqual(newRegChildDraftItem)
     expect(wrapper.vm.isNewRegItem(childDraftItem)).toBe(true)
     expect(wrapper.vm.isNewRegParentItem(childDraftItem)).toBe(false)
     expect(wrapper.vm.isNewRegParentItem(baseRegItem)).toBe(true)
     expect(wrapper.vm.setRowRef(childDraftItem)).toBe('newRegItem')
 
     // setting to empty clears new reg dynamically
-    await wrapper.setProps({ setNewRegData: emptyNewReg })
-    expect(wrapper.vm.newRegData).toEqual(emptyNewReg)
+    await wrapper.setProps({ setNewRegItem: emptyNewReg })
+    expect(wrapper.vm.newReg).toEqual(emptyNewReg)
     for (const i in testItems) {
       expect(wrapper.vm.isNewRegItem(testItems[i])).toBe(false)
       expect(wrapper.vm.isNewRegParentItem(testItems[i])).toBe(false)

@@ -9,6 +9,9 @@ import {
   DraftIF,
   LengthTrustIF,
   IndividualNameIF,
+  RegTableDataI,
+  RegTableNewItemI,
+  RegistrationSortIF,
   RegistrationTypeIF,
   SearchResponseIF,
   SearchTypeIF,
@@ -18,7 +21,8 @@ import {
   AccountProductSubscriptionIF,
   GeneralCollateralIF,
   VehicleCollateralIF,
-  RegTableDataI
+  RegistrationSummaryIF,
+  DraftResultIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -239,6 +243,46 @@ export const mutateShowStepErrors = (state: StateIF, show: boolean) => {
 
 export const mutateRegistrationTable = (state: StateIF, regTableData: RegTableDataI) => {
   state.stateModel.registrationTable = regTableData
+}
+
+export const mutateRegistrationTableBaseRegs = (state: StateIF, baseRegs: RegistrationSummaryIF[]): void => {
+  state.stateModel.registrationTable.baseRegs = baseRegs
+}
+
+export const mutateRegistrationTableCollapseAll = (state: StateIF): void => {
+  // ensures that the table triggers an update when returning from a new reg / amend / draft when
+  // the base reg is already expanded (otherwise the ref does not get set properly and the scroll doesn't work)
+  for (let i = 0; i < state.stateModel.registrationTable.baseRegs.length; i++) {
+    state.stateModel.registrationTable.baseRegs[i].expand = false
+  }
+}
+
+export const mutateRegistrationTableDraftsBaseReg = (state: StateIF, drafts: DraftResultIF[]): void => {
+  state.stateModel.registrationTable.draftsBaseReg = drafts
+}
+
+export const mutateRegistrationTableDraftsChildReg = (state: StateIF, drafts: DraftResultIF[]): void => {
+  state.stateModel.registrationTable.draftsChildReg = drafts
+}
+
+export const mutateRegistrationTableNewItem = (state: StateIF, newItem: RegTableNewItemI) => {
+  state.stateModel.registrationTable.newItem = newItem
+}
+
+export const mutateRegistrationTableSortHasMorePages = (state: StateIF, hasMorePages: boolean): void => {
+  state.stateModel.registrationTable.sortHasMorePages = hasMorePages
+}
+
+export const mutateRegistrationTableSortOptions = (state: StateIF, options: RegistrationSortIF) => {
+  state.stateModel.registrationTable.sortOptions = options
+}
+
+export const mutateRegistrationTableSortPage = (state: StateIF, page: number): void => {
+  state.stateModel.registrationTable.sortPage = page
+}
+
+export const mutateRegistrationTableTotalRowCount = (state: StateIF, count: number): void => {
+  state.stateModel.registrationTable.totalRowCount = count
 }
 
 export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) => {
