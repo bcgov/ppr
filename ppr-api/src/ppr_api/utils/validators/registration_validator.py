@@ -18,20 +18,20 @@ Validation includes verifying delete collateral ID's and timestamps.
 from ppr_api.models import utils as model_utils, VehicleCollateral
 
 
-COURT_ORDER_INVALID = 'CourtOrderInformation is not allowed with a base registration type of {}.\n'
-COURT_ORDER_MISSING = 'Required courtOrderInformation is missing.\n'
+COURT_ORDER_INVALID = 'CourtOrderInformation is not allowed with a base registration type of {}. '
+COURT_ORDER_MISSING = 'Required courtOrderInformation is missing. '
 COURT_ORDER_INVALID_DATE = 'Invalid courtOrderInformation.orderDate: the value must be between the base ' + \
-                           'registration date and the current system date.\n'
-AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration.\n'
-DELETE_MISSING_ID_VEHICLE = 'Required vehicleId missing in delete Vehicle Collateral.\n'
-DELETE_MISSING_ID_GENERAL = 'Required collateralId missing in delete General Collateral.\n'
-DELETE_INVALID_ID_VEHICLE = 'Invalid vehicleId {} in delete Vehicle Collateral.\n'
-DELETE_INVALID_ID_GENERAL = 'Invalid collateralId {} in delete General Collateral.\n'
-LI_NOT_ALLOWED = 'Life Infinite is not allowed with this registration type.\n'
-RENEWAL_INVALID = 'Renewal registration is now allowed: the base registration has an infinite life.\n'
-LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type.\n'
-LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed.\n'
-VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed.\n'
+                           'registration date and the current system date. '
+AUTHORIZATION_INVALID = 'Authorization Received indicator is required with this registration. '
+DELETE_MISSING_ID_VEHICLE = 'Required vehicleId missing in delete Vehicle Collateral. '
+DELETE_MISSING_ID_GENERAL = 'Required collateralId missing in delete General Collateral. '
+DELETE_INVALID_ID_VEHICLE = 'Invalid vehicleId {} in delete Vehicle Collateral. '
+DELETE_INVALID_ID_GENERAL = 'Invalid collateralId {} in delete General Collateral. '
+LI_NOT_ALLOWED = 'Life Infinite is not allowed with this registration type. '
+RENEWAL_INVALID = 'Renewal registration is now allowed: the base registration has an infinite life. '
+LIFE_MISSING = 'Either Life Years or Life Infinite is required with this registration type. '
+LIFE_INVALID = 'Only one of Life Years or Life Infinite is allowed. '
+VC_AP_NOT_ALLOWED = 'Vehicle Collateral type AP is not allowed. '
 
 
 def validate_registration(json_data, financing_statement=None):

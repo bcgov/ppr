@@ -172,7 +172,11 @@ class ApiRequestError(Exception):
         """Set up the exception."""
         if response is not None:
             self.status_code = response.status_code
-            self.json_data = json.loads(response.text)
+            try:
+                self.json_data = json.loads(response.text)
+            except Exception:   # noqa: B902; return nicer default error
+                current_app.logger.error('Pay api non-JSON response: ' + response.text)
+                self.json_data = {'message': 'Error parsing payment error response as JSON.'}
             self.json_data['status_code'] = response.status_code
             self.detail = self.json_data.get('detail', '')
             self.title = self.json_data.get('title', '')

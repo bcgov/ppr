@@ -20,6 +20,8 @@ Test-Suite to ensure that the Registration Model is working as expected.
 
 import pytest
 
+# from flask import current_app
+
 from ppr_api.models import Registration, registration_utils as registration_utils, utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
 
@@ -120,7 +122,8 @@ def test_account_reg_base_query(session, reg_num, reg_type, client_ref, register
     if params.status_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_STATUS_CLAUSE) != -1
     if params.start_date_time and params.end_date_time:
-        assert query.find(registration_utils.QUERY_ACCOUNT_REG_DATE_CLAUSE) != -1
+        date_clause = registration_utils.build_reg_date_clause(params, True)
+        assert query.find(date_clause) != -1
 
 
 @pytest.mark.parametrize('reg_num,reg_type,client_ref,registering,status,start_ts,end_ts', TEST_QUERY_BASE_DATA)
@@ -151,7 +154,8 @@ def test_account_change_base_query(session, reg_num, reg_type, client_ref, regis
     if params.status_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE) != -1
     if params.start_date_time and params.end_date_time:
-        assert query.find(registration_utils.QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE) != -1
+        date_clause = registration_utils.build_reg_date_clause(params, False)
+        assert query.find(date_clause) != -1
     assert query.find(registration_utils.QUERY_ACCOUNT_REG_LIMIT) != -1
 
 
@@ -183,7 +187,8 @@ def test_account_reg_query(session, reg_num, reg_type, client_ref, registering, 
     if params.status_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_STATUS_CLAUSE) != -1
     if params.start_date_time and params.end_date_time:
-        assert query.find(registration_utils.QUERY_ACCOUNT_REG_DATE_CLAUSE) != -1
+        date_clause = registration_utils.build_reg_date_clause(params, True)
+        assert query.find(date_clause) != -1
     assert query.find(' ORDER BY ') != -1
     assert query.find(registration_utils.QUERY_ACCOUNT_REG_LIMIT) != -1
 
@@ -216,7 +221,8 @@ def test_account_change_query(session, reg_num, reg_type, client_ref, registerin
     if params.status_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE) != -1
     if params.start_date_time and params.end_date_time:
-        assert query.find(registration_utils.QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE) != -1
+        date_clause = registration_utils.build_reg_date_clause(params, False)
+        assert query.find(date_clause) != -1
     assert query.find(registration_utils.QUERY_ACCOUNT_REG_LIMIT) != -1
 
 
@@ -262,12 +268,8 @@ def test_account_query_params(session, reg_num, reg_type, client_ref, registerin
         assert query_params.get('status_type')
     else:
         assert 'status_type' not in query_params
-    if params.start_date_time and params.end_date_time:
-        assert query_params.get('start_date_time')
-        assert query_params.get('end_date_time')
-    else:
-        assert 'start_date_time' not in query_params
-        assert 'end_date_time' not in query_params
+    assert 'start_date_time' not in query_params
+    assert 'end_date_time' not in query_params
 
 
 @pytest.mark.parametrize('reg_num,reg_type,client_ref,registering,status,start_ts,end_ts', TEST_QUERY_BASE_DATA)
