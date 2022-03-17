@@ -137,3 +137,14 @@ export enum UIAmendmentTypes {
     PARTIAL_DISCHARGE = 'Amendment - Collateral Deleted',
     SECURED_PARTY_TRANSFER = 'Amendment - Secured Parties Amended'
 }
+
+export enum UIRegistrationClassTypes {
+    PPSALIEN = 'Registration Verification',
+    RENEWAL = 'Renewal Verification',
+    AMENDMENT = 'Amendment Verification',
+    CHANGE = 'Change Verification',
+    CROWNLIEN = 'Registration Verification',
+    MISCLIEN = 'Registration Verification',
+    COURTORDER = 'Amendment Verification',
+    DISCHARGE = 'Discharge Verification'
+}

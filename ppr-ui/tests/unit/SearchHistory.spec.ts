@@ -23,7 +23,6 @@ const store = getVuexStore()
 const historyTable: string = '#search-history-table'
 const noResultsInfo: string = '#no-history-info'
 
-
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -112,7 +111,7 @@ describe('Test result table with results', () => {
         expect(rows.at(i + 1).text()).toContain('PDF')
         wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
         await Vue.nextTick()
-        expect(downloadMock).toHaveBeenCalledWith(searchId)
+        expect(downloadMock).toHaveBeenCalledWith(mockedSearchHistory.searches[i])
       }
     }
   })

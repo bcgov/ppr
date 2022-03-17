@@ -51,7 +51,7 @@
                     class="pdf-btn px-0 mt-n3"
                     depressed
                     :loading="item.searchId === loadingPDF"
-                    @click="downloadPDF(item.searchId)"
+                    @click="downloadPDF(item)"
                   >
                     <img src="@/assets/svgs/pdf-icon-blue.svg" />
                     <span class="pl-1">PDF</span>
@@ -193,9 +193,9 @@ export default defineComponent({
       }
       return UISearchType
     }
-    const downloadPDF = async (searchId: string): Promise<any> => {
-      localState.loadingPDF = searchId
-      const pdf = await searchPDF(searchId)
+    const downloadPDF = async (item: SearchResponseIF): Promise<any> => {
+      localState.loadingPDF = item.searchId
+      const pdf = await searchPDF(item.searchId)
       if (pdf.error) {
         emit('error', pdf.error)
       } else {
@@ -208,7 +208,7 @@ export default defineComponent({
         // IE doesn't allow using a blob object directly as link href
         // instead it is necessary to use msSaveOrOpenBlob
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(blob, searchId)
+          window.navigator.msSaveOrOpenBlob(blob, item.searchId)
         } else {
           // for other browsers, create a link pointing to the ObjectURL containing the blob
           const url = window.URL.createObjectURL(blob)
@@ -216,7 +216,12 @@ export default defineComponent({
           window.document.body.appendChild(a)
           a.setAttribute('style', 'display: none')
           a.href = url
-          a.download = searchId
+          // Format: [Date (in YYYY-MM-DD format)] BCPPR Search Result - [Search Criteria] Search ID
+          // Example: 2022-01-03 BCPPR BO Search Result - Telus Communications Inc. Search ID
+          const today = new Date()
+          const searchValue = displaySearchValue(item.searchQuery).replace(/ /g, '_')
+          a.download = today.toISOString().slice(0, 10) + '_BCPPR_Search_Result_' +
+            searchValue + '_' + item.searchId
           a.click()
           window.URL.revokeObjectURL(url)
           a.remove()

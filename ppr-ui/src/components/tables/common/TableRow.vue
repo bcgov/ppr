@@ -127,7 +127,7 @@
         class="pdf-btn px-0 mt-n3"
         depressed
         :loading="item.path === loadingPDF"
-        @click="downloadPDF(item.path)"
+        @click="downloadPDF(item)"
       >
         <img src="@/assets/svgs/pdf-icon-blue.svg">
         <span class="pl-1">PDF</span>
@@ -312,7 +312,8 @@ import {
   APIRegistrationTypes,
   APIStatusTypes, // eslint-disable-line no-unused-vars
   DraftTypes, // eslint-disable-line no-unused-vars
-  TableActions // eslint-disable-line no-unused-vars
+  TableActions, // eslint-disable-line no-unused-vars
+  UIRegistrationClassTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import moment from 'moment'
@@ -394,9 +395,9 @@ export default defineComponent({
       }
     }
 
-    const downloadPDF = async (path: string): Promise<any> => {
-      localState.loadingPDF = path
-      const pdf = await registrationPDF(path)
+    const downloadPDF = async (item: RegistrationSummaryIF): Promise<any> => {
+      localState.loadingPDF = item.path
+      const pdf = await registrationPDF(item.path)
       if (pdf.error) {
         emit('error', pdf.error)
       } else {
@@ -409,7 +410,7 @@ export default defineComponent({
         // IE doesn't allow using a blob object directly as link href
         // instead it is necessary to use msSaveOrOpenBlob
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(blob, path)
+          window.navigator.msSaveOrOpenBlob(blob, item.path)
         } else {
           // for other browsers, create a link pointing to the ObjectURL containing the blob
           const url = window.URL.createObjectURL(blob)
@@ -417,7 +418,18 @@ export default defineComponent({
           window.document.body.appendChild(a)
           a.setAttribute('style', 'display: none')
           a.href = url
-          a.download = path.replace('/ppr/api/v1/', '')
+          // Format: [Date (in YYYY-MM-DD format)] BCPPR [Two Letter Registration Type Code
+          // (only for Standard Registrations)] [Verification Statement Type] - [Registration Number]
+          // Example: 2022-01-03 BCPPR SA Registration Verification - 100559B
+          const today = new Date()
+          const regClass = getRegistrationClass(item.registrationClass)
+          if (regClass === 'Registration Verification') {
+            a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
+              item.registrationType + '_' + regClass + '_' + item.registrationNumber
+          } else {
+            a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
+              regClass + '_' + item.registrationNumber
+          }
           a.click()
           window.URL.revokeObjectURL(url)
           a.remove()
@@ -436,6 +448,10 @@ export default defineComponent({
           regNum: item.baseRegistrationNumber
         })
       }
+    }
+
+    const getRegistrationClass = (regClass: string): string => {
+      return UIRegistrationClassTypes[regClass]
     }
 
     const freezeScrolling = (isMenuOpen: boolean) => {
