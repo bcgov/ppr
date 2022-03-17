@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@bcrs-shared-components/date-picker": "1.1.12",
-    "@bcrs-shared-components/staff-payment": "1.0.29",
+    "@bcrs-shared-components/staff-payment": "2.0.2",
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-range-number-validator": "^1.1.0",
     "@sentry/browser": "^6.0.4",
