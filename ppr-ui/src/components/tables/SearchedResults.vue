@@ -46,6 +46,7 @@
           disable-sort
           fixed
           fixed-header
+          group-by="matchType"
           :headers="headers"
           hide-default-footer
           :items="results"
@@ -68,6 +69,23 @@
               :value="props.value"
               @click="on.input(!props.value)"
             />
+          </template>
+          <template v-slot:[`group.header`]="{ group }">
+            <td
+              class="group-header px-2"
+              :colspan="headers.length"
+              :style="exactMatchesLength === 0 ? 'text-align: center;' : ''"
+            >
+              <span v-if="group === 'EXACT'">
+                Exact Matches ({{ exactMatchesLength }})
+              </span>
+              <span v-else-if="exactMatchesLength === 0">
+                No Exact Matches
+              </span>
+              <span v-else>
+                Similar Matches ({{ totalResultsLength - exactMatchesLength }})
+              </span>
+            </td>
           </template>
           <template v-slot:[`item.data-table-select`]="{ item, isSelected, select }">
             <td v-if="isSelected && item.matchType === 'EXACT'" class="checkbox-info">
@@ -284,6 +302,10 @@ th {
 }
 .exact-match i {
   color: $gray7 !important;
+}
+.group-header, .group-header:hover {
+  background-color: $gray3;
+  font-weight: bold;
 }
 .main-results-div {
   width: 100%;
