@@ -132,17 +132,17 @@ import {
   computed,
   toRefs
 } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useGetters } from 'vuex-composition-helpers'
 // local components
 import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
 // local helpers / types / etc.
 import { useParty } from '@/composables/useParty'
+import { useRegisteringParty } from '@/composables/useRegisteringParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
-import { AddPartiesIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
-import { getRegisteringPartyFromAuth, getStaffegisteringParty } from '@/utils'
 import { ErrorContact } from '@/components/common'
 
 export default defineComponent({
@@ -152,15 +152,9 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, context) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
     const {
       getAddSecuredPartiesAndDebtors,
-      getRegistrationFlowType,
-      isRoleStaffSbc,
-      isRoleStaffReg,
-      isRoleStaffBcol
+      getRegistrationFlowType
     } = useGetters<any>([
       'getAddSecuredPartiesAndDebtors',
       'getRegistrationFlowType',
@@ -182,7 +176,8 @@ export default defineComponent({
         }
       }
     })
-    const { getName, isBusiness, isPartiesValid } = useParty()
+    const { getName, isBusiness } = useParty()
+    const { getRegisteringParty } = useRegisteringParty()
     const localState = reactive({
       addEditInProgress: false,
       showEditParty: false,
@@ -213,21 +208,6 @@ export default defineComponent({
     const resetData = () => {
       localState.addEditInProgress = false
       localState.showEditParty = false
-    }
-
-    const getRegisteringParty = async () => {
-      let regParty = null
-      var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-      if (isRoleStaffBcol.value || isRoleStaffReg.value) {
-        regParty = await getStaffegisteringParty(isRoleStaffBcol.value)
-      } else if (isRoleStaffSbc.value) {
-        // do nothing (keep regParty null)
-      } else {
-        regParty = await getRegisteringPartyFromAuth()
-      }
-      parties.registeringParty = regParty
-      parties.valid = isPartiesValid(parties)
-      setAddSecuredPartiesAndDebtors(parties)
     }
 
     return {
