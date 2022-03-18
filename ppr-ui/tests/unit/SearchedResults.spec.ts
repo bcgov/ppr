@@ -112,8 +112,8 @@ describe('Serial number results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header so add 1
-    expect(rows.length).toBe(testResults.results.length + 1)
+    // includes header and 2 group headers (exact / similar) so add 3
+    expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.serialNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.type)
@@ -155,8 +155,8 @@ describe('Individual debtor results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header so add 1
-    expect(rows.length).toBe(testResults.results.length + 1)
+    // includes header and 2 group headers (exact / similar) so add 3
+    expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].debtor.personName.first)
       if (testResults.results[i].debtor.personName.second) {
@@ -202,8 +202,8 @@ describe('Business debtor results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header so add 1
-    expect(rows.length).toBe(testResults.results.length + 1)
+    // includes header and 2 group headers (exact / similar) so add 3
+    expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].debtor.businessName)
     }
@@ -240,8 +240,8 @@ describe('Manufactured home results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header so add 1
-    expect(rows.length).toBe(testResults.results.length + 1)
+    // includes header and 2 group headers (exact / similar) so add 3
+    expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.serialNumber)
       expect(rows.at(i + 1).text()).toContain(
@@ -283,8 +283,8 @@ describe('Aircraft results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header so add 1
-    expect(rows.length).toBe(testResults.results.length + 1)
+    // includes header and 2 group headers (exact / similar) so add 3
+    expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.serialNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].vehicleCollateral.year)
@@ -324,8 +324,8 @@ describe('Registration number results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header so add 1
-    expect(rows.length).toBe(testResults.results.length + 1)
+    // includes header and 2 group headers (exact / similar) so add 3
+    expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
     }
