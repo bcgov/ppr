@@ -317,7 +317,7 @@ ACCOUNT_SEARCH_HISTORY_QUERY = \
 'FETCH FIRST ' + str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE) + ' ROWS ONLY'
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW = f"""
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
+SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size, sc.user_id,
   (SELECT COUNT(*) FROM json_array_elements(sc.updated_selection) sc2
     WHERE sc2 ->> 'matchType' = 'EXACT') AS exact_match_count,
   sr.similar_match_count, sr.callback_url, sr.doc_storage_url, sr.api_result,
@@ -334,7 +334,7 @@ FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
 """
 
 ACCOUNT_SEARCH_HISTORY_QUERY_NEW = f"""
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
+SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size, sc.user_id,
   (SELECT COUNT(*) FROM json_array_elements(sc.updated_selection) sc2
     WHERE sc2 ->> 'matchType' = 'EXACT') AS exact_match_count,
   sr.similar_match_count, sr.callback_url, sr.doc_storage_url, sr.api_result,

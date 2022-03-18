@@ -416,6 +416,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     if from_ui:
                         # if api_result is null then the selections have not been finished
                         search['inProgress'] = not mapping['api_result']
+                        search['userId'] = str(mapping['user_id'])
 
         return history_list
 
