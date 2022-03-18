@@ -371,8 +371,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         history_list = []
         if account_id:
             query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace('?', account_id)
+            if from_ui:
+                query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW.replace('?', account_id)
             if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
                 query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY.replace('?', account_id)
+                if from_ui:
+                    query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW.replace('?', account_id)
             rows = None
             try:
                 result = db.session.execute(query)
