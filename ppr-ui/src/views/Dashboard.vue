@@ -894,35 +894,43 @@ export default class Dashboard extends Vue {
       if (val.addedRegParent) {
         // new child reg. Find parent + update it with new summary
         const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === val.addedRegParent)
-        if (val.prevDraft) {
-          // remove draft
-          const changes = baseRegs[parentIndex].changes as DraftResultIF[]
-          if (changes) baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== val.prevDraft)
-          // update hasDraft value if removed draft was the only child draft
-          const draftIndex = changes.findIndex(
-            reg => reg.documentId !== val.prevDraft && reg.documentId !== undefined)
-          if (!draftIndex) baseRegs[parentIndex].hasDraft = false
-        }
-        if (newDraftSummary.documentId) {
-          // slot draft into parent changes
-          if (!baseRegs[parentIndex].changes) baseRegs[parentIndex].changes = []
-          baseRegs[parentIndex].changes.unshift(newDraftSummary)
+        if (parentIndex === -1) {
+          // reg was a child of a new base reg so we are adding the full base reg
+          newRegSummary.expand = true
+          baseRegs.unshift(newRegSummary)
+          this.setRegTableBaseRegs([...baseRegs])
+          this.setRegTableTotalRowCount(this.getRegTableTotalRowCount + 1)
         } else {
-          // replace with new summary + then add drafts back on
-          const changes = baseRegs[parentIndex].changes as DraftResultIF[]
-          baseRegs[parentIndex] = newRegSummary
-          if (changes) {
-            const drafts = changes.filter(draft => !!draft.documentId)
-            for (let i = drafts.length; i > 0; i--) {
-              baseRegs[parentIndex].changes.unshift(drafts[i - 1])
-              baseRegs[parentIndex].hasDraft = true
+          if (val.prevDraft) {
+            // remove draft
+            const changes = baseRegs[parentIndex].changes as DraftResultIF[]
+            if (changes) baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== val.prevDraft)
+            // update hasDraft value if removed draft was the only child draft
+            const draftIndex = changes.findIndex(
+              reg => reg.documentId !== val.prevDraft && reg.documentId !== undefined)
+            if (!draftIndex) baseRegs[parentIndex].hasDraft = false
+          }
+          if (newDraftSummary.documentId) {
+            // slot draft into parent changes
+            if (!baseRegs[parentIndex].changes) baseRegs[parentIndex].changes = []
+            baseRegs[parentIndex].changes.unshift(newDraftSummary)
+          } else {
+            // replace with new summary + then add drafts back on
+            const changes = baseRegs[parentIndex].changes as DraftResultIF[]
+            baseRegs[parentIndex] = newRegSummary
+            if (changes) {
+              const drafts = changes.filter(draft => !!draft.documentId)
+              for (let i = drafts.length; i > 0; i--) {
+                baseRegs[parentIndex].changes.unshift(drafts[i - 1])
+                baseRegs[parentIndex].hasDraft = true
+              }
             }
           }
+          // expand row
+          baseRegs[parentIndex].expand = true
+          // update store
+          this.setRegTableBaseRegs(cloneDeep(baseRegs))
         }
-        // expand row
-        baseRegs[parentIndex].expand = true
-        // update store
-        this.setRegTableBaseRegs(cloneDeep(baseRegs))
       } else if (newDraftSummary.documentId) {
         // new draft base reg
         const draftBaseRegs = this.getRegTableDraftsBaseReg
