@@ -315,3 +315,36 @@ ACCOUNT_SEARCH_HISTORY_QUERY = \
    "AND sc.account_id = '?' " + \
 'ORDER BY sc.search_ts DESC ' + \
 'FETCH FIRST ' + str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE) + ' ROWS ONLY'
+
+ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW = f"""
+SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size, sc.user_id,
+  (SELECT COUNT(*) FROM json_array_elements(sc.updated_selection) sc2
+    WHERE sc2 ->> 'matchType' = 'EXACT') AS exact_match_count,
+  sr.similar_match_count, sr.callback_url, sr.doc_storage_url, sr.api_result,
+  json_array_length(sr.api_result) as selected_match_count,
+  (SELECT CASE WHEN sc.user_id IS NULL THEN ''
+    ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id)
+    END) AS username
+FROM search_requests sc, search_results sr
+WHERE sc.id = sr.search_id
+  AND sc.account_id = '?'
+  AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
+ORDER BY sc.search_ts DESC
+FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
+"""
+
+ACCOUNT_SEARCH_HISTORY_QUERY_NEW = f"""
+SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size, sc.user_id,
+  (SELECT COUNT(*) FROM json_array_elements(sc.updated_selection) sc2
+    WHERE sc2 ->> 'matchType' = 'EXACT') AS exact_match_count,
+  sr.similar_match_count, sr.callback_url, sr.doc_storage_url, sr.api_result,
+  json_array_length(sc.updated_selection) as selected_match_count,
+  (SELECT CASE WHEN sc.user_id IS NULL THEN ''
+    ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id)
+    END) AS username
+FROM search_requests sc, search_results sr
+WHERE sc.id = sr.search_id
+  AND sc.account_id = '?'
+ORDER BY sc.search_ts DESC
+FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
+"""

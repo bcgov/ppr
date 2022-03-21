@@ -366,13 +366,17 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return search
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str = None):
+    def find_all_by_account_id(cls, account_id: str = None, from_ui: bool = False):
         """Return a search history summary list of searches executed by an account."""
         history_list = []
         if account_id:
             query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace('?', account_id)
+            if from_ui:
+                query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW.replace('?', account_id)
             if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
                 query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY.replace('?', account_id)
+                if from_ui:
+                    query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW.replace('?', account_id)
             rows = None
             try:
                 result = db.session.execute(query)
@@ -409,6 +413,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     else:
                         search['selectedResultsSize'] = 0
                     history_list.append(search)
+                    if from_ui:
+                        # if api_result is null then the selections have not been finished
+                        search['inProgress'] = not mapping['api_result']
+                        search['userId'] = str(mapping['user_id'])
 
         return history_list
 

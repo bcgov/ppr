@@ -55,7 +55,8 @@ class SearchHistoryResource(Resource):
             # Try to fetch search history by account id.
             # No results throws a not found business exception.
             current_app.logger.info(f'Fetching search history for {account_id}.')
-            history = SearchRequest.find_all_by_account_id(account_id)
+            from_ui = request.args.get('from_ui', False)
+            history = SearchRequest.find_all_by_account_id(account_id, from_ui)
             return jsonify(history), HTTPStatus.OK
 
         except DatabaseException as db_exception:
