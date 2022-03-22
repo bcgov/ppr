@@ -33,20 +33,32 @@
                   {{ item.searchQuery.clientReferenceId }}
                 </td>
                 <td>
-                  {{ displayDate(item.searchDateTime) }}
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ displayDate(item.searchDateTime) }}
+                  </span>
+                  <span v-else>Pending</span>
                 </td>
                 <td>
-                  {{ item.totalResultsSize }}
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.totalResultsSize }}
+                  </span>
+                  <span v-else>-</span>
                 </td>
                 <td>
-                  {{ item.exactResultsSize }}
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.exactResultsSize }}
+                  </span>
+                  <span v-else>-</span>
                 </td>
                 <td>
-                  {{ item.selectedResultsSize }}
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.selectedResultsSize }}
+                  </span>
+                  <span v-else>-</span>
                 </td>
                 <td>
                   <v-btn
-                    v-if="item.searchId !== 'PENDING'"
+                    v-if="item.searchId !== 'PENDING' && !item.inProgress"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     depressed
@@ -65,12 +77,23 @@
                     transition="fade-transition"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <v-icon color="primary" v-bind="attrs" v-on="on"
-                        >mdi-information-outline</v-icon
-                      >
+                      <!-- FUTURE: @click to refresh history item -->
+                      <v-btn v-if="!item.inProgress" icon>
+                        <v-icon color="primary" v-bind="attrs" v-on="on">
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+                      <v-btn v-else-if="isSearchOwner(item)" icon @click="generateReport(item)">
+                        <v-icon color="primary" v-bind="attrs" v-on="on">
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+                      <v-icon v-else color="primary" v-bind="attrs" v-on="on">
+                        mdi-information-outline
+                      </v-icon>
                     </template>
                     <div class="pt-2 pb-2">
-                      <span v-html="tooltipTxtPdf"></span>
+                      <span v-html="getTooltipTxtPdf(item)"></span>
                     </div>
                   </v-tooltip>
                 </td>
@@ -115,10 +138,11 @@ import {
   toRefs
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
+import _ from 'lodash'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
-import { convertDate, searchPDF } from '@/utils'
+import { convertDate, searchPDF, submitSelected, successfulPPRResponses } from '@/utils'
 import { ErrorContact } from '../common'
 
 export default defineComponent({
@@ -126,12 +150,9 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, { emit }) {
-    const { getSearchHistory, isRoleStaff } = useGetters<any>(['getSearchHistory', 'isRoleStaff'])
-    const tooltipTxtPdf =
-      'This document PDF is still being generated. Click the ' +
-        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
-        ' icon to see if your PDF is ready to download. <br>' +
-        'Note: Large documents may take up to 20 minutes to generate.'
+    const { getSearchHistory, getUserUsername, isRoleStaff } = useGetters<any>(
+      ['getSearchHistory', 'isRoleStaff', 'getUserUsername'])
+
     const localState = reactive({
       loadingPDF: '',
       headers: computed((): Array<any> => {
@@ -229,6 +250,47 @@ export default defineComponent({
       }
       localState.loadingPDF = ''
     }
+    const generateReport = _.throttle(async (item: SearchResponseIF): Promise<void> => {
+      let callBack = false
+      if (item.selectedResultsSize >= 75) callBack = true
+      // item searchId may be flipped to pending so keep track of real id with constant
+      const searchId = item.searchId
+      localState.loadingPDF = searchId
+      // wait at least 1 second
+      setTimeout(async () => {
+        // stop waiting after 5 seconds
+        setTimeout(() => {
+          localState.loadingPDF = ''
+          // set to pending if submit was not finished
+          if (item.inProgress) item.searchId = 'PENDING'
+        }, 500)
+        const statusCode = await submitSelected(searchId, [], callBack, true)
+        // FUTURE: add error handling, for now just ignore so they can try again
+        if (successfulPPRResponses.includes(statusCode)) {
+          if (item.selectedResultsSize >= 75) item.searchId = 'PENDING'
+          else item.searchId = searchId
+          item.inProgress = false
+        }
+      }, 100)
+    }, 600, { trailing: false })
+    const getTooltipTxtPdf = (item: SearchResponseIF): string => {
+      if (item.inProgress) {
+        if (isSearchOwner(item)) {
+          return '<p class="ma-0">The document PDF has not been generated. Click the ' +
+            '<i class="v-icon notranslate mdi mdi-information-outline" ' +
+            'style="font-size:18px; margin-bottom:4px;"></i>' +
+            ' icon to generate your PDF.</p>' +
+            '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+        }
+        return 'This search is in progress by another user.'
+      }
+      return '<p class="ma-0">This document PDF is still being generated. Reload this page to ' +
+        'to see if your PDF is ready to download.</p>' +
+        '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+    }
+    const isSearchOwner = (item: SearchResponseIF): Boolean => {
+      return getUserUsername.value === item?.userId
+    }
     const retrySearch = (): void => {
       emit('retry')
     }
@@ -239,8 +301,10 @@ export default defineComponent({
       displaySearchValue,
       displayType,
       downloadPDF,
-      retrySearch,
-      tooltipTxtPdf
+      generateReport,
+      getTooltipTxtPdf,
+      isSearchOwner,
+      retrySearch
     }
   }
 })
@@ -254,5 +318,9 @@ export default defineComponent({
 .search-contact-container {
   width: 350px;
   font-size: 0.875rem;
+}
+::v-deep .v-btn--icon.v-size--default {
+  height: 24px;
+  width: 24px;
 }
 </style>
