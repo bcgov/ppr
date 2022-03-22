@@ -1,8 +1,7 @@
-import { ErrorIF, VehicleCollateralIF, SearchNameIF } from '@/interfaces'
+import { VehicleCollateralIF, SearchNameIF } from '@/interfaces'
 
 // Interface for a single search result matching the search criteria.
 export interface SearchResultIF {
-  error?: ErrorIF
   id: number
   matchType: string // EXACT or SIMILAR
   registrationNumber?: string // Conditional: only returned with search by registration number.
