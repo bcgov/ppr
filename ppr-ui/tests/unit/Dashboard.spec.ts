@@ -84,7 +84,7 @@ describe('Dashboard component', () => {
     // stub api calls
     sandbox = sinon.createSandbox()
     const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history')
+    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getDraft = getStub.withArgs(`drafts/${draftDocId}`)
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
@@ -299,7 +299,7 @@ describe('Dashboard registration table tests', () => {
     sandbox = sinon.createSandbox()
     // get stubs
     const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history')
+    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
@@ -502,7 +502,7 @@ describe('Dashboard add registration tests', () => {
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
     const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history')
+    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
@@ -610,7 +610,7 @@ describe('Dashboard error modal tests', () => {
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
     const getStub = sandbox.stub(axios, 'get')
-    const getSearchHistory = getStub.withArgs('search-history')
+    const getSearchHistory = getStub.withArgs('search-history?from_ui=true')
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
