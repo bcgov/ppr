@@ -308,6 +308,7 @@ export default class Dashboard extends Vue {
   @Getter isNonBillable!: boolean
 
   @Action resetNewRegistration: ActionBindingIF
+  @Action resetRegTableData: ActionBindingIF
   @Action setRegTableBaseRegs: ActionBindingIF
   @Action setRegTableCollapsed: ActionBindingIF
   @Action setRegTableDraftsBaseReg: ActionBindingIF
@@ -803,6 +804,7 @@ export default class Dashboard extends Vue {
       this.handleRegTableNewItem(this.getRegTableNewItem)
     } else {
       // load in registrations from scratch
+      this.resetRegTableData(null)
       const myRegDrafts = await draftHistory(cloneDeep(this.getRegTableSortOptions))
       const myRegHistory = await registrationHistory(cloneDeep(this.getRegTableSortOptions), 1)
 

@@ -30,6 +30,10 @@ export const resetNewRegistration: ActionIF = ({ commit }): void => {
   commit('mutateNewRegistration')
 }
 
+export const resetRegTableData: ActionIF = ({ commit }): void => {
+  commit('mutateRegistrationTableReset')
+}
+
 export const setAccountProductSubscribtion: ActionIF = (
   { commit },
   productSubscriptions: AccountProductSubscriptionIF

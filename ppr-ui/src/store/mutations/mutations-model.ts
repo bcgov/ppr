@@ -269,6 +269,34 @@ export const mutateRegistrationTableNewItem = (state: StateIF, newItem: RegTable
   state.stateModel.registrationTable.newItem = newItem
 }
 
+export const mutateRegistrationTableReset = (state: StateIF): void => {
+  state.stateModel.registrationTable.baseRegs = []
+  state.stateModel.registrationTable.draftsBaseReg = []
+  state.stateModel.registrationTable.draftsChildReg = []
+  state.stateModel.registrationTable.newItem = {
+    addedReg: '',
+    addedRegParent: '',
+    addedRegSummary: null,
+    prevDraft: ''
+  }
+  state.stateModel.registrationTable.sortHasMorePages = true
+  state.stateModel.registrationTable.sortOptions = {
+    endDate: null,
+    folNum: '',
+    orderBy: 'createDateTime',
+    orderVal: 'desc',
+    regBy: '',
+    regNum: '',
+    regParty: '',
+    regType: '',
+    secParty: '',
+    startDate: null,
+    status: ''
+  }
+  state.stateModel.registrationTable.sortPage = 1
+  state.stateModel.registrationTable.totalRowCount = 0
+}
+
 export const mutateRegistrationTableSortHasMorePages = (state: StateIF, hasMorePages: boolean): void => {
   state.stateModel.registrationTable.sortHasMorePages = hasMorePages
 }
