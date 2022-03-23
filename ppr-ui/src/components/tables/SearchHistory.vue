@@ -219,7 +219,7 @@ export default defineComponent({
           // Format: [Date (in YYYY-MM-DD format)] BCPPR Search Result - [Search Criteria] Search ID
           // Example: 2022-01-03 BCPPR BO Search Result - Telus Communications Inc. Search ID
           const today = new Date()
-          const searchValue = displaySearchValue(item.searchQuery).replace(/ /g, '_')
+          const searchValue = displaySearchValue(item.searchQuery).replace(/ /g, '_').split('.').join('')
           a.download = today.toISOString().slice(0, 10) + '_BCPPR_Search_Result_' +
             searchValue + '_' + item.searchId
           a.click()
