@@ -13,6 +13,7 @@ export interface SearchResponseIF {
   results: SearchResultIF[],
   error?: ErrorIF,
   inProgress?: boolean,
+  loadingPDF?: boolean,
   userId?: string,
   username?: string
 }

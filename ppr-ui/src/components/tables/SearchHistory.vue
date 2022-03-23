@@ -62,7 +62,7 @@
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     depressed
-                    :loading="item.searchId === loadingPDF"
+                    :loading="item.loadingPDF"
                     @click="downloadPDF(item)"
                   >
                     <img src="@/assets/svgs/pdf-icon-blue.svg" />
@@ -78,12 +78,18 @@
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <!-- FUTURE: @click to refresh history item -->
-                      <v-btn v-if="!item.inProgress" icon>
+                      <v-btn v-if="!item.inProgress" color="primary" icon :loading="item.loadingPDF">
                         <v-icon color="primary" v-bind="attrs" v-on="on">
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
-                      <v-btn v-else-if="isSearchOwner(item)" icon @click="generateReport(item)">
+                      <v-btn
+                        v-else-if="isSearchOwner(item)"
+                        color="primary"
+                        icon
+                        :loading="item.loadingPDF"
+                        @click="generateReport(item)"
+                      >
                         <v-icon color="primary" v-bind="attrs" v-on="on">
                           mdi-information-outline
                         </v-icon>
@@ -154,7 +160,6 @@ export default defineComponent({
       ['getSearchHistory', 'isRoleStaff', 'getUserUsername'])
 
     const localState = reactive({
-      loadingPDF: '',
       headers: computed((): Array<any> => {
         if (localState.isStaff) {
           return searchHistoryTableHeadersStaff
@@ -214,8 +219,8 @@ export default defineComponent({
       }
       return UISearchType
     }
-    const downloadPDF = async (item: SearchResponseIF): Promise<any> => {
-      localState.loadingPDF = item.searchId
+    const downloadPDF = async (item: SearchResponseIF): Promise<void> => {
+      item.loadingPDF = true
       const pdf = await searchPDF(item.searchId)
       if (pdf.error) {
         emit('error', pdf.error)
@@ -248,22 +253,22 @@ export default defineComponent({
           a.remove()
         }
       }
-      localState.loadingPDF = ''
+      item.loadingPDF = false
     }
     const generateReport = _.throttle(async (item: SearchResponseIF): Promise<void> => {
       let callBack = false
       if (item.selectedResultsSize >= 75) callBack = true
       // item searchId may be flipped to pending so keep track of real id with constant
       const searchId = item.searchId
-      localState.loadingPDF = searchId
+      item.loadingPDF = true
       // wait at least 1 second
       setTimeout(async () => {
         // stop waiting after 5 seconds
         setTimeout(() => {
-          localState.loadingPDF = ''
+          item.loadingPDF = false
           // set to pending if submit was not finished
           if (item.inProgress) item.searchId = 'PENDING'
-        }, 500)
+        }, 5000)
         const statusCode = await submitSelected(searchId, [], callBack, true)
         // FUTURE: add error handling, for now just ignore so they can try again
         if (successfulPPRResponses.includes(statusCode)) {
@@ -271,8 +276,9 @@ export default defineComponent({
           else item.searchId = searchId
           item.inProgress = false
         }
-      }, 100)
-    }, 600, { trailing: false })
+        item.loadingPDF = false
+      }, 1000)
+    }, 250, { trailing: false })
     const getTooltipTxtPdf = (item: SearchResponseIF): string => {
       if (item.inProgress) {
         if (isSearchOwner(item)) {
@@ -285,7 +291,7 @@ export default defineComponent({
         return 'This search is in progress by another user.'
       }
       return '<p class="ma-0">This document PDF is still being generated. Reload this page to ' +
-        'to see if your PDF is ready to download.</p>' +
+        'see if your PDF is ready to download.</p>' +
         '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
     }
     const isSearchOwner = (item: SearchResponseIF): Boolean => {
@@ -321,6 +327,11 @@ export default defineComponent({
 }
 ::v-deep .v-btn--icon.v-size--default {
   height: 24px;
+  width: 24px;
+}
+::v-deep .v-btn.v-btn--depressed.v-btn--loading.pdf-btn {
+  height: 24px;
+  min-width: 24px;
   width: 24px;
 }
 </style>
