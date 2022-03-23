@@ -27,7 +27,7 @@ from ppr_api.utils.util import cors_preflight
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.services.authz import authorized
 from ppr_api.services.queue_service import GoogleQueueService
-from ppr_api.models import EventTracking, SearchResult, utils as model_utils
+from ppr_api.models import EventTracking, SearchResult, SearchRequest, utils as model_utils
 from ppr_api.resources import utils as resource_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.callback.reports.report_service import get_search_report
@@ -51,6 +51,7 @@ CALLBACK_MESSAGES = {
 }
 CALLBACK_PARAM = 'callbackURL'
 REPORT_URL = '/ppr/api/v1/search-results/{search_id}'
+USE_CURRENT_PARAM = 'useCurrent'
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -76,11 +77,17 @@ class SearchResultsResource(Resource):
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
 
-            request_json = request.get_json(silent=True)
-            # Validate schema.
-            valid_format, errors = schema_utils.validate(request_json, 'searchSummary', 'ppr')
-            if not valid_format:
-                return resource_utils.validation_error_response(errors, VAL_ERROR)
+            request_json = None
+            use_current_selection = request.args.get(USE_CURRENT_PARAM)
+            if use_current_selection:
+                search_request = SearchRequest.find_by_id(search_id)
+                request_json = search_request.updated_selection or []
+            else:
+                request_json = request.get_json(silent=True)
+                # Validate schema.
+                valid_format, errors = schema_utils.validate(request_json, 'searchSummary', 'ppr')
+                if not valid_format:
+                    return resource_utils.validation_error_response(errors, VAL_ERROR)
 
             # Perform any extra data validation such as start and end dates here
             search_detail = SearchResult.validate_search_select(request_json, search_id)
