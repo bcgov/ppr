@@ -272,6 +272,9 @@ export default defineComponent({
 
     onMounted(() => {
       getVehicle()
+      if (currentVehicle.value.manufacturedHomeRegistrationNumber === 'NR') {
+        currentVehicle.value.manufacturedHomeRegistrationNumber = ''
+      }
       if (mustHaveManufacturedHomeCollateral()) {
         // set the current vehicle type to motor home
         currentVehicle.value.type = APIVehicleTypes.MANUFACTURED_HOME
