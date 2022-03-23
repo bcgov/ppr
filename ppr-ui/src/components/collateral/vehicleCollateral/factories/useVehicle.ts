@@ -89,6 +89,10 @@ export const useVehicle = (props, context) => {
       localState.currentVehicle.id = newList.length + 1
       newList.push(localState.currentVehicle)
     } else {
+      // remove the NR state when comparing
+      if (localState.originalVehicle.manufacturedHomeRegistrationNumber === 'NR') {
+        delete localState.originalVehicle.manufacturedHomeRegistrationNumber
+      }
       // if they didn't change anything, just exit
       if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
         isEqual(localState.currentVehicle, localState.originalVehicle)) {
