@@ -60,6 +60,7 @@
           :items="searchTypes"
           item-disabled="selectDisabled"
           item-text="searchTypeUI"
+          item-value="searchTypeAPI"
           :label="selectedSearchType ? '' : searchTypeLabel"
           return-object
           v-model="selectedSearchType"
@@ -192,8 +193,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
-import { SearchTypes } from '@/resources'
+import { getFeatureFlag, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
   DialogOptionsIF, // eslint-disable-line no-unused-vars
@@ -259,7 +260,17 @@ export default defineComponent({
       folioNumber: props.defaultFolioNumber,
       folioError: false,
       hideDetails: false,
-      searchTypes: SearchTypes,
+      searchTypes: computed((): Array<SearchTypeIF> => {
+        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
+          if (isRoleStaffReg.value) {
+            const allSearchTypes = []
+            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+            return allSearchTypes
+          }
+        }
+        return SearchTypes
+      }),
       searchValue: props.defaultSearchValue,
       searchValueFirst: props.defaultDebtor?.first,
       searchValueSecond: props.defaultDebtor?.second,

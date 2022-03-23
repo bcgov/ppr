@@ -1,4 +1,4 @@
-import { APISearchTypes, UISearchTypes } from '@/enums'
+import { APISearchTypes, UISearchTypes, APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
 import { SearchTypeIF } from '@/interfaces'
 
 export const SearchTypes: Array<SearchTypeIF> = [
@@ -10,7 +10,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a serial number',
     hints: {
       searchValue: 'Serial numbers normally contain letters and numbers only'
-    }
+    },
+    group: 1
   },
   {
     divider: false,
@@ -18,7 +19,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeUI: UISearchTypes.INDIVIDUAL_DEBTOR,
     searchTypeAPI: APISearchTypes.INDIVIDUAL_DEBTOR,
     textLabel: '',
-    hints: null
+    hints: null,
+    group: 1
   },
   {
     divider: false,
@@ -28,7 +30,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a business debtor name',
     hints: {
       searchValue: 'Business names must contain between 2 and 150 characters'
-    }
+    },
+    group: 1
   },
   {
     // divider in dropdown list
@@ -37,7 +40,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeUI: null,
     searchTypeAPI: null,
     textLabel: null,
-    hints: null
+    hints: null,
+    group: 1
   },
   {
     divider: false,
@@ -47,7 +51,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a manufactured home registration number',
     hints: {
       searchValue: 'Manufactured home registration number must contain 6 digits'
-    }
+    },
+    group: 1
   },
   {
     divider: false,
@@ -57,7 +62,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter an aircraft airframe D.O.T. number',
     hints: {
       searchValue: 'Up to 25 characters'
-    }
+    },
+    group: 1
   },
   {
     divider: false,
@@ -67,6 +73,60 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a registration number',
     hints: {
       searchValue: 'Registration numbers contain 7 characters'
-    }
+    },
+    group: 1
+  }
+]
+
+export const MHRSearchTypes: Array<SearchTypeIF> = [
+  {
+    // divider in dropdown list
+    divider: true,
+    selectDisabled: true,
+    searchTypeUI: null,
+    searchTypeAPI: null,
+    textLabel: null,
+    hints: null,
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHRMHR_NUMBER,
+    searchTypeAPI: APIMHRSearchTypes.MHRMHR_NUMBER,
+    textLabel: 'Enter a manufactured home registration number',
+    hints: {
+      searchValue: 'Manufactured home registration number must contain 6 digits'
+    },
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHROWNER_NAME,
+    searchTypeAPI: APIMHRSearchTypes.MHROWNER_NAME,
+    textLabel: '',
+    hints: null,
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHRORGANIZATION_NAME,
+    searchTypeAPI: APIMHRSearchTypes.MHRORGANIZATION_NAME,
+    textLabel: '',
+    hints: null,
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHRSERIAL_NUMBER,
+    searchTypeAPI: APIMHRSearchTypes.MHRSERIAL_NUMBER,
+    textLabel: 'Enter a serial number',
+    hints: {
+      searchValue: 'Serial numbers normally contain letters and numbers only'
+    },
+    group: 2
   }
 ]
