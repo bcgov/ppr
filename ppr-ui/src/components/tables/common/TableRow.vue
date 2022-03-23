@@ -425,10 +425,10 @@ export default defineComponent({
           const regClass = getRegistrationClass(item.registrationClass)
           if (regClass === 'Registration Verification') {
             a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
-              item.registrationType + '_' + regClass + '_' + item.registrationNumber
+              item.registrationType + '_' + regClass.replace(/ /g, '_') + '_' + item.registrationNumber
           } else {
             a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
-              regClass + '_' + item.registrationNumber
+              regClass.replace(/ /g, '_') + '_' + item.registrationNumber
           }
           a.click()
           window.URL.revokeObjectURL(url)
