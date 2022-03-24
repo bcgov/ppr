@@ -283,17 +283,18 @@ export async function updateSelected (
 export async function submitSelected (
   searchId: string,
   selected: Array<SearchResultIF>,
-  shouldCallback: boolean
+  shouldCallback: boolean,
+  useCurrentSelect: boolean = false
 ): Promise<number> {
   const url = sessionStorage.getItem('PPR_API_URL')
   // change to application/pdf to get the pdf right away
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   let callback = ''
   if (shouldCallback) {
-    callback = '?callbackURL=PPR_UI'
+    callback = '&callbackURL=PPR_UI'
   }
   return axios
-    .post(`search-results/${searchId}${callback}`, selected, config)
+    .post(`search-results/${searchId}?useCurrent=${useCurrentSelect}${callback}`, selected, config)
     .then(response => {
       return response.status
     })
@@ -334,7 +335,7 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
-    .get<Array<SearchResponseIF>>('search-history', config)
+    .get<Array<SearchResponseIF>>('search-history?from_ui=true', config)
     .then(response => {
       const data = response?.data
       if (!data) {

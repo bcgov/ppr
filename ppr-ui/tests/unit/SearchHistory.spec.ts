@@ -5,6 +5,7 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
+import flushPromises from 'flush-promises'
 
 // Components
 import { SearchHistory } from '@/components/tables'
@@ -45,6 +46,7 @@ describe('Test result table with no results', () => {
   beforeEach(async () => {
     await store.dispatch('setSearchHistory', [])
     wrapper = createComponent()
+    await flushPromises()
   })
   afterEach(() => {
     wrapper.destroy()

@@ -11,5 +11,9 @@ export interface SearchResponseIF {
   searchDateTime?: string, // UTC ISO formatted date and time.
   searchQuery: SearchCriteriaIF, // Echoes request
   results: SearchResultIF[],
-  error?: ErrorIF
+  error?: ErrorIF,
+  inProgress?: boolean,
+  loadingPDF?: boolean,
+  userId?: string,
+  username?: string
 }
