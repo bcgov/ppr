@@ -2,6 +2,7 @@
   <v-select
           id="search-select"
           class="search-bar-type-select"
+          ref="searchSelect"
           :error-messages="categoryMessage ? categoryMessage : ''"
           filled
           :items="displayItems"
@@ -11,17 +12,19 @@
           :label="selectedSearchType ? '' : searchTypeLabel"
           return-object
           v-model="selectedSearchType"
+          @focus="updateSelections()"
         >
         <template v-slot:item="{ item }">
         <template v-if="item.class === 'search-list-header'">
           <v-list-item-content style="padding: 9px 0;">
             <v-row
-              :id="`reg-type-drop-${item.group}`"
+              :id="`srch-type-drop-${item.group}`"
               style="width: 45rem; pointer-events: all;"
               @click="toggleGroup(item.group)"
             >
               <v-col class="py-0" align-self="center" cols="11">
-                <span class="search-list-header">{{ item.textLabel }}</span>
+                <span class="search-list-header"><v-icon class="menu-icon">{{item.icon}}</v-icon>
+                {{ item.textLabel }}</span>
               </v-col>
               <v-col class="py-0" align-self="center" cols="auto">
                 <v-btn icon small style="pointer-events: all;">
@@ -34,7 +37,7 @@
         </template>
         <template v-else class="search-list">
           <v-list-item
-            id="btn-security"
+            v-if="displayGroup[item.group]"
             class="copy-normal"
             @click="selectSearchType(item)"
           >
@@ -47,7 +50,7 @@
   </v-select>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, computed, ref } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { UISearchTypes, APISearchTypes } from '@/enums'
@@ -60,6 +63,10 @@ export default defineComponent({
   props: {
     defaultSelectedSearchType: {
       type: Object as () => SearchTypeIF
+    },
+    defaultCategoryMessage: {
+      type: String,
+      default: ''
     }
   },
   setup (props, { emit }) {
@@ -68,21 +75,19 @@ export default defineComponent({
     } = useGetters<any>([
       'isRoleStaffReg'
     ])
+    const searchSelect = ref(null)
     const localState = reactive({
       searchTypes: UISearchTypes,
       searchTypeValues: APISearchTypes,
       selectedSearchType: props.defaultSelectedSearchType,
-      searchTypeLabel: 'Select a search category',
-      displayItems: computed((): Array<SearchTypeIF> => {
-        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
-          if (isRoleStaffReg.value) {
-            const allSearchTypes = []
-            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
-            return allSearchTypes
-          }
+      categoryMessage: computed((): string => {
+        return props.defaultCategoryMessage
+      }),
+      searchTypeLabel: computed((): string => {
+        if (localState.selectedSearchType?.searchTypeUI) {
+          return localState.selectedSearchType.searchTypeUI
         }
-        return SearchTypes
+        return 'Select a search category'
       }),
       origItems: computed((): Array<SearchTypeIF> => {
         if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
@@ -95,6 +100,7 @@ export default defineComponent({
         }
         return SearchTypes
       }),
+      displayItems: [],
       displayGroup: {
         1: true,
         2: true
@@ -138,9 +144,16 @@ export default defineComponent({
     }
     const selectSearchType = (val: SearchTypeIF) => {
       emit('selected', val)
+      localState.selectedSearchType = val
+      searchSelect.value.blur()
+    }
+    const updateSelections = () => {
+      localState.displayItems = localState.origItems
     }
 
     return {
+      updateSelections,
+      searchSelect,
       selectSearchType,
       toggleGroup,
       ...toRefs(localState)
@@ -150,44 +163,16 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-div.v-menu__content.theme--light.menuable__content__active {
-  left: auto !important;
+.menu-icon {
+  margin-bottom: 5px;
+  padding-right: 5px;
 }
-.actions__more-actions__btn {
-  width: 50px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  box-shadow: none;
-  margin-left: 1px;
-}
-.actions__more-actions.more-actions {
-  overflow: auto;
-}
-.search-bar-btn {
-  min-width: 0 !important;
-  width: 285px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  background-color: $primary-blue;
-  color: white;
-  height: 2.85rem;
-  font-weight: normal;
-  box-shadow: none;
-}
-.search-list-item {
+.copy-normal {
   color: $gray7 !important;
+  padding-left: 20px;
 }
-::v-deep .v-list-item__title, .v-list-item__action {
-  color: $gray7 !important;
-  font-size: 0.875rem !important;
-  min-height: 0;
-  padding: 11.5px 22px;
-}
-::v-deep .v-list-item__title:hover{
-  background-color: $gray1;
-  color: $primary-blue !important;
-}
-::v-deep .v-list-item {
-  padding: 0;
+.search-list-header {
+  color: $gray9 !important;
+  font-weight:bold;
 }
 </style>

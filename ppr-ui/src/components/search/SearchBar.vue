@@ -16,8 +16,7 @@
     />
     <v-row no-gutters class="pt-2">
       <v-col :class="[$style['search-info'], 'select-search-text', 'pt-4']">
-        <span>
-          Select a search category and then enter a value to search.
+        <span v-html="typeOfSearch">
         </span>
         <span v-if="!isStaffBcolReg">
           <span>
@@ -53,10 +52,14 @@
     <v-row no-gutters class="pt-1">
       <v-col class="ml-n6 pl-6" cols="4">
 
-        <search-bar-list />
+        <search-bar-list
+          :defaultSelectedSearchType="selectedSearchType"
+          :defaultCategoryMessage="categoryMessage"
+          @selected="returnSearchSelection($event)"
+        />
 
       </v-col>
-      <v-col v-if="!isIndividualDebtor" cols="7" class="pl-3">
+      <v-col v-if="!isIndividual" cols="7" class="pl-3">
         <v-tooltip content-class="bottom-tooltip"
                    bottom
                    :open-on-hover="false"
@@ -188,12 +191,12 @@ import {
   SearchValidationIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { SettingOptions, UISearchTypes } from '@/enums'
+import { SettingOptions, UIMHRSearchTypes, UISearchTypes } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
-import { SearchBarList } from '.'
+import SearchBarList from '@/components/search/SearchBarList.vue'
 
 export default defineComponent({
   components: {
@@ -292,8 +295,9 @@ export default defineComponent({
         }
         return '8.50'
       }),
-      isIndividualDebtor: computed((): boolean => {
-        if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) {
+      isIndividual: computed((): boolean => {
+        if ((localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) ||
+           (localState.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHROWNER_NAME)) {
           return true
         }
         return false
@@ -309,6 +313,19 @@ export default defineComponent({
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
+      }),
+      typeOfSearch: computed((): string => {
+        if (localState.selectedSearchType) {
+          const sti = SearchTypes.findIndex(st => st.searchTypeAPI === localState.selectedSearchType.searchTypeAPI)
+          if (sti) {
+            return '<v-icon>' + SearchTypes[0].icon + '</v-icon>' + SearchTypes[0].textLabel
+          }
+          const mhi = MHRSearchTypes.findIndex(mh => mh.searchTypeAPI === localState.selectedSearchType.searchTypeAPI)
+          if (mhi) {
+            return '<v-icon>' + MHRSearchTypes[0].icon + '</v-icon>' + MHRSearchTypes[0].textLabel
+          }
+        }
+        return 'Select a search category and then enter a value to search.'
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
@@ -348,7 +365,7 @@ export default defineComponent({
     })
 
     const getCriteria = () => {
-      if (localState.isIndividualDebtor) {
+      if (localState.isIndividual) {
         const first = localState.searchValueFirst?.trim()
         const second = localState.searchValueSecond?.trim()
         const last = localState.searchValueLast?.trim()
@@ -385,7 +402,7 @@ export default defineComponent({
         if (resp?.error) emit('search-error', resp.error)
         else {
           emit('searched-type', localState.selectedSearchType)
-          if (localState.isIndividualDebtor) {
+          if (localState.isIndividual) {
             emit('debtor-name', {
               first: localState.searchValueFirst,
               second: localState.searchValueSecond,
@@ -412,6 +429,9 @@ export default defineComponent({
     }
     const setHideDetails = (hideDetails: boolean) => {
       localState.hideDetails = hideDetails
+    }
+    const returnSearchSelection = (selection: SearchTypeIF) => {
+      localState.selectedSearchType = selection
     }
     const setSearchValue = (searchValue: string) => {
       localState.autoCompleteIsActive = false
@@ -487,6 +507,7 @@ export default defineComponent({
       setCloseAutoComplete,
       clientSearch,
       togglePaymentConfirmation,
+      returnSearchSelection,
       updateFolioNumber
     }
   }

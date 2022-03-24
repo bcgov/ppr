@@ -7,8 +7,9 @@ export interface SearchTypeIF {
   hints: HintIF
   selectDisabled: boolean
   searchTypeUI: UISearchTypes|UIMHRSearchTypes
-  searchTypeAPI: APISearchTypes|APIMHRSearchTypes
+  searchTypeAPI: APISearchTypes|APIMHRSearchTypes|number
   textLabel: string
   group: number
   class?: string
+  icon?: string
 }

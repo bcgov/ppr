@@ -8,9 +8,10 @@ export const SearchTypes: Array<SearchTypeIF> = [
     divider: false,
     group: 1,
     searchTypeUI: null,
-    searchTypeAPI: null,
-    textLabel: 'Personal Property',
-    hints: null
+    searchTypeAPI: 1,
+    textLabel: 'Personal Property Registry Search',
+    hints: null,
+    icon: 'mdi-car'
   },
   {
     divider: false,
@@ -48,7 +49,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     divider: true,
     selectDisabled: true,
     searchTypeUI: null,
-    searchTypeAPI: null,
+    searchTypeAPI: 2,
     textLabel: null,
     hints: null,
     group: 1
@@ -93,18 +94,19 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     class: 'search-list-header',
     selectDisabled: true,
     divider: false,
-    group: 3,
+    group: 2,
     searchTypeUI: null,
-    searchTypeAPI: null,
-    textLabel: 'Manufactured Homes',
-    hints: null
+    searchTypeAPI: 3,
+    textLabel: 'Manufactured Home Registration Search',
+    hints: null,
+    icon: 'mdi-home'
   },
   {
     // divider in dropdown list
     divider: true,
     selectDisabled: true,
     searchTypeUI: null,
-    searchTypeAPI: null,
+    searchTypeAPI: 4,
     textLabel: null,
     hints: null,
     group: 2
@@ -135,7 +137,9 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     searchTypeUI: UIMHRSearchTypes.MHRORGANIZATION_NAME,
     searchTypeAPI: APIMHRSearchTypes.MHRORGANIZATION_NAME,
     textLabel: '',
-    hints: null,
+    hints: {
+      searchValue: 'Organization names must contain between 2 and 150 characters'
+    },
     group: 2
   },
   {
