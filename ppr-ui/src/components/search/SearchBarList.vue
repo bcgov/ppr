@@ -1,179 +1,148 @@
 <template>
-  <v-container id="reg-btn-list" fluid class="pa-0">
-    <div>
-      <v-btn
-        id="registration-bar-btn"
-        class="registration-bar-btn copy-normal"
-        color="primary"
-        @click="selectRegistration(registrationTypeValues.SECURITY_AGREEMENT)"
-      >
-        <template>
-          <v-icon class="pr-2">mdi-note-plus-outline</v-icon>
-          Create New {{ registrationTypes.SECURITY_AGREEMENT }}
+  <v-select
+          id="search-select"
+          class="search-bar-type-select"
+          :error-messages="categoryMessage ? categoryMessage : ''"
+          filled
+          :items="displayItems"
+          item-disabled="selectDisabled"
+          item-text="searchTypeUI"
+          item-value="searchTypeAPI"
+          :label="selectedSearchType ? '' : searchTypeLabel"
+          return-object
+          v-model="selectedSearchType"
+        >
+        <template v-slot:item="{ item }">
+        <template v-if="item.class === 'search-list-header'">
+          <v-list-item-content style="padding: 9px 0;">
+            <v-row
+              :id="`reg-type-drop-${item.group}`"
+              style="width: 45rem; pointer-events: all;"
+              @click="toggleGroup(item.group)"
+            >
+              <v-col class="py-0" align-self="center" cols="11">
+                <span class="search-list-header">{{ item.textLabel }}</span>
+              </v-col>
+              <v-col class="py-0" align-self="center" cols="auto">
+                <v-btn icon small style="pointer-events: all;">
+                  <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
+                  <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-list-item-content>
         </template>
-      </v-btn>
-      <!-- dropdown menu -->
-      <v-menu
-        attach="#reg-btn-list"
-        nudge-bottom="4"
-        offset-y
-        style="left: auto;"
-        v-model="showMenu"
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn
-            id="registration-more-actions-btn"
-            color="primary"
-            class="actions__more-actions__btn px-0"
-            v-on="on"
-          >
-            <v-icon v-if="showMenu">mdi-menu-up</v-icon>
-            <v-icon v-else>mdi-menu-down</v-icon>
-          </v-btn>
-        </template>
-        <v-list class="actions__more-actions more-actions">
+        <template v-else class="search-list">
           <v-list-item
             id="btn-security"
             class="copy-normal"
-            @click="selectRegistration(registrationTypeValues.SECURITY_AGREEMENT)"
+            @click="selectSearchType(item)"
           >
             <v-list-item-title>
-              {{ registrationTypes.SECURITY_AGREEMENT }}
-              ({{ registrationTypeValues.SECURITY_AGREEMENT }})
+              {{ item.searchTypeUI }}
             </v-list-item-title>
           </v-list-item>
-
-          <v-list-item
-            id="btn-reparers"
-            class="copy-normal"
-            @click="selectRegistration(registrationTypeValues.REPAIRERS_LIEN)"
-          >
-            <v-list-item-title>
-              {{ registrationTypes.REPAIRERS_LIEN }}
-              ({{ registrationTypeValues.REPAIRERS_LIEN }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-marriage"
-            class="copy-normal"
-            @click="selectRegistration(registrationTypeValues.MARRIAGE_MH)"
-          >
-            <v-list-item-title>
-              {{ registrationTypes.MARRIAGE_MH }}
-              ({{ registrationTypeValues.MARRIAGE_MH }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-land"
-            class="copy-normal"
-            @click="selectRegistration(registrationTypeValues.LAND_TAX_LIEN)"
-          >
-            <v-list-item-title>
-              {{ registrationTypes.LAND_TAX_LIEN }}
-              ({{ registrationTypeValues.LAND_TAX_LIEN }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-sale"
-            class="copy-normal"
-            @click="selectRegistration(registrationTypeValues.SALE_OF_GOODS)"
-          >
-            <v-list-item-title>
-              {{ registrationTypes.SALE_OF_GOODS }}
-              ({{ registrationTypeValues.SALE_OF_GOODS }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-mhl"
-            class="copy-normal"
-            @click="
-              selectRegistration(registrationTypeValues.MANUFACTURED_HOME_LIEN)
-            "
-          >
-            <v-list-item-title>
-              {{ registrationTypes.MANUFACTURED_HOME_LIEN }}
-              ({{ registrationTypeValues.MANUFACTURED_HOME_LIEN }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-fcl"
-            class="copy-normal"
-            @click="
-              selectRegistration(registrationTypeValues.FORESTRY_CONTRACTOR_LIEN)
-            "
-          >
-            <v-list-item-title>
-              {{ registrationTypes.FORESTRY_CONTRACTOR_LIEN }}
-              ({{ registrationTypeValues.FORESTRY_CONTRACTOR_LIEN }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-fcc"
-            class="copy-normal"
-            @click="
-              selectRegistration(
-                registrationTypeValues.FORESTRY_CONTRACTOR_CHARGE
-              )
-            "
-          >
-            <v-list-item-title>
-              {{ registrationTypes.FORESTRY_CONTRACTOR_CHARGE }}
-              ({{ registrationTypeValues.FORESTRY_CONTRACTOR_CHARGE }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            id="btn-fsl"
-            class="copy-normal"
-            @click="
-              selectRegistration(
-                registrationTypeValues.FORESTRY_SUBCONTRACTOR_LIEN
-              )
-            "
-          >
-            <v-list-item-title>
-              {{ registrationTypes.FORESTRY_SUBCONTRACTOR_LIEN }}
-              ({{ registrationTypeValues.FORESTRY_SUBCONTRACTOR_LIEN }})
-            </v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </div>
-  </v-container>
+        </template>
+      </template>
+  </v-select>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
-
-import { RegistrationTypes } from '@/resources'
-import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
+import { defineComponent, reactive, toRefs, computed } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
+import { MHRSearchTypes, SearchTypes } from '@/resources'
+import { UISearchTypes, APISearchTypes } from '@/enums'
+import { SearchTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
-  name: 'RegistrationBarButtonList',
+  name: 'SearchBarList',
   emits: ['selected'],
+  props: {
+    defaultSelectedSearchType: {
+      type: Object as () => SearchTypeIF
+    }
+  },
   setup (props, { emit }) {
+    const {
+      isRoleStaffReg
+    } = useGetters<any>([
+      'isRoleStaffReg'
+    ])
     const localState = reactive({
-      registrationTypes: UIRegistrationTypes,
-      registrationTypeValues: APIRegistrationTypes,
+      searchTypes: UISearchTypes,
+      searchTypeValues: APISearchTypes,
+      selectedSearchType: props.defaultSelectedSearchType,
+      searchTypeLabel: 'Select a search category',
+      displayItems: computed((): Array<SearchTypeIF> => {
+        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
+          if (isRoleStaffReg.value) {
+            const allSearchTypes = []
+            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+            return allSearchTypes
+          }
+        }
+        return SearchTypes
+      }),
+      origItems: computed((): Array<SearchTypeIF> => {
+        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
+          if (isRoleStaffReg.value) {
+            const allSearchTypes = []
+            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+            return allSearchTypes
+          }
+        }
+        return SearchTypes
+      }),
+      displayGroup: {
+        1: true,
+        2: true
+      },
       showMenu: false
     })
-    const selectRegistration = (val: APIRegistrationTypes) => {
-      const reg = RegistrationTypes.find(
-        function (reg, index) {
-          if (reg.registrationTypeAPI === val) {
-            return true
+    const toggleGroup = (group: number) => {
+      localState.displayGroup[group] = !localState.displayGroup[group]
+      let newDisplayItems = [] as Array<SearchTypeIF>
+      if (!localState.displayGroup[group]) {
+        // remove elements from display
+        for (let i = 0; i < localState.displayItems.length; i++) {
+          const isHeader = localState.displayItems[i].selectDisabled || false
+          // if item is not part of the group or is a header add to new list
+          if (localState.displayItems[i].group !== group || isHeader) {
+            newDisplayItems.push({ ...localState.displayItems[i] })
           }
-        })
-      emit('selected', reg)
+        }
+      } else {
+        // add items to their proper spot in the display list
+        newDisplayItems = [...localState.displayItems]
+        // get the index of the group header
+        let headerIdx = 0
+        for (let i = 0; i < newDisplayItems.length; i++) {
+          if (newDisplayItems[i].group === group) {
+            headerIdx = i
+            break
+          }
+        }
+        // insert the items of that group after their header in the display list
+        let offset = 1
+        for (let i = 0; i < localState.origItems.length; i++) {
+          const isHeader = localState.origItems[i].selectDisabled || false
+          if (localState.origItems[i].group === group && !isHeader) {
+            newDisplayItems.splice(headerIdx + offset, 0, { ...localState.origItems[i] })
+            offset++
+          }
+        }
+      }
+      localState.displayItems = [...newDisplayItems]
+    }
+    const selectSearchType = (val: SearchTypeIF) => {
+      emit('selected', val)
     }
 
     return {
-      selectRegistration,
+      selectSearchType,
+      toggleGroup,
       ...toRefs(localState)
     }
   }
@@ -194,7 +163,7 @@ div.v-menu__content.theme--light.menuable__content__active {
 .actions__more-actions.more-actions {
   overflow: auto;
 }
-.registration-bar-btn {
+.search-bar-btn {
   min-width: 0 !important;
   width: 285px;
   border-top-right-radius: 0;
@@ -205,7 +174,7 @@ div.v-menu__content.theme--light.menuable__content__active {
   font-weight: normal;
   box-shadow: none;
 }
-.registration-list-item {
+.search-list-item {
   color: $gray7 !important;
 }
 ::v-deep .v-list-item__title, .v-list-item__action {

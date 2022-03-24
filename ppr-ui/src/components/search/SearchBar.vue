@@ -52,25 +52,9 @@
     </v-row>
     <v-row no-gutters class="pt-1">
       <v-col class="ml-n6 pl-6" cols="4">
-        <v-select
-          id="search-select"
-          class="search-bar-type-select"
-          :error-messages="categoryMessage ? categoryMessage : ''"
-          filled
-          :items="searchTypes"
-          item-disabled="selectDisabled"
-          item-text="searchTypeUI"
-          item-value="searchTypeAPI"
-          :label="selectedSearchType ? '' : searchTypeLabel"
-          return-object
-          v-model="selectedSearchType"
-        >
-          <template slot="item" slot-scope="data">
-            <span :id="`search-bar-${data.item.searchTypeUI}`">
-              {{ data.item.searchTypeUI }}
-            </span>
-          </template>
-        </v-select>
+
+        <search-bar-list />
+
       </v-col>
       <v-col v-if="!isIndividualDebtor" cols="7" class="pl-3">
         <v-tooltip content-class="bottom-tooltip"
@@ -209,13 +193,15 @@ import { SettingOptions, UISearchTypes } from '@/enums'
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
+import { SearchBarList } from '.'
 
 export default defineComponent({
   components: {
     AutoComplete,
     ConfirmationDialog,
     StaffPaymentDialog,
-    FolioNumber
+    FolioNumber,
+    SearchBarList
   },
   props: {
     defaultDebtor: {

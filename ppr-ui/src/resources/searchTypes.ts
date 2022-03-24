@@ -3,6 +3,16 @@ import { SearchTypeIF } from '@/interfaces'
 
 export const SearchTypes: Array<SearchTypeIF> = [
   {
+    class: 'search-list-header',
+    selectDisabled: true,
+    divider: false,
+    group: 1,
+    searchTypeUI: null,
+    searchTypeAPI: null,
+    textLabel: 'Personal Property',
+    hints: null
+  },
+  {
     divider: false,
     selectDisabled: false,
     searchTypeUI: UISearchTypes.SERIAL_NUMBER,
@@ -79,6 +89,16 @@ export const SearchTypes: Array<SearchTypeIF> = [
 ]
 
 export const MHRSearchTypes: Array<SearchTypeIF> = [
+  {
+    class: 'search-list-header',
+    selectDisabled: true,
+    divider: false,
+    group: 3,
+    searchTypeUI: null,
+    searchTypeAPI: null,
+    textLabel: 'Manufactured Homes',
+    hints: null
+  },
   {
     // divider in dropdown list
     divider: true,

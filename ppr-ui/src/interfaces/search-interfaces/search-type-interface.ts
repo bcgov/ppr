@@ -10,4 +10,5 @@ export interface SearchTypeIF {
   searchTypeAPI: APISearchTypes|APIMHRSearchTypes
   textLabel: string
   group: number
+  class?: string
 }
