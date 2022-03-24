@@ -15,6 +15,7 @@ from datetime import timedelta
 from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
+import markupsafe
 
 import pycountry
 import requests
@@ -382,11 +383,14 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'generalCollateral' in statement:
             for collateral in statement['generalCollateral']:
                 if 'description' in collateral:
-                    collateral['description'] = collateral['description'].replace('/r/n', '/n')
+                    collateral['description'] = collateral['description'].replace('/r/n', '<br>')
+                    collateral['description'] = markupsafe.Markup(collateral['description'])
                 if 'descriptionAdd' in collateral:
-                    collateral['descriptionAdd'] = collateral['descriptionAdd'].replace('/r/n', '/n')
+                    collateral['descriptionAdd'] = collateral['descriptionAdd'].replace('/r/n', '<br>')
+                    collateral['descriptionAdd'] = markupsafe.Markup(collateral['descriptionAdd'])
                 if 'descriptionDelete' in collateral:
-                    collateral['descriptionDelete'] = collateral['descriptionDelete'].replace('/r/n', '/n')
+                    collateral['descriptionDelete'] = collateral['descriptionDelete'].replace('/r/n', '<br>')
+                    collateral['descriptionDelete'] = markupsafe.Markup(collateral['descriptionDelete'])
 
     @staticmethod
     def _set_amend_change_general_collateral(statement):
@@ -394,11 +398,13 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'deleteGeneralCollateral' in statement:
             for collateral in statement['deleteGeneralCollateral']:
                 if 'description' in collateral:
-                    collateral['description'] = collateral['description'].replace('/r/n', '/n')
+                    collateral['description'] = collateral['description'].replace('/r/n', '<br>')
+                    collateral['description'] = markupsafe.Markup(collateral['description'])
         if 'addGeneralCollateral' in statement:
             for collateral in statement['addGeneralCollateral']:
                 if 'description' in collateral:
-                    collateral['description'] = collateral['description'].replace('/r/n', '/n')
+                    collateral['description'] = collateral['description'].replace('/r/n', '<br>')
+                    collateral['description'] = markupsafe.Markup(collateral['description'])
 
     def _set_search_general_collateral(self):
         """Replace report newline characters in search general collateral descriptions."""
@@ -597,7 +603,6 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
             order_date = Report._to_report_datetime(statement['courtOrderInformation']['orderDate'], False)
             statement['courtOrderInformation']['orderDate'] = order_date
-
         for debtor in statement['debtors']:
             if 'birthDate' in debtor:
                 debtor['birthDate'] = Report._to_report_datetime(debtor['birthDate'], False)
