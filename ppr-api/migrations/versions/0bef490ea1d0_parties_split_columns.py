@@ -35,6 +35,8 @@ def upgrade():
     op.create_index(op.f('ix_parties_last_name_split1'), 'parties', ['last_name_split1'], unique=False)
     op.create_index(op.f('ix_parties_last_name_split2'), 'parties', ['last_name_split2'], unique=False)
     op.create_index(op.f('ix_parties_last_name_split3'), 'parties', ['last_name_split3'], unique=False)
+    op.create_index('party_last_name_gist_idx', 'parties', ['last_name'], unique=False, postgresql_using='gist')
+    op.create_index('party_first_name_gist_idx', 'parties', ['first_name'], unique=False, postgresql_using='gist')
 
  
     # ### end Alembic commands ###
@@ -47,6 +49,8 @@ def downgrade():
     op.drop_index(op.f('ix_parties_last_name_split1'), table_name='parties')
     op.drop_index(op.f('ix_parties_first_name_split2'), table_name='parties')
     op.drop_index(op.f('ix_parties_first_name_split1'), table_name='parties')
+    op.drop_index(op.f('party_last_name_gist_idx'), table_name='parties')
+    op.drop_index(op.f('party_first_name_gist_idx'), table_name='parties')
 
     # Manually added
   
