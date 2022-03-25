@@ -27,3 +27,11 @@ export enum UIMHRSearchTypes {
   MHRORGANIZATION_NAME = 'Organization Name',
   MHRSERIAL_NUMBER = 'Serial Number'
 }
+
+// for blank or header options in the drop down
+export enum BlankSearchTypes {
+  BLANK1 = '1',
+  BLANK2 = '2',
+  BLANK3 = '3',
+  BLANK4 = '4'
+}

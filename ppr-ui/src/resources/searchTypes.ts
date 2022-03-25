@@ -1,4 +1,4 @@
-import { APISearchTypes, UISearchTypes, APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
+import { APISearchTypes, UISearchTypes, APIMHRSearchTypes, UIMHRSearchTypes, BlankSearchTypes } from '@/enums'
 import { SearchTypeIF } from '@/interfaces'
 
 export const SearchTypes: Array<SearchTypeIF> = [
@@ -8,7 +8,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     divider: false,
     group: 1,
     searchTypeUI: null,
-    searchTypeAPI: 1,
+    searchTypeAPI: BlankSearchTypes.BLANK1,
     textLabel: 'Personal Property Registry Search',
     hints: null,
     icon: 'mdi-car'
@@ -49,7 +49,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     divider: true,
     selectDisabled: true,
     searchTypeUI: null,
-    searchTypeAPI: 2,
+    searchTypeAPI: BlankSearchTypes.BLANK2,
     textLabel: null,
     hints: null,
     group: 1
@@ -96,7 +96,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     divider: false,
     group: 2,
     searchTypeUI: null,
-    searchTypeAPI: 3,
+    searchTypeAPI: BlankSearchTypes.BLANK3,
     textLabel: 'Manufactured Home Registration Search',
     hints: null,
     icon: 'mdi-home'
@@ -106,7 +106,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     divider: true,
     selectDisabled: true,
     searchTypeUI: null,
-    searchTypeAPI: 4,
+    searchTypeAPI: BlankSearchTypes.BLANK4,
     textLabel: null,
     hints: null,
     group: 2

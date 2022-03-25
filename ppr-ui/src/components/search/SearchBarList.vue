@@ -90,15 +90,15 @@ export default defineComponent({
         return 'Select a search category'
       }),
       origItems: computed((): Array<SearchTypeIF> => {
-        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
-          if (isRoleStaffReg.value) {
-            const allSearchTypes = []
-            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
-            return allSearchTypes
+        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only')) {
+          if (!isRoleStaffReg.value) {
+            return SearchTypes
           }
         }
-        return SearchTypes
+        const allSearchTypes = []
+        allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+        allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+        return allSearchTypes
       }),
       displayItems: [],
       displayGroup: {
@@ -163,10 +163,6 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-.menu-icon {
-  margin-bottom: 5px;
-  padding-right: 5px;
-}
 .copy-normal {
   color: $gray7 !important;
   padding-left: 20px;

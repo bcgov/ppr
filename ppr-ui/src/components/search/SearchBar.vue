@@ -18,7 +18,7 @@
       <v-col :class="[$style['search-info'], 'select-search-text', 'pt-4']">
         <span v-html="typeOfSearch">
         </span>
-        <span v-if="!isStaffBcolReg">
+        <div v-if="shouldShowFeeHint">
           <span>
             Each search incurs a
           </span>
@@ -38,7 +38,7 @@
               </span>
             </v-row>
           </v-tooltip>
-        </span>
+        </div>
       </v-col>
       <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
         <folio-number
@@ -180,7 +180,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { getFeatureFlag, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
@@ -249,22 +249,10 @@ export default defineComponent({
       folioNumber: props.defaultFolioNumber,
       folioError: false,
       hideDetails: false,
-      searchTypes: computed((): Array<SearchTypeIF> => {
-        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only') || isRoleStaffReg.value) {
-          if (isRoleStaffReg.value) {
-            const allSearchTypes = []
-            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
-            return allSearchTypes
-          }
-        }
-        return SearchTypes
-      }),
       searchValue: props.defaultSearchValue,
       searchValueFirst: props.defaultDebtor?.first,
       searchValueSecond: props.defaultDebtor?.second,
       searchValueLast: props.defaultDebtor?.last,
-      searchTypeLabel: 'Select a search category',
       selectedSearchType: props.defaultSelectedSearchType,
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
@@ -273,6 +261,10 @@ export default defineComponent({
       validations: Object as SearchValidationIF,
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
+      }),
+      shouldShowFeeHint: computed((): boolean => {
+        return !(isRoleStaffBcol.value || isRoleStaffReg.value) &&
+          (!isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }
@@ -316,13 +308,13 @@ export default defineComponent({
       }),
       typeOfSearch: computed((): string => {
         if (localState.selectedSearchType) {
-          const sti = SearchTypes.findIndex(st => st.searchTypeAPI === localState.selectedSearchType.searchTypeAPI)
-          if (sti) {
-            return '<v-icon>' + SearchTypes[0].icon + '</v-icon>' + SearchTypes[0].textLabel
+          if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
+              '"></i>' + SearchTypes[0].textLabel
           }
-          const mhi = MHRSearchTypes.findIndex(mh => mh.searchTypeAPI === localState.selectedSearchType.searchTypeAPI)
-          if (mhi) {
-            return '<v-icon>' + MHRSearchTypes[0].icon + '</v-icon>' + MHRSearchTypes[0].textLabel
+          if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + MHRSearchTypes[0].icon +
+              '"></i>' + MHRSearchTypes[0].textLabel
           }
         }
         return 'Select a search category and then enter a value to search.'
@@ -383,6 +375,14 @@ export default defineComponent({
         criteria: getCriteria(),
         clientReferenceId: localState.folioNumber
       }
+    }
+    const isMHRSearchType = (type: string): boolean => {
+      const mhi = MHRSearchTypes.findIndex(mh => mh.searchTypeAPI === type)
+      return mhi >= 0
+    }
+    const isPPRSearchType = (type: string): boolean => {
+      const sti = SearchTypes.findIndex(st => st.searchTypeAPI === type)
+      return sti >= 0
     }
     const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
