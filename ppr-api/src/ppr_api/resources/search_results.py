@@ -62,7 +62,7 @@ class SearchResultsResource(Resource):
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def post(search_id):  # pylint: disable=too-many-branches
+    def post(search_id):  # pylint: disable=too-many-branches, too-many-locals
         """Execute a search detail request using selection choices in the request body."""
         try:
             if search_id is None:

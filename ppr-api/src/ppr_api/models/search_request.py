@@ -366,7 +366,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return search
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str = None, from_ui: bool = False):
+    def find_all_by_account_id(cls, account_id: str = None, from_ui: bool = False): # pylint: disable=too-many-branches, too-many-locals
         """Return a search history summary list of searches executed by an account."""
         history_list = []
         if account_id:

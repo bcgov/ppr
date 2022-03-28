@@ -420,7 +420,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         return count
 
     @classmethod
-    def find_all_by_account_id(cls, params: AccountRegistrationParams):  # pylint: disable=too-many-locals
+    def find_all_by_account_id(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
+        # pylint: disable=too-many-locals
         """Return a summary list of recent registrations belonging to an account.
 
         To access a verification statement report, one of the followng conditions must be true:
@@ -435,9 +436,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         registrations_json = []
         try:
             if params.from_ui:
-                return Registration.find_all_by_account_id_filter(params)
+                return Registration.find_all_by_account_id_filter(params, new_feature_enabled)
             if registration_utils.api_account_reg_filter(params):
-                return Registration.find_all_by_account_id_api_filter(params)
+                return Registration.find_all_by_account_id_api_filter(params, new_feature_enabled)
 
             results = db.session.execute(model_utils.QUERY_ACCOUNT_REGISTRATIONS,
                                          {'query_account': params.account_id,
@@ -492,11 +493,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         return results_json
 
     @classmethod
-    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams):  # pylint: disable=too-many-locals
+    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool): 
+        # pylint: disable=too-many-locals
         """Return a summary list of registrations belonging to an account applying filters."""
         results_json = []
         count = Registration.get_account_reg_count(params.account_id)
-        query = registration_utils.build_account_reg_query(params)
+        query = registration_utils.build_account_reg_query(params, new_feature_enabled)
         query_params = registration_utils.build_account_query_params(params)
         results = db.session.execute(query, query_params)
         rows = results.fetchall()
@@ -512,7 +514,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         return results_json
 
     @classmethod
-    def find_all_by_account_id_api_filter(cls, params: AccountRegistrationParams):
+    def find_all_by_account_id_api_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
         """Return a summary list of registrations belonging to an api account applying filters."""
         results_json = []
         # Restrict filter to client ref id, reg number, or timestamp range.
@@ -522,7 +524,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         params.registration_type = None
         params.status_type = None
         params.registering_name = None
-        query = registration_utils.build_account_reg_query(params)
+        query = registration_utils.build_account_reg_query(params, new_feature_enabled)
         query_params = registration_utils.build_account_query_params(params, True)
         results = db.session.execute(query, query_params)
         rows = results.fetchall()
