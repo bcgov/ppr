@@ -7,7 +7,7 @@
     <template v-slot:content>
       <staff-payment-component
         :staffPaymentData="staffPaymentData"
-        :validate="validate"
+        :validate="true"
         :displaySideLabel="false"
         :displayPriorityCheckbox="false"
         @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
@@ -79,7 +79,7 @@ export default defineComponent({
     ])
     const { getStaffPayment } = useGetters<any>(['getStaffPayment'])
     const localState = reactive({
-      validate: false,
+      validate: true,
       certify: false,
       valid: false,
       paymentOption: StaffPaymentOptions.NONE,
