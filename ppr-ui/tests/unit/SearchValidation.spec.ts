@@ -40,7 +40,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount(SearchBar, {
     localVue,
-    propsData: { searchTypes },
+    propsData: { },
     store,
     vuetify
   })
@@ -50,6 +50,7 @@ describe('SearchBar base validation', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    SearchTypes.shift()
     wrapper = createComponent(SearchTypes)
   })
   afterEach(() => {
@@ -58,9 +59,7 @@ describe('SearchBar base validation', () => {
 
   it('prevents searching and gives validation when category is not selected', async () => {
     expect(wrapper.vm.$data.selectedSearchType).toBeUndefined()
-    wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
-    expect(wrapper.vm.$data.searchTypes).toStrictEqual(SearchTypes)
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
     expect(wrapper.vm.$data.validations.category?.message).toBeDefined()
@@ -84,8 +83,8 @@ describe('Serial number validation', () => {
   })
 
   it('prevents searching and gives validation when the search is empty', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
-    wrapper.vm.$data.selectedSearchType = select1
+    const select1: SearchTypeIF = SearchTypes[1]
+    wrapper.vm.returnSearchSelection(select1)
     await Vue.nextTick()
     expect(wrapper.vm.$data.searchValue).toBeNull()
     wrapper.find(searchButtonSelector).trigger('click')
@@ -100,7 +99,7 @@ describe('Serial number validation', () => {
   })
 
   it('prevents searching and gives validation when the search is over 25 characters', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
+    const select1: SearchTypeIF = SearchTypes[1]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = '12345678901234567890123456'
@@ -118,7 +117,7 @@ describe('Serial number validation', () => {
   })
 
   it('gives validation messages/hints as user types', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
+    const select1: SearchTypeIF = SearchTypes[1]
     // hint
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
@@ -163,7 +162,7 @@ describe('Individual debtor validation', () => {
   })
 
   it('prevents searching and gives validation when first name or last name is empty', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     expect(wrapper.vm.$data.searchValue).toBeNull()
@@ -185,7 +184,7 @@ describe('Individual debtor validation', () => {
   })
 
   it('prevents searching and gives validation when first name is above max characters', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     wrapper.vm.$data.searchValueFirst = '1'.repeat(51)
@@ -204,7 +203,7 @@ describe('Individual debtor validation', () => {
   })
 
   it('prevents searching and gives validation when last name is above max characters', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     wrapper.vm.$data.searchValueFirst = 'first'
@@ -223,7 +222,7 @@ describe('Individual debtor validation', () => {
   })
 
   it('gives validation messages/hints as user types', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[0]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[1]
     // hint
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
@@ -260,7 +259,7 @@ describe('Business debtor validation', () => {
   })
 
   it('prevents searching and gives validation when the search is empty', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[3]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     expect(wrapper.vm.$data.searchValue).toBeNull()
@@ -276,7 +275,7 @@ describe('Business debtor validation', () => {
   })
 
   it('prevents searching when search value is less than minimum characters', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[3]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 'F'
@@ -293,7 +292,7 @@ describe('Business debtor validation', () => {
   })
 
   it('prevents searching when search value is more than maximum characters', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[3]
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = '1'.repeat(151)
@@ -310,7 +309,7 @@ describe('Business debtor validation', () => {
   })
 
   it('gives validation messages/hints as user types', async () => {
-    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[2]
+    const select1: SearchTypeIF = wrapper.vm.$data.searchTypes[3]
     // hint
     wrapper.vm.$data.selectedSearchType = select1
     await Vue.nextTick()
