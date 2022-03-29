@@ -63,7 +63,7 @@ class Flags():
 
     def init_app(self, app):
         """Initialize the Feature Flag environment.
-        
+
         This is called by Flask when the extension is loaded.
 
         For non-production environments, the SDK key is read from the config file.

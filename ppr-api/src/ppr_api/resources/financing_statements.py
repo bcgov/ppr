@@ -20,7 +20,7 @@ from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, UserExtraRegistration
+from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, User, UserExtraRegistration
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.reports import ReportTypes
@@ -598,6 +598,13 @@ class GetRegistrationResource(Resource):
             account_id = resource_utils.get_account_id(request)
             if account_id is None:
                 return resource_utils.account_required_response()
+            # Set feature flag value
+            username = 'anonymous'
+            user = User.find_by_id(account_id)
+            if user and user.username:
+                username = user.username
+            new_feature_enabled = current_app.extensions['featureflags'].all_flags_state(
+                {'key': username}).get_flag_value('enable-new-feature-api')
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
@@ -617,7 +624,7 @@ class GetRegistrationResource(Resource):
                                                                           account_name=account_name,
                                                                           sbc_staff=sbc_staff)
             params = resource_utils.get_account_registration_params(request, params)
-            statement_list = Registration.find_all_by_account_id(params)
+            statement_list = Registration.find_all_by_account_id(params, new_feature_enabled)
             return jsonify(statement_list), HTTPStatus.OK
         except DatabaseException as db_exception:   # noqa: B902; return nicer error
             return resource_utils.db_exception_response(db_exception, account_id,

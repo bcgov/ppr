@@ -53,7 +53,8 @@ QUERY_ACCOUNT_REG_NUM_CLAUSE = """
                  AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
                  AND arv2.registration_number LIKE :reg_num || '%'))
 """
-QUERY_ACCOUNT_CLIENT_REF_CLAUSE = """
+QUERY_ACCOUNT_CLIENT_REF_CLAUSE = " AND arv.client_reference_id LIKE :client_reference_id || '%'"
+QUERY_ACCOUNT_CLIENT_REF_CLAUSE_NEW = """
  AND (arv.client_reference_id LIKE :client_reference_id || '%' OR
     EXISTS (SELECT arv2.financing_id
             FROM account_registration_vw arv2
@@ -61,7 +62,8 @@ QUERY_ACCOUNT_CLIENT_REF_CLAUSE = """
                 AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
                 AND arv2.client_reference_id LIKE :client_reference_id || '%'))
 """
-QUERY_ACCOUNT_REG_NAME_CLAUSE = """
+QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE :registering_name || '%'"
+QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW = """
  AND (arv.registering_name LIKE :registering_name || '%' OR
     EXISTS (SELECT arv2.financing_id
             FROM account_registration_vw arv2
@@ -223,7 +225,7 @@ def get_account_change_query_order(params: AccountRegistrationParams) -> str:
     return order_by
 
 
-def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
+def build_account_reg_base_query(params: AccountRegistrationParams, new_feature_enabled: bool) -> str:
     """Build the account registration base query from the provided parameters."""
     base_query: str = model_utils.QUERY_ACCOUNT_BASE_REG_BASE
     if params.start_date_time and params.end_date_time:
@@ -234,9 +236,15 @@ def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
     if params.registration_type:
         base_query += QUERY_ACCOUNT_REG_TYPE_CLAUSE
     if params.client_reference_id:
-        base_query += QUERY_ACCOUNT_CLIENT_REF_CLAUSE
+        if new_feature_enabled:
+            base_query += QUERY_ACCOUNT_CLIENT_REF_CLAUSE_NEW
+        else:
+            base_query += QUERY_ACCOUNT_CLIENT_REF_CLAUSE
     if params.registering_name:
-        base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE
+        if new_feature_enabled:
+            base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW
+        else:
+            base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE
     if params.status_type:
         base_query += QUERY_ACCOUNT_STATUS_CLAUSE
     return base_query
@@ -275,9 +283,9 @@ def build_account_change_base_query(params: AccountRegistrationParams) -> str:
     return base_query
 
 
-def build_account_reg_query(params: AccountRegistrationParams) -> str:
+def build_account_reg_query(params: AccountRegistrationParams, new_feature_enabled: bool) -> str:
     """Build the account registration query from the provided parameters."""
-    base_query: str = build_account_reg_base_query(params)
+    base_query: str = build_account_reg_base_query(params, new_feature_enabled)
     order_by: str = get_account_reg_query_order(params)
     query: str
     if params.start_date_time and params.end_date_time:
