@@ -24,7 +24,7 @@ import {
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { DraftTypes, ErrorCategories, SettingOptions } from '@/enums'
+import { DraftTypes, ErrorCategories, ErrorCodes, SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -177,12 +177,10 @@ export async function search (
         results: [],
         error: {
           category: ErrorCategories.SEARCH,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -362,12 +360,10 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
         searches: null,
         error: {
           category: ErrorCategories.HISTORY_SEARCHES,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -408,12 +404,10 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
         defaultTableFilters: true,
         error: {
           category: ErrorCategories.ACCOUNT_SETTINGS,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -457,12 +451,10 @@ export async function updateUserSettings (
         defaultTableFilters: true,
         error: {
           category: ErrorCategories.ACCOUNT_SETTINGS,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -496,12 +488,10 @@ export async function createDraft (draft: DraftIF): Promise<DraftIF> {
       }
       draft.error = {
         category: ErrorCategories.REGISTRATION_SAVE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return draft
     })
@@ -550,12 +540,10 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
       }
       draft.error = {
         category: ErrorCategories.REGISTRATION_SAVE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return draft
     })
@@ -598,12 +586,10 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
       }
       draft.error = {
         category: ErrorCategories.DRAFT_LOAD,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return draft
     })
@@ -634,12 +620,10 @@ export async function deleteDraft (documentId: string): Promise<ErrorIF> {
       }
       return {
         category: ErrorCategories.DRAFT_DELETE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
     })
 }
@@ -680,12 +664,10 @@ export async function partyCodeSearch (
       }
       return {
         error: {
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -721,12 +703,10 @@ export async function partyCodeAccount (): Promise<[SearchPartyIF]> {
       }
       return {
         error: {
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -771,12 +751,10 @@ export async function registrationHistory (sortOptions: RegistrationSortIF, page
         registrations: null,
         error: {
           category: ErrorCategories.HISTORY_REGISTRATIONS,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -834,12 +812,10 @@ export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
         drafts: null,
         error: {
           category: ErrorCategories.HISTORY_REGISTRATIONS,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -880,12 +856,10 @@ export async function createFinancingStatement (
       }
       statement.error = {
         category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return statement
     })
@@ -912,12 +886,10 @@ export async function createAmendmentStatement (
     .catch(error => {
       statement.error = {
         category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return statement
     })
@@ -957,12 +929,10 @@ export async function createDischarge (
       }
       discharge.error = {
         category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return discharge
     })
@@ -1002,12 +972,10 @@ export async function createRenewal (
       }
       renewal.error = {
         category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
       return renewal
     })
@@ -1052,12 +1020,10 @@ export async function getFinancingStatement (
         debtors: [],
         error: {
           category: ErrorCategories.REGISTRATION_LOAD,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -1103,12 +1069,10 @@ export async function addRegistrationSummary (
         registrationType: null,
         securedParties: '',
         error: {
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -1160,12 +1124,10 @@ export async function getRegistrationSummary (
         securedParties: '',
         error: {
           category: ErrorCategories.HISTORY_REGISTRATIONS,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -1197,12 +1159,10 @@ export async function deleteRegistrationSummary (
       }
       return {
         category: ErrorCategories.REGISTRATION_DELETE,
-        statusCode: error?.response?.data?.rootCause?.statusCode ||
-          error?.response?.status ||
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
         message: error?.response?.data?.message,
         detail: error?.response?.data?.rootCause?.detail,
-        type: error?.response?.data?.rootCause?.type
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
     })
 }
@@ -1244,12 +1204,10 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
       return {
         error: {
           category: ErrorCategories.REPORT_GENERATION,
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
@@ -1286,12 +1244,10 @@ export async function debtorNames (registrationNum: string): Promise<[DebtorName
       return {
         searches: null,
         error: {
-          statusCode: error?.response?.data?.rootCause?.statusCode ||
-            error?.response?.status ||
-            StatusCodes.INTERNAL_SERVER_ERROR,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
-          type: error?.response?.data?.rootCause?.type
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
     })
