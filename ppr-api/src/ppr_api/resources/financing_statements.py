@@ -603,8 +603,8 @@ class GetRegistrationResource(Resource):
             user = User.find_by_id(account_id)
             if user and user.username:
                 username = user.username
-            new_feature_enabled = current_app.extensions['featureflags'].all_flags_state(
-                {'key': username}).get_flag_value('enable-new-feature-api')
+            new_feature_enabled = current_app.extensions['featureflags'].variation(
+                'enable-new-feature-api', {'key': username}, False)
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
