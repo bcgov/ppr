@@ -15,7 +15,7 @@
 # pylint: disable=too-many-return-statements
 from http import HTTPStatus
 
-from flask import jsonify, request, current_app
+from flask import g, jsonify, request, current_app
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
@@ -600,7 +600,7 @@ class GetRegistrationResource(Resource):
                 return resource_utils.account_required_response()
             # Set feature flag value
             username = 'anonymous'
-            user = User.find_by_id(account_id)
+            user = User.find_by_jwt_token(g.jwt_oidc_token_info, account_id)
             if user and user.username:
                 username = user.username
             new_feature_enabled = current_app.extensions['featureflags'].variation(
