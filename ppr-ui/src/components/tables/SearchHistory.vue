@@ -265,9 +265,11 @@ export default defineComponent({
       setTimeout(async () => {
         // stop waiting after 5 seconds
         setTimeout(() => {
-          item.loadingPDF = false
           // set to pending if submit was not finished
-          if (item.inProgress) item.searchId = 'PENDING'
+          if (item.inProgress) {
+            item.loadingPDF = false
+            item.searchId = 'PENDING'
+          }
         }, 5000)
         const statusCode = await submitSelected(searchId, [], callBack, true)
         // FUTURE: add error handling, for now just ignore so they can try again
