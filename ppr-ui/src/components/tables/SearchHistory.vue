@@ -84,7 +84,7 @@
                         </v-icon>
                       </v-btn>
                       <v-btn
-                        v-else-if="isSearchOwner(item) && isPDFAvailable(item)"
+                        v-else-if="isSearchOwner(item)"
                         color="primary"
                         icon
                         :loading="item.loadingPDF"
