@@ -79,6 +79,7 @@ describe('Payment component', () => {
   it('updates search certified when checkbox is selected', async () => {
     expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(false)
     wrapper.find('#certify-checkbox').trigger('click')
+    wrapper.vm.$data.valid = true
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
     expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(true)
