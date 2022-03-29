@@ -79,7 +79,6 @@ export default defineComponent({
     ])
     const { getStaffPayment } = useGetters<any>(['getStaffPayment'])
     const localState = reactive({
-      validate: true,
       certify: false,
       valid: false,
       paymentOption: StaffPaymentOptions.NONE,
@@ -114,8 +113,6 @@ export default defineComponent({
           setSearchCertified(localState.certify)
           setStaffPayment(localState.staffPaymentData)
           emit('proceed', val)
-        } else {
-          localState.validate = true
         }
         // is false... they cancelled or closed the box
       } else {
@@ -132,7 +129,6 @@ export default defineComponent({
         // reset certified
         localState.certify = false
         setSearchCertified(localState.certify)
-        localState.validate = false
         emit('proceed', val)
       }
     }
@@ -144,8 +140,6 @@ export default defineComponent({
       }
 
       // disable validation
-      localState.validate = false
-
       switch (staffPaymentData.option) {
         case StaffPaymentOptions.FAS:
           staffPaymentData = {
