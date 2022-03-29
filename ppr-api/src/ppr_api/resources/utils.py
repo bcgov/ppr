@@ -541,15 +541,36 @@ def find_secured_parties(registration: Registration):
     return parties
 
 
+def same_party(party_1: dict, party_2: dict) -> bool:
+    """Check that party name and address are identical (registering party is also secured party)."""
+    if party_1['address'] != party_2['address']:
+        return False
+    if 'businessName' in party_1 and 'businessName' in party_2 and party_1['businessName'] == party_2['businessName']:
+        return True
+    if 'personName' in party_1 and 'personName' in party_2 and party_1['personName'] == party_2['personName']:
+        return True
+    return False
+
+
 def queue_secured_party_verification(registration: Registration):
     """Set up mail out of verification statements to secured parties."""
     try:
+        registering_json = None
         registration_id = registration.id
+        for party in registration.parties:
+            if party.party_type == Party.PartyTypes.REGISTERING_PARTY.value:
+                registering_json = party.json
+                break
         parties = find_secured_parties(registration)
+        # Skip mailing verification statement if the secured party is also the registration registering party.
         for party in parties:
-            enqueue_verification_report(registration_id, party.id)
+            if same_party(registering_json, party.json):
+                msg = f'Queue secured party verification stmt skipped for id={registration_id}, partyId={party.id}.'
+                current_app.logger.info(msg)
+            else:
+                enqueue_verification_report(registration_id, party.id)
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Queue secured parties failed for id={registration_id}: ' + str(err)
+        msg = f'Queue secured party verification stmt failed for id={registration_id}: ' + str(err)
         current_app.logger.error(msg)
 
 

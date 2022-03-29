@@ -90,11 +90,76 @@ TEST_NO_FEE_AMENDMENT_DATA = [
     ('WL', True),
     ('LT', True)
 ]
+RP_BUS_JSON = {
+    'businessName': 'business inc',
+    'address': {
+        'street': 'street',
+        'streetAdditional': 'additional',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S2J4'
+    }
+}
+RP_IND_JSON = {
+    'personName': {
+        'first': 'first',
+        'last': 'last',
+        'middle': 'middle'
+    },
+    'address': {
+        'street': 'street',
+        'streetAdditional': 'additional',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S2J4'
+    }
+}
+SP_BUS_JSON = {
+    'businessName': 'business inc',
+    'address': {
+        'street': 'street',
+        'streetAdditional': 'additional',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S2J4'
+    }
+}
+SP_IND_JSON = {
+    'personName': {
+        'first': 'first',
+        'last': 'last',
+        'middle': 'middle'
+    },
+    'address': {
+        'street': 'street',
+        'streetAdditional': 'additional',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S2J4'
+    }
+}
+
 # testdata pattern is ({description}, {reg_id}, {party_id}, {valid data})
 TEST_FINANCING_SP_DATA = [
     ('Valid base registration secured party', 200000010, 200000004, True),
     ('Valid registration secured party', 200000010, 200000022, True),
     ('Invalid registration secured party', 200000010, 200000016, False)
+]
+
+# testdata pattern is ({description}, {rp_json}, {sp_json}, {same}, {same_address}, {same_name})
+TEST_SAME_PARTY_DATA = [
+    ('Bus party match', RP_BUS_JSON, SP_BUS_JSON, True, True, True),
+    ('Ind party match', RP_IND_JSON, SP_IND_JSON, True, True, True),
+    ('Bus Ind party no match', RP_BUS_JSON, SP_IND_JSON, False, True, True),
+    ('Ind Bus party no match', RP_IND_JSON, SP_BUS_JSON, False, True, True),
+    ('Bus party name no match', RP_BUS_JSON, SP_BUS_JSON, False, True, False),
+    ('Ind party name no match', RP_IND_JSON, SP_IND_JSON, False, True, False),
+    ('Bus party address no match', RP_BUS_JSON, SP_BUS_JSON, False, False, True),
+    ('Ind party address no match', RP_IND_JSON, SP_IND_JSON, False, False, True)
 ]
 
 
@@ -337,3 +402,23 @@ def test_queue_reg_report(session, client, jwt):
     assert v_report
     assert v_report.id
     assert v_report.registration_id == registration.id
+
+
+@pytest.mark.parametrize('desc, rp_json, sp_json, same, same_address, same_name', TEST_SAME_PARTY_DATA)
+def test_same_party(session, client, jwt, desc, rp_json, sp_json, same, same_address, same_name):
+    """Assert that comparing registering and secured parties works as expected."""
+    # setup
+    if not same and not same_name:
+        if rp_json.get('businessName', '') != '':
+            rp_json['businessName'] = 'DIFFERENT LTD.'
+        else:
+            sp_json['personName']['last'] = 'DIFFERENT'
+    if not same and not same_address:
+        rp_json['address']['city'] = 'DIFFERENT'
+
+    # test
+    result: bool = resource_utils.same_party(rp_json, sp_json)
+    if same:
+        assert result
+    else:
+        assert not result
