@@ -8,7 +8,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 // Components
 import { SearchedResult } from '@/components/tables'
 import { Search } from '@/views'
-import { SearchBar } from '@/components/search'
 
 // Other
 import mockRouter from './MockRouter'
