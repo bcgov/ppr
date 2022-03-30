@@ -18,9 +18,21 @@ Test-Suite to ensure that the Vehicle Collateral Model is working as expected.
 """
 import copy
 
+import pytest
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT, AMENDMENT_STATEMENT
 
 from ppr_api.models import VehicleCollateral
+
+
+# testdata pattern is ({serial_type}, {serial_num}, {search_key}, {mhr_number})
+TEST_SEARCH_KEY_DATA = [
+    ('MH', '579', '000579', '046171'),
+    ('MV', '5C93803614479B', '144798', ''),
+    ('OB', 'DT9.9C804254', '804254', ''),
+    ('AP', 'PCE38163', 'E38163', ''),
+    ('AC', '1805289', '805289', ''),
+    ('AF', 'N38KK', 'N38KK', '')
+]
 
 
 def test_find_by_id(session):
@@ -157,3 +169,18 @@ def test_create_from_statement_json(session):
         assert c.financing_id == 22222
         assert c.vehicle_type
         assert c.serial_number
+
+
+@pytest.mark.parametrize('serial_type,serial_num,search_key,mhr_number', TEST_SEARCH_KEY_DATA)
+def test_search_key(session, serial_type, serial_num, search_key, mhr_number):
+    """Assert that the search key is generated correctly for different serial types."""
+    json_data = {
+        'type': serial_type,
+        'year': 2004,
+        'make': 'MAKE',
+        'model': 'MODEL',
+        'serialNumber': serial_num,
+        'manufacturedHomeRegistrationNumber': mhr_number
+    }
+    collateral = VehicleCollateral.create_from_json(json_data, 12345)
+    assert collateral.search_vin == search_key
