@@ -233,7 +233,7 @@ export function validateSearchRealTime (
       if (searchValue?.length > 70) {
         validation.searchValue.message = 'Maximum 70 characters'
       }
-        break  
+      break
   }
   if (
     Object.keys(validation.searchValue)?.length ||
