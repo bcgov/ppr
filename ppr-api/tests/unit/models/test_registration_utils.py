@@ -287,7 +287,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
     if start_ts and end_ts:
         params.start_date_time = start_ts
         params.end_date_time = model_utils.format_ts(model_utils.now_ts())
-    statement_list = Registration.find_all_by_account_id_filter(params)
+    statement_list = Registration.find_all_by_account_id_filter(params, True)
     assert statement_list
     assert statement_list[0]['totalRegistrationCount']
     for statement in statement_list:

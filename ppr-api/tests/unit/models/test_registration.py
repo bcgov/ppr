@@ -252,7 +252,7 @@ def test_find_all_by_account_id(session, desc, account_id, collapse, user_added_
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                   collapse=collapse,
                                                                   account_name='PH Testing PPR with PAD')
-    statement_list = Registration.find_all_by_account_id(params)
+    statement_list = Registration.find_all_by_account_id(params, True)
     found_added: bool = False
     found_removed: bool = False
 
@@ -295,7 +295,7 @@ def test_find_all_by_account_id_no_result(session):
     params: AccountRegistrationParams = AccountRegistrationParams(account_id='XXXXX45',
                                                                   collapse=True,
                                                                   account_name='Unit Testing')
-    statement_list = Registration.find_all_by_account_id(params)
+    statement_list = Registration.find_all_by_account_id(params, True)
     assert len(statement_list) == 0
 
 
@@ -948,7 +948,7 @@ def test_account_registering_name(session, reg_num, account_id, has_data):
                                                                   collapse=True,
                                                                   account_name='Unit Testing',
                                                                   sbc_staff=sbc_staff)
-    results = Registration.find_all_by_account_id(params)
+    results = Registration.find_all_by_account_id(params, True)
     for result in results:
         if result['registrationNumber'] == reg_num:
             if has_data:
@@ -965,7 +965,7 @@ def test_account_path(session, reg_num, account_id, has_data):
                                                                   collapse=True,
                                                                   account_name='Unit Testing',
                                                                   sbc_staff=sbc_staff)
-    results = Registration.find_all_by_account_id(params)
+    results = Registration.find_all_by_account_id(params, True)
     for result in results:
         if result['registrationNumber'] == reg_num:
             if has_data:

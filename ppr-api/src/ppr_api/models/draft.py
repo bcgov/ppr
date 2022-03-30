@@ -98,14 +98,14 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         return draft
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str, params: AccountRegistrationParams):
+    def find_all_by_account_id(cls, account_id: str, params: AccountRegistrationParams, new_feature_enabled: bool):
         """Return a summary list of drafts belonging to an account."""
         drafts_json = []
         if not account_id:
             return drafts_json
         try:
             if params and params.from_ui:
-                return Draft.find_all_by_account_id_filter(params)
+                return Draft.find_all_by_account_id_filter(params, new_feature_enabled)
 
             max_results_size = int(current_app.config.get('ACCOUNT_DRAFTS_MAX_RESULTS'))
             results = db.session.execute(model_utils.QUERY_ACCOUNT_DRAFTS,
@@ -122,10 +122,10 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         return drafts_json
 
     @classmethod
-    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams):
+    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
         """Return a summary list of drafts belonging to an account applying filters."""
         drafts_json = []
-        query = Draft.build_account_draft_query(params)
+        query = Draft.build_account_draft_query(params, new_feature_enabled)
         # current_app.logger.info(query)
         query_params = Draft.build_account_draft_query_params(params)
         # current_app.logger.info(query_params)
@@ -301,7 +301,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         return order_by
 
     @staticmethod
-    def build_account_draft_query(params: AccountRegistrationParams) -> str:
+    def build_account_draft_query(params: AccountRegistrationParams, new_feature_enabled: bool) -> str:
         """Build the account drafts query from the provided parameters."""
         query: str = model_utils.QUERY_ACCOUNT_DRAFTS_FILTER
         if params.registration_number:
@@ -309,9 +309,15 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         if params.registration_type:
             query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE
         if params.client_reference_id:
-            query += model_utils.QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE
+            if new_feature_enabled:
+                query += model_utils.QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE_NEW
+            else:
+                query += model_utils.QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE
         if params.registering_name:
-            query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE
+            if new_feature_enabled:
+                query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW    
+            else:
+                query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE
         if params.start_date_time and params.end_date_time:
             query += model_utils.QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE
         query += Draft.get_account_draft_query_order(params)
