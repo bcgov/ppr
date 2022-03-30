@@ -155,6 +155,14 @@ export const routes = [
     }
   },
   {
+    path: '/mhr-search',
+    name: RouteNames.MHRSEARCH,
+    component: Search,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     // default/fallback route
     // must be last
     path: '*',

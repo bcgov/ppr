@@ -29,7 +29,7 @@ const tombstoneInfo: string = '.tombstone-info'
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchedResult> object with the given parameters.
+ * @returns a Wrapper<SearchedResultPPR> object with the given parameters.
  */
 function createComponent (mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()

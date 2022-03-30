@@ -27,7 +27,7 @@ const submitBtn = '#btn-stacked-submit'
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchedResult> object with the given parameters.
+ * @returns a Wrapper<SearchedResultPPR> object with the given parameters.
  */
 function createComponent (
   backBtn: string,

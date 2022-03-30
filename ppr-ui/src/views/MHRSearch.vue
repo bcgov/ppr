@@ -4,18 +4,6 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
-    <large-search-result-dialog
-      :setDisplay="largeSearchResultDialog"
-      :setOptions="largeSearchResultOptions"
-      :setNumberRegistrations="selectedResultsLength"
-      @proceed="handleLargeReport($event)"
-    />
-    <large-search-delay-dialog
-      :setDisplay="largeSearchDelayDialog"
-      :setOptions="largeSearchDelayOptions"
-      :setNumberRegistrations="exactResultsLength"
-      @proceed="handleDelayReport($event)"
-    />
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="confirmOptions"
@@ -32,16 +20,12 @@
           <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
           <span :class="$style['search-info']">{{ searchTime }}</span>
         </p>
-        <p v-if="folioNumber" id="results-folio-header" class="ma-0" style="padding-top: 22px;">
-          <b :class="$style['search-table-title']">Folio Number: </b>
-          <span :class="$style['search-info']">{{ folioNumber }}</span>
-        </p>
         <v-row no-gutters style="padding-top: 22px;">
           <v-col :class="$style['search-info']">
             <span v-if="totalResultsLength !== 0" id="results-info">
-              Select the registrations you want to include in a printable PDF search report. Exact matches
-              are automatically selected. This report will contain the full record of the registration for
-              each selected match and will be automatically saved to your PPR Dashboard.
+              Select the manufactured home to download the full details of the home. Selecting the home will debit
+              your search fee from your BC Online account. The downloaded report will contain the full record of
+              the registration for the home and will be automatically saved to your dashboard.
             </span>
             <span v-else id="no-results-info">
               No Registrations were found. A printable PDF search result report and a general record of your search
