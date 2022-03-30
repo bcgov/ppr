@@ -14,7 +14,7 @@ type mockedSearchResponse = {
 export const mockedSearchResponse: mockedSearchResponse = {
   [UISearchTypes.SERIAL_NUMBER]: {
     searchId: '12234',
-    searchDateTime: '2021-03-23T18:33:32Z',
+    searchDateTime: (new Date()).toISOString(),
     exactResultsSize: 2,
     selectedResultsSize: 3,
     returnedResultsSize: mockedSearchResults[UISearchTypes.SERIAL_NUMBER].length,
