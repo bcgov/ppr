@@ -301,8 +301,10 @@ export default defineComponent({
     }
     const isPDFAvailable = (item: SearchResponseIF): Boolean => {
       const now = new Date()
-      const searchDate = new Date(item.searchDateTime)
-      const diffTime = now.getTime() - searchDate.getTime()
+      const nowDate = new Date(now.toDateString())
+      const searchDatetime = new Date(item.searchDateTime)
+      const searchDate = new Date(searchDatetime.toDateString())
+      const diffTime = nowDate.getTime() - searchDate.getTime()
       const diffDays = diffTime / (1000 * 3600 * 24)
       return diffDays < 8
     }
