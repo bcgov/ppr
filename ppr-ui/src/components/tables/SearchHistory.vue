@@ -58,7 +58,7 @@
                 </td>
                 <td>
                   <v-btn
-                    v-if="item.searchId !== 'PENDING' && !item.inProgress"
+                    v-if="item.searchId !== 'PENDING' && !item.inProgress && isPDFAvailable(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     depressed
@@ -292,9 +292,19 @@ export default defineComponent({
         }
         return 'This search is in progress by another user.'
       }
+      if (!isPDFAvailable(item)) {
+        return 'This document PDF is no longer available.'
+      }
       return '<p class="ma-0">This document PDF is still being generated. Reload this page to ' +
         'see if your PDF is ready to download.</p>' +
         '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
+    }
+    const isPDFAvailable = (item: SearchResponseIF): Boolean => {
+      const now = new Date()
+      const searchDate = new Date(item.searchDateTime)
+      const diffTime = now.getTime() - searchDate.getTime()
+      const diffDays = diffTime / (1000 * 3600 * 24)
+      return diffDays < 8
     }
     const isSearchOwner = (item: SearchResponseIF): Boolean => {
       return getUserUsername.value === item?.userId
@@ -311,6 +321,7 @@ export default defineComponent({
       downloadPDF,
       generateReport,
       getTooltipTxtPdf,
+      isPDFAvailable,
       isSearchOwner,
       retrySearch
     }
