@@ -17,11 +17,11 @@
 
 from http import HTTPStatus
 
-from flask import g, jsonify, request
+from flask import current_app, g, jsonify, request
 from flask_restx import Namespace, Resource, cors
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import Draft
+from ppr_api.models import Draft, User
 from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized
@@ -54,6 +54,14 @@ class DraftResource(Resource):
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
+            
+            # Set feature flag value
+            username = 'anonymous'
+            user = User.find_by_jwt_token(g.jwt_oidc_token_info, account_id)
+            if user and user.username:
+                username = user.username
+            new_feature_enabled = current_app.extensions['featureflags'].variation(
+                'enable-new-feature-api', {'key': username}, False)
 
             # Try to fetch draft list for account ID
             params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
@@ -61,7 +69,7 @@ class DraftResource(Resource):
                                                                           account_name=None,
                                                                           sbc_staff=False)
             params = resource_utils.get_account_registration_params(request, params)
-            draft_list = Draft.find_all_by_account_id(account_id, params)
+            draft_list = Draft.find_all_by_account_id(account_id, params, new_feature_enabled)
             return jsonify(draft_list), HTTPStatus.OK
 
         except DatabaseException as db_exception:

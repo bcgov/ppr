@@ -61,7 +61,7 @@ TEST_QUERY_BASE_DATA = [
 
 def test_find_all_by_account_id(session):
     """Assert that the draft summary list items contains all expected elements."""
-    draft_list = Draft.find_all_by_account_id('PS12345', None)
+    draft_list = Draft.find_all_by_account_id('PS12345', None, True)
     # print(draft_list)
     assert draft_list
     for draft in draft_list:
@@ -120,7 +120,7 @@ def test_find_by_document_id_amendment(session):
 
 def test_find_by_account_id_no_result(session):
     """Assert that the find draft statement by invalid account ID returns the expected result."""
-    drafts = Draft.find_all_by_account_id('X12345X', None)
+    drafts = Draft.find_all_by_account_id('X12345X', None, True)
 
     # check
     assert len(drafts) == 0
@@ -336,7 +336,7 @@ def test_find_all_by_account_id_filter(session, doc_num, reg_type, client_ref, r
     if start_ts and end_ts:
         params.start_date_time = start_ts
         params.end_date_time = model_utils.format_ts(model_utils.now_ts())
-    draft_list = Draft.find_all_by_account_id_filter(params)
+    draft_list = Draft.find_all_by_account_id_filter(params, True)
     assert draft_list
     for draft in draft_list:
         assert draft['type']
