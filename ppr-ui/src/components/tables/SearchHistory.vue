@@ -3,6 +3,7 @@
     <v-row no-gutters class="pt-4">
       <v-col cols="12">
         <v-data-table
+          v-if="searchHistory"
           id="search-history-table"
           hide-default-footer
           fixed
@@ -37,6 +38,8 @@
                     {{ displayDate(item.searchDateTime) }}
                   </span>
                   <span v-else>Pending</span>
+                </td>
+                <td v-if="hasBothRoles">
                 </td>
                 <td>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
@@ -150,21 +153,44 @@ import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disa
 import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses } from '@/utils'
 import { ErrorContact } from '../common'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   components: {
     ErrorContact
   },
   setup (props, { emit }) {
-    const { getSearchHistory, getUserUsername, isRoleStaff } = useGetters<any>(
-      ['getSearchHistory', 'isRoleStaff', 'getUserUsername'])
-
+    const {
+      getSearchHistory,
+      getUserUsername,
+      isRoleStaff,
+      hasPprRole,
+      hasMhrRole
+    } = useGetters<any>([
+      'getSearchHistory',
+      'getUserUsername'
+      'isRoleStaff',
+      'hasPprRole',
+      'hasMhrRole'
+    ])
     const localState = reactive({
       headers: computed((): Array<any> => {
+        const tableHeaders = cloneDeep(searchHistoryTableHeaders)
         if (localState.isStaff) {
           return searchHistoryTableHeadersStaff
         }
-        return searchHistoryTableHeaders
+        if (hasPprRole.value && hasMhrRole.value) {
+          tableHeaders.splice(4, 0, {
+            class: 'column-mds',
+            sortable: false,
+            text: 'Registry',
+            value: 'registry'
+          })
+        }
+        return tableHeaders
+      }),
+      hasBothRoles: computed((): boolean => {
+        return hasPprRole.value && hasMhrRole.value
       }),
       isStaff: computed((): boolean => {
         if (isRoleStaff.value) {

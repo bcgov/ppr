@@ -165,11 +165,28 @@
             </v-list>
           </v-menu>
         </v-row>
-        <v-row v-if="!isStaffBcolReg" no-gutters>
+        <v-row v-if="shouldShowFeeHint" no-gutters>
           <span :id="$style['search-btn-info']" class="pl-1 pt-2 fee-text">
             ${{ fee }} fee
           </span>
         </v-row>
+      </v-col>
+    </v-row>
+    <v-row v-if="shouldShowPprCheckbox">
+      <v-col cols="4"></v-col>
+      <v-col>
+        <v-checkbox
+          id="include-ppr-checkbox"
+          class="ma-0 ml-n6"
+          hide-details
+          v-model="includePprCheckbox"
+        >
+          <template v-slot:label>
+            <p class="ma-0">
+              Include a Personal Property search (additional fee)
+            </p>
+          </template>
+        </v-checkbox>
       </v-col>
     </v-row>
   </v-container>
@@ -232,7 +249,9 @@ export default defineComponent({
       isRoleStaffReg,
       isRoleStaffSbc,
       isSearchCertified,
-      getStaffPayment
+      getStaffPayment,
+      hasPprRole,
+      hasMhrRole
     } = useGetters<any>([
       'getUserSettings',
       'isSearching',
@@ -240,7 +259,9 @@ export default defineComponent({
       'isRoleStaffReg',
       'isRoleStaffSbc',
       'isSearchCertified',
-      'getStaffPayment'
+      'getStaffPayment',
+      'hasPprRole',
+      'hasMhrRole'
     ])
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -249,6 +270,7 @@ export default defineComponent({
       folioNumber: props.defaultFolioNumber,
       folioError: false,
       hideDetails: false,
+      includePprCheckbox: false,
       searchValue: props.defaultSearchValue,
       searchValueFirst: props.defaultDebtor?.first,
       searchValueSecond: props.defaultDebtor?.second,
@@ -263,8 +285,12 @@ export default defineComponent({
         return localState.validations?.category?.message || ''
       }),
       shouldShowFeeHint: computed((): boolean => {
-        return !(isRoleStaffBcol.value || isRoleStaffReg.value) &&
-          (!isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
+        return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
+          (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
+      }),
+      shouldShowPprCheckbox: computed((): boolean => {
+        return (hasPprRole) &&
+          (isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }

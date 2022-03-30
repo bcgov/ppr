@@ -30,7 +30,9 @@
                   id="search-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
-              <b>Personal Property Search</b>
+              <b v-if="hasPprRole && hasMhrRole">Asset Search</b>
+              <b v-else-if="hasPprRole">Personal Property Search</b>
+              <b v-else-if="hasMhrRole">Manufactured Home Search</b>
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -306,6 +308,8 @@ export default class Dashboard extends Vue {
   @Getter getUserSettings: UserSettingsIF
   @Getter hasMorePages: boolean
   @Getter isNonBillable!: boolean
+  @Getter hasPprRole: boolean
+  @Getter hasMhrRole: boolean
 
   @Action resetNewRegistration: ActionBindingIF
   @Action resetRegTableData: ActionBindingIF

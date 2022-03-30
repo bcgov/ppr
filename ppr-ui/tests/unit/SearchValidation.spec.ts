@@ -9,7 +9,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { SearchBar } from '@/components/search'
 
 // Other
-import { SearchTypes } from '@/resources'
+import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { SearchTypeIF } from '@/interfaces'
 import { getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
@@ -572,5 +572,66 @@ describe('Registration number validation', () => {
       expect(messages1.length).toBe(1)
       expect(messages1.at(0).text()).toBe('Registration numbers contain 7 characters')
     }
+  })
+})
+
+describe('organization name validation', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('prevents searching and gives validation when the search is empty', async () => {
+    const select1: SearchTypeIF = MHRSearchTypes[4]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.searchValue).toBeNull()
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Enter an organization name to search')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  })
+
+  it('prevents searching when search value is less than minimum characters', async () => {
+    const select1: SearchTypeIF = MHRSearchTypes[4]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'F'
+    await Vue.nextTick()
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Must contain more than 1 character')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
+  })
+
+  it('prevents searching when search value is more than maximum characters', async () => {
+    const select1: SearchTypeIF = MHRSearchTypes[4]
+    wrapper.vm.$data.selectedSearchType = select1
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = '1'.repeat(81)
+    await Vue.nextTick()
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    expect(messages.at(0).text()).toBe('Maximum 70 characters')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    expect(getLastEvent(wrapper, searchData)).toBeNull()
   })
 })

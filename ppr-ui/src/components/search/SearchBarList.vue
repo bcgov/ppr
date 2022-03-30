@@ -71,9 +71,13 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      isRoleStaffReg
+      isRoleStaffReg,
+      hasPprRole,
+      hasMhrRole
     } = useGetters<any>([
-      'isRoleStaffReg'
+      'isRoleStaffReg',
+      'hasPprRole',
+      'hasMhrRole'
     ])
     const searchSelect = ref(null)
     const localState = reactive({
@@ -96,8 +100,12 @@ export default defineComponent({
           }
         }
         const allSearchTypes = []
-        allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-        allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+        if (hasPprRole) {
+          allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+        }
+        if (hasMhrRole) {
+          allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+        }
         return allSearchTypes
       }),
       displayItems: [],

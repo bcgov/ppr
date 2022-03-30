@@ -1,13 +1,17 @@
-import { APIRegistrationTypes, UISearchTypes } from '@/enums'
-import { IndividualNameIF, SearchTypeIF, SearchValidationIF } from '@/interfaces'
+import { APIRegistrationTypes, UISearchTypes, UIMHRSearchTypes } from '@/enums'
+import {
+  IndividualNameIF,
+  SearchTypeIF,
+  SearchValidationIF
+} from '@/interfaces'
 
 // subset of the localState that includes what the validator needs
 type partialSearchState = {
   debtorName?: IndividualNameIF
-  searchValue?: string,
-  searchValueFirst?: string,
-  searchValueSecond?: string,
-  searchValueLast?: string,
+  searchValue?: string
+  searchValueFirst?: string
+  searchValueSecond?: string
+  searchValueLast?: string
   selectedSearchType: SearchTypeIF
 }
 
@@ -20,12 +24,14 @@ const regNumberPartial = /^\d{1,6}[A-z]{0,1}$/
 // replaceAll fails in jest so use regex
 const dash = /-/g
 
-export function validateSearchAction (searchState: partialSearchState): SearchValidationIF {
-  const validation:SearchValidationIF = {
+export function validateSearchAction (
+  searchState: partialSearchState
+): SearchValidationIF {
+  const validation: SearchValidationIF = {
     category: {},
     searchValue: {}
   }
-  let searchValue:string = searchState?.searchValue?.trim()
+  let searchValue: string = searchState?.searchValue?.trim()
   const first = searchState?.searchValueFirst?.trim()
   const second = searchState?.searchValueSecond?.trim()
   const last = searchState?.searchValueLast?.trim()
@@ -35,6 +41,7 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
   }
   switch (searchState?.selectedSearchType?.searchTypeUI) {
     case UISearchTypes.SERIAL_NUMBER:
+    case UIMHRSearchTypes.MHRSERIAL_NUMBER:
       if (!searchValue) {
         validation.searchValue.message = 'Enter a serial number to search'
       }
@@ -57,9 +64,25 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
         validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
+    case UIMHRSearchTypes.MHROWNER_NAME:
+      if (!first) {
+        validation.searchValue.messageFirst = 'Enter a first name'
+      } else if (first?.length > 50) {
+        validation.searchValue.messageFirst = 'Maximum 50 characters'
+      }
+      if (second && second?.length > 50) {
+        validation.searchValue.messageSecond = 'Maximum 50 characters'
+      }
+      if (!last) {
+        validation.searchValue.messageLast = 'Enter a last name'
+      } else if (last?.length > 50) {
+        validation.searchValue.messageLast = 'Maximum 50 characters'
+      }
+      break
     case UISearchTypes.BUSINESS_DEBTOR:
       if (!searchValue) {
-        validation.searchValue.message = 'Enter a business debtor name to search'
+        validation.searchValue.message =
+          'Enter a business debtor name to search'
       }
       if (searchValue?.length > 150) {
         validation.searchValue.message = 'Maximum 150 characters'
@@ -69,8 +92,10 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
       }
       break
     case UISearchTypes.MHR_NUMBER:
+    case UIMHRSearchTypes.MHRMHR_NUMBER:
       if (!searchValue) {
-        validation.searchValue.message = 'Enter a manufactured home registration number to search'
+        validation.searchValue.message =
+          'Enter a manufactured home registration number to search'
       }
       if (searchValue?.length > 6) {
         validation.searchValue.message = 'Maximum 6 digits'
@@ -81,7 +106,8 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
       break
     case UISearchTypes.AIRCRAFT:
       if (!searchValue) {
-        validation.searchValue.message = 'Enter an aircraft airframe D.O.T. number to search'
+        validation.searchValue.message =
+          'Enter an aircraft airframe D.O.T. number to search'
       } else {
         searchValue = searchValue?.replace(dash, '')
         if (searchValue?.length > 25) {
@@ -94,16 +120,32 @@ export function validateSearchAction (searchState: partialSearchState): SearchVa
         validation.searchValue.message = 'Enter a registration number to search'
       }
       if (searchValue && searchValue.length !== 7) {
-        validation.searchValue.message = 'Registration numbers contain 7 characters'
+        validation.searchValue.message =
+          'Registration numbers contain 7 characters'
+      }
+      break
+    case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+      if (!searchValue) {
+        validation.searchValue.message = 'Enter an organization name to search'
+      }
+      if (searchValue?.length > 70) {
+        validation.searchValue.message = 'Maximum 70 characters'
+      }
+      if (searchValue?.length < 2) {
+        validation.searchValue.message = 'Must contain more than 1 character'
       }
       break
   }
-  if (Object.keys(validation.searchValue)?.length || Object.keys(validation.category)?.length) return validation
-  else return null
+  if (
+    Object.keys(validation.searchValue)?.length ||
+    Object.keys(validation.category)?.length
+  ) { return validation } else return null
 }
 
-export function validateSearchRealTime (searchState: partialSearchState): SearchValidationIF {
-  const validation:SearchValidationIF = {
+export function validateSearchRealTime (
+  searchState: partialSearchState
+): SearchValidationIF {
+  const validation: SearchValidationIF = {
     category: {},
     searchValue: {}
   }
@@ -114,7 +156,8 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
   switch (searchState?.selectedSearchType?.searchTypeUI) {
     case UISearchTypes.SERIAL_NUMBER:
       if (searchValue && specialCharsStrict.test(searchValue)) {
-        validation.searchValue.message = "Serial numbers don't normally contain special characters"
+        validation.searchValue.message =
+          "Serial numbers don't normally contain special characters"
       }
       if (searchValue?.length < 4) {
         validation.searchValue.popUp = [
@@ -129,17 +172,20 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
       break
     case UISearchTypes.INDIVIDUAL_DEBTOR:
       if (first && specialCharsLax.test(first)) {
-        validation.searchValue.messageFirst = "Names don't normally contain special characters"
+        validation.searchValue.messageFirst =
+          "Names don't normally contain special characters"
       } else if (first && first?.length > 50) {
         validation.searchValue.messageFirst = 'Maximum 50 characters'
       }
       if (second && specialCharsLax.test(second)) {
-        validation.searchValue.messageSecond = "Names don't normally contain special characters"
+        validation.searchValue.messageSecond =
+          "Names don't normally contain special characters"
       } else if (second && second?.length > 50) {
         validation.searchValue.messageSecond = 'Maximum 50 characters'
       }
       if (last && specialCharsLax.test(last)) {
-        validation.searchValue.messageLast = "Names don't normally contain special characters"
+        validation.searchValue.messageLast =
+          "Names don't normally contain special characters"
       } else if (last?.length > 50) {
         validation.searchValue.messageLast = 'Maximum 50 characters'
       }
@@ -179,12 +225,20 @@ export function validateSearchRealTime (searchState: partialSearchState): Search
       break
     case UISearchTypes.REGISTRATION_NUMBER:
       if (searchValue && searchValue.length !== 7) {
-        validation.searchValue.message = 'Registration numbers contain 7 characters'
+        validation.searchValue.message =
+          'Registration numbers contain 7 characters'
       }
       break
+    case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+      if (searchValue?.length > 70) {
+        validation.searchValue.message = 'Maximum 70 characters'
+      }
+        break  
   }
-  if (Object.keys(validation.searchValue)?.length || Object.keys(validation.category)?.length) return validation
-  else return null
+  if (
+    Object.keys(validation.searchValue)?.length ||
+    Object.keys(validation.category)?.length
+  ) { return validation } else return null
 }
 
 export function isSecuredPartyRestrictedList (regType: string): boolean {

@@ -128,7 +128,9 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     searchTypeUI: UIMHRSearchTypes.MHROWNER_NAME,
     searchTypeAPI: APIMHRSearchTypes.MHROWNER_NAME,
     textLabel: '',
-    hints: null,
+    hints: {
+      searchValue: 'Owner names normally contain letter and numbers only'
+    },
     group: 2
   },
   {
@@ -138,7 +140,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APIMHRSearchTypes.MHRORGANIZATION_NAME,
     textLabel: '',
     hints: {
-      searchValue: 'Organization names must contain between 2 and 150 characters'
+      searchValue: 'Organization names must contain between 2 and 70 characters'
     },
     group: 2
   },
