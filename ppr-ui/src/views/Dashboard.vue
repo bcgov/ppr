@@ -58,7 +58,12 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
+            <v-col v-if="!pageLoader" cols="12">
+              <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
+            </v-col>
+            <v-col v-else class="pa-10" cols="12">
+              <v-progress-linear color="primary" indeterminate rounded height="6" />
+            </v-col>
           </v-row>
         </v-col>
       </v-row>
@@ -190,7 +195,7 @@
             </v-col>
           </v-row>
           <v-row no-gutters class="white">
-            <v-col cols="12">
+            <v-col v-if="!pageLoader" cols="12">
               <registration-table
                 :setHeaders="myRegHeaders"
                 :setLoading="myRegDataLoading || myRegDataAdding"
@@ -204,6 +209,9 @@
                 @getNext="myRegGetNext()"
                 @sort="myRegSort($event)"
               />
+            </v-col>
+            <v-col v-else class="pa-10" cols="12">
+              <v-progress-linear color="primary" indeterminate rounded height="6" />
             </v-col>
           </v-row>
         </v-col>
