@@ -36,9 +36,9 @@
           <v-row no-gutters>
             <v-col cols="12">
               <router-view
+                :appLoadingData="!haveData"
                 :appReady="appReady"
                 :isJestRunning="isJestRunning"
-                :loading="!haveData"
                 :saveDraftExit="saveDraftExitToggle"
                 :registryUrl="registryUrl"
                 @profileReady="profileReady = true"
