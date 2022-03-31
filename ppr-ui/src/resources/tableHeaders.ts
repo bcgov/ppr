@@ -425,3 +425,58 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   }
 ]
+
+export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Owner Name',
+    value: ''
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Registration Number',
+    value: ''
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Status',
+    value: 'status'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Year',
+    value: 'year'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Make',
+    value: 'make'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Model',
+    value: 'model'
+  },
+  {
+    class: 'column-md',
+    text: 'Home Location',
+    value: 'homeLocation'
+  },
+  {
+    class: 'column-md',
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'actions-col pa-0',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]
