@@ -186,7 +186,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
             return None
 
         statement = SEARCH_VIN_STATEMENT
-        if vehicle_type == VehicleCollateral.SerialTypes.AIRCRAFT.value:
+        if vehicle_type in (VehicleCollateral.SerialTypes.AIRCRAFT.value,
+                            VehicleCollateral.SerialTypes.AIRPLANE.value,
+                            VehicleCollateral.SerialTypes.AIRCRAFT_AIRFRAME.value):
             statement = SEARCH_VIN_STATEMENT_AC
 
         result = db.session.execute(statement, {'serial_number': serial_number})
