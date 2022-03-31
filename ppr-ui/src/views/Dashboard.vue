@@ -58,7 +58,12 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
+            <v-col v-if="!appLoadingData" cols="12">
+              <search-history class="soft-corners-bottom" @retry="retrieveSearchHistory" @error="emitError"/>
+            </v-col>
+            <v-col v-else class="pa-10" cols="12">
+              <v-progress-linear color="primary" indeterminate rounded height="6" />
+            </v-col>
           </v-row>
         </v-col>
       </v-row>
@@ -190,7 +195,7 @@
             </v-col>
           </v-row>
           <v-row no-gutters class="white">
-            <v-col cols="12">
+            <v-col v-if="!appLoadingData" cols="12">
               <registration-table
                 :setHeaders="myRegHeaders"
                 :setLoading="myRegDataLoading || myRegDataAdding"
@@ -204,6 +209,9 @@
                 @getNext="myRegGetNext()"
                 @sort="myRegSort($event)"
               />
+            </v-col>
+            <v-col v-else class="pa-10" cols="12">
+              <v-progress-linear color="primary" indeterminate rounded height="6" />
             </v-col>
           </v-row>
         </v-col>
@@ -331,6 +339,9 @@ export default class Dashboard extends Vue {
   @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
   @Action setUnsavedChanges: ActionBindingIF
   @Action setUserSettings: ActionBindingIF
+
+  @Prop({ default: false })
+  private appLoadingData: boolean
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -795,6 +806,7 @@ export default class Dashboard extends Vue {
       this.redirectRegistryHome()
       return
     }
+    this.emitHaveData(false)
     this.resetNewRegistration(null) // Clear store data from any previous registration.
     // FUTURE: add loading for search history too
     this.myRegDataLoading = true
