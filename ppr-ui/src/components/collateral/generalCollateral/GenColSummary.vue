@@ -159,7 +159,7 @@
     </div>
     <div v-else class="general-collateral-summary pt-5">
       <p v-if="generalCollateral.length > 0" class="ma-0">
-        <span style="white-space: pre-wrap;">{{ generalCollateral[0].description }}</span>
+        <span style="white-space: pre-wrap;" v-html="generalCollateral[0].description"></span>
       </p>
     </div>
   </v-container>
