@@ -169,6 +169,7 @@ describe('Serial number search', () => {
   })
 
   it('searches when fields are filled', async () => {
+    await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
     expect(wrapper.find('.select-search-text').text()).toContain('Each search incurs')
     wrapper.vm.returnSearchSelection(select)

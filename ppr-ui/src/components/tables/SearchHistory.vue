@@ -168,7 +168,7 @@ export default defineComponent({
       hasMhrRole
     } = useGetters<any>([
       'getSearchHistory',
-      'getUserUsername'
+      'getUserUsername',
       'isRoleStaff',
       'hasPprRole',
       'hasMhrRole'
