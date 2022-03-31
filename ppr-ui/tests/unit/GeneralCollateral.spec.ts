@@ -3,6 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
+import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // local components
@@ -12,8 +13,14 @@ import { RegistrationFlowType } from '@/enums'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
+Vue.use(TiptapVuetifyPlugin, {
+  // the next line is important! You need to provide the Vuetify Object to this place.
+  vuetify, // same as "vuetify: vuetify"
+  // optional, default to 'md' (default vuetify icons before v2.0.0)
+  iconsGroup: 'mdi'
+})
+
 const store = getVuexStore()
 
 /**

@@ -13,6 +13,7 @@ import { getVuexStore } from '@/store'
 import Affix from 'vue-affix'
 import * as Sentry from '@sentry/browser'
 import * as Integrations from '@sentry/integrations'
+import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 
 // Styles
 // NB: order matters - do not change
@@ -20,6 +21,8 @@ import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-l
 import '@/assets/styles/base.scss'
 import '@/assets/styles/layout.scss'
 import '@/assets/styles/overrides.scss'
+// tiptap editor
+import 'tiptap-vuetify/dist/main.css'
 
 // Base App
 import App from './App.vue'
@@ -37,6 +40,14 @@ Vue.use(VueCompositionApi)
 Vue.use(Vuetify)
 Vue.use(Affix)
 Vue.use(Vuelidate)
+const vuetify = new Vuetify()
+// use this package's plugin
+Vue.use(TiptapVuetifyPlugin, {
+  // the next line is important! You need to provide the Vuetify Object to this place.
+  vuetify, // same as "vuetify: vuetify"
+  // optional, default to 'md' (default vuetify icons before v2.0.0)
+  iconsGroup: 'mdi'
+})
 
 // main code
 async function start () {
