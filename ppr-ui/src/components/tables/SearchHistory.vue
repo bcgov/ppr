@@ -147,13 +147,12 @@ import {
   toRefs
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
-import _ from 'lodash'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses } from '@/utils'
 import { ErrorContact } from '../common'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, _ } from 'lodash'
 
 export default defineComponent({
   components: {
