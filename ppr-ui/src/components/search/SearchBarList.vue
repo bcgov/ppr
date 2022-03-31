@@ -94,17 +94,29 @@ export default defineComponent({
         return 'Select a search category'
       }),
       origItems: computed((): Array<SearchTypeIF> => {
-        if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only')) {
-          if (!isRoleStaffReg.value) {
+        const allSearchTypes = []
+        if (isRoleStaffReg.value) {
+          if (getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only')) {
+            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+            return allSearchTypes
+          } else {
             return SearchTypes
           }
         }
-        const allSearchTypes = []
-        if (hasPprRole) {
+        if (hasPprRole.value) {
           allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+          // we can pop the title off if there is only one search type
+          if (!hasMhrRole.value) {
+            allSearchTypes.shift()
+          }
         }
-        if (hasMhrRole) {
+        if (hasMhrRole.value) {
           allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+          // we can pop the title off if there is only one search type
+          if (!hasPprRole.value) {
+            allSearchTypes.shift()
+          }
         }
         return allSearchTypes
       }),

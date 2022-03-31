@@ -197,7 +197,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { getFeatureFlag, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
@@ -333,14 +333,18 @@ export default defineComponent({
         return localState.validations?.searchValue?.message || ''
       }),
       typeOfSearch: computed((): string => {
-        if (localState.selectedSearchType) {
-          if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
-            return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
-              '"></i>' + SearchTypes[0].textLabel
-          }
-          if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
-            return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + MHRSearchTypes[0].icon +
-              '"></i>' + MHRSearchTypes[0].textLabel
+        // only show the type of search if authorized to both types
+        if ((hasPprRole.value && hasMhrRole.value) ||
+           ((isRoleStaffReg.value) && getFeatureFlag('bcregistry-ui-ppr-mhr-staff-only'))) {
+          if (localState.selectedSearchType) {
+            if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+              return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
+                '"></i>' + SearchTypes[0].textLabel
+            }
+            if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+              return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + MHRSearchTypes[0].icon +
+                '"></i>' + MHRSearchTypes[0].textLabel
+            }
           }
         }
         return 'Select a search category and then enter a value to search.'
