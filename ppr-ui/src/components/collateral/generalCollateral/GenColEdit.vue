@@ -10,16 +10,9 @@
           General Collateral
         </v-col>
         <v-col cols="9" class="pr-4">
-          <v-textarea
-            v-model="newDesc"
-            id="general-collateral-new-desc"
-            auto-grow
-            filled
-            label="Description of General Collateral"
-            class="white pt-2 text-input-field"
-          />
           <tiptap-vuetify :extensions="extensions"
             v-model="newDesc"
+            id="general-collateral-new-desc"
             placeholder="Description of General Collateral"
             :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
           />
