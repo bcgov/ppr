@@ -64,7 +64,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         result = None
         if self.search_response:
             result = self.search_response
-            if self.search_select:
+            # Distinguish a search with matches where none are selected from no results found.
+            if not self.search_select and self.search.total_results_size > 0:
+                result['selected'] = self.search_select
+            elif self.search_select:
                 result['selected'] = self.search_select
         return result
 
