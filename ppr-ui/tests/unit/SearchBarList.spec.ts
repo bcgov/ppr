@@ -68,10 +68,17 @@ describe('SearchBar component basic tests', () => {
   /* we are currently unable to mock the feature flag process */ 
 
   it('shows all of the options', async () => {
-    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    await store.dispatch('setAuthRoles', ['mhr', 'ppr'])
     wrapper.vm.updateSelections()
     await flushPromises
     expect(wrapper.vm.$data.displayItems.length).toBe(14)
+  })
+
+  it('shows only ppr options', async () => {
+    await store.dispatch('setAuthRoles', ['ppr'])
+    wrapper.vm.updateSelections()
+    await flushPromises
+    expect(wrapper.vm.$data.displayItems.length).toBe(7)
   })
 
   it('sends selected event', async () => {
