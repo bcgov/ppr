@@ -12,7 +12,7 @@
     />
     <v-container class="container">
       <b :class="$style['search-title']">Search Results</b>
-      <p v-if="!getSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
+      <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
       </p>
       <div v-else no-gutters style="padding-top: 26px;">
@@ -36,7 +36,7 @@
           <v-col cols="auto" style="width: 320px;" />
         </v-row>
       </div>
-      <v-row v-if="getSearchResults" no-gutters style="padding-top: 38px;">
+      <v-row v-if="getManufacturedHomeSearchResults" no-gutters style="padding-top: 38px;">
         <searched-result-mhr class="soft-corners" @submit="submitCheck()" />
       </v-row>
     </v-container>
@@ -61,7 +61,7 @@ import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
 import { RouteNames, SettingOptions } from '@/enums'
 import {
-  ActionBindingIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
+  ActionBindingIF, ErrorIF, IndividualNameIF, ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
@@ -83,13 +83,13 @@ import { getFeatureFlag, navigate, pacificDate } from '@/utils'
 })
 export default class Search extends Vue {
   @Getter getSearchDebtorName: IndividualNameIF
-  @Getter getSearchResults: SearchResponseIF
+  @Getter getManufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF
   @Getter getSearchedValue: string
   @Getter getSearchedType: SearchTypeIF
   @Getter getUserSettings: UserSettingsIF
 
   @Action setSearchDebtorName: ActionBindingIF
-  @Action setSearchResults: ActionBindingIF
+  @Action setManufacturedHomeSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
 
@@ -114,7 +114,7 @@ export default class Search extends Vue {
   private settingOption = SettingOptions.SELECT_CONFIRMATION_DIALOG
 
   private get folioNumber (): string {
-    return this.getSearchResults?.searchQuery?.clientReferenceId || ''
+    return this.getManufacturedHomeSearchResults?.searchQuery?.clientReferenceId || ''
   }
 
   private get isAuthenticated (): boolean {
@@ -123,7 +123,7 @@ export default class Search extends Vue {
 
   private get searchTime (): string {
     // return formatted date
-    const searchResult = this.getSearchResults
+    const searchResult = this.getManufacturedHomeSearchResults
     if (searchResult) {
       const searchDate = new Date(searchResult.searchDateTime)
       return ` as of ${pacificDate(searchDate)}`
@@ -136,7 +136,7 @@ export default class Search extends Vue {
   }
 
   private get searchValue (): string {
-    const searchResult = this.getSearchResults
+    const searchResult = this.getManufacturedHomeSearchResults
     if (searchResult) {
       // will put in more logic when doing individual debtor
       const first = searchResult.searchQuery?.criteria?.debtorName?.first
@@ -155,14 +155,12 @@ export default class Search extends Vue {
   }
 
   private get totalResultsLength (): number {
-    const searchResult = this.getSearchResults
+    const searchResult = this.getManufacturedHomeSearchResults
     if (searchResult) {
       return searchResult.totalResultsSize
     }
     return 0
   }
-
-  
 
   private created (): void {
     window.onbeforeunload = (event) => {
@@ -170,7 +168,7 @@ export default class Search extends Vue {
       const isSearchReportUnsaved = (
         this.$router.currentRoute.name === RouteNames.MHRSEARCH &&
         this.appReady &&
-        !!this.getSearchResults
+        !!this.getManufacturedHomeSearchResults
       )
       if (isSearchReportUnsaved) {
         event.preventDefault()
@@ -195,15 +193,12 @@ export default class Search extends Vue {
   }
 
   private submitCheck (): void {
-    
+
   }
 
   private async submit (proceed: boolean): Promise<void> {
     this.confirmationDialog = false
-    
   }
-
-  
 
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
@@ -219,7 +214,7 @@ export default class Search extends Vue {
     }
 
     // if navigated here without search results redirect to the dashboard
-    if (!this.getSearchResults) {
+    if (!this.getManufacturedHomeSearchResults) {
       this.$router.push({
         name: RouteNames.DASHBOARD
       })

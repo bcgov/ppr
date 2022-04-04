@@ -43,7 +43,7 @@
               @debtor-name="setSearchDebtorName"
               @searched-type="setSearchedType"
               @searched-value="setSearchedValue"
-              @search-data="setSearchResults"
+              @search-data="saveResults($event)"
               @toggleStaffPaymentDialog="staffPaymentDialogDisplay = true"
               @search-error="emitError($event)"
             />
@@ -240,7 +240,7 @@ import {
   BreadcrumbIF, // eslint-disable-line no-unused-vars
   DialogOptionsIF, // eslint-disable-line no-unused-vars
   DraftResultIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
+  ErrorIF, ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
   RegistrationSortIF, // eslint-disable-line no-unused-vars
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, RegTableDataI, RegTableNewItemI, // eslint-disable-line no-unused-vars
@@ -337,6 +337,7 @@ export default class Dashboard extends Vue {
   @Action setSearchHistory: ActionBindingIF
   @Action setSearchHistoryLength: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
+  @Action setManufacturedHomeSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
   @Action setStateModel: ActionBindingIF
@@ -801,6 +802,22 @@ export default class Dashboard extends Vue {
     }
   }
 
+  private saveResults (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) {
+    if (results) {
+      if (this.isMHRSearchType(results.searchQuery.type)) {
+        this.setManufacturedHomeSearchResults(results)
+        this.$router.replace({
+          name: RouteNames.MHRSEARCH
+        })
+      } else {
+        this.setSearchResults(results)
+        this.$router.replace({
+          name: RouteNames.SEARCH
+        })
+      }
+    }
+  }
+
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')
   private async onAppReady (val: boolean): Promise<void> {
@@ -992,24 +1009,6 @@ export default class Dashboard extends Vue {
     if (oldVal !== null) {
       this.snackbarMsg = 'Your search was successfully added to your table.'
       this.toggleSnackbar = !this.toggleSnackbar
-    }
-  }
-
-  @Watch('getSearchResults')
-  private onSearch (val: SearchResponseIF): void {
-    // navigate to search page if not null/reset
-    if (val) {
-      if (this.isMHRSearchType(this.getSearchedType.searchTypeAPI)) {
-        // 'replace' resets the state so window.onbeforeunload event is fired when the browser 'back' btn is pressed
-        this.$router.replace({
-          name: RouteNames.MHRSEARCH
-        })
-      } else {
-        // 'replace' resets the state so window.onbeforeunload event is fired when the browser 'back' btn is pressed
-        this.$router.replace({
-          name: RouteNames.SEARCH
-        })
-      }
     }
   }
 

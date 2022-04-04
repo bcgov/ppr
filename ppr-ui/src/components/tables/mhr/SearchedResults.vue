@@ -17,7 +17,7 @@
       <v-col align-self="end" style="padding-right: 30px; width: 320px;">
         <folio-number
           :defaultFolioNumber="folioNumber"
-          @folio-number="updateFolioNumber"
+          @folio-number="folioNumber = $event"
           @folio-error="folioError = $event"
         />
       </v-col>
@@ -26,7 +26,7 @@
       <v-col cols="12">
         <v-data-table
           v-if="results"
-          id="search-results-table"
+          id="mh-search-results-table"
           class="results-table"
           disable-sort
           fixed
@@ -35,14 +35,10 @@
           :headers="headers"
           hide-default-footer
           :items="results"
-          :item-class="getClass"
           item-key="id"
           :items-per-page="-1"
           mobile-breakpoint="0"
           return-object
-          show-select
-          @toggle-select-all="selectAll($event)"
-          v-model="selected"
         >
 
           <template v-slot:[`group.header`]="{ group }">
@@ -56,8 +52,8 @@
               <span v-else-if="group === 'EXEMPT'">
                 EXEMPT ({{ exemptMatchesLength }})
               </span>
-              <span v-else-if="group === 'HISTORIC'">
-                HISTORIC ({{ historicMatchesLength }})
+              <span v-else-if="group === 'HISTORICAL'">
+                HISTORICAL ({{ historicMatchesLength }})
               </span>
             </td>
           </template>
@@ -105,48 +101,43 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, onMounted } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
-import { searchTableHeaders } from '@/resources'
+import { manufacturedHomeSearchTableHeaders } from '@/resources'
 import { ManufacturedHomeSearchResultIF, TableHeadersIF, ManufacturedHomeSearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { FolioNumber } from '@/components/common'
 
 export default defineComponent({
-  emits: ['selected-matches', 'submit'],
+  emits: ['submit'],
+  components: {
+    FolioNumber
+  },
   setup (props, { emit }) {
-    const { getManufacturedHomeSearchResults } = useGetters<any>(['getSearchResults'])
-    const resp = getManufacturedHomeSearchResults.value
+    const { getManufacturedHomeSearchResults } = useGetters<any>(['getManufacturedHomeSearchResults'])
+
     const localState = reactive({
       searched: false,
       searchValue: '',
-      selectedInitialized: false,
+      searchType: null,
+      folioNumber: '',
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
-      headers: searchTableHeaders[resp.searchQuery.type],
-      results: resp.results,
+      headers: manufacturedHomeSearchTableHeaders,
+      results: [],
       totalResultsLength: 0,
-      setTableData: computed((): ManufacturedHomeSearchResponseIF => {
-        let resp = null
-        resp = getManufacturedHomeSearchResults.value
-
-        if (resp) {
-          localState.searchValue = resp.searchQuery.criteria.value
-          localState.searched = true
-          localState.headers = searchTableHeaders[resp.searchQuery.type]
-          localState.results = resp.results
-          localState.totalResultsLength = resp.totalResultsSize
-          return resp
-        }
-        return {
-          searchId: '',
-          totalResultsSize: NaN,
-          searchQuery: {
-            type: '',
-            criteria: {}
-          },
-          results: []
-        }
+      activeMatchesLength: computed((): number => {
+        return 2
       })
+    })
+
+    onMounted(() => {
+      const resp = getManufacturedHomeSearchResults.value
+      localState.searchValue = resp.searchQuery.criteria.value
+      localState.searched = true
+      localState.searchType = resp.searchQuery.type
+      localState.results = resp.results
+      localState.totalResultsLength = resp.totalResultsSize
     })
 
     return {

@@ -431,13 +431,13 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: false,
     text: 'Owner Name',
-    value: ''
+    value: 'ownerName'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: false,
     text: 'Registration Number',
-    value: ''
+    value: 'registrationNumber'
   },
   {
     class: 'column-sm',

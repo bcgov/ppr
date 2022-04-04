@@ -5,6 +5,7 @@ import {
   ConfirmDischarge,
   Dashboard,
   LengthTrust,
+  MHRSearch,
   ReviewConfirm,
   ReviewRegistration,
   RenewRegistration,
@@ -157,7 +158,7 @@ export const routes = [
   {
     path: '/mhr-search',
     name: RouteNames.MHRSEARCH,
-    component: Search,
+    component: MHRSearch,
     meta: {
       requiresAuth: true
     }

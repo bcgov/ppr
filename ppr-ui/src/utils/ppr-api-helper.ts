@@ -199,7 +199,7 @@ export function manufacturedHomeSearch (
     searchId: 'test',
     totalResultsSize: 5,
     searchQuery: {
-      type: 'TEST', // One of APISearchTypes
+      type: 'MHRMHR_NUMBER', // One of APISearchTypes
       criteria: {
         value: 'test'
       }
