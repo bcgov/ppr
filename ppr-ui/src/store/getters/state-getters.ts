@@ -200,6 +200,14 @@ export const getUserRoles = (state: StateIF): Array<string> => {
   return state.stateModel.authorization?.authRoles
 }
 
+export const hasPprRole = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('ppr')
+}
+
+export const hasMhrRole = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('mhr')
+}
+
 /** The current user's service fee (applicable for non billable users). */
 export const getUserServiceFee = (state: StateIF): number => {
   return state.stateModel.userInfo?.feeSettings?.serviceFee || 1.50

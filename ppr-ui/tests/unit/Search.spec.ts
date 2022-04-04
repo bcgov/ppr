@@ -8,7 +8,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 // Components
 import { SearchedResult } from '@/components/tables'
 import { Search } from '@/views'
-import { SearchBar } from '@/components/search'
 
 // Other
 import mockRouter from './MockRouter'
@@ -64,14 +63,14 @@ describe('Search component', () => {
     expect(wrapper.findComponent(SearchedResult).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
-    wrapper.vm.setSearchedType(SearchTypes[0])
+    wrapper.vm.setSearchedType(SearchTypes[1])
     wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await Vue.nextTick()
     expect(wrapper.vm.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
-    expect(wrapper.vm.getSearchedType).toStrictEqual(SearchTypes[0])
+    expect(wrapper.vm.getSearchedType).toStrictEqual(SearchTypes[1])
     await Vue.nextTick()
     expect(wrapper.vm.folioNumber).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.clientReferenceId)
-    expect(wrapper.vm.searchType).toBe(SearchTypes[0].searchTypeUI)
+    expect(wrapper.vm.searchType).toBe(SearchTypes[1].searchTypeUI)
     expect(wrapper.vm.searchValue).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.criteria.value)
     expect(wrapper.vm.searchTime).toBeDefined()
     const searchMetaDisplay = wrapper.findAll(searchMeta)
@@ -94,14 +93,14 @@ describe('Search component', () => {
     response.totalResultsSize = 0
     response.selectedResultsSize = 0
     response.results = []
-    wrapper.vm.setSearchedType(SearchTypes[0])
+    wrapper.vm.setSearchedType(SearchTypes[1])
     wrapper.vm.setSearchResults(response)
     await Vue.nextTick()
     expect(wrapper.vm.getSearchResults).toStrictEqual(response)
-    expect(wrapper.vm.getSearchedType).toStrictEqual(SearchTypes[0])
+    expect(wrapper.vm.getSearchedType).toStrictEqual(SearchTypes[1])
     await Vue.nextTick()
     expect(wrapper.vm.folioNumber).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.clientReferenceId)
-    expect(wrapper.vm.searchType).toBe(SearchTypes[0].searchTypeUI)
+    expect(wrapper.vm.searchType).toBe(SearchTypes[1].searchTypeUI)
     expect(wrapper.vm.searchValue).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.criteria.value)
     expect(wrapper.vm.searchTime).toBeDefined()
     const searchMetaDisplay = wrapper.findAll(searchMeta)

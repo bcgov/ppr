@@ -97,7 +97,7 @@ describe('SearchBar component basic tests', () => {
 describe('Payment confirmation popup', () => {
   let wrapper: Wrapper<any>
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
-  const select: SearchTypeIF = SearchTypes[0]
+  const select: SearchTypeIF = SearchTypes[1]
 
   beforeEach(async () => {
     // GET search data
@@ -114,7 +114,8 @@ describe('Payment confirmation popup', () => {
   })
 
   it('pops up with payment confirmation modal before searching', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
+    wrapper.vm.returnSearchSelection(select)
+    await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 'F100'
@@ -144,7 +145,7 @@ describe('Serial number search', () => {
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
-  const select: SearchTypeIF = SearchTypes[0]
+  const select: SearchTypeIF = SearchTypes[1]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -168,9 +169,11 @@ describe('Serial number search', () => {
   })
 
   it('searches when fields are filled', async () => {
+    await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
     expect(wrapper.find('.select-search-text').text()).toContain('Each search incurs')
-    expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
+    wrapper.vm.returnSearchSelection(select)
+    await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 'F100'
@@ -200,7 +203,7 @@ describe('Serial number search', () => {
       folioNumber: ''
     })
     await store.dispatch('setSearchCertified', true)
-    expect(select.searchTypeUI).toEqual(UISearchTypes.SERIAL_NUMBER)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 'F100'
@@ -234,7 +237,7 @@ describe('Individual debtor search', () => {
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.INDIVIDUAL_DEBTOR]
-  const select: SearchTypeIF = SearchTypes[1]
+  const select: SearchTypeIF = SearchTypes[2]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -258,7 +261,7 @@ describe('Individual debtor search', () => {
   })
 
   it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.INDIVIDUAL_DEBTOR)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValueFirst = 'test'
@@ -288,7 +291,7 @@ describe('Individual debtor search', () => {
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('Middle name is optional', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.INDIVIDUAL_DEBTOR)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValueFirst = 'test'
@@ -325,7 +328,7 @@ describe('Business debtor search', () => {
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
   const vonResp: AutoCompleteResponseIF = mockedVonResponse
-  const select: SearchTypeIF = SearchTypes[2]
+  const select: SearchTypeIF = SearchTypes[3]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -353,7 +356,7 @@ describe('Business debtor search', () => {
   })
 
   it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.BUSINESS_DEBTOR)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 'test business debtor'
@@ -374,7 +377,7 @@ describe('Business debtor search', () => {
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('shows von api results while typing', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.BUSINESS_DEBTOR)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 't'
@@ -393,7 +396,7 @@ describe('Business debtor search', () => {
     expect(autoCompleteNames.at(4).text()).toEqual(mockedVonResponse.results[4].value)
   })
   it('updates the search value and removes the autocomplete list after a name is selected', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.BUSINESS_DEBTOR)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = 'test'
@@ -418,55 +421,6 @@ describe('MHR search', () => {
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
-  const select: SearchTypeIF = SearchTypes[4]
-
-  beforeEach(async () => {
-    sandbox = sinon.createSandbox()
-    const post = sandbox.stub(axios, 'post')
-
-    // GET search data
-    post.returns(new Promise(resolve => resolve({
-      data: resp
-    })))
-    await store.dispatch('setUserInfo', {
-      firstname: 'test',
-      lastname: 'tester',
-      username: 'user',
-      settings: mockedDisableAllUserSettingsResponse
-    })
-    wrapper = createComponent()
-  })
-  afterEach(() => {
-    sandbox.restore()
-    wrapper.destroy()
-  })
-
-  it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.MHR_NUMBER)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = '123456'
-    wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
-    await Vue.nextTick()
-    await Vue.nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-  })
-})
-
-describe('Aircraft search', () => {
-  let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
-  let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.AIRCRAFT]
   const select: SearchTypeIF = SearchTypes[5]
 
   beforeEach(async () => {
@@ -491,17 +445,17 @@ describe('Aircraft search', () => {
   })
 
   it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.AIRCRAFT)
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'abcd-efgh-fhgh' // dashes allowed
+    wrapper.vm.$data.searchValue = '123456'
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Up to 25 characters')
+    expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
@@ -511,11 +465,11 @@ describe('Aircraft search', () => {
   })
 })
 
-describe('Registration number search', () => {
+describe('Aircraft search', () => {
   let wrapper: Wrapper<any>
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
+  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.AIRCRAFT]
   const select: SearchTypeIF = SearchTypes[6]
 
   beforeEach(async () => {
@@ -540,7 +494,56 @@ describe('Registration number search', () => {
   })
 
   it('searches when fields are filled', async () => {
-    expect(select.searchTypeUI).toEqual(UISearchTypes.REGISTRATION_NUMBER)
+    wrapper.vm.returnSearchSelection(select)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'abcd-efgh-fhgh' // dashes allowed
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    const messages = wrapper.findAll('.v-messages__message')
+    expect(messages.length).toBe(1)
+    // ensure its the hint message not a validation message
+    expect(messages.at(0).text()).toContain('Up to 25 characters')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+})
+
+describe('Registration number search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  let sandbox
+  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
+  const select: SearchTypeIF = SearchTypes[7]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('searches when fields are filled', async () => {
+    wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = '123456A'

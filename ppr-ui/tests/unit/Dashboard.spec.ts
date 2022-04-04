@@ -99,6 +99,7 @@ describe('Dashboard component', () => {
 
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
+    await store.dispatch('setAuthRoles', ['ppr'])
     patchUserSettings.returns(new Promise(resolve => resolve(
       { data: mockedUpdateRegTableUserSettingsResponse }
     )))
@@ -159,6 +160,7 @@ describe('Dashboard component', () => {
   })
 
   it('displays the search header', () => {
+    
     const header = wrapper.findAll(searchHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Personal Property Search')

@@ -16,10 +16,9 @@
     />
     <v-row no-gutters class="pt-2">
       <v-col :class="[$style['search-info'], 'select-search-text', 'pt-4']">
-        <span>
-          Select a search category and then enter a value to search.
+        <span v-html="typeOfSearch">
         </span>
-        <span v-if="!isStaffBcolReg">
+        <div v-if="shouldShowFeeHint">
           <span>
             Each search incurs a
           </span>
@@ -39,7 +38,7 @@
               </span>
             </v-row>
           </v-tooltip>
-        </span>
+        </div>
       </v-col>
       <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
         <folio-number
@@ -52,26 +51,15 @@
     </v-row>
     <v-row no-gutters class="pt-1">
       <v-col class="ml-n6 pl-6" cols="4">
-        <v-select
-          id="search-select"
-          class="search-bar-type-select"
-          :error-messages="categoryMessage ? categoryMessage : ''"
-          filled
-          :items="searchTypes"
-          item-disabled="selectDisabled"
-          item-text="searchTypeUI"
-          :label="selectedSearchType ? '' : searchTypeLabel"
-          return-object
-          v-model="selectedSearchType"
-        >
-          <template slot="item" slot-scope="data">
-            <span :id="`search-bar-${data.item.searchTypeUI}`">
-              {{ data.item.searchTypeUI }}
-            </span>
-          </template>
-        </v-select>
+
+        <search-bar-list
+          :defaultSelectedSearchType="selectedSearchType"
+          :defaultCategoryMessage="categoryMessage"
+          @selected="returnSearchSelection($event)"
+        />
+
       </v-col>
-      <v-col v-if="!isIndividualDebtor" cols="7" class="pl-3">
+      <v-col v-if="!isIndividual" cols="7" class="pl-3">
         <v-tooltip content-class="bottom-tooltip"
                    bottom
                    :open-on-hover="false"
@@ -177,11 +165,28 @@
             </v-list>
           </v-menu>
         </v-row>
-        <v-row v-if="!isStaffBcolReg" no-gutters>
+        <v-row v-if="shouldShowFeeHint" no-gutters>
           <span :id="$style['search-btn-info']" class="pl-1 pt-2 fee-text">
             ${{ fee }} fee
           </span>
         </v-row>
+      </v-col>
+    </v-row>
+    <v-row v-if="shouldShowPprCheckbox">
+      <v-col cols="4"></v-col>
+      <v-col>
+        <v-checkbox
+          id="include-ppr-checkbox"
+          class="ma-0 ml-n6"
+          hide-details
+          v-model="includePprCheckbox"
+        >
+          <template v-slot:label>
+            <p class="ma-0">
+              Include a Personal Property search (additional fee)
+            </p>
+          </template>
+        </v-checkbox>
       </v-col>
     </v-row>
   </v-container>
@@ -192,8 +197,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
-import { SearchTypes } from '@/resources'
+import { getFeatureFlag, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
   DialogOptionsIF, // eslint-disable-line no-unused-vars
@@ -203,18 +208,20 @@ import {
   SearchValidationIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { SettingOptions, UISearchTypes } from '@/enums'
+import { SettingOptions, UIMHRSearchTypes, UISearchTypes } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
+import SearchBarList from '@/components/search/SearchBarList.vue'
 
 export default defineComponent({
   components: {
     AutoComplete,
     ConfirmationDialog,
     StaffPaymentDialog,
-    FolioNumber
+    FolioNumber,
+    SearchBarList
   },
   props: {
     defaultDebtor: {
@@ -242,7 +249,9 @@ export default defineComponent({
       isRoleStaffReg,
       isRoleStaffSbc,
       isSearchCertified,
-      getStaffPayment
+      getStaffPayment,
+      hasPprRole,
+      hasMhrRole
     } = useGetters<any>([
       'getUserSettings',
       'isSearching',
@@ -250,7 +259,9 @@ export default defineComponent({
       'isRoleStaffReg',
       'isRoleStaffSbc',
       'isSearchCertified',
-      'getStaffPayment'
+      'getStaffPayment',
+      'hasPprRole',
+      'hasMhrRole'
     ])
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -259,12 +270,11 @@ export default defineComponent({
       folioNumber: props.defaultFolioNumber,
       folioError: false,
       hideDetails: false,
-      searchTypes: SearchTypes,
+      includePprCheckbox: false,
       searchValue: props.defaultSearchValue,
       searchValueFirst: props.defaultDebtor?.first,
       searchValueSecond: props.defaultDebtor?.second,
       searchValueLast: props.defaultDebtor?.last,
-      searchTypeLabel: 'Select a search category',
       selectedSearchType: props.defaultSelectedSearchType,
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG,
       showSearchPopUp: true,
@@ -273,6 +283,14 @@ export default defineComponent({
       validations: Object as SearchValidationIF,
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
+      }),
+      shouldShowFeeHint: computed((): boolean => {
+        return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
+          (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
+      }),
+      shouldShowPprCheckbox: computed((): boolean => {
+        return (hasPprRole) &&
+          (isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }
@@ -295,8 +313,9 @@ export default defineComponent({
         }
         return '8.50'
       }),
-      isIndividualDebtor: computed((): boolean => {
-        if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) {
+      isIndividual: computed((): boolean => {
+        if ((localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) ||
+           (localState.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHROWNER_NAME)) {
           return true
         }
         return false
@@ -312,6 +331,23 @@ export default defineComponent({
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
+      }),
+      typeOfSearch: computed((): string => {
+        // only show the type of search if authorized to both types
+        if ((hasPprRole.value && hasMhrRole.value) ||
+           ((isRoleStaffReg.value) && getFeatureFlag('bcregistry-ui-mhr-enabled'))) {
+          if (localState.selectedSearchType) {
+            if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+              return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
+                '"></i>' + SearchTypes[0].textLabel
+            }
+            if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+              return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + MHRSearchTypes[0].icon +
+                '"></i>' + MHRSearchTypes[0].textLabel
+            }
+          }
+        }
+        return 'Select a search category and then enter a value to search.'
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
@@ -351,7 +387,7 @@ export default defineComponent({
     })
 
     const getCriteria = () => {
-      if (localState.isIndividualDebtor) {
+      if (localState.isIndividual) {
         const first = localState.searchValueFirst?.trim()
         const second = localState.searchValueSecond?.trim()
         const last = localState.searchValueLast?.trim()
@@ -369,6 +405,14 @@ export default defineComponent({
         criteria: getCriteria(),
         clientReferenceId: localState.folioNumber
       }
+    }
+    const isMHRSearchType = (type: string): boolean => {
+      const mhi = MHRSearchTypes.findIndex(mh => mh.searchTypeAPI === type)
+      return mhi >= 0
+    }
+    const isPPRSearchType = (type: string): boolean => {
+      const sti = SearchTypes.findIndex(st => st.searchTypeAPI === type)
+      return sti >= 0
     }
     const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
@@ -388,7 +432,7 @@ export default defineComponent({
         if (resp?.error) emit('search-error', resp.error)
         else {
           emit('searched-type', localState.selectedSearchType)
-          if (localState.isIndividualDebtor) {
+          if (localState.isIndividual) {
             emit('debtor-name', {
               first: localState.searchValueFirst,
               second: localState.searchValueSecond,
@@ -415,6 +459,9 @@ export default defineComponent({
     }
     const setHideDetails = (hideDetails: boolean) => {
       localState.hideDetails = hideDetails
+    }
+    const returnSearchSelection = (selection: SearchTypeIF) => {
+      localState.selectedSearchType = selection
     }
     const setSearchValue = (searchValue: string) => {
       localState.autoCompleteIsActive = false
@@ -490,6 +537,7 @@ export default defineComponent({
       setCloseAutoComplete,
       clientSearch,
       togglePaymentConfirmation,
+      returnSearchSelection,
       updateFolioNumber
     }
   }

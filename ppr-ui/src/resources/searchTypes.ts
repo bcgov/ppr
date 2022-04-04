@@ -1,7 +1,18 @@
-import { APISearchTypes, UISearchTypes } from '@/enums'
+import { APISearchTypes, UISearchTypes, APIMHRSearchTypes, UIMHRSearchTypes, BlankSearchTypes } from '@/enums'
 import { SearchTypeIF } from '@/interfaces'
 
 export const SearchTypes: Array<SearchTypeIF> = [
+  {
+    class: 'search-list-header',
+    selectDisabled: true,
+    divider: false,
+    group: 1,
+    searchTypeUI: null,
+    searchTypeAPI: BlankSearchTypes.BLANK1,
+    textLabel: 'Personal Property Registry Search',
+    hints: null,
+    icon: 'mdi-car'
+  },
   {
     divider: false,
     selectDisabled: false,
@@ -10,7 +21,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a serial number',
     hints: {
       searchValue: 'Serial numbers normally contain letters and numbers only'
-    }
+    },
+    group: 1
   },
   {
     divider: false,
@@ -18,7 +30,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeUI: UISearchTypes.INDIVIDUAL_DEBTOR,
     searchTypeAPI: APISearchTypes.INDIVIDUAL_DEBTOR,
     textLabel: '',
-    hints: null
+    hints: null,
+    group: 1
   },
   {
     divider: false,
@@ -28,16 +41,18 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a business debtor name',
     hints: {
       searchValue: 'Business names must contain between 2 and 150 characters'
-    }
+    },
+    group: 1
   },
   {
     // divider in dropdown list
     divider: true,
     selectDisabled: true,
     searchTypeUI: null,
-    searchTypeAPI: null,
+    searchTypeAPI: BlankSearchTypes.BLANK2,
     textLabel: null,
-    hints: null
+    hints: null,
+    group: 1
   },
   {
     divider: false,
@@ -47,7 +62,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a manufactured home registration number',
     hints: {
       searchValue: 'Manufactured home registration number must contain 6 digits'
-    }
+    },
+    group: 1
   },
   {
     divider: false,
@@ -57,7 +73,8 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter an aircraft airframe D.O.T. number',
     hints: {
       searchValue: 'Up to 25 characters'
-    }
+    },
+    group: 1
   },
   {
     divider: false,
@@ -67,6 +84,75 @@ export const SearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Enter a registration number',
     hints: {
       searchValue: 'Registration numbers contain 7 characters'
-    }
+    },
+    group: 1
+  }
+]
+
+export const MHRSearchTypes: Array<SearchTypeIF> = [
+  {
+    class: 'search-list-header',
+    selectDisabled: true,
+    divider: false,
+    group: 2,
+    searchTypeUI: null,
+    searchTypeAPI: BlankSearchTypes.BLANK3,
+    textLabel: 'Manufactured Home Registration Search',
+    hints: null,
+    icon: 'mdi-home'
+  },
+  {
+    // divider in dropdown list
+    divider: true,
+    selectDisabled: true,
+    searchTypeUI: null,
+    searchTypeAPI: BlankSearchTypes.BLANK4,
+    textLabel: null,
+    hints: null,
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHRMHR_NUMBER,
+    searchTypeAPI: APIMHRSearchTypes.MHRMHR_NUMBER,
+    textLabel: 'Enter a manufactured home registration number',
+    hints: {
+      searchValue: 'Manufactured home registration number must contain 6 digits'
+    },
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHROWNER_NAME,
+    searchTypeAPI: APIMHRSearchTypes.MHROWNER_NAME,
+    textLabel: '',
+    hints: {
+      searchValue: 'Owner names normally contain letter and numbers only'
+    },
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHRORGANIZATION_NAME,
+    searchTypeAPI: APIMHRSearchTypes.MHRORGANIZATION_NAME,
+    textLabel: '',
+    hints: {
+      searchValue: 'Organization names must contain between 2 and 70 characters'
+    },
+    group: 2
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    searchTypeUI: UIMHRSearchTypes.MHRSERIAL_NUMBER,
+    searchTypeAPI: APIMHRSearchTypes.MHRSERIAL_NUMBER,
+    textLabel: 'Enter a serial number',
+    hints: {
+      searchValue: 'Serial numbers normally contain letters and numbers only'
+    },
+    group: 2
   }
 ]

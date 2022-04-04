@@ -14,3 +14,24 @@ export enum UISearchTypes {
   REGISTRATION_NUMBER = 'Registration Number',
   SERIAL_NUMBER = 'Serial Number'
 }
+
+export enum APIMHRSearchTypes {
+  MHRMHR_NUMBER = 'MHRMHR_NUMBER',
+  MHROWNER_NAME = 'MHROWNER_NAME',
+  MHRORGANIZATION_NAME = 'MHRORGANIZATION_NAME',
+  MHRSERIAL_NUMBER = 'MHRSERIAL_NUMBER'
+}
+export enum UIMHRSearchTypes {
+  MHRMHR_NUMBER = 'Manufactured Home Registration Number',
+  MHROWNER_NAME = 'Owner Name',
+  MHRORGANIZATION_NAME = 'Organization Name',
+  MHRSERIAL_NUMBER = 'Serial Number'
+}
+
+// for blank or header options in the drop down
+export enum BlankSearchTypes {
+  BLANK1 = '1',
+  BLANK2 = '2',
+  BLANK3 = '3',
+  BLANK4 = '4'
+}

@@ -143,3 +143,27 @@ describe('Test result table with error', () => {
     expect(wrapper.find('#retry-search-history').exists()).toBe(true)
   })
 })
+
+describe('Test table headers', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setSearchHistory', mockedSearchHistory.searches)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('headers for ppr only', async () => {
+    await store.dispatch('setAuthRoles', ['ppr'])
+    expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+    expect(wrapper.vm.$data.headers.length).toBe(8)
+  })
+
+  it('headers for both mhr and ppr', async () => {
+    await store.dispatch('setAuthRoles', ['ppr', 'mhr'])
+    expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+    expect(wrapper.vm.$data.headers.length).toBe(9)
+  })
+})
