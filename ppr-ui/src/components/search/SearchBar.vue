@@ -197,7 +197,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { getFeatureFlag, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { getFeatureFlag, manufacturedHomeSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
@@ -427,7 +427,12 @@ export default defineComponent({
             isSearchCertified.value)
           setStaffPayment(null)
         } else {
-          resp = await search(getSearchApiParams(), '')
+          if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
+            resp = await search(getSearchApiParams(), '')
+          }
+          if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            resp = manufacturedHomeSearch(getSearchApiParams(), '')
+          }
         }
         if (resp?.error) emit('search-error', resp.error)
         else {

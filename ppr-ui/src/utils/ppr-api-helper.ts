@@ -190,7 +190,7 @@ export async function search (
 
 // Submit a search query (search step 1) request.
 export function manufacturedHomeSearch (
-  searchCriteria: ManufacturedHomeSearchResultIF,
+  searchCriteria: SearchCriteriaIF,
   extraParams: string
 ): ManufacturedHomeSearchResponseIF {
   const url = sessionStorage.getItem('PPR_API_URL')
