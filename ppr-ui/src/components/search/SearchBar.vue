@@ -214,6 +214,7 @@ import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
 import SearchBarList from '@/components/search/SearchBarList.vue'
+import { useSearch } from '@/composables/useSearch'
 
 export default defineComponent({
   components: {
@@ -263,6 +264,7 @@ export default defineComponent({
       'hasPprRole',
       'hasMhrRole'
     ])
+    const { isMHRSearchType, isPPRSearchType } = useSearch()
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -405,14 +407,6 @@ export default defineComponent({
         criteria: getCriteria(),
         clientReferenceId: localState.folioNumber
       }
-    }
-    const isMHRSearchType = (type: string): boolean => {
-      const mhi = MHRSearchTypes.findIndex(mh => mh.searchTypeAPI === type)
-      return mhi >= 0
-    }
-    const isPPRSearchType = (type: string): boolean => {
-      const sti = SearchTypes.findIndex(st => st.searchTypeAPI === type)
-      return sti >= 0
     }
     const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false

@@ -37,7 +37,7 @@
         </v-row>
       </div>
       <v-row v-if="getSearchResults" no-gutters style="padding-top: 38px;">
-        <searched-result class="soft-corners" @selected-matches="updateSelectedMatches" @submit="submitCheck()" />
+        <searched-result-mhr class="soft-corners" @submit="submitCheck()" />
       </v-row>
     </v-container>
   </v-container>
@@ -56,23 +56,20 @@ import {
   LargeSearchResultDialog,
   LargeSearchDelayDialog
 } from '@/components/dialogs'
-import { SearchedResultPPR } from '@/components/tables'
+import { SearchedResultMhr } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
-import { MatchTypes, RouteNames, SettingOptions } from '@/enums'
+import { RouteNames, SettingOptions } from '@/enums'
 import {
   ActionBindingIF, ErrorIF, IndividualNameIF, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
-  largeSearchReportError,
   searchReportError,
   selectionConfirmaionDialog,
-  largeSearchReportDelay,
-  saveResultsError,
   saveSelectionsError
 } from '@/resources/dialogOptions'
-import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate, pacificDate } from '@/utils'
+import { getFeatureFlag, navigate, pacificDate } from '@/utils'
 
 @Component({
   components: {
@@ -81,7 +78,7 @@ import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected,
     LargeSearchResultDialog,
     LargeSearchDelayDialog,
     SearchBar,
-    SearchedResultPPR
+    SearchedResultMhr
   }
 })
 export default class Search extends Vue {
@@ -112,13 +109,8 @@ export default class Search extends Vue {
   private confirmationDialog = false
   private confirmOptions = selectionConfirmaionDialog
   private errorDialog = false
-  private largeSearchResultDialog = false
-  private largeSearchDelayDialog = false
   private errorOptions = searchReportError
-  private largeSearchResultOptions = largeSearchReportError
-  private largeSearchDelayOptions = largeSearchReportDelay
   private loading = false
-  private selectedMatches: Array<SearchResultIF> = []
   private settingOption = SettingOptions.SELECT_CONFIRMATION_DIALOG
 
   private get folioNumber (): string {
@@ -170,46 +162,13 @@ export default class Search extends Vue {
     return 0
   }
 
-  private get exactResultsLength (): number {
-    const selectedExactMatches = []
-    const results = this.getSearchResults?.results
-    let count = 0
-    let x:any
-    for (x in results) {
-      if (results[x].matchType === MatchTypes.EXACT) {
-        count += 1
-        selectedExactMatches.push(results[x])
-      }
-    }
-    return count
-  }
-
-  private get selectedResultsLength (): number {
-    if (this.selectedMatches) {
-      return this.selectedMatches.length
-    }
-    return 0
-  }
-
-  /** Use to conditionally display selection confirmation dialog. */
-  private get similarResultsLength (): number {
-    const searchResult = this.getSearchResults
-    var similarCount = 0
-    if (searchResult) {
-      for (var result of searchResult.results) {
-        if (result.matchType !== 'EXACT') {
-          similarCount += 1
-        }
-      }
-    }
-    return similarCount
-  }
+  
 
   private created (): void {
     window.onbeforeunload = (event) => {
       // unsaved selections if app is ready, search results exist, and on the search page
       const isSearchReportUnsaved = (
-        this.$router.currentRoute.name === RouteNames.SEARCH &&
+        this.$router.currentRoute.name === RouteNames.MHRSEARCH &&
         this.appReady &&
         !!this.getSearchResults
       )
@@ -230,71 +189,21 @@ export default class Search extends Vue {
     }
   }
 
-  private handleLargeReport (generateReport: boolean): void {
-    if (generateReport) {
-      this.submit(true)
-    }
-    this.largeSearchResultDialog = false
-  }
-
-  private handleDelayReport (acknowledge: boolean): void {
-    this.submit(true)
-    this.largeSearchDelayDialog = false
-  }
-
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     navigate(this.registryUrl)
   }
 
   private submitCheck (): void {
-    // if exact match is more than 75, inform about the delay
-    if (this.exactResultsLength >= 75) {
-      this.largeSearchDelayDialog = true
-    // if they have selected more than 75 including inexact, give them the option
-    } else if (this.selectedMatches?.length >= 75) {
-      this.largeSearchResultDialog = true
-    } else if (
-      this.getUserSettings?.selectConfirmationDialog &&
-      this.totalResultsLength > 0 && this.totalResultsLength < 75 &&
-      this.similarResultsLength > 0 && this.similarResultsLength < 75
-    ) {
-      this.confirmOptions = { ...selectionConfirmaionDialog }
-      this.confirmOptions.text = `<b>${this.selectedMatches?.length}</b> ${selectionConfirmaionDialog.text}`
-      this.confirmationDialog = true
-    } else {
-      this.submit(true)
-    }
+    
   }
 
   private async submit (proceed: boolean): Promise<void> {
     this.confirmationDialog = false
-    if (proceed) {
-      this.loading = true
-      let shouldCallback = false
-      if (this.selectedMatches?.length >= 75) {
-        shouldCallback = true
-      }
-      const statusCode = await submitSelected(this.getSearchResults.searchId, this.selectedMatches, shouldCallback)
-      this.loading = false
-      if (!successfulPPRResponses.includes(statusCode)) {
-        this.errorOptions = { ...saveResultsError }
-        this.errorDialog = true
-        console.error({ statusCode: statusCode })
-      } else {
-        this.$router.push({ name: RouteNames.DASHBOARD })
-      }
-    }
+    
   }
 
-  private async updateSelectedMatches (matches:Array<SearchResultIF>): Promise<void> {
-    this.selectedMatches = matches
-    const statusCode = await updateSelected(this.getSearchResults.searchId, matches)
-    if (!successfulPPRResponses.includes(statusCode)) {
-      this.errorOptions = { ...saveSelectionsError }
-      this.errorDialog = true
-    }
-  }
+  
 
   /** Called when App is ready and this component can load its data. */
   @Watch('appReady')

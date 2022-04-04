@@ -118,6 +118,7 @@ export const stateModel: StateModelIF = {
     searchHistory: null,
     searchHistoryLength: null,
     searchResults: null,
+    manufacturedHomeSearchResults: null,
     searchedType: null,
     searchedValue: '',
     searching: false,

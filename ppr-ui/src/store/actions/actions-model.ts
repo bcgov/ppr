@@ -21,7 +21,8 @@ import {
   GeneralCollateralIF,
   VehicleCollateralIF,
   RegistrationSummaryIF,
-  DraftResultIF
+  DraftResultIF,
+  ManufacturedHomeSearchResponseIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -157,6 +158,13 @@ export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<Sear
 export const setSearchResults: ActionIF = ({ commit }, searchResults: SearchResponseIF): void => {
   commit('mutateSearchResults', searchResults)
 }
+
+export const setManufacturedHomeSearchResults: ActionIF =
+  ({ commit },
+    manufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF
+  ): void => {
+    commit('mutateManufacturedHomeSearchResults', manufacturedHomeSearchResults)
+  }
 
 export const setSearchedType: ActionIF = ({ commit }, searchedType: SearchTypeIF): void => {
   commit('mutateSearchedType', searchedType)

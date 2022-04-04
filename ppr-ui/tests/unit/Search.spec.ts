@@ -6,7 +6,7 @@ import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
-import { SearchedResultPPR } from '@/components/tables'
+import { SearchedResultPpr } from '@/components/tables'
 import { Search } from '@/views'
 
 // Other
@@ -60,7 +60,7 @@ describe('Search component', () => {
     expect(wrapper.find(resultsInfo).exists()).toBe(false)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     expect(wrapper.find(folioHeader).exists()).toBe(false)
-    expect(wrapper.findComponent(SearchedResultPPR).exists()).toBe(false)
+    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
     wrapper.vm.setSearchedType(SearchTypes[1])
@@ -85,7 +85,7 @@ describe('Search component', () => {
     expect(folioDisplay.length).toBe(1)
     expect(folioDisplay.at(0).text()).toContain(wrapper.vm.folioNumber)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
-    expect(wrapper.findComponent(SearchedResultPPR).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
   })
   it('renders the Results component and displays search data elements with empty result set.', async () => {
     const response = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
@@ -115,6 +115,6 @@ describe('Search component', () => {
     const folioDisplay = wrapper.findAll(folioHeader)
     expect(folioDisplay.length).toBe(1)
     expect(folioDisplay.at(0).text()).toContain(wrapper.vm.folioNumber)
-    expect(wrapper.findComponent(SearchedResultPPR).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
   })
 })

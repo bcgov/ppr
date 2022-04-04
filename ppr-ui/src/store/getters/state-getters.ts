@@ -13,6 +13,7 @@ import {
   GeneralCollateralIF,
   IndividualNameIF,
   LengthTrustIF,
+  ManufacturedHomeSearchResponseIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -155,6 +156,10 @@ export const getSearchResults = (state: StateIF): SearchResponseIF => {
   return state.stateModel.search.searchResults
 }
 
+export const getManufacturedHomeSearchResults = (state: StateIF): ManufacturedHomeSearchResponseIF => {
+  return state.stateModel.search.manufacturedHomeSearchResults
+}
+
 /** The selected search type object. */
 export const getSearchedType = (state: StateIF): SearchTypeIF => {
   return state.stateModel.search.searchedType
@@ -205,6 +210,7 @@ export const hasPprRole = (state: StateIF): boolean => {
 }
 
 export const hasMhrRole = (state: StateIF): boolean => {
+  return true
   return state.stateModel.authorization?.authRoles.includes('mhr')
 }
 

@@ -244,7 +244,7 @@ import {
   RegistrationSortIF, // eslint-disable-line no-unused-vars
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, RegTableDataI, RegTableNewItemI, // eslint-disable-line no-unused-vars
-  SearchResponseIF, // eslint-disable-line no-unused-vars
+  SearchResponseIF, SearchTypeIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
@@ -286,6 +286,7 @@ import { Tombstone } from '@/components/tombstone'
 import { SearchBar } from '@/components/search'
 import { SearchHistory, RegistrationTable } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
+import { useSearch } from '@/composables/useSearch'
 
 @Component({
   components: {
@@ -310,6 +311,7 @@ export default class Dashboard extends Vue {
   @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchHistoryLength: number
   @Getter getSearchResults: SearchResponseIF
+  @Getter getSearchedType: SearchTypeIF
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getStateModel: StateModelIF
   @Getter getUserServiceFee!: number
@@ -371,6 +373,8 @@ export default class Dashboard extends Vue {
   private myRegAddDialogDisplay = false
   private myRegDeleteDialogDisplay = false
   private myRegDeleteDialog: DialogOptionsIF = null
+  private isMHRSearchType = useSearch().isMHRSearchType
+  private isPPRSearchType = useSearch().isPPRSearchType
 
   private myRegDataLoading = false
   private myRegDataAdding = false
@@ -995,10 +999,17 @@ export default class Dashboard extends Vue {
   private onSearch (val: SearchResponseIF): void {
     // navigate to search page if not null/reset
     if (val) {
-      // 'replace' resets the state so window.onbeforeunload event is fired when the browser 'back' btn is pressed
-      this.$router.replace({
-        name: RouteNames.SEARCH
-      })
+      if (this.isMHRSearchType(this.getSearchedType.searchTypeAPI)) {
+        // 'replace' resets the state so window.onbeforeunload event is fired when the browser 'back' btn is pressed
+        this.$router.replace({
+          name: RouteNames.MHRSEARCH
+        })
+      } else {
+        // 'replace' resets the state so window.onbeforeunload event is fired when the browser 'back' btn is pressed
+        this.$router.replace({
+          name: RouteNames.SEARCH
+        })
+      }
     }
   }
 

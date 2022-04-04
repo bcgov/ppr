@@ -4,29 +4,13 @@
       <v-col style="padding-right: 30px;" cols="auto">
         <v-row no-gutters>
           <v-col class="divider pr-3 mr-3" cols="auto">
-            <b>{{ totalResultsLength }}</b> matches found
+            <b>{{ totalResultsLength }}</b> homes found
           </v-col>
           <v-col :class="totalResultsLength !== 0 ? 'divider pr-3 mr-3' : ''" cols="auto">
-            <b>{{ exactMatchesLength }}</b> exact matches
+            <b></b> active homes
           </v-col>
-          <v-col v-if="totalResultsLength !== 0" cols="auto">
-            <b>{{ selectedLength }}</b> total matches in
-            <b>{{ selectedRegistrationsLength }}</b> registrations added to report
-            <v-tooltip
-              v-if="selectedRegistrationsLength !== selectedLength"
-              class="pa-2"
-              content-class="top-tooltip"
-              nudge-right="6"
-              top
-              transition="fade-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon class="pl-2" color="primary" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
-              </template>
-              <div class="pt-2 pb-2">
-                {{ tooltipTxtSrchMtchs }}
-              </div>
-            </v-tooltip>
+          <v-col cols="auto">
+
           </v-col>
         </v-row>
       </v-col>
@@ -47,7 +31,7 @@
           disable-sort
           fixed
           fixed-header
-          group-by="matchType"
+          group-by="status"
           :headers="headers"
           hide-default-footer
           :items="results"
@@ -60,73 +44,50 @@
           @toggle-select-all="selectAll($event)"
           v-model="selected"
         >
-          <template v-slot:[`header.data-table-select`]="{ props, on }">
-            <v-checkbox
-              class="header-checkbox ma-0 pa-0"
-              color="primary"
-              hide-details
-              :indeterminate="props.indeterminate"
-              label="Select All"
-              :value="props.value"
-              @click="on.input(!props.value)"
-            />
-          </template>
+
           <template v-slot:[`group.header`]="{ group }">
             <td
               class="group-header px-2"
               :colspan="headers.length"
-              :style="exactMatchesLength === 0 ? 'text-align: center;' : ''"
             >
-              <span v-if="group === 'EXACT'">
-                Exact Matches ({{ exactMatchesLength }})
+              <span v-if="group === 'ACTIVE'">
+                ACTIVE ({{ activeMatchesLength }})
               </span>
-              <span v-else-if="exactMatchesLength === 0">
-                No Exact Matches
+              <span v-else-if="group === 'EXEMPT'">
+                EXEMPT ({{ exemptMatchesLength }})
               </span>
-              <span v-else>
-                Similar Matches ({{ totalResultsLength - exactMatchesLength }})
+              <span v-else-if="group === 'HISTORIC'">
+                HISTORIC ({{ historicMatchesLength }})
               </span>
             </td>
           </template>
-          <template v-slot:[`item.data-table-select`]="{ item, isSelected, select }">
-            <td v-if="isSelected && item.matchType === 'EXACT'" class="checkbox-info">
-              <v-row no-gutters>
-                <v-col cols="2">
-                  <v-simple-checkbox readonly :ripple="false" :value="isSelected"/>
-                </v-col>
-                <v-col cols="auto" class="pl-2 pt-1">
-                  exact match added
-                </v-col>
-              </v-row>
-            </td>
-            <td v-else class="checkbox-info">
-              <v-row no-gutters>
-                <v-col cols="2">
-                  <v-simple-checkbox :ripple="false" :value="isSelected" @click="select(!isSelected)"/>
-                </v-col>
-                <v-col v-if="isSelected" cols="auto" class="pl-2 pt-1">
-                  added
-                </v-col>
-              </v-row>
-            </td>
-          </template>
-          <template v-slot:[`item.vehicleCollateral.type`]="{ item }">
-            {{ getVehicleDescription(item.vehicleCollateral.type) }}
-          </template>
-          <template v-slot:[`item.vehicleCollateral.make`]="{ item }">
-            {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
-          </template>
-          <template v-slot:[`item.debtor.personName`]="{ item }">
-            {{ item.debtor.personName.last }},
-            {{ item.debtor.personName.first }}
-            {{ item.debtor.personName.middle }}
-            {{ item.debtor.personName.second }}
-          </template>
-          <template v-slot:[`item.debtor.birthDate`]="{ item }">
-            {{ displayDate(item.debtor.birthDate) }}
+
+          <template v-slot:[`item.ownerName`]="{ item }">
+            {{ item.ownerName.last }},
+            {{ item.ownerName.first }}
+            {{ item.ownerName.middle }}
+
           </template>
           <template v-slot:[`item.registrationNumber`]="{ item }">
-            <span>{{ item.baseRegistrationNumber }}</span>
+            {{ item.registrationNumber }}
+          </template>
+          <template v-slot:[`item.status`]="{ item }">
+            {{ item.status }}
+          </template>
+          <template v-slot:[`item.year`]="{ item }">
+            {{ item.year }}
+          </template>
+          <template v-slot:[`item.make`]="{ item }">
+            {{ item.make }}
+          </template>
+          <template v-slot:[`item.model`]="{ item }">
+            {{ item.model }}
+          </template>
+          <template v-slot:[`item.homeLocation`]="{ item }">
+            {{ item.homeLocation }}
+          </template>
+          <template v-slot:[`item.serialNumber`]="{ item }">
+            <span>{{ item.serialNumber }}</span>
           </template>
         </v-data-table>
       </v-col>
@@ -135,8 +96,8 @@
       <v-col cols="8">
         <p class="no-results-title ma-0 pt-10"><b>Nil Result</b></p>
         <p class="ma-0 pt-2">
-          No registered liens or encumbrances have been found on file that match EXACTLY to the
-          search criteria above and no similar matches to the criteria have been found.
+          No registered homes can be found to match the
+          search criteria above.
         </p>
       </v-col>
     </v-row>
@@ -144,48 +105,29 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 
-import { searchTableHeaders, VehicleTypes } from '@/resources'
-import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { MatchTypes } from '@/enums'
-import { convertDate } from '@/utils'
+import { searchTableHeaders } from '@/resources'
+import { ManufacturedHomeSearchResultIF, TableHeadersIF, ManufacturedHomeSearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
-  props: {
-    defaultHeaders: {
-      type: Array as () => TableHeadersIF
-    },
-    defaultResults: {
-      type: Array as () => Array<SearchResultIF>
-    },
-    defaultSelected: {
-      type: Array as () => Array<SearchResultIF>
-    }
-  },
   emits: ['selected-matches', 'submit'],
   setup (props, { emit }) {
-    const { getSearchResults } = useGetters<any>(['getSearchResults'])
+    const { getManufacturedHomeSearchResults } = useGetters<any>(['getSearchResults'])
+    const resp = getManufacturedHomeSearchResults.value
     const localState = reactive({
       searched: false,
       searchValue: '',
-      selected: props.defaultSelected,
       selectedInitialized: false,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
-      headers: props.defaultHeaders,
-      results: props.defaultResults,
-      exactMatchRegistrations: 0,
-      exactMatchesLength: 0,
+      headers: searchTableHeaders[resp.searchQuery.type],
+      results: resp.results,
       totalResultsLength: 0,
-      selectedRegistrationsLength: 0,
-      selectedLength: computed((): number => {
-        return localState.selected?.length | 0
-      }),
-      setTableData: computed((): SearchResponseIF => {
+      setTableData: computed((): ManufacturedHomeSearchResponseIF => {
         let resp = null
-        resp = getSearchResults.value
+        resp = getManufacturedHomeSearchResults.value
 
         if (resp) {
           localState.searchValue = resp.searchQuery.criteria.value
@@ -197,9 +139,7 @@ export default defineComponent({
         }
         return {
           searchId: '',
-          maxResultsSize: NaN,
           totalResultsSize: NaN,
-          returnedResultsSize: NaN,
           searchQuery: {
             type: '',
             criteria: {}
@@ -208,68 +148,10 @@ export default defineComponent({
         }
       })
     })
-    const displayDate = (dateString:string):string => {
-      if (!dateString) {
-        return ''
-      }
-      const date = new Date(dateString)
-      return convertDate(date, false, false)
-    }
-    const getClass = (item:SearchResultIF):string => {
-      if (item.matchType === MatchTypes.EXACT) return 'exact-match'
-      return 'normal-match'
-    }
-    const getVehicleDescription = (code: string): string => {
-      const vehicle = VehicleTypes.find(obj => obj.value === code)
-      return vehicle.text
-    }
-    const selectAll = (props: { items:Array<SearchResultIF>, value:boolean }):void => {
-      // ensures exact matches are never deselected
-      if (!props.value) {
-        const selected = []
-        props.items.forEach(item => {
-          if (item.matchType === MatchTypes.EXACT) {
-            selected.push(item)
-          }
-        })
-        localState.selected = selected
-      }
-    }
-    watch(() => localState.results, (results) => {
-      const selectedExactMatches = []
-      let count = 0
-      for (const x in results) {
-        if (results[x].matchType === MatchTypes.EXACT) {
-          count += 1
-          selectedExactMatches.push(results[x])
-        }
-      }
-      localState.exactMatchesLength = count
-      localState.selected = selectedExactMatches
-    })
-    watch(() => localState.selected, (selected) => {
-      const baseRegs = []
-      for (const x in selected) {
-        if (!baseRegs.includes(selected[x].baseRegistrationNumber)) {
-          baseRegs.push(selected[x].baseRegistrationNumber)
-        }
-      }
-      localState.selectedRegistrationsLength = baseRegs.length
-
-      if (!localState.selectedInitialized) {
-        localState.selectedInitialized = true
-        return
-      }
-      emit('selected-matches', selected)
-    })
 
     return {
       ...toRefs(localState),
-      displayDate,
-      emit,
-      getClass,
-      getVehicleDescription,
-      selectAll
+      emit
     }
   }
 })
