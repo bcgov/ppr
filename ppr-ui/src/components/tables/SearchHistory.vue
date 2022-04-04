@@ -152,7 +152,8 @@ import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disa
 import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses } from '@/utils'
 import { ErrorContact } from '../common'
-import { cloneDeep, _ } from 'lodash'
+import { cloneDeep } from 'lodash' // eslint-disable-line
+import _ from 'lodash' // eslint-disable-line
 
 export default defineComponent({
   components: {
