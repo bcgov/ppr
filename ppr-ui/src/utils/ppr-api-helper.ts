@@ -204,6 +204,7 @@ export function manufacturedHomeSearch (
         value: 'test'
       }
     },
+    searchDateTime: '2022-04-05T20:31:45+00:00',
     results: [
       {
         id: 1,

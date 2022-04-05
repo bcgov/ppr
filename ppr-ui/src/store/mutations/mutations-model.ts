@@ -23,7 +23,8 @@ import {
   VehicleCollateralIF,
   RegistrationSummaryIF,
   DraftResultIF,
-  ManufacturedHomeSearchResponseIF
+  ManufacturedHomeSearchResponseIF,
+  ManufacturedHomeSearchResultIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -215,6 +216,11 @@ export const mutateManufacturedHomeSearchResults = (
   manufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF
 ) => {
   state.stateModel.search.manufacturedHomeSearchResults = manufacturedHomeSearchResults
+}
+
+export const mutateSelectedManufacturedHome = (state: StateIF,
+  selectedManufacturedHome: ManufacturedHomeSearchResultIF) => {
+  state.stateModel.selectedManufacturedHome = selectedManufacturedHome
 }
 
 export const mutateUserInfo = (state: StateIF, userInfo: UserInfoIF) => {

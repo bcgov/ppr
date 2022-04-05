@@ -474,7 +474,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'serialNumber'
   },
   {
-    class: 'actions-col pa-0',
+    class: 'lien-info',
     sortable: false,
     text: '',
     value: 'edit'

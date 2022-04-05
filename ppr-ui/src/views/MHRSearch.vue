@@ -16,10 +16,6 @@
         Your search results will display below.
       </p>
       <div v-else no-gutters style="padding-top: 26px;">
-        <p id="search-meta-info" class="ma-0">
-          <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
-          <span :class="$style['search-info']">{{ searchTime }}</span>
-        </p>
         <v-row no-gutters style="padding-top: 22px;">
           <v-col :class="$style['search-info']">
             <span v-if="totalResultsLength !== 0" id="results-info">

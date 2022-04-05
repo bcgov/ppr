@@ -536,7 +536,8 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     }
   },
   folioOrReferenceNumber: 'UT-AM-001-ADD',
-  unsavedChanges: false
+  unsavedChanges: false,
+  selectedManufacturedHome: null
 }
 
 export const mockedModelAmendmdmentDelete: StateModelIF = {
@@ -642,7 +643,8 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     }
   },
   folioOrReferenceNumber: 'UT-AM-002-DELETE',
-  unsavedChanges: false
+  unsavedChanges: false,
+  selectedManufacturedHome: null
 }
 
 export const mockedModelAmendmdmentEdit: StateModelIF = {
@@ -749,7 +751,8 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     }
   },
   folioOrReferenceNumber: 'UT-AM-003-EDIT',
-  unsavedChanges: false
+  unsavedChanges: false,
+  selectedManufacturedHome: null
 }
 
 export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
@@ -855,5 +858,6 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     }
   },
   folioOrReferenceNumber: 'UT-AM-004-COURT-ORDER',
-  unsavedChanges: false
+  unsavedChanges: false,
+  selectedManufacturedHome: null
 }

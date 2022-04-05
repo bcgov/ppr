@@ -242,7 +242,11 @@ export default defineComponent({
     serviceFee: { default: 1.50 }
   },
   setup (props, { emit }) {
-    const { setSearching, setStaffPayment } = useActions<any>(['setSearching', 'setStaffPayment'])
+    const {
+      setSearching,
+      setStaffPayment,
+      setFolioOrReferenceNumber
+    } = useActions<any>(['setSearching', 'setStaffPayment', 'setFolioOrReferenceNumber'])
     const {
       getUserSettings,
       isSearching,
@@ -425,6 +429,7 @@ export default defineComponent({
             resp = await search(getSearchApiParams(), '')
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            setFolioOrReferenceNumber(localState.folioNumber)
             resp = manufacturedHomeSearch(getSearchApiParams(), '')
           }
         }

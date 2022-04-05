@@ -6,6 +6,7 @@ import { initialize, LDClient, LDFlagSet, LDOptions, LDUser } from 'launchdarkly
 const defaultFlagSet: LDFlagSet = {
   'financing-statement': false,
   'ppr-ui-enabled': true,
+  'bcregistry-ui-mhr-enabled': false,
   'search-registration-number': false,
   'search-serial-number': false
 }
