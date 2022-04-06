@@ -1,7 +1,0 @@
-include requirements/*.txt
-include CONTRIBUTING.md
-graft docs
-prune docs/_build
-graft examples
-graft tests
-global-exclude *.pyc
