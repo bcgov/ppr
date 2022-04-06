@@ -1,3 +1,0 @@
-Flask
-python-dotenv
-gunicorn
