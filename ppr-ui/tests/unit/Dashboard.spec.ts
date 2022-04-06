@@ -193,7 +193,7 @@ describe('Dashboard component', () => {
   })
 
   it('routes to search after getting a search response', async () => {
-    wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    wrapper.vm.saveResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe('search')
   })
