@@ -670,7 +670,7 @@ class AccountRegistrationResource(Resource):
                 return resource_utils.duplicate_error_response(message)
             # Restricted access check for crown charge class of registration types.
             if not is_all_staff_account(account_id) and \
-                    registration['registrationClass'] == model_utils.REG_CLASS_CROWN and \
+                    registration['registrationClass'] in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC) and \
                     not AccountBcolId.crown_charge_account(account_id):
                 return resource_utils.cc_forbidden_error_response(account_id)
             if registration['accountId'] != account_id:
