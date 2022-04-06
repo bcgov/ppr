@@ -95,8 +95,6 @@ export default defineComponent({
       }),
       origItems: computed((): Array<SearchTypeIF> => {
         const allSearchTypes = []
-        const bce = getFeatureFlag('bcregistry-ui-mhr-enabled')
-        console.log(bce)
         if (isRoleStaffReg.value) {
           if (getFeatureFlag('bcregistry-ui-mhr-enabled')) {
             allSearchTypes.push.apply(allSearchTypes, SearchTypes)

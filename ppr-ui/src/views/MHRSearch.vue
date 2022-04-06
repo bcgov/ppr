@@ -169,33 +169,15 @@ export default class Search extends Vue {
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-#done-btn {
-  font-size: 0.825rem !important;
-}
 .search-title {
   color: $gray9;
   font-size: 2rem;
   line-height: 2rem;
-}
-.search-sub-title {
-  color: $gray8;
-  font-size: 1.1rem;
-  line-height: 1.5rem;
 }
 .search-info {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;
 }
-.search-note {
-  color: $gray7;
-  font-size: 0.875rem;
-  font-style: italic;
-  line-height: 1rem;
-}
-.search-table-title {
-  color: $gray9;
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
+
 </style>

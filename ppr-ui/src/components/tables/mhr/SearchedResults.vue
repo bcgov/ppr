@@ -197,14 +197,6 @@ th {
 .divider {
   border-right: 1px solid $gray3;
 }
-.exact-match td {
-  background-color: $blueSelected;
-  font-weight: bold;
-  pointer-events: none;
-}
-.exact-match i {
-  color: $gray7 !important;
-}
 .group-header, .group-header:hover {
   background-color: $gray3;
   font-weight: bold;
@@ -230,18 +222,7 @@ th {
 ::v-deep .results-table .v-input--checkbox .v-input__slot .v-label {
   font-size: 0.875rem !important;
 }
-::v-deep .header-checkbox .v-input__control .v-input__slot .v-label {
-  color: $primary-blue !important;
-  font-size: 0.875rem !important;
-  font-weight: normal;
-}
-::v-deep .header-checkbox .v-input__control .v-input--selection-controls__input i,
-::v-deep .header-checkbox .v-input__control .v-input--selection-controls__ripple,
-::v-deep .header-checkbox .v-input__control .mdi-checkbox-blank-outline,
-::v-deep .checkbox-info .row .col .v-simple-checkbox .v-input--selection-controls__ripple,
-::v-deep .checkbox-info .row .col .v-simple-checkbox .mdi-checkbox-blank-outline {
-  color: $primary-blue !important;
-}
+
 ::v-deep .results-table .v-data-table__wrapper {
   max-height: 550px;
 }
