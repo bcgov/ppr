@@ -1,6 +1,6 @@
-import { APISearchTypes, UISearchTypes } from '@/enums'
-import { SearchResponseIF } from '@/interfaces'
-import { mockedSearchResults } from '.'
+import { APIMHRSearchTypes, APISearchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
+import { ManufacturedHomeSearchResponseIF, SearchResponseIF } from '@/interfaces'
+import { mockedSearchResults, mockedMHRSearchResults } from '.'
 
 type mockedSearchResponse = {
   [UISearchTypes.SERIAL_NUMBER]?: SearchResponseIF
@@ -9,6 +9,13 @@ type mockedSearchResponse = {
   [UISearchTypes.MHR_NUMBER]?: SearchResponseIF
   [UISearchTypes.AIRCRAFT]?: SearchResponseIF
   [UISearchTypes.REGISTRATION_NUMBER]?: SearchResponseIF
+}
+
+type mockedMHRSearchResponse = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]?: ManufacturedHomeSearchResponseIF
+  [UIMHRSearchTypes.MHRORGANIZATION_NAME]?: ManufacturedHomeSearchResponseIF
+  [UIMHRSearchTypes.MHROWNER_NAME]?: ManufacturedHomeSearchResponseIF
+  [UIMHRSearchTypes.MHRSERIAL_NUMBER]?: ManufacturedHomeSearchResponseIF
 }
 
 export const mockedSearchResponse: mockedSearchResponse = {
@@ -118,5 +125,56 @@ export const mockedSearchResponse: mockedSearchResponse = {
       clientReferenceId: '1q'
     },
     results: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER]
+  }
+}
+
+export const mockedMHRSearchResponse: mockedMHRSearchResponse = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]: {
+    searchId: 'test',
+    totalResultsSize: 5,
+    searchQuery: {
+      type: APIMHRSearchTypes.MHRMHR_NUMBER, // One of APISearchTypes
+      criteria: {
+        value: 'test'
+      }
+    },
+    searchDateTime: '2022-04-05T20:31:45+00:00',
+    results: mockedMHRSearchResults[UIMHRSearchTypes.MHRMHR_NUMBER]
+  },
+  [UIMHRSearchTypes.MHROWNER_NAME]: {
+    searchId: 'test',
+    totalResultsSize: 5,
+    searchQuery: {
+      type: APIMHRSearchTypes.MHROWNER_NAME, // One of APISearchTypes
+      criteria: {
+        value: 'test'
+      }
+    },
+    searchDateTime: '2022-04-05T20:31:45+00:00',
+    results: mockedMHRSearchResults[UIMHRSearchTypes.MHROWNER_NAME]
+  },
+  [UIMHRSearchTypes.MHRORGANIZATION_NAME]: {
+    searchId: 'test',
+    totalResultsSize: 5,
+    searchQuery: {
+      type: APIMHRSearchTypes.MHRORGANIZATION_NAME, // One of APISearchTypes
+      criteria: {
+        value: 'test'
+      }
+    },
+    searchDateTime: '2022-04-05T20:31:45+00:00',
+    results: mockedMHRSearchResults[UIMHRSearchTypes.MHRORGANIZATION_NAME]
+  },
+  [UIMHRSearchTypes.MHRSERIAL_NUMBER]: {
+    searchId: 'test',
+    totalResultsSize: 5,
+    searchQuery: {
+      type: APIMHRSearchTypes.MHRSERIAL_NUMBER, // One of APISearchTypes
+      criteria: {
+        value: 'test'
+      }
+    },
+    searchDateTime: '2022-04-05T20:31:45+00:00',
+    results: mockedMHRSearchResults[UIMHRSearchTypes.MHRSERIAL_NUMBER]
   }
 }

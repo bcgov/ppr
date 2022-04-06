@@ -3,13 +3,6 @@
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <base-dialog :setDisplay="errorDialog" :setOptions="errorOptions" @proceed="handleReportError($event)" />
-    <confirmation-dialog
-      :setDisplay="confirmationDialog"
-      :setOptions="confirmOptions"
-      :setSettingOption="settingOption"
-      @proceed="submit($event)"
-    />
     <v-container class="container">
       <b :class="$style['search-title']">Search Results</b>
       <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
@@ -55,17 +48,12 @@ import {
 import { SearchedResultMhr } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
-import { RouteNames, SettingOptions } from '@/enums'
+import { RouteNames } from '@/enums'
 import {
   ActionBindingIF, ErrorIF, IndividualNameIF, ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
-  SearchResponseIF, SearchResultIF, SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
+  SearchTypeIF, UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import {
-  searchReportError,
-  selectionConfirmaionDialog,
-  saveSelectionsError
-} from '@/resources/dialogOptions'
-import { getFeatureFlag, navigate, pacificDate } from '@/utils'
+import { getFeatureFlag, navigate } from '@/utils'
 
 @Component({
   components: {
@@ -102,52 +90,10 @@ export default class Search extends Vue {
   @Prop({ default: 'https://bcregistry.ca' })
   private registryUrl: string
 
-  private confirmationDialog = false
-  private confirmOptions = selectionConfirmaionDialog
-  private errorDialog = false
-  private errorOptions = searchReportError
   private loading = false
-  private settingOption = SettingOptions.SELECT_CONFIRMATION_DIALOG
-
-  private get folioNumber (): string {
-    return this.getManufacturedHomeSearchResults?.searchQuery?.clientReferenceId || ''
-  }
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get searchTime (): string {
-    // return formatted date
-    const searchResult = this.getManufacturedHomeSearchResults
-    if (searchResult) {
-      const searchDate = new Date(searchResult.searchDateTime)
-      return ` as of ${pacificDate(searchDate)}`
-    }
-    return ''
-  }
-
-  private get searchType (): string {
-    return this.getSearchedType?.searchTypeUI || ''
-  }
-
-  private get searchValue (): string {
-    const searchResult = this.getManufacturedHomeSearchResults
-    if (searchResult) {
-      // will put in more logic when doing individual debtor
-      const first = searchResult.searchQuery?.criteria?.debtorName?.first
-      const second = searchResult.searchQuery?.criteria?.debtorName?.second
-      const last = searchResult.searchQuery?.criteria?.debtorName?.last
-      const business = searchResult.searchQuery?.criteria?.debtorName?.business
-      if (first && last) {
-        if (second) {
-          return `${last}, ${first} ${second}`
-        }
-        return `${last}, ${first}`
-      }
-      return business || searchResult.searchQuery?.criteria?.value || ''
-    }
-    return ''
   }
 
   private get totalResultsLength (): number {
@@ -175,14 +121,6 @@ export default class Search extends Vue {
     }
   }
 
-  private handleReportError (stayOnSearchResults: boolean): void {
-    this.errorDialog = false
-    if (!stayOnSearchResults || (this.errorOptions !== searchReportError &&
-      this.errorOptions !== saveSelectionsError)) {
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
   /** Redirects browser to Business Registry home page. */
   private redirectRegistryHome (): void {
     navigate(this.registryUrl)
@@ -190,10 +128,6 @@ export default class Search extends Vue {
 
   private submitCheck (): void {
 
-  }
-
-  private async submit (proceed: boolean): Promise<void> {
-    this.confirmationDialog = false
   }
 
   /** Called when App is ready and this component can load its data. */

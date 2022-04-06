@@ -1,5 +1,5 @@
-import { APIVehicleTypes, MatchTypes, UISearchTypes } from '@/enums'
-import { SearchResultIF } from '@/interfaces'
+import { APIVehicleTypes, MatchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
+import { ManufacturedHomeSearchResultIF, SearchResultIF } from '@/interfaces'
 
 type mockSearchResults = {
   [UISearchTypes.SERIAL_NUMBER]?: Array<SearchResultIF>
@@ -8,6 +8,13 @@ type mockSearchResults = {
   [UISearchTypes.MHR_NUMBER]?: Array<SearchResultIF>
   [UISearchTypes.AIRCRAFT]?: Array<SearchResultIF>
   [UISearchTypes.REGISTRATION_NUMBER]?: Array<SearchResultIF>
+}
+
+type mockMHRSearchResults = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]?: Array<ManufacturedHomeSearchResultIF>
+  [UIMHRSearchTypes.MHRORGANIZATION_NAME]?: Array<ManufacturedHomeSearchResultIF>
+  [UIMHRSearchTypes.MHROWNER_NAME]?: Array<ManufacturedHomeSearchResultIF>
+  [UIMHRSearchTypes.MHRSERIAL_NUMBER]?: Array<ManufacturedHomeSearchResultIF>
 }
 
 export const mockedSearchResults: mockSearchResults = {
@@ -393,6 +400,242 @@ export const mockedSearchResults: mockSearchResults = {
       baseRegistrationNumber: '123454A',
       createDateTime: '2020-02-21T18:56:20Z',
       registrationType: 'SA'
+    }
+  ]
+}
+
+
+export const mockedMHRSearchResults: mockMHRSearchResults = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 3,
+      ownerName: {
+        first: 'John',
+        last: 'Lane'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 4,
+      ownerName: {
+        first: 'Karen',
+        last: 'Pensley'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    }
+  ],
+  [UIMHRSearchTypes.MHROWNER_NAME]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 3,
+      ownerName: {
+        first: 'John',
+        last: 'Lane'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 4,
+      ownerName: {
+        first: 'Karen',
+        last: 'Pensley'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    }
+  ],
+  [UIMHRSearchTypes.MHRORGANIZATION_NAME]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 3,
+      ownerName: {
+        first: 'John',
+        last: 'Lane'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 4,
+      ownerName: {
+        first: 'Karen',
+        last: 'Pensley'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    }
+  ],
+  [UIMHRSearchTypes.MHRSERIAL_NUMBER]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 3,
+      ownerName: {
+        first: 'John',
+        last: 'Lane'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 4,
+      ownerName: {
+        first: 'Karen',
+        last: 'Pensley'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria'
     }
   ]
 }
