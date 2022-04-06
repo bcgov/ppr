@@ -7,7 +7,8 @@ const defaultFlagSet: LDFlagSet = {
   'financing-statement': false,
   'ppr-ui-enabled': true,
   'search-registration-number': false,
-  'search-serial-number': false
+  'search-serial-number': false,
+  'mhr-ui-enabled': false
 }
 
 /**

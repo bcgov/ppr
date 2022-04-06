@@ -335,7 +335,7 @@ export default defineComponent({
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
         if ((hasPprRole.value && hasMhrRole.value) ||
-           ((isRoleStaffReg.value) && getFeatureFlag('bcregistry-ui-mhr-enabled'))) {
+           ((isRoleStaffReg.value) && getFeatureFlag('mhr-ui-enabled'))) {
           if (localState.selectedSearchType) {
             if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
               return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
