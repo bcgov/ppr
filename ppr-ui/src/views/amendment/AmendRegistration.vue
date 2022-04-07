@@ -47,6 +47,7 @@
             class="pt-4"
             :setEnableNoDataAction="false"
           />
+          <caution-box class="mt-9" :setMsg="cautionTxtRP" :setImportantWord="'Note'" />
           <h3 class="pt-6">Secured Parties</h3>
           <secured-parties
             v-if="registrationType !== registrationTypeRL"
@@ -248,6 +249,10 @@ export default class AmendRegistration extends Vue {
   private cautionTxt =
     'Secured Parties in this registration ' +
     'will receive a copy of the Amendment Verification Statement.'
+
+  private cautionTxtRP = 'The Registry will not provide ' +
+    'the verification statement for this amendment to the Registering Party named above.'
+
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private dataLoadError = false
   private feeType = FeeSummaryTypes.AMEND
