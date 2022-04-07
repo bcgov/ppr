@@ -74,6 +74,9 @@ export function getFeeSummary (
   registrationType: UIRegistrationTypes,
   registrationLength: RegistrationLengthI
 ): FeeSummaryI {
+  if (feeType === FeeSummaryTypes.MHSEARCH) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_5] }
+  }
   if (feeType === FeeSummaryTypes.DISCHARGE) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }

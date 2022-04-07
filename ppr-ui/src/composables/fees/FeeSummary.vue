@@ -136,6 +136,8 @@ export default defineComponent({
           return 'Registration Renewal'
         } else if (localState.feeType === FeeSummaryTypes.AMEND) {
           return 'Registration Amendment'
+        } else if (localState.feeType === FeeSummaryTypes.MHSEARCH) {
+          return 'Manufactured Home Search'
         } else {
           return localState.registrationType
         }
