@@ -50,6 +50,7 @@
           <registering-party-change
             class="pt-4"
           />
+          <caution-box :setMsg="cautionTxt" :setImportantWord="'Note'" />
           <registration-length-trust-summary class="mt-10" :isRenewal="true"
           />
           <div v-if="showCourtOrderInfo">
@@ -105,7 +106,8 @@ import {
   FolioNumberSummary,
   CertifyInformation,
   CourtOrder,
-  StickyContainer
+  StickyContainer,
+  CautionBox
 } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
@@ -141,6 +143,7 @@ import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
     RegisteringPartyChange,
     RegistrationLengthTrustSummary,
     CertifyInformation,
+    CautionBox,
     StickyContainer
   }
 })
@@ -191,6 +194,9 @@ export default class ConfirmDischarge extends Vue {
     'Registries user account information. This information can be updated within ' +
     'your account settings. You can change to a different Registering Party by ' +
     'using the Change button.'
+
+  private cautionTxt = 'The Registry will not provide ' +
+    'the verification statement for this renewal to the Registering Party named above.'
 
   private validFolio = true
   private validCertify = false

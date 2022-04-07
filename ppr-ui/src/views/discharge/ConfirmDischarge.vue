@@ -43,6 +43,7 @@
           <registering-party-change
             class="pt-4"
           />
+          <caution-box :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -162,6 +163,10 @@ export default class ConfirmDischarge extends Vue {
 
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
+
+  private cautionTxtRP = 'The Registry will not provide ' +
+    'the verification statement for this total discharge to the Registering Party named above.'
+
   private collateralSummary = '' // eslint-disable-line lines-between-class-members
   private dataLoaded = false
   private dataLoadError = false

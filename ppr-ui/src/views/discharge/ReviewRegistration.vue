@@ -34,7 +34,6 @@
           </div>
           <h3 class="pt-6">Original Registering Party</h3>
           <registering-party-summary class="pt-4" :setEnableNoDataAction="false" />
-          <caution-box class="mt-9" :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
           <h3 class="pt-6">Secured Parties</h3>
           <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6">Debtors</h3>
@@ -131,8 +130,6 @@ export default class ReviewRegistration extends Vue {
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
 
-  private cautionTxtRP = 'The Registry will not provide ' +
-    'the verification statement for this total discharge to the Registering Party named above.'
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private dataLoadError = false
   private feeType = FeeSummaryTypes.DISCHARGE

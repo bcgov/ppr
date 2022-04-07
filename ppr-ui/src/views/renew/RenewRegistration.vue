@@ -51,7 +51,6 @@
             class="pt-4"
             :setEnableNoDataAction="false"
           />
-          <caution-box class="mt-9" :setMsg="cautionTxt" :setImportantWord="'Note'" />
           <h3 class="pt-6">Secured Parties</h3>
           <secured-party-summary class="pt-4" :setEnableNoDataAction="false" />
           <h3 class="pt-6">Debtors</h3>
@@ -94,7 +93,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
+import { StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
@@ -131,7 +130,6 @@ import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
 @Component({
   components: {
     BaseDialog,
-    CautionBox,
     RegistrationLengthTrust,
     RegistrationRepairersLien,
     Collateral,
@@ -181,8 +179,6 @@ export default class ReviewRegistration extends Vue {
   private options: DialogOptionsIF = notCompleteDialog
   private showCancelDialog = false
   private showInvalid = false
-  private cautionTxt = 'The Registry will not provide ' +
-    'the verification statement for this renewal to the Registering Party named above.'
 
   private get asOfDateTime (): string {
     // return formatted date

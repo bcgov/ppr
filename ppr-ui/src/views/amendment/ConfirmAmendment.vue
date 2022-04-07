@@ -119,6 +119,7 @@
             @registeringPartyOpen="regOpenClose($event)"
             :setShowErrorBar="showErrors && registeringOpen"
           />
+          <caution-box :setMsg="cautionTxtRP" :setImportantWord="'Note'" />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -288,6 +289,9 @@ export default class ConfirmAmendment extends Vue {
   private cautionTxt =
     'The Secured Parties in the registration ' +
     'will receive a copy of the Amendment Verification Statement.'
+
+  private cautionTxtRP = 'The Registry will not provide ' +
+    'the verification statement for this amendment to the Registering Party named above.'
 
   private tooltipTxt = 'The default Registering Party is based on your BC ' +
     'Registries user account information. This information can be updated within ' +
