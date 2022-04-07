@@ -53,7 +53,7 @@
         </v-row>
       </div>
       <v-row v-if="getSearchResults" no-gutters style="padding-top: 38px;">
-        <searched-result class="soft-corners" @selected-matches="updateSelectedMatches" @submit="submitCheck()" />
+        <searched-result-ppr class="soft-corners" @selected-matches="updateSelectedMatches" @submit="submitCheck()" />
       </v-row>
     </v-container>
   </v-container>
@@ -72,7 +72,7 @@ import {
   LargeSearchResultDialog,
   LargeSearchDelayDialog
 } from '@/components/dialogs'
-import { SearchedResult } from '@/components/tables'
+import { SearchedResultPpr } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 // local helpers/enums/interfaces/resources
 import { MatchTypes, RouteNames, SettingOptions } from '@/enums'
@@ -97,7 +97,7 @@ import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected,
     LargeSearchResultDialog,
     LargeSearchDelayDialog,
     SearchBar,
-    SearchedResult
+    SearchedResultPpr
   }
 })
 export default class Search extends Vue {

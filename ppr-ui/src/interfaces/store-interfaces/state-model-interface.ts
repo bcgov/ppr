@@ -4,7 +4,7 @@ import {
   SearchTypeIF, RegTableDataI, UserInfoIF
 } from '@/interfaces'
 import { AccountProductSubscriptionIF } from '../account-interfaces'
-import { CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF } from '../ppr-api-interfaces'
+import { CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF, ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF } from '../ppr-api-interfaces'
 import { AddPartiesIF, AddCollateralIF, LengthTrustIF } from '../registration-interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -43,11 +43,13 @@ export interface StateModelIF {
     searchHistory: Array<SearchResponseIF>
     searchHistoryLength: Number
     searchResults: SearchResponseIF
+    manufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF
     searchedType: SearchTypeIF
     searchedValue: string
     searching: boolean
     searchCertified: boolean
   }
+  selectedManufacturedHome: ManufacturedHomeSearchResultIF
   staffPayment: StaffPaymentIF
   unsavedChanges: Boolean // used for cancel flows
   userInfo: UserInfoIF

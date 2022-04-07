@@ -3,6 +3,7 @@ export * from './court-order-interface'
 export * from './debtor-name-interface'
 export * from './general-collateral-interface'
 export * from './individual-name-interface'
+export * from './manufactured-home-search-result-interface'
 export * from './party-interface'
 export * from './registration-interfaces' // Includes payment and draft
 export * from './search-history-response-interface'

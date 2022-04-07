@@ -13,6 +13,8 @@ import {
   GeneralCollateralIF,
   IndividualNameIF,
   LengthTrustIF,
+  ManufacturedHomeSearchResponseIF,
+  ManufacturedHomeSearchResultIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -153,6 +155,10 @@ export const getSearchDebtorName = (state: StateIF): IndividualNameIF => {
 /** The api response for ppr search. */
 export const getSearchResults = (state: StateIF): SearchResponseIF => {
   return state.stateModel.search.searchResults
+}
+
+export const getManufacturedHomeSearchResults = (state: StateIF): ManufacturedHomeSearchResponseIF => {
+  return state.stateModel.search.manufacturedHomeSearchResults
 }
 
 /** The selected search type object. */
@@ -458,4 +464,8 @@ export const getRegTableTotalRowCount = (state: StateIF): number => {
 
 export const hasMorePages = (state: StateIF): boolean => {
   return state.stateModel.registrationTable.sortHasMorePages
+}
+
+export const getSelectedManfacturedHome = (state: StateIF): ManufacturedHomeSearchResultIF => {
+  return state.stateModel.selectedManufacturedHome
 }

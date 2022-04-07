@@ -118,10 +118,22 @@ export const stateModel: StateModelIF = {
     searchHistory: null,
     searchHistoryLength: null,
     searchResults: null,
+    manufacturedHomeSearchResults: null,
     searchedType: null,
     searchedValue: '',
     searching: false,
     searchCertified: false
+  },
+  selectedManufacturedHome: {
+    id: null,
+    ownerName: null,
+    status: null,
+    registrationNumber: null,
+    serialNumber: null,
+    year: null,
+    make: null,
+    model: null,
+    homeLocation: null
   },
   staffPayment: null,
   unsavedChanges: false,

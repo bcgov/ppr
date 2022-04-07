@@ -197,7 +197,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { getFeatureFlag, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { getFeatureFlag, manufacturedHomeSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 import {
@@ -214,6 +214,7 @@ import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
 import SearchBarList from '@/components/search/SearchBarList.vue'
+import { useSearch } from '@/composables/useSearch'
 
 export default defineComponent({
   components: {
@@ -241,7 +242,11 @@ export default defineComponent({
     serviceFee: { default: 1.50 }
   },
   setup (props, { emit }) {
-    const { setSearching, setStaffPayment } = useActions<any>(['setSearching', 'setStaffPayment'])
+    const {
+      setSearching,
+      setStaffPayment,
+      setFolioOrReferenceNumber
+    } = useActions<any>(['setSearching', 'setStaffPayment', 'setFolioOrReferenceNumber'])
     const {
       getUserSettings,
       isSearching,
@@ -263,6 +268,7 @@ export default defineComponent({
       'hasPprRole',
       'hasMhrRole'
     ])
+    const { isMHRSearchType, isPPRSearchType } = useSearch()
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -406,14 +412,6 @@ export default defineComponent({
         clientReferenceId: localState.folioNumber
       }
     }
-    const isMHRSearchType = (type: string): boolean => {
-      const mhi = MHRSearchTypes.findIndex(mh => mh.searchTypeAPI === type)
-      return mhi >= 0
-    }
-    const isPPRSearchType = (type: string): boolean => {
-      const sti = SearchTypes.findIndex(st => st.searchTypeAPI === type)
-      return sti >= 0
-    }
     const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
@@ -427,7 +425,13 @@ export default defineComponent({
             isSearchCertified.value)
           setStaffPayment(null)
         } else {
-          resp = await search(getSearchApiParams(), '')
+          if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
+            resp = await search(getSearchApiParams(), '')
+          }
+          if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            setFolioOrReferenceNumber(localState.folioNumber)
+            resp = manufacturedHomeSearch(getSearchApiParams(), '')
+          }
         }
         if (resp?.error) emit('search-error', resp.error)
         else {

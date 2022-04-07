@@ -16,7 +16,7 @@ const store = getVuexStore()
 /**
  * Creates and mounts a component, so that it can be tested.
  *
- * @returns a Wrapper<SearchedResult> object with the given parameters.
+ * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
  */
 function createComponent (setMsg: string): Wrapper<any> {
   const localVue = createLocalVue()
