@@ -42,8 +42,9 @@
           </h2>
           <registering-party-change
             class="pt-4"
+            @registeringPartyOpen="setShowWarning()"
           />
-          <caution-box :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
+          <caution-box v-if="showRegMsg" :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -111,7 +112,7 @@ import {
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
-import { APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Throttle } from '@/decorators'
 import {
@@ -143,6 +144,7 @@ import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
 export default class ConfirmDischarge extends Vue {
   @Getter getConfirmDebtorName: DebtorNameIF
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
   @Getter getStateModel: StateModelIF
   @Getter isRoleStaffBcol: boolean
 
@@ -175,6 +177,7 @@ export default class ConfirmDischarge extends Vue {
   private options: DialogOptionsIF = notCompleteDialog
   private showCancelDialog = false
   private showErrors = false
+  private showRegMsg = false
   private submitting = false
   private tooltipTxt = 'The default Registering Party is based on your BC ' +
     'Registries user account information. This information can be updated within ' +
@@ -325,6 +328,15 @@ export default class ConfirmDischarge extends Vue {
       name: RouteNames.DASHBOARD
     })
     this.emitHaveData(false)
+  }
+
+  private setShowWarning (): void {
+    const parties = this.getAddSecuredPartiesAndDebtors
+    if (parties.registeringParty?.action === ActionTypes.EDITED) {
+      this.showRegMsg = true
+    } else {
+      this.showRegMsg = false
+    }
   }
 
   /** Emits Have Data event. */
