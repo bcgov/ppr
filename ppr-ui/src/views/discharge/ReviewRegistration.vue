@@ -129,6 +129,7 @@ export default class ReviewRegistration extends Vue {
 
   private cautionTxt = 'Secured Parties in this registration ' +
     'will receive a copy of the Total Discharge Verification Statement.'
+
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private dataLoadError = false
   private feeType = FeeSummaryTypes.DISCHARGE

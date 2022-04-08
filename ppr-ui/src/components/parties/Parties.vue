@@ -129,7 +129,7 @@ export default defineComponent({
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       isSbc: isRoleStaffSbc.value,
-      cautionTxt: 'The Registry will not send the verification statement for this registration ' +
+      cautionTxt: 'The Registry will not provide the verification statement for this registration ' +
         'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
         return getAddSecuredPartiesAndDebtors.value.registeringParty

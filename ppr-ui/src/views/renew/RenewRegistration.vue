@@ -93,7 +93,7 @@ import { Action, Getter } from 'vuex-class'
 // bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
-import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
+import { StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
@@ -130,7 +130,6 @@ import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
 @Component({
   components: {
     BaseDialog,
-    CautionBox,
     RegistrationLengthTrust,
     RegistrationRepairersLien,
     Collateral,
