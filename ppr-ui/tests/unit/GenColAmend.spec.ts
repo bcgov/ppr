@@ -3,6 +3,8 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
+import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -14,6 +16,12 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
+Vue.use(TiptapVuetifyPlugin, {
+  // the next line is important! You need to provide the Vuetify Object to this place.
+  vuetify, // same as "vuetify: vuetify"
+  // optional, default to 'md' (default vuetify icons before v2.0.0)
+  iconsGroup: 'mdi'
+})
 const store = getVuexStore()
 
 // Input field selectors / buttons
@@ -58,8 +66,7 @@ describe('GenColAmend tests', () => {
     expect(wrapper.vm.addDesc).toBe('')
     expect(wrapper.vm.delDesc).toBe('')
     expect(wrapper.vm.generalCollateral).toEqual([])
-    expect(wrapper.findAll(deleteDescriptionTxt).length).toBe(1)
-    expect(wrapper.findAll(addDescriptionTxt).length).toBe(1)
+    expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)
   })
 
   it('shows saved general collateral', async () => {
@@ -82,8 +89,8 @@ describe('GenColAmend tests', () => {
   it('updates general collateral', async () => {
     await store.dispatch('setGeneralCollateral', [])
     wrapper = createComponent(false)
-    wrapper.find('#general-collateral-delete-desc').setValue('JOE')
-    wrapper.find('#general-collateral-add-desc').setValue('SCHMOE')
+    wrapper.vm.delDesc = 'JOE'
+    wrapper.vm.addDesc = 'SCHMOE'
     wrapper.find(doneButtonSelector).trigger('click')
     expect(getLastEvent(wrapper, 'closeGenColAmend')).toBeTruthy()
     await flushPromises()
@@ -95,8 +102,8 @@ describe('GenColAmend tests', () => {
     await store.dispatch('setGeneralCollateral',
       [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
     wrapper = createComponent(false)
-    wrapper.find('#general-collateral-delete-desc').setValue('JOE')
-    wrapper.find('#general-collateral-add-desc').setValue('SCHMOE')
+    wrapper.vm.delDesc = 'JOE'
+    wrapper.vm.addDesc = 'SCHMOE'
     wrapper.find(doneButtonSelector).trigger('click')
     expect(getLastEvent(wrapper, 'closeGenColAmend')).toBeTruthy()
     await flushPromises()
