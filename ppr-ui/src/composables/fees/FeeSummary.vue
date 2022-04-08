@@ -128,7 +128,9 @@ export default defineComponent({
       registrationLength: computed((): RegistrationLengthI => {
         return props.setRegistrationLength
       }),
-      isValid: computed((): boolean => { return getLengthTrust.value.valid }),
+      isValid: computed((): boolean => {
+        return getLengthTrust.value.valid || (localState.feeType === FeeSummaryTypes.MHSEARCH)
+      }),
       feeLabel: computed((): string => {
         if (localState.feeType === FeeSummaryTypes.DISCHARGE) {
           return 'Total Discharge'

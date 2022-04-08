@@ -25,13 +25,14 @@
               list.
             </p>
           </div>
-          
+          <search-result-summary />
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
             class="pt-15"
           />
-          <v-col class="pl-6" cols="3">
+        </v-col>
+        <v-col class="pl-6" cols="3">
           <aside>
             <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
               <sticky-container
@@ -44,9 +45,9 @@
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Pay and Download Result'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
-                @back="goToReviewRegistration()"
+                @back="goToSearchResult()"
                 @cancel="showDialog()"
-                @submit="submitDischarge()"
+                @submit="submitSearch()"
               />
             </affix>
           </aside>
@@ -78,7 +79,7 @@ import {
   ErrorIF, // eslint-disable-line no-unused-vars
   StateModelIF, // eslint-disable-line no-unused-vars
   DialogOptionsIF // eslint-disable-line no-unused-vars
- } from '@/interfaces'
+} from '@/interfaces'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag } from '@/utils'
 
@@ -112,12 +113,11 @@ export default class ConfirmDischarge extends Vue {
   private submitting = false
   private validConfirm = false // eslint-disable-line lines-between-class-members
   private validFolio = true
-  
+
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  
   private get stickyComponentErrMsg (): string {
     if ((!this.validConfirm || !this.validFolio) && this.showErrors) {
       return '< Please complete required information'
@@ -126,23 +126,6 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async loadSearchResult (): Promise<void> {
-    if (!this.registrationNumber || !this.getConfirmDebtorName) {
-      if (!this.registrationNumber) {
-        console.error('No registration number given to discharge. Redirecting to dashboard...')
-      } else {
-        console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
-      }
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-    this.financingStatementDate = new Date()
-    const financingStatement = await getFinancingStatement(
-      true,
-      this.registrationNumber
-    )
-    
   }
 
   mounted () {
@@ -152,15 +135,13 @@ export default class ConfirmDischarge extends Vue {
   private handleDialogResp (val: boolean): void {
     this.showCancelDialog = false
     if (!val) {
-      this.setRegistrationNumber(null)
       this.$router.push({ name: RouteNames.DASHBOARD })
     }
   }
 
-  private goToReviewRegistration (): void {
+  private goToSearchResult (): void {
     this.$router.push({
-      name: RouteNames.REVIEW_DISCHARGE,
-      query: { 'reg-num': this.registrationNumber }
+      name: RouteNames.MHRSEARCH
     })
     this.emitHaveData(false)
   }
@@ -174,30 +155,20 @@ export default class ConfirmDischarge extends Vue {
   }
 
   @Throttle(2000)
-  private async submitDischarge (): Promise<void> {
-    if ((!this.validConfirm) || (!this.validFolio) || (!this.validCertify)) {
+  private async submitSearch (): Promise<void> {
+    if (!this.validFolio) {
       this.showErrors = true
       return
     }
-
-    const stateModel: StateModelIF = this.getStateModel
     this.submitting = true
-    const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
+    // const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
     this.submitting = false
-    if (apiResponse === undefined || apiResponse?.error !== undefined) {
-      this.emitError(apiResponse?.error)
-    } else {
-      // set new added reg
-      const newItem: RegTableNewItemI = {
-        addedReg: apiResponse.dischargeRegistrationNumber,
-        addedRegParent: apiResponse.baseRegistrationNumber,
-        addedRegSummary: null,
-        prevDraft: ''
-      }
-      this.setRegTableNewItem(newItem)
-      // On success return to dashboard
-      this.goToDashboard()
-    }
+    // if (apiResponse === undefined || apiResponse?.error !== undefined) {
+    //  this.emitError(apiResponse?.error)
+    // } else {
+    // On success return to dashboard
+    this.goToDashboard()
+    // }
   }
 
   private goToDashboard (): void {
@@ -232,7 +203,6 @@ export default class ConfirmDischarge extends Vue {
 
     // get registration data from api and load into store
     this.submitting = true
-    await this.loadRegistration()
     this.submitting = false
 
     // page is ready to view

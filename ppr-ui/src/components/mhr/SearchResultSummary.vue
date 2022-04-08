@@ -10,27 +10,43 @@
         >
       </v-col>
     </v-row>
-    <v-container class="pa-0 white rounded-bottom">
+    <v-container class="pa-0 pl-6 white rounded-bottom">
       <v-row class="pt-6 px-1">
-        <v-col>Registration Number</v-col>
+        <v-col><span class="generic-label">Registration Number</span><br>
+        {{ mhResult.registrationNumber}}</v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col>Owner</v-col>
+        <v-col>
+          <span class="generic-label">Owner</span><br>
+          {{ mhResult.ownerName.last }}, {{ mhResult.ownerName.first }}
+        </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col>Registration Status</v-col>
+        <v-col>
+          <span class="generic-label">Registration Status</span><br>
+          {{ mhResult.status }}
+        </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col>Year Make Model</v-col>
+        <v-col>
+          <span class="generic-label">Year Make Model</span><br>
+          {{ mhResult.year }} {{ mhResult.make }} {{ mhResult.model }}
+        </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col>Serial Number</v-col>
+        <v-col>
+          <span class="generic-label">Serial Number</span><br>
+          {{ mhResult.serialNumber }}
+        </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col>Location</v-col>
+        <v-col>
+          <span class="generic-label">Location</span><br>
+          {{ mhResult.homeLocation }}
+        </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col>Include lien information in search result</v-col>
+        <v-col><v-checkbox label="Include lien information in search result"></v-checkbox></v-col>
       </v-row>
     </v-container>
   </v-container>
@@ -43,55 +59,40 @@ import {
   computed,
   toRefs
 } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useGetters } from 'vuex-composition-helpers'
 
-import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useParty } from '@/composables/useParty'
-import { PartyAddressSchema } from '@/schemas'
-
+import { ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
+    const { getSelectedManufacturedHome } = useGetters<any>([
+      'getSelectedManufacturedHome'
     ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
 
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
-    const addressSchema = PartyAddressSchema
-
-    const { getName, getFormattedBirthdate, isBusiness } = useParty()
     const localState = reactive({
-      debtors: parties.debtors,
-      securedParties: parties.securedParties,
-      registeringParty:
-        parties.registeringParty !== null ? [parties.registeringParty] : [],
-      showErrorSummary: computed((): boolean => {
-        return !parties.valid
-      }),
-      shouldShowHint: computed((): boolean => {
-        if ((parties.registeringParty) && (parties.registeringParty.action)) {
-          return true
+      mhResult: computed((): ManufacturedHomeSearchResultIF => {
+        if (getSelectedManufacturedHome.value) {
+          return getSelectedManufacturedHome.value
+        } else {
+          return {
+            id: 0,
+            ownerName: {
+              first: '',
+              last: ''
+            },
+            status: '',
+            registrationNumber: '',
+            serialNumber: '',
+            year: '',
+            make: '',
+            model: '',
+            homeLocation: ''
+          }
         }
-        return false
       })
     })
 
-    const goToParties = (): void => {
-      parties.showInvalid = true
-      setAddSecuredPartiesAndDebtors(parties)
-      router.push({ path: '/add-securedparties-debtors' })
-    }
-
     return {
-      getName,
-      isBusiness,
-      addressSchema,
-      getFormattedBirthdate,
-      goToParties,
       ...toRefs(localState)
     }
   }
