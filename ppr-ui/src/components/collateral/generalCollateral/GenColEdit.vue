@@ -10,13 +10,11 @@
           General Collateral
         </v-col>
         <v-col cols="9" class="pr-4">
-          <v-textarea
+          <tiptap-vuetify :extensions="extensions"
             v-model="newDesc"
             id="general-collateral-new-desc"
-            auto-grow
-            filled
-            label="Description of General Collateral"
-            class="white pt-2 text-input-field"
+            placeholder="Description of General Collateral"
+            :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
           />
           <p class="summary-text">
             Note: If you are pasting text, <strong>we recommend pasting plain text</strong>
@@ -43,9 +41,14 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+// import the component and the necessary extensions
+import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Paragraph, BulletList, OrderedList, ListItem, Blockquote, HardBreak, HorizontalRule, History } from 'tiptap-vuetify'
 
 export default defineComponent({
   name: 'GenColEdit',
+  components: {
+    TiptapVuetify
+  },
   props: {
     showInvalid: {
       type: Boolean,
@@ -56,6 +59,25 @@ export default defineComponent({
     const { getGeneralCollateral } = useGetters<any>(['getGeneralCollateral'])
     const { getRegistrationFlowType } = useGetters<any>(['getRegistrationFlowType'])
     const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+    const extensions = [
+      History,
+      Blockquote,
+      Underline,
+      Strike,
+      Italic,
+      ListItem,
+      BulletList,
+      OrderedList,
+      [Heading, {
+        options: {
+          levels: [1, 2, 3]
+        }
+      }],
+      Bold,
+      HorizontalRule,
+      Paragraph,
+      HardBreak
+    ]
 
     const localState = reactive({
       newDesc: '',
@@ -94,6 +116,7 @@ export default defineComponent({
     })
 
     return {
+      extensions,
       ...toRefs(localState)
     }
   }

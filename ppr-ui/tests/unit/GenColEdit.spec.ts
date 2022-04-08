@@ -3,6 +3,8 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
+import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -13,6 +15,12 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
+Vue.use(TiptapVuetifyPlugin, {
+  // the next line is important! You need to provide the Vuetify Object to this place.
+  vuetify, // same as "vuetify: vuetify"
+  // optional, default to 'md' (default vuetify icons before v2.0.0)
+  iconsGroup: 'mdi'
+})
 const store = getVuexStore()
 
 // Input field selectors / buttons
@@ -59,7 +67,7 @@ describe('GenColEdit tests', () => {
     expect(wrapper.vm.generalCollateral).toEqual([])
     expect(wrapper.vm.showErrorComponent).toBe(false)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)
-    expect(wrapper.findAll(newDescriptionTxt).length).toBe(1)
+    expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)
     expect(wrapper.findAll(errorMsg).length).toBe(0)
     expect(wrapper.findAll(showError).length).toBe(0)
   })
@@ -67,8 +75,8 @@ describe('GenColEdit tests', () => {
   it('updates general collateral with new description text', async () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent(false)
-    await wrapper.find(newDescriptionTxt).setValue('new description')
-    expect(wrapper.vm.newDesc).toBe('new description')
+    wrapper.vm.newDesc = 'new description'
+    await Vue.nextTick()
     expect(wrapper.vm.generalCollateral).toEqual([{ description: 'new description' }])
   })
 
@@ -97,7 +105,7 @@ describe('GenColEdit tests', () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent(true)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)
-    expect(wrapper.findAll(newDescriptionTxt).length).toBe(1)
+    expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)
     expect(wrapper.findAll(errorMsg).length).toBe(0)
     expect(wrapper.findAll(showError).length).toBe(1)
   })
