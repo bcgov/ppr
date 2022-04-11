@@ -62,9 +62,9 @@ QUERY_ACCOUNT_CLIENT_REF_CLAUSE_NEW = """
                 AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
                 AND arv2.client_reference_id ILIKE :client_reference_id || '%'))
 """
-QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE :registering_name || '%'"
+QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE '%' || :registering_name || '%'"
 QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW = """
- AND (arv.registering_name ILIKE :registering_name || '%' OR
+ AND (arv.registering_name ILIKE '%' || :registering_name || '%' OR
     EXISTS (SELECT arv2.financing_id
             FROM account_registration_vw arv2
             WHERE arv2.financing_id = arv.financing_id
