@@ -466,6 +466,6 @@ export const hasMorePages = (state: StateIF): boolean => {
   return state.stateModel.registrationTable.sortHasMorePages
 }
 
-export const getSelectedManfacturedHome = (state: StateIF): ManufacturedHomeSearchResultIF => {
+export const getSelectedManufacturedHome = (state: StateIF): ManufacturedHomeSearchResultIF => {
   return state.stateModel.selectedManufacturedHome
 }

@@ -128,7 +128,9 @@ export default defineComponent({
       registrationLength: computed((): RegistrationLengthI => {
         return props.setRegistrationLength
       }),
-      isValid: computed((): boolean => { return getLengthTrust.value.valid }),
+      isValid: computed((): boolean => {
+        return getLengthTrust.value.valid || (localState.feeType === FeeSummaryTypes.MHSEARCH)
+      }),
       feeLabel: computed((): string => {
         if (localState.feeType === FeeSummaryTypes.DISCHARGE) {
           return 'Total Discharge'
@@ -136,6 +138,8 @@ export default defineComponent({
           return 'Registration Renewal'
         } else if (localState.feeType === FeeSummaryTypes.AMEND) {
           return 'Registration Amendment'
+        } else if (localState.feeType === FeeSummaryTypes.MHSEARCH) {
+          return 'Manufactured Home Search'
         } else {
           return localState.registrationType
         }
