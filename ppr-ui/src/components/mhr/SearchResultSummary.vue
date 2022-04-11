@@ -13,40 +13,40 @@
     <v-container class="pa-0 pl-6 white rounded-bottom">
       <v-row class="pt-6 px-1">
         <v-col><span class="generic-label">Registration Number</span><br>
-        {{ mhResult.registrationNumber}}</v-col>
+        <span id="registrationNumber">{{ mhResult.registrationNumber}}</span></v-col>
       </v-row>
       <v-row class="pt-6 px-1">
         <v-col>
           <span class="generic-label">Owner</span><br>
-          {{ mhResult.ownerName.last }}, {{ mhResult.ownerName.first }}
+          <span id="ownerName">{{ mhResult.ownerName.last }}, {{ mhResult.ownerName.first }}</span>
         </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
         <v-col>
           <span class="generic-label">Registration Status</span><br>
-          {{ mhResult.status }}
+          <span id="status">{{ mhResult.status }}</span>
         </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
         <v-col>
           <span class="generic-label">Year Make Model</span><br>
-          {{ mhResult.year }} {{ mhResult.make }} {{ mhResult.model }}
+          <span id="yearMakeModel">{{ mhResult.year }} {{ mhResult.make }} {{ mhResult.model }}</span>
         </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
         <v-col>
           <span class="generic-label">Serial Number</span><br>
-          {{ mhResult.serialNumber }}
+          <span id="serialNumber">{{ mhResult.serialNumber }}</span>
         </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
         <v-col>
           <span class="generic-label">Location</span><br>
-          {{ mhResult.homeLocation }}
+          <span id="homeLocation">{{ mhResult.homeLocation }}</span>
         </v-col>
       </v-row>
       <v-row class="pt-6 px-1">
-        <v-col><v-checkbox label="Include lien information in search result"></v-checkbox></v-col>
+        <v-col><v-checkbox id="includeLien" label="Include lien information in search result"></v-checkbox></v-col>
       </v-row>
     </v-container>
   </v-container>
