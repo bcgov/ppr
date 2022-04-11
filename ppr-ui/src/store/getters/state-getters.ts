@@ -211,7 +211,6 @@ export const hasPprRole = (state: StateIF): boolean => {
 }
 
 export const hasMhrRole = (state: StateIF): boolean => {
-  return true
   return state.stateModel.authorization?.authRoles.includes('mhr')
 }
 
