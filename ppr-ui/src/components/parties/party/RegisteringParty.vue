@@ -39,7 +39,7 @@
                   <v-btn
                       text
                       color="primary"
-                      class="smaller-button edit-btn pr-4"
+                      class="smaller-button edit-btn pr-0"
                       v-if="!row.item.action"
                       @click="changeRegisteringParty()"
                   >
@@ -49,7 +49,7 @@
                   <v-btn
                       text
                       color="primary"
-                      class="smaller-button edit-btn pr-4"
+                      class="smaller-button edit-btn pr-0"
                       :disabled="addEditInProgress"
                       v-else
                       @click="undo()"
