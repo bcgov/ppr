@@ -59,7 +59,7 @@
           <court-order
             :setShowErrors="showInvalid"
             :setRequireCourtOrder="true"
-            @setCourtOrderValid="registrationValid = $event"
+            @setCourtOrderValid="setValid($event)"
             v-if="registrationType === registrationTypeRL"
             class="mt-15" />
         </v-col>
@@ -75,6 +75,7 @@
                 :setRegistrationType="registrationTypeUI"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Review and Complete'"
+                :setErrMsg="errMsg"
                 @cancel="showCancelDialog = true"
                 @submit="confirmRenewal()"
               />
@@ -179,6 +180,7 @@ export default class ReviewRegistration extends Vue {
   private options: DialogOptionsIF = notCompleteDialog
   private showCancelDialog = false
   private showInvalid = false
+  private errMsg = ''
 
   private get asOfDateTime (): string {
     // return formatted date
@@ -325,14 +327,33 @@ export default class ReviewRegistration extends Vue {
     this.onAppReady(this.appReady)
   }
 
+  private setValid (isValid): void {
+    this.registrationValid = isValid
+    if (isValid) {
+      this.errMsg = ''
+    }
+  }
+
   private confirmRenewal (): void {
+    this.errMsg = ''
     if (this.registrationValid) {
       this.$router.push({
         name: RouteNames.CONFIRM_RENEWAL,
         query: { 'reg-num': this.registrationNumber }
       })
     } else {
+      this.errMsg = '< You have unfinished changes'
       this.showInvalid = true
+      this.scrollToInvalid()
+    }
+  }
+
+  private async scrollToInvalid (): Promise<void> {
+    if (!this.registrationValid) {
+      const component = document.getElementById('court-order')
+      if (component) {
+        await component.scrollIntoView({ behavior: 'smooth' })
+      }
     }
   }
 
