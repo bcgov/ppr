@@ -34,28 +34,28 @@
                 <td>{{ row.item.emailAddress }}</td>
                 <td>{{ row.item.code }}</td>
                 <td class="actions-cell actions-width px-0">
-                <div class="actions float-right actions-up">
+                <div class="actions float-right actions-up pr-4">
 
                   <v-btn
                       text
                       color="primary"
-                      class="smaller-button edit-btn pr-5"
+                      class="smaller-button edit-btn pr-4"
                       v-if="!row.item.action"
                       @click="changeRegisteringParty()"
                   >
                         <v-icon small>mdi-pencil</v-icon>
-                        <span class="ml-1">Change</span>
+                        <span class="ml-1 mr-2">Change</span>
                   </v-btn>
                   <v-btn
                       text
                       color="primary"
-                      class="smaller-button edit-btn pr-5"
+                      class="smaller-button edit-btn pr-4"
                       :disabled="addEditInProgress"
                       v-else
                       @click="undo()"
                   >
                         <v-icon small>mdi-undo</v-icon>
-                        <span class="ml-1">Undo</span>
+                        <span class="ml-1 mr-2">Undo</span>
                   </v-btn>
                   <span class="actions-border actions__more"
                     v-if="row.item.action && !row.item.code"
