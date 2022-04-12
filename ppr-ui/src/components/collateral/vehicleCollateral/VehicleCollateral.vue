@@ -43,10 +43,12 @@
                   </v-chip>
                 </div>
               </td>
-              <td>{{ row.item.year }}</td>
-              <td>{{ row.item.make }}</td>
-              <td>{{ row.item.model }}</td>
-              <td  :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}" class="vehicle-cell">
+              <td v-bind:title="row.item.year">{{ row.item.year }}</td>
+              <td v-bind:title="row.item.make">{{ row.item.make }}</td>
+              <td v-bind:title="row.item.model">{{ row.item.model }}</td>
+              <td v-bind:title="row.item.serialNumber"
+               :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}"
+                class="vehicle-cell">
                 {{ row.item.serialNumber }}
               </td>
               <td v-if="getMH" :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
@@ -132,12 +134,10 @@
                   </v-chip>
                 </div>
               </td>
-              <td>
-                {{ row.item.year }}
-              </td>
-              <td>{{ row.item.make }}</td>
-              <td>{{ row.item.model }}</td>
-              <td class="vehicle-cell">
+              <td v-bind:title="row.item.year">{{ row.item.year }}</td>
+              <td v-bind:title="row.item.make">{{ row.item.make }}</td>
+              <td v-bind:title="row.item.model">{{ row.item.model }}</td>
+              <td class="vehicle-cell" v-bind:title="row.item.serialNumber">
                 {{ row.item.serialNumber }}
               </td>
               <td v-if="getMH">
