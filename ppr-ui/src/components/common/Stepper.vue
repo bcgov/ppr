@@ -97,6 +97,8 @@ export default class Stepper extends Vue {
   align-items: center;
   justify-content: center;
   padding-bottom: 2rem;
+  min-width: 255px;
+  border-bottom: 3px solid #ffffff !important;
 }
 
 .step:hover {
@@ -157,7 +159,8 @@ export default class Stepper extends Vue {
 }
 
 .step__btn2 {
-  position: relative;
+  position: absolute !important;
+  top: 29px;
   margin-top: -32px;
   margin-left: -16px;
   background: $BCgovInputBG;
