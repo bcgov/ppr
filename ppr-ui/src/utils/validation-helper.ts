@@ -45,8 +45,13 @@ export function validateSearchAction (
       if (!searchValue) {
         validation.searchValue.message = 'Enter a serial number to search'
       }
-      if (searchValue?.length > 25) {
+      if ((searchState?.selectedSearchType?.searchTypeUI === UISearchTypes.SERIAL_NUMBER) &&
+        (searchValue?.length > 25)) {
         validation.searchValue.message = 'Maximum 25 characters'
+      }
+      if ((searchState?.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHRSERIAL_NUMBER) &&
+        (searchValue?.length > 20)) {
+        validation.searchValue.message = 'Maximum 20 characters'
       }
       break
     case UISearchTypes.INDIVIDUAL_DEBTOR:
@@ -170,7 +175,13 @@ export function validateSearchRealTime (
         validation.searchValue.message = 'Maximum 25 characters'
       }
       break
+    case UIMHRSearchTypes.MHRSERIAL_NUMBER:
+      if (searchValue?.length > 20) {
+        validation.searchValue.message = 'Maximum 20 characters'
+      }
+      break
     case UISearchTypes.INDIVIDUAL_DEBTOR:
+    case UIMHRSearchTypes.MHROWNER_NAME:
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst =
           "Names don't normally contain special characters"

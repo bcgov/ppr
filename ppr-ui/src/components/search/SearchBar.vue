@@ -415,15 +415,26 @@ export default defineComponent({
     const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
+        // pad mhr number with 0s
+        if ((localState.selectedSearchType?.searchTypeUI === UISearchTypes.MHR_NUMBER) ||
+           (localState.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHRMHR_NUMBER)) {
+          localState.searchValue.padStart(6, '0')
+        }
         setSearching(true)
         emit('search-data', null) // clear any current results
         let resp
         if (isRoleStaffReg.value) {
-          resp = await staffSearch(
-            getSearchApiParams(),
-            getStaffPayment.value,
-            isSearchCertified.value)
-          setStaffPayment(null)
+          if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
+            resp = await staffSearch(
+              getSearchApiParams(),
+              getStaffPayment.value,
+              isSearchCertified.value)
+            setStaffPayment(null)
+          }
+          if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            setFolioOrReferenceNumber(localState.folioNumber)
+            resp = manufacturedHomeSearch(getSearchApiParams(), '')
+          }
         } else {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
             resp = await search(getSearchApiParams(), '')
