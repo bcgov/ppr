@@ -1,4 +1,4 @@
-import { APIRegistrationTypes, UISearchTypes, UIMHRSearchTypes } from '@/enums'
+import { APIRegistrationTypes, APISearchTypes, APIMHRSearchTypes } from '@/enums'
 import {
   IndividualNameIF,
   SearchTypeIF,
@@ -39,17 +39,22 @@ export function validateSearchAction (
     validation.category.message = 'Please select a category'
     return validation
   }
-  switch (searchState?.selectedSearchType?.searchTypeUI) {
-    case UISearchTypes.SERIAL_NUMBER:
-    case UIMHRSearchTypes.MHRSERIAL_NUMBER:
+  switch (searchState?.selectedSearchType?.searchTypeAPI) {
+    case APISearchTypes.SERIAL_NUMBER:
+    case APIMHRSearchTypes.MHRSERIAL_NUMBER:
       if (!searchValue) {
         validation.searchValue.message = 'Enter a serial number to search'
       }
-      if (searchValue?.length > 25) {
+      if ((searchState?.selectedSearchType?.searchTypeAPI === APISearchTypes.SERIAL_NUMBER) &&
+        (searchValue?.length > 25)) {
         validation.searchValue.message = 'Maximum 25 characters'
       }
+      if ((searchState?.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHRSERIAL_NUMBER) &&
+        (searchValue?.length > 20)) {
+        validation.searchValue.message = 'Maximum 20 characters'
+      }
       break
-    case UISearchTypes.INDIVIDUAL_DEBTOR:
+    case APISearchTypes.INDIVIDUAL_DEBTOR:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
       } else if (first?.length > 50) {
@@ -64,7 +69,7 @@ export function validateSearchAction (
         validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
-    case UIMHRSearchTypes.MHROWNER_NAME:
+    case APIMHRSearchTypes.MHROWNER_NAME:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
       } else if (first?.length > 50) {
@@ -79,7 +84,7 @@ export function validateSearchAction (
         validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
-    case UISearchTypes.BUSINESS_DEBTOR:
+    case APISearchTypes.BUSINESS_DEBTOR:
       if (!searchValue) {
         validation.searchValue.message =
           'Enter a business debtor name to search'
@@ -91,8 +96,8 @@ export function validateSearchAction (
         validation.searchValue.message = 'Must contain more than 1 character'
       }
       break
-    case UISearchTypes.MHR_NUMBER:
-    case UIMHRSearchTypes.MHRMHR_NUMBER:
+    case APISearchTypes.MHR_NUMBER:
+    case APIMHRSearchTypes.MHRMHR_NUMBER:
       if (!searchValue) {
         validation.searchValue.message =
           'Enter a manufactured home registration number to search'
@@ -104,7 +109,7 @@ export function validateSearchAction (
         validation.searchValue.message = 'Must contain numbers only'
       }
       break
-    case UISearchTypes.AIRCRAFT:
+    case APISearchTypes.AIRCRAFT:
       if (!searchValue) {
         validation.searchValue.message =
           'Enter an aircraft airframe D.O.T. number to search'
@@ -115,7 +120,7 @@ export function validateSearchAction (
         }
       }
       break
-    case UISearchTypes.REGISTRATION_NUMBER:
+    case APISearchTypes.REGISTRATION_NUMBER:
       if (!searchValue) {
         validation.searchValue.message = 'Enter a registration number to search'
       }
@@ -124,7 +129,7 @@ export function validateSearchAction (
           'Registration numbers contain 7 characters'
       }
       break
-    case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+    case APIMHRSearchTypes.MHRORGANIZATION_NAME:
       if (!searchValue) {
         validation.searchValue.message = 'Enter an organization name to search'
       }
@@ -153,8 +158,8 @@ export function validateSearchRealTime (
   const first = searchState?.searchValueFirst?.trim()
   const second = searchState?.searchValueSecond?.trim()
   const last = searchState?.searchValueLast?.trim()
-  switch (searchState?.selectedSearchType?.searchTypeUI) {
-    case UISearchTypes.SERIAL_NUMBER:
+  switch (searchState?.selectedSearchType?.searchTypeAPI) {
+    case APISearchTypes.SERIAL_NUMBER:
       if (searchValue && specialCharsStrict.test(searchValue)) {
         validation.searchValue.message =
           "Serial numbers don't normally contain special characters"
@@ -170,7 +175,13 @@ export function validateSearchRealTime (
         validation.searchValue.message = 'Maximum 25 characters'
       }
       break
-    case UISearchTypes.INDIVIDUAL_DEBTOR:
+    case APIMHRSearchTypes.MHRSERIAL_NUMBER:
+      if (searchValue?.length > 20) {
+        validation.searchValue.message = 'Maximum 20 characters'
+      }
+      break
+    case APISearchTypes.INDIVIDUAL_DEBTOR:
+    case APIMHRSearchTypes.MHROWNER_NAME:
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst =
           "Names don't normally contain special characters"
@@ -190,12 +201,12 @@ export function validateSearchRealTime (
         validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
-    case UISearchTypes.BUSINESS_DEBTOR:
+    case APISearchTypes.BUSINESS_DEBTOR:
       if (searchValue?.length > 150) {
         validation.searchValue.message = 'Maximum 150 characters'
       }
       break
-    case UISearchTypes.MHR_NUMBER:
+    case APISearchTypes.MHR_NUMBER:
       if (searchValue?.length > 6) {
         validation.searchValue.message = 'Maximum 6 digits'
       }
@@ -210,7 +221,7 @@ export function validateSearchRealTime (
         ]
       }
       break
-    case UISearchTypes.AIRCRAFT:
+    case APISearchTypes.AIRCRAFT:
       searchValue = searchValue?.replace(dash, '')
       if (searchValue?.length > 25) {
         validation.searchValue.message = 'Maximum 25 characters'
@@ -223,13 +234,13 @@ export function validateSearchRealTime (
         ]
       }
       break
-    case UISearchTypes.REGISTRATION_NUMBER:
+    case APISearchTypes.REGISTRATION_NUMBER:
       if (searchValue && searchValue.length !== 7) {
         validation.searchValue.message =
           'Registration numbers contain 7 characters'
       }
       break
-    case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+    case APIMHRSearchTypes.MHRORGANIZATION_NAME:
       if (searchValue?.length > 70) {
         validation.searchValue.message = 'Maximum 70 characters'
       }
