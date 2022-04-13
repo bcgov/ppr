@@ -43,7 +43,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          FROM serial_collateral sc
         WHERE sc.financing_id = fs.id
           AND (sc.registration_id = r.id OR 
-               (sc.registration_id_end IS NOT NULL AND sc.registration_id_end <= r.id))) AS vehicle_count 
+               (sc.registration_id <= r.id AND (sc.registration_id_end IS NULL OR sc.registration_id_end < r.id)))) AS vehicle_count 
  FROM registrations r, registration_types rt, financing_statements fs, registrations r2, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -100,7 +100,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          FROM serial_collateral sc
         WHERE sc.financing_id = fs.id
           AND (sc.registration_id = r.id OR 
-               (sc.registration_id_end IS NOT NULL AND sc.registration_id_end <= r.id))) AS vehicle_count 
+               (sc.registration_id <= r.id AND (sc.registration_id_end IS NULL OR sc.registration_id_end < r.id)))) AS vehicle_count 
   FROM registrations r, registration_types rt, financing_statements fs, user_extra_registrations uer, registrations r2, q
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
