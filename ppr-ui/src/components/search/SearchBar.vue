@@ -398,7 +398,7 @@ export default defineComponent({
         const second = localState.searchValueSecond?.trim()
         const last = localState.searchValueLast?.trim()
         return { debtorName: { first: first, second: second, last: last } }
-      } else if (localState.selectedSearchType.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR) {
+      } else if (localState.selectedSearchType.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR) {
         return { debtorName: { business: localState.searchValue?.trim() } }
       } else {
         const cleanedSearchValue = localState.searchValue?.trim()
