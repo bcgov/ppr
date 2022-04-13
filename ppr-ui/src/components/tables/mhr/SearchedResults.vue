@@ -115,19 +115,20 @@ import { manufacturedHomeSearchTableHeaders } from '@/resources'
 import { ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
+import { RouteNames } from '@/enums'
 
 export default defineComponent({
-  emits: ['submit'],
   components: {
     FolioNumber
   },
-  setup (props, { emit }) {
+  setup (props, context) {
     const {
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
       getSearchedType
     } = useGetters<any>(['getManufacturedHomeSearchResults', 'getFolioOrReferenceNumber', 'getSearchedType'])
     const { setSelectedManufacturedHome } = useActions<any>(['setSelectedManufacturedHome'])
+    const router = context.root.$router
 
     const localState = reactive({
       searched: false,
@@ -153,7 +154,7 @@ export default defineComponent({
 
     const handleSelect = (item: ManufacturedHomeSearchResultIF) => {
       setSelectedManufacturedHome(item)
-      alert('on to the next page!')
+      router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
     }
 
     onMounted(() => {
@@ -169,8 +170,7 @@ export default defineComponent({
 
     return {
       handleSelect,
-      ...toRefs(localState),
-      emit
+      ...toRefs(localState)
     }
   }
 })

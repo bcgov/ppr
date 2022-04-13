@@ -74,7 +74,8 @@ export default defineComponent({
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           return tombstoneBreadcrumbDashboard
-        } else if ((routeName.value === RouteNames.SEARCH) || (routeName.value === RouteNames.MHRSEARCH)) {
+        } else if ((routeName.value === RouteNames.SEARCH) || (routeName.value === RouteNames.MHRSEARCH) ||
+        (routeName.value === RouteNames.MHRSEARCH_CONFIRM)) {
           return tombstoneBreadcrumbSearch
         } else if (currentPath.value?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]

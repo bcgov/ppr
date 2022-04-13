@@ -6,6 +6,7 @@ import {
   Dashboard,
   LengthTrust,
   MHRSearch,
+  ConfirmMHRSearch,
   ReviewConfirm,
   ReviewRegistration,
   RenewRegistration,
@@ -148,7 +149,7 @@ export const routes = [
     }
   },
   {
-    path: '/search',
+    path: '/ppr/search',
     name: RouteNames.SEARCH,
     component: Search,
     meta: {
@@ -156,9 +157,17 @@ export const routes = [
     }
   },
   {
-    path: '/mhr-search',
+    path: '/mhr/search',
     name: RouteNames.MHRSEARCH,
     component: MHRSearch,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr/search-confirm',
+    name: RouteNames.MHRSEARCH_CONFIRM,
+    component: ConfirmMHRSearch,
     meta: {
       requiresAuth: true
     }

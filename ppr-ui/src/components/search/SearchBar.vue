@@ -208,7 +208,7 @@ import {
   SearchValidationIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { SettingOptions, UIMHRSearchTypes, UISearchTypes } from '@/enums'
+import { APIMHRSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
@@ -320,8 +320,8 @@ export default defineComponent({
         return '8.50'
       }),
       isIndividual: computed((): boolean => {
-        if ((localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) ||
-           (localState.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHROWNER_NAME)) {
+        if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.INDIVIDUAL_DEBTOR) ||
+           (localState.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHROWNER_NAME)) {
           return true
         }
         return false
@@ -398,7 +398,7 @@ export default defineComponent({
         const second = localState.searchValueSecond?.trim()
         const last = localState.searchValueLast?.trim()
         return { debtorName: { first: first, second: second, last: last } }
-      } else if (localState.selectedSearchType.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR) {
+      } else if (localState.selectedSearchType.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR) {
         return { debtorName: { business: localState.searchValue?.trim() } }
       } else {
         const cleanedSearchValue = localState.searchValue?.trim()
@@ -415,15 +415,26 @@ export default defineComponent({
     const searchAction = _.throttle(async (proceed: boolean) => {
       localState.confirmationDialog = false
       if (proceed) {
+        // pad mhr number with 0s
+        if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.MHR_NUMBER) ||
+           (localState.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHRMHR_NUMBER)) {
+          localState.searchValue.padStart(6, '0')
+        }
         setSearching(true)
         emit('search-data', null) // clear any current results
         let resp
         if (isRoleStaffReg.value) {
-          resp = await staffSearch(
-            getSearchApiParams(),
-            getStaffPayment.value,
-            isSearchCertified.value)
-          setStaffPayment(null)
+          if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
+            resp = await staffSearch(
+              getSearchApiParams(),
+              getStaffPayment.value,
+              isSearchCertified.value)
+            setStaffPayment(null)
+          }
+          if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            setFolioOrReferenceNumber(localState.folioNumber)
+            resp = manufacturedHomeSearch(getSearchApiParams(), '')
+          }
         } else {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
             resp = await search(getSearchApiParams(), '')
@@ -504,7 +515,7 @@ export default defineComponent({
     watch(() => localState.searchValue, (val: string) => {
       if (!val) localState.validations = null
       else localState.validations = validateSearchRealTime(localState)
-      if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR &&
+      if (localState.selectedSearchType?.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR &&
           localState.autoCompleteIsActive) {
         localState.autoCompleteSearchValue = val
       }
@@ -526,7 +537,7 @@ export default defineComponent({
     watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
       localState.validations = null
       localState.searchValue = null
-      if (val.searchTypeUI !== UISearchTypes.BUSINESS_DEBTOR) localState.autoCompleteIsActive = false
+      if (val.searchTypeAPI !== APISearchTypes.BUSINESS_DEBTOR) localState.autoCompleteIsActive = false
       else localState.autoCompleteIsActive = true
     })
 

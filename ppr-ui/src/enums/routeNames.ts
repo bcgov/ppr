@@ -8,6 +8,7 @@ export enum RouteNames {
     DASHBOARD = 'dashboard',
     SEARCH = 'search',
     MHRSEARCH = 'mhr-search',
+    MHRSEARCH_CONFIRM = 'mhr-search-confirm',
     LENGTH_TRUST = 'length-trust',
     ADD_SECUREDPARTIES_AND_DEBTORS = 'add-securedparties-debtors',
     ADD_COLLATERAL = 'add-collateral',
