@@ -208,7 +208,7 @@ import {
   SearchValidationIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { SettingOptions, UIMHRSearchTypes, UISearchTypes } from '@/enums'
+import { APIMHRSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
@@ -320,8 +320,8 @@ export default defineComponent({
         return '8.50'
       }),
       isIndividual: computed((): boolean => {
-        if ((localState.selectedSearchType?.searchTypeUI === UISearchTypes.INDIVIDUAL_DEBTOR) ||
-           (localState.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHROWNER_NAME)) {
+        if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.INDIVIDUAL_DEBTOR) ||
+           (localState.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHROWNER_NAME)) {
           return true
         }
         return false
@@ -416,8 +416,8 @@ export default defineComponent({
       localState.confirmationDialog = false
       if (proceed) {
         // pad mhr number with 0s
-        if ((localState.selectedSearchType?.searchTypeUI === UISearchTypes.MHR_NUMBER) ||
-           (localState.selectedSearchType?.searchTypeUI === UIMHRSearchTypes.MHRMHR_NUMBER)) {
+        if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.MHR_NUMBER) ||
+           (localState.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHRMHR_NUMBER)) {
           localState.searchValue.padStart(6, '0')
         }
         setSearching(true)
@@ -515,7 +515,7 @@ export default defineComponent({
     watch(() => localState.searchValue, (val: string) => {
       if (!val) localState.validations = null
       else localState.validations = validateSearchRealTime(localState)
-      if (localState.selectedSearchType?.searchTypeUI === UISearchTypes.BUSINESS_DEBTOR &&
+      if (localState.selectedSearchType?.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR &&
           localState.autoCompleteIsActive) {
         localState.autoCompleteSearchValue = val
       }
@@ -537,7 +537,7 @@ export default defineComponent({
     watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
       localState.validations = null
       localState.searchValue = null
-      if (val.searchTypeUI !== UISearchTypes.BUSINESS_DEBTOR) localState.autoCompleteIsActive = false
+      if (val.searchTypeAPI !== APISearchTypes.BUSINESS_DEBTOR) localState.autoCompleteIsActive = false
       else localState.autoCompleteIsActive = true
     })
 

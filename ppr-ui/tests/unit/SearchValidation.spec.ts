@@ -13,6 +13,7 @@ import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { SearchTypeIF } from '@/interfaces'
 import { getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
+import { UISearchTypes } from '@/enums'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -105,6 +106,7 @@ describe('Serial number validation', () => {
   it('prevents searching and gives validation when the search is over 25 characters', async () => {
     const select1: SearchTypeIF = SearchTypes[1]
     wrapper.vm.$data.selectedSearchType = select1
+    expect(wrapper.vm.$data.selectedSearchType.searchTypeUI).toBe(UISearchTypes.SERIAL_NUMBER)
     await Vue.nextTick()
     wrapper.vm.$data.searchValue = '12345678901234567890123456'
     await Vue.nextTick()
