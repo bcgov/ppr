@@ -381,7 +381,13 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
           FROM user_extra_registrations uer
          WHERE uer.account_id = :query_account
            AND (uer.registration_number = :query_reg_num OR
-                uer.registration_number = r.registration_number)) AS exists_count
+                uer.registration_number = r.registration_number)) AS exists_count,
+       (SELECT COUNT(sc.id)
+         FROM serial_collateral sc
+        WHERE sc.financing_id = fs.id
+          AND (sc.registration_id = r.id OR
+               (sc.registration_id <= r.id AND (sc.registration_id_end IS NULL OR
+                                                sc.registration_id_end > r.id)))) AS vehicle_count
   FROM registrations r
     INNER JOIN registration_types rt
     ON r.registration_type = rt.registration_type
