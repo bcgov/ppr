@@ -174,7 +174,7 @@ def build_account_collapsed_filter_json(financing_json,
                         registration['clientReferenceId'].upper().startswith(params.client_reference_id.upper()):
                     statement['expand'] = True
                 elif not api_filter and params.registering_name and \
-                        registration['registeringName'].upper().startswith(params.registering_name.upper()):
+                        params.registering_name.upper() in registration['registeringName'].upper():
                     statement['expand'] = True
         if changes:
             statement['changes'] = changes
