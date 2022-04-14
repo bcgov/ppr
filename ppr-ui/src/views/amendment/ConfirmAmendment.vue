@@ -30,7 +30,7 @@
               Review your Amendment and complete the additional information before registering.
             </p>
           </div>
-          <caution-box class="mt-9" style="margin-bottom: 60px;" :setMsg="cautionTxt" />
+          <caution-box class="mt-9" style="margin-bottom: 60px;" :setMsg="cautionTxt" :setImportantWord="'Note'" />
 
           <v-row no-gutters class="summary-header pa-2 mt-4 rounded-top">
             <v-col cols="12" class="pa-2">
@@ -288,8 +288,7 @@ export default class ConfirmAmendment extends Vue {
   private showErrors = false
 
   private cautionTxt =
-    'The Secured Parties in the registration ' +
-    'will receive a copy of the Amendment Verification Statement.'
+    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
 
   private cautionTxtRP = 'The Registry will not provide ' +
     'the verification statement for this amendment to the Registering Party named above.'
