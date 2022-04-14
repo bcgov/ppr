@@ -128,8 +128,7 @@ export default class ReviewRegistration extends Vue {
   private isJestRunning: boolean
 
   private cautionTxt =
-    'The Registry will provide the Total Discharge Verification ' +
-    'Statement to all Secured Parties named in this registration.'
+    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
 
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private dataLoadError = false

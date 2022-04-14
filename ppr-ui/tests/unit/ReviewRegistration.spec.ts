@@ -76,7 +76,7 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.findComponent(ReviewRegistration).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).vm.setMsg).toContain(
-      'will receive a copy of the Total Discharge Verification Statement.')
+      'provide the verification statement to all Secured Parties')
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_DISCHARGE)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)

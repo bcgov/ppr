@@ -164,8 +164,7 @@ export default class ConfirmDischarge extends Vue {
   private isJestRunning: boolean
 
   private cautionTxt =
-    'The Registry will provide the Total Discharge Verification ' +
-    'Statement to all Secured Parties named in this registration.'
+    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
 
   private cautionTxtRP = 'The Registry will not provide ' +
     'the verification statement for this total discharge to the Registering Party named above.'
