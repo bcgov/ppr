@@ -5,4 +5,5 @@ export enum FeeSummaryDefaults {
   DEFAULT_10 = 'feeDefault10',
   DEFAULT_500 = 'feeDefault500',
   SELECT_5 = 'feeSelect5',
+  SEARCH_5 = 'feeSearch5'
 }

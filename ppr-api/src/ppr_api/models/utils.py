@@ -404,8 +404,8 @@ QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = " ORDER BY create_ts DESC"
 QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE = " AND document_number LIKE :doc_num || '%'"
 QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE :client_reference_id || '%'"
 QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE_NEW = " AND client_reference_id ILIKE :client_reference_id || '%'"
-QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE = " AND registering_name LIKE :registering_name || '%'"
-QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW = " AND registering_name ILIKE :registering_name || '%'"
+QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE = " AND registering_name LIKE '%' || :registering_name || '%'"
+QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW = " AND registering_name ILIKE '%' || :registering_name || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE = ' AND registration_type = :registration_type'
 QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE = """
  AND create_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
