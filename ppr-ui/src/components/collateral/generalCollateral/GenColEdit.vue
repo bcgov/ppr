@@ -42,8 +42,7 @@ import {
   toRefs,
   watch,
   onMounted,
-  computed,
-  onUpdated
+  computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
