@@ -489,11 +489,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB find_all_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
-
         return results_json
 
     @classmethod
-    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool): 
+    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
         # pylint: disable=too-many-locals
         """Return a summary list of registrations belonging to an account applying filters."""
         results_json = []
@@ -980,7 +979,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         for registration in self.financing_statement.registration:
             if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
                 expiry_ts = model_utils.expiry_dt_repairer_lien(expiry_ts)
-
         return model_utils.format_ts(expiry_ts)
 
     def __get_renewal_expiry(self):
@@ -997,5 +995,4 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         for registration in self.financing_statement.registration:
             if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
                 expiry_ts = model_utils.expiry_dt_add_years(expiry_ts, registration.life)
-
         return model_utils.format_ts(expiry_ts)

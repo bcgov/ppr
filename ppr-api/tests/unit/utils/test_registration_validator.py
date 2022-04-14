@@ -17,6 +17,7 @@ import copy
 import pytest
 
 from ppr_api.models import FinancingStatement, utils as model_utils
+from ppr_api.models.registration import CrownChargeTypes
 from ppr_api.utils.validators import registration_validator as validator
 
 
@@ -525,3 +526,16 @@ def test_validate_sc_ap(session):
     # print(error_msg)
     assert error_msg != ''
     assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1
+
+
+def test_amend_crown_charge_sc(session):
+    """Assert that crown charge amdendments that add/remove serial collateral pass validation."""
+    statement = FinancingStatement.find_by_registration_number('TEST0001', False)
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
+    for reg_type in CrownChargeTypes:
+        statement.type = reg_type.value 
+        error_msg = validator.validate_collateral(json_data, statement)
+        if error_msg != '':
+            print(error_msg)
+        assert error_msg == ''
