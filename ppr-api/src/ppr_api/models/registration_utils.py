@@ -69,7 +69,7 @@ QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW = """
             FROM account_registration_vw arv2
             WHERE arv2.financing_id = arv.financing_id
                 AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-                AND arv2.registering_name ILIKE :registering_name || '%'))
+                AND arv2.registering_name ILIKE '%' || :registering_name || '%'))
 """
 QUERY_ACCOUNT_STATUS_CLAUSE = ' AND arv.state = :status_type'
 QUERY_ACCOUNT_REG_TYPE_CLAUSE = ' AND arv.registration_type = :registration_type'
@@ -79,7 +79,7 @@ QUERY_ACCOUNT_REG_DATE_CLAUSE = """
 QUERY_ACCOUNT_CHANGE_REG_CLASS_CLAUSE = " AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')"
 QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE = " AND arv2.registration_number LIKE :reg_num || '%'"
 QUERY_ACCOUNT_CHANGE_CLIENT_REF_CLAUSE = " AND arv2.client_reference_id LIKE :client_reference_id || '%'"
-QUERY_ACCOUNT_CHANGE_REG_NAME_CLAUSE = " AND arv2.registering_name LIKE :registering_name || '%'"
+QUERY_ACCOUNT_CHANGE_REG_NAME_CLAUSE = " AND arv2.registering_name LIKE '%' || :registering_name || '%'"
 QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE = ' AND arv2.state = :status_type'
 QUERY_ACCOUNT_CHANGE_REG_TYPE_CLAUSE = ' AND arv2.registration_type = :registration_type'
 QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE = """
