@@ -567,7 +567,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         'securedParties': str(mapping['secured_party']),
                         'clientReferenceId': str(mapping['client_reference_id']),
                         'registeringName': str(mapping['registering_name']),
-                        'accountId': str(mapping['account_id'])
+                        'accountId': str(mapping['account_id']),
+                        'vehicleCount': int(mapping['vehicle_count'])
                     }
                     if model_utils.is_financing(reg_class):
                         result['baseRegistrationNumber'] = reg_num
