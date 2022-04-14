@@ -24,7 +24,7 @@
               previous amendments or court orders, you will need to conduct a separate search.
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt"/>
+          <caution-box class="mt-9" :setMsg="cautionTxt" :setImportantWord="'Note'"/>
           <registration-length-trust-summary class="mt-15" />
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
@@ -127,8 +127,8 @@ export default class ReviewRegistration extends Vue {
   @Prop({ default: false })
   private isJestRunning: boolean
 
-  private cautionTxt = 'Secured Parties in this registration ' +
-    'will receive a copy of the Total Discharge Verification Statement.'
+  private cautionTxt =
+    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
 
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private dataLoadError = false

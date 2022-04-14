@@ -28,7 +28,7 @@
               </span>
             </p>
           </div>
-          <caution-box class="mt-9" :setMsg="cautionTxt" />
+          <caution-box class="mt-9" :setMsg="cautionTxt" :setImportantWord="'Note'" />
           <registration-length-trust-amendment
             v-if="registrationType !== registrationTypeRL"
             :setShowErrorBar="errorBar"
@@ -246,8 +246,7 @@ export default class AmendRegistration extends Vue {
   private isJestRunning: boolean
 
   private cautionTxt =
-    'Secured Parties in this registration ' +
-    'will receive a copy of the Amendment Verification Statement.'
+    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
 
   private dataLoaded = false // eslint-disable-line lines-between-class-members
   private dataLoadError = false
