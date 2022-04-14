@@ -480,9 +480,9 @@ export default defineComponent({
 
     const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
       const changes = item?.changes as RegistrationSummaryIF[]
-      // if there are amendments, get the vehicle count from the last one
+      // if there are amendments, get the vehicle count from the first array element
       if (changes) {
-        const lastChange = changes[changes.length - 1]
+        const lastChange = changes[0]
         return (lastChange.vehicleCount === 1)
       }
       return (item.vehicleCount === 1)
