@@ -17,7 +17,7 @@
             placeholder="Description of General Collateral"
             :card-props="{
               flat: true,
-              style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)',
+              style: 'background: rgba(0, 0, 0, 0.06)',
             }"
             :editor-properties="{ editorProps: editorProperties }"
           />
@@ -42,7 +42,8 @@ import {
   toRefs,
   watch,
   onMounted,
-  computed
+  computed,
+  onUpdated
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
@@ -56,14 +57,17 @@ import {
   Italic,
   Strike,
   Underline,
-  Paragraph,
   BulletList,
   OrderedList,
   ListItem,
   Blockquote,
   HardBreak,
   HorizontalRule,
-  History
+  History,
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow
 } from 'tiptap-vuetify'
 
 export default defineComponent({
@@ -102,8 +106,11 @@ export default defineComponent({
       ],
       Bold,
       HorizontalRule,
-      Paragraph,
-      HardBreak
+      HardBreak,
+      Table,
+      TableCell,
+      TableHeader,
+      TableRow
     ]
 
     const editorProperties = {
@@ -166,6 +173,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .tiptap-vuetify-editor__content {
+  height: 350px; overflow-y: scroll;
+}
 </style>
