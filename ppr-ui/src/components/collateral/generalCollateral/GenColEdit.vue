@@ -10,24 +10,19 @@
           General Collateral
         </v-col>
         <v-col cols="9" class="pr-4">
-          <tiptap-vuetify
-            :extensions="extensions"
+          <v-textarea
             v-model="newDesc"
             id="general-collateral-new-desc"
-            placeholder="Description of General Collateral"
-            :card-props="{
-              flat: true,
-              style: 'background: rgba(0, 0, 0, 0.06)',
-            }"
-            :editor-properties="{ editorProps: editorProperties }"
+            auto-grow
+            filled
+            label="Description of General Collateral"
+            class="white pt-2 text-input-field"
           />
           <p class="summary-text">
-            Note: If you are pasting text,
-            <strong>we recommend pasting plain text</strong>
-            to avoid formatting and font issues with PDF and printed
-            registrations. If you have pasted text other than plain text, verify
-            that your documents are correct. If they are not correct, they will
-            need to be amended.
+            Note: If you are pasting text, <strong>we recommend pasting plain text</strong>
+            to avoid formatting and font issues with PDF and printed registrations.
+            If you have pasted text other than plain text, verify that your
+            documents are correct. If they are not correct, they will need to be amended.
           </p>
         </v-col>
       </v-row>
@@ -48,32 +43,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-// import the component and the necessary extensions
-import {
-  TiptapVuetify,
-  Heading,
-  Bold,
-  Italic,
-  Strike,
-  Underline,
-  BulletList,
-  OrderedList,
-  ListItem,
-  Blockquote,
-  HardBreak,
-  HorizontalRule,
-  History,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow
-} from 'tiptap-vuetify'
 
 export default defineComponent({
   name: 'GenColEdit',
-  components: {
-    TiptapVuetify
-  },
   props: {
     showInvalid: {
       type: Boolean,
@@ -82,49 +54,13 @@ export default defineComponent({
   },
   setup (props) {
     const { getGeneralCollateral } = useGetters<any>(['getGeneralCollateral'])
-    const { getRegistrationFlowType } = useGetters<any>([
-      'getRegistrationFlowType'
-    ])
+    const { getRegistrationFlowType } = useGetters<any>(['getRegistrationFlowType'])
     const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
-    const extensions = [
-      History,
-      Blockquote,
-      Underline,
-      Strike,
-      Italic,
-      ListItem,
-      BulletList,
-      OrderedList,
-      [
-        Heading,
-        {
-          options: {
-            levels: [1, 2, 3]
-          }
-        }
-      ],
-      Bold,
-      HorizontalRule,
-      HardBreak,
-      Table,
-      TableCell,
-      TableHeader,
-      TableRow
-    ]
-
-    const editorProperties = {
-      transformPastedText (text) {
-        return text.replace(/[^\x00-\x7F]/g, '') // eslint-disable-line
-      },
-      transformPastedHTML (html) {
-        return html.replace(/[^\x00-\x7F]/g, '') // eslint-disable-line
-      }
-    }
 
     const localState = reactive({
       newDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
+        return getGeneralCollateral.value as GeneralCollateralIF[] || []
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
@@ -139,42 +75,31 @@ export default defineComponent({
       }
     })
 
-    watch(
-      () => localState.newDesc,
-      (val: string) => {
-        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
-          if (val) {
-            setGeneralCollateral([{ description: val }])
-          } else {
-            setGeneralCollateral([])
-          }
+    watch(() => localState.newDesc, (val: string) => {
+      if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+        if (val) {
+          setGeneralCollateral([{ description: val }])
+        } else {
+          setGeneralCollateral([])
         }
       }
-    )
+    })
 
-    watch(
-      () => localState.generalCollateral,
-      (val: GeneralCollateralIF[]) => {
-        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
-          if (val.length > 0 && val[0].description !== localState.newDesc) {
-            localState.newDesc = val[0].description
-          }
+    watch(() => localState.generalCollateral, (val: GeneralCollateralIF[]) => {
+      if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+        if (val.length > 0 && val[0].description !== localState.newDesc) {
+          localState.newDesc = val[0].description
         }
       }
-    )
+    })
 
     return {
-      extensions,
-      editorProperties,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-::v-deep .tiptap-vuetify-editor__content {
-  height: 350px; overflow-y: scroll;
-}
 </style>
