@@ -135,7 +135,8 @@ def validate_general_collateral(json_data, reg_type: str, reg_class: str):
 def validate_vehicle_collateral(json_data, reg_type: str):
     """Validate vehicleCollateral by registration type."""
     error_msg = ''
-    if reg_type in GC_ONLY_LIST and 'vehicleCollateral' in json_data and json_data['vehicleCollateral']:
+    if reg_type in GC_ONLY_LIST and reg_type != MiscellaneousTypes.WAGES_UNPAID.value and \
+            'vehicleCollateral' in json_data and json_data['vehicleCollateral']:
         error_msg = VC_NOT_ALLOWED
     elif reg_type in VC_REQUIRED_LIST and ('vehicleCollateral' not in json_data or not json_data['vehicleCollateral']):
         error_msg = VC_REQUIRED

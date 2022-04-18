@@ -215,7 +215,7 @@ TEST_FL_FA_FS_HN_WL_DATA = [
     (DESC_INCLUDES_VC, False, 'FA', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'FS', validator.VC_NOT_ALLOWED),
     (DESC_INCLUDES_VC, False, 'HN', validator.VC_NOT_ALLOWED),
-    (DESC_INCLUDES_VC, False, 'WL', validator.VC_NOT_ALLOWED)
+    (DESC_INCLUDES_VC, True, 'WL', None)
 ]
 
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
