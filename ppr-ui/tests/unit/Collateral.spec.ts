@@ -324,10 +324,9 @@ describe('Collateral Carbon Tax summary test', () => {
     expect(wrapper.vm.valid).toBe(false)
     expect(wrapper.findAll(collateralSummary).length).toBe(1)
     expect(wrapper.findAll(collateralEdit).length).toBe(0)
-    expect(wrapper.findAll('.invalid-message').length).toBe(0)
-    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
-    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findAll('.invalid-message').length).toBe(2)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(true)
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
   })
 })
 
