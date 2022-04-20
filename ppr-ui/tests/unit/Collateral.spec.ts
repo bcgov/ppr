@@ -199,7 +199,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   })
 })
 
-describe('Collateral Lien unpaid wages tests', () => {
+describe('Collateral Lien unpaid wages summary test', () => {
   let wrapper: Wrapper<any>
   const registrationType = mockedLienUnpaid()
 
@@ -221,18 +221,36 @@ describe('Collateral Lien unpaid wages tests', () => {
   it('renders summary view with general collateral when none is given', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
-    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
-    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
+    expect(wrapper.vm.valid).toBe(false)
     expect(wrapper.findAll(collateralSummary).length).toBe(1)
     expect(wrapper.findAll(collateralEdit).length).toBe(0)
-    expect(wrapper.findAll('.invalid-message').length).toBe(0)
-    expect(wrapper.find(goToCollateralBtn).exists()).toBe(false)
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
-    expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
+    expect(wrapper.findAll('.invalid-message').length).toBe(2)
+    expect(wrapper.find(goToCollateralBtn).exists()).toBe(true)
+    expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
   })
+})
 
+describe('Collateral Lien unpaid wages edit tests', () => {
+  let wrapper: Wrapper<any>
+  const registrationType = mockedLienUnpaid()
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+
+    wrapper = createComponent(false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
   it('renders edit view with general collateral when none is given', async () => {
-    await wrapper.setProps({ isSummary: false })
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
@@ -280,7 +298,7 @@ describe('Collateral Lien unpaid wages tests', () => {
   })
 })
 
-describe('Collateral Carbon Tax tests', () => {
+describe('Collateral Carbon Tax summary test', () => {
   let wrapper: Wrapper<any>
   const registrationType = mockedOtherCarbon()
 
@@ -302,8 +320,8 @@ describe('Collateral Carbon Tax tests', () => {
   it('renders summary view with general collateral when none is given', async () => {
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(false)
-    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
-    expect(wrapper.vm.valid).toBe(true)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
+    expect(wrapper.vm.valid).toBe(false)
     expect(wrapper.findAll(collateralSummary).length).toBe(1)
     expect(wrapper.findAll(collateralEdit).length).toBe(0)
     expect(wrapper.findAll('.invalid-message').length).toBe(0)
@@ -311,6 +329,28 @@ describe('Collateral Carbon Tax tests', () => {
     expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
     expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(true)
   })
+})
+
+describe('Collateral Carbon Tax edit tests', () => {
+  let wrapper: Wrapper<any>
+  const registrationType = mockedOtherCarbon()
+
+  beforeEach(async () => {
+    await store.dispatch('setRegistrationType', registrationType)
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.dispatch('setAddCollateral', {
+      generalCollateral: [],
+      vehicleCollateral: [],
+      valid: false,
+      showInvalid: false
+    })
+
+    wrapper = createComponent(false)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
 
   it('renders edit view with general collateral when none is given', async () => {
     await wrapper.setProps({ isSummary: false })
