@@ -172,7 +172,8 @@ export default defineComponent({
     onMounted(() => {
       if (
         getRegistrationFlowType.value === RegistrationFlowType.NEW &&
-        localState.collateral?.generalCollateral?.length === 0
+        localState.collateral?.generalCollateral?.length === 0 &&
+        !localState.summaryView
       ) {
         if (hasGeneralCollateral(registrationType)) {
           if (registrationType === APIRegistrationTypes.LIEN_UNPAID_WAGES) {
