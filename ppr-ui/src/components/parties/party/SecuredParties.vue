@@ -205,7 +205,7 @@
                     </v-list-item>
                   </v-list>
                 </div>
-                <div v-else class="actions-up actions float-right">
+                <div v-else class="actions-up actions float-right pr-4">
                   <span
                     v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                     || (registrationFlowType === RegistrationFlowType.AMENDMENT &&

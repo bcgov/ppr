@@ -339,12 +339,6 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   word-wrap: break-word;
 }
 
-.collateral-table.v-data-table td{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .registration-table.v-data-table tr.filter-row td {
   padding-bottom: 0px !important;
 }
