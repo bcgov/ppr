@@ -28,13 +28,11 @@
       </v-row>
       <v-row no-gutters>
         <v-col class="pr-4">
-          <v-textarea
+          <tiptap-vuetify :extensions="extensions"
             v-model="delDesc"
             id="general-collateral-delete-desc"
-            auto-grow
-            filled
-            label="Enter the General Collateral to be deleted from this registration"
-            class="white pt-2 text-input-field"
+            placeholder="Enter the General Collateral to be deleted from this registration"
+            :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
           />
         </v-col>
       </v-row>
@@ -45,13 +43,11 @@
       </v-row>
       <v-row no-gutters>
         <v-col class="pr-4">
-          <v-textarea
+          <tiptap-vuetify :extensions="extensions"
             v-model="addDesc"
             id="general-collateral-add-desc"
-            auto-grow
-            filled
-            label="Enter the General Collateral to be added to this registration"
-            class="white pt-2 text-input-field"
+            placeholder="Enter the General Collateral to be added to this registration"
+            :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
           />
         </v-col>
       </v-row>
@@ -93,6 +89,8 @@ import {
   computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+// import the component and the necessary extensions
+import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Paragraph, BulletList, OrderedList, ListItem, Blockquote, HardBreak, HorizontalRule, History } from 'tiptap-vuetify'
 // local
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
@@ -107,11 +105,33 @@ export default defineComponent({
       default: false
     }
   },
+  components: {
+    TiptapVuetify
+  },
   setup (props, { emit }) {
     const { getGeneralCollateral } = useGetters<any>([
       'getGeneralCollateral'
     ])
     const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+    const extensions = [
+      History,
+      Blockquote,
+      Underline,
+      Strike,
+      Italic,
+      ListItem,
+      BulletList,
+      OrderedList,
+      [Heading, {
+        options: {
+          levels: [1, 2, 3]
+        }
+      }],
+      Bold,
+      HorizontalRule,
+      Paragraph,
+      HardBreak
+    ]
 
     const localState = reactive({
       delDesc: '',
@@ -177,6 +197,7 @@ export default defineComponent({
 
     return {
       onSubmitForm,
+      extensions,
       resetFormAndData,
       ...toRefs(localState)
     }
