@@ -145,7 +145,7 @@
 
               <!-- Action Btns -->
               <td class="actions-width actions-cell px-0 py-2">
-                <div class="actions actions-up float-right">
+                <div class="actions actions-up float-right pr-4">
                   <span v-if="isRepairersLienAmendment && !row.item.action">
                     <v-tooltip
                       top
