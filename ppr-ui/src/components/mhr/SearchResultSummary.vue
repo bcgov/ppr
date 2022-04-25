@@ -2,12 +2,10 @@
   <v-container flat class="pa-0" id="party-summary">
     <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
-        <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>
-        <label class="pl-3" :class="$style['sectionText']"
-          ><strong
-            >Manufactured Home Details</strong
-          ></label
-        >
+        <v-icon color="darkBlue">mdi-home</v-icon>
+        <label class="pl-3" :class="$style['sectionText']">
+          <strong>Search Results Summary</strong>
+        </label>
       </v-col>
     </v-row>
     <v-container class="pa-0 pl-6 white rounded-bottom">

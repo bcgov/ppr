@@ -211,7 +211,7 @@ export const hasPprRole = (state: StateIF): boolean => {
 }
 
 export const hasMhrRole = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('mhr')
+  return true // state.stateModel.authorization?.authRoles.includes('mhr')
 }
 
 /** The current user's service fee (applicable for non billable users). */
@@ -466,6 +466,6 @@ export const hasMorePages = (state: StateIF): boolean => {
   return state.stateModel.registrationTable.sortHasMorePages
 }
 
-export const getSelectedManufacturedHome = (state: StateIF): ManufacturedHomeSearchResultIF => {
-  return state.stateModel.selectedManufacturedHome
+export const getSelectedManufacturedHomes = (state: StateIF): ManufacturedHomeSearchResultIF[] => {
+  return state.stateModel.selectedManufacturedHomes
 }

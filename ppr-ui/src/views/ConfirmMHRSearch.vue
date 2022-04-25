@@ -18,14 +18,26 @@
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review Search Result</h1>
-          <div style="padding-top: 25px; max-width: 875px;">
+          <div class="mt-6">
             <p class="ma-0">
               Review the details of the manufactured home before paying. Your search result will download
               automatically after payment is received. Your search result will also be available in your searches
               list.
             </p>
           </div>
-          <search-result-summary />
+
+          <v-card flat class="mt-6">
+            <v-row no-gutters class="summary-header pa-2 rounded-top">
+              <v-col cols="auto" class="pa-2">
+                <v-icon color="darkBlue">mdi-home</v-icon>
+                <label class="pl-3" :class="$style['sectionText']">
+                  <strong>Search Results Summary</strong>
+                </label>
+              </v-col>
+            </v-row>
+            <searched-result-mhr class="soft-corners px-6" :isReadOnly="true" />
+          </v-card>
+
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
@@ -82,13 +94,15 @@ import {
 } from '@/interfaces'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag } from '@/utils'
+import { SearchedResultMhr } from '@/components/tables'
 
 @Component({
   components: {
     BaseDialog,
     FolioNumberSummary,
     SearchResultSummary,
-    StickyContainer
+    StickyContainer,
+    SearchedResultMhr
   }
 })
 export default class ConfirmDischarge extends Vue {

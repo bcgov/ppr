@@ -1,31 +1,51 @@
 <template>
-  <v-container class="main-results-div pa-0 white">
-    <v-row>
-      <v-col id="search-meta-info" cols="8" class="pl-8 pt-8 ma-0">
-          <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
-          <span class="search-info"> as of {{ searchTime }}</span>
-      </v-col>
-      <v-col cols="4" class="pt-8 ma-0" style="padding-left:100px;">
-        <folio-number
-          :defaultFolioNumber="folioNumber"
-          @folio-number="folioNumber = $event"
-          @folio-error="folioError = $event"
-        />
-      </v-col>
-    </v-row>
-    <v-row v-if="searched" class="result-info pl-5 mt-n8 pb-6" align="center" no-gutters>
-      <v-col style="padding-right: 30px;" cols="auto">
-        <v-row no-gutters>
-          <v-col class="divider pr-3 mr-3" cols="auto">
-            <b>{{ totalResultsLength }}</b> homes found
-          </v-col>
-          <v-col :class="totalResultsLength !== 0 ? 'pr-3 mr-3' : ''" cols="auto">
-            <b>{{ activeMatchesLength }}</b> active homes
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-row v-if="totalResultsLength !== 0" class="pt-3" no-gutters>
+  <v-container class="main-results-div white pa-0 ma-0">
+    <!-- Table Header -->
+    <article id="search-meta-info" class="px-4 pt-8">
+      <v-row no-gutters>
+        <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
+        <span class="search-info"> as of {{ searchTime }}</span>
+      </v-row>
+      <v-row v-if="searched && !isReadOnly" class="result-info pt-6">
+        <v-col cols="auto">
+          <span class="divider pr-3"><b>{{ totalResultsLength }}</b> homes found</span>
+        </v-col>
+        <v-col cols="auto" class="pl-0">
+          <span class="divider pr-3"><b>{{ activeMatchesLength }}</b> active homes</span>
+        </v-col>
+        <v-col cols="auto" class="pl-0">
+          <span>
+            <b>{{ selectedMatchesLength }}</b> homes selected + <b>{{ selectedLiensLength }}</b> lien search
+          </span>
+        </v-col>
+        <v-col class="mt-n3 mr-6">
+          <v-row class="float-right">
+            <folio-number
+              class="mr-3 ml-0 mt-n2"
+              :defaultFolioNumber="folioNumber"
+              @folio-number="folioNumber = $event"
+              @folio-error="folioError = $event"
+            />
+            <v-btn
+              id="review-confirm-btn"
+              color="primary"
+              filled
+              @click="reviewAndConfirm()"
+            >
+              Review and Confirm
+            </v-btn>
+          </v-row>
+        </v-col>
+      </v-row>
+      <v-row v-else class="result-info">
+        <v-col cols="auto">
+          <span><b>{{ selectedMatchesLength }}</b> Manufactured Homes</span>
+        </v-col>
+      </v-row>
+    </article>
+
+    <!-- Search Results Table -->
+    <v-row v-if="totalResultsLength !== 0" class="pt-3">
       <v-col cols="12">
         <v-data-table
           v-if="results"
@@ -41,37 +61,58 @@
           item-key="id"
           :items-per-page="-1"
           mobile-breakpoint="0"
-          @click:row="handleSelect($event)"
           return-object
         >
 
+          <template  v-if="!isReadOnly" v-slot:[`header.ownerName`]>
+            <v-checkbox
+              class="header-checkbox ma-0 pa-0"
+              color="primary"
+              hide-details
+              label="Owner Name"
+              v-model="selectAll"
+            />
+          </template>
+
+          <template  v-if="!isReadOnly" v-slot:[`header.edit`]>
+            <v-checkbox
+              class="header-checkbox ma-0 pa-0"
+              color="primary"
+              hide-details
+              label="Include lien information for all selections"
+              v-model="selectAllLien"
+            />
+          </template>
+
           <template v-slot:[`group.header`]="{ group }">
             <td
-              class="group-header px-2"
+              class="group-header px-4"
               :colspan="headers.length"
             >
               <span v-if="group === 'ACTIVE'">
-                ACTIVE ({{ activeMatchesLength }})
+                <span class="pl-8">
+                  ACTIVE ({{ activeMatchesLength }})
+                </span>
               </span>
-              <span v-else-if="group === 'EXEMPT'">
+              <span v-else-if="group === 'EXEMPT'" class="pl-8">
                 EXEMPT ({{ exemptMatchesLength }})
               </span>
-              <span v-else-if="group === 'HISTORICAL'">
+              <span v-else-if="group === 'HISTORICAL'" class="pl-8">
                 HISTORICAL ({{ historicalMatchesLength }})
               </span>
             </td>
           </template>
 
           <template v-slot:[`item.ownerName`]="{ item }">
-            {{ item.ownerName.last }},
-            {{ item.ownerName.first }}
-            {{ item.ownerName.middle }}
-
+            <v-checkbox
+              :label="getOwnerName(item)"
+              v-model="item.selected"
+            />
           </template>
           <template v-slot:[`item.registrationNumber`]="{ item }">
             {{ item.registrationNumber }}
           </template>
-          <template v-slot:[`item.status`]="{ item }">
+          <template v-slot:[`item.state`]="{ item }">
             {{ item.status }}
           </template>
           <template v-slot:[`item.year`]="{ item }">
@@ -90,12 +131,15 @@
             <span>{{ item.serialNumber }}</span>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
-            <span v-if="item.id === 1"><v-checkbox label="Include lien information"></v-checkbox></span>
+            <v-checkbox
+              :label="`${!isReadOnly ? 'Include lien' : 'Lien'} information`"
+              v-model="item.lienSelected"
+            />
           </template>
         </v-data-table>
       </v-col>
     </v-row>
-    <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center" no-gutters>
+    <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center">
       <v-col cols="8">
         <p class="no-results-title ma-0 pt-10"><b>Nil Result</b></p>
         <p class="ma-0 pt-2">
@@ -108,11 +152,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, onMounted, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
-import { manufacturedHomeSearchTableHeaders } from '@/resources'
-import { ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
+import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
 import { RouteNames } from '@/enums'
@@ -121,13 +165,19 @@ export default defineComponent({
   components: {
     FolioNumber
   },
+  props: {
+    isReadOnly: { default: false }
+  },
   setup (props, context) {
     const {
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
-      getSearchedType
-    } = useGetters<any>(['getManufacturedHomeSearchResults', 'getFolioOrReferenceNumber', 'getSearchedType'])
-    const { setSelectedManufacturedHome } = useActions<any>(['setSelectedManufacturedHome'])
+      getSearchedType,
+      getSelectedManufacturedHomes
+    } = useGetters<any>([
+      'getManufacturedHomeSearchResults', 'getFolioOrReferenceNumber', 'getSearchedType', 'getSelectedManufacturedHomes'
+    ])
+    const { setSelectedManufacturedHomes } = useActions<any>(['setSelectedManufacturedHomes'])
     const router = context.root.$router
 
     const localState = reactive({
@@ -135,26 +185,48 @@ export default defineComponent({
       searchValue: '',
       searchTime: '',
       searchType: null,
+      selectAll: false,
+      selectAllLien: false,
       folioNumber: getFolioOrReferenceNumber.value,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
-      headers: manufacturedHomeSearchTableHeaders,
       results: [],
+      selectedResults: [],
       totalResultsLength: 0,
       activeMatchesLength: computed((): number => {
         return localState.results.filter(item => item.status === 'ACTIVE').length
+      }),
+      selectedMatchesLength: computed((): number => {
+        return localState.results.filter(item => item.selected === true).length
+      }),
+      selectedLiensLength: computed((): number => {
+        return localState.results.filter(item => item.lienSelected === true).length
       }),
       exemptMatchesLength: computed((): number => {
         return localState.results.filter(item => item.status === 'EXEMPT').length
       }),
       historicalMatchesLength: computed((): number => {
         return localState.results.filter(item => item.status === 'HISTORICAL').length
+      }),
+      headers: computed((): Array<BaseHeaderIF> => {
+        return props.isReadOnly ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
+      }),
+      selectAllModel: computed((): boolean => {
+        return localState.results.every(result => result && result.selected === true)
       })
     })
 
-    const handleSelect = (item: ManufacturedHomeSearchResultIF) => {
-      setSelectedManufacturedHome(item)
+    const reviewAndConfirm = (): void => {
+      localState.selectedResults = localState.results.filter(result => result.selected === true)
+      setSelectedManufacturedHomes(localState.selectedResults)
       router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
+    }
+
+    const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
+      return `
+          ${item.ownerName.last},
+          ${item.ownerName.first}
+          ${item.ownerName.middle || ''}`
     }
 
     onMounted(() => {
@@ -162,14 +234,27 @@ export default defineComponent({
       localState.searchValue = resp.searchQuery.criteria.value
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
-      localState.results = resp.results
+      localState.results = props.isReadOnly ? getSelectedManufacturedHomes : resp.results
       localState.totalResultsLength = resp.totalResultsSize
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
     })
 
+    watch(() => localState.selectAllModel, () => {
+      if (!props.isReadOnly) localState.selectAll = localState.selectAllModel
+    })
+
+    watch(() => localState.selectAll, (val: boolean) => {
+      localState.results = localState.results.map(result => ({ ...result, selected: val }))
+    })
+
+    watch(() => localState.selectAllLien, (val: boolean) => {
+      localState.results = localState.results.map(result => ({ ...result, lienSelected: val }))
+    })
+
     return {
-      handleSelect,
+      reviewAndConfirm,
+      getOwnerName,
       ...toRefs(localState)
     }
   }
@@ -197,6 +282,10 @@ th {
 .divider {
   border-right: 1px solid $gray3;
 }
+#review-confirm-btn {
+  min-width: 260px;
+  font-weight: 600 !important;
+}
 .group-header, .group-header:hover {
   background-color: $gray3;
   font-weight: bold;
@@ -216,8 +305,13 @@ th {
   color: $gray7 !important;
   font-size: 1rem;
 }
+::v-deep .header-checkbox .v-input__control .v-input__slot .v-label {
+  color: $gray9;
+  font-size: 0.875rem !important;
+  font-weight: bold;
+}
 ::v-deep .results-table .lien-info {
-  width: 250px;
+  width: 100%;
 }
 ::v-deep .results-table .v-input--checkbox .v-input__slot .v-label {
   font-size: 0.875rem !important;
