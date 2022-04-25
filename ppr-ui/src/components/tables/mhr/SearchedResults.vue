@@ -7,14 +7,14 @@
         <span class="search-info"> as of {{ searchTime }}</span>
       </v-row>
       <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
-        <v-col cols="auto">
+        <v-col id="home-results-count" cols="auto">
           <span class="divider pr-3"><b>{{ totalResultsLength }}</b> homes found</span>
         </v-col>
-        <v-col cols="auto" class="pl-0">
+        <v-col id="active-results-count" cols="auto" class="pl-0">
           <span class="divider pr-3"><b>{{ activeMatchesLength }}</b> active homes</span>
         </v-col>
         <v-col cols="auto" class="pl-0">
-          <span>
+          <span id="selected-results-count">
             <b>{{ selectedMatchesLength }}</b> homes selected + <b>{{ selectedLiensLength }}</b> lien search
           </span>
         </v-col>
@@ -38,7 +38,7 @@
         </v-col>
       </v-row>
       <v-row v-else class="result-info">
-        <v-col cols="auto">
+        <v-col id="review-results-count" cols="auto">
           <span><b>{{ selectedMatchesLength }}</b> Manufactured Homes</span>
         </v-col>
       </v-row>
