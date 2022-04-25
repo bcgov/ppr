@@ -2,17 +2,17 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import CompositionApi, {isRaw} from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
 import { SearchedResultMhr } from '@/components/tables'
 
 // Other
-import { manufacturedHomeSearchTableHeaders } from '@/resources'
+import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
 import { ManufacturedHomeSearchResponseIF } from '@/interfaces'
 import { APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
-import { mockedMHRSearchResponse } from './test-data'
+import { mockedMHRSearchResponse, mockedMHRSearchSelections } from './test-data'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -41,7 +41,7 @@ const noResultsDiv = '#search-no-results-info'
  *
  * @returns a Wrapper<SearchedResultMhr> object with the given parameters.
  */
-function createComponent (): Wrapper<any> {
+function createComponent (propsData: any = null): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
@@ -49,7 +49,8 @@ function createComponent (): Wrapper<any> {
   return mount(SearchedResultMhr, {
     localVue,
     store,
-    vuetify
+    vuetify,
+    propsData: { ...propsData }
   })
 }
 describe('Test result table with no results', () => {
@@ -95,13 +96,19 @@ describe('Serial number results', () => {
     expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(true)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
   })
 
   it('displays results in the table', async () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (active / exempt) so add 3
+    // includes header and 2 group headers (Active, Exempt, Historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
@@ -110,6 +117,41 @@ describe('Serial number results', () => {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].make)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].model)
     }
+  })
+})
+
+describe('Serial number results in Review Mode', () => {
+  let wrapper: Wrapper<any>
+  const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRSERIAL_NUMBER]
+  const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRSERIAL_NUMBER]
+
+  beforeEach(async () => {
+    await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    wrapper = createComponent({ isReviewMode: true })
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders Results Component with Serial number data', () => {
+    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(false)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
+  })
+
+  it('displays results in the table', async () => {
+    const datatable = wrapper.findAll(resultsTable)
+    expect(datatable.length).toBe(1)
+    const rows = wrapper.findAll('tr')
+    // includes group categories (Active)
+    expect(rows.length).toBe(selectedResults.length + 2)
   })
 })
 
@@ -132,13 +174,19 @@ describe('Owner name debtor results', () => {
     expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(true)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
   })
 
   it('displays results in the table', async () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (exact / similar) so add 3
+    // includes header and 2 group headers (Active, Exempt, Historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
@@ -147,6 +195,41 @@ describe('Owner name debtor results', () => {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].make)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].model)
     }
+  })
+})
+
+describe('Owner name name in Review Mode', () => {
+  let wrapper: Wrapper<any>
+  const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHROWNER_NAME]
+  const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHROWNER_NAME]
+
+  beforeEach(async () => {
+    await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    wrapper = createComponent({ isReviewMode: true })
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders Results Component with Owner name data', () => {
+    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(false)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
+  })
+
+  it('displays results in the table', async () => {
+    const datatable = wrapper.findAll(resultsTable)
+    expect(datatable.length).toBe(1)
+    const rows = wrapper.findAll('tr')
+    // includes group categories (Active)
+    expect(rows.length).toBe(selectedResults.length + 2)
   })
 })
 
@@ -169,17 +252,58 @@ describe('Business debtor results', () => {
     expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(true)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
   })
 
   it('displays results in the table', async () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (exact / similar) so add 3
+    // includes header and 2 group headers (Active, Exempt) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
     }
+  })
+})
+
+describe('Business debtor results in Review Mode', () => {
+  let wrapper: Wrapper<any>
+  const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRORGANIZATION_NAME]
+  const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRORGANIZATION_NAME]
+
+  beforeEach(async () => {
+    await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    wrapper = createComponent({ isReviewMode: true })
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders Results Component with business debtor name data', () => {
+    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(false)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
+  })
+
+  it('displays results in the table', async () => {
+    const datatable = wrapper.findAll(resultsTable)
+    expect(datatable.length).toBe(1)
+    const rows = wrapper.findAll('tr')
+    // includes group categories (Active, Exempt)
+    expect(rows.length).toBe(selectedResults.length + 3)
   })
 })
 
@@ -202,14 +326,19 @@ describe('Manufactured home results', () => {
     expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
-  })
 
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(true)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
+  })
 
   it('displays results in the table', async () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (exact / similar) so add 3
+    // includes header and 2 group headers (active / exempt / historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
@@ -221,5 +350,37 @@ describe('Manufactured home results', () => {
   })
 })
 
+describe('Manufactured home results in Review Mode', () => {
+  let wrapper: Wrapper<any>
+  const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
+  const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRMHR_NUMBER]
 
+  beforeEach(async () => {
+    await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    wrapper = createComponent({ isReviewMode: true })
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
 
+  it('renders Results Component with manufactured home results data', () => {
+    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
+
+    // Verify base mode features
+    expect(wrapper.find('#search-summary-info').exists()).toBe(false)
+    expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
+    expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
+    expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
+  })
+
+  it('displays results in the table', async () => {
+    const datatable = wrapper.findAll(resultsTable)
+    expect(datatable.length).toBe(1)
+    const rows = wrapper.findAll('tr')
+    // includes group categories (Active, Exempt, Historical)
+    expect(rows.length).toBe(selectedResults.length + 3)
+  })
+})

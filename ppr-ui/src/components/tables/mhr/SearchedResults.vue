@@ -6,7 +6,7 @@
         <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
         <span class="search-info"> as of {{ searchTime }}</span>
       </v-row>
-      <v-row v-if="searched && !isReviewMode" class="result-info pt-6">
+      <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
         <v-col cols="auto">
           <span class="divider pr-3"><b>{{ totalResultsLength }}</b> homes found</span>
         </v-col>
@@ -66,6 +66,7 @@
 
           <template  v-if="!isReviewMode" v-slot:[`header.ownerName`]>
             <v-checkbox
+              id="select-all-checkbox"
               class="header-checkbox ma-0 pa-0"
               color="primary"
               hide-details
@@ -76,6 +77,7 @@
 
           <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
             <v-checkbox
+              id="select-all-lien-checkbox"
               class="header-checkbox ma-0 pa-0"
               color="primary"
               hide-details
