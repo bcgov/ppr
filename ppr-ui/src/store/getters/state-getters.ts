@@ -211,7 +211,7 @@ export const hasPprRole = (state: StateIF): boolean => {
 }
 
 export const hasMhrRole = (state: StateIF): boolean => {
-  return true // state.stateModel.authorization?.authRoles.includes('mhr')
+  return state.stateModel.authorization?.authRoles.includes('mhr')
 }
 
 /** The current user's service fee (applicable for non billable users). */

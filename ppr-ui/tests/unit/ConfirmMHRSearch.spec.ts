@@ -20,7 +20,7 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { SearchResultSummary } from '@/components/mhr'
+import { SearchedResultMhr } from '@/components/tables'
 
 Vue.use(Vuetify)
 
@@ -34,7 +34,7 @@ describe('Confirm MHRSearch view', () => {
   let wrapper: any
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-  
+
   beforeEach(async () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
@@ -56,7 +56,7 @@ describe('Confirm MHRSearch view', () => {
 
   it('renders Confirm Registration View with child components', () => {
     expect(wrapper.findComponent(ConfirmMHRSearch).exists()).toBe(true)
-    expect(wrapper.findComponent(SearchResultSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHRSEARCH_CONFIRM)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
@@ -99,7 +99,6 @@ describe('Confirm MHRSearch view', () => {
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
-
 
   it('shows errors when folio is invalid', async () => {
     await wrapper.findComponent(FolioNumberSummary).vm.$emit('folioValid', false)
