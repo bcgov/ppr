@@ -35,7 +35,7 @@
                 </label>
               </v-col>
             </v-row>
-            <searched-result-mhr class="soft-corners px-6" :isReadOnly="true" />
+            <searched-result-mhr class="soft-corners px-6" :isReviewMode="true" />
           </v-card>
 
           <folio-number-summary
@@ -80,7 +80,6 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
-import { SearchResultSummary } from '@/components/mhr'
 import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums' // eslint-disable-line no-unused-vars
@@ -100,7 +99,6 @@ import { SearchedResultMhr } from '@/components/tables'
   components: {
     BaseDialog,
     FolioNumberSummary,
-    SearchResultSummary,
     StickyContainer,
     SearchedResultMhr
   }

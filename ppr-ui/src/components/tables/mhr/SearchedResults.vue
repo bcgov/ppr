@@ -6,7 +6,7 @@
         <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
         <span class="search-info"> as of {{ searchTime }}</span>
       </v-row>
-      <v-row v-if="searched && !isReadOnly" class="result-info pt-6">
+      <v-row v-if="searched && !isReviewMode" class="result-info pt-6">
         <v-col cols="auto">
           <span class="divider pr-3"><b>{{ totalResultsLength }}</b> homes found</span>
         </v-col>
@@ -64,7 +64,7 @@
           return-object
         >
 
-          <template  v-if="!isReadOnly" v-slot:[`header.ownerName`]>
+          <template  v-if="!isReviewMode" v-slot:[`header.ownerName`]>
             <v-checkbox
               class="header-checkbox ma-0 pa-0"
               color="primary"
@@ -74,7 +74,7 @@
             />
           </template>
 
-          <template  v-if="!isReadOnly" v-slot:[`header.edit`]>
+          <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
             <v-checkbox
               class="header-checkbox ma-0 pa-0"
               color="primary"
@@ -132,7 +132,7 @@
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-checkbox
-              :label="`${!isReadOnly ? 'Include lien' : 'Lien'} information`"
+              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
               v-model="item.lienSelected"
             />
           </template>
@@ -166,7 +166,7 @@ export default defineComponent({
     FolioNumber
   },
   props: {
-    isReadOnly: { default: false }
+    isReviewMode: { default: false }
   },
   setup (props, context) {
     const {
@@ -209,7 +209,7 @@ export default defineComponent({
         return localState.results.filter(item => item.status === 'HISTORICAL').length
       }),
       headers: computed((): Array<BaseHeaderIF> => {
-        return props.isReadOnly ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
+        return props.isReviewMode ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
       }),
       selectAllModel: computed((): boolean => {
         return localState.results.every(result => result && result.selected === true)
@@ -234,14 +234,14 @@ export default defineComponent({
       localState.searchValue = resp.searchQuery.criteria.value
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
-      localState.results = props.isReadOnly ? getSelectedManufacturedHomes : resp.results
+      localState.results = props.isReviewMode ? getSelectedManufacturedHomes : resp.results
       localState.totalResultsLength = resp.totalResultsSize
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
     })
 
     watch(() => localState.selectAllModel, () => {
-      if (!props.isReadOnly) localState.selectAll = localState.selectAllModel
+      if (!props.isReviewMode) localState.selectAll = localState.selectAllModel
     })
 
     watch(() => localState.selectAll, (val: boolean) => {
