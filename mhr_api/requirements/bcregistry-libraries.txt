@@ -1,0 +1,1 @@
+git+https://github.com/bcgov/registry-schemas.git@1.5.5#egg=registry_schemas
