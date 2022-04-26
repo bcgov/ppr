@@ -167,9 +167,9 @@ export const setManufacturedHomeSearchResults: ActionIF =
     commit('mutateManufacturedHomeSearchResults', manufacturedHomeSearchResults)
   }
 
-export const setSelectedManufacturedHome: ActionIF = ({ commit },
-  selectedManufacturedHome: ManufacturedHomeSearchResultIF): void => {
-  commit('mutateSelectedManufacturedHome', selectedManufacturedHome)
+export const setSelectedManufacturedHomes: ActionIF = ({ commit },
+  selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]): void => {
+  commit('mutateSelectedManufacturedHomes', selectedManufacturedHomes)
 }
 
 export const setSearchedType: ActionIF = ({ commit }, searchedType: SearchTypeIF): void => {

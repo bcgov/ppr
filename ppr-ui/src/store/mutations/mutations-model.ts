@@ -218,9 +218,9 @@ export const mutateManufacturedHomeSearchResults = (
   state.stateModel.search.manufacturedHomeSearchResults = manufacturedHomeSearchResults
 }
 
-export const mutateSelectedManufacturedHome = (state: StateIF,
-  selectedManufacturedHome: ManufacturedHomeSearchResultIF) => {
-  state.stateModel.selectedManufacturedHome = selectedManufacturedHome
+export const mutateSelectedManufacturedHomes = (state: StateIF,
+  selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]) => {
+  state.stateModel.selectedManufacturedHomes = selectedManufacturedHomes
 }
 
 export const mutateUserInfo = (state: StateIF, userInfo: UserInfoIF) => {

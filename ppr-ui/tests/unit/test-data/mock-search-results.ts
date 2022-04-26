@@ -404,7 +404,6 @@ export const mockedSearchResults: mockSearchResults = {
   ]
 }
 
-
 export const mockedMHRSearchResults: mockMHRSearchResults = {
   [UIMHRSearchTypes.MHRMHR_NUMBER]: [
     {
@@ -636,6 +635,145 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       make: 'Honda',
       model: 'Trailer',
       homeLocation: 'Victoria'
+    }
+  ]
+}
+
+export const mockedMHRSearchSelections: mockMHRSearchResults = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: true
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: false
+    },
+    {
+      id: 3,
+      ownerName: {
+        first: 'John',
+        last: 'Lane'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: false
+    }
+  ],
+  [UIMHRSearchTypes.MHROWNER_NAME]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: false
+    }
+  ],
+  [UIMHRSearchTypes.MHRORGANIZATION_NAME]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: false
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'EXEMPT',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: true
+    }
+  ],
+  [UIMHRSearchTypes.MHRSERIAL_NUMBER]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: false
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      registrationNumber: '1234567',
+      serialNumber: 'ABC987',
+      year: 2000,
+      make: 'Honda',
+      model: 'Trailer',
+      homeLocation: 'Victoria',
+      selected: true,
+      lienSelected: true
     }
   ]
 }

@@ -8,9 +8,9 @@
       <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
       </p>
-      <div v-else no-gutters style="padding-top: 26px;">
-        <v-row no-gutters style="padding-top: 22px;">
-          <v-col :class="$style['search-info']">
+      <div v-else no-gutters>
+        <v-row no-gutters class="mt-6">
+          <v-col class="pr-6" :class="$style['search-info']">
             <span v-if="totalResultsLength !== 0" id="results-info">
               Select the manufactured home to download the full details of the home. Selecting the home will debit
               your search fee from your BC Online account. The downloaded report will contain the full record of
@@ -21,11 +21,9 @@
               will be saved to your Personal Property Registry dashboard.
             </span>
           </v-col>
-          <!-- to cut off in line with table submit btn -->
-          <v-col cols="auto" style="width: 320px;" />
         </v-row>
       </div>
-      <v-row v-if="getManufacturedHomeSearchResults" no-gutters style="padding-top: 38px;">
+      <v-row v-if="getManufacturedHomeSearchResults" no-gutters class="mt-6">
         <searched-result-mhr class="soft-corners" @submit="submitCheck()" />
       </v-row>
     </v-container>
