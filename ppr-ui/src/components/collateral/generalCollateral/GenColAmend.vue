@@ -15,8 +15,8 @@
           >Indicate the General Collateral to be deleted from or added to this
           registration.
           <p class="pt-2 mb-0 mr-2">
-            Note: If you are pasting text, <strong>we recommend pasting plain text</strong> to avoid formatting and font issues
-            with PDF and printed registrations. If you have pasted text other than plain text, verify that your
+            Note: If you are pasting text, <strong>we recommend pasting plain text</strong> to avoid formatting and font
+            issues with PDF and printed registrations. If you have pasted text other than plain text, verify that your
             documents are correct. If they are not correct, they will need to be amended.
           </p>
         </v-col>
@@ -90,7 +90,10 @@ import {
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // import the component and the necessary extensions
-import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Paragraph, BulletList, OrderedList, ListItem, Blockquote, HardBreak, HorizontalRule, History } from 'tiptap-vuetify'
+import {
+  TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Paragraph, BulletList, OrderedList, ListItem, Blockquote,
+  HardBreak, HorizontalRule, History
+} from 'tiptap-vuetify'
 // local
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 

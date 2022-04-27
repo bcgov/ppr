@@ -23,7 +23,7 @@
               @click="toggleGroup(item.group)"
             >
               <v-col class="py-0" align-self="center" cols="11">
-                <span class="search-list-header"><v-icon class="menu-icon">{{item.icon}}</v-icon>
+                <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
                 {{ item.textLabel }}</span>
               </v-col>
               <v-col class="py-0" align-self="center" cols="auto">

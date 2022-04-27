@@ -112,20 +112,22 @@ import {
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
-import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Throttle } from '@/decorators'
 import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  DischargeRegistrationIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF, // eslint-disable-line no-unused-vars
-  RegTableNewItemI // eslint-disable-line no-unused-vars
+  ActionBindingIF,
+  DischargeRegistrationIF,
+  ErrorIF,
+  AddPartiesIF,
+  RegistrationTypeIF,
+  StateModelIF,
+  DialogOptionsIF,
+  DebtorNameIF,
+  RegTableNewItemI
 } from '@/interfaces'
+/* eslint-enable no-unused-vars */
 import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
