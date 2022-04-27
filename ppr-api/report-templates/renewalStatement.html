@@ -53,6 +53,10 @@
           <td>
               {% if lifeInfinite is defined and lifeInfinite %}
                   Infinite
+              {% elif expiryDate is defined and expiryDate == 'Never' %}
+                  Infinite
+              {% elif lifeYears is not defined or lifeYears == 0 %}
+                  180 Days
               {% elif lifeYears is defined %}
                   {{lifeYears}} {% if lifeYears != 1 %} Years {% else %} Year {% endif %}
               {% endif %}
