@@ -15,8 +15,8 @@ from datetime import timedelta
 from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
-import markupsafe
 
+import markupsafe
 import pycountry
 import requests
 from flask import current_app, jsonify

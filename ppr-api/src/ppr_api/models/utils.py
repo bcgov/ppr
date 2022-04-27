@@ -606,7 +606,7 @@ def today_ts_offset(offset_days: int = 1, add: bool = False):
     return today_ts - timedelta(days=offset_days)
 
 
-def expiry_dt_from_years(life_years: int, iso_date: str = None):
+def expiry_dt_from_years_last(life_years: int, iso_date: str = None):
     """Create a date representing the date at 23:59:59 local time as UTC.
 
     Adjusted by the life_years number of years in the future. Current date if no iso_date
@@ -625,6 +625,29 @@ def expiry_dt_from_years(life_years: int, iso_date: str = None):
     local_ts = LOCAL_TZ.localize(_datetime.combine(future_date, expiry_time))
     # Return as UTC
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+
+def expiry_dt_from_years(life_years: int, iso_date: str = None):
+    """Create a date representing the date at 23:59:59 local time as UTC.
+
+    Adjusted by the life_years number of years in the future. Use current date if no iso_date.
+    PYTZ has a DST issue (not working after 2037), so set the time before adding years.
+    """
+    # Naive date
+    today = None
+    if iso_date:
+        today = date.fromisoformat(iso_date[:10])
+    else:
+        today = now_ts().astimezone(LOCAL_TZ)
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    expiry_now = _datetime.combine(date(today.year, today.month, today.day), expiry_time)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(expiry_now)
+    # Add years
+    future_ts = local_ts + datedelta(years=life_years)
+    # Return as UTC
+    return _datetime.utcfromtimestamp(future_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
 def expiry_dt_repairer_lien(expiry_ts: _datetime = None):

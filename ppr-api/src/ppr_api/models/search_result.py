@@ -26,7 +26,7 @@ from ppr_api.models import utils as model_utils
 from .db import db
 from .financing_statement import FinancingStatement
 from .search_request import SearchRequest
-from .search_utils import GET_DETAIL_DAYS_LIMIT
+from .search_utils import GET_HISTORY_DAYS_LIMIT
 
 
 # PPR UI search detail report callbackURL parameter: skip notification is request originates from UI.
@@ -244,7 +244,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 current_app.logger.error('DB find_by_search_id exception: ' + repr(db_exception))
                 raise DatabaseException(db_exception)
         elif search_id and limit_by_date:
-            min_allowed_date = model_utils.today_ts_offset(GET_DETAIL_DAYS_LIMIT, False)
+            min_allowed_date = model_utils.today_ts_offset(GET_HISTORY_DAYS_LIMIT, False)
             try:
                 search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
