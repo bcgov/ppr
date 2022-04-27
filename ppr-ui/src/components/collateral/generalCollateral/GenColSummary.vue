@@ -159,7 +159,7 @@
     </div>
     <div v-else class="general-collateral-summary pt-5">
       <p v-if="generalCollateral.length > 0" class="ma-0">
-        <span style="white-space: pre-wrap;" v-html="generalCollateral[0].description"></span>
+        <span v-html="generalCollateral[0].description"></span>
       </p>
     </div>
   </v-container>
@@ -348,6 +348,11 @@ export default defineComponent({
   line-height: 1.375rem;
   color: $gray7;
 }
+
+::v-deep .general-collateral-summary table td {
+  white-space: normal;
+}
+
 #gc-show-history-btn {
   font-size: 0.875rem;
   height: 1rem;

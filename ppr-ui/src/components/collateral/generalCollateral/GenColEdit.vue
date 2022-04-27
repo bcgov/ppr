@@ -177,4 +177,8 @@ export default defineComponent({
 ::v-deep .tiptap-vuetify-editor__content {
   height: 350px; overflow-y: scroll;
 }
+
+::v-deep .tiptap-vuetify-editor__content table td {
+  white-space: normal;
+}
 </style>
