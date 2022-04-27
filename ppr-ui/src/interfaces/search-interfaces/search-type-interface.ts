@@ -12,4 +12,5 @@ export interface SearchTypeIF {
   group: number
   class?: string
   icon?: string
+  color?: string
 }
