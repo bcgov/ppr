@@ -43,7 +43,8 @@ import {
   tombstoneBreadcrumbRenewal,
   tombstoneBreadcrumbAmendment,
   tombstoneBreadcrumbRegistration,
-  tombstoneBreadcrumbSearch
+  tombstoneBreadcrumbSearch,
+  tombstoneBreadcrumbSearchConfirm
 } from '@/resources'
 import { RouteNames } from '@/enums'
 
@@ -74,9 +75,10 @@ export default defineComponent({
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           return tombstoneBreadcrumbDashboard
-        } else if ((routeName.value === RouteNames.SEARCH) || (routeName.value === RouteNames.MHRSEARCH) ||
-        (routeName.value === RouteNames.MHRSEARCH_CONFIRM)) {
+        } else if ((routeName.value === RouteNames.SEARCH) || (routeName.value === RouteNames.MHRSEARCH)) {
           return tombstoneBreadcrumbSearch
+        } else if (routeName.value === RouteNames.MHRSEARCH_CONFIRM) {
+          return tombstoneBreadcrumbSearchConfirm
         } else if (currentPath.value?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
           dischargeBreadcrumb[2].text =

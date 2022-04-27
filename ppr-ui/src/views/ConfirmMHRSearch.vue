@@ -155,7 +155,6 @@ export default class ConfirmDischarge extends Vue {
     this.$router.push({
       name: RouteNames.MHRSEARCH
     })
-    this.emitHaveData(false)
   }
 
   private setFolioValid (valid: boolean): void {
