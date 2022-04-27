@@ -132,13 +132,19 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: false,
-    text: 'Folio',
-    value: 'searchQuery.clientReferenceId'
+    text: 'Registry',
+    value: 'registry'
   },
   {
     class: 'column-lg',
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Folio',
+    value: 'searchQuery.clientReferenceId'
   },
   {
     class: 'column-sm',
@@ -180,15 +186,21 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'UISearchType'
   },
   {
-    class: 'column-md',
+    class: 'column-mdl',
     sortable: false,
-    text: 'Username',
-    value: 'username'
+    text: 'Registry',
+    value: 'registry'
   },
   {
     class: 'column-lg',
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Username',
+    value: 'username'
   },
   {
     class: 'column-sm',

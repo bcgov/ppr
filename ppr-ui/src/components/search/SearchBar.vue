@@ -197,17 +197,26 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import { getFeatureFlag, manufacturedHomeSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import {
+  getFeatureFlag,
+  manufacturedHomeSearch,
+  search,
+  staffSearch,
+  validateSearchAction,
+  validateSearchRealTime
+} from '@/utils'
 import { SearchTypes, MHRSearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
+/* eslint-disable no-unused-vars */
 import {
-  DialogOptionsIF, // eslint-disable-line no-unused-vars
-  IndividualNameIF, // eslint-disable-line no-unused-vars
-  SearchCriteriaIF, // eslint-disable-line no-unused-vars
-  SearchTypeIF, // eslint-disable-line no-unused-vars
-  SearchValidationIF, // eslint-disable-line no-unused-vars
-  UserSettingsIF // eslint-disable-line no-unused-vars
+  DialogOptionsIF,
+  IndividualNameIF,
+  SearchCriteriaIF,
+  SearchTypeIF,
+  SearchValidationIF,
+  UserSettingsIF
 } from '@/interfaces'
+/* eslint-enable no-unused-vars */
 import { APIMHRSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'

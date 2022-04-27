@@ -115,22 +115,24 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegisteringPartyChange } from '@/components/parties/party'
 
 // local helpers/enums/interfaces/resources
-import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Throttle } from '@/decorators'
 import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  RenewRegistrationIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  AddPartiesIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  LengthTrustIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF, // eslint-disable-line no-unused-vars
-  RegTableNewItemI // eslint-disable-line no-unused-vars
+  ActionBindingIF,
+  RenewRegistrationIF,
+  ErrorIF,
+  AddPartiesIF,
+  RegistrationTypeIF,
+  StateModelIF,
+  LengthTrustIF,
+  DialogOptionsIF,
+  DebtorNameIF,
+  RegTableNewItemI
 } from '@/interfaces'
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'

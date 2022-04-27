@@ -158,7 +158,7 @@ describe('Test table headers', () => {
   it('headers for ppr only', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers.length).toBe(8)
+    expect(wrapper.vm.$data.headers.length).toBe(9)
   })
 
   it('headers for both mhr and ppr', async () => {

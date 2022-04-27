@@ -182,26 +182,33 @@ import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/compon
 import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
 
 // local helpers/enums/interfaces/resources
-import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import {
+  ActionTypes,
+  APIRegistrationTypes,
+  RouteNames,
+  UIRegistrationTypes
+} from '@/enums'
 import { Throttle } from '@/decorators'
 import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  AddCollateralIF, // eslint-disable-line no-unused-vars
-  AddPartiesIF, // eslint-disable-line no-unused-vars
-  AmendmentStatementIF, // eslint-disable-line no-unused-vars
-  CertifyIF, // eslint-disable-line no-unused-vars
-  CourtOrderIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  LengthTrustIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF, // eslint-disable-line no-unused-vars
-  DraftIF, // eslint-disable-line no-unused-vars
-  FinancingStatementIF, // eslint-disable-line no-unused-vars
-  RegTableNewItemI // eslint-disable-line no-unused-vars
+  ActionBindingIF,
+  AddCollateralIF,
+  AddPartiesIF,
+  AmendmentStatementIF,
+  CertifyIF,
+  CourtOrderIF,
+  ErrorIF,
+  RegistrationTypeIF,
+  StateModelIF,
+  LengthTrustIF,
+  DialogOptionsIF,
+  DebtorNameIF,
+  DraftIF,
+  FinancingStatementIF,
+  RegTableNewItemI
 } from '@/interfaces'
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 
 import { AllRegistrationTypes } from '@/resources'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'

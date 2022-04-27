@@ -22,16 +22,16 @@
             <tbody v-if="items.length > 0">
               <tr v-for="item in items" :key="item.name">
                 <td>
+                  <v-icon v-if="isPprSearch(item)" class="pr-2" color="primary">mdi-car</v-icon>
+                  <v-icon v-else class="pr-2" color="success">mdi-home</v-icon>
                   {{ displaySearchValue(item.searchQuery) }}
                 </td>
                 <td>
                   {{ displayType(item.searchQuery.type) }}
                 </td>
-                <td v-if="isStaff">
-                  {{ item.username }}
-                </td>
-                <td v-else>
-                  {{ item.searchQuery.clientReferenceId }}
+                <td>
+                  <span v-if="isPprSearch(item)">Personal Property</span>
+                  <span v-else>Manufactured Homes</span>
                 </td>
                 <td>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
@@ -39,7 +39,11 @@
                   </span>
                   <span v-else>Pending</span>
                 </td>
-                <td v-if="hasBothRoles">
+                <td v-if="isStaff">
+                  {{ item.username }}
+                </td>
+                <td v-else>
+                  {{ item.searchQuery.clientReferenceId || '-' }}
                 </td>
                 <td>
                   <span v-if="!item.inProgress || isSearchOwner(item)">
@@ -48,7 +52,7 @@
                   <span v-else>-</span>
                 </td>
                 <td>
-                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                  <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
                     {{ item.exactResultsSize }}
                   </span>
                   <span v-else>-</span>
@@ -178,14 +182,6 @@ export default defineComponent({
         const tableHeaders = cloneDeep(searchHistoryTableHeaders)
         if (localState.isStaff) {
           return searchHistoryTableHeadersStaff
-        }
-        if (hasPprRole.value && hasMhrRole.value) {
-          tableHeaders.splice(4, 0, {
-            class: 'column-mds',
-            sortable: false,
-            text: 'Registry',
-            value: 'registry'
-          })
         }
         return tableHeaders
       }),
@@ -340,6 +336,9 @@ export default defineComponent({
     const retrySearch = (): void => {
       emit('retry')
     }
+    const isPprSearch = (item: SearchResponseIF): boolean => {
+      return item.exactResultsSize >= 0
+    }
 
     return {
       ...toRefs(localState),
@@ -350,6 +349,7 @@ export default defineComponent({
       generateReport,
       getTooltipTxtPdf,
       isPDFAvailable,
+      isPprSearch,
       isSearchOwner,
       retrySearch
     }
@@ -366,13 +366,18 @@ export default defineComponent({
   width: 350px;
   font-size: 0.875rem;
 }
-::v-deep .v-btn--icon.v-size--default {
-  height: 24px;
-  width: 24px;
-}
-::v-deep .v-btn.v-btn--depressed.v-btn--loading.pdf-btn {
-  height: 24px;
-  min-width: 24px;
-  width: 24px;
+::v-deep {
+  td .v-icon {
+    font-size: 20px;
+  }
+  .v-btn--icon.v-size--default {
+    height: 24px;
+    width: 24px;
+  }
+  .v-btn.v-btn--depressed.v-btn--loading.pdf-btn {
+    height: 24px;
+    min-width: 24px;
+    width: 24px;
+  }
 }
 </style>

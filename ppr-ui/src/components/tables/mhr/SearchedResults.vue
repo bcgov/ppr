@@ -75,6 +75,10 @@
             />
           </template>
 
+          <template  v-else v-slot:[`header.ownerName`]>
+            <span class="pl-8">Owner Name</span>
+          </template>
+
           <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
             <v-checkbox
               id="select-all-lien-checkbox"
@@ -307,37 +311,25 @@ th {
   color: $gray7 !important;
   font-size: 1rem;
 }
-::v-deep .header-checkbox .v-input__control .v-input__slot .v-label {
-  color: $gray9;
-  font-size: 0.875rem !important;
-  font-weight: bold;
-}
-::v-deep .results-table .lien-info {
-  width: 100%;
-}
-::v-deep .results-table .v-input--checkbox .v-input__slot .v-label {
-  font-size: 0.875rem !important;
-}
-
-::v-deep .results-table .v-data-table__wrapper {
-  max-height: 550px;
-}
-::v-deep .results-table .v-data-table__wrapper table tbody {
-  tr {
-    height: 54px;
+::v-deep {
+  .header-checkbox .v-input__control .v-input__slot .v-label {
+    color: $gray9;
+    font-size: 0.875rem !important;
+    font-weight: bold;
   }
-
-  tr:not(.v-data-table__selected)::before,
-  tr:not(.v-data-table__selected)::after,
-  tr:not(.v-data-table__selected):hover {
-    // $gray1 at 75%
-    background-color: #f1f3f5BF !important;
+  .results-table .lien-info {
+    width: 100%;
   }
-
-  tr.v-data-table__selected::before,
-  tr.v-data-table__selected::after,
-  tr.v-data-table__selected:hover {
-    background-color: #E4EDF7 !important;
+  .results-table .v-input--checkbox .v-input__slot .v-label {
+    font-size: 0.875rem !important;
+  }
+  .results-table .v-data-table__wrapper {
+    max-height: 550px;
+  }
+  .results-table .v-data-table__wrapper table tbody {
+    tr {
+      height: 54px;
+    }
   }
 }
 </style>
