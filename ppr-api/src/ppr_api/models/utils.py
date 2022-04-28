@@ -681,21 +681,28 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     """Create a date representing the expiry date for a registration.
 
     Adjust the registration timestamp by the life_years number of years in the future.
+    PYTZ has a DST issue (not working after 2037), so set the time before adding years.
     """
     reg_local_ts = registration_ts.astimezone(LOCAL_TZ)
     base_time = reg_local_ts.timestamp()
     offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
     base_ts = reg_local_ts + offset
-    current_app.logger.info(f'Adjusted local expiry Date: {base_ts.year}-{base_ts.month}-{base_ts.day} ')
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
+    current_app.logger.info('Adjusted local reg Date: ' + base_date.isoformat())
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
-    future_ts: _datetime = _datetime.combine(base_date, expiry_time)
+    expiry_reg = _datetime.combine(base_date, expiry_time)
     if life_years:
-        future_ts = future_ts + datedelta(years=life_years)
-    else:
-        # is RL
-        future_ts = future_ts + timedelta(days=REPAIRER_LIEN_DAYS)
+        # Explicitly set to local timezone which will adjust for daylight savings.
+        local_ts = LOCAL_TZ.localize(expiry_reg)
+        # Add years
+        future_ts = local_ts + datedelta(years=life_years)
+        current_app.logger.info('Local expiry timestamp: ' + future_ts.isoformat())
+        # Return as UTC
+        return _datetime.utcfromtimestamp(future_ts.timestamp()).replace(tzinfo=timezone.utc)
+
+    # is RL
+    future_ts = expiry_reg + timedelta(days=REPAIRER_LIEN_DAYS)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
     current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())

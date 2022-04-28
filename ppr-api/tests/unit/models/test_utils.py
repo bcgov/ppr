@@ -98,7 +98,9 @@ TEST_DATA_EXPIRY_REGISTRATION = [
     ('Daylight savings', '2021-08-31T12:00:01-07:00', 5, 6, '2026-09-01T06:59:59+00:00'),
     ('Daylight savings after 5 PM', '2021-08-31T17:00:01-07:00', 5, 6, '2026-09-01T06:59:59+00:00'),
     ('No daylight savings', '2021-01-31T13:00:01-08:00', 10, 7, '2031-02-01T07:59:59+00:00'),
-    ('No daylight savings after 4 PM', '2021-01-31T16:00:01-08:00', 10, 7, '2031-02-01T07:59:59+00:00')
+    ('No daylight savings after 4 PM', '2021-01-31T16:00:01-08:00', 10, 7, '2031-02-01T07:59:59+00:00'),
+    ('Daylight savings after 2037', '2022-08-31T12:00:01-07:00', 16, 6, '2038-09-01T06:59:59+00:00'),
+    ('No daylight savings after 2037', '2022-01-31T13:00:01-08:00', 16, 7, '2038-02-01T07:59:59+00:00')
 ]
 # testdata pattern is ({desc}, {utc_ts}, {local_ts})
 TEST_DATA_LOCAL_TIMEZONE = [
