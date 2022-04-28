@@ -328,7 +328,7 @@ export default defineComponent({
       const searchDate = new Date(searchDatetime.toDateString())
       const diffTime = nowDate.getTime() - searchDate.getTime()
       const diffDays = diffTime / (1000 * 3600 * 24)
-      return diffDays < 8
+      return diffDays < 15
     }
     const isSearchOwner = (item: SearchResponseIF): Boolean => {
       return getUserUsername.value === item?.userId

@@ -55,8 +55,13 @@
           <v-row no-gutters
                   id="search-history-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
-            <v-col cols="auto">
+            <v-col cols="12" sm="3">
               <b>Searches</b> ({{ searchHistoryLength }})
+            </v-col>
+            <v-col cols="12" sm="9">
+              <span :class="[$style['header-help-text'], 'float-right', 'pr-4']">
+                The Searches table will display up to 1000 searches conducted within the last 14 days.
+              </span>
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -1077,5 +1082,9 @@ export default class Dashboard extends Vue {
   color: $error;
   font-size: 0.75rem;
   position: absolute;
+}
+.header-help-text {
+  color: $gray7;
+  font-size: .875rem;
 }
 </style>
