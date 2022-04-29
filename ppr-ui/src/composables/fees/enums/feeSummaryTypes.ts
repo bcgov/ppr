@@ -3,5 +3,6 @@ export enum FeeSummaryTypes {
   DISCHARGE = 'discharge',
   NEW = 'new',
   RENEW = 'renew',
-  MHSEARCH = 'manufactured_home_search'
+  MHSEARCH = 'manufactured_home_search',
+  MHR_COMBINED_SEARCH = 'combined_home_'
 }

@@ -75,7 +75,7 @@ export function getFeeSummary (
   registrationLength: RegistrationLengthI
 ): FeeSummaryI {
   if (feeType === FeeSummaryTypes.MHSEARCH) {
-    return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_5] }
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_8] }
   }
   if (feeType === FeeSummaryTypes.DISCHARGE) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }

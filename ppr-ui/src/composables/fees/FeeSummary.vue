@@ -3,7 +3,7 @@
     <header class="font-weight-bold px-3 py-3">
       <slot name="header">Fee Summary</slot>
     </header>
-    <v-slide-y-transition group tag="ul" :class="[$style['fee-list']]">
+    <v-slide-y-transition group tag="ul" :class="[$style['fee-list'], 'px-0']">
       <template>
         <li
           :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
@@ -24,6 +24,13 @@
           <div v-else :class="$style['fee-list__item-value']">
             ${{ totalFees.toFixed(2) }}
           </div>
+        </li>
+        <li
+          v-if="setFeeQuantity > 1"
+          :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
+          :key="setFeeQuantity"
+        >
+          <div class="fee-list__hint">{{ setFeeQuantity }} @ ${{ feeSummary.feeAmount.toFixed(2) }} each</div>
         </li>
         <li
           v-if="hintFee"
@@ -87,19 +94,13 @@
 
 <script lang="ts">
 // external
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-  watch
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from './enums' // eslint-disable-line no-unused-vars
 import { FeeSummaryI, RegistrationLengthI } from './interfaces' // eslint-disable-line no-unused-vars
-import { getFeeSummary, getFeeHint } from './factories'
+import { getFeeHint, getFeeSummary } from './factories'
 
 export default defineComponent({
   name: 'FeeSummary',
@@ -110,6 +111,10 @@ export default defineComponent({
     },
     setFeeType: {
       type: String as () => FeeSummaryTypes
+    },
+    setFeeQuantity: {
+      default: null,
+      type: Number
     },
     setRegistrationLength: {
       type: Object as () => RegistrationLengthI
@@ -150,6 +155,9 @@ export default defineComponent({
           localState.registrationType,
           localState.registrationLength
         )
+        if (props.setFeeQuantity) {
+          feeSummary.quantity = props.setFeeQuantity
+        }
         if (localState.feeType === FeeSummaryTypes.RENEW) {
           feeSummary.processingFee = 5
         }
@@ -199,6 +207,9 @@ export default defineComponent({
     watch(() => props.setFeeType, (val: FeeSummaryTypes) => {
       localState.feeType = val
     })
+    watch(() => props.setFeeQuantity, (val: number) => {
+      console.log(val)
+    })
     watch(() => props.setRegistrationType, (val: UIRegistrationTypes) => {
       localState.registrationType = val
     })
@@ -227,7 +238,9 @@ header {
 }
 
 .fee-list {
-  padding-left: 30px !important;
+  li {
+    padding-left: 30px !important;
+  }
 }
 
 .fee-list__hint {

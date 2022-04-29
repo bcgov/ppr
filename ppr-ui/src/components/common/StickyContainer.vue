@@ -4,6 +4,7 @@
       v-if="showFeeSummary"
       :setFeeOverride="feeOverride"
       :setFeeType="feeType"
+      :setFeeQuantity="feeQuantity"
       :setRegistrationLength="registrationLength"
       :setRegistrationType="registrationType"
       :setStaffReg="isStaffReg"
@@ -97,9 +98,10 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc
-    } = useGetters<any>(
-      ['getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc']
+      getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc, getSelectedManufacturedHomes
+    } = useGetters<any>([
+      'getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc', 'getSelectedManufacturedHomes'
+    ]
     )
 
     const localState = reactive({
@@ -132,6 +134,10 @@ export default defineComponent({
       }),
       isStaffSBC: computed(() => {
         return isRoleStaffSbc.value as boolean
+      }),
+      feeQuantity: computed(() => {
+        console.log(getSelectedManufacturedHomes.value.length)
+        return getSelectedManufacturedHomes.value.length
       })
     })
     const back = () => {
@@ -149,6 +155,10 @@ export default defineComponent({
 
     watch(() => props.setErrMsg, (val: string) => {
       localState.errMsg = val
+    })
+
+    watch(() => getSelectedManufacturedHomes, (val: any) => {
+      console.log(getSelectedManufacturedHomes.value.length)
     })
 
     watch(() => props.setRegistrationLength, (val: RegistrationLengthI) => {
