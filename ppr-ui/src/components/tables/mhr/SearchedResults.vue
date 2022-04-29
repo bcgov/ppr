@@ -212,7 +212,6 @@ export default defineComponent({
       searchType: null,
       selectAll: false,
       selectAllLien: false,
-      // isIndeterminate: false,
       folioNumber: getFolioOrReferenceNumber.value,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
