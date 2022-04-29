@@ -20,6 +20,7 @@ from datetime import date  # noqa: F401 pylint: disable=unused-import
 from datetime import datetime as _datetime
 from datetime import time, timedelta, timezone
 
+import re
 import pytz
 from flask import current_app
 
@@ -34,6 +35,7 @@ TO_DB_SEARCH_TYPE = {
     'MHR_NUMBER': 'MM',
     'SERIAL_NUMBER': 'MS'
 }
+KEY_ALLOWED_CHARS: str = '&#ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
 
 # Error messages
@@ -168,3 +170,54 @@ def get_address_from_db2(legacy_address: str, postal_code: str = ''):
     if street2:
         address['streetAdditional'] = street2
     return address
+
+
+def get_compressed_key(name: str) -> str:
+    """Get the compressed search key for the organization or combined owner name."""
+    key: str = ''
+    if not name:
+        return key
+    key = name.upper()
+    # 1 Remove the first character of the string if it’s not in the accepted alphanumeric characters.
+    #   Accepted characters: &#ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
+    if KEY_ALLOWED_CHARS.find(key[0:1]) < 0:
+        key = key[1:]
+    # 2 Remove 'THE ' from the beginning of the string.
+    if key.startswith('THE '):
+        key = key[4:]
+    # 3 Remove any non-alphanumeric characters.
+    #   Accepted characters: &#ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
+    key = re.sub('[^0-9A-Z&#]+', '', key)
+    # 4 If the remaining string starts with 'BRITISHCOLUMBIA ', replace it with ‘BC’.
+    if key.startswith('BRITISHCOLUMBIA'):
+        key = 'BC' + key[15:]
+    # 5 Replace ‘#’ with ‘NUMBER’.
+    key = key.replace('#', 'NUMBER')
+    # 6 Replace ‘&’ with ‘AND’;
+    key = key.replace('&', 'AND')
+
+    # 7 Replace all numbers with matching words (0 with ZERO)
+    key = key.replace('0', 'ZERO')
+    key = key.replace('1', 'ONE')
+    key = key.replace('2', 'TWO')
+    key = key.replace('3', 'THREE')
+    key = key.replace('4', 'FOUR')
+    key = key.replace('5', 'FIVE')
+    key = key.replace('6', 'SIX')
+    key = key.replace('7', 'SEVEN')
+    key = key.replace('8', 'EIGHT')
+    key = key.replace('9', 'NINE')
+    if len(key) > 30:
+        return key[0:30]
+    return key
+
+
+def get_serial_number_key(serial_num: str) -> str:
+    """Get the compressed search serial number key for the MH serial number."""
+    key: str = ''
+    if not serial_num:
+        return key
+    key = serial_num.strip().upper()
+    if len(key) > 20:
+        return key[0:20]
+    return key

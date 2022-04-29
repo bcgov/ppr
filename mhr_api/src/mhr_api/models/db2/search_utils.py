@@ -23,6 +23,7 @@ Search constants and helper functions.
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
+from mhr_api.models import utils as model_utils
 
 
 GET_DETAIL_DAYS_LIMIT = 7 # Number of days in the past a get details request is allowed.
@@ -36,27 +37,6 @@ SEARCH_RESULTS_MAX_SIZE = 5000
 
 # Result set size limit clause
 RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
-
-# Serial number search base where clause
-SERIAL_SEARCH_BASE = """
-SELECT r.registration_type,r.registration_ts AS base_registration_ts,
-        sc.serial_type,sc.serial_number,sc.year,sc.make,sc.model,
-        r.registration_number AS base_registration_num,
-        CASE WHEN serial_number = :query_value THEN 'EXACT' ELSE 'SIMILAR' END match_type,
-        fs.expire_date,fs.state_type,sc.id AS vehicle_id, sc.mhr_number
-  FROM registrations r, financing_statements fs, serial_collateral sc 
- WHERE r.financing_id = fs.id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id 
-                     FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND sc.financing_id = fs.id
-   AND sc.registration_id_end IS NULL
-"""
 
 MHR_NUM_QUERY = """
 SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1, de.yearmade,
@@ -75,130 +55,116 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
 """
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
-SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + """
-   AND sc.serial_type NOT IN ('AC', 'AF', 'AP')
-   AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value)) 
-ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
+SERIAL_NUM_QUERY = """
+SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
+       o.ownrname,
+--       (SELECT LISTAGG(o2.ownrname, ',')
+--          FROM amhrtdb.owner o2
+--         WHERE o2.manhomid = mh.manhomid) as owner_names, 
+       l.towncity, de.sernumb1, de.yearmade,
+       de.makemodl
+  FROM amhrtdb.manuhome mh, amhrtdb.document d, amhrtdb.owner o, amhrtdb.location l, amhrtdb.descript de
+ WHERE mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+   AND mh.manhomid = o.manhomid
+   AND o.owngrpid = 1
+   AND o.ownerid = 1
+   AND (de.sernumb1 LIKE :query_value || '%' OR 
+        de.sernumb2 LIKE :query_value || '%' OR 
+        de.sernumb3 LIKE :query_value || '%' OR 
+        de.sernumb4 LIKE :query_value || '%')
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND mh.manhomid = de.manhomid
+   AND de.status = 'A'
+ORDER BY d.regidate ASC
 """
 
-
-BUSINESS_NAME_QUERY = """
-WITH q AS (
-   SELECT(SELECT searchkey_business_name(:query_bus_name)) AS search_key,
-   SUBSTR((SELECT searchkey_business_name(:query_bus_name)),1,1) AS search_key_char1,
-   (SELECT business_name_strip_designation(:query_bus_name)) AS search_name_base,
-   (SELECT array_length(string_to_array(trim(regexp_replace(:query_bus_name,'^THE','','gi')),' '),1)) AS word_length)
-SELECT r.registration_type,r.registration_ts AS base_registration_ts,
-       p.business_name,
-       r.registration_number AS base_registration_num,
-       CASE WHEN p.bus_name_base = search_name_base THEN 'EXACT'
-            ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type,p.id
-  FROM registrations r, financing_statements fs, parties p, q
-WHERE r.financing_id = fs.id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id
-                     FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.id
-   AND p.registration_id_end IS NULL
-   AND p.party_type = 'DB'
-   AND p.bus_name_key_char1 = search_key_char1
-   AND ((search_key <% p.business_srch_key AND
-          SIMILARITY(search_key, p.business_srch_key) >= :query_bus_quotient)
-          OR p.business_srch_key = search_key
-          OR word_length=1 and search_key = split_part(business_name,' ',1)
-          OR (LENGTH(search_key) >= 3 AND LEVENSHTEIN(search_key, p.business_srch_key) <= 1) AND 
-              p.bus_name_key_char1 = search_key_char1
-    )
-ORDER BY match_type, p.business_name ASC, r.registration_ts ASC
+OWNER_NAME_QUERY = """
+SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
+       de.yearmade, de.makemodl
+  FROM manuhome mh, document d, owner o, location l, descript de
+ WHERE mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+   AND mh.manhomid = o.manhomid
+   AND o.ownrtype = 'I'
+   AND o.compname LIKE :query_value || '%'
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND mh.manhomid = de.manhomid
+   AND de.status = 'A'
+ORDER BY o.ownrname ASC, d.regidate ASC
 """
 
-INDIVIDUAL_NAME_QUERY = """
-WITH q AS (SELECT(searchkey_last_name(:query_last)) AS search_last_key)
-SELECT r.registration_type,r.registration_ts AS base_registration_ts,
-       p.last_name,p.first_name,p.middle_initial,p.id,
-       r.registration_number AS base_registration_num,
-       CASE WHEN search_last_key = p.last_name_key AND p.first_name = :query_first THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) = 1 AND
-                 :query_first = p.first_name_char1 THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND LENGTH(p.first_name) = 1 AND
-                 p.first_name = LEFT(:query_first, 1) THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-' AND
-                 p.first_name_char1 = LEFT(:query_first, 1) THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) > 1 AND SUBSTR(:query_first, 2, 1) = '-'
-                 AND p.first_name_char1 = LEFT(:query_first, 1) THEN 'EXACT'
-            ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type, p.birth_date
-  FROM registrations r, financing_statements fs, parties p, q
-WHERE r.financing_id = fs.id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id
-                     FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.id
-   AND p.registration_id_end IS NULL
-   AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
-                                                           :query_first_quotient, :query_default_quotient))) 
-ORDER BY match_type, p.last_name ASC, p.first_name ASC, p.middle_initial ASC, p.birth_date ASC,  r.registration_ts ASC
-"""
-
-INDIVIDUAL_NAME_MIDDLE_QUERY = """
-WITH q AS (SELECT(searchkey_last_name(:query_last)) AS search_last_key)
-SELECT r.registration_type,r.registration_ts AS base_registration_ts,
-       p.last_name,p.first_name,p.middle_initial,p.id,
-       r.registration_number AS base_registration_num,
-       CASE WHEN search_last_key = p.last_name_key AND p.first_name = :query_first AND
-               (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) = 1 AND
-                 :query_first = p.first_name_char1 AND
-                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND LENGTH(p.first_name) = 1 AND
-                 p.first_name = LEFT(:query_first, 1) AND
-                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND p.first_name_char2 IS NOT NULL AND p.first_name_char2 = '-' AND
-                 p.first_name_char1 = LEFT(:query_first, 1) AND
-                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
-            WHEN search_last_key = p.last_name_key AND LENGTH(:query_first) > 1 AND SUBSTR(:query_first, 2, 1) = '-'
-                 AND p.first_name_char1 = LEFT(:query_first, 1) AND
-                 (p.middle_initial is NULL OR LEFT(p.middle_initial, 1) = LEFT(:query_middle, 1)) THEN 'EXACT'
-            ELSE 'SIMILAR' END match_type,
-       fs.expire_date,fs.state_type, p.birth_date
-  FROM registrations r, financing_statements fs, parties p, q
-WHERE r.financing_id = fs.id
-   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-   AND r.base_reg_number IS NULL
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id
-                     FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-   AND p.financing_id = fs.id
-   AND p.registration_id_end IS NULL
-   AND p.party_type = 'DI'
-   AND p.id IN (SELECT * FROM unnest(match_individual_name(:query_last, :query_first, :query_last_quotient,
-                                                           :query_first_quotient, :query_default_quotient))) 
-ORDER BY match_type, p.last_name ASC, p.first_name ASC, p.middle_initial ASC, p.birth_date ASC,  r.registration_ts ASC
+ORG_NAME_QUERY = """
+SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
+       de.yearmade, de.makemodl
+  FROM manuhome mh, document d, owner o, location l, descript de
+ WHERE mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+   AND mh.manhomid = o.manhomid
+   AND o.ownrtype = 'B'
+   AND o.compname LIKE :query_value || '%'
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND mh.manhomid = de.manhomid
+   AND de.status = 'A'
+ORDER BY o.ownrname ASC, d.regidate ASC
 """
 
 
 def search_by_mhr_number(current_app, db, request_json):
      """Execute a DB2 search by mhr number query."""
      mhr_num = request_json['criteria']['value']
+     current_app.logger.info(f'DB2 search_by_mhr_number search value={mhr_num}.')
      try:
           query = text(MHR_NUM_QUERY)
           result = db.get_engine(current_app, 'db2').execute(query, {'query_value': mhr_num.strip()})
           return result
      except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('DB2 search_by_mhr_number exception: ' + repr(db_exception))
+        current_app.logger.error('DB2 search_by_mhr_number exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+def search_by_organization_name(current_app, db, request_json):
+     """Execute a DB2 search by organization name query."""
+     value = request_json['criteria']['value']
+     key = model_utils.get_compressed_key(value)
+     current_app.logger.info(f'DB2 search_by_organization_name search value={value}, key={key}.')
+     try:
+          query = text(ORG_NAME_QUERY)
+          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': key})
+          return result
+     except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB2 search_by_organization_name exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+def search_by_owner_name(current_app, db, request_json):
+     """Execute a DB2 search by owner name query."""
+     try:
+          owner_name = request_json['criteria']['ownerName']
+          name: str = owner_name.get('last')
+          if owner_name.get('first'):
+               name += ' ' + owner_name.get('first')
+          if owner_name.get('middle'):
+               name += ' ' + owner_name.get('middle').upper()
+          key = model_utils.get_compressed_key(name)
+          current_app.logger.info(f'DB2 search_by_owner_name search value={name}, key={key}.')
+          query = text(OWNER_NAME_QUERY)
+          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': key})
+          return result
+     except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB2 search_by_owner_name exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+def search_by_serial_number(current_app, db, request_json):
+     """Execute a DB2 search by serial number query."""
+     serial_num:str = request_json['criteria']['value']
+     serial_num = model_utils.get_serial_number_key(serial_num)
+     current_app.logger.info(f'DB2 search_by_serial_number search value={serial_num}.')
+     try:
+          query = text(SERIAL_NUM_QUERY)
+          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': serial_num})
+          return result
+     except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB2 search_by_serial_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)

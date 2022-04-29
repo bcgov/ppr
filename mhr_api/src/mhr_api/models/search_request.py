@@ -117,6 +117,38 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         self.updated_selection = search_json
         self.save()
 
+    @classmethod
+    def __build_search_result(cls, row):
+        """Build a single search summary json from a DB row."""
+        status = 'ACTIVE'
+        mh_status = str(row[1])
+        exempt = str(row[2])
+        if mh_status != 'R':
+            if exempt and exempt != 'N':
+                status = 'EXEMPT'
+            else:
+                status = 'HISTORIC'
+        timestamp = row[3]
+        result_json = {
+            'mhrNumber': str(row[0]),
+            'status': status,
+            'createDateTime': model_utils.format_ts(timestamp),
+            'homeLocation': str(row[6]).strip(),
+            'serialNumber': str(row[7]).strip(),
+            'baseInformation': {
+                'year': int(row[8]),
+                'make': str(row[9]).strip(),
+                'model': ''
+            }
+        }
+        owner_type = str(row[4])
+        owner_name = str(row[5]).strip()
+        if owner_type != 'I':
+            result_json['organizationName'] = owner_name
+        else:
+            result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+        return result_json
+
     def search_by_mhr_number_db2(self):
         """Execute a search by mhr number query."""
         result = db2_search_utils.search_by_mhr_number(current_app, db, self.request_json)
@@ -127,37 +159,75 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             current_app.logger.error('DB search_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
+        result_json = []
         if row is not None:
-            status = 'ACTIVE'
-            mh_status = str(row[1])
-            exempt = str(row[2])
-            if mh_status != 'R':
-                if exempt and exempt != 'N':
-                    status = 'EXEMPT'
-                else:
-                    status = 'HISTORIC'
-            timestamp = row[3]
-            result_json = [{
-                'mhrNumber': str(row[0]),
-                'status': status,
-                'createDateTime': model_utils.format_ts(timestamp),
-                'homeLocation': str(row[6]).strip(),
-                'serialNumber': str(row[7]).strip(),
-                'baseInformation': {
-                    'year': int(row[8]),
-                    'make': str(row[9]).strip(),
-                    'model': ''
-                }
-            }]
-            owner_type = str(row[4])
-            owner_name = str(row[5]).strip()
-            if owner_type != 'I':
-                result_json[0]['organizationName'] = owner_name
-            else:
-                result_json[0]['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+            result_json.append(SearchRequest.__build_search_result(row))
             self.returned_results_size = 1
             self.total_results_size = 1
             self.search_response = result_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
+    def search_by_organization_name_db2(self):
+        """Execute a search by organization name query."""
+        result = db2_search_utils.search_by_organization_name(current_app, db, self.request_json)
+        rows = None
+        try:
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_organization_name_db2 exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                results_json.append(SearchRequest.__build_search_result(row))
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            self.search_response = results_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
+    def search_by_owner_name_db2(self):
+        """Execute a search by owner name query."""
+        result = db2_search_utils.search_by_owner_name(current_app, db, self.request_json)
+        rows = None
+        try:
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_owner_name_db2 exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                results_json.append(SearchRequest.__build_search_result(row))
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            self.search_response = results_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
+    def search_by_serial_number_db2(self):
+        """Execute a search by serial number query."""
+        result = db2_search_utils.search_by_serial_number(current_app, db, self.request_json)
+        rows = None
+        try:
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_serial_number_db2 exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                results_json.append(SearchRequest.__build_search_result(row))
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            self.search_response = results_json
         else:
             self.returned_results_size = 0
             self.total_results_size = 0
@@ -201,11 +271,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.search_type == self.SearchTypes.MANUFACTURED_HOME_NUM:
             self.search_by_mhr_number_db2()
         elif self.search_type == self.SearchTypes.SERIAL_NUM:
-            self.search_by_serial_number()
+            self.search_by_serial_number_db2()
         elif self.search_type == self.SearchTypes.ORGANIZATION_NAME:
-            self.search_by_organization_name()
+            self.search_by_organization_name_db2()
         else:
-            self.search_by_owner_name()
+            self.search_by_owner_name_db2()
         self.save()
 
     @classmethod
@@ -288,7 +358,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """
         error_msg = ''
         # validate search type - criteria combinations
-        search_type = json_data['type']
+        search_type: str = json_data['type']
+        if len(search_type) != 2:
+            search_type = model_utils.TO_DB_SEARCH_TYPE[search_type]
         if search_type == SearchRequest.SearchTypes.OWNER_NAME:
             if 'ownerName' not in json_data['criteria']:
                 error_msg += f'Search criteria ownerName is required for search type {search_type}. '
