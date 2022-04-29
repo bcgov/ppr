@@ -362,7 +362,18 @@ export default defineComponent({
 .edit-button {
   padding-right: 15px;
 }
-::v-deep .v-btn:not(.v-btn--round).v-size--default::before {
-  background-color: transparent;
+::v-deep {
+  .v-btn:not(.v-btn--round).v-size--default::before {
+    background-color: transparent;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  td {
+    vertical-align: baseline;
+    border: 1px solid $gray3;
+    padding: 3px 5px;
+    width: 33%;
+  }
 }
 </style>

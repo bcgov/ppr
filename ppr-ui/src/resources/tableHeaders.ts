@@ -192,7 +192,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'registry'
   },
   {
-    class: 'column-mdl',
+    class: 'column-lg',
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
   },
