@@ -20,9 +20,8 @@
           <h1>Review Search Result</h1>
           <div class="mt-6">
             <p class="ma-0">
-              Review the details of the manufactured home before paying. Your search result will download
-              automatically after payment is received. Your search result will also be available in your searches
-              list.
+              Review the details of the manufactured home before paying. Your search result will be available in your
+              Searches list.
             </p>
           </div>
 

@@ -72,6 +72,7 @@
               hide-details
               label="Owner Name"
               v-model="selectAll"
+              :indeterminate="isIndeterminate"
             />
           </template>
 
@@ -87,6 +88,7 @@
               hide-details
               label="Include lien information for all selections"
               v-model="selectAllLien"
+              :indeterminate="isLienIndeterminate"
             />
           </template>
 
@@ -121,7 +123,10 @@
           <template v-slot:[`item.state`]="{ item }">
             {{ item.status }}
           </template>
-          <template v-slot:[`item.year`]="{ item }">
+          <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
+            {{ item.year }} {{ item.make }} {{ item.model }}
+          </template>
+          <template v-else v-slot:[`item.year`]="{ item }">
             {{ item.year }}
           </template>
           <template v-slot:[`item.make`]="{ item }">
@@ -137,10 +142,24 @@
             <span>{{ item.serialNumber }}</span>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
-            <v-checkbox
-              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-              v-model="item.lienSelected"
-            />
+            <v-tooltip
+              top
+              content-class="top-tooltip"
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <span  v-bind="attrs" v-on="on">
+                  <v-checkbox
+                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                    v-model="item.lienSelected"
+                  />
+                </span>
+              </template>
+              <div class="pt-2 pb-2">
+                Select this to include a Personal Property Registry (PPR) lien search for this manufactured home for an
+                additional fee.
+              </div>
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-col>
@@ -193,6 +212,7 @@ export default defineComponent({
       searchType: null,
       selectAll: false,
       selectAllLien: false,
+      // isIndeterminate: false,
       folioNumber: getFolioOrReferenceNumber.value,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
@@ -217,8 +237,17 @@ export default defineComponent({
       headers: computed((): Array<BaseHeaderIF> => {
         return props.isReviewMode ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
       }),
-      selectAllModel: computed((): boolean => {
+      areAllSelected: computed((): boolean => {
         return localState.results.every(result => result && result.selected === true)
+      }),
+      isIndeterminate: computed((): boolean => {
+        return localState.selectAll !== localState.areAllSelected
+      }),
+      areAllLienSelected: computed((): boolean => {
+        return localState.results.every(result => result && result.lienSelected === true)
+      }),
+      isLienIndeterminate: computed((): boolean => {
+        return localState.selectAllLien !== localState.areAllLienSelected
       })
     })
 
@@ -246,8 +275,12 @@ export default defineComponent({
       localState.searchTime = pacificDate(date)
     })
 
-    watch(() => localState.selectAllModel, () => {
-      if (!props.isReviewMode) localState.selectAll = localState.selectAllModel
+    watch(() => localState.areAllSelected, (val: boolean) => {
+      if (!props.isReviewMode && val) localState.selectAll = localState.areAllSelected
+    })
+
+    watch(() => localState.areAllLienSelected, (val: boolean) => {
+      if (!props.isReviewMode && val) localState.selectAllLien = localState.areAllLienSelected
     })
 
     watch(() => localState.selectAll, (val: boolean) => {

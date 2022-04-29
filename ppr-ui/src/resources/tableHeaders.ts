@@ -136,7 +136,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
     value: 'registry'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdl',
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
   },
@@ -186,13 +186,13 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'UISearchType'
   },
   {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Registry',
     value: 'registry'
   },
   {
-    class: 'column-lg',
+    class: 'column-mdl',
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
   },
@@ -495,13 +495,13 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
 
 export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
   {
-    class: 'column-md',
+    class: 'column-mdl',
     sortable: false,
     text: 'Owner Name',
     value: 'ownerName'
   },
   {
-    class: 'column-mds',
+    class: 'column-md',
     sortable: false,
     text: 'Registration Number',
     value: 'registrationNumber'
@@ -513,22 +513,10 @@ export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
     value: 'status'
   },
   {
-    class: 'column-sm',
+    class: 'column-mdl',
     sortable: false,
-    text: 'Year',
-    value: 'year'
-  },
-  {
-    class: 'column-sm',
-    sortable: false,
-    text: 'Make',
-    value: 'make'
-  },
-  {
-    class: 'column-sm',
-    sortable: false,
-    text: 'Model',
-    value: 'model'
+    text: 'Year Make Model',
+    value: 'yearMakeModel'
   },
   {
     class: 'column-sm',

@@ -59,7 +59,7 @@
               <b>Searches</b> ({{ searchHistoryLength }})
             </v-col>
             <v-col cols="12" sm="9">
-              <span :class="[$style['header-help-text'], 'float-right', 'pr-4']">
+              <span :class="[$style['header-help-text'], 'float-right', 'pr-6']">
                 The Searches table will display up to 1000 searches conducted within the last 14 days.
               </span>
             </v-col>
