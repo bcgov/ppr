@@ -114,10 +114,10 @@ export default defineComponent({
 
     const editorProperties = {
       transformPastedText (text) {
-        return text.replace(/[^\x00-\x7F]/g, '') // eslint-disable-line
+        return text.replaceAll(/^\x00-\x7F|(?:&#x200E;)/g, '') // eslint-disable-line
       },
       transformPastedHTML (html) {
-        return html.replace(/[^\x00-\x7F]/g, '') // eslint-disable-line
+        return html.replaceAll(/^\x00-\x7F|(?:&#x200E;)/g, '') // eslint-disable-line
       }
     }
 
