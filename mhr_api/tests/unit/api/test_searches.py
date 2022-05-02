@@ -37,6 +37,30 @@ MHR_NUMBER_JSON = {
     },
     'clientReferenceId': 'T-SQ-MH-1'
 }
+ORG_NAME_JSON = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'value': 'GUTHRIE HOLDINGS LTD.'
+    },
+    'clientReferenceId': 'T-SQ-MO-1'
+}
+OWNER_NAME_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'David',
+            'last': 'Hamm'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
+SERIAL_NUMBER_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': '4551'
+    },
+    'clientReferenceId': 'T-SQ-MS-1'
+}
 SELECTED_JSON_NONE = []
 SELECTED_JSON = [
     {'baseInformation': {
@@ -68,7 +92,10 @@ SELECTED_JSON_INVALID = [
 
 # testdata pattern is ({search_type}, {json_data})
 TEST_SEARCH_TYPE_DATA = [
-    ('MM', MHR_NUMBER_JSON)
+    ('MM', MHR_NUMBER_JSON),
+    ('MB', ORG_NAME_JSON),
+    ('MI', OWNER_NAME_JSON),
+    ('MS', SERIAL_NUMBER_JSON)
 ]
 
 # testdata pattern is ({desc}, {type}, {value}, {roles}, {account_id}, {status})

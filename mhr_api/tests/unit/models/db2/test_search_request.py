@@ -23,7 +23,7 @@ from flask import current_app
 
 import pytest
 
-from mhr_api.models import SearchRequest
+from mhr_api.models import SearchRequest, utils as model_utils
 # from mhr_api.models.utils import format_ts
 from mhr_api.exceptions import BusinessException
 
@@ -52,18 +52,114 @@ MH_NONE_JSON = {
     },
     'clientReferenceId': 'T-SQ-MH-4'
 }
+ORG_NAME_JSON = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'value': 'GUTHRIE HOLDINGS LTD.'
+    },
+    'clientReferenceId': 'T-SQ-MO-1'
+}
+MO_INVALID_JSON = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'JAMES',
+            'last': 'BROWN'
+        }
+    }
+}
+# Test valid criteria with no results.
+MO_NONE_JSON = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'value': 'XXXXXXXXXXXZZZZZ'
+    },
+    'clientReferenceId': 'T-SQ-MH-4'
+}
+OWNER_NAME_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'David',
+            'last': 'Hamm'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
+OWNER_NAME_JSON2 = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'DWAYNE',
+            'middle': 'LARRY',
+            'last': 'MANKE'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
+MI_INVALID_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'value': 'GUTHRIE HOLDINGS LTD.'
+    }
+}
+# Test valid criteria with no results.
+MI_NONE_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'ZZZZYYYYY',
+            'last': 'XXXXXXXXOO'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-4'
+}
+SERIAL_NUMBER_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': '4551'
+    },
+    'clientReferenceId': 'T-SQ-MS-1'
+}
+MS_INVALID_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'ownerName': {
+            'first': 'JAMES',
+            'last': 'BROWN'
+        }
+    }
+}
+# Test valid criteria with no results.
+MS_NONE_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': 'XXXXXXXXX'
+    },
+    'clientReferenceId': 'T-SQ-MS-4'
+}
 
 # testdata pattern is ({search type}, {JSON data})
 TEST_VALID_DATA = [
-    ('MM', MHR_NUMBER_JSON)
+    ('MM', MHR_NUMBER_JSON),
+    ('MO', ORG_NAME_JSON),
+    ('MI', OWNER_NAME_JSON),
+    ('MI', OWNER_NAME_JSON2),
+    ('MS', SERIAL_NUMBER_JSON),
 ]
 # testdata pattern is ({search type}, {JSON data})
 TEST_NONE_DATA = [
-    ('MM', MH_NONE_JSON)
+    ('MM', MH_NONE_JSON),
+    ('MO', MO_NONE_JSON),
+    ('MI', MO_NONE_JSON),
+    ('MS', MS_NONE_JSON)
 ]
 # testdata pattern is ({search type}, {JSON data})
 TEST_INVALID_DATA = [
-    ('MM', MH_INVALID_JSON)
+    ('MM', MH_INVALID_JSON),
+    ('MO', MO_INVALID_JSON),
+    ('MI', MI_INVALID_JSON),
+    ('MS', MS_INVALID_JSON)
 ]
 
 
@@ -80,6 +176,10 @@ def test_search_no_account(session):
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
 def test_search_valid(session, search_type, json_data):
     """Assert that a valid search returns the expected search type result."""
+    test_data = copy.deepcopy(json_data)
+    test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
+    SearchRequest.validate_query(test_data)
+
     query: SearchRequest = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
     query.search_db2()
     assert not query.updated_selection
@@ -139,9 +239,11 @@ def test_create_from_json(session):
 @pytest.mark.parametrize('search_type,json_data', TEST_INVALID_DATA)
 def test_search_invalid_criteria_400(session, client, jwt, search_type, json_data):
     """Assert that validation of a search request with invalid criteria throws a BusinessException."""
+    test_data = copy.deepcopy(json_data)
+    test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
     # test
     with pytest.raises(BusinessException) as bad_request_err:
-        SearchRequest.validate_query(json_data)
+        SearchRequest.validate_query(test_data)
 
     # check
     assert bad_request_err

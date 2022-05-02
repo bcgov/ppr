@@ -84,18 +84,10 @@ class _Config():  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv('DATABASE_HOST', '')
     DB_PORT = os.getenv('DATABASE_PORT', '5432')  # POSTGRESQL
     # POSTGRESQL
-    # GCP syntax example
-    # SQLALCHEMY_DATABASE_URI=‘postgresql+psycopg2://user4ca:xxxxx@/ppr?host=/cloudsql/eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb’
-    # {driver}://{username}:{password}@/{database_name}?host=/{cloud_driver}/{gcp_project}:{gcp_region}:{gcp_cloud_sql_instance_name}’
-    # you leave out the hostname between the @ /
-
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{user}:{password}@{host}:{port}/{name}'.format(
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=int(DB_PORT),
-        name=DB_NAME,
-    )
+    if DB_UNIX_SOCKET := os.getenv('DATABASE_UNIX_SOCKET', None):
+        SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?host={DB_UNIX_SOCKET}'
+    else:
+        SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
     # Remove after legacy migration to Postgres
     DB2_DB_USER = os.getenv('DB2_DATABASE_USERNAME', '')
