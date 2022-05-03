@@ -23,7 +23,7 @@
             <folio-number
               class="mr-3 ml-0 mt-n2"
               :defaultFolioNumber="folioNumber"
-              @folio-number="folioNumber = $event"
+              @folio-number="updateFolioOrReference($event)"
               @folio-error="folioError = $event"
             />
             <v-btn
@@ -202,7 +202,9 @@ export default defineComponent({
     } = useGetters<any>([
       'getManufacturedHomeSearchResults', 'getFolioOrReferenceNumber', 'getSearchedType', 'getSelectedManufacturedHomes'
     ])
-    const { setSelectedManufacturedHomes } = useActions<any>(['setSelectedManufacturedHomes'])
+    const { setSelectedManufacturedHomes, setFolioOrReferenceNumber } = useActions<any>([
+      'setSelectedManufacturedHomes', 'setFolioOrReferenceNumber'
+    ])
     const router = context.root.$router
 
     const localState = reactive({
@@ -263,6 +265,10 @@ export default defineComponent({
           ${item.ownerName.middle || ''}`
     }
 
+    const updateFolioOrReference = (folioOrReference: string): void => {
+      setFolioOrReferenceNumber(folioOrReference)
+    }
+
     onMounted(() => {
       const resp = getManufacturedHomeSearchResults.value
       localState.searchValue = resp.searchQuery.criteria.value
@@ -293,6 +299,7 @@ export default defineComponent({
     return {
       reviewAndConfirm,
       getOwnerName,
+      updateFolioOrReference,
       ...toRefs(localState)
     }
   }
