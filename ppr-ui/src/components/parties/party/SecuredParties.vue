@@ -509,8 +509,9 @@ export default defineComponent({
         localState.securedParties.splice(index, 1, cloneDeep(originalParties.securedParties[index]))
       }
       currentParties.securedParties = localState.securedParties
-      setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getSecuredPartyValidity()
+      currentParties.valid = isValid
+      setAddSecuredPartiesAndDebtors(currentParties)
       emitSecuredPartyValidity(isValid)
     }
 
