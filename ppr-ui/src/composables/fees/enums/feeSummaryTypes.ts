@@ -4,5 +4,5 @@ export enum FeeSummaryTypes {
   NEW = 'new',
   RENEW = 'renew',
   MHSEARCH = 'manufactured_home_search',
-  MHR_COMBINED_SEARCH = 'combined_home_'
+  MHR_COMBINED_SEARCH = 'combined_home_search'
 }

@@ -3,12 +3,13 @@
     <fee-summary
       v-if="showFeeSummary"
       :setFeeOverride="feeOverride"
-      :setFeeType="feeType"
-      :setFeeQuantity="feeQuantity"
+      :setFeeType="setFeeType"
+      :setFeeQuantity="setFeeQuantity"
       :setRegistrationLength="registrationLength"
       :setRegistrationType="registrationType"
       :setStaffReg="isStaffReg"
       :setStaffSBC="isStaffSBC"
+      :additionalFees="setAdditionalFees"
     />
     <buttons-stacked
       v-if="showButtons"
@@ -42,9 +43,15 @@ import { useGetters } from 'vuex-composition-helpers'
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
 // local enums/interfaces/etc.
-import { UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
-import { FeeSummaryTypes } from '@/composables/fees/enums' // eslint-disable-line no-unused-vars
-import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import { UIRegistrationTypes } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import {
+  AdditionalSearchFeeIF,
+  FeeSummaryI,
+  RegistrationLengthI
+} from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'StickyContainer',
@@ -73,11 +80,19 @@ export default defineComponent({
     setFeeType: {
       type: String as () => FeeSummaryTypes
     },
+    setFeeQuantity: {
+      default: null,
+      type: Number
+    },
     setRegistrationLength: {
       type: Object as () => RegistrationLengthI
     },
     setRegistrationType: {
       type: String as () => UIRegistrationTypes
+    },
+    setAdditionalFees: {
+      default: null,
+      type: Object as () => AdditionalSearchFeeIF
     },
     // buttons
     setBackBtn: {
@@ -98,7 +113,7 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc, getSelectedManufacturedHomes
+      getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc
     } = useGetters<any>([
       'getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc', 'getSelectedManufacturedHomes'
     ]
@@ -108,7 +123,6 @@ export default defineComponent({
       backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
       errMsg: props.setErrMsg,
-      feeType: props.setFeeType,
       leftOffset: props.setLeftOffset,
       registrationType: props.setRegistrationType,
       registrationLength: props.setRegistrationLength,
@@ -134,10 +148,6 @@ export default defineComponent({
       }),
       isStaffSBC: computed(() => {
         return isRoleStaffSbc.value as boolean
-      }),
-      feeQuantity: computed(() => {
-        console.log(getSelectedManufacturedHomes.value.length)
-        return getSelectedManufacturedHomes.value.length
       })
     })
     const back = () => {
@@ -155,10 +165,6 @@ export default defineComponent({
 
     watch(() => props.setErrMsg, (val: string) => {
       localState.errMsg = val
-    })
-
-    watch(() => getSelectedManufacturedHomes, (val: any) => {
-      console.log(getSelectedManufacturedHomes.value.length)
     })
 
     watch(() => props.setRegistrationLength, (val: RegistrationLengthI) => {

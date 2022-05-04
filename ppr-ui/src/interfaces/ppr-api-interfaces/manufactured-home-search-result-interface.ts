@@ -10,5 +10,7 @@ export interface ManufacturedHomeSearchResultIF {
   year?: number | '' // Optional
   make?: string // Optional
   model?: string // Optional
-  homeLocation?: string
+  homeLocation?: string // Optional
+  selected?: boolean // Optional
+  lienSelected?: boolean // Optional
 }

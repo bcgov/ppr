@@ -77,6 +77,9 @@ export function getFeeSummary (
   if (feeType === FeeSummaryTypes.MHSEARCH) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_8] }
   }
+  if (feeType === FeeSummaryTypes.MHR_COMBINED_SEARCH) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_12] }
+  }
   if (feeType === FeeSummaryTypes.DISCHARGE) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }

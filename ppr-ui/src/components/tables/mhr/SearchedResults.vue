@@ -178,13 +178,14 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, onMounted, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers' // eslint-disable-line no-unused-vars
 
 import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
 import { RouteNames } from '@/enums'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -218,7 +219,6 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
-      selectedResults: [],
       totalResultsLength: 0,
       activeMatchesLength: computed((): number => {
         return localState.results.filter(item => item.status === 'ACTIVE').length
@@ -249,12 +249,15 @@ export default defineComponent({
       }),
       isLienIndeterminate: computed((): boolean => {
         return localState.selectAllLien !== localState.areAllLienSelected
+      }),
+      activeResults: computed((): any => {
+        return props.isReviewMode
+          ? cloneDeep(getSelectedManufacturedHomes)
+          : cloneDeep(getManufacturedHomeSearchResults.value.results)
       })
     })
 
     const reviewAndConfirm = (): void => {
-      localState.selectedResults = localState.results.filter(result => result.selected === true)
-      setSelectedManufacturedHomes(localState.selectedResults)
       router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
     }
 
@@ -274,7 +277,7 @@ export default defineComponent({
       localState.searchValue = resp.searchQuery.criteria.value
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
-      localState.results = props.isReviewMode ? getSelectedManufacturedHomes : resp.results
+      localState.results = localState.activeResults
       localState.totalResultsLength = resp.totalResultsSize
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
@@ -287,6 +290,12 @@ export default defineComponent({
     watch(() => localState.areAllLienSelected, (val: boolean) => {
       if (!props.isReviewMode && val) localState.selectAllLien = localState.areAllLienSelected
     })
+
+    watch(() => localState.results, () => {
+      const selectedManufacturedHomes = cloneDeep(localState.results.filter(result => result.selected === true))
+
+      setSelectedManufacturedHomes(selectedManufacturedHomes)
+    }, { deep: true })
 
     watch(() => localState.selectAll, (val: boolean) => {
       localState.results = localState.results.map(result => ({ ...result, selected: val }))

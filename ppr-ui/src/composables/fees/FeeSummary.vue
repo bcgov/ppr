@@ -32,6 +32,34 @@
         >
           <div class="fee-list__hint">{{ setFeeQuantity }} @ ${{ feeSummary.feeAmount.toFixed(2) }} each</div>
         </li>
+        <template v-if="additionalFees">
+          <li
+            :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
+            :key="additionalFeeLabel"
+          >
+            <div :class="$style['fee-list__item-name']">
+              {{ additionalFeeLabel }}
+            </div>
+            <div
+              v-if="additionalFeeSummary && additionalFeeSummary.feeAmount === 0"
+              :class="$style['fee-list__item-value']"
+            >
+              No Fee
+            </div>
+            <div v-else :class="$style['fee-list__item-value']">
+              ${{ totalAdditionalFees.toFixed(2) }}
+            </div>
+          </li>
+          <li
+            v-if="additionalFeeSummary.quantity > 1"
+            :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
+            :key="`Additional Fee: ${additionalFeeSummary.quantity}`"
+          >
+            <div class="fee-list__hint">
+              {{ additionalFeeSummary.quantity }} @ ${{ additionalFeeSummary.feeAmount.toFixed(2) }} each
+            </div>
+          </li>
+        </template>
         <li
           v-if="hintFee"
           :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'pr-4', 'pt-3']"
@@ -98,8 +126,14 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { UIRegistrationTypes } from '@/enums'
-import { FeeSummaryTypes } from './enums' // eslint-disable-line no-unused-vars
-import { FeeSummaryI, RegistrationLengthI } from './interfaces' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import { FeeSummaryTypes } from './enums'
+import {
+  AdditionalSearchFeeIF,
+  FeeSummaryI,
+  RegistrationLengthI
+} from './interfaces'
+// eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
 
 export default defineComponent({
@@ -115,6 +149,10 @@ export default defineComponent({
     setFeeQuantity: {
       default: null,
       type: Number
+    },
+    additionalFees: {
+      default: null,
+      type: Object as () => AdditionalSearchFeeIF
     },
     setRegistrationLength: {
       type: Object as () => RegistrationLengthI
@@ -137,17 +175,10 @@ export default defineComponent({
         return getLengthTrust.value.valid || (localState.feeType === FeeSummaryTypes.MHSEARCH)
       }),
       feeLabel: computed((): string => {
-        if (localState.feeType === FeeSummaryTypes.DISCHARGE) {
-          return 'Total Discharge'
-        } else if (localState.feeType === FeeSummaryTypes.RENEW) {
-          return 'Registration Renewal'
-        } else if (localState.feeType === FeeSummaryTypes.AMEND) {
-          return 'Registration Amendment'
-        } else if (localState.feeType === FeeSummaryTypes.MHSEARCH) {
-          return 'Manufactured Home Search'
-        } else {
-          return localState.registrationType
-        }
+        return mapFeeTypeToDisplayName(localState.feeType)
+      }),
+      additionalFeeLabel: computed((): string => {
+        return mapFeeTypeToDisplayName(props.additionalFees?.feeType)
       }),
       feeSummary: computed((): FeeSummaryI => {
         const feeSummary = getFeeSummary(
@@ -166,6 +197,20 @@ export default defineComponent({
         }
         if (props.setFeeOverride && feeSummary.serviceFee !== 0) {
           feeSummary.serviceFee = props.setFeeOverride.serviceFee
+        }
+        return feeSummary
+      }),
+      additionalFeeSummary: computed((): FeeSummaryI => {
+        const feeSummary = props.additionalFees && getFeeSummary(
+          props.additionalFees?.feeType,
+          props.additionalFees?.registrationType,
+          props.additionalFees?.registrationLength
+        )
+        if (props.additionalFees?.quantity) {
+          feeSummary.quantity = props.additionalFees?.quantity
+        }
+        if (props.additionalFees?.feeType === FeeSummaryTypes.RENEW) {
+          feeSummary.processingFee = 5
         }
         return feeSummary
       }),
@@ -191,8 +236,10 @@ export default defineComponent({
             extraFee = localState.feeSummary.processingFee
           }
           return (
-            localState.feeSummary.feeAmount *
-            localState.feeSummary.quantity +
+            (localState.feeSummary.feeAmount *
+            localState.feeSummary.quantity) +
+            (localState.additionalFeeSummary && (localState.additionalFeeSummary?.feeAmount *
+            localState.additionalFeeSummary?.quantity)) +
             extraFee
           )
         }
@@ -201,14 +248,27 @@ export default defineComponent({
         if (localState.isValid) {
           return localState.feeSummary.feeAmount * localState.feeSummary.quantity
         }
+      }),
+      totalAdditionalFees: computed((): number => {
+        if (localState.isValid) {
+          return localState.additionalFeeSummary?.feeAmount * localState.additionalFeeSummary?.quantity
+        }
       })
     })
 
+    const mapFeeTypeToDisplayName = (feeType: FeeSummaryTypes): string => {
+      switch (feeType) {
+        case FeeSummaryTypes.DISCHARGE: return 'Total Discharge'
+        case FeeSummaryTypes.RENEW: return 'Registration Renewal'
+        case FeeSummaryTypes.AMEND: return 'Registration Amendment'
+        case FeeSummaryTypes.MHSEARCH: return 'Manufactured Home search'
+        case FeeSummaryTypes.MHR_COMBINED_SEARCH: return 'Combined Home and Lien search'
+        default: return localState.registrationType
+      }
+    }
+
     watch(() => props.setFeeType, (val: FeeSummaryTypes) => {
       localState.feeType = val
-    })
-    watch(() => props.setFeeQuantity, (val: number) => {
-      console.log(val)
     })
     watch(() => props.setRegistrationType, (val: UIRegistrationTypes) => {
       localState.registrationType = val
