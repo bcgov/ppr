@@ -11,7 +11,7 @@
     />
     <buttons-stacked
       v-if="showButtons"
-      class="pt-4"
+      class="pt-4 buttons-stacked"
       :setBackBtn="backBtn"
       :setCancelBtn="cancelBtn"
       :setSubmitBtn="submitBtn"

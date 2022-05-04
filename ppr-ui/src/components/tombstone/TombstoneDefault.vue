@@ -103,4 +103,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+@media print {
+  .staff-header {
+    background-image: none;
+    width: 0px;
+    display: none;
+  }
+}
 </style>

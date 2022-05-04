@@ -3,12 +3,12 @@
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
-          <v-col cols="9">
+          <v-col class="left-page" cols="9">
             <v-row no-gutters
                    id="registration-header"
                    class="length-trust-header pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
-                <h1>{{ registrationTypeUI }}</h1>
+                <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>
               </v-col>
             </v-row>
             <stepper class="mt-4" :showStepErrorsFlag="showStepErrors"/>
@@ -73,7 +73,7 @@
               </v-container>
             </v-row>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col class="right-page pl-6 pt-5" cols="3">
             <aside>
               <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -283,6 +283,47 @@ export default class ReviewConfirm extends Vue {
     }
   }
 }
+@media print {
+  body {
+    overflow: auto;
+    height: auto;
+  }
+  ::v-deep .v-data-table__wrapper {
+    overflow: visible;
+    height: auto;
+  }
+  ::v-deep .col-9 {
+    max-width: 100%;
+  }
+  .v-footer {
+    display: none;
+  }
+  .right-page {
+    width: 30%;
+  }
+  #step-buttons-container {
+    display: none;
+  }
+  .vue-affix {
+    position: relative;
+    top: 0px !important;
+  }
+  table {
+    table-layout: auto;
+  }
+  .px-15 {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
+  {
+    padding: 0 8px;
+  }
+}
+
 .review-header {
   color: $gray9;
   font-size: 1.5rem;
