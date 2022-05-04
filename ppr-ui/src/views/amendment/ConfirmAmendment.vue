@@ -23,7 +23,7 @@
     />
     <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
-        <v-col cols="9">
+        <v-col class="review-page" cols="9">
           <h1>Review and Complete Amendment</h1>
           <div style="padding-top: 25px; max-width: 875px;">
             <p class="ma-0">
@@ -131,7 +131,7 @@
             class="pt-10"
           />
         </v-col>
-        <v-col class="pl-6" cols="3">
+        <v-col class="right-page pl-6" cols="3">
           <aside>
             <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
               <sticky-container
@@ -696,9 +696,50 @@ export default class ConfirmAmendment extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.border-btm {
-  border-bottom: 1px solid $gray3;
+@media print {
+  body {
+    overflow: auto;
+    height: auto;
+  }
+  ::v-deep .v-data-table__wrapper {
+    overflow: visible;
+    height: auto;
+  }
+  ::v-deep .col-9 {
+    max-width: 100%;
+  }
+  .review-page {
+    min-width: 1024px;
+  }
+  .v-footer {
+    display: none;
+  }
+  .right-page {
+    width: 100%;
+  }
+  .vue-affix {
+    position: relative;
+    top: 0px !important;
+  }
+  table {
+    table-layout: auto;
+  }
+  .px-15, .pa-15 {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
+  ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
+  {
+    padding: 0 8px;
+  }
+  ::v-deep .buttons-stacked {
+    display: none;
+  }
 }
+
 </style>
