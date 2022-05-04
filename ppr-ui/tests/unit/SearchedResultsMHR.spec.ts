@@ -165,6 +165,7 @@ describe('Owner name debtor results', () => {
 
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', [])
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -247,6 +248,7 @@ describe('Business debtor results', () => {
 
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', [])
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -325,6 +327,7 @@ describe('Manufactured home results', () => {
 
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSelectedManufacturedHomes', [])
     wrapper = createComponent()
   })
   afterEach(() => {

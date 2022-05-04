@@ -101,7 +101,7 @@ describe('Sticky Container component tests', () => {
 
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(false)
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.NEW)
+    expect(wrapper.props().setFeeType).toBe(FeeSummaryTypes.NEW)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
     expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(registrationLength)

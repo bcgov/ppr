@@ -251,9 +251,24 @@ export default defineComponent({
         return localState.selectAllLien !== localState.areAllLienSelected
       }),
       activeResults: computed((): any => {
+        const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
+        const baseResults = cloneDeep(getManufacturedHomeSearchResults.value.results)
+
+        // Map selected results with base results when user navigates back to edit selections further
+        const activeResults = baseResults.map(result => {
+          const matchedResult = selectedResults.find(({ id }) => id === result.id)
+          return {
+            ...result,
+            ...(matchedResult && {
+              selected: matchedResult.selected,
+              lienSelected: matchedResult.lienSelected
+            })
+          }
+        })
+
         return props.isReviewMode
-          ? cloneDeep(getSelectedManufacturedHomes)
-          : cloneDeep(getManufacturedHomeSearchResults.value.results)
+          ? selectedResults
+          : activeResults
       })
     })
 
@@ -283,17 +298,8 @@ export default defineComponent({
       localState.searchTime = pacificDate(date)
     })
 
-    watch(() => localState.areAllSelected, (val: boolean) => {
-      if (!props.isReviewMode && val) localState.selectAll = localState.areAllSelected
-    })
-
-    watch(() => localState.areAllLienSelected, (val: boolean) => {
-      if (!props.isReviewMode && val) localState.selectAllLien = localState.areAllLienSelected
-    })
-
     watch(() => localState.results, () => {
       const selectedManufacturedHomes = cloneDeep(localState.results.filter(result => result.selected === true))
-
       setSelectedManufacturedHomes(selectedManufacturedHomes)
     }, { deep: true })
 
@@ -303,6 +309,14 @@ export default defineComponent({
 
     watch(() => localState.selectAllLien, (val: boolean) => {
       localState.results = localState.results.map(result => ({ ...result, lienSelected: val }))
+    })
+
+    watch(() => localState.areAllSelected, (val: boolean) => {
+      if (!props.isReviewMode && val) localState.selectAll = localState.areAllSelected
+    })
+
+    watch(() => localState.areAllLienSelected, (val: boolean) => {
+      if (!props.isReviewMode && val) localState.selectAllLien = localState.areAllLienSelected
     })
 
     return {
