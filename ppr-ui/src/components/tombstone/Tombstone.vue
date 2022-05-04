@@ -1,5 +1,5 @@
 <template>
-  <v-container class="view-container px-15 py-0" fluid style="background-color: white;">
+  <v-container class="header-container view-container px-15 py-0" fluid style="background-color: white;">
     <div class="container pa-0" style="padding: 29px 0 !important;">
       <tombstone-discharge v-if="displayDischarge || displayRenewal || displayAmendment" />
       <tombstone-default v-else />
@@ -46,6 +46,12 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+@media print {
+  .px-15 {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
 </style>

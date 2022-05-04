@@ -684,3 +684,12 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
   margin-bottom: 5px;
   padding-right: 5px;
 }
+
+.only-print {
+  display: none;
+}
+@media print {
+  .only-print {
+    display: initial;
+  }
+}
