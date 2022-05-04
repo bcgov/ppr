@@ -47,13 +47,13 @@ export const defaultFeeSummaries = {
   [FeeSummaryDefaults.SEARCH_8]: {
     feeAmount: 8,
     processingFee: 0,
-    quantity: 1,
+    quantity: 0,
     serviceFee: 1
   } as FeeSummaryI,
   [FeeSummaryDefaults.SEARCH_12]: {
     feeAmount: 12,
     processingFee: 0,
-    quantity: 1,
+    quantity: 0,
     serviceFee: 1
   } as FeeSummaryI
 }

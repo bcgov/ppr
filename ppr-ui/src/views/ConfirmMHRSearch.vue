@@ -154,7 +154,8 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private get feeQuantity (): number {
-    return this.getSelectedManufacturedHomes.length
+    // Return selected quantity that is not a combination search
+    return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.lienSelected).length
   }
 
   private async loadSearchResult (): Promise<void> {

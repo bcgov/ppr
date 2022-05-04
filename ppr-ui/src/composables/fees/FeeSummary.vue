@@ -6,6 +6,7 @@
     <v-slide-y-transition group tag="ul" :class="[$style['fee-list'], 'px-0']">
       <template>
         <li
+          v-if="setFeeQuantity > 0"
           :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
           :key="feeLabel"
         >
@@ -13,7 +14,7 @@
             {{ feeLabel }}
           </div>
           <div
-            v-if="feeSummary && feeSummary.feeAmount === 0"
+            v-if="feeSummary.feeAmount === 0"
             :class="$style['fee-list__item-value']"
           >
             No Fee
@@ -229,7 +230,8 @@ export default defineComponent({
         return hint
       }),
       isComplete: computed((): boolean => {
-        return localState.feeSummary.quantity > 0 && localState.isValid
+        return localState.isValid &&
+          (localState.feeSummary?.quantity > 0 || localState.additionalFeeSummary?.quantity > 0) && localState.isValid
       }),
       totalAmount: computed((): number => {
         if (localState.isValid) {

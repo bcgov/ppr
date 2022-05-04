@@ -554,6 +554,7 @@ describe('FeeSummary component tests', () => {
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
       setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
       setRegistrationLength: null,
       setRegistrationType: null
     })
@@ -573,6 +574,7 @@ describe('FeeSummary component tests', () => {
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
       setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
       setRegistrationLength: null,
       setRegistrationType: null,
       additionalFees: {
