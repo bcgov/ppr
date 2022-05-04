@@ -549,4 +549,88 @@ describe('FeeSummary component tests', () => {
       expect(wrapper.vm.$data.hintFee).toBe('')
     }
   })
+
+  it('renders with correct values for a MHR Search', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setRegistrationLength: null,
+      setRegistrationType: null
+    })
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(8)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
+    expect(wrapper.vm.$data.totalFees).toBe(8)
+    expect(wrapper.vm.$data.totalAmount).toBe(9)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+  })
+
+  it('renders with correct values for a MHR Search and Combined Search', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      additionalFees: {
+        feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+        quantity: 1
+      }
+    })
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(8)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
+
+    expect(wrapper.vm.$data.additionalFeeLabel).toBe('Combined Home and Lien search')
+    expect(wrapper.vm.$data.additionalFeeSummary.feeAmount).toBe(12)
+    expect(wrapper.vm.$data.additionalFeeSummary.quantity).toBe(1)
+    expect(wrapper.vm.$data.additionalFeeSummary.serviceFee).toBe(1)
+
+    expect(wrapper.vm.$data.totalFees).toBe(8)
+    expect(wrapper.vm.$data.totalAdditionalFees).toBe(12)
+
+    expect(wrapper.vm.$data.totalAmount).toBe(21)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+  })
+
+  it('renders with correct values for a MHR Search and Combined Search with multiples', async () => {
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 2,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      additionalFees: {
+        feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+        quantity: 3
+      }
+    })
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.find('#quantity-label').text()).toBe('2 @ $8.00 each')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(8)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(2)
+    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
+
+    expect(wrapper.vm.$data.additionalFeeLabel).toBe('Combined Home and Lien search')
+    expect(wrapper.find('#additional-quantity-label').text()).toBe('3 @ $12.00 each')
+    expect(wrapper.vm.$data.additionalFeeSummary.feeAmount).toBe(12)
+    expect(wrapper.vm.$data.additionalFeeSummary.quantity).toBe(3)
+    expect(wrapper.vm.$data.additionalFeeSummary.serviceFee).toBe(1)
+
+    expect(wrapper.vm.$data.totalFees).toBe(16)
+    expect(wrapper.vm.$data.totalAdditionalFees).toBe(36)
+
+    expect(wrapper.vm.$data.totalAmount).toBe(53)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+  })
 })

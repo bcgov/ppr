@@ -83,19 +83,22 @@ import {
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Throttle } from '@/decorators'
 import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF, ManufacturedHomeSearchResultIF // eslint-disable-line no-unused-vars
+  ActionBindingIF,
+  ErrorIF,
+  StateModelIF,
+  DialogOptionsIF,
+  ManufacturedHomeSearchResultIF
 } from '@/interfaces'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
-import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 
 @Component({
   components: {

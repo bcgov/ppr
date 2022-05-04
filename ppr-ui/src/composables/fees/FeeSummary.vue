@@ -30,7 +30,9 @@
           :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
           :key="setFeeQuantity"
         >
-          <div class="fee-list__hint">{{ setFeeQuantity }} @ ${{ feeSummary.feeAmount.toFixed(2) }} each</div>
+          <div id="quantity-label" class="fee-list__hint">
+            {{ setFeeQuantity }} @ ${{ feeSummary.feeAmount.toFixed(2) }} each
+          </div>
         </li>
         <template v-if="additionalFees">
           <li
@@ -55,7 +57,7 @@
             :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
             :key="`Additional Fee: ${additionalFeeSummary.quantity}`"
           >
-            <div class="fee-list__hint">
+            <div id="additional-quantity-label" class="fee-list__hint">
               {{ additionalFeeSummary.quantity }} @ ${{ additionalFeeSummary.feeAmount.toFixed(2) }} each
             </div>
           </li>

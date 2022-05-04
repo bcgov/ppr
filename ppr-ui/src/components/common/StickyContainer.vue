@@ -114,9 +114,8 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc
-    } = useGetters<any>([
-      'getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc', 'getSelectedManufacturedHomes'
-    ]
+    } = useGetters<any>(
+      ['getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc']
     )
 
     const localState = reactive({
