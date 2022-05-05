@@ -199,7 +199,7 @@ import _ from 'lodash'
 
 import {
   getFeatureFlag,
-  manufacturedHomeSearch,
+  mhrSearch,
   search,
   staffSearch,
   validateSearchAction,
@@ -442,7 +442,7 @@ export default defineComponent({
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
             setFolioOrReferenceNumber(localState.folioNumber)
-            resp = manufacturedHomeSearch(getSearchApiParams(), '')
+            resp = await mhrSearch(getSearchApiParams(), '')
           }
         } else {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
@@ -450,7 +450,7 @@ export default defineComponent({
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
             setFolioOrReferenceNumber(localState.folioNumber)
-            resp = manufacturedHomeSearch(getSearchApiParams(), '')
+            resp = await mhrSearch(getSearchApiParams(), '')
           }
         }
         if (resp?.error) emit('search-error', resp.error)

@@ -809,6 +809,7 @@ export default class Dashboard extends Vue {
 
   private saveResults (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) {
     if (results) {
+      console.log(results)
       if (this.isMHRSearchType(results.searchQuery.type)) {
         this.setManufacturedHomeSearchResults(results)
         this.$router.replace({

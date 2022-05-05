@@ -16,7 +16,7 @@
         <v-col cols="auto" class="pl-0">
           <span id="selected-results-count">
             <b>{{ selectedMatchesLength }}</b> homes selected + <b>{{ selectedLiensLength }}</b> lien search
-          </span>
+          </span>{{results}}
         </v-col>
         <v-col class="mt-n3 mr-6">
           <v-row class="float-right">
@@ -117,23 +117,23 @@
               v-model="item.selected"
             />
           </template>
-          <template v-slot:[`item.registrationNumber`]="{ item }">
-            {{ item.registrationNumber }}
+          <template v-slot:[`item.mhrNumber`]="{ item }">
+            {{ item.mhrNumber }}
           </template>
           <template v-slot:[`item.state`]="{ item }">
             {{ item.status }}
           </template>
           <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
-            {{ item.year }} {{ item.make }} {{ item.model }}
+            {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
           </template>
           <template v-else v-slot:[`item.year`]="{ item }">
-            {{ item.year }}
+            {{ item.baseInformation.year }}
           </template>
           <template v-slot:[`item.make`]="{ item }">
-            {{ item.make }}
+            {{ item.baseInformation.make }}
           </template>
           <template v-slot:[`item.model`]="{ item }">
-            {{ item.model }}
+            {{ item.baseInformation.model }}
           </template>
           <template v-slot:[`item.homeLocation`]="{ item }">
             {{ item.homeLocation }}
@@ -278,9 +278,9 @@ export default defineComponent({
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
       return `
-          ${item.ownerName.last},
-          ${item.ownerName.first}
-          ${item.ownerName.middle || ''}`
+          ${item.ownerName?.last},
+          ${item.ownerName?.first}
+          ${item.ownerName?.middle || ''}`
     }
 
     const updateFolioOrReference = (folioOrReference: string): void => {

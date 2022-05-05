@@ -47,6 +47,12 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('PPR_API_KEY', pprApiKey)
   console.log('Set PPR API URL to: ' + pprApiUrl)
 
+  const mhrApiUrl: string = response.data.MHR_API_URL + response.data.MHR_API_VERSION + '/'
+  const mhrApiKey: string = response.data.PPR_API_KEY
+  sessionStorage.setItem('MHR_API_URL', mhrApiUrl)
+  sessionStorage.setItem('MHR_API_KEY', mhrApiKey)
+  console.log('Set MHR API URL to: ' + mhrApiUrl)
+
   const registryUrl: string = response.data.REGISTRY_URL
   sessionStorage.setItem('REGISTRY_URL', registryUrl)
   console.log('Set REGISTRY URL to: ' + registryUrl)
