@@ -40,13 +40,12 @@ class Payment:
     ):
         """Submit a payment request for the account_id-jwt pair.
 
-        Quantity is always 1 except for financing and renewal statements, where it is the number of life
-        years.
+        Quantity is by default is 1.
         Transaction type is one of the Payment TransactionTypes.
-        Transaction ID is the ppr GUID reference for the payment transaction: either the
+        Transaction ID is the mhr GUID reference for the payment transaction: either the
         registration_id or the search_id if available.
         Client reference ID if present maps to the pay api folio number.
-        Detail_label and detail_value if they exist will show up on the account transaction report.
+        Details label and value if they exist will show up on the account transaction report.
         """
         try:
             api_instance = SBCPaymentClient(self.jwt,
@@ -83,12 +82,18 @@ class Payment:
         except Exception as err:   # noqa: B902; wrapping exception
             raise SBCPaymentException(err)
 
-    def create_payment_staff_search(self, transaction_info, client_reference_id=None):
-        """Submit a staff payment request for the transaction_info. Token must have a staff role.
+    def create_payment_search(self, selections, transaction_id=None, client_reference_id=None, staff_gov=False):
+        """Submit a non-staff search payment request for the account_id-jwt pair.
 
-        Payment info transaction type is one of the Payment TransactionTypes.
+        Quantity is by default is 1, but increments with each selected search match.
+        Payment filing type(s) and quantity are dynamically derived based on the search selection.
+        Possible combinations are search MHR only, search MHR and PPR only, or both.
+        Selections is an array of selected search matches.
+        Transaction ID is the mhr GUID reference for the payment transaction: either the
+        registration_id or the search_id if available.
         Client reference ID if present maps to the pay api folio number.
-        Detail_label and detail_value if they exist will show up on the account transaction report.
+        Staff_gov is the government staff flag (different filing type).
+        Details label and value if they exist will show up on the account transaction report.
         """
         try:
             api_instance = SBCPaymentClient(self.jwt,
@@ -97,29 +102,36 @@ class Payment:
                                             self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
-            api_response = api_instance.create_payment_staff_search(transaction_info, client_reference_id)
+            api_response = api_instance.create_payment_search(selections,
+                                                              transaction_id,
+                                                              client_reference_id,
+                                                              staff_gov)
             current_app.logger.debug(api_response)
             return api_response
 
+        except ApiRequestError as api_err:
+            raise SBCPaymentException(api_err, json_data=api_err.json_data)
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err)
 
-    def create_payment_staff_registration(self, transaction_info, client_reference_id=None, processing_fee=None):
-        """Submit a staff payment request for the transaction_info. Token must have a reg staff role.
+    def create_payment_staff_search(self, selections, transaction_info, transaction_id=None, client_reference_id=None):
+        """Submit a staff payment request for the transaction_info. Token must have a staff role.
 
         Payment info transaction type is one of the Payment TransactionTypes.
         Client reference ID if present maps to the pay api folio number.
-        Detail_label and detail_value if they exist will show up on the account transaction report.
+        Details label and value if they exist will show up on the account transaction report.
         """
         try:
             api_instance = SBCPaymentClient(self.jwt,
-                                            None,
+                                            self.account_id,
                                             self.api_key,
                                             self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
-            api_response = api_instance.create_payment_staff_registration(
-                transaction_info, client_reference_id, processing_fee)
+            api_response = api_instance.create_payment_staff_search(selections,
+                                                                    transaction_info,
+                                                                    transaction_id,
+                                                                    client_reference_id)
             current_app.logger.debug(api_response)
             return api_response
 
