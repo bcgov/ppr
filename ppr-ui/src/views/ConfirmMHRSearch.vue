@@ -52,10 +52,12 @@
                 :setShowButtons="true"
                 :setShowFeeSummary="true"
                 :setFeeType="feeType"
+                :setFeeQuantity="feeQuantity"
                 :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Pay and Download Result'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
+                :setAdditionalFees="combinedSearchFees"
                 @back="goToSearchResult()"
                 @cancel="showDialog()"
                 @submit="submitSearch()"
@@ -81,18 +83,22 @@ import {
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums' // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Throttle } from '@/decorators'
 import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF // eslint-disable-line no-unused-vars
+  ActionBindingIF,
+  ErrorIF,
+  StateModelIF,
+  DialogOptionsIF,
+  ManufacturedHomeSearchResultIF
 } from '@/interfaces'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
+import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 
 @Component({
   components: {
@@ -105,6 +111,7 @@ import { SearchedResultMhr } from '@/components/tables'
 export default class ConfirmDischarge extends Vue {
   @Getter getStateModel: StateModelIF
   @Getter isRoleStaffBcol: boolean
+  @Getter getSelectedManufacturedHomes!: ManufacturedHomeSearchResultIF[]
 
   @Action setUnsavedChanges: ActionBindingIF
 
@@ -134,6 +141,21 @@ export default class ConfirmDischarge extends Vue {
       return '< Please complete required information'
     }
     return ''
+  }
+
+  private get combinedSearchFees (): AdditionalSearchFeeIF {
+    const searchQuantity = this.getSelectedManufacturedHomes?.filter(item => item.lienSelected === true).length
+    return searchQuantity > 0
+      ? {
+        feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+        quantity: searchQuantity
+      }
+      : null
+  }
+
+  private get feeQuantity (): number {
+    // Return selected quantity that is not a combination search
+    return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.lienSelected).length
   }
 
   private async loadSearchResult (): Promise<void> {
