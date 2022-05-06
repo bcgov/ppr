@@ -52,6 +52,8 @@ export default defineComponent({
       getUserFirstName,
       getUserLastName,
       isRoleStaff,
+      hasMhrRole,
+      hasPprRole,
       isRoleStaffBcol,
       isRoleStaffSbc
     } = useGetters<any>([
@@ -59,6 +61,8 @@ export default defineComponent({
       'getUserFirstName',
       'getUserLastName',
       'isRoleStaff',
+      'hasMhrRole',
+      'hasPprRole',
       'isRoleStaffBcol',
       'isRoleStaffSbc'
     ])
@@ -68,10 +72,39 @@ export default defineComponent({
       }),
       date: '',
       header: computed((): string => {
-        if (isRoleStaff.value) {
-          return 'Staff Personal Property Registry'
+        let header = 'My Personal Property Registry'
+        if (localState.isStaffMHRandPPR) {
+          header = 'Staff Manufactured Home and Personal Property Registry'
+        } else if (localState.isStaffMHR) {
+          header = 'Staff Manufactured Home Registry'
+        } else if (localState.isStaffPPR || isRoleStaff.value) {
+          header = 'Staff Personal Property Registry'
+        } else if (localState.isClientMHRandPPR) {
+          header = 'My Manufactured Home and Personal Property Registry'
+        } else if (localState.isClientMHR) {
+          header = 'My Manufactured Home Registry'
+        } else if (localState.isClientPPR) {
+          header = 'My Personal Property Registry'
         }
-        return 'My Personal Property Registry'
+        return header
+      }),
+      isStaffMHR: computed((): boolean => {
+        return isRoleStaff.value && hasMhrRole.value && !hasPprRole.value
+      }),
+      isStaffPPR: computed((): boolean => {
+        return isRoleStaff.value && hasPprRole.value && !hasMhrRole.value
+      }),
+      isClientMHR: computed((): boolean => {
+        return hasMhrRole.value && !hasPprRole.value && !isRoleStaff.value
+      }),
+      isClientPPR: computed((): boolean => {
+        return hasPprRole.value && !hasMhrRole.value && !isRoleStaff.value
+      }),
+      isStaffMHRandPPR: computed((): boolean => {
+        return isRoleStaff.value && hasPprRole.value && hasMhrRole.value
+      }),
+      isClientMHRandPPR: computed((): boolean => {
+        return hasPprRole.value && hasMhrRole.value && !isRoleStaff.value
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value

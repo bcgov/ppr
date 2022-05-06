@@ -30,7 +30,7 @@
                   id="search-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
-              <b v-if="hasPprRole && hasMhrRole">Asset Search</b>
+              <b v-if="hasPprRole && hasMhrRole">Manufactured Home and Personal Property Registry Search</b>
               <b v-else-if="hasPprRole">Personal Property Search</b>
               <b v-else-if="hasMhrRole">Manufactured Home Search</b>
             </v-col>
