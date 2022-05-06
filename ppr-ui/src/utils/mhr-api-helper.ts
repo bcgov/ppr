@@ -7,13 +7,16 @@ import {
   ManufacturedHomeSearchResultIF,
   ManufacturedHomeSearchResponseIF,
   SearchCriteriaIF,
-  SearchResponseIF
+  SearchResponseIF,
+  MhrSearchCriteriaIF, SearchResultIF, ErrorIF
 } from '@/interfaces'
 import { ErrorCategories, ErrorCodes } from '@/enums'
+import { useSearch } from '@/composables/useSearch'
+const { mapMhrSearchType } = useSearch()
 
-// Submit a search query (search step 1) request.
+// Submit an mhr search query request.
 export async function mhrSearch (
-  searchCriteria: SearchCriteriaIF,
+  searchCriteria: MhrSearchCriteriaIF,
   extraParams: string
 ): Promise<any> {
   const url = sessionStorage.getItem('MHR_API_URL')
@@ -26,6 +29,10 @@ export async function mhrSearch (
       if (!data) {
         throw new Error('Invalid API response')
       }
+
+      // Map query return type to differentiate between ppr & mhr in ui
+      data.searchQuery.type = mapMhrSearchType(data.searchQuery.type, true)
+
       // need a unique value for the data table (can't use the index in the list)
       const results = data.results
       if (results) {
@@ -34,7 +41,6 @@ export async function mhrSearch (
         })
         data.results = results
       }
-      console.log(data.results)
       return data
     })
     .catch(error => {
@@ -67,5 +73,29 @@ export async function mhrSearch (
           type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
         }
       }
+    })
+}
+
+// Submit selected matches in mhr search results
+export async function submitSelectedMhr (
+  searchId: string,
+  selected: Array<ManufacturedHomeSearchResultIF>,
+  shouldCallback: boolean,
+  useCurrentSelect: boolean = false
+): Promise<number> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  // change to application/pdf to get the pdf right away
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  let callback = ''
+  if (shouldCallback) {
+    callback = '&callbackURL=PPR_UI'
+  }
+  return axios
+    .post(`search-results/${searchId}?useCurrent=${useCurrentSelect}${callback}`, selected, config)
+    .then(response => {
+      return response.status
+    })
+    .catch(error => {
+      return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
     })
 }

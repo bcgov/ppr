@@ -97,9 +97,8 @@ export default defineComponent({
         const allSearchTypes = []
         if (isRoleStaffReg.value) {
           if (getFeatureFlag('mhr-ui-enabled')) {
-            // allSearchTypes.push.apply(allSearchTypes, SearchTypes)
+            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
             allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
-            console.log(allSearchTypes)
             return allSearchTypes
           } else {
             allSearchTypes.push.apply(allSearchTypes, SearchTypes)

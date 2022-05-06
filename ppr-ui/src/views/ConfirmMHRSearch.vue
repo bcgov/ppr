@@ -60,7 +60,7 @@
                 :setAdditionalFees="combinedSearchFees"
                 @back="goToSearchResult()"
                 @cancel="showDialog()"
-                @submit="submitSearch()"
+                @submit="submit()"
               />
             </affix>
           </aside>
@@ -92,12 +92,13 @@ import {
   ErrorIF,
   StateModelIF,
   DialogOptionsIF,
-  ManufacturedHomeSearchResultIF
+  ManufacturedHomeSearchResultIF, ManufacturedHomeSearchResponseIF
 } from '@/interfaces'
-import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag } from '@/utils'
+import { notCompleteDialog, saveResultsError } from '@/resources/dialogOptions'
+import { getFeatureFlag, submitSelected, submitSelectedMhr, successfulPPRResponses } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
+import { getManufacturedHomeSearchResults } from '@/store/getters'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -111,6 +112,7 @@ import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 export default class ConfirmDischarge extends Vue {
   @Getter getStateModel: StateModelIF
   @Getter isRoleStaffBcol: boolean
+  @Getter getManufacturedHomeSearchResults!: ManufacturedHomeSearchResponseIF
   @Getter getSelectedManufacturedHomes!: ManufacturedHomeSearchResultIF[]
 
   @Action setUnsavedChanges: ActionBindingIF
@@ -144,7 +146,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private get combinedSearchFees (): AdditionalSearchFeeIF {
-    const searchQuantity = this.getSelectedManufacturedHomes?.filter(item => item.lienSelected === true).length
+    const searchQuantity = this.getSelectedManufacturedHomes?.filter(item => item.includeLienInfo === true).length
     return searchQuantity > 0
       ? {
         feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
@@ -155,7 +157,7 @@ export default class ConfirmDischarge extends Vue {
 
   private get feeQuantity (): number {
     // Return selected quantity that is not a combination search
-    return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.lienSelected).length
+    return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo).length
   }
 
   private async loadSearchResult (): Promise<void> {
@@ -186,21 +188,25 @@ export default class ConfirmDischarge extends Vue {
     this.showCancelDialog = true
   }
 
-  @Throttle(2000)
-  private async submitSearch (): Promise<void> {
+  private async submit (): Promise<void> {
     if (!this.validFolio) {
       this.showErrors = true
       return
     }
     this.submitting = true
-    // const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
+    const apiResponse = await submitSelectedMhr(
+      this.getManufacturedHomeSearchResults.searchId,
+      this.getSelectedManufacturedHomes,
+      false
+    )
     this.submitting = false
-    // if (apiResponse === undefined || apiResponse?.error !== undefined) {
-    //  this.emitError(apiResponse?.error)
-    // } else {
-    // On success return to dashboard
-    this.goToDashboard()
-    // }
+    if (apiResponse === undefined || apiResponse !== 200) {
+      // Todo: Handle Error Response
+      console.log(apiResponse)
+    } else {
+      // On success return to dashboard
+      this.goToDashboard()
+    }
   }
 
   private goToDashboard (): void {

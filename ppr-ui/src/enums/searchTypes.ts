@@ -21,6 +21,12 @@ export enum APIMHRSearchTypes {
   MHRORGANIZATION_NAME = 'ORGANIZATION_NAME',
   MHRSERIAL_NUMBER = 'SERIAL_NUMBER'
 }
+export enum APIMHRMapSearchTypes {
+  MHRMHR_NUMBER = 'mhr-MHR_NUMBER',
+  MHROWNER_NAME = 'mhr-OWNER_NAME',
+  MHRORGANIZATION_NAME = 'mhr-ORGANIZATION_NAME',
+  MHRSERIAL_NUMBER = 'mhr-SERIAL_NUMBER'
+}
 export enum UIMHRSearchTypes {
   MHRMHR_NUMBER = 'Manufactured Home Registration Number',
   MHROWNER_NAME = 'Owner Name',

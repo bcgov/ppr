@@ -16,7 +16,7 @@
         <v-col cols="auto" class="pl-0">
           <span id="selected-results-count">
             <b>{{ selectedMatchesLength }}</b> homes selected + <b>{{ selectedLiensLength }}</b> lien search
-          </span>{{results}}
+          </span>
         </v-col>
         <v-col class="mt-n3 mr-6">
           <v-row class="float-right">
@@ -30,6 +30,7 @@
               id="review-confirm-btn"
               color="primary"
               filled
+              :disabled="totalResultsLength === 0"
               @click="reviewAndConfirm()"
             >
               Review and Confirm
@@ -68,7 +69,6 @@
             <v-checkbox
               id="select-all-checkbox"
               class="header-checkbox ma-0 pa-0"
-              color="primary"
               hide-details
               label="Owner Name"
               v-model="selectAll"
@@ -84,7 +84,6 @@
             <v-checkbox
               id="select-all-lien-checkbox"
               class="header-checkbox ma-0 pa-0"
-              color="primary"
               hide-details
               label="Include lien information for all selections"
               v-model="selectAllLien"
@@ -127,13 +126,13 @@
             {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
           </template>
           <template v-else v-slot:[`item.year`]="{ item }">
-            {{ item.baseInformation.year }}
+            {{ item.baseInformation.year || '-' }}
           </template>
           <template v-slot:[`item.make`]="{ item }">
-            {{ item.baseInformation.make }}
+            {{ item.baseInformation.make || '-' }}
           </template>
           <template v-slot:[`item.model`]="{ item }">
-            {{ item.baseInformation.model }}
+            {{ item.baseInformation.model || '-' }}
           </template>
           <template v-slot:[`item.homeLocation`]="{ item }">
             {{ item.homeLocation }}
@@ -151,7 +150,7 @@
                 <span  v-bind="attrs" v-on="on">
                   <v-checkbox
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                    v-model="item.lienSelected"
+                    v-model="item.includeLienInfo"
                   />
                 </span>
               </template>
@@ -221,31 +220,31 @@ export default defineComponent({
       results: [],
       totalResultsLength: 0,
       activeMatchesLength: computed((): number => {
-        return localState.results.filter(item => item.status === 'ACTIVE').length
+        return localState.results?.filter(item => item.status === 'ACTIVE').length
       }),
       selectedMatchesLength: computed((): number => {
-        return localState.results.filter(item => item.selected === true).length
+        return localState.results?.filter(item => item.selected === true).length
       }),
       selectedLiensLength: computed((): number => {
-        return localState.results.filter(item => item.lienSelected === true).length
+        return localState.results?.filter(item => item.includeLienInfo === true).length
       }),
       exemptMatchesLength: computed((): number => {
-        return localState.results.filter(item => item.status === 'EXEMPT').length
+        return localState.results?.filter(item => item.status === 'EXEMPT').length
       }),
       historicalMatchesLength: computed((): number => {
-        return localState.results.filter(item => item.status === 'HISTORICAL').length
+        return localState.results?.filter(item => item.status === 'HISTORICAL').length
       }),
       headers: computed((): Array<BaseHeaderIF> => {
         return props.isReviewMode ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
       }),
       areAllSelected: computed((): boolean => {
-        return localState.results.every(result => result && result.selected === true)
+        return localState.results?.every(result => result && result.selected === true)
       }),
       isIndeterminate: computed((): boolean => {
         return localState.selectAll !== localState.areAllSelected
       }),
       areAllLienSelected: computed((): boolean => {
-        return localState.results.every(result => result && result.lienSelected === true)
+        return localState.results?.every(result => result && result.includeLienInfo === true)
       }),
       isLienIndeterminate: computed((): boolean => {
         return localState.selectAllLien !== localState.areAllLienSelected
@@ -255,13 +254,13 @@ export default defineComponent({
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value.results)
 
         // Map selected results with base results when user navigates back to edit selections further
-        const activeResults = baseResults.map(result => {
-          const matchedResult = selectedResults.find(({ id }) => id === result.id)
+        const activeResults = baseResults?.map(result => {
+          const matchedResult = selectedResults?.find(({ id }) => id === result.id)
           return {
             ...result,
             ...(matchedResult && {
               selected: matchedResult.selected,
-              lienSelected: matchedResult.lienSelected
+              includeLienInfo: matchedResult.includeLienInfo
             })
           }
         })
@@ -277,10 +276,14 @@ export default defineComponent({
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
-      return `
+      if (item.ownerName) {
+        return `
           ${item.ownerName?.last},
           ${item.ownerName?.first}
           ${item.ownerName?.middle || ''}`
+      } else if (item.organizationName) {
+        return item.organizationName
+      } else return '-'
     }
 
     const updateFolioOrReference = (folioOrReference: string): void => {
@@ -299,7 +302,7 @@ export default defineComponent({
     })
 
     watch(() => localState.results, () => {
-      const selectedManufacturedHomes = cloneDeep(localState.results.filter(result => result.selected === true))
+      const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
     }, { deep: true })
 
@@ -308,7 +311,7 @@ export default defineComponent({
     })
 
     watch(() => localState.selectAllLien, (val: boolean) => {
-      localState.results = localState.results.map(result => ({ ...result, lienSelected: val }))
+      localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
     })
 
     watch(() => localState.areAllSelected, (val: boolean) => {
@@ -391,6 +394,9 @@ th {
   .results-table .v-data-table__wrapper table tbody {
     tr {
       height: 54px;
+      td {
+        white-space: inherit;
+      }
     }
   }
 }

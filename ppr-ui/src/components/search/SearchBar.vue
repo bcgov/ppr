@@ -217,7 +217,7 @@ import {
   UserSettingsIF
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
-import { APIMHRSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
+import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import { FolioNumber } from '@/components/common'
@@ -254,8 +254,14 @@ export default defineComponent({
     const {
       setSearching,
       setStaffPayment,
-      setFolioOrReferenceNumber
-    } = useActions<any>(['setSearching', 'setStaffPayment', 'setFolioOrReferenceNumber'])
+      setFolioOrReferenceNumber,
+      setSelectedManufacturedHomes
+    } = useActions<any>([
+      'setSearching',
+      'setStaffPayment',
+      'setFolioOrReferenceNumber',
+      'setSelectedManufacturedHomes'
+    ])
     const {
       getUserSettings,
       isSearching,
@@ -277,7 +283,7 @@ export default defineComponent({
       'hasPprRole',
       'hasMhrRole'
     ])
-    const { isMHRSearchType, isPPRSearchType } = useSearch()
+    const { isMHRSearchType, isPPRSearchType, mapMhrSearchType } = useSearch()
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -330,7 +336,7 @@ export default defineComponent({
       }),
       isIndividual: computed((): boolean => {
         if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.INDIVIDUAL_DEBTOR) ||
-           (localState.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHROWNER_NAME)) {
+           (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHROWNER_NAME)) {
           return true
         }
         return false
@@ -406,7 +412,13 @@ export default defineComponent({
         const first = localState.searchValueFirst?.trim()
         const second = localState.searchValueSecond?.trim()
         const last = localState.searchValueLast?.trim()
-        return { debtorName: { first: first, second: second, last: last } }
+
+        if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+          return { debtorName: { first: first, second: second, last: last } }
+        }
+        if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+          return { ownerName: { first: first, second: second, last: last } }
+        }
       } else if (localState.selectedSearchType.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR) {
         return { debtorName: { business: localState.searchValue?.trim() } }
       } else {
@@ -415,8 +427,11 @@ export default defineComponent({
       }
     }
     const getSearchApiParams = (): SearchCriteriaIF => {
+      const searchTypeApi = localState.selectedSearchType.searchTypeAPI
+      const type = isMHRSearchType(searchTypeApi) ? mapMhrSearchType(searchTypeApi) : searchTypeApi
+
       return {
-        type: localState.selectedSearchType.searchTypeAPI,
+        type: type,
         criteria: getCriteria(),
         clientReferenceId: localState.folioNumber
       }
@@ -426,7 +441,7 @@ export default defineComponent({
       if (proceed) {
         // pad mhr number with 0s
         if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.MHR_NUMBER) ||
-           (localState.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHRMHR_NUMBER)) {
+           (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHRMHR_NUMBER)) {
           localState.searchValue.padStart(6, '0')
         }
         setSearching(true)
@@ -441,6 +456,7 @@ export default defineComponent({
             setStaffPayment(null)
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            setSelectedManufacturedHomes([])
             setFolioOrReferenceNumber(localState.folioNumber)
             resp = await mhrSearch(getSearchApiParams(), '')
           }
@@ -449,6 +465,7 @@ export default defineComponent({
             resp = await search(getSearchApiParams(), '')
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            setSelectedManufacturedHomes([])
             setFolioOrReferenceNumber(localState.folioNumber)
             resp = await mhrSearch(getSearchApiParams(), '')
           }
