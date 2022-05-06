@@ -213,19 +213,23 @@ def is_staff(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statem
     return False
 
 
-def is_bcol_help(account_id: str) -> bool:
+def is_bcol_help(account_id: str, jwt: JwtManager = None) -> bool:
     """Return True if the account id is a bcol help account id."""
+    if jwt is not None and jwt.validate_roles([BCOL_HELP]):
+        return True
     return account_id is not None and account_id == BCOL_HELP
 
 
-def is_staff_account(account_id: str) -> bool:
-    """Return True if the account id is a registries staff or sbc office account id."""
+def is_staff_account(account_id: str, jwt: JwtManager = None) -> bool:
+    """Return True if the account id is a registries staff or has a staff role."""
+    if jwt is not None and jwt.validate_roles([STAFF_ROLE]):
+        return True
     return account_id is not None and account_id == STAFF_ROLE
 
 
-def is_reg_staff_account(account_id: str) -> bool:
+def is_reg_staff_account(account_id: str, jwt: JwtManager = None) -> bool:
     """Return True if the account id is a staff registries account id."""
-    return account_id is not None and account_id == STAFF_ROLE
+    return is_staff_account(account_id, jwt)
 
 
 def is_sbc_office_account(token: str, account_id: str) -> bool:

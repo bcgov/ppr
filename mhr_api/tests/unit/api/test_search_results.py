@@ -21,7 +21,10 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE
+from mhr_api.models import SearchResult, SearchRequest
+from mhr_api.resources.v1.search_results import get_payment_details
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
+
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
@@ -32,6 +35,31 @@ MHR_NUMBER_JSON = {
     },
     'clientReferenceId': 'T-SQ-MH-1'
 }
+ORG_NAME_JSON = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'value': 'GUTHRIE HOLDINGS LTD.'
+    },
+    'clientReferenceId': 'T-SQ-MO-1'
+}
+OWNER_NAME_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'David',
+            'last': 'Hamm'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
+SERIAL_NUMBER_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': '4551'
+    },
+    'clientReferenceId': 'T-SQ-MS-1'
+}
+
 SELECTED_JSON_NONE = []
 SELECTED_JSON = [
     {'baseInformation': {
@@ -60,6 +88,12 @@ SELECTED_JSON_INVALID = [
     'serialNumber': '2427',
     'status': 'EXEMPT'}
 ]
+SELECTED_JSON_COMBO = [
+    {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'includeLienInfo': True, 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
+]
 
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
@@ -86,6 +120,27 @@ TEST_GET_DATA = [
     ('Invalid no search selection', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000001, False),
     ('Invalid search Id', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 300000006, False),
     ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005, False)
+]
+
+# testdata pattern is ({description}, {type}, {search_data}, {select_data}, {label}, {value})
+TEST_PAYMENT_DETAILS_DATA = [
+    ('MHR number', 'MM', MHR_NUMBER_JSON, SELECTED_JSON, 'MHR Search', '022911'),
+    ('Combo MHR number', 'MM', MHR_NUMBER_JSON, SELECTED_JSON_COMBO, 'Combined Search', '022911'),
+    ('Owner Name', 'MI', OWNER_NAME_JSON, SELECTED_JSON, 'MHR Search', 'Hamm, David'),
+    ('Org Name', 'MO', ORG_NAME_JSON, SELECTED_JSON, 'MHR Search', 'GUTHRIE HOLDINGS LTD.'),
+    ('Serial number', 'MS', SERIAL_NUMBER_JSON, SELECTED_JSON, 'MHR Search', '4551')
+]
+
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
+TEST_STAFF_SEARCH_DATA = [
+    (STAFF_ROLE, None, None, None, HTTPStatus.OK),
+    (STAFF_ROLE, '12345', None, None, HTTPStatus.OK),
+    (STAFF_ROLE, None, '654321', '111111', HTTPStatus.OK),
+    (STAFF_ROLE, '12345', '654321', '111111', HTTPStatus.BAD_REQUEST),
+    (BCOL_HELP, None, None, None, HTTPStatus.OK),
+    (GOV_ACCOUNT_ROLE, '12345', None, None, HTTPStatus.OK),
+    (GOV_ACCOUNT_ROLE, None, '654321', '111111', HTTPStatus.OK),
+    (GOV_ACCOUNT_ROLE, None, None, None, HTTPStatus.OK)
 ]
 
 
@@ -118,6 +173,43 @@ def test_post_selected(session, client, jwt, desc, json_data, search_id, roles, 
         assert rv.status_code == status
 
 
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_SEARCH_DATA)
+def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, status):
+    """Assert that staff search requests returns the correct status."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    params = ''
+    if routing_slip:
+        params = '?routingSlipNumber=' + str(routing_slip)
+    if bcol_number:
+        if len(params) > 0:
+            params += '&bcolAccountNumber=' + str(bcol_number)
+        else:
+            params = '?bcolAccountNumber=' + str(bcol_number)
+    if dat_number:
+        if len(params) > 0:
+            params += '&datNumber=' + str(dat_number)
+    print('params=' + params)
+    roles = [MHR_ROLE]
+    account_id = role
+    if role == GOV_ACCOUNT_ROLE:
+        roles.append(GOV_ACCOUNT_ROLE)
+        account_id = '1234'
+    headers=create_header_account(jwt, roles, 'test-user', account_id)
+    rv = client.post('/api/v1/searches',
+                    json=MHR_NUMBER_JSON,
+                    headers=headers,
+                    content_type='application/json')
+    test_search_id = rv.json['searchId']
+    rv = client.post('/api/v1/search-results/' + test_search_id + params,
+                     json=SELECTED_JSON,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+
+
 @pytest.mark.parametrize('desc,roles,status,has_account, search_id, is_report', TEST_GET_DATA)
 def test_get_search_detail(session, client, jwt, desc, roles, status, has_account, search_id, is_report):
     """Assert that a get search detail info by search id works as expected."""
@@ -138,3 +230,19 @@ def test_get_search_detail(session, client, jwt, desc, roles, status, has_accoun
     # check
     # print(rv.json)
     assert rv.status_code == status
+
+
+@pytest.mark.parametrize('desc,type,search_data,select_data,label,value', TEST_PAYMENT_DETAILS_DATA)
+def test_get_payment_details(session, client, jwt, desc, type, search_data, select_data, label, value):
+    """Assert that a valid search request payment details setup works as expected."""
+    # setup
+    search: SearchRequest = SearchRequest(id=1, search_type=type, search_criteria=search_data)
+    result: SearchResult = SearchResult(search_id=1, search=search)
+
+    # test
+    details = get_payment_details(result, select_data)
+
+    # check
+    assert details
+    assert details['label'] == label
+    assert details['value'] == value

@@ -1,0 +1,632 @@
+{
+	"info": {
+		"_postman_id": "53809702-5212-459e-a0cb-92524c3c8867",
+		"name": "MHR API Unit Tests",
+		"description": "Requests to demonstrate the Manufactured Home Registry API. The requests use a test consumer API key and account ID.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "searches",
+			"item": [
+				{
+					"name": "Search Step 1 Query No Results",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/post"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MHR_NUMBER\",\n  \"criteria\": {\n    \"value\": \"999999\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by Serial Num",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Prefer",
+								"value": "example=/api/v1/searches/post/SERIAL_NUMBER",
+								"description": "Prism only local mock server header.",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SERIAL_NUMBER\",\n  \"criteria\": {\n    \"value\": \"4551\"\n  },\n  \"clientReferenceId\": \"UT-MS-00001\"\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by serial number."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query by MHR Num",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Prefer",
+								"value": "example=/api/v1/searches/post/MHR_NUMBER",
+								"description": "Prism only local mock server header.",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MHR_NUMBER\",\n  \"criteria\": {\n    \"value\": \"022911\"\n  },\n  \"clientReferenceId\": \"UT-MM-00001\"\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by manufactured home registration number."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Owner Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/post/INDIVIDUAL_DEBTOR"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"OWNER_NAME\",\n  \"criteria\": {\n    \"ownerName\": {\n      \"first\": \"David\",\n      \"last\": \"Hamm\"\n    }\n  },\n  \"clientReferenceId\": \"MI-UT-0001\"\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor individual name."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 1 Query By Organization Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/post/BUSINESS_DEBTOR"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"ORGANIZATION_NAME\",\n  \"criteria\": {\n    \"value\": \"GUTHRIE HOLDINGS LTD.\"\n  },\n  \"clientReferenceId\": \"MO-UT-0001\"\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/searches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"searches"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by debtor individual name."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 2 Serial Number",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294371/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n        {\n            \"baseInformation\": {\n                \"make\": \"BUDDY\",\n                \"model\": \"\",\n                \"year\": 1960\n            },\n            \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n            \"homeLocation\": \"KELOWNA\",\n            \"mhrNumber\": \"013575\",\n            \"ownerName\": {\n                \"first\": \"VERDELLE\",\n                \"last\": \"MUTTITT\",\n                \"middle\": \"MAE\"\n            },\n            \"serialNumber\": \"455106374\",\n            \"status\": \"EXEMPT\"\n        },\n        {\n            \"baseInformation\": {\n                \"make\": \"C SERIES - 450\",\n                \"model\": \"\",\n                \"year\": 1992\n            },\n            \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n            \"homeLocation\": \"CRANBROOK\",\n            \"mhrNumber\": \"068831\",\n            \"ownerName\": {\n                \"first\": \"DIANE\",\n                \"last\": \"DAY\",\n                \"middle\": \"MAUREEN\"\n            },\n            \"serialNumber\": \"4551\",\n            \"status\": \"EXEMPT\"\n        },\n        {\n            \"baseInformation\": {\n                \"make\": \"CAMBRIDGE SS-164-1\",\n                \"model\": \"\",\n                \"year\": 1995\n            },\n            \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n            \"homeLocation\": \"ABBOTSFORD\",\n            \"mhrNumber\": \"078385\",\n            \"organizationName\": \"NOR-TEC DESIGN GROUP LTD.\",\n            \"serialNumber\": \"4551\",\n            \"status\": \"ACTIVE\"\n        },\n        {\n            \"baseInformation\": {\n                \"make\": \"GENERAL\",\n                \"model\": \"\",\n                \"year\": 1959\n            },\n            \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n            \"homeLocation\": \"150 MILE HOUSE\",\n            \"mhrNumber\": \"035355\",\n            \"ownerName\": {\n                \"first\": \"RAYMOND\",\n                \"last\": \"MACKENZIE\",\n                \"middle\": \"EDWARD\"\n            },\n            \"serialNumber\": \"455161\",\n            \"status\": \"EXEMPT\"\n        },\n        {\n            \"baseInformation\": {\n                \"make\": \"SQUIRE\",\n                \"model\": \"\",\n                \"year\": 1967\n            },\n            \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n            \"homeLocation\": \"UCLUELET\",\n            \"mhrNumber\": \"011355\",\n            \"ownerName\": {\n                \"first\": \"GARTH\",\n                \"last\": \"CAMERON\",\n                \"middle\": \"RICHARD\"\n            },\n            \"serialNumber\": \"45515512\",\n            \"status\": \"ACTIVE\"\n        }\n    ]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/8656",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"8656"
+							]
+						},
+						"description": "Select Financing Statements to retrieve details exact match example."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 2 MHR Number",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294371/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"baseInformation\": {\n            \"make\": \"GLENDALE\",\n            \"model\": \"\",\n            \"year\": 1968\n        },\n        \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n        \"includeLienInfo\": false,\n        \"homeLocation\": \"FORT NELSON\",\n        \"mhrNumber\": \"022911\",\n        \"ownerName\": {\n            \"first\": \"PRITNAM\",\n            \"last\": \"SANDHU\"\n        },\n        \"serialNumber\": \"2427\",\n        \"status\": \"EXEMPT\"\n    }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/8660",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"8660"
+							]
+						},
+						"description": "Select Financing Statements to retrieve details exact match example."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 2 Owner Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294371/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"baseInformation\": {\n            \"make\": \"FLASHBACK\",\n            \"model\": \"\",\n            \"year\": 1984\n        },\n        \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n        \"homeLocation\": \"SICAMOUS\",\n        \"mhrNumber\": \"074026\",\n        \"ownerName\": {\n            \"first\": \"DAVID\",\n            \"last\": \"HAMM\",\n            \"middle\": \"ABRAM\"\n        },\n        \"serialNumber\": \"117\",\n        \"status\": \"ACTIVE\"\n    },\n    {\n        \"baseInformation\": {\n            \"make\": \"GLENDALE\",\n            \"model\": \"\",\n            \"year\": 1968\n        },\n        \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n        \"homeLocation\": \"FORT NELSON\",\n        \"mhrNumber\": \"022911\",\n        \"ownerName\": {\n            \"first\": \"DAVID\",\n            \"last\": \"HAMM\",\n            \"middle\": \"MICHAEL\"\n        },\n        \"serialNumber\": \"2427\",\n        \"status\": \"EXEMPT\"\n    },\n    {\n        \"baseInformation\": {\n            \"make\": \"3 BEDROOM\",\n            \"model\": \"\",\n            \"year\": 1973\n        },\n        \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n        \"homeLocation\": \"INVERMERE\",\n        \"mhrNumber\": \"024289\",\n        \"ownerName\": {\n            \"first\": \"DAVID\",\n            \"last\": \"HAMM\",\n            \"middle\": \"WAYNE\"\n        },\n        \"serialNumber\": \"68MA0970\",\n        \"status\": \"ACTIVE\"\n    }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/8667",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"8667"
+							]
+						},
+						"description": "Select Financing Statements to retrieve details exact match example."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Step 2 Organization Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294371/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"baseInformation\": {\n            \"make\": \"DUTCH VILLA 470-26\",\n            \"model\": \"\",\n            \"year\": 1990\n        },\n        \"createDateTime\": \"1995-11-14T00:00:01+00:00\",\n        \"homeLocation\": \"CASSIDY\",\n        \"mhrNumber\": \"063644\",\n        \"organizationName\": \"GUTHRIE HOLDINGS LTD.\",\n        \"serialNumber\": \"3774\",\n        \"status\": \"ACTIVE\"\n    }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/8659",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"8659"
+							]
+						},
+						"description": "Select Financing Statements to retrieve details exact match example."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Search Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294371/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-results/8653",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-results",
+								"8653"
+							]
+						},
+						"description": "Retrieve search details exact match example."
+					},
+					"response": []
+				},
+				{
+					"name": "Get account search history",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294376/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/search-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search-history"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{apikey}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "x-apikey",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apikey",
+			"value": "PROVIDE"
+		},
+		{
+			"key": "account_id",
+			"value": "PROVIDE"
+		},
+		{
+			"key": "base_url_prism",
+			"value": "http://127.0.0.1:4010/mhr"
+		},
+		{
+			"key": "base_url",
+			"value": "bcregistry-dev.apigee.net/mhr",
+			"type": "string"
+		},
+		{
+			"key": "jwt",
+			"value": "PROVIDE",
+			"type": "string"
+		}
+	]
+}
