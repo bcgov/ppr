@@ -809,7 +809,6 @@ export default class Dashboard extends Vue {
 
   private saveResults (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) {
     if (results) {
-      // Figure out how to differentiate between MHR AND PPR REQUESTS
       if (this.isMHRSearchType(results.searchQuery.type)) {
         this.setManufacturedHomeSearchResults(results)
         this.$router.replace({
