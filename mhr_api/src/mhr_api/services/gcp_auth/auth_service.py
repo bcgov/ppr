@@ -12,30 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This maintains access tokens for API calls."""
+import base64
+import json
 import os
-from abc import ABC, abstractmethod
 
 import google.auth.transport.requests
 from google.oauth2 import service_account
 from flask import current_app
 
-
-class TokenService(ABC):  # pylint: disable=too-few-public-methods
-    """Token Service abstract class with single get_token method."""
-
-    @classmethod
-    @abstractmethod
-    def get_token(cls):
-        """Generate an OAuth access token with storage access."""
+from mhr_api.services.abstract_auth_service import AuthService
 
 
-class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public-methods
-    """Google Cloud Storage implementation.
+class GoogleAuthService(AuthService):  # pylint: disable=too-few-public-methods
+    """Google Auth Service implementation.
 
-    Maintain access token for Google Cloud Storage API calls.
+    Maintains a wrapper to get a service account access token and credentials for Google API calls.
     """
 
     # Google APIs and cloud storage os.getenv('GCP
+    GOOGLE_DEFAULT_SERVICE_ACCOUNT = os.getenv('GOOGLE_DEFAULT_SERVICE_ACCOUNT')
     GCP_PROJECT_ID = os.getenv('GCP_CS_PROJECT_ID')
     GCP_SA_CLIENT_EMAIL = os.getenv('GCP_CS_SA_CLIENT_EMAIL')
     GCP_SA_CLIENT_ID = os.getenv('GCP_CS_SA_CLIENT_ID')
@@ -44,19 +39,25 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
     GCP_SA_CERT_URL = os.getenv('GCP_CS_SA_CERT_URL')
     # https://developers.google.com/identity/protocols/oauth2/scopes
     GCP_SA_SCOPES = [os.getenv('GCP_CS_SA_SCOPES', 'https://www.googleapis.com/auth/cloud-platform')]
-    service_account_info = {
-        'type': 'service_account',
-        'project_id': GCP_PROJECT_ID,
-        'private_key_id': GCP_SA_PRIVATE_KEY_ID,
-        'private_key': str(GCP_SA_PRIVATE_KEY).replace('\\n', '\n'),
-        'client_email': GCP_SA_CLIENT_EMAIL,
-        'client_id': GCP_SA_CLIENT_ID,
-        'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
-        'token_uri': 'https://oauth2.googleapis.com/token',
-        'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs',
-        'client_x509_cert_url': GCP_SA_CERT_URL
-    }
+
+    service_account_info = None
     credentials = None
+    if GOOGLE_DEFAULT_SERVICE_ACCOUNT:
+        sa_bytes = bytes(GOOGLE_DEFAULT_SERVICE_ACCOUNT, 'utf-8')
+        service_account_info = json.loads(base64.b64decode(sa_bytes.decode('utf-8')))
+    elif GCP_SA_PRIVATE_KEY:
+        service_account_info = {
+            'type': 'service_account',
+            'project_id': GCP_PROJECT_ID,
+            'private_key_id': GCP_SA_PRIVATE_KEY_ID,
+            'private_key': str(GCP_SA_PRIVATE_KEY).replace('\\n', '\n'),
+            'client_email': GCP_SA_CLIENT_EMAIL,
+            'client_id': GCP_SA_CLIENT_ID,
+            'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
+            'token_uri': 'https://oauth2.googleapis.com/token',
+            'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs',
+            'client_x509_cert_url': GCP_SA_CERT_URL
+        }
 
     @classmethod
     def get_token(cls):

@@ -16,14 +16,14 @@ import os
 import json
 import urllib.parse
 from abc import ABC, abstractmethod
-from enum import Enum
 
 import requests
 from flask import current_app
 from google.cloud import storage
 
-from mhr_api.services.gcp_auth.token_service import GoogleStorageTokenService
+from mhr_api.services.gcp_auth.auth_service import GoogleAuthService
 from mhr_api.services.utils.exceptions import StorageException
+from mhr_api.utils.base import BaseEnum
 
 
 HTTP_DELETE = 'delete'
@@ -31,7 +31,7 @@ HTTP_GET = 'get'
 HTTP_POST = 'post'
 
 
-class DocumentTypes(str, Enum):
+class DocumentTypes(BaseEnum):
     """Render an Enum of storage document types."""
 
     SEARCH_RESULTS = 'SEARCH_RESULTS'
@@ -73,7 +73,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
             url = cls.GET_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=''))
-            token = GoogleStorageTokenService.get_token()
+            token = GoogleAuthService.get_token()
             current_app.logger.info('Fetching doc with GET ' + url)
             return cls.__call_api(HTTP_GET, url, token)
         except StorageException as storage_err:
@@ -102,7 +102,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
             url = cls.DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=''))
-            token = GoogleStorageTokenService.get_token()
+            token = GoogleAuthService.get_token()
             current_app.logger.info(f'Deleting doc with DELETE {url}.')
             return cls.__call_api(HTTP_DELETE, url, token)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
@@ -125,7 +125,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         try:
             bucket_id = cls.__get_bucket_id(doc_type)
             url = cls.UPLOAD_DOC_URL.format(bucket_id=bucket_id, name=urllib.parse.quote(name, safe=''))
-            token = GoogleStorageTokenService.get_token()
+            token = GoogleAuthService.get_token()
             current_app.logger.info('Saving doc with POST ' + url)
             return cls.__call_api(HTTP_POST, url, token, raw_data)
         except StorageException as storage_err:
@@ -195,7 +195,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     @classmethod
     def __call_cs_api(cls, method: str, name: str, data=None, doc_type: str = None):
         """Call the Cloud Storage API."""
-        credentials = GoogleStorageTokenService.get_credentials()
+        credentials = GoogleAuthService.get_credentials()
         storage_client = storage.Client(credentials=credentials)
         bucket = storage_client.bucket(cls.__get_bucket_id(doc_type))
         blob = bucket.blob(name)
@@ -207,5 +207,5 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             return contents
         if method == HTTP_DELETE:
             blob.delete()
-            return blob.time_created
+            return None
         return None

@@ -94,4 +94,3 @@ def test_cs_get_registration_document(session):
 def test_cs_delete_search_document(session):
     """Assert that deleting a search bucket document from google cloud storage works as expected."""
     response = GoogleStorageService.delete_document(TEST_SAVE_DOC_NAME2, DocumentTypes.SEARCH_RESULTS)
-    assert response
