@@ -1,4 +1,4 @@
-import { APIRegistrationTypes, APISearchTypes, APIMHRSearchTypes } from '@/enums'
+import { APIRegistrationTypes, APISearchTypes, APIMHRMapSearchTypes } from '@/enums'
 import {
   IndividualNameIF,
   SearchTypeIF,
@@ -41,7 +41,7 @@ export function validateSearchAction (
   }
   switch (searchState?.selectedSearchType?.searchTypeAPI) {
     case APISearchTypes.SERIAL_NUMBER:
-    case APIMHRSearchTypes.MHRSERIAL_NUMBER:
+    case APIMHRMapSearchTypes.MHRSERIAL_NUMBER:
       if (!searchValue) {
         validation.searchValue.message = 'Enter a serial number to search'
       }
@@ -49,7 +49,7 @@ export function validateSearchAction (
         (searchValue?.length > 25)) {
         validation.searchValue.message = 'Maximum 25 characters'
       }
-      if ((searchState?.selectedSearchType?.searchTypeAPI === APIMHRSearchTypes.MHRSERIAL_NUMBER) &&
+      if ((searchState?.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHRSERIAL_NUMBER) &&
         (searchValue?.length > 20)) {
         validation.searchValue.message = 'Maximum 20 characters'
       }
@@ -69,7 +69,7 @@ export function validateSearchAction (
         validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
-    case APIMHRSearchTypes.MHROWNER_NAME:
+    case APIMHRMapSearchTypes.MHROWNER_NAME:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
       } else if (first?.length > 50) {
@@ -97,7 +97,7 @@ export function validateSearchAction (
       }
       break
     case APISearchTypes.MHR_NUMBER:
-    case APIMHRSearchTypes.MHRMHR_NUMBER:
+    case APIMHRMapSearchTypes.MHRMHR_NUMBER:
       if (!searchValue) {
         validation.searchValue.message =
           'Enter a manufactured home registration number to search'
@@ -129,7 +129,7 @@ export function validateSearchAction (
           'Registration numbers contain 7 characters'
       }
       break
-    case APIMHRSearchTypes.MHRORGANIZATION_NAME:
+    case APIMHRMapSearchTypes.MHRORGANIZATION_NAME:
       if (!searchValue) {
         validation.searchValue.message = 'Enter an organization name to search'
       }
@@ -175,13 +175,13 @@ export function validateSearchRealTime (
         validation.searchValue.message = 'Maximum 25 characters'
       }
       break
-    case APIMHRSearchTypes.MHRSERIAL_NUMBER:
+    case APIMHRMapSearchTypes.MHRSERIAL_NUMBER:
       if (searchValue?.length > 20) {
         validation.searchValue.message = 'Maximum 20 characters'
       }
       break
     case APISearchTypes.INDIVIDUAL_DEBTOR:
-    case APIMHRSearchTypes.MHROWNER_NAME:
+    case APIMHRMapSearchTypes.MHROWNER_NAME:
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst =
           "Names don't normally contain special characters"
@@ -240,7 +240,7 @@ export function validateSearchRealTime (
           'Registration numbers contain 7 characters'
       }
       break
-    case APIMHRSearchTypes.MHRORGANIZATION_NAME:
+    case APIMHRMapSearchTypes.MHRORGANIZATION_NAME:
       if (searchValue?.length > 70) {
         validation.searchValue.message = 'Maximum 70 characters'
       }

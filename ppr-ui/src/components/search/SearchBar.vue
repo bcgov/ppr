@@ -400,7 +400,7 @@ export default defineComponent({
       }),
       showConfirmationDialog: computed((): boolean => {
         // don't show confirmation dialog if bcol or reg staff
-        if (localState.isStaffBcolReg) return false
+        if (localState.isStaffBcolReg || isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)) return false
 
         const settings: UserSettingsIF = getUserSettings.value
         return settings?.paymentConfirmationDialog
