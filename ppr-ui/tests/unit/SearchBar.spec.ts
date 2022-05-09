@@ -525,7 +525,7 @@ describe('Mhr Owner name search', () => {
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
-  it.only('searches when fields are filled as Staff', async () => {
+  it('searches when fields are filled as Staff', async () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
     wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
