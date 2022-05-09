@@ -1,4 +1,11 @@
-import { APISearchTypes, UISearchTypes, APIMHRSearchTypes, UIMHRSearchTypes, BlankSearchTypes } from '@/enums'
+import {
+  APISearchTypes,
+  UISearchTypes,
+  APIMHRSearchTypes,
+  UIMHRSearchTypes,
+  BlankSearchTypes,
+  APIMHRMapSearchTypes
+} from '@/enums'
 import { SearchTypeIF } from '@/interfaces'
 
 export const SearchTypes: Array<SearchTypeIF> = [
@@ -117,7 +124,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     divider: false,
     selectDisabled: false,
     searchTypeUI: UIMHRSearchTypes.MHRMHR_NUMBER,
-    searchTypeAPI: APIMHRSearchTypes.MHRMHR_NUMBER,
+    searchTypeAPI: APIMHRMapSearchTypes.MHRMHR_NUMBER,
     textLabel: 'Enter a manufactured home registration number',
     hints: {
       searchValue: 'Manufactured home registration number must contain 6 digits'
@@ -128,7 +135,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     divider: false,
     selectDisabled: false,
     searchTypeUI: UIMHRSearchTypes.MHROWNER_NAME,
-    searchTypeAPI: APIMHRSearchTypes.MHROWNER_NAME,
+    searchTypeAPI: APIMHRMapSearchTypes.MHROWNER_NAME,
     textLabel: '',
     hints: {
       searchValue: 'Owner names normally contain letter and numbers only'
@@ -139,7 +146,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     divider: false,
     selectDisabled: false,
     searchTypeUI: UIMHRSearchTypes.MHRORGANIZATION_NAME,
-    searchTypeAPI: APIMHRSearchTypes.MHRORGANIZATION_NAME,
+    searchTypeAPI: APIMHRMapSearchTypes.MHRORGANIZATION_NAME,
     textLabel: '',
     hints: {
       searchValue: 'Organization names must contain between 2 and 70 characters'
@@ -150,7 +157,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     divider: false,
     selectDisabled: false,
     searchTypeUI: UIMHRSearchTypes.MHRSERIAL_NUMBER,
-    searchTypeAPI: APIMHRSearchTypes.MHRSERIAL_NUMBER,
+    searchTypeAPI: APIMHRMapSearchTypes.MHRSERIAL_NUMBER,
     textLabel: 'Enter a serial number',
     hints: {
       searchValue: 'Serial numbers normally contain letters and numbers only'

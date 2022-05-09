@@ -449,7 +449,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-mds',
     sortable: false,
     text: 'Registration Number',
-    value: 'registrationNumber'
+    value: 'mhrNumber'
   },
   {
     class: 'column-mds',
@@ -464,7 +464,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'year'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: false,
     text: 'Make',
     value: 'make'
@@ -481,7 +481,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'homeLocation'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -501,25 +501,19 @@ export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
     value: 'ownerName'
   },
   {
-    class: 'column-md',
+    class: 'column-mds',
     sortable: false,
     text: 'Registration Number',
-    value: 'registrationNumber'
+    value: 'mhrNumber'
   },
   {
-    class: 'column-sm',
-    sortable: false,
-    text: 'Status',
-    value: 'status'
-  },
-  {
-    class: 'column-mdl',
+    class: 'column-md',
     sortable: false,
     text: 'Year Make Model',
     value: 'yearMakeModel'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     text: 'Home Location',
     value: 'homeLocation'
   },

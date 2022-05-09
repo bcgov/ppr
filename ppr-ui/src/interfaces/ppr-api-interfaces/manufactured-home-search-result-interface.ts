@@ -4,13 +4,16 @@ import { IndividualNameIF } from '@/interfaces'
 export interface ManufacturedHomeSearchResultIF {
   id: number
   ownerName: IndividualNameIF
+  organizationName?: string
   status: string // ACTIVE or EXEMPT or HISTORIC
-  registrationNumber: string
+  mhrNumber: string
   serialNumber: string
-  year?: number | '' // Optional
-  make?: string // Optional
-  model?: string // Optional
+  baseInformation?: {
+    year?: number | '' // Optional
+    make?: string // Optional
+    model?: string // Optional
+  }
   homeLocation?: string // Optional
   selected?: boolean // Optional
-  lienSelected?: boolean // Optional
+  includeLienInfo?: boolean // Optional
 }

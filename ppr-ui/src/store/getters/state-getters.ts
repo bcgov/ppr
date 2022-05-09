@@ -161,6 +161,10 @@ export const getManufacturedHomeSearchResults = (state: StateIF): ManufacturedHo
   return state.stateModel.search.manufacturedHomeSearchResults
 }
 
+export const getSelectedManufacturedHomes = (state: StateIF): ManufacturedHomeSearchResultIF[] => {
+  return state.stateModel.selectedManufacturedHomes
+}
+
 /** The selected search type object. */
 export const getSearchedType = (state: StateIF): SearchTypeIF => {
   return state.stateModel.search.searchedType
@@ -464,8 +468,4 @@ export const getRegTableTotalRowCount = (state: StateIF): number => {
 
 export const hasMorePages = (state: StateIF): boolean => {
   return state.stateModel.registrationTable.sortHasMorePages
-}
-
-export const getSelectedManufacturedHomes = (state: StateIF): ManufacturedHomeSearchResultIF[] => {
-  return state.stateModel.selectedManufacturedHomes
 }

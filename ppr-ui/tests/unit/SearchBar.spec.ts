@@ -13,15 +13,15 @@ import { ConfirmationDialog } from '@/components/dialogs'
 import { SearchBar } from '@/components/search'
 
 // Other
-import { SearchTypes } from '@/resources'
-import { AutoCompleteResponseIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import {MHRSearchTypes, SearchTypes} from '@/resources'
+import {AutoCompleteResponseIF, ManufacturedHomeSearchResponseIF, SearchResponseIF, SearchTypeIF} from '@/interfaces'
 import {
   mockedDefaultUserSettingsResponse,
-  mockedDisableAllUserSettingsResponse,
+  mockedDisableAllUserSettingsResponse, mockedMHRSearchResponse,
   mockedSearchResponse,
   mockedVonResponse
 } from './test-data'
-import { UISearchTypes } from '@/enums'
+import {APIMHRSearchTypes, UIMHRSearchTypes, UISearchTypes} from '@/enums'
 import { FolioNumber } from '@/components/common'
 import { getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
@@ -418,7 +418,7 @@ describe('Business debtor search', () => {
 
 describe('MHR search', () => {
   let wrapper: Wrapper<any>
-  sessionStorage.setItem('PPR_API_URL', 'mock-url')
+  sessionStorage.setItem('MHR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
   const select: SearchTypeIF = SearchTypes[5]
@@ -458,6 +458,131 @@ describe('MHR search', () => {
     expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
     await Vue.nextTick()
     await Vue.nextTick()
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+})
+
+describe('Mhr Owner name search', () => {
+  let wrapper: Wrapper<any>
+  sessionStorage.setItem('MHR_API_URL', 'mock-url')
+  let sandbox
+  const resp: ManufacturedHomeSearchResponseIF = mockedMHRSearchResponse[UIMHRSearchTypes.MHROWNER_NAME]
+  const select: SearchTypeIF = MHRSearchTypes[3]
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    const post = sandbox.stub(axios, 'post')
+
+    // GET search data
+    post.returns(new Promise(resolve => resolve({
+      data: resp
+    })))
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('searches when fields are filled', async () => {
+    wrapper.vm.returnSearchSelection(select)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValueFirst = 'test first'
+    wrapper.vm.$data.searchValueSecond = 'test middle'
+    wrapper.vm.$data.searchValueLast = 'test last'
+    wrapper.vm.$data.folioNumber = '123'
+    expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
+      type: APIMHRSearchTypes.MHROWNER_NAME,
+      criteria: {
+        ownerName: {
+          first: 'test first',
+          second: 'test middle',
+          last: 'test last'
+        }
+      },
+      clientReferenceId: '123'
+    })
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+
+  it('searches when fields are filled as Staff', async () => {
+    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    wrapper.vm.returnSearchSelection(select)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValueFirst = 'test first'
+    wrapper.vm.$data.searchValueSecond = 'test middle'
+    wrapper.vm.$data.searchValueLast = 'test last'
+    wrapper.vm.$data.folioNumber = '123'
+    expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
+      type: APIMHRSearchTypes.MHROWNER_NAME,
+      criteria: {
+        ownerName: {
+          first: 'test first',
+          second: 'test middle',
+          last: 'test last'
+        }
+      },
+      clientReferenceId: '123'
+    })
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    expect(getLastEvent(wrapper, searchError)).toBeNull()
+    // verify payment confirmation disabled, otherwise it would not have gotten the response yet
+    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+
+  it('Middle name is optional', async () => {
+    wrapper.vm.returnSearchSelection(select)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValueFirst = 'test first'
+    wrapper.vm.$data.searchValueLast = 'test last'
+    wrapper.vm.$data.folioNumber = '123'
+    expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
+      type: APIMHRSearchTypes.MHROWNER_NAME,
+      criteria: {
+        ownerName: {
+          first: 'test first',
+          second: undefined,
+          last: 'test last'
+        }
+      },
+      clientReferenceId: '123'
+    })
+    wrapper.find(searchButtonSelector).trigger('click')
+    await Vue.nextTick()
+    expect(wrapper.vm.$data.validations).toBeNull()
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
+    await Vue.nextTick()
+    await Vue.nextTick()
+
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)

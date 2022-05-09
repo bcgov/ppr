@@ -114,11 +114,11 @@ describe('Serial number results', () => {
     // includes header and 2 group headers (Active, Exempt, Historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].year)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].make)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].model)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.year)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.make)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.model)
     }
   })
 })
@@ -197,11 +197,11 @@ describe('Owner name debtor results', () => {
     // includes header and 2 group headers (Active, Exempt, Historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].year)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].make)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].model)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.year)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.make)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.model)
     }
   })
 })
@@ -280,7 +280,7 @@ describe('Business debtor results', () => {
     // includes header and 2 group headers (Active, Exempt) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
     }
   })
 })
@@ -359,11 +359,11 @@ describe('Manufactured home results', () => {
     // includes header and 2 group headers (active / exempt / historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
     for (let i; i < testResults.results; i++) {
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].registrationNumber)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].year)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].make)
-      expect(rows.at(i + 1).text()).toContain(testResults.results[i].model)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.year)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.make)
+      expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.model)
     }
   })
 })

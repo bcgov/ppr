@@ -1,4 +1,11 @@
-import { APIMHRSearchTypes, APISearchTypes, BlankSearchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
+import {
+  APIMHRMapSearchTypes,
+  APIMHRSearchTypes,
+  APISearchTypes,
+  BlankSearchTypes,
+  UIMHRSearchTypes,
+  UISearchTypes
+} from '@/enums'
 import { HintIF } from '.'
 
 // Search type interface
@@ -7,7 +14,7 @@ export interface SearchTypeIF {
   hints: HintIF
   selectDisabled: boolean
   searchTypeUI: UISearchTypes|UIMHRSearchTypes
-  searchTypeAPI: APISearchTypes|APIMHRSearchTypes|BlankSearchTypes
+  searchTypeAPI: APISearchTypes|APIMHRMapSearchTypes|BlankSearchTypes
   textLabel: string
   group: number
   class?: string

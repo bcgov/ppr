@@ -413,11 +413,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -427,11 +429,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -441,11 +445,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Lane'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -455,11 +461,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Pensley'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     }
   ],
@@ -471,11 +479,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -485,11 +495,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -499,11 +511,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Lane'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -513,11 +527,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Pensley'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     }
   ],
@@ -529,11 +545,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -543,11 +561,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -557,11 +577,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Lane'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -571,11 +593,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Pensley'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     }
   ],
@@ -587,11 +611,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -601,11 +627,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -615,11 +643,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Lane'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     },
     {
@@ -629,11 +659,13 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Pensley'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria'
     }
   ]
@@ -648,14 +680,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: true
+      includeLienInfo: true
     },
     {
       id: 2,
@@ -664,14 +698,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: false
+      includeLienInfo: false
     },
     {
       id: 3,
@@ -680,14 +716,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Lane'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: false
+      includeLienInfo: false
     }
   ],
   [UIMHRSearchTypes.MHROWNER_NAME]: [
@@ -698,14 +736,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: false
+      includeLienInfo: false
     }
   ],
   [UIMHRSearchTypes.MHRORGANIZATION_NAME]: [
@@ -716,14 +756,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: false
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -732,14 +774,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'EXEMPT',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: true
+      includeLienInfo: true
     }
   ],
   [UIMHRSearchTypes.MHRSERIAL_NUMBER]: [
@@ -750,14 +794,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Smith'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: false
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -766,14 +812,16 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
         last: 'Doe'
       },
       status: 'ACTIVE',
-      registrationNumber: '1234567',
+      mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      year: 2000,
-      make: 'Honda',
-      model: 'Trailer',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
       homeLocation: 'Victoria',
       selected: true,
-      lienSelected: true
+      includeLienInfo: true
     }
   ]
 }

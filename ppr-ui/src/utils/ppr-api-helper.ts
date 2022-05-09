@@ -20,13 +20,11 @@ import {
   RenewRegistrationIF,
   ErrorIF,
   BaseHeaderIF,
-  RegistrationSortIF,
-  ManufacturedHomeSearchResultIF,
-  ManufacturedHomeSearchResponseIF
+  RegistrationSortIF
 } from '@/interfaces'
 import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
-import { DraftTypes, ErrorCategories, ErrorCodes, SettingOptions } from '@/enums'
+import { ErrorCategories, ErrorCodes, SettingOptions } from '@/enums'
 
 /**
  * Actions that provide integration with the ppr api.
@@ -186,98 +184,6 @@ export async function search (
         }
       }
     })
-}
-
-// Submit a search query (search step 1) request.
-export function manufacturedHomeSearch (
-  searchCriteria: SearchCriteriaIF,
-  extraParams: string
-): ManufacturedHomeSearchResponseIF {
-  const url = sessionStorage.getItem('PPR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return {
-    searchId: 'test',
-    totalResultsSize: 5,
-    searchQuery: {
-      type: 'MHRMHR_NUMBER', // One of APISearchTypes
-      criteria: {
-        value: 'test'
-      }
-    },
-    searchDateTime: '2022-04-05T20:31:45+00:00',
-    results: [
-      {
-        id: 1,
-        ownerName: {
-          first: 'Ted',
-          last: 'Smith'
-        },
-        status: 'ACTIVE',
-        registrationNumber: '1234567',
-        serialNumber: 'ABC987',
-        year: 2000,
-        make: 'Honda',
-        model: 'Trailer',
-        homeLocation: 'Victoria'
-      },
-      {
-        id: 2,
-        ownerName: {
-          first: 'Jane',
-          last: 'Doe'
-        },
-        status: 'ACTIVE',
-        registrationNumber: '1234567',
-        serialNumber: 'ABC987',
-        year: 2000,
-        make: 'Honda',
-        model: 'Trailer',
-        homeLocation: 'Victoria'
-      },
-      {
-        id: 3,
-        ownerName: {
-          first: 'John',
-          last: 'Lane'
-        },
-        status: 'EXEMPT',
-        registrationNumber: '1234567',
-        serialNumber: 'ABC987',
-        year: 2000,
-        make: 'Honda',
-        model: 'Trailer',
-        homeLocation: 'Victoria'
-      },
-      {
-        id: 4,
-        ownerName: {
-          first: 'Karen',
-          last: 'Pensley'
-        },
-        status: 'EXEMPT',
-        registrationNumber: '1234567',
-        serialNumber: 'ABC987',
-        year: 2000,
-        make: 'Honda',
-        model: 'Trailer',
-        homeLocation: 'Victoria'
-      },
-      {
-        id: 5,
-        ownerName: {
-          first: 'Gertrude',
-          last: 'Vine'
-        },
-        status: 'HISTORICAL',
-        registrationNumber: '1234567',
-        serialNumber: 'ABC987',
-        year: 2000,
-        make: 'Honda',
-        model: 'Trailer',
-        homeLocation: 'Victoria'
-      }
-    ]
-  }
 }
 
 // Submit a search query (search step 1) request.

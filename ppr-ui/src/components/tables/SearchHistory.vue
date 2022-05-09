@@ -22,12 +22,21 @@
             <tbody v-if="items.length > 0">
               <tr v-for="item in items" :key="item.name">
                 <td>
-                  <v-icon v-if="isPprSearch(item)" class="pr-2" color="primary">mdi-car</v-icon>
-                  <v-icon v-else class="pr-2" color="success">mdi-home</v-icon>
-                  {{ displaySearchValue(item.searchQuery) }}
+                  <v-row no-gutters>
+                    <v-col cols="2">
+                      <v-icon v-if="isPprSearch(item)" class="pr-2" color="primary">mdi-car</v-icon>
+                      <v-icon v-else class="pr-2" color="success">mdi-home</v-icon>
+                    </v-col>
+                    <v-col>
+                      {{ displaySearchValue(item.searchQuery) }}
+                    </v-col>
+                  </v-row>
                 </td>
-                <td>
+                <td v-if="isPprSearch(item)">
                   {{ displayType(item.searchQuery.type) }}
+                </td>
+                <td v-else>
+                  {{ displayMhrType(item.searchQuery.type) }}
                 </td>
                 <td>
                   <span v-if="isPprSearch(item)">Personal Property</span>
@@ -153,9 +162,10 @@ import {
 import { useGetters } from 'vuex-composition-helpers'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
+import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses } from '@/utils'
 import { ErrorContact } from '../common'
+import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
 import _ from 'lodash' // eslint-disable-line
 
@@ -214,14 +224,16 @@ export default defineComponent({
         return false
       })
     })
+    const { mapMhrSearchType } = useSearch()
     const displayDate = (searchDate: string): string => {
       const date = new Date(searchDate)
       return convertDate(date, true, false)
     }
     const displaySearchValue = (query: SearchCriteriaIF): string => {
-      const first = query?.criteria?.debtorName?.first
-      const second = query?.criteria?.debtorName?.second
-      const last = query?.criteria?.debtorName?.last
+      const individualKey = Object.keys(query?.criteria)[0]
+      const first = query?.criteria?.[individualKey]?.first
+      const second = query?.criteria?.[individualKey]?.second
+      const last = query?.criteria?.[individualKey]?.last
       const business = query?.criteria?.debtorName?.business
       if (first && last) {
         if (second) {
@@ -236,6 +248,16 @@ export default defineComponent({
       for (let i = 0; i < SearchTypes.length; i++) {
         if (APISearchType === SearchTypes[i].searchTypeAPI) {
           UISearchType = SearchTypes[i].searchTypeUI
+          break
+        }
+      }
+      return UISearchType
+    }
+    const displayMhrType = (APISearchType: string): string => {
+      let UISearchType = ''
+      for (let i = 0; i < MHRSearchTypes.length; i++) {
+        if (mapMhrSearchType(APISearchType, true) === MHRSearchTypes[i].searchTypeAPI) {
+          UISearchType = MHRSearchTypes[i].searchTypeUI
           break
         }
       }
@@ -345,6 +367,7 @@ export default defineComponent({
       displayDate,
       displaySearchValue,
       displayType,
+      displayMhrType,
       downloadPDF,
       generateReport,
       getTooltipTxtPdf,
