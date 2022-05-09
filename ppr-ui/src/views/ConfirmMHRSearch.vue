@@ -201,8 +201,7 @@ export default class ConfirmDischarge extends Vue {
     )
     this.submitting = false
     if (apiResponse === undefined || apiResponse !== 200) {
-      // Todo: Handle Error Response
-      console.log(apiResponse)
+      console.error('Api Error: ' + apiResponse)
     } else {
       // On success return to dashboard
       this.goToDashboard()
