@@ -46,6 +46,17 @@ function createComponent (mockRoute: string): Wrapper<any> {
   })
 }
 
+/**
+ * Check tombstone header content against different roles.
+ *
+ */
+async function assertHeaderForRole (wrapper: Wrapper<any>, roles: Array<string>, headerContent: string) {
+  await store.dispatch('setAuthRoles', roles)
+  const header = wrapper.findAll(tombstoneHeader)
+  expect(header.length).toBe(1)
+  expect(header.at(0).text()).toContain(headerContent)
+}
+
 describe('TombstoneDefault component tests', () => {
   let wrapper: any
   const { assign } = window.location
@@ -129,6 +140,24 @@ describe('TombstoneDefault component tests', () => {
     await store.dispatch('setRoleSbc', true)
     const subHeader = wrapper.findAll(tombstoneSubHeader)
     expect(subHeader.at(0).text()).toContain('SBC Staff')
+  })
+
+  it('displays different headers for different auth roles', async () => {
+    wrapper = createComponent(RouteNames.DASHBOARD)
+
+    const STAFF_PPR = ['staff', 'ppr']
+    const STAFF_MHR = ['staff', 'mhr']
+    const CLIENT_MHR = ['mhr']
+    const CLIENT_PPR = ['ppr']
+    const STAFF_MHR_PPR = ['staff', 'mhr', 'ppr']
+    const CLIENT_MHR_PPR = ['mhr', 'ppr']
+
+    assertHeaderForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
+    assertHeaderForRole(wrapper, STAFF_MHR, 'Staff Manufactured Home Registry')
+    assertHeaderForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry')
+    assertHeaderForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry')
+    assertHeaderForRole(wrapper, STAFF_MHR_PPR, 'Staff Manufactured Home and Personal Property Registry')
+    assertHeaderForRole(wrapper, CLIENT_MHR_PPR, 'My Manufactured Home and Personal Property Registry')
   })
   
 })

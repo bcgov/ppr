@@ -53,14 +53,26 @@ export default defineComponent({
       getUserLastName,
       isRoleStaff,
       isRoleStaffBcol,
-      isRoleStaffSbc
+      isRoleStaffSbc,
+      isRoleStaffMhr,
+      isRoleStaffPpr,
+      isRoleClientMhr,
+      isRoleClientPpr,
+      isRoleStaffMhrPpr,
+      isRoleClientMhrPpr
     } = useGetters<any>([
       'getAccountLabel',
       'getUserFirstName',
       'getUserLastName',
       'isRoleStaff',
       'isRoleStaffBcol',
-      'isRoleStaffSbc'
+      'isRoleStaffSbc',
+      'isRoleStaffMhr',
+      'isRoleStaffPpr',
+      'isRoleClientMhr',
+      'isRoleClientPpr',
+      'isRoleStaffMhrPpr',
+      'isRoleClientMhrPpr'
     ])
     const localState = reactive({
       userName: computed((): string => {
@@ -68,10 +80,21 @@ export default defineComponent({
       }),
       date: '',
       header: computed((): string => {
-        if (isRoleStaff.value) {
-          return 'Staff Personal Property Registry'
+        let header = 'My Personal Property Registry'
+        if (isRoleStaffMhrPpr.value) {
+          header = 'Staff Manufactured Home and Personal Property Registry'
+        } else if (isRoleStaffMhr.value) {
+          header = 'Staff Manufactured Home Registry'
+        } else if (isRoleStaffPpr.value || isRoleStaff.value) {
+          header = 'Staff Personal Property Registry'
+        } else if (isRoleClientMhrPpr.value) {
+          header = 'My Manufactured Home and Personal Property Registry'
+        } else if (isRoleClientMhr.value) {
+          header = 'My Manufactured Home Registry'
+        } else if (isRoleClientPpr.value) {
+          header = 'My Personal Property Registry'
         }
-        return 'My Personal Property Registry'
+        return header
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value
