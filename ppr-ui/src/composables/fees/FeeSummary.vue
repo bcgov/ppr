@@ -213,9 +213,6 @@ export default defineComponent({
         if (props.additionalFees?.quantity) {
           feeSummary.quantity = props.additionalFees?.quantity
         }
-        if (props.additionalFees?.feeType === FeeSummaryTypes.RENEW) {
-          feeSummary.processingFee = 5
-        }
         return feeSummary
       }),
       hasProcessingFee: computed(() => {
