@@ -72,12 +72,15 @@ export const hasNoChargeAmendment = (val: UIRegistrationTypes): boolean => {
 export function getFeeSummary (
   feeType: FeeSummaryTypes,
   registrationType: UIRegistrationTypes,
-  registrationLength: RegistrationLengthI
+  registrationLength: RegistrationLengthI,
+  isStaff: boolean = false
 ): FeeSummaryI {
   if (feeType === FeeSummaryTypes.MHSEARCH) {
-    return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_8] }
+    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_10] }
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_7] }
   }
   if (feeType === FeeSummaryTypes.MHR_COMBINED_SEARCH) {
+    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_15] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_12] }
   }
   if (feeType === FeeSummaryTypes.DISCHARGE) {

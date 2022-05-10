@@ -71,6 +71,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable no-unused-vars */
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
@@ -83,10 +84,8 @@ import {
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 // local helpers/enums/interfaces/resources
-/* eslint-disable no-unused-vars */
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { Throttle } from '@/decorators'
 import {
   ActionBindingIF,
   ErrorIF,
@@ -94,11 +93,11 @@ import {
   DialogOptionsIF,
   ManufacturedHomeSearchResultIF, ManufacturedHomeSearchResponseIF
 } from '@/interfaces'
-import { notCompleteDialog, saveResultsError } from '@/resources/dialogOptions'
-import { getFeatureFlag, submitSelected, submitSelectedMhr, successfulPPRResponses } from '@/utils'
+import { notCompleteDialog } from '@/resources/dialogOptions'
+import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
-import { getManufacturedHomeSearchResults } from '@/store/getters'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -111,7 +110,10 @@ import { getManufacturedHomeSearchResults } from '@/store/getters'
 })
 export default class ConfirmDischarge extends Vue {
   @Getter getStateModel: StateModelIF
+  @Getter isSearchCertified!: boolean
   @Getter isRoleStaffBcol: boolean
+  @Getter isRoleStaffReg!: boolean
+  @Getter getStaffPayment!: StaffPaymentIF
   @Getter getManufacturedHomeSearchResults!: ManufacturedHomeSearchResponseIF
   @Getter getSelectedManufacturedHomes!: ManufacturedHomeSearchResultIF[]
 
@@ -194,13 +196,23 @@ export default class ConfirmDischarge extends Vue {
       return
     }
     this.submitting = true
-    const apiResponse = await submitSelectedMhr(
-      this.getManufacturedHomeSearchResults.searchId,
-      this.getSelectedManufacturedHomes,
-      false
-    )
+    let apiResponse
+    if (this.isRoleStaffReg) {
+      apiResponse = await submitSelectedMhr(
+        this.getManufacturedHomeSearchResults.searchId,
+        this.getSelectedManufacturedHomes,
+        this.getStaffPayment,
+        this.isSearchCertified
+      )
+    } else {
+      apiResponse = await submitSelectedMhr(
+        this.getManufacturedHomeSearchResults.searchId,
+        this.getSelectedManufacturedHomes
+      )
+    }
     this.submitting = false
     if (apiResponse === undefined || apiResponse !== 200) {
+      // Expand Error Handling
       console.error('Api Error: ' + apiResponse)
     } else {
       // On success return to dashboard

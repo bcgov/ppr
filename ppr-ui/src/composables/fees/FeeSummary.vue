@@ -6,7 +6,7 @@
     <v-slide-y-transition group tag="ul" :class="[$style['fee-list'], 'px-0']">
       <template>
         <li
-          v-if="setFeeQuantity > 0"
+          v-if="feeSummary.quantity > 0"
           :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
           :key="feeLabel"
         >
@@ -27,9 +27,9 @@
           </div>
         </li>
         <li
-          v-if="setFeeQuantity > 1"
+          v-if="setFeeQuantity > 0"
           :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
-          :key="setFeeQuantity"
+          :key="`Fee: ${setFeeQuantity}`"
         >
           <div id="quantity-label" class="fee-list__hint">
             {{ setFeeQuantity }} @ ${{ feeSummary.feeAmount.toFixed(2) }} each
@@ -54,7 +54,6 @@
             </div>
           </li>
           <li
-            v-if="additionalFeeSummary.quantity > 1"
             :class="[$style['fee-container'], $style['fee-list__hint'], 'pb-4', 'mt-n3']"
             :key="`Additional Fee: ${additionalFeeSummary.quantity}`"
           >
@@ -167,7 +166,7 @@ export default defineComponent({
     setStaffSBC: { default: false }
   },
   setup (props) {
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
+    const { getLengthTrust, isRoleStaff } = useGetters<any>(['getLengthTrust', 'isRoleStaff'])
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
@@ -187,7 +186,8 @@ export default defineComponent({
         const feeSummary = getFeeSummary(
           localState.feeType,
           localState.registrationType,
-          localState.registrationLength
+          localState.registrationLength,
+          isRoleStaff.value
         )
         if (props.setFeeQuantity) {
           feeSummary.quantity = props.setFeeQuantity
@@ -207,7 +207,8 @@ export default defineComponent({
         const feeSummary = props.additionalFees && getFeeSummary(
           props.additionalFees?.feeType,
           props.additionalFees?.registrationType,
-          props.additionalFees?.registrationLength
+          props.additionalFees?.registrationLength,
+          isRoleStaff.value
         )
         if (props.additionalFees?.quantity) {
           feeSummary.quantity = props.additionalFees?.quantity

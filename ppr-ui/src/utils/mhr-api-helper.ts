@@ -5,10 +5,8 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
   ManufacturedHomeSearchResultIF,
-  ManufacturedHomeSearchResponseIF,
-  SearchCriteriaIF,
   SearchResponseIF,
-  MhrSearchCriteriaIF, SearchResultIF, ErrorIF
+  MhrSearchCriteriaIF
 } from '@/interfaces'
 import { ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -76,22 +74,50 @@ export async function mhrSearch (
     })
 }
 
+function mhrStaffPaymentParameters (staffPayment: StaffPaymentIF) {
+  let paymentParams = ''
+  // filled out staff payment parameters
+  if (staffPayment) {
+    switch (staffPayment.option) {
+      case StaffPaymentOptions.FAS:
+        paymentParams = paymentParams + 'routingSlipNumber=' + staffPayment.routingSlipNumber
+        break
+      case StaffPaymentOptions.BCOL:
+        paymentParams = paymentParams + 'bcolAccountNumber=' + staffPayment.bcolAccountNumber
+        paymentParams = paymentParams + '&datNumber=' + staffPayment.datNumber
+        break
+    }
+  }
+  return paymentParams
+}
+
 // Submit selected matches in mhr search results
 export async function submitSelectedMhr (
   searchId: string,
   selected: Array<ManufacturedHomeSearchResultIF>,
-  shouldCallback: boolean,
-  useCurrentSelect: boolean = false
+  staffPayment: StaffPaymentIF = null,
+  isCertified: boolean = false
 ): Promise<number> {
   const url = sessionStorage.getItem('MHR_API_URL')
   // change to application/pdf to get the pdf right away
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  let callback = ''
-  if (shouldCallback) {
-    callback = '&callbackURL=PPR_UI'
+  let extraParams = ''
+
+  if (staffPayment) {
+    extraParams += '?'
+    // do they want a certified search
+    if (isCertified) {
+      extraParams += 'certified=True'
+    }
+
+    const paymentParams = mhrStaffPaymentParameters(staffPayment)
+    if (paymentParams.length > 0) {
+      extraParams += `&${paymentParams}`
+    }
   }
+
   return axios
-    .post(`search-results/${searchId}?useCurrent=${useCurrentSelect}${callback}`, selected, config)
+    .post(`search-results/${searchId}${extraParams}`, selected, config)
     .then(response => {
       return response.status
     })
