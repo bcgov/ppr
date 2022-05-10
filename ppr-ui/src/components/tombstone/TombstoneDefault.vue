@@ -55,7 +55,13 @@ export default defineComponent({
       hasMhrRole,
       hasPprRole,
       isRoleStaffBcol,
-      isRoleStaffSbc
+      isRoleStaffSbc,
+      isRoleStaffMhr,
+      isRoleStaffPpr,
+      isRoleClientMhr,
+      isRoleClientPpr,
+      isRoleStaffMhrPpr,
+      isRoleClientMhrPpr
     } = useGetters<any>([
       'getAccountLabel',
       'getUserFirstName',
@@ -64,7 +70,13 @@ export default defineComponent({
       'hasMhrRole',
       'hasPprRole',
       'isRoleStaffBcol',
-      'isRoleStaffSbc'
+      'isRoleStaffSbc',
+      'isRoleStaffMhr',
+      'isRoleStaffPpr',
+      'isRoleClientMhr',
+      'isRoleClientPpr',
+      'isRoleStaffMhrPpr',
+      'isRoleClientMhrPpr'
     ])
     const localState = reactive({
       userName: computed((): string => {
@@ -73,38 +85,20 @@ export default defineComponent({
       date: '',
       header: computed((): string => {
         let header = 'My Personal Property Registry'
-        if (localState.isStaffMHRandPPR) {
+        if (isRoleStaffMhrPpr.value) {
           header = 'Staff Manufactured Home and Personal Property Registry'
-        } else if (localState.isStaffMHR) {
+        } else if (isRoleStaffMhr.value) {
           header = 'Staff Manufactured Home Registry'
-        } else if (localState.isStaffPPR || isRoleStaff.value) {
+        } else if (isRoleStaffPpr.value || isRoleStaff.value) {
           header = 'Staff Personal Property Registry'
-        } else if (localState.isClientMHRandPPR) {
+        } else if (isRoleClientMhrPpr.value) {
           header = 'My Manufactured Home and Personal Property Registry'
-        } else if (localState.isClientMHR) {
+        } else if (isRoleClientMhr.value) {
           header = 'My Manufactured Home Registry'
-        } else if (localState.isClientPPR) {
+        } else if (isRoleClientPpr.value) {
           header = 'My Personal Property Registry'
         }
         return header
-      }),
-      isStaffMHR: computed((): boolean => {
-        return isRoleStaff.value && hasMhrRole.value && !hasPprRole.value
-      }),
-      isStaffPPR: computed((): boolean => {
-        return isRoleStaff.value && hasPprRole.value && !hasMhrRole.value
-      }),
-      isClientMHR: computed((): boolean => {
-        return hasMhrRole.value && !hasPprRole.value && !isRoleStaff.value
-      }),
-      isClientPPR: computed((): boolean => {
-        return hasPprRole.value && !hasMhrRole.value && !isRoleStaff.value
-      }),
-      isStaffMHRandPPR: computed((): boolean => {
-        return isRoleStaff.value && hasPprRole.value && hasMhrRole.value
-      }),
-      isClientMHRandPPR: computed((): boolean => {
-        return hasPprRole.value && hasMhrRole.value && !isRoleStaff.value
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value
