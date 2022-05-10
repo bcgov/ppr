@@ -32,7 +32,7 @@
                 </v-row>
               </v-container>
             </v-row>
-            <v-row no-gutters>
+            <v-row no-gutters id="parties-summary">
               <v-container fluid class="ps-1 pt-8">
                 <v-row no-gutters class='pt-1'>
                   <v-col>
@@ -287,6 +287,8 @@ export default class ReviewConfirm extends Vue {
   body {
     overflow: auto;
     height: auto;
+    -webkit-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
+    color-adjust: exact !important;                 /*Firefox*/
   }
   ::v-deep .v-data-table__wrapper {
     overflow: visible;
@@ -321,6 +323,9 @@ export default class ReviewConfirm extends Vue {
   ::v-deep .v-data-table > .v-data-table__wrapper > table > thead > tr > th
   {
     padding: 0 8px;
+  }
+  #parties-summary {
+    page-break-inside: avoid !important;
   }
 }
 
