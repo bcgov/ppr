@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Google Storage token tests."""
-from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
+"""Google storage service tests."""
+from mhr_api.services.abstract_storage_service import DocumentTypes
+from mhr_api.services.document_storage.storage_service import GoogleStorageService
 
 
 TEST_DOC_NAME = 'test_search_doc.pdf'

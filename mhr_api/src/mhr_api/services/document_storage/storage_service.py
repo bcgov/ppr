@@ -15,7 +15,6 @@
 import os
 import json
 import urllib.parse
-from abc import ABC, abstractmethod
 
 import requests
 from flask import current_app
@@ -23,33 +22,12 @@ from google.cloud import storage
 
 from mhr_api.services.gcp_auth.auth_service import GoogleAuthService
 from mhr_api.services.utils.exceptions import StorageException
-from mhr_api.utils.base import BaseEnum
+from mhr_api.services.abstract_storage_service import DocumentTypes, StorageService
 
 
 HTTP_DELETE = 'delete'
 HTTP_GET = 'get'
 HTTP_POST = 'post'
-
-
-class DocumentTypes(BaseEnum):
-    """Render an Enum of storage document types."""
-
-    SEARCH_RESULTS = 'SEARCH_RESULTS'
-    REGISTRATION = 'REGISTRATION'
-
-
-class StorageService(ABC):  # pylint: disable=too-few-public-methods
-    """Storage Service abstract class for all implementations."""
-
-    @classmethod
-    @abstractmethod
-    def get_document(cls, name: str, doc_type: str = None):
-        """Fetch the uniquely named document from storage as binary data."""
-
-    @classmethod
-    @abstractmethod
-    def save_document(cls, name: str, raw_data, doc_type: str = None):
-        """Save or replace the named document in storage with the binary data as the file contents."""
 
 
 class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-methods
