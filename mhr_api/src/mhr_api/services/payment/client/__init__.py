@@ -279,10 +279,6 @@ class SBCPaymentClient(BaseClient):
                 if 'datNumber' in transaction_info:
                     account_info['datNumber'] = transaction_info['datNumber']
                 data['accountInfo'] = account_info
-        if client_reference_id:
-            data['filingInfo']['folioNumber'] = client_reference_id
-        else:
-            del data['filingInfo']['folioNumber']
         return data
 
     @staticmethod
@@ -421,6 +417,7 @@ class SBCPaymentClient(BaseClient):
 
     def create_payment_staff_search(self, selections, transaction_info, mhr_id=None, client_reference_id=None):
         """Submit a staff search payment request for the PPR API transaction."""
+        current_app.logger.debug('Setting up staff search data.')
         data = SBCPaymentClient.create_payment_staff_search_data(selections,
                                                                  transaction_info,
                                                                  mhr_id,
