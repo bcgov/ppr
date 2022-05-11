@@ -30,6 +30,7 @@ google-api-core==2.4.0
 google-auth-oauthlib==0.4.6
 google-auth==2.3.3
 google-cloud-pubsub==2.9.0
+google-cloud-storage==2.3.0
 googleapis-common-protos==1.54.0
 grpc-google-iam-v1==0.12.3
 grpcio-status==1.43.0
