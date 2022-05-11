@@ -46,6 +46,10 @@ export const mutateOriginalAddCollateral = (state: StateIF, addCollateral: AddCo
   state.stateModel.originalRegistration.collateral = addCollateral
 }
 
+export const mutateUserAccessRole = (state: StateIF, userAccessRole: string) => {
+  state.stateModel.accountInformation.userAccessRole = userAccessRole
+}
+
 export const mutateAddSecuredPartiesAndDebtors = (state: StateIF, addParties: AddPartiesIF) => {
   state.stateModel.registration.parties = addParties
 }

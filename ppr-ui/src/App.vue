@@ -139,6 +139,7 @@ export default class App extends Mixins(AuthMixin) {
   @Action setRegistrationNumber!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
+  @Action setUserAccessRole: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -397,6 +398,7 @@ export default class App extends Mixins(AuthMixin) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
+        this.setUserAccessRole(authRoles)
       } else {
         throw new Error('Invalid auth roles')
       }

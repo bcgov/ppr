@@ -34,6 +34,10 @@ export const getAccountId = (state: StateIF): number => {
   return state.stateModel.accountInformation?.id
 }
 
+export const getUserAccessRole = (state: StateIF): string => {
+  return state.stateModel.accountInformation.userAccessRole
+}
+
 /** The current account label/name. */
 export const getAccountLabel = (state: StateIF): string => {
   return state.stateModel.accountInformation?.label
