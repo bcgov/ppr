@@ -6,7 +6,7 @@
     <v-slide-y-transition group tag="ul" :class="[$style['fee-list'], 'px-0']">
       <template>
         <li
-          v-if="feeSummary.quantity > 0"
+          v-if="!additionalFees || feeSummary.quantity > 0"
           :class="[$style['fee-container'], $style['fee-list__item'], { 'pb-4': !hintFee }, 'pr-4', 'pt-5']"
           :key="feeLabel"
         >
