@@ -22,7 +22,7 @@
               </a>
             </template>
             Learn about the Personal Property Registry and how to use the application through step-by-step guides,
-             online videos, and downloadable quick guides.
+            online videos, and downloadable quick guides.
           </v-tooltip>
         </v-row>
         <v-row id="tombstone-user-info" class="tombstone-sub-header" no-gutters>
