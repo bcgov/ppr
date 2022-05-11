@@ -105,6 +105,7 @@ export async function submitSelectedMhr (
 
   if (staffPayment) {
     extraParams += '?'
+
     // do they want a certified search
     if (isCertified) {
       extraParams += 'certified=True'
@@ -112,7 +113,8 @@ export async function submitSelectedMhr (
 
     const paymentParams = mhrStaffPaymentParameters(staffPayment)
     if (paymentParams.length > 0) {
-      extraParams += `&${paymentParams}`
+      if (isCertified) extraParams += '&'
+      extraParams += `${paymentParams}`
     }
   }
 
