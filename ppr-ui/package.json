@@ -26,7 +26,7 @@
     "material-design-icons": "^3.0.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
-    "sbc-common-components": "2.4.40",
+    "sbc-common-components": "2.4.45",
     "sinon": "^9.2.4",
     "tiptap-vuetify": "^2.24.0",
     "vue": "^2.6.12",
