@@ -19,9 +19,10 @@ from http import HTTPStatus
 import json
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from mhr_api.models import Db2Manuhome, utils as model_utils
+from mhr_api.models import Db2Manuhome, FinancingStatement, utils as model_utils, search_utils
 
 from .db import db
 # from .financing_statement import FinancingStatement
@@ -101,7 +102,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             detail_response['payment'] = payment
 
-        self.search_select = search_select
+        self.set_search_selection(search_select)
         results = self.search_response
         new_results = []
         select_count = 0
@@ -114,7 +115,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                         # Now if combined search add PPR MHR search financing statement info.
                         if select.get('includeLienInfo', False):
                             current_app.logger.info(f'Searching PPR for MHR num {mhr_num}.')
-
+                            ppr_registrations = SearchResult.search_ppr_by_mhr_number(mhr_num)
+                            result['pprRegistrations'] = ppr_registrations
                         new_results.append(result)
 
         # current_app.logger.debug('saving updates')
@@ -134,6 +136,21 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 current_app.logger.info(f'Search id={self.search_id} size exceeds RT max, setting up async report.')
                 self.callback_url = current_app.config.get('UI_SEARCH_CALLBACK_URL')
         self.save()
+
+    def set_search_selection(self, update_select):
+        """Sort the selection for the report TOC."""
+        self.search_select = SearchResult.__sort_mhr_number(update_select)
+
+    @classmethod
+    def __sort_mhr_number(cls, update_select):
+        """Sort selected business debtor names."""
+        update_select.sort(key=SearchResult.__select_sort_mhr_num)
+        return update_select
+
+    @classmethod
+    def __select_sort_mhr_num(cls, item):
+        """Sort the match list by MHR number."""
+        return item['mhrNumber']
 
     @classmethod
     def find_by_search_id(cls, search_id: int, limit_by_date: bool = False):
@@ -253,3 +270,39 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             raise BusinessException(error=error_msg, status_code=status_code)
 
         return search_result
+
+    @staticmethod
+    def search_ppr_by_mhr_number(mhr_number):
+        """Execute a PPR MHR Number search query."""
+        current_app.logger.info(f'Search_ppr_by_mhr_number search value={mhr_number}.')
+        rows = None
+        try:
+            query = text(search_utils.PPR_MHR_NUMBER_QUERY)
+            result = db.session.execute(query, {'query_value': mhr_number})
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Search_ppr_by_mhr_number query exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        results_json = []
+        if rows is None:
+            return results_json
+        try:
+            for row in rows:
+                financing_id: int = int(row[0])
+                current_app.logger.info(f'Found financing id={financing_id}.')
+                financing: FinancingStatement = FinancingStatement.find_by_id(financing_id)
+                financing.mark_update_json = True  # Added for PDF, indicate if party or collateral was added.
+                # Set to true to include change history.
+                financing.include_changes_json = False
+                financing_json = {
+                    'matchType': 'EXACT',
+                    'financingStatement': financing.json
+                }
+                results_json.append(financing_json)
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Search_ppr_by_mhr_number build results error: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        current_app.logger.info('Search_ppr_by_mhr_number results length=' + str(len(results_json)))
+        return results_json

@@ -16,6 +16,7 @@
 
 Test-Suite to ensure that the /searches endpoint is working as expected.
 """
+import copy
 from http import HTTPStatus
 
 import pytest
@@ -142,6 +143,12 @@ TEST_STAFF_SEARCH_DATA = [
     (GOV_ACCOUNT_ROLE, None, '654321', '111111', HTTPStatus.OK),
     (GOV_ACCOUNT_ROLE, None, None, None, HTTPStatus.OK)
 ]
+# testdata pattern is ({description}, {JSON data}, {mhr_num}, {match_count})
+TEST_PPR_SEARCH_DATA = [
+    ('Combo no match mhr number', SELECTED_JSON_COMBO, '022911', 0),
+    ('Not combo no ppr registration info', SELECTED_JSON, '022911', 0),
+    ('Double match mhr number', SELECTED_JSON_COMBO, '022000', 1)
+]
 
 
 @pytest.mark.parametrize('desc,json_data,search_id,roles,account_id,status', TEST_SELECTED_DATA)
@@ -246,3 +253,49 @@ def test_get_payment_details(session, client, jwt, desc, type, search_data, sele
     assert details
     assert details['label'] == label
     assert details['value'] == value
+
+
+@pytest.mark.parametrize('desc,json_data,mhr_num,match_count', TEST_PPR_SEARCH_DATA)
+def test_post_selected_combo(session, client, jwt, desc, json_data, mhr_num, match_count):
+    """Assert that valid search criteria with PPR search returns a 201 status."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = create_header_account(jwt, [MHR_ROLE])
+    search_criteria = copy.deepcopy(MHR_NUMBER_JSON)
+    search_criteria['criteria']['value'] = mhr_num
+    select_data = copy.deepcopy(json_data)
+    select_data[0]['mhrNumber'] = mhr_num
+
+    # test
+    rv = client.post('/api/v1/searches',
+                    json=search_criteria,
+                    headers=headers,
+                    content_type='application/json')
+    test_search_id = rv.json['searchId']
+    rv = client.post('/api/v1/search-results/' + test_search_id,
+                        json=select_data,
+                        headers=headers,
+                        content_type='application/json')
+    # check
+    # current_app.logger.debug(rv.json)
+    assert rv.status_code == HTTPStatus.OK
+    response_json = rv.json
+    if json_data[0].get('includeLienInfo', False) and response_json.get('details'):
+        assert 'pprRegistrations' in response_json['details'][0]
+        if match_count > 0:
+            assert len(response_json['details'][0]['pprRegistrations']) >= match_count
+            for ppr_result in response_json['details'][0]['pprRegistrations']:
+                assert ppr_result['financingStatement']
+                statement = ppr_result['financingStatement']
+                assert statement['type']
+                assert statement['baseRegistrationNumber']
+                assert statement['createDateTime']
+                assert statement['registeringParty']
+                assert statement['securedParties']
+                assert statement['debtors']
+                assert statement['vehicleCollateral'] or statement['generalCollateral']
+        else:
+            assert not response_json['details'][0]['pprRegistrations']
+    elif 'details' in response_json and response_json['details']:
+        assert 'pprRegistrations' not in response_json['details'][0]
