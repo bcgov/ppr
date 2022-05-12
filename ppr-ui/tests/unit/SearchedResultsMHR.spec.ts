@@ -12,7 +12,7 @@ import { SearchedResultMhr } from '@/components/tables'
 import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
 import { ManufacturedHomeSearchResponseIF } from '@/interfaces'
 import { APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
-import {mockedMHRSearchResponse, mockedMHRSearchResultsSorted, mockedMHRSearchSelections} from './test-data'
+import { mockedMHRSearchResponse, mockedMHRSearchResultsSorted, mockedMHRSearchSelections } from './test-data'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
