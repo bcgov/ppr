@@ -17,7 +17,8 @@ import {
   tombstoneBreadcrumbRegistration,
   tombstoneBreadcrumbSearch,
   tombstoneBreadcrumbAmendment,
-  tombstoneBreadcrumbRenewal
+  tombstoneBreadcrumbRenewal,
+  breadcrumbsTitles
 } from '@/resources'
 import { routes } from '@/router'
 
@@ -58,6 +59,13 @@ function createComponent (
     router,
     vuetify
   })
+}
+
+async function assertBreadcrumbItemForRole (wrapper: Wrapper<any>, roles: Array<string>, breadcrumbItemContent: string) {
+  await store.dispatch('setUserAccessRole', roles)
+  const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+  expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
+  expect(breadcrumbs.at(1).text()).toContain(breadcrumbItemContent)
 }
 
 const dashboardRoute = routes.find(obj => {
@@ -105,6 +113,7 @@ describe('Breadcrumb component tests', () => {
     // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
+    await store.dispatch('setUserAccessRole', ['staff', 'ppr'])
   })
 
   afterEach(() => {
@@ -114,9 +123,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on dashboard with breadcrumb', () => {
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
+    tombstoneBreadcrumbDashboard[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbDashboard.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDashboard[i].text)
     }
@@ -124,9 +135,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on search with breadcrumb', () => {
     wrapper = createComponent(RouteNames.SEARCH, searchRoute.path, searchRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbSearch.length)
+    tombstoneBreadcrumbSearch[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbSearch.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbSearch[i].text)
     }
@@ -134,9 +147,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on discharge: review discharge with breadcrumb', () => {
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE, reviewDischargeRoute.path, reviewDischargeRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
+    tombstoneBreadcrumbDischarge[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDischarge[i].text)
     }
@@ -144,9 +159,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on discharge: confirm discharge with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_DISCHARGE, confirmDischargeRoute.path, confirmDischargeRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
+    tombstoneBreadcrumbDischarge[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDischarge[i].text)
     }
@@ -154,9 +171,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: length trust with breadcrumb', () => {
     wrapper = createComponent(RouteNames.LENGTH_TRUST, addLengthTrustRoute.path, addLengthTrustRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
     }
@@ -164,9 +183,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: secured parties / debtors with breadcrumb', () => {
     wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS, addPartiesRoute.path, addPartiesRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
     }
@@ -174,9 +195,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: collateral with breadcrumb', () => {
     wrapper = createComponent(RouteNames.ADD_COLLATERAL, addCollateralRoute.path, addCollateralRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
     }
@@ -184,9 +207,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: review confirm with breadcrumb', () => {
     wrapper = createComponent(RouteNames.REVIEW_CONFIRM, confirmNewRegRoute.path, confirmNewRegRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
     }
@@ -194,9 +219,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on renew: review renewal with breadcrumb', () => {
     wrapper = createComponent(RouteNames.RENEW_REGISTRATION, reviewRenewRoute.path, reviewRenewRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
+    tombstoneBreadcrumbRenewal[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRenewal[i].text)
     }
@@ -204,9 +231,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on renew: confirm renewal with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_RENEWAL, confirmRenewRoute.path, confirmRenewRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
+    tombstoneBreadcrumbRenewal[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRenewal[i].text)
     }
@@ -214,9 +243,11 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on amendment: review amendment with breadcrumb', () => {
     wrapper = createComponent(RouteNames.AMEND_REGISTRATION, reviewAmendRoute.path, reviewAmendRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
+    tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
     }
@@ -224,20 +255,41 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on amendment: confirm amendment with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_AMENDMENT, confirmAmendRoute.path, confirmAmendRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
+    tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
       expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
     }
   })
 
   it('renders staff dashboard with breadcrumb', () => {
-    wrapper.vm.$store.state.stateModel.authorization.authRoles = ['staff']
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
+    const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
+    tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRole]
     expect(breadcrumbs.at(1).text()).toContain('Staff')
+  })
+
+  it('displays different breadcrumbs for different auth roles', async () => {
+    wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
+
+    const STAFF_PPR = ['staff', 'ppr']
+    const STAFF_MHR = ['staff', 'mhr']
+    const CLIENT_MHR = ['mhr']
+    const CLIENT_PPR = ['ppr']
+    const STAFF_PPR_MHR = ['staff', 'ppr', 'mhr']
+    const CLIENT_PPR_MHR = ['ppr', 'mhr']
+
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Manufactured Home Registry')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, 'Staff Asset Registries')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries')
   })
 })

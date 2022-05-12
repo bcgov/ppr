@@ -44,7 +44,8 @@ import {
   tombstoneBreadcrumbAmendment,
   tombstoneBreadcrumbRegistration,
   tombstoneBreadcrumbSearch,
-  tombstoneBreadcrumbSearchConfirm
+  tombstoneBreadcrumbSearchConfirm,
+  breadcrumbsTitles
 } from '@/resources'
 import { RouteNames } from '@/enums'
 
@@ -58,8 +59,9 @@ export default defineComponent({
     const {
       getRegistrationNumber,
       getRegistrationType,
-      isRoleStaff
-    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType', 'isRoleStaff'])
+      isRoleStaff,
+      getUserAccessRole
+    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType', 'isRoleStaff', 'getUserAccessRole'])
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
@@ -73,29 +75,37 @@ export default defineComponent({
         }
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
+        const roleBasedBreadcrumbTitle = breadcrumbsTitles[getUserAccessRole.value]
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
+          tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard
         } else if ((routeName.value === RouteNames.SEARCH) || (routeName.value === RouteNames.MHRSEARCH)) {
+          tombstoneBreadcrumbSearch[1].text = roleBasedBreadcrumbTitle
           return tombstoneBreadcrumbSearch
         } else if (routeName.value === RouteNames.MHRSEARCH_CONFIRM) {
+          tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbSearchConfirm[1].text 
           return tombstoneBreadcrumbSearchConfirm
         } else if (currentPath.value?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
+          dischargeBreadcrumb[1].text = roleBasedBreadcrumbTitle
           dischargeBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
           return dischargeBreadcrumb
         } else if (currentPath.value?.includes('renew')) {
           const renewBreadcrumb = [...tombstoneBreadcrumbRenewal]
+          renewBreadcrumb[1].text = roleBasedBreadcrumbTitle || renewBreadcrumb[1].text
           renewBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Renewal` || renewBreadcrumb[2].text
           return renewBreadcrumb
         } else if (currentPath.value?.includes('amend')) {
-          const amnendBreadcrumb = [...tombstoneBreadcrumbAmendment]
-          amnendBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber.value} - Amendment` || amnendBreadcrumb[2].text
-          return amnendBreadcrumb
+          const amendBreadcrumb = [...tombstoneBreadcrumbAmendment]
+          amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text = roleBasedBreadcrumbTitle
+          amendBreadcrumb[2].text =
+            `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
+          return amendBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
+          registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text
           registrationBreadcrumb[2].text =
             getRegistrationType.value?.registrationTypeUI || registrationBreadcrumb[2].text
           return registrationBreadcrumb
