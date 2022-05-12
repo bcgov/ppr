@@ -3,23 +3,23 @@
     <v-col v-if="isStaff" class="staff-header" cols="1"></v-col>
     <v-col :cols="isStaff? '11' : '12'" :class="isStaff? 'pl-4' : ''">
       <div class="ma-0 pa-0">
-        <v-row no-gutters class="header-row" style="justify-content: space-between;align-items: baseline;">
+        <v-row no-gutters class="justify-space-between align-baseline">
           <span class="tombstone-header">
-          <b>{{ header }}</b>
+            <b>{{ header }}</b>
           </span>
-          <v-tooltip top content-class="top-tooltip">
+          <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30">
             <template  v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs"
-                v-on="on"
-                style="font-size:16px;">
-                <v-row no-gutters style="align-items: center;">
-                  <v-icon left color="#1669BB">
-                  mdi-help-circle-outline
-                  </v-icon>
-                  <span style="color:#1669BB;">Help</span>
-                  <v-icon right color="#1669BB" small>mdi-open-in-new</v-icon>
-                </v-row>
-              </div>
+              <a :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
+              +'permits-licences/news-updates/modernization-updates/modernization-resources#ppr'"
+              class="text-decoration-none" target="_blank" rel="noopener noreferrer">
+                <div v-bind="attrs" v-on="on">
+                  <v-row no-gutters class="align-center">
+                    <v-icon left color="primary">mdi-help-circle-outline</v-icon>
+                    <span class="primary--text" style="font-size: 16px">Help</span>
+                    <v-icon right color="primary" small>mdi-open-in-new</v-icon>
+                  </v-row>
+                </div>
+              </a>
             </template>
             Learn about the Personal Property Registry and how to use the application through step-by-step guides,
               online videos, and downloadable quick guides.
