@@ -28,11 +28,13 @@
       </v-row>
       <v-row no-gutters>
         <v-col class="pr-4">
-          <tiptap-vuetify :extensions="extensions"
+          <tiptap-vuetify
+            :extensions="extensions"
             v-model="delDesc"
             id="general-collateral-delete-desc"
             placeholder="Enter the General Collateral to be deleted from this registration"
             :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
+            :editor-properties="{ editorProps: editorProperties }"
           />
         </v-col>
       </v-row>
@@ -43,11 +45,13 @@
       </v-row>
       <v-row no-gutters>
         <v-col class="pr-4">
-          <tiptap-vuetify :extensions="extensions"
+          <tiptap-vuetify
+            :extensions="extensions"
             v-model="addDesc"
             id="general-collateral-add-desc"
             placeholder="Enter the General Collateral to be added to this registration"
             :card-props="{ flat: true, style: 'min-height: 350px; background: rgba(0, 0, 0, 0.06)' }"
+            :editor-properties="{ editorProps: editorProperties }"
           />
         </v-col>
       </v-row>
@@ -91,8 +95,23 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // import the component and the necessary extensions
 import {
-  TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Paragraph, BulletList, OrderedList, ListItem, Blockquote,
-  HardBreak, HorizontalRule, History
+  TiptapVuetify,
+  Heading,
+  Bold,
+  Italic,
+  Strike,
+  Underline,
+  BulletList,
+  OrderedList,
+  ListItem,
+  Blockquote,
+  HardBreak,
+  HorizontalRule,
+  History,
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow
 } from 'tiptap-vuetify'
 // local
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -125,15 +144,21 @@ export default defineComponent({
       ListItem,
       BulletList,
       OrderedList,
-      [Heading, {
-        options: {
-          levels: [1, 2, 3]
+      [
+        Heading,
+        {
+          options: {
+            levels: [1, 2, 3]
+          }
         }
-      }],
+      ],
       Bold,
       HorizontalRule,
-      Paragraph,
-      HardBreak
+      HardBreak,
+      Table,
+      TableCell,
+      TableHeader,
+      TableRow
     ]
 
     const localState = reactive({
@@ -184,6 +209,15 @@ export default defineComponent({
       emit('closeGenColAmend', true)
     }
 
+    const editorProperties = {
+      transformPastedText (text) {
+        return text.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
+      },
+      transformPastedHTML (html) {
+        return html.replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '') // eslint-disable-line
+      }
+    }
+
     const resetFormAndData = () => {
       emit('closeGenColAmend', true)
     }
@@ -199,8 +233,9 @@ export default defineComponent({
     })
 
     return {
-      onSubmitForm,
+      editorProperties,
       extensions,
+      onSubmitForm,
       resetFormAndData,
       ...toRefs(localState)
     }
