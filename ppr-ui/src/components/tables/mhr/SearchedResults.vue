@@ -302,7 +302,7 @@ export default defineComponent({
     })
 
     /** Custom sorting method to handle results by status. */
-    const sortByStatus = (items: Array<ManufacturedHomeSearchResultIF> = []): any => {
+    const sortByStatus = (items: Array<ManufacturedHomeSearchResultIF> = []): Array<ManufacturedHomeSearchResultIF> => {
       items.sort((a, b) => {
         if (a.status < b.status) {
           return -1
