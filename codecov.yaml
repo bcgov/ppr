@@ -1,16 +1,12 @@
 codecov:
   require_ci_to_pass: true
+  branch: main
   max_report_age: false
-
-comment:
-  layout: "diff,flags,tree"
-  behavior: default
-  require_changes: true
 
 coverage:
   precision: 2
   round: down
-  range: "50...100"
+  range: "70...100"
   status:
     patch: false
 
@@ -24,3 +20,8 @@ parsers:
       loop: true
       method: false
       macro: false
+
+comment:
+  layout: "diff,flags,tree"
+  behavior: default
+  require_changes: truee
