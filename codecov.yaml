@@ -24,4 +24,4 @@ parsers:
 comment:
   layout: "diff,flags,tree"
   behavior: default
-  require_changes: truee
+  require_changes: true
