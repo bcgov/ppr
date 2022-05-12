@@ -60,6 +60,7 @@ import {
   toRefs
 } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
+import { tombstoneTitles } from '@/resources'
 // local
 import { pacificDate } from '@/utils'
 
@@ -73,12 +74,7 @@ export default defineComponent({
       isRoleStaff,
       isRoleStaffBcol,
       isRoleStaffSbc,
-      isRoleStaffMhr,
-      isRoleStaffPpr,
-      isRoleClientMhr,
-      isRoleClientPpr,
-      isRoleStaffMhrPpr,
-      isRoleClientMhrPpr
+      getUserAccessRole
     } = useGetters<any>([
       'getAccountLabel',
       'getUserFirstName',
@@ -86,12 +82,7 @@ export default defineComponent({
       'isRoleStaff',
       'isRoleStaffBcol',
       'isRoleStaffSbc',
-      'isRoleStaffMhr',
-      'isRoleStaffPpr',
-      'isRoleClientMhr',
-      'isRoleClientPpr',
-      'isRoleStaffMhrPpr',
-      'isRoleClientMhrPpr'
+      'getUserAccessRole'
     ])
     const localState = reactive({
       userName: computed((): string => {
@@ -99,21 +90,7 @@ export default defineComponent({
       }),
       date: '',
       header: computed((): string => {
-        let header = 'My Personal Property Registry'
-        if (isRoleStaffMhrPpr.value) {
-          header = 'Staff Manufactured Home and Personal Property Registry'
-        } else if (isRoleStaffMhr.value) {
-          header = 'Staff Manufactured Home Registry'
-        } else if (isRoleStaffPpr.value || isRoleStaff.value) {
-          header = 'Staff Personal Property Registry'
-        } else if (isRoleClientMhrPpr.value) {
-          header = 'My Manufactured Home and Personal Property Registry'
-        } else if (isRoleClientMhr.value) {
-          header = 'My Manufactured Home Registry'
-        } else if (isRoleClientPpr.value) {
-          header = 'My Personal Property Registry'
-        }
-        return header
+        return tombstoneTitles[getUserAccessRole.value]
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value
