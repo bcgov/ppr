@@ -12,7 +12,7 @@ import { SearchedResultMhr } from '@/components/tables'
 import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
 import { ManufacturedHomeSearchResponseIF } from '@/interfaces'
 import { APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
-import { mockedMHRSearchResponse, mockedMHRSearchSelections } from './test-data'
+import {mockedMHRSearchResponse, mockedMHRSearchResultsSorted, mockedMHRSearchSelections} from './test-data'
 
 // Vue.use(CompositionApi)
 Vue.use(Vuetify)
@@ -113,6 +113,11 @@ describe('Serial number results', () => {
     const rows = wrapper.findAll('tr')
     // includes header and 2 group headers (Active, Exempt, Historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
+
+    const groupHeaders = wrapper.findAll('.group-header')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
@@ -196,6 +201,11 @@ describe('Owner name debtor results', () => {
     const rows = wrapper.findAll('tr')
     // includes header and 2 group headers (Active, Exempt, Historical) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
+
+    const groupHeaders = wrapper.findAll('.group-header')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
@@ -279,6 +289,11 @@ describe('Business debtor results', () => {
     const rows = wrapper.findAll('tr')
     // includes header and 2 group headers (Active, Exempt) so add 3
     expect(rows.length).toBe(testResults.results.length + 3)
+
+    const groupHeaders = wrapper.findAll('.group-header')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
     }
@@ -324,7 +339,7 @@ describe('Business debtor results in Review Mode', () => {
 describe('Manufactured home results', () => {
   let wrapper: Wrapper<any>
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
-
+  const sortedResults = mockedMHRSearchResultsSorted[UIMHRSearchTypes.MHRMHR_NUMBER]
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
@@ -339,7 +354,7 @@ describe('Manufactured home results', () => {
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.$data.results).toStrictEqual(sortedResults)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
 
     // Verify base mode features
@@ -357,7 +372,13 @@ describe('Manufactured home results', () => {
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
     // includes header and 2 group headers (active / exempt / historical) so add 3
-    expect(rows.length).toBe(testResults.results.length + 3)
+    expect(rows.length).toBe(testResults.results.length + 4)
+
+    const groupHeaders = wrapper.findAll('.group-header')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+    expect(groupHeaders.at(2).text()).toBe('HISTORIC (1)')
+
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
