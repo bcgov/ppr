@@ -23,13 +23,16 @@ from .db2.manuhome import Db2Manuhome
 from .db2.mhomnote import Db2Mhomnote
 from .db2.owner import Db2Owner
 from .db2.owngroup import Db2Owngroup
+from .event_tracking import EventTracking
 from .search_request import SearchRequest
 from .search_result import SearchResult
 from .type_tables import (
+    EventTrackingType,
     SearchType
 )
 
 __all__ = ('db',
            'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manuhome', 'Db2Mhomnote',
            'Db2Owner', 'Db2Owngroup',
+           'EventTracking', 'EventTrackingType',
            'SearchRequest', 'SearchResult', 'SearchType')

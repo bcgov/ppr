@@ -19,7 +19,9 @@ from flask import Flask
 
 from .meta import bp as meta_bp
 from .ops import bp as ops_bp
+from .registration_report_callback import bp as registration_report_callback_bp
 from .search_history import bp as search_history_bp
+from .search_report_callback import bp as search_report_callback_bp
 from .search_results import bp as search_result_bp
 from .searches import bp as searches_bp
 
@@ -43,6 +45,8 @@ class V1Endpoint:
         self.app.register_blueprint(searches_bp)
         self.app.register_blueprint(search_history_bp)
         self.app.register_blueprint(search_result_bp)
+        self.app.register_blueprint(search_report_callback_bp)
+        self.app.register_blueprint(registration_report_callback_bp)
 
 
 v1_endpoint = V1Endpoint()  # pylint: disable=invalid-name
