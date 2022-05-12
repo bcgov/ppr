@@ -56,7 +56,8 @@ describe('Tombstone component', () => {
     accountType: '',
     id: 1,
     label: 'testPPR',
-    type: ''
+    type: '',
+    userAccessRole: ''
   }
   const userInfo: UserInfoIF = {
     contacts: [
@@ -100,6 +101,7 @@ describe('Tombstone component', () => {
     await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
     await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
     await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
+    await store.dispatch('setUserAccessRole', ['ppr'])
   })
 
   afterEach(() => {
