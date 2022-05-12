@@ -83,7 +83,7 @@ export default defineComponent({
           tombstoneBreadcrumbSearch[1].text = roleBasedBreadcrumbTitle
           return tombstoneBreadcrumbSearch
         } else if (routeName.value === RouteNames.MHRSEARCH_CONFIRM) {
-          tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbSearchConfirm[1].text 
+          tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbSearchConfirm[1].text
           return tombstoneBreadcrumbSearchConfirm
         } else if (currentPath.value?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
@@ -99,7 +99,7 @@ export default defineComponent({
           return renewBreadcrumb
         } else if (currentPath.value?.includes('amend')) {
           const amendBreadcrumb = [...tombstoneBreadcrumbAmendment]
-          amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text = roleBasedBreadcrumbTitle
+          amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text
           amendBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
