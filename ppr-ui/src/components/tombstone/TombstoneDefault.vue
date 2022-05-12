@@ -10,12 +10,12 @@
           <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30">
             <template  v-slot:activator="{ on, attrs }">
               <a :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-              +'permits-licences/news-updates/modernization-updates/modernization-resources#ppr'"
+                +'permits-licences/news-updates/modernization-updates/modernization-resources#ppr'"
               class="text-decoration-none" target="_blank" rel="noopener noreferrer">
                 <div v-bind="attrs" v-on="on">
                   <v-row no-gutters class="align-center">
                     <v-icon left color="primary">mdi-help-circle-outline</v-icon>
-                    <span class="primary--text" style="font-size: 16px">Help</span>
+                    <span class="primary--text">Help</span>
                     <v-icon right color="primary" small>mdi-open-in-new</v-icon>
                   </v-row>
                 </div>
