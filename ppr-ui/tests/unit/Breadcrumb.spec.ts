@@ -8,7 +8,6 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
 import { Breadcrumb } from '@/components/common'
-
 // Other
 import { RouteNames } from '@/enums'
 import {
@@ -21,6 +20,7 @@ import {
   breadcrumbsTitles
 } from '@/resources'
 import { routes } from '@/router'
+import { getTestId } from './utils'
 
 // unit test resources
 import mockRouter from './MockRouter'
@@ -63,7 +63,7 @@ function createComponent (
 
 async function assertBreadcrumbItemForRole (wrapper: Wrapper<any>, roles: Array<string>, breadcrumbItemContent: string) {
   await store.dispatch('setUserAccessRole', roles)
-  const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+  const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
   expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
   expect(breadcrumbs.at(1).text()).toContain(breadcrumbItemContent)
 }
@@ -125,7 +125,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
     tombstoneBreadcrumbDashboard[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbDashboard.length; i++) {
@@ -137,7 +137,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.SEARCH, searchRoute.path, searchRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbSearch.length)
     tombstoneBreadcrumbSearch[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbSearch.length; i++) {
@@ -149,7 +149,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE, reviewDischargeRoute.path, reviewDischargeRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
     tombstoneBreadcrumbDischarge[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
@@ -161,7 +161,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.CONFIRM_DISCHARGE, confirmDischargeRoute.path, confirmDischargeRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
     tombstoneBreadcrumbDischarge[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
@@ -173,7 +173,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.LENGTH_TRUST, addLengthTrustRoute.path, addLengthTrustRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
@@ -185,7 +185,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS, addPartiesRoute.path, addPartiesRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
@@ -197,7 +197,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.ADD_COLLATERAL, addCollateralRoute.path, addCollateralRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
@@ -209,7 +209,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.REVIEW_CONFIRM, confirmNewRegRoute.path, confirmNewRegRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
@@ -221,7 +221,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.RENEW_REGISTRATION, reviewRenewRoute.path, reviewRenewRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
     tombstoneBreadcrumbRenewal[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
@@ -233,7 +233,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.CONFIRM_RENEWAL, confirmRenewRoute.path, confirmRenewRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
     tombstoneBreadcrumbRenewal[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
@@ -245,7 +245,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.AMEND_REGISTRATION, reviewAmendRoute.path, reviewAmendRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
     tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
@@ -257,7 +257,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.CONFIRM_AMENDMENT, confirmAmendRoute.path, confirmAmendRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
     tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRole]
     for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
@@ -269,7 +269,7 @@ describe('Breadcrumb component tests', () => {
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
     const userRole = wrapper.vm.$store.state.stateModel.accountInformation.userAccessRole as string
     expect(wrapper.find(backBtn).exists()).toBe(true)
-    const breadcrumbs = wrapper.findAll('.v-breadcrumbs__item')
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
     tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRole]
     expect(breadcrumbs.at(1).text()).toContain('Staff')

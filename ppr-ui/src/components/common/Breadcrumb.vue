@@ -16,7 +16,7 @@
         </v-col>
         <v-col cols="auto" class="pl-3" style="padding-top: 6px;">
           <v-breadcrumbs class="pa-0" :items="breadcrumbs">
-            <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="buildHref(item.href)">
+            <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="buildHref(item.href)" data-test-id='breadcrumb-item'>
               <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
                 {{ handleStaff(item.text) }}
               </span>
