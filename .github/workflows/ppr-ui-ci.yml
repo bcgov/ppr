@@ -69,7 +69,6 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
-          file: ./ppr-ui/coverage.xml
           flags: ppr-ui
           name: codecov-ppr-ui
           fail_ci_if_error: true
