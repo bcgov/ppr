@@ -46,13 +46,6 @@ jobs:
         id: flake8
         run: |
           make flake8
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./ppr-api/coverage.xml
-          flags: ppr-api
-          name: codecov-ppr-api
-          fail_ci_if_error: true
 
   testing:
     needs: setup-job
