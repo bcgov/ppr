@@ -93,3 +93,22 @@ WHERE sc.id = sr.search_id
 ORDER BY sc.search_ts DESC
 FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
 """
+
+PPR_MHR_NUMBER_QUERY = """
+SELECT DISTINCT fs.id
+  FROM registrations r, financing_statements fs, serial_collateral sc 
+ WHERE r.financing_id = fs.id
+   AND r.registration_type_cl IN ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+   AND r.base_reg_number IS NULL
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id 
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+   AND sc.financing_id = fs.id
+   AND sc.registration_id_end IS NULL
+   AND sc.serial_type = 'MH'
+   AND sc.mhr_number = (SELECT searchkey_mhr(:query_value))
+ORDER BY fs.id ASC
+"""

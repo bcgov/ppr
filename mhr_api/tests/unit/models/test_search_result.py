@@ -17,6 +17,7 @@
 Test-Suite to ensure that the Search Detail Model (search step 2 select search
 results) is working as expected.
 """
+import copy
 from http import HTTPStatus
 
 import pytest
@@ -25,6 +26,7 @@ from flask import current_app
 
 from mhr_api.models import SearchResult, SearchRequest
 from mhr_api.exceptions import BusinessException
+from mhr_api.resources.v1.search_results import get_payment_details
 
 
 # Valid test data
@@ -42,11 +44,59 @@ MHR_NUMBER_NIL_JSON = {
     },
     'clientReferenceId': 'T-SQ-MM-2'
 }
+ORG_NAME_JSON = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'value': 'GUTHRIE HOLDINGS LTD.'
+    },
+    'clientReferenceId': 'T-SQ-MO-1'
+}
+OWNER_NAME_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'David',
+            'last': 'Hamm'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
+SERIAL_NUMBER_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': '4551'
+    },
+    'clientReferenceId': 'T-SQ-MS-1'
+}
 
 SET_SELECT_NIL = []
 
 SET_SELECT_MM = [
     {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
+]
+SET_SELECT_MM_COMBO = [
+    {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'includeLienInfo': True, 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
+]
+SET_SELECT_SORT = [
+    {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}},
+    {'mhrNumber': '002200', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}},
+    {'mhrNumber': '000199', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}},
+    {'mhrNumber': '001999', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
      'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
      'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
      'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
@@ -63,7 +113,20 @@ TEST_INVALID_DATA = [
     ('Invalid search id', SET_SELECT_MM, 390000001),
     ('Invalid search completed', SET_SELECT_MM, 200000000)
 ]
+# testdata pattern is ({description}, {JSON data}, {mhr_num}, {match_count})
+TEST_PPR_SEARCH_DATA = [
+    ('No match mhr number', SET_SELECT_MM_COMBO, '999999', 0),
+    ('Single match mhr number', SET_SELECT_MM_COMBO, '022000', 1),
+    ('Double match mhr number', SET_SELECT_MM_COMBO, '220000', 2)
+]
 
+# testdata pattern is ({mhr1}, {mhr2}, {mhr3}, mhr4)
+TEST_SELECT_SORT_DATA = [
+    ('001999', '002200', '000199', '022911'),
+    ('000199', '002200', '001999', '022911'),
+    ('022911', '002200', '000199', '001999'),
+    ('000199', '001999', '002200', '022911')
+]
 
 @pytest.mark.parametrize('desc,search_data,select_data', TEST_VALID_DATA)
 def test_search_valid_db2(session, desc, search_data, select_data):
@@ -111,3 +174,51 @@ def test_search_invalid(session, desc, json_data, search_id):
     else:
         assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     # print(bad_request_err.value.error)
+
+
+@pytest.mark.parametrize('desc,json_data,mhr_num,match_count', TEST_PPR_SEARCH_DATA)
+def test_search_ppr_by_mhr_number(session, desc, json_data, mhr_num, match_count):
+    """Assert that a PPR MHR number search returns the expected result."""
+    if json_data[0].get('includeLienInfo', False):
+        # test
+        result_json = SearchResult.search_ppr_by_mhr_number(mhr_num)
+        # current_app.logger.debug(result_json)
+        # check
+        assert result_json is not None
+        if match_count == 0:
+            assert not result_json
+        else:
+            assert len(result_json) == match_count
+            for result in result_json:
+                assert result['financingStatement']
+                statement = result['financingStatement']
+                assert statement['type']
+                assert statement['baseRegistrationNumber']
+                assert statement['createDateTime']
+                assert statement['registeringParty']
+                assert statement['securedParties']
+                assert statement['debtors']
+                assert statement['vehicleCollateral'] or statement['generalCollateral']
+
+
+@pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA)
+def test_search_sort(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
+    """Assert that submitting a new search selection is sorted as expected."""
+    # setup
+    select_data = copy.deepcopy(SET_SELECT_SORT)
+    select_data[0]['mhrNumber'] = mhr1
+    select_data[1]['mhrNumber'] = mhr2
+    select_data[2]['mhrNumber'] = mhr3
+    select_data[3]['mhrNumber'] = mhr4
+
+    # test
+    search_result: SearchResult = SearchResult()
+    search_result.set_search_selection(select_data)
+    sorted_data = search_result.search_select
+
+    # check
+    assert len(sorted_data) == 4
+    assert select_data[0]['mhrNumber'] == '000199'
+    assert select_data[1]['mhrNumber'] == '001999'
+    assert select_data[2]['mhrNumber'] == '002200'
+    assert select_data[3]['mhrNumber'] == '022911'
