@@ -245,6 +245,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .tiptap-vuetify-editor__content {
+  height: 350px; overflow-y: scroll;
+}
+
+::v-deep .tiptap-vuetify-editor__content table td {
+  white-space: normal;
+}
 .border-error-left
 {
   margin-left: -31px;
