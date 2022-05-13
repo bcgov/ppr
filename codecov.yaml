@@ -1,0 +1,42 @@
+codecov:
+  require_ci_to_pass: true
+  branch: main
+  max_report_age: false
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  status:
+    patch: false
+    backend:
+      target: auto
+      flags:
+        - ppr-api
+        - ppr-ui
+
+ignore:
+  - "^/tests/**/*" # ignore test harness code
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: true
+      loop: true
+      method: false
+      macro: false
+
+comment:
+  layout: "diff,flags,tree"
+  behavior: default
+  require_changes: true
+
+flags:
+  ppr-api:
+    paths:
+      - ppr-api/src/ppr-api
+    carryforward: true
+  ppr-ui:
+    paths:
+      - ppr-ui/src
+    carryforward: true
