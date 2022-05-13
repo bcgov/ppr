@@ -460,6 +460,22 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         first: 'Karen',
         last: 'Pensley'
       },
+      status: 'HISTORIC',
+      mhrNumber: '1234567',
+      serialNumber: 'ABC987',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 5,
+      ownerName: {
+        first: 'Steve',
+        last: 'Jobs'
+      },
       status: 'EXEMPT',
       mhrNumber: '1234567',
       serialNumber: 'ABC987',
@@ -659,6 +675,91 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         last: 'Pensley'
       },
       status: 'EXEMPT',
+      mhrNumber: '1234567',
+      serialNumber: 'ABC987',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
+      homeLocation: 'Victoria'
+    }
+  ]
+}
+
+export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]: [
+    {
+      id: 1,
+      ownerName: {
+        first: 'Ted',
+        last: 'Smith'
+      },
+      status: 'ACTIVE',
+      mhrNumber: '1234567',
+      serialNumber: 'ABC987',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 2,
+      ownerName: {
+        first: 'Jane',
+        last: 'Doe'
+      },
+      status: 'ACTIVE',
+      mhrNumber: '1234567',
+      serialNumber: 'ABC987',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 3,
+      ownerName: {
+        first: 'John',
+        last: 'Lane'
+      },
+      status: 'EXEMPT',
+      mhrNumber: '1234567',
+      serialNumber: 'ABC987',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 5,
+      ownerName: {
+        first: 'Steve',
+        last: 'Jobs'
+      },
+      status: 'EXEMPT',
+      mhrNumber: '1234567',
+      serialNumber: 'ABC987',
+      baseInformation: {
+        year: 2000,
+        make: 'Honda',
+        model: 'Trailer'
+      },
+      homeLocation: 'Victoria'
+    },
+    {
+      id: 4,
+      ownerName: {
+        first: 'Karen',
+        last: 'Pensley'
+      },
+      status: 'HISTORIC',
       mhrNumber: '1234567',
       serialNumber: 'ABC987',
       baseInformation: {

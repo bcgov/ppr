@@ -104,8 +104,8 @@
               <span v-else-if="group === 'EXEMPT'" class="pl-8">
                 EXEMPT ({{ exemptMatchesLength }})
               </span>
-              <span v-else-if="group === 'HISTORICAL'" class="pl-8">
-                HISTORICAL ({{ historicalMatchesLength }})
+              <span v-else-if="group === 'HISTORIC'" class="pl-8">
+                HISTORIC ({{ historicalMatchesLength }})
               </span>
             </td>
           </template>
@@ -232,7 +232,7 @@ export default defineComponent({
         return localState.results?.filter(item => item.status === 'EXEMPT').length
       }),
       historicalMatchesLength: computed((): number => {
-        return localState.results?.filter(item => item.status === 'HISTORICAL').length
+        return localState.results?.filter(item => item.status === 'HISTORIC').length
       }),
       headers: computed((): Array<BaseHeaderIF> => {
         return props.isReviewMode ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
@@ -292,14 +292,28 @@ export default defineComponent({
 
     onMounted(() => {
       const resp = getManufacturedHomeSearchResults.value
-      localState.searchValue = resp.searchQuery.criteria.value
+      localState.searchValue = resp.searchQuery.criteria.value || getOwnerName(resp.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
-      localState.results = localState.activeResults
+      localState.results = sortByStatus(localState.activeResults)
       localState.totalResultsLength = resp.totalResultsSize
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
     })
+
+    /** Custom sorting method to handle results by status. */
+    const sortByStatus = (items: Array<ManufacturedHomeSearchResultIF> = []): Array<ManufacturedHomeSearchResultIF> => {
+      items.sort((a, b) => {
+        if (a.status < b.status) {
+          return -1
+        }
+        if (a.status > b.status) {
+          return 1
+        }
+        return 0
+      })
+      return items
+    }
 
     watch(() => localState.results, () => {
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
