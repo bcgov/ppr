@@ -34,6 +34,10 @@ export const getAccountId = (state: StateIF): number => {
   return state.stateModel.accountInformation?.id
 }
 
+export const getUserAccessRole = (state: StateIF): string => {
+  return state.stateModel.accountInformation.userAccessRole
+}
+
 /** The current account label/name. */
 export const getAccountLabel = (state: StateIF): string => {
   return state.stateModel.accountInformation?.label
@@ -216,30 +220,6 @@ export const hasPprRole = (state: StateIF): boolean => {
 
 export const hasMhrRole = (state: StateIF): boolean => {
   return state.stateModel.authorization?.authRoles.includes('mhr')
-}
-
-export const isRoleStaffMhr = (state: StateIF): boolean => {
-  return isRoleStaff(state) && hasMhrRole(state) && !hasPprRole(state)
-}
-
-export const isRoleStaffPpr = (state: StateIF): boolean => {
-  return isRoleStaff(state) && hasPprRole(state) && !hasMhrRole(state)
-}
-
-export const isRoleClientMhr = (state: StateIF): boolean => {
-  return hasMhrRole(state) && !hasPprRole(state) && !isRoleStaff(state)
-}
-
-export const isRoleClientPpr = (state: StateIF): boolean => {
-  return hasPprRole(state) && !hasMhrRole(state) && !isRoleStaff(state)
-}
-
-export const isRoleStaffMhrPpr = (state: StateIF): boolean => {
-  return hasPprRole(state) && hasMhrRole(state) && isRoleStaff(state)
-}
-
-export const isRoleClientMhrPpr = (state: StateIF): boolean => {
-  return hasPprRole(state) && hasMhrRole(state) && !isRoleStaff(state)
 }
 
 /** The current user's service fee (applicable for non billable users). */

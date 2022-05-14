@@ -438,7 +438,8 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
     accountType: '',
     id: null,
     label: '',
-    type: ''
+    type: '',
+    userAccessRole: ''
   },
   accountProductSubscriptions: null,
   authorization: {
@@ -545,7 +546,8 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
     accountType: '',
     id: null,
     label: '',
-    type: ''
+    type: '',
+    userAccessRole: ''
   },
   accountProductSubscriptions: null,
   authorization: {
@@ -652,7 +654,8 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
     accountType: '',
     id: null,
     label: '',
-    type: ''
+    type: '',
+    userAccessRole: ''
   },
   accountProductSubscriptions: null,
   authorization: {
@@ -760,7 +763,8 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
     accountType: '',
     id: null,
     label: '',
-    type: ''
+    type: '',
+    userAccessRole: ''
   },
   accountProductSubscriptions: null,
   authorization: {

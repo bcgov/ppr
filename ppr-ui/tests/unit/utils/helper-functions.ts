@@ -53,3 +53,10 @@ export function getLastEvent (wrapper: Wrapper<any>, name: string): any {
   );
 }
 
+/**
+ * Utility function that keeps tests looking cleaner (via string template).
+ * @param dataTestId - Name of 'data-test-id' attribute in the component that needs to be tested.
+ */
+export function getTestId(dataTestId: string) {
+  return `[data-test-id='${dataTestId}']`
+}

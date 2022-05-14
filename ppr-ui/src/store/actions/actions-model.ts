@@ -56,6 +56,17 @@ export const setOriginalAddCollateral: ActionIF = ({ commit }, addCollateral: Ad
   commit('mutateOriginalAddCollateral', addCollateral)
 }
 
+export const setUserAccessRole: ActionIF = ({ commit }, authRoles: Array<string>): void => {
+  const accessRole = []
+
+  if (authRoles.includes('staff')) accessRole.push('STAFF')
+  else accessRole.push('CLIENT')
+
+  if (authRoles.includes('ppr')) accessRole.push('PPR')
+  if (authRoles.includes('mhr')) accessRole.push('MHR')
+  commit('mutateUserAccessRole', accessRole.join('_'))
+}
+
 export const setAddSecuredPartiesAndDebtors: ActionIF = ({ commit }, addParties: AddPartiesIF): void => {
   commit('mutateAddSecuredPartiesAndDebtors', addParties)
   commit('mutateUnsavedChanges', true)
