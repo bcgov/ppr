@@ -16,7 +16,12 @@
         </v-col>
         <v-col cols="auto" class="pl-3" style="padding-top: 6px;">
           <v-breadcrumbs class="pa-0" :items="breadcrumbs">
-            <v-breadcrumbs-item slot="item" slot-scope="{ item }" exact :href="buildHref(item.href)" data-test-id='breadcrumb-item'>
+            <v-breadcrumbs-item
+              slot="item"
+              slot-scope="{ item }"
+              exact :href="buildHref(item.href)"
+              data-test-id='breadcrumb-item'
+            >
               <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
                 {{ handleStaff(item.text) }}
               </span>
@@ -83,7 +88,8 @@ export default defineComponent({
           tombstoneBreadcrumbSearch[1].text = roleBasedBreadcrumbTitle
           return tombstoneBreadcrumbSearch
         } else if (routeName.value === RouteNames.MHRSEARCH_CONFIRM) {
-          tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbSearchConfirm[1].text
+          tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle ||
+            tombstoneBreadcrumbSearchConfirm[1].text
           return tombstoneBreadcrumbSearchConfirm
         } else if (currentPath.value?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
