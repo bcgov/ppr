@@ -40,7 +40,7 @@
           </v-tooltip>
         </div>
       </v-col>
-      <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
+      <v-col align-self="end" cols="3">
         <folio-number
           :defaultFolioNumber="folioNumber"
           @folio-number="updateFolioNumber"
