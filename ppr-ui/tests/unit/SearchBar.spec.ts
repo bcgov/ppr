@@ -221,7 +221,7 @@ describe('Serial number search', () => {
     const staffGroups = ['helpdesk', 'ppr_staff']
     for (let i = 0; i < staffGroups.length; i++) {
       await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
-      expect(wrapper.findComponent(FolioNumber).exists()).toBeFalsy()
+      expect(wrapper.findComponent(FolioNumber).exists()).toBeTruthy()
       expect(wrapper.find('.fee-text').exists()).toBeFalsy()
     }
     await store.dispatch('setAuthRoles', [])
