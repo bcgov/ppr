@@ -16,6 +16,7 @@ import {
 import { UISearchTypes } from '@/enums'
 import { getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
+import { defaultFlagSet } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -62,12 +63,10 @@ describe('SearchBar component basic tests', () => {
   it('renders SearchBar Component with basic elements', async () => {
     expect(wrapper.findComponent(SearchBarList).exists()).toBe(true)
     expect(wrapper.find(searchDropDown).exists()).toBe(true)
-    
   })
 
-  /* we are currently unable to mock the feature flag process */ 
-
   it('shows all of the options', async () => {
+    defaultFlagSet['mhr-ui-enabled'] = true
     await store.dispatch('setAuthRoles', ['mhr', 'ppr'])
     wrapper.vm.updateSelections()
     await flushPromises
@@ -86,4 +85,3 @@ describe('SearchBar component basic tests', () => {
     expect(getLastEvent(wrapper, 'selected')).toBe(SearchTypes[1])
   })
 })
-

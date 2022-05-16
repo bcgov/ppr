@@ -113,7 +113,7 @@ export default defineComponent({
             allSearchTypes.shift()
           }
         }
-        if (hasMhrRole.value) {
+        if (hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')) {
           allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
           // we can pop the title off if there is only one search type
           if (!hasPprRole.value) {
