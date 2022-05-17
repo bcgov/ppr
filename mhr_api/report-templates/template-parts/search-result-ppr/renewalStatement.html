@@ -1,0 +1,56 @@
+<div class="container pt-4 no-page-break">
+
+    <div class="statement-title">RENEWAL</div>
+    <div class="separator-statement mt-1"></div>
+    <table class="no-page-break section-data statement-table mt-4" role="presentation">
+        <tr>
+            <td class="section-sub-title">Registration Date and Time:</td>
+            <td>{{change.createDateTime}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Registration Number:</td>
+            <td>{{change.renewalRegistrationNumber}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Registration Life:</td>
+            <td>
+                {% if change.lifeInfinite is defined and change.lifeInfinite %}
+                    Infinite
+                {% elif change.expiryDate is defined and change.expiryDate == 'Never' %}
+                    Infinite
+                {% elif change.lifeYears is not defined or change.lifeYears == 0 %}
+                    180 Days
+                {% elif change.lifeYears is defined %}
+                    {{change.lifeYears}} {% if change.lifeYears != 1 %} Years {% else %} Year {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">New Expiration Date and Time:</td>
+            <td>
+                {% if change.lifeInfinite is defined and change.lifeInfinite %}
+                    Never
+                {% else %}
+                    {{change.expiryDate}}
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+{% if change.courtOrderInformation is defined %}
+<div class="container pt-4">
+
+    [[search-result/courtOrderInformation.html]]
+
+</div>
+{% endif %}
+
+<div class="container pt-4">
+
+  [[search-result/registeringParty.html]]
+
+</div>
+
+<div class="separator mt-4"></div> 

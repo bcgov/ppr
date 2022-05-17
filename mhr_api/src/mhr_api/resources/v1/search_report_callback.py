@@ -14,6 +14,7 @@
 """API callback endpoint to generate and store MHR search reports after completting search step 2."""
 
 from http import HTTPStatus
+import json
 
 # import requests
 from flask import Blueprint, current_app  # , jsonify, request
@@ -21,14 +22,12 @@ from flask_cors import cross_origin
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.services.queue_service import GoogleQueueService
-from mhr_api.models import EventTracking, SearchResult  # , utils as model_utils
+from mhr_api.models import EventTracking, SearchResult, utils as model_utils
+from mhr_api.services.payment.client import SBCPaymentClient
+from mhr_api.reports import ReportTypes, get_callback_pdf
 from mhr_api.resources import utils as resource_utils
-
-
-# from mhr_api.reports import ReportTypes, get_pdf
-# from mhr_api.callback.reports.report_service import get_search_report
 from mhr_api.services.utils.exceptions import ReportException, ReportDataException, StorageException
-# from mhr_api.services.document_storage.storage_service import GoogleStorageService
+from mhr_api.services.document_storage.storage_service import GoogleStorageService
 
 
 bp = Blueprint('SEARCH_REPORT1', __name__, url_prefix='/api/v1/search-report-callback')  # pylint: disable=invalid-name
@@ -78,26 +77,26 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
 
         # Generate the report with an API call here
         current_app.logger.info(f'Generating search detail report for {search_id}.')
-        # raw_data, status_code, headers = get_search_report(search_id)
-        # if not raw_data or not status_code:
-        #    return callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
-        #                            search_id,
-        #                            HTTPStatus.INTERNAL_SERVER_ERROR,
-        #                            'No data or status code.')
-        # current_app.logger.debug('report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
-        # if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-        #    message = f'Status code={status_code}. Response: ' + raw_data.get_data(as_text=True)
-        #    return callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
-        #                            search_id,
-        #                            HTTPStatus.INTERNAL_SERVER_ERROR,
-        #                            message)
+        raw_data, status_code, headers = get_search_report(search_id)
+        if not raw_data or not status_code:
+            return callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
+                                  search_id,
+                                  HTTPStatus.INTERNAL_SERVER_ERROR,
+                                  'No data or status code.')
+        current_app.logger.debug('report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
+        if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+            message = f'Status code={status_code}. Response: ' + raw_data.get_data(as_text=True)
+            return callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
+                                  search_id,
+                                  HTTPStatus.INTERNAL_SERVER_ERROR,
+                                  message)
 
-        # doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
-        # current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
-        # response = GoogleStorageService.save_document(doc_name, raw_data)
-        # current_app.logger.info('Save document storage response: ' + json.dumps(response))
-        # search_detail.doc_storage_url = doc_name
-        # search_detail.save()
+        doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
+        current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
+        response = GoogleStorageService.save_document(doc_name, raw_data)
+        current_app.logger.info('Save document storage response: ' + str(response))
+        search_detail.doc_storage_url = doc_name
+        search_detail.save()
 
         # Track success event.
         EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
@@ -161,3 +160,23 @@ def enqueue_search_report(search_id: str):
                              EventTracking.EventTrackingTypes.SEARCH_REPORT,
                              int(HTTPStatus.INTERNAL_SERVER_ERROR),
                              'Enqueue search report event failed: ' + str(err))
+
+
+def get_search_report(search_id: str):
+    """Generate a search result report."""
+    current_app.logger.info('Search report request id=' + search_id)
+    search_detail = SearchResult.find_by_search_id(int(search_id), False)
+    if search_detail is None:
+        current_app.logger.info('No search report data found for id=' + search_id)
+        raise ReportDataException('No search report data found for id=' + search_id)
+
+    try:
+        report_data = search_detail.json
+        account_id = search_detail.search.account_id
+        account_name = search_detail.account_name
+        token = SBCPaymentClient.get_sa_token()
+        return get_callback_pdf(report_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT, token, account_name)
+    except Exception as err:  # pylint: disable=broad-except # noqa F841;
+        current_app.logger.error('Search report generation failed for id=' + search_id)
+        current_app.logger.error(repr(err))
+        raise ReportException('Search report generation failed for id=' + search_id)

@@ -16,25 +16,23 @@
 # pylint: disable=too-many-return-statements
 from http import HTTPStatus
 
-# import requests
+import requests
 from flask import Blueprint, current_app, jsonify, request
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.exceptions import BusinessException, DatabaseException
-# from mhr_api.services.queue_service import GoogleQueueService
-from mhr_api.models import SearchRequest, SearchResult  # , utils as model_utils,EventTracking
+from mhr_api.models import EventTracking, SearchRequest, SearchResult  # , utils as model_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import authorized, is_bcol_help, is_gov_account, is_staff_account
-from mhr_api.services.payment.exceptions import SBCPaymentException
-from mhr_api.services.payment.payment import Payment
-from mhr_api.utils.auth import jwt
-
-
 # from mhr_api.reports import ReportTypes, get_pdf
 # from mhr_api.callback.reports.report_service import get_search_report
 # from mhr_api.callback.utils.exceptions import ReportException, ReportDataException, StorageException
-# from mhr_api.callback.document_storage.storage_service import GoogleStorageService
+from mhr_api.services.document_storage.storage_service import GoogleStorageService
+from mhr_api.services.payment.exceptions import SBCPaymentException
+from mhr_api.services.payment.payment import Payment
+from mhr_api.services.queue_service import GoogleQueueService
+from mhr_api.utils.auth import jwt
 
 
 bp = Blueprint('SEARCH_RESULTS1', __name__, url_prefix='/api/v1/search-results')  # pylint: disable=invalid-name
@@ -105,15 +103,13 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         # Large report threshold check, require/save callbackURL parameter.
         # UI may not request a report in step 2.
         callback_url = request.args.get(CALLBACK_PARAM)
-        is_ui_pdf = (callback_url is not None and callback_url == current_app.config.get('UI_SEARCH_CALLBACK_URL'))
-        if is_async(search_detail, request_json) and (resource_utils.is_pdf(request) or is_ui_pdf):
+        if is_async(search_detail, request_json):
             if callback_url is None:
                 error = f'Large search report required callbackURL parameter missing for {search_id}.'
                 current_app.logger.warn(error)
                 return resource_utils.error_response(HTTPStatus.BAD_REQUEST, error)
         else:
             callback_url = None
-            is_ui_pdf = False
 
         # Charge a search fee.
         payment = Payment(jwt=jwt.get_token_auth_header(),
@@ -161,23 +157,14 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             raise db_exception
 
         response_data = search_detail.json
+        # queue report generation.
+        enqueue_search_report(search_id)
+        response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
         # Results data that is too large for real time report generation (small number of results) is also
         # asynchronous.
         if callback_url is None and search_detail.callback_url is not None:
             callback_url = search_detail.callback_url
-            is_ui_pdf = True
-        # if resource_utils.is_pdf(request) or is_ui_pdf:
-            # If results over threshold return JSON with callbackURL, getReportURL
-            # if callback_url is not None:
-            #    # Add enqueue report generation event here.
-            #    enqueue_search_report(search_id)
-            #    response_data['callbackURL'] = requests.utils.unquote(callback_url)
-            #    response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
-            #    return jsonify(response_data), HTTPStatus.OK
-
-            # Return report if request header Accept MIME type is application/pdf.
-            # return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
-            #                jwt.get_token_auth_header())
+            response_data['callbackURL'] = requests.utils.unquote(callback_url)
 
         return jsonify(response_data), HTTPStatus.OK
 
@@ -220,24 +207,19 @@ def get_search_results(search_id: str):
         if search_detail.search_select is None and search_detail.search.total_results_size > 0:
             return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
-        # If the request is for an async large report, fetch binary data from doc storage.
-        # if resource_utils.is_pdf(request) and search_detail.callback_url is not None:
-        #    if search_detail.doc_storage_url is None:
-        #        error_msg = f'Search report not yet available for {search_id}.'
-        #        current_app.logger.info(error_msg)
-        #        return resource_utils.bad_request_response(error_msg)
-        #    doc_name = search_detail.doc_storage_url if not search_detail.doc_storage_url.startswith('http') \
-        #        else SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
-        #    current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
-        #    raw_data = GoogleStorageService.get_document(doc_name)
-        #    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+        # If the request is for a report, fetch binary data from doc storage.
+        if resource_utils.is_pdf(request):
+            if search_detail.doc_storage_url is None:
+                # If report api call failed, try again here if > 20 minutes has elapsed.
+                error_msg = f'Search report not yet available for {search_id}.'
+                current_app.logger.info(error_msg)
+                return resource_utils.bad_request_response(error_msg)
+            doc_name = search_detail.doc_storage_url
+            current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
+            raw_data = GoogleStorageService.get_document(doc_name)
+            return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
         response_data = search_detail.json
-        # if resource_utils.is_pdf(request):
-        #   # Return report if request header Accept MIME type is application/pdf.
-        #    return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
-        #                    jwt.get_token_auth_header())
-
         return jsonify(response_data), HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -306,3 +288,22 @@ def build_staff_payment(req: request, account_id: str):
         payment_info['waiveFees'] = False
     current_app.logger.debug(payment_info)
     return payment_info
+
+
+def enqueue_search_report(search_id: str):
+    """Add the search report request to the queue."""
+    try:
+        payload = {
+            'searchId': search_id
+        }
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_search_report(payload)
+        current_app.logger.info(f'Enqueue search report successful for id={search_id}.')
+    except Exception as err:  # noqa: B902; do not alter app processing
+        current_app.logger.error(f'Enqueue search report failed for id={search_id}: ' + repr(err))
+        EventTracking.create(search_id,
+                             EventTracking.EventTrackingTypes.SEARCH_REPORT,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             'Enqueue search report event failed: ' + repr(err))

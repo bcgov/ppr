@@ -1,0 +1,315 @@
+{
+  "details": [
+    {
+      "clientReferenceId": "",
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "declaredValue": 0,
+      "description": {
+        "baseInformation": {
+          "make": "BUDDY",
+          "model": "",
+          "year": "1960"
+        },
+        "csaNumber": "",
+        "csaStandard": "",
+        "engineerDate": "0001-01-01",
+        "engineerName": "",
+        "manufacturer": "*",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 52,
+            "lengthInches": 0,
+            "serialNumber": "455106374",
+            "widthFeet": 10,
+            "widthInches": 0
+          }
+        ]
+      },
+      "location": {
+        "address": {
+          "city": "KELOWNA",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": "11211 3 FORKS ROAD"
+        },
+        "pad": "",
+        "parkName": ""
+      },
+      "mhrNumber": "013575",
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "VICTORIA                  BC V8W 1E1    CANADA",
+            "country": "CA",
+            "postalCode": "",
+            "region": "BC",
+            "street": "734 BROUGHTON STREET"
+          },
+          "contactName": "DYE & DURHAM COMPANY INC. (VICTORIA)",
+          "createDateTime": "2006-11-09T16:41:44+00:00",
+          "documentId": "10026607",
+          "documentType": "EXRS",
+          "remarks": ""
+        }
+      ],
+      "owners": [
+        {
+          "address": {
+            "city": "KELOWNA, BC",
+            "country": "CA",
+            "postalCode": "V1X 4K4",
+            "region": "BC",
+            "street": "RR 5, BOX 12, HWY 33 EAST"
+          },
+          "individualName": {
+            "first": "VERDELLE",
+            "last": "MUTTITT",
+            "middle": "MAE"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "ARMSTRONG, BC",
+            "country": "CA",
+            "postalCode": "VOE 1BO",
+            "region": "BC",
+            "street": "RR 1, COMP 36 FRED"
+          },
+          "individualName": {
+            "first": "HELEN",
+            "last": "FONTAINE",
+            "middle": "VERA"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "KELOWNA, BC",
+            "country": "CA",
+            "postalCode": "V1W 4N9",
+            "region": "BC",
+            "street": "769 BARNABY ROAD"
+          },
+          "individualName": {
+            "first": "JOCHEN",
+            "last": "WOLF",
+            "middle": "KARL"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "KELOWNA, B.C.",
+            "country": "CA",
+            "postalCode": "V1W 4N9",
+            "region": "BC",
+            "street": "769C BARNABY ROAD"
+          },
+          "individualName": {
+            "first": "JOCHEN",
+            "last": "WOLF",
+            "middle": "KARL"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "KELOWNA, B.C.",
+            "country": "CA",
+            "postalCode": "V1W 4N9",
+            "region": "BC",
+            "street": "769C BARNABY ROAD"
+          },
+          "individualName": {
+            "first": "CATHY",
+            "last": "WOLF"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "KELOWNA, B.C.",
+            "country": "CA",
+            "postalCode": "V1W 4N9",
+            "region": "BC",
+            "street": "769C BARNABY ROAD"
+          },
+          "individualName": {
+            "first": "CATHY",
+            "last": "WOLF"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "KELOWNA, B.C.",
+            "country": "CA",
+            "postalCode": "V1W 4N9",
+            "region": "BC",
+            "street": "769C BARNABY ROAD"
+          },
+          "individualName": {
+            "first": "CATHERINE",
+            "last": "WOLF"
+          },
+          "type": "SO"
+        }
+      ],
+      "status": "E"
+    },
+    {
+      "clientReferenceId": "",
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "declaredValue": 0,
+      "description": {
+        "baseInformation": {
+          "make": "C SERIES - 450",
+          "model": "",
+          "year": "1992"
+        },
+        "csaNumber": "S11248",
+        "csaStandard": "",
+        "engineerDate": "0001-01-01",
+        "engineerName": "",
+        "manufacturer": "TRIPLE E HOMES LTD.",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 66,
+            "lengthInches": 8,
+            "serialNumber": "4551",
+            "widthFeet": 14,
+            "widthInches": 0
+          }
+        ]
+      },
+      "location": {
+        "address": {
+          "city": "CRANBROOK",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": "724 INNES AVENUE"
+        },
+        "pad": "",
+        "parkName": ""
+      },
+      "mhrNumber": "068831",
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "CRANBROOK                 BC V1C 2M8    CANADA",
+            "country": "CA",
+            "postalCode": "",
+            "region": "BC",
+            "street": "22 10TH AVENUE SOUTH"
+          },
+          "contactName": "SUZANNE PANTAZIS, NOTARY PUBLIC",
+          "createDateTime": "2004-09-24T14:31:21+00:00",
+          "documentId": "10006014",
+          "documentType": "EXRS",
+          "remarks": ""
+        }
+      ],
+      "owners": [
+        {
+          "address": {
+            "city": "CRANBROOK, BC",
+            "country": "CA",
+            "postalCode": "V1C 3L9",
+            "region": "BC",
+            "street": "APT 1, 1803-4TH STREET NORTH"
+          },
+          "individualName": {
+            "first": "DIANE",
+            "last": "DAY",
+            "middle": "MAUREEN"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "CRANBROOK BC",
+            "country": "CA",
+            "postalCode": "V1C 2A5",
+            "region": "BC",
+            "street": "13 - 714 INNES AVENUE"
+          },
+          "individualName": {
+            "first": "LAURA",
+            "last": "HALL",
+            "middle": "ANNE"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "CRANBROOK BC",
+            "country": "CA",
+            "postalCode": "V1C 3G5",
+            "region": "BC",
+            "street": "413 - 20TH AVENUE SOUTH"
+          },
+          "individualName": {
+            "first": "DIANE",
+            "last": "DAY",
+            "middle": "MAUREEN"
+          },
+          "type": "JT"
+        }
+      ],
+      "status": "E"
+    }
+  ],
+  "payment": {
+    "invoiceId": "19160",
+    "receipt": "/api/v1/payment-requests/19160/receipts"
+  },
+  "searchDateTime": "2022-05-16T15:55:32+00:00",
+  "searchQuery": {
+    "clientReferenceId": "MS-UT-0001",
+    "criteria": {"value": "4551"},
+    "type": "SERIAL_NUMBER"
+  },
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "BUDDY",
+        "model": "",
+        "year": 1960
+      },
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "homeLocation": "KELOWNA",
+      "mhrNumber": "013575",
+      "ownerName": {
+        "first": "VERDELLE",
+        "last": "MUTTITT",
+        "middle": "MAE"
+      },
+      "serialNumber": "455106374",
+      "status": "EXEMPT"
+    },
+    {
+      "baseInformation": {
+        "make": "C SERIES - 450",
+        "model": "",
+        "year": 1992
+      },
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "homeLocation": "CRANBROOK",
+      "includeLienInfo": true,
+      "mhrNumber": "068831",
+      "ownerName": {
+        "first": "DIANE",
+        "last": "DAY",
+        "middle": "MAUREEN"
+      },
+      "serialNumber": "4551",
+      "status": "EXEMPT"
+    }
+  ],
+  "totalResultsSize": 2
+}

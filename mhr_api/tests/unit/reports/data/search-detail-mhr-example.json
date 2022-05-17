@@ -1,0 +1,209 @@
+{
+  "details": [
+    {
+      "clientReferenceId": "",
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "declaredValue": 0,
+      "description": {
+        "baseInformation": {
+          "make": "MONARCH #956",
+          "model": "",
+          "year": "1976"
+        },
+        "csaNumber": "",
+        "csaStandard": "",
+        "engineerDate": "0001-01-01",
+        "engineerName": "",
+        "manufacturer": "MODULINE",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 60,
+            "lengthInches": 0,
+            "serialNumber": "3F6024",
+            "widthFeet": 12,
+            "widthInches": 0
+          }
+        ]
+      },
+      "location": {
+        "address": {
+          "city": "CASTLEGAR",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": "969 WALDIE RD"
+        },
+        "pad": "",
+        "parkName": ""
+      },
+      "mhrNumber": "022000",
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V1N 1E9",
+            "country": "CA",
+            "postalCode": "",
+            "region": "BC",
+            "street": "740 WOODLAND DR",
+            "streetAdditional": "CASTLEGAR BC"
+          },
+          "contactName": "GEORGE KOLESNIKOFF",
+          "createDateTime": "2006-05-08T14:56:11+00:00",
+          "documentId": "90008255",
+          "documentType": "103",
+          "expiryDate": "2006-06-07",
+          "remarks": ""
+        },
+        {
+          "contactAddress": {
+            "city": "CASTLEGAR BC  V1N4T7",
+            "country": "CA",
+            "postalCode": "",
+            "region": "BC",
+            "street": "962 WALDIE RD"
+          },
+          "contactName": "HANS KOLMAN",
+          "createDateTime": "2012-04-30T13:46:51+00:00",
+          "documentId": "90011305",
+          "documentType": "103",
+          "expiryDate": "2012-05-30",
+          "remarks": ""
+        }
+      ],
+      "owners": [
+        {
+          "address": {
+            "city": "ROBSON, BC",
+            "country": "CA",
+            "postalCode": "V0G 1X0",
+            "region": "BC",
+            "street": "BOX 280"
+          },
+          "individualName": {
+            "first": "PHILIP",
+            "last": "BONDEROFF"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "ROBSON, BC",
+            "country": "CA",
+            "postalCode": "VOG 1XO",
+            "region": "BC",
+            "street": "BOX 280"
+          },
+          "individualName": {
+            "first": "PHILIP",
+            "last": "BONDEROFF"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "ROBSON, BC",
+            "country": "CA",
+            "postalCode": "VOG 1XO",
+            "region": "BC",
+            "street": "BOX 280"
+          },
+          "individualName": {
+            "first": "KENNETH",
+            "last": "BONDEROFF",
+            "middle": "PHILIP"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "ROBSON, BC",
+            "country": "CA",
+            "postalCode": "VOG 1XO",
+            "region": "BC",
+            "street": "BOX 280"
+          },
+          "individualName": {
+            "first": "PHILIP",
+            "last": "BONDEROFF"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SALMO, BC",
+            "country": "CA",
+            "postalCode": "VOG 1ZO",
+            "region": "BC",
+            "street": "BOX 543"
+          },
+          "individualName": {
+            "first": "KENNETH",
+            "last": "BONDEROFF",
+            "middle": "PHILIP"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "CASTLEGAR, B.C.",
+            "country": "CA",
+            "postalCode": "V1N 1E9",
+            "region": "BC",
+            "street": "740 WOODLAND DRIVE"
+          },
+          "individualName": {
+            "first": "GEORGE",
+            "last": "KOLESNIKOFF"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "CASTLEGAR, B.C.",
+            "country": "CA",
+            "postalCode": "V1N 1E9",
+            "region": "BC",
+            "street": "740 WOODLAND DRIVE"
+          },
+          "individualName": {
+            "first": "FIONNA",
+            "last": "KOLESNIKOFF"
+          },
+          "type": "JT"
+        }
+      ],
+      "status": "R"
+    }
+  ],
+  "payment": {
+    "invoiceId": "1000000",
+    "receipt": "/mockTarget/pay/api/v1/payment-requests/1000000/receipts"
+  },
+  "searchDateTime": "2022-05-12T19:31:45+00:00",
+  "searchQuery": {
+    "clientReferenceId": "T-SQ-MH-1",
+    "criteria": {"value": "022000"},
+    "type": "MHR_NUMBER"
+  },
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "GLENDALE",
+        "model": "",
+        "year": 1968
+      },
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "homeLocation": "FORT NELSON",
+      "includeLienInfo": true,
+      "mhrNumber": "022000",
+      "ownerName": {
+        "first": "PRITNAM",
+        "last": "SANDHU"
+      },
+      "serialNumber": "2427",
+      "status": "EXEMPT"
+    }
+  ],
+  "totalResultsSize": 1
+}
