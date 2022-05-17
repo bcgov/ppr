@@ -171,7 +171,11 @@ describe('Serial number search', () => {
   it('searches when fields are filled', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
-    expect(wrapper.find('.select-search-text').text()).toContain('Each search incurs')
+    const searchText = wrapper.find('.select-search-text').text()
+    expect(searchText).toContain('Select a search category and then enter a value to search')
+    expect(searchText).toContain('$8.50')
+    expect(searchText).toContain('$7.00')
+    expect(searchText).toContain('$12.00')
     wrapper.vm.returnSearchSelection(select)
     await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
@@ -194,6 +198,10 @@ describe('Serial number search', () => {
 
   it('hides and shows things for staff', async () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    const searchText = wrapper.find('.select-search-text').text()
+    expect(searchText).toContain('Select a search category and then enter a value to search')
+    expect(searchText).toContain('$10.00')
+    expect(searchText).toContain('$15.00')
     await store.dispatch('setStaffPayment', {
       option: 1,
       routingSlipNumber: '888555222',
