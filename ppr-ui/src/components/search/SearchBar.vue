@@ -280,6 +280,7 @@ export default defineComponent({
         return localState.validations?.category?.message || ''
       }),
       shouldShowFeeHint: computed((): boolean => {
+        if (hasMhrRole.value || isRoleStaffReg.value) return false
         return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
           (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
       }),
