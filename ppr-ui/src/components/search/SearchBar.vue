@@ -15,29 +15,16 @@
       @proceed="onStaffPaymentChanges($event)"
     />
     <v-row no-gutters class="pt-2">
-      <v-col :class="[$style['search-info'], 'select-search-text', 'pt-4']">
-        <span v-html="typeOfSearch">
-        </span>
-        <div v-if="shouldShowFeeHint">
-          <span>
-            Each search incurs a
-          </span>
-          <v-tooltip
-            class="pa-2 pt-2"
-            content-class="top-tooltip"
-            top
-            transition="fade-transition"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <span v-bind="attrs" v-on="on" :class="$style['fee-info']"> fee of ${{ fee }}.</span>
-            </template>
-            <v-row no-gutters class="pt-2 pb-2">
-              <span>
-                Each search will incur a fee of ${{ fee }},
-                including searches that return no results.
-              </span>
-            </v-row>
-          </v-tooltip>
+      <v-col :class="[$style['search-info'], 'select-search-text']">
+        <div v-if="isStaffBcolReg || isStaffSbc">
+          Select a search category and then enter a value to search. Search fees are as follows:
+          Personal Property search - $10.00; Manufactured Home Search - $10.00;
+          combined Personal Property and Manufactured Home search - $15.00.
+        </div>
+        <div v-else>
+          Select a search category and then enter a value to search. Search fees are as follows:
+          Personal Property search - $8.50; Manufactured Home search - $7.00;
+          combined Personal Property and Manufactured Home search - $12.00.
         </div>
       </v-col>
       <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
@@ -48,6 +35,11 @@
         />
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
+    </v-row>
+    <v-row>
+      <v-col>
+        <div v-html="typeOfSearch" class="font-weight-bold"></div>
+      </v-col>
     </v-row>
     <v-row no-gutters class="pt-1">
       <v-col class="ml-n6 pl-6" cols="4">
@@ -346,7 +338,6 @@ export default defineComponent({
             }
           }
         }
-        return 'Select a search category and then enter a value to search.'
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
