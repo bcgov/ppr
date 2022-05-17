@@ -3,7 +3,7 @@ import { initialize, LDClient, LDFlagSet, LDOptions, LDUser } from 'launchdarkly
 /**
  * Default feature flags in case LD env key is not defined (eg, local development).
  */
-const defaultFlagSet: LDFlagSet = {
+export const defaultFlagSet: LDFlagSet = {
   'financing-statement': false,
   'ppr-ui-enabled': true,
   'bcregistry-ui-mhr-enabled': false,
