@@ -23,9 +23,9 @@ from urllib3.util.retry import Retry
 
 
 SYSTEM_ROLE = 'system'
-STAFF_ROLE = 'ppr_staff'  # 'mhr_staff'
+STAFF_ROLE = 'mhr_staff'
 COLIN_ROLE = 'colin'
-MHR_ROLE = 'ppr'  # 'mhr'
+MHR_ROLE = 'mhr'
 BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
