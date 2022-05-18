@@ -34,22 +34,22 @@ TO_SEARCH_DESCRIPTION = {
     'SERIAL_NUMBER': 'Serial Number'
 }
 TO_NOTE_DESCRIPTION = {
-'101': 'Register New Unit',
-'102': 'Decal Replacement',
-'103': 'Transport Permit',
-'103E': 'Extend Tran Permit',
-'CAU': 'Caution',
-'CAUC': 'Continue Caution',
-'CAUE': 'Extend Caution',
-'EXNR': 'Non-Res. Exemption',
-'EXRS': 'Res. Exemption',
-'FZE': 'Registrars Freeze',
-'NCON': 'Confidential Note',
-'NPUB': 'Public Note',
-'REGC': 'Reg. Correction',
-'REST': 'Restraining Order',
-'STAT': 'Dec./Illegal Move',
-'TAXN': 'Tax Sale Notice'
+    '101': 'Register New Unit',
+    '102': 'Decal Replacement',
+    '103': 'Transport Permit',
+    '103E': 'Extend Tran Permit',
+    'CAU': 'Caution',
+    'CAUC': 'Continue Caution',
+    'CAUE': 'Extend Caution',
+    'EXNR': 'Non-Res. Exemption',
+    'EXRS': 'Res. Exemption',
+    'FZE': 'Registrars Freeze',
+    'NCON': 'Confidential Note',
+    'NPUB': 'Public Note',
+    'REGC': 'Reg. Correction',
+    'REST': 'Restraining Order',
+    'STAT': 'Dec./Illegal Move',
+    'TAXN': 'Tax Sale Notice'
 }
 
 
@@ -273,7 +273,6 @@ class Report:  # pylint: disable=too-few-public-methods
                     for note in detail['notes']:
                         if note.get('contactAddress'):
                             Report._format_address(note['contactAddress'])
-                
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
@@ -288,12 +287,12 @@ class Report:  # pylint: disable=too-few-public-methods
                     if declared_value.isnumeric() and declared_value != '0':
                         detail['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
                     else:
-                        detail['declaredValue']  = ''
+                        detail['declaredValue'] = ''
                     if detail.get('description') and 'engineerDate' in detail['description']:
                         if detail['description']['engineerDate'] == '0001-01-01':
                             detail['description']['engineerDate'] = ''
                         else:
-                           detail['description']['engineerDate'] = \
+                            detail['description']['engineerDate'] = \
                                 Report._to_report_datetime(detail['description']['engineerDate'], False)
 
     def _set_selected(self):

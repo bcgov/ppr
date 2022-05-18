@@ -147,7 +147,7 @@ class Db2Manuhome(db.Model):
         declared_ts: str = None
         if self.reg_documents:
             for doc in self.reg_documents:
-                if self.reg_document_id and self.reg_document_id == doc.id:    
+                if self.reg_document_id and self.reg_document_id == doc.id:
                     doc_json = doc.registration_json
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
                     man_home['clientReferenceId'] = doc_json.get('attentionReference', '')
@@ -162,7 +162,7 @@ class Db2Manuhome(db.Model):
         man_home['declaredValue'] = declared_value
         if declared_ts:
             man_home['declaredDateTime'] = model_utils.format_ts(declared_ts)
-            
+
         if self.reg_owners:
             owners = []
             for owner in self.reg_owners:

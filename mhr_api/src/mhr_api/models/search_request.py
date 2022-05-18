@@ -261,6 +261,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search(self):
         """Execute a search with the previously set search type and criteria."""
         use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
+        if self.search_type == self.SearchTypes.MANUFACTURED_HOME_NUM:
+            # Format before searching
+            search_utils.format_mhr_number(self.request_json)
+
         if use_legacy_db:
             self.search_db2()
         else:
