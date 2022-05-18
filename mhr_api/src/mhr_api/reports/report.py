@@ -33,6 +33,24 @@ TO_SEARCH_DESCRIPTION = {
     'MHR_NUMBER': 'MHR Number',
     'SERIAL_NUMBER': 'Serial Number'
 }
+TO_NOTE_DESCRIPTION = {
+'101': 'Register New Unit',
+'102': 'Decal Replacement',
+'103': 'Transport Permit',
+'103E': 'Extend Tran Permit',
+'CAU': 'Caution',
+'CAUC': 'Continue Caution',
+'CAUE': 'Extend Caution',
+'EXNR': 'Non-Res. Exemption',
+'EXRS': 'Res. Exemption',
+'FZE': 'Registrars Freeze',
+'NCON': 'Confidential Note',
+'NPUB': 'Public Note',
+'REGC': 'Reg. Correction',
+'REST': 'Restraining Order',
+'STAT': 'Dec./Illegal Move',
+'TAXN': 'Tax Sale Notice'
+}
 
 
 class ReportTypes(BaseEnum):
@@ -154,7 +172,13 @@ class Report:  # pylint: disable=too-few-public-methods
             'logo',
             'macros',
             'registrarSignature',
+            'search-result/details',
+            'search-result/location',
+            'search-result/notes',
+            'search-result/owners',
             'search-result/selected',
+            'search-result/sections',
+            'search-result/registration',
             'search-result-ppr/financingStatement',
             'search-result-ppr/amendmentStatement',
             'search-result-ppr/changeStatement',
@@ -192,6 +216,7 @@ class Report:  # pylint: disable=too-few-public-methods
         self._set_meta_info()
         self._set_addresses()
         self._set_date_times()
+        self._set_notes()
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
             self._set_selected()
             # Add MHR search template setup here:
@@ -207,6 +232,30 @@ class Report:  # pylint: disable=too-few-public-methods
                                              registration['financingStatement']['baseRegistrationNumber'])
                     ppr_report_utils.set_ppr_template_data(registration['financingStatement'])
 
+    def _set_notes(self):
+        """Add note type descriptions and dates."""
+        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and self._report_data['totalResultsSize'] > 0:
+            self._set_search_notes()
+
+    def _set_search_notes(self):
+        """Add search note document type description and dates."""
+        if self._report_data and self._report_data['details']:
+            for detail in self._report_data['details']:
+                if detail.get('notes'):
+                    for note in detail['notes']:
+                        if note.get('documentType') and TO_NOTE_DESCRIPTION.get(note.get('documentType')):
+                            note['documentDescription'] = TO_NOTE_DESCRIPTION.get(note.get('documentType'))
+                        elif note.get('documentType'):
+                            note['documentDescription'] = note.get('documentType')
+                        else:
+                            note['documentDescription'] = ''
+                        if note.get('createDateTime'):
+                            note['createDateTime'] = Report._to_report_datetime(note.get('createDateTime'))
+                        if note.get('expiryDate') and note['expiryDate'] == '0001-01-01':
+                            note['expiryDate'] = ''
+                        elif note.get('expiryDate'):
+                            note['expiryDate'] = Report._to_report_datetime(note['expiryDate'], False)
+
     def _set_addresses(self):
         """Replace address country code with description."""
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and self._report_data['totalResultsSize'] > 0:
@@ -214,8 +263,17 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_search_addresses(self):
         """Replace search results addresses country code with description."""
-        if self._report_data:
-            current_app.logger.warn('TODO: set search addresses')
+        if self._report_data and self._report_data['details']:
+            for detail in self._report_data['details']:
+                for owner in detail['owners']:
+                    Report._format_address(owner['address'])
+                if detail.get('location') and 'address' in detail['location']:
+                    Report._format_address(detail['location']['address'])
+                if detail.get('notes'):
+                    for note in detail['notes']:
+                        if note.get('contactAddress'):
+                            Report._format_address(note['contactAddress'])
+                
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
@@ -224,13 +282,26 @@ class Report:  # pylint: disable=too-few-public-methods
             if self._report_data['totalResultsSize'] > 0:
                 for detail in self._report_data['details']:
                     detail['createDateTime'] = Report._to_report_datetime(detail['createDateTime'])
-                    current_app.logger.warn('TODO: set search dates:')
+                    if detail.get('declaredDateTime'):
+                        detail['declaredDateTime'] = Report._to_report_datetime(detail['declaredDateTime'], False)
+                    declared_value = str(detail['declaredValue'])
+                    if declared_value.isnumeric() and declared_value != '0':
+                        detail['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
+                    else:
+                        detail['declaredValue']  = ''
+                    if detail.get('description') and 'engineerDate' in detail['description']:
+                        if detail['description']['engineerDate'] == '0001-01-01':
+                            detail['description']['engineerDate'] = ''
+                        else:
+                           detail['description']['engineerDate'] = \
+                                Report._to_report_datetime(detail['description']['engineerDate'], False)
 
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""
         if 'selected' in self._report_data:
-            for result in self._report_data['selected']:
+            for index, result in enumerate(self._report_data['selected'], start=0):
                 result['createDateTime'] = Report._to_report_datetime(result['createDateTime'], False)
+                result['index'] = (index + 1)
             self._report_data['totalResultsSize'] = len(self._report_data['selected'])
 
     @staticmethod

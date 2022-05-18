@@ -1,5 +1,5 @@
 <div class="container pt-4">
-    {% if searchQuery.type in ('OWNER_NAME', 'MHR_NUMBER') %}
+    {% if searchQuery.type == 'OWNER_NAME' %}
     <table class="selected-mhr-table mt-4" role="presentation">
         <tr class="solid-row-separator selected-mhr-table-header no-page-break">
             <td class="top-align"></td>
@@ -19,8 +19,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {{result.mhrNumber}}
-                    {#    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a> #}
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td>
                     {{result.ownerName.last}}
@@ -40,7 +39,61 @@
                 </td>
                 <td>{{result.homeLocation}}</td>
                 <td class="right-align">
-                    {#<a href="#{{result.mhrNumber}}" class="tocpagenr"></a>#}
+                    <a href="#{{result.mhrNumber}}" class="tocpagenr"></a>
+                </td>
+                </tr>
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="4" style="height:1px"/>
+                </tr>
+        {% endfor %}
+    </table>  
+    {% elif searchQuery.type == 'MHR_NUMBER' %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+            <td class="top-align"></td>
+            <td class="top-align">MHR Number</td>
+            <td class="top-align">
+                {% if selected[0].organizationName is defined %}Organization{% else %}Owner{% endif %} Name
+            </td>
+            <td class="top-align">Status</td>
+            <td class="top-align">Year</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">Location</td>
+            <td class="top-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td>
+                    {% if result.index is defined %}
+                        {{result.index}}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
+                </td>
+                <td>
+                    {% if result.organizationName is defined %}
+                        {{result.organizationName}}
+                    {% else %}
+                        {{result.ownerName.last}}
+                        {% if result.ownerName.first %}
+                            ,{{result.ownerName.first}}
+                            {% if result.ownerName.middle %}{{result.ownerName.middle}}{% endif %}
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    {{result.status}}
+                </td>
+                <td>{{result.baseInformation.year}}</td>
+                <td>{{result.baseInformation.make}} 
+                    {% if result.baseInformation.model is defined and result.baseInformation.model != '' %} 
+                        / {{result.baseInformation.model}}
+                    {% endif %}
+                </td>
+                <td>{{result.homeLocation}}</td>
+                <td class="right-align">
+                    <a href="#{{result.mhrNumber}}" class="tocpagenr"></a>
                 </td>
                 </tr>
                 <tr class="solid-row-separator no-page-break">
@@ -68,8 +121,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {{result.mhrNumber}}
-                    {#    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a> #}
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td>
                     {{result.serialNumber}}
@@ -85,7 +137,7 @@
                 </td>
                 <td>{{result.homeLocation}}</td>
                 <td class="right-align">
-                    {#<a href="#{{result.mhrNumber}}" class="tocpagenr"></a>#}
+                    <a href="#{{result.mhrNumber}}" class="tocpagenr"></a>
                 </td>
                 </tr>
                 <tr class="solid-row-separator no-page-break">
@@ -113,8 +165,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {{result.mhrNumber}}
-                    {#    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a> #}
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td>
                     {{result.organizationName}}
@@ -130,7 +181,7 @@
                 </td>
                 <td>{{result.homeLocation}}</td>
                 <td class="right-align">
-                    {#<a href="#{{result.mhrNumber}}" class="tocpagenr"></a>#}
+                    <a href="#{{result.mhrNumber}}" class="tocpagenr"></a>
                 </td>
                 </tr>
                 <tr class="solid-row-separator no-page-break">

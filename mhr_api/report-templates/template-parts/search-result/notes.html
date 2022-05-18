@@ -1,0 +1,47 @@
+{% if detail.notes is defined and detail.notes|length > 0  %}
+    {% for note in detail.notes %}
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-3">{{note.documentDescription}}</div>
+        <table class="no-page-break section-data details-table mt-4" role="presentation">
+            <tr>
+                <td class="section-sub-title">MHR Number:</td>
+                <td>{{detail.mhrNumber}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Document Number:</td>
+                <td>{{note.documentId}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Registration Date and Time:</td>
+                <td>{{note.createDateTime}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Expired Date and Time:</td>
+                <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
+                        {{note.expiryDate}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Remarks:</td>
+                <td>{{note.remarks}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title pt-2">Contact:</td>
+                <td class="pt-2">
+                    <div>{{note.contactName}}</div>
+                    {% if note.contactAddress is defined %}
+                        <div>{{ note.contactAddress.street }}</div>
+                        <div>{{ note.contactAddress.streetAdditional }}</div>
+                        <div>{{ note.contactAddress.city }} {{ note.contactAddress.region }}</div>
+                        <div>{{ note.contactAddress.postalCode }} {{ note.contactAddress.country }}</div>
+                    {% endif %}
+                </td>
+            </tr>
+       </table>
+    {% endfor %}
+{% else %}
+    <div class="section-data">None</div>
+{% endif %}

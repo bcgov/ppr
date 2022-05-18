@@ -59,7 +59,7 @@ class Db2Manuhome(db.Model):
 
     # relationships
 
-    reg_document = None
+    reg_documents = []
     reg_owners = []
     reg_location = None
     reg_descript = None
@@ -84,9 +84,8 @@ class Db2Manuhome(db.Model):
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
-        if manuhome and manuhome.reg_document_id and manuhome.reg_document_id.strip():
-            manuhome.reg_document = Db2Document.find_by_id(manuhome.reg_document_id.strip())
         if manuhome:
+            manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
             manuhome.reg_owners = Db2Owner.find_by_manuhome_id(manuhome.id)
             manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
             manuhome.reg_location = Db2Location.find_by_manuhome_id_active(manuhome.id)
@@ -110,8 +109,7 @@ class Db2Manuhome(db.Model):
                                                                     mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
-        if manuhome.reg_document_id and manuhome.reg_document_id.strip():
-            manuhome.reg_document = Db2Document.find_by_id(manuhome.reg_document_id.strip())
+        manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
         manuhome.reg_owners = Db2Owner.find_by_manuhome_id(manuhome.id)
         manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
         manuhome.reg_location = Db2Location.find_by_manuhome_id_active(manuhome.id)
@@ -145,11 +143,26 @@ class Db2Manuhome(db.Model):
             'mhrNumber': self.mhr_number,
             'status': self.mh_status
         }
-        if self.reg_document:
-            doc_json = self.reg_document.registration_json
-            man_home['createDateTime'] = doc_json.get('createDateTime', '')
-            man_home['clientReferenceId'] = doc_json.get('attentionReference', '')
-            man_home['declaredValue'] = doc_json.get('declaredValue', 0)
+        declared_value: int = 0
+        declared_ts: str = None
+        if self.reg_documents:
+            for doc in self.reg_documents:
+                if self.reg_document_id and self.reg_document_id == doc.id:    
+                    doc_json = doc.registration_json
+                    man_home['createDateTime'] = doc_json.get('createDateTime', '')
+                    man_home['clientReferenceId'] = doc_json.get('attentionReference', '')
+                if doc.declared_value > 0 and declared_value == 0:
+                    declared_value = doc.declared_value
+                    declared_ts = doc.registration_ts
+                elif doc.declared_value > 0 and doc.registration_ts and declared_ts and \
+                        doc.registration_ts > declared_ts:
+                    declared_value = doc.declared_value
+                    declared_ts = doc.registration_ts
+
+        man_home['declaredValue'] = declared_value
+        if declared_ts:
+            man_home['declaredDateTime'] = model_utils.format_ts(declared_ts)
+            
         if self.reg_owners:
             owners = []
             for owner in self.reg_owners:
@@ -163,8 +176,20 @@ class Db2Manuhome(db.Model):
             notes = []
             for note in self.reg_notes:
                 notes.append(note.registration_json)
-            man_home['notes'] = notes
+            # Now sort in descending timestamp order.
+            man_home['notes'] = Db2Manuhome.__sort_notes(notes)
         return man_home
+
+    @classmethod
+    def __sort_notes(cls, notes):
+        """Sort notes by registration timesamp."""
+        notes.sort(key=Db2Manuhome.__sort_key_notes_ts, reverse=True)
+        return notes
+
+    @classmethod
+    def __sort_key_notes_ts(cls, item):
+        """Sort the notes registration timestamp."""
+        return item['createDateTime']
 
     @staticmethod
     def create_from_dict(new_info: dict):
