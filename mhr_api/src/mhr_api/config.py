@@ -168,6 +168,20 @@ class _Config():  # pylint: disable=too-few-public-methods
     # Default true, set to false when switching from legacy DB2 to Postgres
     USE_LEGACY_DB: bool = bool(os.getenv('USE_LEGACY_DB', 'True'))
 
+    # Google APIs and cloud storage
+    GCP_PROJECT_ID = os.getenv('GCP_PROJECT_ID')
+    GOOGLE_DEFAULT_SERVICE_ACCOUNT = os.getenv('GOOGLE_DEFAULT_SERVICE_ACCOUNT')
+    # https://developers.google.com/identity/protocols/oauth2/scopes
+    GCP_CS_SA_SCOPES = os.getenv('GCP_CS_SA_SCOPES')
+    GCP_CS_BUCKET_ID = os.getenv('mhr_search_result_report_dev')
+    GCP_CS_BUCKET_ID_REGISTRATION = os.getenv('mhr_registration_report_dev')
+    # Pub/Sub
+    GCP_PS_PROJECT_ID = os.getenv('GCP_PS_PROJECT_ID')
+    GCP_PS_SEARCH_REPORT_TOPIC = os.getenv('GCP_PS_SEARCH_REPORT_TOPIC')
+    GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv('GCP_PS_REGISTRATION_REPORT_TOPIC')
+
+    SUBSCRIPTION_API_KEY = os.getenv('SUBSCRIPTION_API_KEY')
+
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods
     """Creates the Development Config object."""

@@ -1,0 +1,188 @@
+{
+  "details": [
+    {
+      "clientReferenceId": "",
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "declaredValue": 0,
+      "description": {
+        "baseInformation": {
+          "make": "DUTCH VILLA 470-26",
+          "model": "",
+          "year": "1990"
+        },
+        "csaNumber": "*",
+        "csaStandard": "",
+        "engineerDate": "0001-01-01",
+        "engineerName": "",
+        "manufacturer": "TRIPLE E HOMES LTD.",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 66,
+            "lengthInches": 0,
+            "serialNumber": "3774",
+            "widthFeet": 14,
+            "widthInches": 0
+          }
+        ]
+      },
+      "location": {
+        "address": {
+          "city": "CASSIDY",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": " HWY 19S, TIMBERLAND ROAD"
+        },
+        "pad": "130",
+        "parkName": "TIMBERLAND MOBILE HOME PARK"
+      },
+      "mhrNumber": "063644",
+      "owners": [
+        {
+          "address": {
+            "city": "SORRENTO, BC",
+            "country": "CA",
+            "postalCode": "V0E 2W0",
+            "region": "BC",
+            "street": "R.R.#1"
+          },
+          "organizationName": "GUTHRIE HOLDINGS LTD.",
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH BC",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "TIMBERLAND MOBILE HOME PARK, RR# 1"
+          },
+          "individualName": {
+            "first": "FLOYD",
+            "last": "PETERS",
+            "middle": "WILLIAM"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH BC",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "TIMBERLAND MOBILE HOME PARK, RR# 1"
+          },
+          "individualName": {
+            "first": "VICTORIA",
+            "last": "PETERS",
+            "middle": "GAYE"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH, BC",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "TIMBERLAND MOBILE HOME PARK, RR 1"
+          },
+          "individualName": {
+            "first": "FLOYD",
+            "last": "PETERS",
+            "middle": "WILLIAM"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH, BC",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "TIMBERLAND MOBILE HOME PARK, RR 1"
+          },
+          "individualName": {
+            "first": "VICTORIA",
+            "last": "PETERS",
+            "middle": "GAYE"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH, B.C.",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "#130 - 1736 TIMBERLANDS ROAD"
+          },
+          "individualName": {
+            "first": "GEORGE",
+            "last": "SOMERVILLE",
+            "middle": "KENNETH"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH, B.C.",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "#130 - 1736 TIMBERLANDS ROAD"
+          },
+          "individualName": {
+            "first": "JEAN",
+            "last": "SOMERVILLE",
+            "middle": "SHIRLEY"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "LADYSMITH, B.C.",
+            "country": "CA",
+            "postalCode": "V0R 2E0",
+            "region": "BC",
+            "street": "#130 - 1736 TIMBERLANDS ROAD"
+          },
+          "individualName": {
+            "first": "JEAN",
+            "last": "SOMERVILLE",
+            "middle": "SHIRLEY"
+          },
+          "type": "SO"
+        }
+      ],
+      "status": "R"
+    }
+  ],
+  "payment": {
+    "invoiceId": "19162",
+    "receipt": "/api/v1/payment-requests/19162/receipts"
+  },
+  "searchDateTime": "2022-05-16T20:35:50+00:00",
+  "searchQuery": {
+    "clientReferenceId": "MO-UT-0001",
+    "criteria": {"value": "GUTHRIE HOLDINGS LTD."},
+    "type": "ORGANIZATION_NAME"
+  },
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "DUTCH VILLA 470-26",
+        "model": "",
+        "year": 1990
+      },
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "homeLocation": "CASSIDY",
+      "mhrNumber": "063644",
+      "organizationName": "GUTHRIE HOLDINGS LTD.",
+      "serialNumber": "3774",
+      "status": "ACTIVE"
+    }
+  ],
+  "totalResultsSize": 1
+}

@@ -36,3 +36,10 @@ def test_search_report_callback(session, client, jwt, desc, status, search_id):
                      headers=None)
     # check
     assert rv.status_code == status
+
+
+def test_search_report_serial(session, client, jwt):
+    """Assert that a callback request returns the expected status."""
+    # test
+    rv = client.post('/api/v1/search-report-callback/8958',
+                     headers=None)

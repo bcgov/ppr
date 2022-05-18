@@ -1,0 +1,67 @@
+{% if detail.financingStatement.registeringParty is defined and change is not defined  %}
+<div class="no-page-break">
+    <div class="separator mt-5"></div>
+    <div class="section-title mt-3">Original Registering Party</div>
+    <table class="section-data section-data-table mt-4" role="presentation">
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">
+                    {% if detail.financingStatement.registeringParty.businessName is defined %}
+                        {{ detail.financingStatement.registeringParty.businessName }}
+                    {% elif detail.financingStatement.registeringParty.personName is defined %}
+                        {{ detail.financingStatement.registeringParty.personName.last }},
+                        {{ detail.financingStatement.registeringParty.personName.first }}
+                        {% if detail.financingStatement.registeringParty.personName.middle is defined %}
+                            &nbsp;{{ detail.financingStatement.registeringParty.personName.middle }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ detail.financingStatement.registeringParty.address.street }}</div>
+                <div>{{ detail.financingStatement.registeringParty.address.streetAdditional }}</div>
+                <div>{{ detail.financingStatement.registeringParty.address.city }} 
+                     {{ detail.financingStatement.registeringParty.address.region }}</div>
+                <div>{{ detail.financingStatement.registeringParty.address.postalCode }} 
+                     {{ detail.financingStatement.registeringParty.address.country }}</div>
+            </td>
+            <td class="col-33">
+            </td>
+         </tr>
+    </table>
+</div>
+{% elif change.registeringParty is defined %}
+<div class="no-page-break">
+    <div class="section-title mt-3">Registering Party Information</div>
+    <table class="section-data section-data-table mt-4" role="presentation">
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">
+                    {% if change.registeringParty.businessName is defined %}
+                        {{ change.registeringParty.businessName }}
+                    {% elif change.registeringParty.personName is defined %}
+                        {{ change.registeringParty.personName.last }},
+                        {{ change.registeringParty.personName.first }}
+                        {% if change.registeringParty.personName.middle is defined %}
+                            &nbsp;{{ change.registeringParty.personName.middle }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ change.registeringParty.address.street }}</div>
+                <div>{{ change.registeringParty.address.streetAdditional }}</div>
+                <div>{{ change.registeringParty.address.city }} 
+                     {{ change.registeringParty.address.region }}</div>
+                <div>{{ change.registeringParty.address.postalCode }} 
+                     {{ change.registeringParty.address.country }}</div>
+            </td>
+            <td class="col-33">
+            </td>
+         </tr>
+    </table>
+</div>
+
+{% endif %}

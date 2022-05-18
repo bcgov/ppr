@@ -1,0 +1,375 @@
+{
+  "details": [
+    {
+      "clientReferenceId": "",
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "declaredValue": 0,
+      "description": {
+        "baseInformation": {
+          "make": "FLASHBACK",
+          "model": "",
+          "year": "1984"
+        },
+        "csaNumber": "",
+        "csaStandard": "",
+        "engineerDate": "0001-01-01",
+        "engineerName": "",
+        "manufacturer": "CARAVELLE",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 70,
+            "lengthInches": 0,
+            "serialNumber": "117",
+            "widthFeet": 14,
+            "widthInches": 0
+          }
+        ]
+      },
+      "location": {
+        "address": {
+          "city": "SICAMOUS",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": " HIGHWAY 97A"
+        },
+        "pad": "6",
+        "parkName": "SICAMOUS CREEK MANUFACTURED HOME PARK"
+      },
+      "mhrNumber": "074026",
+      "owners": [
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V0",
+            "region": "BC",
+            "street": "BOX 166"
+          },
+          "individualName": {
+            "first": "WAYNE",
+            "last": "LOCKERBY",
+            "middle": "NELSON"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS BC",
+            "country": "CA",
+            "postalCode": "V0E 2V0",
+            "region": "BC",
+            "street": "BOX 426"
+          },
+          "organizationName": "F&E INVESTMENTS LTD.",
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "NORTH VACNOUVER BC",
+            "country": "CA",
+            "postalCode": "V7J 3G9",
+            "region": "BC",
+            "street": "1407 - 2555 WHITELEY COURT"
+          },
+          "individualName": {
+            "first": "JIM",
+            "last": "SUTHERLAND"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "801 GRAHAM ROAD"
+          },
+          "individualName": {
+            "first": "EDWARD",
+            "last": "MCKENNA",
+            "middle": "ROSS"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "801 GRAHAM ROAD"
+          },
+          "individualName": {
+            "first": "DOROTHY",
+            "last": "MCKENNA",
+            "middle": "ANN"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "417 GILLIS AVENUE"
+          },
+          "individualName": {
+            "first": "LAWRENCE",
+            "last": "TAGGART",
+            "middle": "JAMES"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "438 OAK AVENUE"
+          },
+          "individualName": {
+            "first": "LAWRENCE",
+            "last": "TAGGART",
+            "middle": "JAMES"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "438 OAK AVENUE"
+          },
+          "individualName": {
+            "first": "LORRAINE",
+            "last": "MCLEOD",
+            "middle": "JOYCE"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, B.C.",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "#6 - 05 HIGHWAY 97A"
+          },
+          "individualName": {
+            "first": "HARVEY",
+            "last": "MOORE",
+            "middle": "NORMAN"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, B.C.",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "#6 - 05 HIGHWAY 97A"
+          },
+          "individualName": {
+            "first": "COLLEEN",
+            "last": "MOORE",
+            "middle": "ANNE"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "6-5 HIGHWAY 97A"
+          },
+          "individualName": {
+            "first": "DAVID",
+            "last": "HAMM",
+            "middle": "ABRAM"
+          },
+          "type": "JT"
+        },
+        {
+          "address": {
+            "city": "SICAMOUS, BC",
+            "country": "CA",
+            "postalCode": "V0E 2V1",
+            "region": "BC",
+            "street": "6-5 HIGHWAY 97A"
+          },
+          "individualName": {
+            "first": "JUNE",
+            "last": "HAMM",
+            "middle": "COLLEEN"
+          },
+          "type": "JT"
+        }
+      ],
+      "status": "R"
+    },
+    {
+      "clientReferenceId": "",
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "declaredValue": 0,
+      "description": {
+        "baseInformation": {
+          "make": "GLENDALE",
+          "model": "",
+          "year": "1968"
+        },
+        "csaNumber": "",
+        "csaStandard": "",
+        "engineerDate": "0001-01-01",
+        "engineerName": "",
+        "manufacturer": "GLENDALE CORP.",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 50,
+            "lengthInches": 0,
+            "serialNumber": "2427",
+            "widthFeet": 10,
+            "widthInches": 0
+          }
+        ]
+      },
+      "location": {
+        "address": {
+          "city": "FORT NELSON",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": "4004 POPLAR AVENUE"
+        },
+        "pad": "",
+        "parkName": ""
+      },
+      "mhrNumber": "022911",
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "VICTORIA , BC                           CANADA                        V8W 1H7",
+            "country": "CA",
+            "postalCode": "",
+            "region": "BC",
+            "street": "100 - 895 FORT STREET"
+          },
+          "contactName": "FRANK L. KITTO REGISTRY SERVICES LTD.",
+          "createDateTime": "1999-09-30T11:01:47+00:00",
+          "documentId": "41009149",
+          "documentType": "EXRS",
+          "remarks": ""
+        }
+      ],
+      "owners": [
+        {
+          "address": {
+            "city": "FORT NELSON, BC",
+            "country": "CA",
+            "postalCode": "V0C 1R0",
+            "region": "BC",
+            "street": "P.O. BOX 1905"
+          },
+          "individualName": {
+            "first": "PRITNAM",
+            "last": "SANDHU"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "FORT NELSON BC",
+            "country": "CA",
+            "postalCode": "V0C 1R0",
+            "region": "BC",
+            "street": "BOX 813"
+          },
+          "individualName": {
+            "first": "DAVID",
+            "last": "HAMM",
+            "middle": "MICHAEL"
+          },
+          "type": "SO"
+        },
+        {
+          "address": {
+            "city": "FORT NELSON BC",
+            "country": "CA",
+            "postalCode": "V0C 1R0",
+            "region": "BC",
+            "street": "BOX 3601"
+          },
+          "individualName": {
+            "first": "DRAGOMIR",
+            "last": "DJURIC"
+          },
+          "type": "SO"
+        }
+      ],
+      "status": "E"
+    }
+  ],
+  "payment": {
+    "invoiceId": "19164",
+    "receipt": "/api/v1/payment-requests/19164/receipts"
+  },
+  "searchDateTime": "2022-05-16T20:52:00+00:00",
+  "searchQuery": {
+    "clientReferenceId": "MI-UT-0001",
+    "criteria": {
+      "ownerName": {
+        "first": "David",
+        "last": "Hamm"
+      }
+    },
+    "type": "OWNER_NAME"
+  },
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "FLASHBACK",
+        "model": "",
+        "year": 1984
+      },
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "homeLocation": "SICAMOUS",
+      "mhrNumber": "074026",
+      "ownerName": {
+        "first": "DAVID",
+        "last": "HAMM",
+        "middle": "ABRAM"
+      },
+      "serialNumber": "117",
+      "status": "ACTIVE"
+    },
+    {
+      "baseInformation": {
+        "make": "GLENDALE",
+        "model": "",
+        "year": 1968
+      },
+      "createDateTime": "1995-11-14T00:00:01+00:00",
+      "homeLocation": "FORT NELSON",
+      "includeLienInfo": true,
+      "mhrNumber": "022911",
+      "ownerName": {
+        "first": "DAVID",
+        "last": "HAMM",
+        "middle": "MICHAEL"
+      },
+      "serialNumber": "2427",
+      "status": "EXEMPT"
+    }
+  ],
+  "totalResultsSize": 2
+}

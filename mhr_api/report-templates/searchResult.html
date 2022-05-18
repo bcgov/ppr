@@ -1,0 +1,154 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if environment == '' %}
+      [[stylePage.html]]
+    {% else %}
+      [[stylePageDraft.html]]
+    {% endif %}
+    [[style.html]]
+  </head>
+  <body>    
+    <article id="search-toc">
+    <div class="header">
+      <table class="header-table" role="presentation">
+        <tr class="no-page-break">
+          <td>
+            [[logo.html]]
+          </td>
+          <td>
+            <div class="report-type">{{ meta_title }}</div>
+            <div class="report-type-desc">BC Registries and Online Services</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="business-details-container">
+
+    {% if meta_subject|length > 70 %}
+      <table class="business-name-header-long ma-0 pa-0" role="presentation">
+        <tr>
+          <td class="lbl-business-name ma-0 pt-3 pb-3">
+            {{ meta_subject }}
+          </td>
+        </tr>
+      </table>
+    {% else %}
+      <div class="business-name-header">
+        <span class="lbl-business-name ma-0 pa-0">{{ meta_subject }}</span>
+      </div>
+    {% endif %}
+
+      <table class="business-details-table" role="presentation">
+        <tr>
+          <td class="lbl-business-detail">
+            <div>Search Date and Time:</div>
+            <div>Account Name:</div>
+            <div>Folio Number:</div>
+          </td>
+          <td>
+            <div>{{searchDateTime}}</div>
+            <div>
+              {% if meta_account_name is defined %}
+                {{meta_account_name}}
+              {% else %}
+                Not available.
+              {% endif %}
+            </div>
+            <div>
+              {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+                {{searchQuery.clientReferenceId}}
+              {% else %}
+                NA
+              {% endif %}
+            </div>
+
+          </td>
+          <td class="registar-certify-section">
+          </td>
+
+        </tr>
+      </table>
+    </div>
+  
+    <table class="header-table-toc mt-6" role="presentation">
+      <tr>
+        <th colspan="3" class="header-toc-title pt-2">
+          {% if totalResultsSize > 0 %}
+            TABLE OF CONTENTS
+          {% elif selected is not defined %}
+            NIL RESULT
+          {% else %}
+            NO REGISTRATIONS SELECTED
+          {% endif %}  
+        </th>
+      </tr>
+      <tr class="mt-2">
+          <td>
+            {% if totalResultsSize > 0 %}
+              Registrations in Report: {{ totalResultsSize }}
+            {% else %}
+              0 Registrations
+            {% endif %}  
+          </td>
+          <td>Total Search Report Pages:
+            {% if totalResultsSize > 0 %}
+              <span id="pagesCounter"></span>
+            {% else %}
+              0
+            {% endif %}  
+          </td>
+      </tr>
+    </table>
+
+
+    {% if totalResultsSize > 0 and selected is defined %}
+        [[search-result/selected.html]]
+{#
+    {% else %}
+      <div class="nil-message pt-6">The search returned a NIL result. 0 registrations were found.</div>
+#}
+    {% endif %}
+
+  </article>
+
+{#
+    {% if totalResultsSize > 0 %}
+      {% for detail in details %}
+        <p style="page-break-before: always" ></p>
+        [[search-result/financingStatement.html]]
+
+        {% if detail.financingStatement.changes is defined %}
+          <p style="page-break-before: always" ></p>
+          <div class="separator-header mt-4"></div>
+          <div class="section-title-centre mt-2">HISTORY</div>
+          <div class="section-statement mt-0">(Showing most recent first)</div>
+          <div class="separator-header mt-2"></div>
+
+          <div class="container pt-4">
+            {% for change in detail.financingStatement.changes %}
+              {% if change.statementType == 'RENEWAL_STATEMENT' %}
+                [[search-result/renewalStatement.html]]
+              {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+                [[search-result/amendmentStatement.html]]
+              {% elif change.statementType == 'CHANGE_STATEMENT' %}
+                [[search-result/changeStatement.html]]
+              {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+                [[search-result/dischargeStatement.html]]
+              {% endif %}
+            {% endfor %}
+          </div>
+
+        {% endif %} 
+      {% endfor %}
+
+    {% endif %}
+#}
+
+  </body>
+</html>

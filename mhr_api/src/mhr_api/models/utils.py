@@ -278,6 +278,16 @@ def to_local_timestamp(utc_ts):
     return utc_ts.astimezone(LOCAL_TZ)
 
 
+def to_local_expiry_report(expiry_date_time: str):
+    """Create an expiry timestamp adjusted from UTC to the local timezone."""
+    utc_ts: _datetime = ts_from_iso_format(expiry_date_time)
+    offset: int = 7 if utc_ts.hour == 6 else 8
+    # current_app.logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
+    local_ts = utc_ts - timedelta(hours=offset)
+    current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
+    return local_ts
+
+
 def today_local():
     """Return today in the local timezone."""
     return now_ts().astimezone(LOCAL_TZ)

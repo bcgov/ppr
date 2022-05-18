@@ -1,0 +1,14 @@
+{
+  "details": [],
+  "payment": {
+    "invoiceId": "1000000",
+    "receipt": "/mockTarget/pay/api/v1/payment-requests/1000000/receipts"
+  },
+  "searchDateTime": "2022-05-12T19:31:45+00:00",
+  "searchQuery": {
+    "clientReferenceId": "",
+    "criteria": {"value": "022000"},
+    "type": "MHR_NUMBER"
+  },
+  "totalResultsSize": 0
+}

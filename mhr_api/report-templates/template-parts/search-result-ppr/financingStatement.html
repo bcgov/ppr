@@ -1,0 +1,85 @@
+
+<div class="business-details-container">
+  <table class="registration-header-table" id="{{ detail.financingStatement.baseRegistrationNumber }}"  role="presentation">
+    <tr>
+      <td>Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}</td>
+      <td>
+        {% if detail.financingStatement.statusType == 'HDC' %} 
+          <span class="badge-gold">DISCHARGED</span>
+        {% elif detail.financingStatement.statusType == 'HEX' %} 
+          <span class="badge-gold">EXPIRED</span>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="business-details-table-grey" role="presentation">
+    <tr>
+      <td>Registration Description:</td>
+      <td>{{ detail.financingStatement.registrationDescription }}</td>
+    </tr>
+    <tr>
+      <td>Act:</td>
+      <td>{{ detail.financingStatement.registrationAct }}</td>
+    </tr>
+    <tr>
+      <td>Base Registration Date and Time:</td>
+      <td>{{detail.financingStatement.createDateTime}}</td>
+    </tr>
+    {% if detail.financingStatement.dischargedDateTime is defined %}
+    <tr>
+      <td>Discharge Date and Time:</td>
+      <td>{{detail.financingStatement.dischargedDateTime}}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td>Current Expiry Date and Time:</td>
+      <td>
+        {% if detail.financingStatement.lifeInfinite is defined and detail.financingStatement.lifeInfinite %} 
+          Never
+        {% else %}
+          {{detail.financingStatement.expiryDate}}
+          {% if detail.financingStatement.statusType == 'HEX' %} 
+            <span style="color: #d3272c">(Expired)</span>
+          {% endif %}
+          <br/>
+          <span class="business-details-note pt-2">Expiry date includes subsequent registered renewal(s)</span>  
+        {% endif %}
+      </td>
+    </tr>
+    {% if detail.financingStatement.type == 'RL' %}
+    <tr>
+      <td>Surrender Date:</td>
+      <td>{{detail.financingStatement.surrenderDate}}</td>
+    </tr>
+    <tr>
+      <td>Lien Amount:</td>
+      <td>{{detail.financingStatement.lienAmount}}</td>
+    </tr>
+    {% endif %}
+    {% if detail.financingStatement.type == 'SA' %}
+    <tr>
+      <td>Trust Indenture:</td>
+      <td>{% if detail.financingStatement.trustIndenture == true %}Yes{% else %}No{% endif %}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<div class="no-page-break">
+  <div class="separator-header mt-6"></div>
+  <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
+  <div class="section-statement mt-0">(as of {{searchDateTime}})</div>
+  <div class="separator-header mt-2"></div>
+</div>
+
+<div class="container pt-4">
+  [[search-result/securedParties.html]]
+  [[search-result/debtors.html]]
+  [[search-result/vehicleCollateral.html]]
+  [[search-result/generalCollateral.html]]
+  {% if detail.financingStatement.courtOrderInformation is defined %}
+    [[search-result/courtOrderInformation.html]]
+  {% endif %}
+  [[search-result/registeringParty.html]]
+</div>
