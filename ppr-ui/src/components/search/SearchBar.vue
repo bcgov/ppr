@@ -16,15 +16,10 @@
     />
     <v-row no-gutters class="pt-2">
       <v-col :class="[$style['search-info'], 'select-search-text']">
-        <div v-if="isStaffBcolReg || isStaffSbc">
+        <div>
           Select a search category and then enter a value to search. Search fees are as follows:
-          Personal Property search - $10.00; Manufactured Home Search - $10.00;
-          combined Personal Property and Manufactured Home search - $15.00.
-        </div>
-        <div v-else>
-          Select a search category and then enter a value to search. Search fees are as follows:
-          Personal Property search - $8.50; Manufactured Home search - $7.00;
-          combined Personal Property and Manufactured Home search - $12.00.
+          Personal Property search - ${{personalPropertySearchFee}} Manufactured Home Search - ${{manHomeSearchFee}};
+          combined Personal Property and Manufactured Home search - ${{comboSearchFee}}.
         </div>
       </v-col>
       <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
@@ -311,6 +306,15 @@ export default defineComponent({
           return true
         }
         return false
+      }),
+      personalPropertySearchFee: computed((): string => {
+        return localState.isStaffBcolReg || localState.isStaffSbc ? '10.00' : '8.50'
+      }),
+      manHomeSearchFee: computed((): string => {
+        return localState.isStaffBcolReg || localState.isStaffSbc ? '10.00' : '7.00'
+      }),
+      comboSearchFee: computed((): string => {
+        return localState.isStaffBcolReg || localState.isStaffSbc ? '15.00' : '12.00'
       }),
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
