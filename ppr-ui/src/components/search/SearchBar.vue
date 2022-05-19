@@ -134,9 +134,9 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
 
-          <v-menu v-if="isStaffBcolReg" offset-y left nudge-bottom="4">
+          <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary">
+              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary" data-test-id="client-search-bar-btn">
                 <v-icon color="primary">mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -235,6 +235,7 @@ export default defineComponent({
     const {
       getUserSettings,
       isSearching,
+      isRoleStaff,
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc,
@@ -245,6 +246,7 @@ export default defineComponent({
     } = useGetters<any>([
       'getUserSettings',
       'isSearching',
+      'isRoleStaff',
       'isRoleStaffBcol',
       'isRoleStaffReg',
       'isRoleStaffSbc',
@@ -308,13 +310,16 @@ export default defineComponent({
         return false
       }),
       personalPropertySearchFee: computed((): string => {
-        return localState.isStaffBcolReg || localState.isStaffSbc ? '10.00' : '8.50'
+        return localState.isRoleStaff || localState.isStaffSbc ? '10.00' : '8.50'
       }),
       manHomeSearchFee: computed((): string => {
-        return localState.isStaffBcolReg || localState.isStaffSbc ? '10.00' : '7.00'
+        return localState.isRoleStaff || localState.isStaffSbc ? '10.00' : '7.00'
       }),
       comboSearchFee: computed((): string => {
-        return localState.isStaffBcolReg || localState.isStaffSbc ? '15.00' : '12.00'
+        return localState.isRoleStaff || localState.isStaffSbc ? '15.00' : '12.00'
+      }),
+      isRoleStaff: computed((): boolean => {
+        return isRoleStaff.value
       }),
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
