@@ -379,9 +379,6 @@ th {
   background-color: $gray3;
   font-weight: bold;
 }
-#group-header-cell {
-  vertical-align: center !important;
-}
 .main-results-div {
   width: 100%;
 }
