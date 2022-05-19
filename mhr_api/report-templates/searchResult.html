@@ -64,7 +64,7 @@
               {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
                 {{searchQuery.clientReferenceId}}
               {% else %}
-                NA
+                N/A
               {% endif %}
             </div>
 
@@ -96,6 +96,7 @@
               0 Registrations
             {% endif %}  
           </td>
+          <td></td>
           <td>Total Search Report Pages:
             {% if totalResultsSize > 0 %}
               <span id="pagesCounter"></span>
@@ -117,38 +118,12 @@
 
   </article>
 
-{#
     {% if totalResultsSize > 0 %}
       {% for detail in details %}
         <p style="page-break-before: always" ></p>
-        [[search-result/financingStatement.html]]
-
-        {% if detail.financingStatement.changes is defined %}
-          <p style="page-break-before: always" ></p>
-          <div class="separator-header mt-4"></div>
-          <div class="section-title-centre mt-2">HISTORY</div>
-          <div class="section-statement mt-0">(Showing most recent first)</div>
-          <div class="separator-header mt-2"></div>
-
-          <div class="container pt-4">
-            {% for change in detail.financingStatement.changes %}
-              {% if change.statementType == 'RENEWAL_STATEMENT' %}
-                [[search-result/renewalStatement.html]]
-              {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
-                [[search-result/amendmentStatement.html]]
-              {% elif change.statementType == 'CHANGE_STATEMENT' %}
-                [[search-result/changeStatement.html]]
-              {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
-                [[search-result/dischargeStatement.html]]
-              {% endif %}
-            {% endfor %}
-          </div>
-
-        {% endif %} 
+        [[search-result/registration.html]]
       {% endfor %}
-
     {% endif %}
-#}
 
   </body>
 </html>

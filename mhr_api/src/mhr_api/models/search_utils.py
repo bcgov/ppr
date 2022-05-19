@@ -112,3 +112,10 @@ SELECT DISTINCT fs.id
    AND sc.mhr_number = (SELECT searchkey_mhr(:query_value))
 ORDER BY fs.id ASC
 """
+
+
+def format_mhr_number(request_json):
+    """Trim and pad with zeroes search query mhr number query."""
+    mhr_num: str = request_json['criteria']['value']
+    mhr_num = mhr_num.strip().rjust(6, '0')
+    request_json['criteria']['value'] = mhr_num

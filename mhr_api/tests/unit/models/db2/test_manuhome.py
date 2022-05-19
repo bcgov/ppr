@@ -114,6 +114,23 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert request_err.value.status_code == http_status
 
 
+def test_notes_sort_order(session):
+    """Assert that manufauctured home notes sort order is as expected."""
+    manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number('053341')
+    report_json = manuhome.registration_json
+    assert len(report_json['notes']) == 2
+    assert report_json['notes'][0]['documentId'] == '90001986'
+    assert report_json['notes'][1]['documentId'] == '43405528'
+
+
+def test_declared_value(session):
+    """Assert that manufauctured home declared value is as expected."""
+    manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number('077344')
+    report_json = manuhome.registration_json
+    assert report_json['declaredValue'] == 28200
+    assert str(report_json['declaredDateTime']).startswith('2010-11-09')
+
+
 def test_manuhome_json(session):
     """Assert that the manufactured home info renders to a json format correctly."""
     manuhome = Db2Manuhome(mhr_number='022911',

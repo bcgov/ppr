@@ -1,0 +1,25 @@
+<div class="no-page-break">
+{% if detail.description is defined and detail.description.sections is defined %}
+   <div class="separator mt-5"></div>
+   <div class="section-title mt-3">Manufactured Home Sections</div>
+   <div class="section-data pt-3"><span class="sections-table-header">Number of Sections:</span> {{ detail.description.sections|length }}</div>
+   <table class="sections-table mt-4" role="presentation">         
+      <tr class="sections-table-header no-page-break">
+         <td class="top-align">Section</td>
+         <td class="top-align">Serial Number</td>
+         <td class="top-align">Length</td>
+         <td class="top-align">Width</td>
+      </tr>
+      {% for section in detail.description.sections %}
+         <tr class="no-page-break">
+            <td>{{loop.index}}</td>
+            <td>{{section.serialNumber}}</td>
+            <td>{{section.lengthFeet}} feet {{section.lengthInches}} inches</td>
+            <td>{{section.widthFeet}} feet {{section.widthInches}} inches</td>
+         </tr>
+      {% endfor %}
+   </table>
+{% else %}
+   <div class="section-data">None</div>
+{% endif %}
+</div>

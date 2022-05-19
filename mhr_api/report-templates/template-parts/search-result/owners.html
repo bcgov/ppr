@@ -1,0 +1,29 @@
+<div class="section-title mt-3">Registered Owner(s) Information</div>
+{% if detail.owners is defined %}
+    <table class="section-data section-data-table mt-4" role="presentation">
+    {% for party in detail.owners %}
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">
+                    {% if party.organizationName is defined %}
+                        {{ party.organizationName }}
+                    {% elif party.individualName is defined %}
+                        {{ party.individualName.last }},
+                        {{ party.individualName.first }}
+                        {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
+                    {% endif %}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ party.address.street }}</div>
+                <div>{{ party.address.streetAdditional }}</div>
+                <div>{{ party.address.city }} {{ party.address.region }}</div>
+                <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+            </td>
+            <td class="col-33">
+           </td>
+         </tr>
+    {% endfor %}
+    </table>
+{% endif %}

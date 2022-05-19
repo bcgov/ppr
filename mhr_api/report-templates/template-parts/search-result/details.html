@@ -1,0 +1,66 @@
+<div class="no-page-break">
+    {% if detail.description is defined %}
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-3">Manufactured Home Details</div>
+        <table class="no-page-break section-data details-table mt-4" role="presentation">
+            <tr>
+                <td class="section-sub-title">Year:</td>
+                <td>{{detail.description.baseInformation.year}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Manufacturer:</td>
+                <td>{{detail.description.manufacturer}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Make/Model:</td>
+                <td>{{ detail.description.baseInformation.make }}
+                    {% if detail.description.baseInformation.model is defined and detail.description.baseInformation.model != '' %} 
+                    / {{detail.description.baseInformation.model}}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">CSA Number:</td>
+                <td>
+                    {% if detail.description.csaNumber is defined and detail.description.csaNumber != '' %}
+                        {{detail.description.csaNumber}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">CSA Standard:</td>
+                <td>
+                    {% if detail.description.csaStandard is defined and detail.description.csaStandard != '' %}
+                        {{detail.description.csaStandard}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Engineer Name:</td>
+                <td>
+                    {% if detail.description.engineerName is defined and detail.description.engineerName != '' %}
+                        {{detail.description.engineerName}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Date of Engineer Report:</td>
+                <td>
+                    {% if detail.description.engineerDate is defined and detail.description.engineerDate != '' %}
+                        {{detail.description.engineerDate}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+   {% endif %}
+
+</div>
+ 
