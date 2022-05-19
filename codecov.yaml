@@ -1,23 +1,25 @@
 codecov:
   require_ci_to_pass: true
+  branch: development
   max_report_age: false
-
-comment:
-  layout: "diff,flags,tree"
-  behavior: default
-  require_changes: true
 
 coverage:
   precision: 2
   round: down
-  range: "50...100"
+  range: "70...100"
   status:
     patch: false
-    backend:
-      target: auto
-      flags:
-        - ppr-api
-        - ppr-ui
+    project:
+      default: false
+      backend:
+        target: 80%
+        flags:
+          - pprapi
+
+      ui:
+        target: 35%
+        flags:
+          - pprui
 
 ignore:
   - "^/tests/**/*" # ignore test harness code
@@ -30,12 +32,17 @@ parsers:
       method: false
       macro: false
 
+comment:
+  layout: "diff,flags,tree"
+  behavior: default
+  require_changes: true
+
 flags:
-  ppr-api:
+  pprapi:
     paths:
       - ppr-api/src/ppr-api
     carryforward: true
-  ppr-ui:
+  pprui:
     paths:
       - ppr-ui/src
     carryforward: true

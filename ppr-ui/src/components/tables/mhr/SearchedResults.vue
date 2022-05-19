@@ -111,10 +111,14 @@
           </template>
 
           <template v-slot:[`item.ownerName`]="{ item }">
-            <v-checkbox
-              :label="getOwnerName(item)"
-              v-model="item.selected"
-            />
+            <v-row class="align-baseline">
+              <v-col cols="2">
+                <v-checkbox v-model="item.selected"/>
+              </v-col>
+              <v-col>
+                {{ getOwnerName(item) }}
+              </v-col>
+            </v-row>
           </template>
           <template v-slot:[`item.mhrNumber`]="{ item }">
             {{ item.mhrNumber }}
@@ -375,6 +379,9 @@ th {
   background-color: $gray3;
   font-weight: bold;
 }
+#group-header-cell {
+  vertical-align: center !important;
+}
 .main-results-div {
   width: 100%;
 }
@@ -406,10 +413,16 @@ th {
     max-height: 550px;
   }
   .results-table .v-data-table__wrapper table tbody {
+    .v-input--selection-controls .v-input__slot, .v-input--selection-controls .v-radio {
+      align-items: baseline;
+    }
     tr {
       height: 54px;
-      td {
-        white-space: inherit;
+      td:not(.group-header) {
+        display: table-cell;
+        vertical-align: baseline;
+        overflow: hidden;
+        white-space: normal;
       }
     }
   }
