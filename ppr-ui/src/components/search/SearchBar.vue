@@ -136,7 +136,8 @@
 
           <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary" data-test-id="client-search-bar-btn">
+              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary"
+                  data-test-id="client-search-bar-btn">
                 <v-icon color="primary">mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -323,6 +324,9 @@ export default defineComponent({
       }),
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
+      }),
+      isStaffSbc: computed((): boolean => {
+        return isRoleStaffSbc.value
       }),
       searching: computed((): boolean => {
         return isSearching.value
