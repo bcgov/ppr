@@ -103,7 +103,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./ppr-api/coverage.xml
-          flags: ppr-api
+          flags: pprapi
           name: codecov-ppr-api
           fail_ci_if_error: true
 
