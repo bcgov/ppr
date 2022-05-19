@@ -15,29 +15,11 @@
       @proceed="onStaffPaymentChanges($event)"
     />
     <v-row no-gutters class="pt-2">
-      <v-col :class="[$style['search-info'], 'select-search-text', 'pt-4']">
-        <span v-html="typeOfSearch">
-        </span>
-        <div v-if="shouldShowFeeHint">
-          <span>
-            Each search incurs a
-          </span>
-          <v-tooltip
-            class="pa-2 pt-2"
-            content-class="top-tooltip"
-            top
-            transition="fade-transition"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <span v-bind="attrs" v-on="on" :class="$style['fee-info']"> fee of ${{ fee }}.</span>
-            </template>
-            <v-row no-gutters class="pt-2 pb-2">
-              <span>
-                Each search will incur a fee of ${{ fee }},
-                including searches that return no results.
-              </span>
-            </v-row>
-          </v-tooltip>
+      <v-col :class="[$style['search-info'], 'select-search-text']">
+        <div>
+          Select a search category and then enter a value to search. Search fees are as follows:
+          Personal Property search - ${{personalPropertySearchFee}} Manufactured Home Search - ${{manHomeSearchFee}};
+          combined Personal Property and Manufactured Home search - ${{comboSearchFee}}.
         </div>
       </v-col>
       <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
@@ -48,6 +30,11 @@
         />
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
+    </v-row>
+    <v-row>
+      <v-col>
+        <div v-html="typeOfSearch" class="font-weight-bold"></div>
+      </v-col>
     </v-row>
     <v-row no-gutters class="pt-1">
       <v-col class="ml-n6 pl-6" cols="4">
@@ -147,9 +134,9 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
 
-          <v-menu v-if="isStaffBcolReg" offset-y left nudge-bottom="4">
+          <v-menu v-if="(isStaffBcolReg || isRoleStaff) && !isStaffSbc" offset-y left nudge-bottom="4">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary">
+              <v-btn v-on="on" :id="$style['client-search']" outlined class="down-btn" color="primary" data-test-id="client-search-bar-btn">
                 <v-icon color="primary">mdi-menu-down</v-icon>
               </v-btn>
             </template>
@@ -248,6 +235,7 @@ export default defineComponent({
     const {
       getUserSettings,
       isSearching,
+      isRoleStaff,
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc,
@@ -258,6 +246,7 @@ export default defineComponent({
     } = useGetters<any>([
       'getUserSettings',
       'isSearching',
+      'isRoleStaff',
       'isRoleStaffBcol',
       'isRoleStaffReg',
       'isRoleStaffSbc',
@@ -288,6 +277,7 @@ export default defineComponent({
         return localState.validations?.category?.message || ''
       }),
       shouldShowFeeHint: computed((): boolean => {
+        if (hasMhrRole.value || isRoleStaffReg.value) return false
         return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
           (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
       }),
@@ -319,6 +309,18 @@ export default defineComponent({
         }
         return false
       }),
+      personalPropertySearchFee: computed((): string => {
+        return localState.isRoleStaff || localState.isStaffSbc ? '10.00' : '8.50'
+      }),
+      manHomeSearchFee: computed((): string => {
+        return localState.isRoleStaff || localState.isStaffSbc ? '10.00' : '7.00'
+      }),
+      comboSearchFee: computed((): string => {
+        return localState.isRoleStaff || localState.isStaffSbc ? '15.00' : '12.00'
+      }),
+      isRoleStaff: computed((): boolean => {
+        return isRoleStaff.value
+      }),
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
       }),
@@ -346,7 +348,6 @@ export default defineComponent({
             }
           }
         }
-        return 'Select a search category and then enter a value to search.'
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''

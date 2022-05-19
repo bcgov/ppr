@@ -23,7 +23,7 @@ import {
 } from './test-data'
 import {APIMHRSearchTypes, UIMHRSearchTypes, UISearchTypes} from '@/enums'
 import { FolioNumber } from '@/components/common'
-import { getLastEvent } from './utils'
+import { getLastEvent, getTestId } from './utils'
 import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
@@ -171,7 +171,11 @@ describe('Serial number search', () => {
   it('searches when fields are filled', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
-    expect(wrapper.find('.select-search-text').text()).toContain('Each search incurs')
+    const searchText = wrapper.find('.select-search-text').text()
+    expect(searchText).toContain('Select a search category and then enter a value to search')
+    expect(searchText).toContain('$8.50')
+    expect(searchText).toContain('$7.00')
+    expect(searchText).toContain('$12.00')
     wrapper.vm.returnSearchSelection(select)
     await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
@@ -194,6 +198,10 @@ describe('Serial number search', () => {
 
   it('hides and shows things for staff', async () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    const searchText = wrapper.find('.select-search-text').text()
+    expect(searchText).toContain('Select a search category and then enter a value to search')
+    expect(searchText).toContain('$10.00')
+    expect(searchText).toContain('$15.00')
     await store.dispatch('setStaffPayment', {
       option: 1,
       routingSlipNumber: '888555222',
@@ -685,5 +693,58 @@ describe('Registration number search', () => {
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
+  })
+})
+
+describe('Staff and Client search buttons', () => {
+
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.dispatch('setUserInfo', {
+      firstname: 'test',
+      lastname: 'tester',
+      username: 'user',
+      settings: mockedDisableAllUserSettingsResponse
+    })
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('should show/hide Staff and Client search buttons', async () => {
+
+    await store.dispatch('setRoleSbc', false)
+    
+    // Staff Roles
+    await store.dispatch('setAuthRoles', ['staff', 'mhr'])
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
+
+    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff', 'ppr'])
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
+
+    await store.dispatch('setAuthRoles', ['helpdesk', 'ppr'])
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
+
+    await store.dispatch('setAuthRoles', ['helpdesk', 'mhr'])
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
+
+    await store.dispatch('setAuthRoles', ['mhr'])
+    await store.dispatch('setRoleSbc', true)
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
+    
+    await store.dispatch('setAuthRoles', ['ppr'])
+    await store.dispatch('setRoleSbc', true)
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
+
+    // Client Roles
+
+    await store.dispatch('setAuthRoles', ['ppr'])
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
+
+    await store.dispatch('setAuthRoles', ['mhr'])
+    expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
+
   })
 })
