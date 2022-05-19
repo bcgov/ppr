@@ -22,7 +22,7 @@
           combined Personal Property and Manufactured Home search - ${{comboSearchFee}}.
         </div>
       </v-col>
-      <v-col v-if="!isStaffBcolReg && !isStaffSbc" align-self="end" cols="3">
+      <v-col align-self="end" cols="3">
         <folio-number
           :defaultFolioNumber="folioNumber"
           @folio-number="updateFolioNumber"
@@ -323,9 +323,6 @@ export default defineComponent({
       }),
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
-      }),
-      isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc.value
       }),
       searching: computed((): boolean => {
         return isSearching.value
