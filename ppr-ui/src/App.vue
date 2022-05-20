@@ -388,17 +388,18 @@ export default class App extends Mixins(AuthMixin) {
     let statusCode = StatusCodes.OK
     try {
       const authRoles = getKeycloakRoles()
+      let isSbc
       if (authRoles && authRoles.length > 0) {
         if (authRoles.includes('gov_account_user')) {
           // if staff make call to check for sbc
-          const isSbc = await getSbcFromAuth()
+          isSbc = await getSbcFromAuth()
           this.setRoleSbc(isSbc)
         }
         if (!authRoles.includes('ppr') && !authRoles.includes('mhr')) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
-        this.setUserAccessRole(authRoles)
+        this.setUserAccessRole({ authRoles: authRoles, isSbc })
       } else {
         throw new Error('Invalid auth roles')
       }

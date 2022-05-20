@@ -101,7 +101,7 @@ describe('Tombstone component', () => {
     await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
     await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
     await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
-    await store.dispatch('setUserAccessRole', ['ppr'])
+    await store.dispatch('setUserAccessRole', { authRoles: ['ppr'], isSbc: false })
   })
 
   afterEach(() => {

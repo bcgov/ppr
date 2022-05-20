@@ -23,7 +23,8 @@ import {
   RegistrationSummaryIF,
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
-  ManufacturedHomeSearchResultIF
+  ManufacturedHomeSearchResultIF,
+  AuthorizationIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -56,14 +57,14 @@ export const setOriginalAddCollateral: ActionIF = ({ commit }, addCollateral: Ad
   commit('mutateOriginalAddCollateral', addCollateral)
 }
 
-export const setUserAccessRole: ActionIF = ({ commit }, authRoles: Array<string>): void => {
+export const setUserAccessRole: ActionIF = ({ commit }, auth: AuthorizationIF ): void => {
   const accessRole = []
 
-  if (authRoles.includes('staff')) accessRole.push('STAFF')
+  if (auth.authRoles.includes('staff') || auth.isSbc) accessRole.push('STAFF')
   else accessRole.push('CLIENT')
 
-  if (authRoles.includes('ppr')) accessRole.push('PPR')
-  if (authRoles.includes('mhr')) accessRole.push('MHR')
+  if (auth.authRoles.includes('ppr')) accessRole.push('PPR')
+  if (auth.authRoles.includes('mhr')) accessRole.push('MHR')
   commit('mutateUserAccessRole', accessRole.join('_'))
 }
 

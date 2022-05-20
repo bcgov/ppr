@@ -61,8 +61,8 @@ function createComponent (
   })
 }
 
-async function assertBreadcrumbItemForRole (wrapper: Wrapper<any>, roles: Array<string>, breadcrumbItemContent: string) {
-  await store.dispatch('setUserAccessRole', roles)
+async function assertBreadcrumbItemForRole (wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, breadcrumbItemContent: string) {
+  await store.dispatch('setUserAccessRole', { authRoles: roles, isSbc })
   const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
   expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
   expect(breadcrumbs.at(1).text()).toContain(breadcrumbItemContent)
@@ -113,7 +113,7 @@ describe('Breadcrumb component tests', () => {
     // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
-    await store.dispatch('setUserAccessRole', ['staff', 'ppr'])
+    await store.dispatch('setUserAccessRole', { authRoles: ['staff', 'ppr'], isSbc: true })
   })
 
   afterEach(() => {
@@ -285,11 +285,11 @@ describe('Breadcrumb component tests', () => {
     const STAFF_PPR_MHR = ['staff', 'ppr', 'mhr']
     const CLIENT_PPR_MHR = ['ppr', 'mhr']
 
-    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
-    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Manufactured Home Registry')
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry')
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry')
-    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, 'Staff Asset Registries')
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, true, 'Staff Personal Property Registry')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, true, 'Staff Manufactured Home Registry')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, false, 'My Manufactured Home Registry')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR, false, 'My Personal Property Registry')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, true, 'Staff Asset Registries')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, false, 'My Asset Registries')
   })
 })
