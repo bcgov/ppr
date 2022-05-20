@@ -176,6 +176,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'search-result/location',
             'search-result/notes',
             'search-result/owners',
+            'search-result/pprRegistrations',
             'search-result/selected',
             'search-result/sections',
             'search-result/registration',
@@ -226,10 +227,13 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_ppr_search(self):  # pylint: disable=too-many-branches, too-many-statements
         """PPR search result setup for combined searches."""
         for detail in self._report_data['details']:
-            if detail.get('pprRegistrations'):
+            if detail.get('pprRegistrations'):                
                 for registration in detail['pprRegistrations']:
                     current_app.logger.debug('Setting up ppr registration for ' +
                                              registration['financingStatement']['baseRegistrationNumber'])
+                    if 'registrationAct' in registration['financingStatement']:
+                        act: str = registration['financingStatement']['registrationAct']
+                        registration['financingStatement']['registrationAct'] = act.title() 
                     ppr_report_utils.set_ppr_template_data(registration['financingStatement'])
 
     def _set_notes(self):
@@ -301,6 +305,8 @@ class Report:  # pylint: disable=too-few-public-methods
             for index, result in enumerate(self._report_data['selected'], start=0):
                 result['createDateTime'] = Report._to_report_datetime(result['createDateTime'], False)
                 result['index'] = (index + 1)
+                if result.get('status'):
+                    result['status'] = str(result['status']).capitalize()
             self._report_data['totalResultsSize'] = len(self._report_data['selected'])
 
     @staticmethod

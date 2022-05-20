@@ -5,6 +5,14 @@
 
     <table class="no-page-break section-data statement-table mt-4" role="presentation">
         <tr>
+            <td class="section-sub-title">Base Registration Number:</td>
+            <td>{{pprDetail.financingStatement.baseRegistrationNumber}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Base Registration Date and Time:</td>
+            <td>{{pprDetail.financingStatement.createDateTime}}</td>
+        </tr>
+        <tr>
             <td class="section-sub-title">Registration Date and Time:</td>
             <td>{{change.createDateTime}}</td>
         </tr>
@@ -22,36 +30,36 @@
 
 {% if change.courtOrderInformation is defined %}
 <div class="container pt-4">
-    [[search-result/courtOrderInformation.html]]
+    [[search-result-ppr/courtOrderInformation.html]]
 </div>
 {% endif %}
 
 {% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined %}
 <div class="container pt-4">
-    [[search-result/vehicleCollateral.html]]
+    [[search-result-ppr/vehicleCollateral.html]]
 </div>
 {% endif %}
 
 {% if change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
 <div class="container pt-4">
-    [[search-result/generalCollateral.html]]
+    [[search-result-ppr/generalCollateral.html]]
 </div>
 {% endif %}
 
 {% if change.addDebtors is defined or change.deleteDebtors is defined %}
 <div class="container pt-4">
-    [[search-result/debtors.html]]
+    [[search-result-ppr/debtors.html]]
 </div>
 {% endif %}
 
 {% if change.addSecuredParties is defined or change.deleteSecuredParties is defined %}
 <div class="container pt-4">
-    [[search-result/securedParties.html]]
+    [[search-result-ppr/securedParties.html]]
 </div>
 {% endif %}
 
 <div class="container pt-4">
-  [[search-result/registeringParty.html]]
+  [[search-result-ppr/registeringParty.html]]
 </div>
 
 <div class="separator mt-4"></div> 

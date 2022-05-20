@@ -294,7 +294,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 financing: FinancingStatement = FinancingStatement.find_by_id(financing_id)
                 financing.mark_update_json = True  # Added for PDF, indicate if party or collateral was added.
                 # Set to true to include change history.
-                financing.include_changes_json = False
+                financing.include_changes_json = True
                 financing_json = {
                     'matchType': 'EXACT',
                     'financingStatement': financing.json

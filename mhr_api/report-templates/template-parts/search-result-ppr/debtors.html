@@ -1,11 +1,11 @@
 <div class="no-page-break">
-{% if detail.financingStatement.debtors is defined and change is not defined %}
+{% if pprDetail.financingStatement.debtors is defined and change is not defined %}
     <div class="separator mt-5"></div>
 {% endif %}
     <div class="section-title mt-3">Debtor Information</div>
-{% if detail.financingStatement.debtors is defined and change is not defined %}
+{% if pprDetail.financingStatement.debtors is defined and change is not defined %}
     <table class="section-data section-data-table mt-4" role="presentation">
-    {% for party in detail.financingStatement.debtors %}
+    {% for party in pprDetail.financingStatement.debtors %}
         <tr class="no-page-break">
             <td class="col-33">
                 <div class="section-sub-title">

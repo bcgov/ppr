@@ -1,29 +1,29 @@
 <div class="no-page-break">
-    {% if detail.financingStatement.courtOrderInformation is defined and change is not defined %}
+    {% if pprDetail.financingStatement.courtOrderInformation is defined and change is not defined %}
         <div class="separator mt-5"></div>
     {% endif %}    
     <div class="section-title mt-3">Court Order Information</div>
-    {% if detail.financingStatement.courtOrderInformation is defined and change is not defined %}
+    {% if pprDetail.financingStatement.courtOrderInformation is defined and change is not defined %}
     <table class="no-page-break section-data court-order-table mt-4" role="presentation">
         <tr>
             <td class="section-sub-title">Name of Court:</td>
-            <td>{{ detail.financingStatement.courtOrderInformation.courtName }}</td>
+            <td>{{ pprDetail.financingStatement.courtOrderInformation.courtName }}</td>
         </tr>
         <tr>
             <td class="section-sub-title">Registry</td>
-            <td>{{ detail.financingStatement.courtOrderInformation.courtRegistry }}</td>
+            <td>{{ pprDetail.financingStatement.courtOrderInformation.courtRegistry }}</td>
         </tr>
         <tr>
             <td class="section-sub-title">Date of Order:</td>
-            <td>{{ detail.financingStatement.courtOrderInformation.orderDate }}</td>
+            <td>{{ pprDetail.financingStatement.courtOrderInformation.orderDate }}</td>
         </tr>
         <tr>
             <td class="section-sub-title">File Number:</td>
-            <td>{{ detail.financingStatement.courtOrderInformation.fileNumber }}</td>
+            <td>{{ pprDetail.financingStatement.courtOrderInformation.fileNumber }}</td>
         </tr>
         <tr>
             <td class="section-sub-title">Effect of Order:</td>
-            <td>{{ detail.financingStatement.courtOrderInformation.effectOfOrder }}</td>
+            <td>{{ pprDetail.financingStatement.courtOrderInformation.effectOfOrder }}</td>
         </tr>
     </table>
     {% elif change is defined and change.courtOrderInformation is defined  %}

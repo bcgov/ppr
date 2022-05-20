@@ -4,6 +4,14 @@
     <div class="separator-statement mt-1"></div>
     <table class="no-page-break section-data statement-table mt-4" role="presentation">
         <tr>
+            <td class="section-sub-title">Base Registration Number:</td>
+            <td>{{pprDetail.financingStatement.baseRegistrationNumber}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Base Registration Date and Time:</td>
+            <td>{{pprDetail.financingStatement.createDateTime}}</td>
+        </tr>
+        <tr>
             <td class="section-sub-title">Registration Date and Time:</td>
             <td>{{change.createDateTime}}</td>
         </tr>
@@ -42,14 +50,14 @@
 {% if change.courtOrderInformation is defined %}
 <div class="container pt-4">
 
-    [[search-result/courtOrderInformation.html]]
+    [[search-result-ppr/courtOrderInformation.html]]
 
 </div>
 {% endif %}
 
 <div class="container pt-4">
 
-  [[search-result/registeringParty.html]]
+  [[search-result-ppr/registeringParty.html]]
 
 </div>
 

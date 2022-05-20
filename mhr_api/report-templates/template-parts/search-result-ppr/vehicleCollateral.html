@@ -1,10 +1,10 @@
 <div class="no-page-break">
-   {% if detail.financingStatement is defined and change is not defined %}
+   {% if pprDetail.financingStatement is defined and change is not defined %}
       <div class="separator mt-5"></div>
    {% endif %}
    <div class="section-title mt-3">Vehicle Collateral</div>
-{% if detail.financingStatement.vehicleCollateral is defined and change is not defined %}
-   {% if detail.financingStatement.mhCollateralCount is defined and detail.financingStatement.mhCollateralCount > 0 %}
+{% if pprDetail.financingStatement.vehicleCollateral is defined and change is not defined %}
+   {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
       <table class="vehicle-collateral-table-mh mt-4" role="presentation">
    {% else %}
       <table class="vehicle-collateral-table mt-4" role="presentation">
@@ -15,18 +15,18 @@
          <td class="top-align">Year</td>
          <td class="top-align">Make/Model</td>
          <td class="top-align">Serial/VIN/DOT Number</td>
-         {% if detail.financingStatement.mhCollateralCount is defined and detail.financingStatement.mhCollateralCount > 0 %}
+         {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
             <td class="top-align">MHR Number</td>
          {% endif %}
       </tr>
-      {% for collateral in detail.financingStatement.vehicleCollateral %}
+      {% for collateral in pprDetail.financingStatement.vehicleCollateral %}
          <tr class="no-page-break">
             <td>{{collateral.type}}</td>
             <td>{{collateral.year}}</td>
             <td>{{collateral.make}} 
                {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
             <td>{{collateral.serialNumber}}</td>
-            {% if detail.financingStatement.mhCollateralCount is defined and detail.financingStatement.mhCollateralCount > 0 %}
+            {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
                <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
                   {{collateral.manufacturedHomeRegistrationNumber}}
                {% endif %}
