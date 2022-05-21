@@ -139,7 +139,6 @@ export default class App extends Mixins(AuthMixin) {
   @Action setRegistrationNumber!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
-  @Action setUserAccessRole: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -388,18 +387,17 @@ export default class App extends Mixins(AuthMixin) {
     let statusCode = StatusCodes.OK
     try {
       const authRoles = getKeycloakRoles()
-      let isSbc
       if (authRoles && authRoles.length > 0) {
         if (authRoles.includes('gov_account_user')) {
           // if staff make call to check for sbc
-          isSbc = await getSbcFromAuth()
+          const isSbc = await getSbcFromAuth()
           this.setRoleSbc(isSbc)
+          isSbc && authRoles.push('sbc')
         }
         if (!authRoles.includes('ppr') && !authRoles.includes('mhr')) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
-        this.setUserAccessRole({ authRoles: authRoles, isSbc })
       } else {
         throw new Error('Invalid auth roles')
       }

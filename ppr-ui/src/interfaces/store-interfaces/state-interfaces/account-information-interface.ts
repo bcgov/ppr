@@ -3,5 +3,4 @@ export interface AccountInformationIF {
   id: number
   label: string
   type: string
-  userAccessRole: string
 }
