@@ -22,11 +22,8 @@
                     <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td>
-                    {{result.ownerName.last}}
-                    {% if result.ownerName.first %}
-                        ,{{result.ownerName.first}}
-                        {% if result.ownerName.middle %}{{result.ownerName.middle}}{% endif %}
-                    {% endif %}
+                    {{result.ownerName.last}}, {{result.ownerName.first}}
+                    {% if result.ownerName.middle %} {{result.ownerName.middle}}{% endif %}
                 </td>    
                 <td>
                     {{result.status}}
@@ -75,11 +72,8 @@
                     {% if result.organizationName is defined %}
                         {{result.organizationName}}
                     {% else %}
-                        {{result.ownerName.last}}
-                        {% if result.ownerName.first %}
-                            ,{{result.ownerName.first}}
-                            {% if result.ownerName.middle %}{{result.ownerName.middle}}{% endif %}
-                        {% endif %}
+                        {{result.ownerName.last}}, {{result.ownerName.first}}
+                        {% if result.ownerName.middle %} {{result.ownerName.middle}}{% endif %}
                     {% endif %}
                 </td>
                 <td>

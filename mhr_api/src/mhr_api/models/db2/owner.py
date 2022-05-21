@@ -112,22 +112,7 @@ class Db2Owner(db.Model):
             owner['individualName'] = model_utils.get_ind_name_from_db2(self.name)
         else:
             owner['organizationName'] = self.name
-        street = self.legacy_address[0:38].strip()
-        street2 = None
-        city = self.legacy_address[39:].strip()
-        if len(self.legacy_address) > 80:
-            city = self.legacy_address[79:].strip()
-            street2 = self.legacy_address[39:78].strip()
-        address = {
-            'city': city,
-            'street': street,
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': self.postal_code
-        }
-        if street2:
-            address['streetAdditional'] = street2
-        owner['address'] = address
+        owner['address'] = model_utils.get_address_from_db2(self.legacy_address, self.postal_code)
         if self.owngroup:
             owner['type'] = self.owngroup.tenancy_type
         return owner

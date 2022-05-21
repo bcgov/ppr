@@ -1,45 +1,48 @@
 
 <div class="business-details-container">
-  <table class="registration-header-table" id="{{ detail.financingStatement.baseRegistrationNumber }}"  role="presentation">
+  <table class="no-page-break ppr-registration-header-table" role="presentation">
     <tr>
-      <td>Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}</td>
       <td>
-        {% if detail.financingStatement.statusType == 'HDC' %} 
-          <span class="badge-gold">DISCHARGED</span>
-        {% elif detail.financingStatement.statusType == 'HEX' %} 
-          <span class="badge-gold">EXPIRED</span>
-        {% endif %}
+        <div class="pt-1">
+          {{ pprDetail.financingStatement.registrationDescription }}
+          {% if pprDetail.financingStatement.statusType == 'HDC' %} 
+            </span><span class="badge-gold">DISCHARGED</span>
+          {% elif pprDetail.financingStatement.statusType == 'HEX' %} 
+            </span><span class="badge-gold">EXPIRED</span>
+          {% endif %}
+        </div>
+        <div class="ppr-registration-header-info pb-1">{{ pprDetail.financingStatement.registrationAct }}</div>
       </td>
     </tr>
   </table>
 
-  <table class="business-details-table-grey" role="presentation">
+  <table class="no-page-break business-details-table-white" role="presentation">
     <tr>
-      <td>Registration Description:</td>
-      <td>{{ detail.financingStatement.registrationDescription }}</td>
+      <td>Search Criteria:</td>
+      <td>MHR Number "{{ detail.mhrNumber }}"</td>
     </tr>
     <tr>
-      <td>Act:</td>
-      <td>{{ detail.financingStatement.registrationAct }}</td>
+      <td>Base Registration Number:</td>
+      <td>{{ pprDetail.financingStatement.baseRegistrationNumber }}</td>
     </tr>
     <tr>
       <td>Base Registration Date and Time:</td>
-      <td>{{detail.financingStatement.createDateTime}}</td>
+      <td>{{pprDetail.financingStatement.createDateTime}}</td>
     </tr>
-    {% if detail.financingStatement.dischargedDateTime is defined %}
+    {% if pprDetail.financingStatement.dischargedDateTime is defined %}
     <tr>
       <td>Discharge Date and Time:</td>
-      <td>{{detail.financingStatement.dischargedDateTime}}</td>
+      <td>{{pprDetail.financingStatement.dischargedDateTime}}</td>
     </tr>
     {% endif %}
     <tr>
       <td>Current Expiry Date and Time:</td>
       <td>
-        {% if detail.financingStatement.lifeInfinite is defined and detail.financingStatement.lifeInfinite %} 
+        {% if pprDetail.financingStatement.lifeInfinite is defined and pprDetail.financingStatement.lifeInfinite %} 
           Never
         {% else %}
-          {{detail.financingStatement.expiryDate}}
-          {% if detail.financingStatement.statusType == 'HEX' %} 
+          {{pprDetail.financingStatement.expiryDate}}
+          {% if pprDetail.financingStatement.statusType == 'HEX' %} 
             <span style="color: #d3272c">(Expired)</span>
           {% endif %}
           <br/>
@@ -47,20 +50,20 @@
         {% endif %}
       </td>
     </tr>
-    {% if detail.financingStatement.type == 'RL' %}
+    {% if pprDetail.financingStatement.type == 'RL' %}
     <tr>
       <td>Surrender Date:</td>
-      <td>{{detail.financingStatement.surrenderDate}}</td>
+      <td>{{pprDetail.financingStatement.surrenderDate}}</td>
     </tr>
     <tr>
       <td>Lien Amount:</td>
-      <td>{{detail.financingStatement.lienAmount}}</td>
+      <td>{{pprDetail.financingStatement.lienAmount}}</td>
     </tr>
     {% endif %}
-    {% if detail.financingStatement.type == 'SA' %}
+    {% if pprDetail.financingStatement.type == 'SA' %}
     <tr>
       <td>Trust Indenture:</td>
-      <td>{% if detail.financingStatement.trustIndenture == true %}Yes{% else %}No{% endif %}</td>
+      <td>{% if pprDetail.financingStatement.trustIndenture == true %}Yes{% else %}No{% endif %}</td>
     </tr>
     {% endif %}
   </table>
@@ -74,12 +77,12 @@
 </div>
 
 <div class="container pt-4">
-  [[search-result/securedParties.html]]
-  [[search-result/debtors.html]]
-  [[search-result/vehicleCollateral.html]]
-  [[search-result/generalCollateral.html]]
-  {% if detail.financingStatement.courtOrderInformation is defined %}
-    [[search-result/courtOrderInformation.html]]
+  [[search-result-ppr/securedParties.html]]
+  [[search-result-ppr/debtors.html]]
+  [[search-result-ppr/vehicleCollateral.html]]
+  [[search-result-ppr/generalCollateral.html]]
+  {% if pprDetail.financingStatement.courtOrderInformation is defined %}
+    [[search-result-ppr/courtOrderInformation.html]]
   {% endif %}
-  [[search-result/registeringParty.html]]
+  [[search-result-ppr/registeringParty.html]]
 </div>

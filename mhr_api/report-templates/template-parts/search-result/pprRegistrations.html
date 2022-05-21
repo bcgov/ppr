@@ -1,0 +1,64 @@
+<div class="business-details-container pt-5">
+  <div class="no-page-break">
+    <div class="dashed-separator-header mt-6"></div>
+    <div class="section-title-centre mt-2">PERSONAL PROPERTY REGISTRY SEARCH RESULT</div>
+    <div class="section-statement mt-0">For MHR Number "{{ detail.mhrNumber }}" as of {{searchDateTime}}</div>
+    <div class="dashed-separator-header mt-2 mb-5"></div>
+  </div>
+</div>
+
+  {% if detail.pprRegistrations|length > 0 %}
+    {% for pprDetail in detail.pprRegistrations %}
+      [[search-result-ppr/financingStatement.html]]
+
+      {% if pprDetail.financingStatement.changes is defined %}
+        {# <p style="page-break-before: always" ></p> #}
+        <div class="separator-header mt-4"></div>
+        <div class="section-title-centre mt-2">HISTORY</div>
+        <div class="section-statement mt-0">(Showing most recent first)</div>
+        <div class="separator-header mt-2"></div>
+
+        <div class="container pt-4">
+          {% for change in pprDetail.financingStatement.changes %}
+            {% if change.statementType == 'RENEWAL_STATEMENT' %}
+              [[search-result-ppr/renewalStatement.html]]
+            {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+              [[search-result-ppr/amendmentStatement.html]]
+            {% elif change.statementType == 'CHANGE_STATEMENT' %}
+              [[search-result-ppr/changeStatement.html]]
+            {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+              [[search-result-ppr/dischargeStatement.html]]
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %} 
+    {% endfor %}
+  {% else %}
+    {# NIL result report #}
+    <div class="no-page-break">
+      <div class="separator-header mt-6"></div>
+      <div class="section-title-centre mt-2">NIL RESULT</div>
+      <div class="section-statement mt-0">Exact Matches: 0</div>
+      <div class="separator-header mt-2"></div>
+      <div class="nil-message pt-6">This search for <span class="bold">MHR Number "{{ detail.mhrNumber }}"</span> returned a NIL result.</div>
+      <div class="nil-message">0 registrations were found.</div>
+      <div class="nil-message pt-6">
+        No registered liens or encumbrances have been found on file that match to the search 
+        criteria listed above.
+      </div>
+      <div class="nil-message-left pt-6">
+        Some, but not all, tax liens and other Crown claims are registered at the Personal Property Registry (PPR) 
+        and if registered, will be displayed on this search result. HOWEVER, it is possible that a particular chattel
+        is subject to a Crown claim that is not registered at the PPR. Please consult the Miscellaneous Registrations Act,
+        1992, for more details. If you are concerned that a particular chattel may be subject to a Crown claim not registered
+        at the PPR, please consult the agency administering the type of Crown claim.
+      </div>
+  </div>
+  {% endif %}
+
+  <div class="no-page-break">
+    <div class="dashed-separator-header mt-6"></div>
+    <div class="section-title-centre mt-2">END OF PERSONAL PROPERTY REGISTRY SEARCH RESULT</div>
+    <div class="section-statement mt-0">For MHR Number "{{ detail.mhrNumber }}"</div>
+    <div class="dashed-separator-header mt-2"></div>
+  </div>

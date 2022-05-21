@@ -35,6 +35,14 @@
                 {% endif %}
             </td>
         </tr>
+        <tr>
+            <td class="section-sub-title pt-5">Base Registration Date and Time:</td>
+            <td class="pt-5">{{pprDetail.financingStatement.createDateTime}}</td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Base Registration Number:</td>
+            <td>{{pprDetail.financingStatement.baseRegistrationNumber}}</td>
+        </tr>
     </table>
 
 </div>
@@ -42,14 +50,14 @@
 {% if change.courtOrderInformation is defined %}
 <div class="container pt-4">
 
-    [[search-result/courtOrderInformation.html]]
+    [[search-result-ppr/courtOrderInformation.html]]
 
 </div>
 {% endif %}
 
 <div class="container pt-4">
 
-  [[search-result/registeringParty.html]]
+  [[search-result-ppr/registeringParty.html]]
 
 </div>
 

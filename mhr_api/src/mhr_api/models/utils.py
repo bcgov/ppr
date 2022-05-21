@@ -208,6 +208,23 @@ ERR_FINANCING_HISTORICAL = \
 
 
 SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
+DB2_REMOVE_ADRRESS = [', BC', ',BC', 'BC', ', B.C.', ',B.C.', 'B.C.', 'BRITISH COLUMBIA', 'CANADA',
+                      ', AB', ',AB', ' AB', ', ALBERTA', 'ALBERTA', ', SK', ',SK', ' SK', ', SASKATCHEWAN',
+                      'SASKATCHEWAN', ', ON', ',ON', ' ON', ', ONTARIO', 'ONTARIO']
+DB2_PROVINCE_MAPPING = {
+    'AB': 'AB',
+    ' AB': 'AB',
+    ', AB': 'AB',
+    'ALBERTA': 'AB',
+    'SK': 'SK',
+    ' SK': 'SK',
+    ', SK': 'SK',
+    'SASKATCHEWAN': 'SK',
+    'ON': 'ON',
+    ' ON': 'ON',
+    ', ON': 'ON',
+    'ONTARIO': 'ON'
+}
 
 
 def get_max_registrations_size():
@@ -398,43 +415,6 @@ def get_search_doc_storage_name(search_request):
     return name
 
 
-def get_ind_name_from_db2(db2_name: str):
-    """Get an individual name json from a DB2 legacy name."""
-    last = db2_name[0:24].strip()
-    first = db2_name[25:].strip()
-    middle = None
-    if len(db2_name) > 40:
-        first = db2_name[25:38].strip()
-        middle = db2_name[39:].strip()
-    name = {
-        'first': first,
-        'last': last
-    }
-    if middle:
-        name['middle'] = middle
-    return name
-
-
-def get_address_from_db2(legacy_address: str, postal_code: str = ''):
-    """Get an address json from a DB2 legacy address."""
-    street = legacy_address[0:38].strip()
-    street2 = None
-    city = legacy_address[39:].strip()
-    if len(legacy_address) > 80:
-        city = legacy_address[79:].strip()
-        street2 = legacy_address[39:78].strip()
-    address = {
-        'city': city,
-        'street': street,
-        'region': 'BC',
-        'country': 'CA',
-        'postalCode': postal_code
-    }
-    if street2:
-        address['streetAdditional'] = street2
-    return address
-
-
 def get_compressed_key(name: str) -> str:
     """Get the compressed search key for the organization or combined owner name."""
     key: str = ''
@@ -593,3 +573,114 @@ def valid_court_order_date(financing_ts, order_ts: str):
     now = now_ts()
     today_date = date(now.year, now.month, now.day)
     return financing_date <= order_date <= today_date
+
+
+def get_ind_name_from_db2(db2_name: str):
+    """Get an individual name json from a DB2 legacy name."""
+    last = db2_name[0:24].strip()
+    first = db2_name[25:].strip()
+    middle = None
+    if len(db2_name) > 40:
+        first = db2_name[25:38].strip()
+        middle = db2_name[39:].strip()
+    name = {
+        'first': first,
+        'last': last
+    }
+    if middle:
+        name['middle'] = middle
+    return name
+
+
+def get_address_from_db2(legacy_address: str, postal_code: str = ''):
+    """Get an address json from a DB2 legacy address."""
+    if len(legacy_address) > 120:
+        return get_long_address_from_db2(legacy_address, postal_code)
+
+    street = legacy_address[0:38].strip()
+    street2 = None
+    city = None
+    province = None
+    if len(legacy_address) > 80:
+        value: str = legacy_address[79:].strip()
+        province = get_province_db2(value, None)
+        for text in DB2_REMOVE_ADRRESS:
+            if value.endswith(text):
+                value = value.replace(text, '')
+                break
+        value = value.strip()
+        if value:
+            city = value
+            street2 = legacy_address[39:78].strip()
+    if not city:
+        city = legacy_address[39:78].strip()
+        province = get_province_db2(city, None)
+        for text in DB2_REMOVE_ADRRESS:
+            if city.endswith(text):
+                city = city.replace(text, '')
+                break
+        city = city.strip()
+    if not province:
+        province = 'BC'
+    address = {
+        'city': city,
+        'street': street,
+        'region': province,
+        'country': 'CA',
+        'postalCode': postal_code
+    }
+    if street2:
+        address['streetAdditional'] = street2
+    return address
+
+
+def get_long_address_from_db2(legacy_address: str, postal_code: str = ''):
+    """Get an address json from a DB2 legacy address."""
+    value: str = legacy_address[119:].strip()
+    street = legacy_address[0:38].strip()
+    street2 = None
+    city = legacy_address[79:118].strip()
+    province = get_province_db2(value, None)
+    for text in DB2_REMOVE_ADRRESS:
+        if value.endswith(text):
+            value = value.replace(text, '')
+            break
+    value = value.strip()
+    # current_app.logger.debug(f'2. value={value}')
+    if value:
+        city = value
+        street2 = legacy_address[39:118].strip()
+        # current_app.logger.debug(f'3. street2={street2}, city={city}')
+    else:
+        province = get_province_db2(city, None)
+        for text in DB2_REMOVE_ADRRESS:
+            if city.endswith(text):
+                city = city.replace(text, '')
+                break
+        city = city.strip()
+        if city == '':
+            city = legacy_address[39:78].strip()
+        else:
+            street2 = legacy_address[39:78].strip()
+        # current_app.logger.debug(f'4. street2={street2}, city={city}')
+    if not province:
+        province = 'BC'
+    address = {
+        'city': city,
+        'street': street,
+        'region': province,
+        'country': 'CA',
+        'postalCode': postal_code
+    }
+    if street2:
+        address['streetAdditional'] = street2
+    return address
+
+
+def get_province_db2(legacy_value: str, default: str):
+    """Get a province code from DB2 legacy address text."""
+    for text in DB2_REMOVE_ADRRESS:
+        if legacy_value.endswith(text) and DB2_PROVINCE_MAPPING.get(text):
+            if len(legacy_value) == 2 or len(text) > 2:
+                return DB2_PROVINCE_MAPPING[text]
+    return default

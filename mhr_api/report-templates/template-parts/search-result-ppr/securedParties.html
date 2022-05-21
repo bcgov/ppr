@@ -1,8 +1,8 @@
 <div class="no-page-break">
     <div class="section-title mt-3">Secured Party Information</div>
-{% if detail.financingStatement.securedParties is defined and change is not defined %}
+{% if pprDetail.financingStatement.securedParties is defined and change is not defined %}
     <table class="section-data section-data-table mt-4" role="presentation">
-    {% for party in detail.financingStatement.securedParties %}
+    {% for party in pprDetail.financingStatement.securedParties %}
         <tr class="no-page-break">
             <td class="col-33">
                 <div class="section-sub-title">

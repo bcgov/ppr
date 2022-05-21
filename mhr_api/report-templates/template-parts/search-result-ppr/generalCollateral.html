@@ -1,12 +1,12 @@
 <div class="no-page-break">
-   {% if detail.financingStatement is defined and change is not defined %}
+   {% if pprDetail.financingStatement is defined and change is not defined %}
       <div class="separator mt-5"></div>
    {% endif %}
    <div class="section-title mt-3">General Collateral</div>
 
-{% if detail.financingStatement.generalCollateral is defined and change is not defined %}
-   {% for collateral in detail.financingStatement.generalCollateral %}
-      {% if collateral.addedDateTime is defined and collateral.addedDateTime == detail.financingStatement.createDateTime %}
+{% if pprDetail.financingStatement.generalCollateral is defined and change is not defined %}
+   {% for collateral in pprDetail.financingStatement.generalCollateral %}
+      {% if collateral.addedDateTime is defined and collateral.addedDateTime == pprDetail.financingStatement.createDateTime %}
          <div class="general-collateral-datetime pt-3 pb-2">Base Registration General Collateral:</div>
       {% else %}
          <div class="general-collateral-datetime pt-3 pb-2">{{ collateral.addedDateTime }}</div>
