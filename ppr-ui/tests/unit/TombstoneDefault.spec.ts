@@ -51,7 +51,8 @@ function createComponent (mockRoute: string): Wrapper<any> {
  *
  */
 async function assertHeaderForRole (wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, headerContent: string) {
-  await store.dispatch('setUserAccessRole', { authRoles: roles, isSbc })
+  await store.dispatch('setAuthRoles', roles)
+  await store.dispatch('setRoleSbc', isSbc)
   const header = wrapper.findAll(tombstoneHeader)
   expect(header.length).toBe(1)
   expect(header.at(0).text()).toContain(headerContent)
@@ -64,8 +65,7 @@ describe('TombstoneDefault component tests', () => {
     accountType: '',
     id: 1,
     label: 'testPPR',
-    type: '',
-    userAccessRole: ''
+    type: ''
   }
   const userInfo: UserInfoIF = {
     contacts: [
@@ -110,7 +110,7 @@ describe('TombstoneDefault component tests', () => {
 
   it('renders default Tombstone component with header and user info displayed', async () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
-    await store.dispatch('setUserAccessRole', { authRoles: ['ppr'], isSbc: false })
+    await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
@@ -125,7 +125,7 @@ describe('TombstoneDefault component tests', () => {
   it('displays staff versions', async () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
     const staffGroups = ['helpdesk', 'ppr_staff']
-    await store.dispatch('setUserAccessRole', { authRoles: ['staff', 'ppr'], isSbc: false })
+    await store.dispatch('setAuthRoles', ['staff', 'ppr'])
     for (let i = 0; i < staffGroups.length; i++) {
       if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
       else await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
