@@ -53,6 +53,7 @@ import {
   breadcrumbsTitles
 } from '@/resources'
 import { RouteNames } from '@/enums'
+import { getDescriptiveUserRole } from '@/utils'
 
 export default defineComponent({
   name: 'Breadcrumb',
@@ -65,8 +66,8 @@ export default defineComponent({
       getRegistrationNumber,
       getRegistrationType,
       isRoleStaff,
-      getUserAccessRole
-    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType', 'isRoleStaff', 'getUserAccessRole'])
+      getUserRoles
+    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType', 'isRoleStaff', 'getUserRoles'])
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
@@ -80,7 +81,7 @@ export default defineComponent({
         }
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
-        const roleBasedBreadcrumbTitle = breadcrumbsTitles[getUserAccessRole.value]
+        const roleBasedBreadcrumbTitle = breadcrumbsTitles[getDescriptiveUserRole(getUserRoles.value)]
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard

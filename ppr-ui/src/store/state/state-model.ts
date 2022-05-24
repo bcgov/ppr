@@ -6,8 +6,7 @@ export const stateModel: StateModelIF = {
     accountType: '',
     id: null,
     label: '',
-    type: '',
-    userAccessRole: ''
+    type: ''
   },
   accountProductSubscriptions: null,
   authorization: {

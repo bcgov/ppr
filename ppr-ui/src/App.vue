@@ -139,7 +139,6 @@ export default class App extends Mixins(AuthMixin) {
   @Action setRegistrationNumber!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
-  @Action setUserAccessRole: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -393,12 +392,12 @@ export default class App extends Mixins(AuthMixin) {
           // if staff make call to check for sbc
           const isSbc = await getSbcFromAuth()
           this.setRoleSbc(isSbc)
+          isSbc && authRoles.push('sbc')
         }
         if (!authRoles.includes('ppr') && !authRoles.includes('mhr')) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
-        this.setUserAccessRole(authRoles)
       } else {
         throw new Error('Invalid auth roles')
       }

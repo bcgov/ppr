@@ -46,10 +46,6 @@ export const mutateOriginalAddCollateral = (state: StateIF, addCollateral: AddCo
   state.stateModel.originalRegistration.collateral = addCollateral
 }
 
-export const mutateUserAccessRole = (state: StateIF, userAccessRole: string) => {
-  state.stateModel.accountInformation.userAccessRole = userAccessRole
-}
-
 export const mutateAddSecuredPartiesAndDebtors = (state: StateIF, addParties: AddPartiesIF) => {
   state.stateModel.registration.parties = addParties
 }
@@ -68,6 +64,13 @@ export const mutateAuthRoles = (state: StateIF, authRoles: Array<string>) => {
 
 export const mutateRoleSbc = (state: StateIF, isSbc: boolean) => {
   state.stateModel.authorization.isSbc = isSbc
+  const roles = state.stateModel.authorization.authRoles
+
+  if (isSbc) {
+    !roles.includes('sbc') && roles.push('sbc')
+  } else {
+    state.stateModel.authorization.authRoles = roles.filter(role => role !== 'sbc')
+  }
 }
 
 export const mutateCertifyInformation = (state: StateIF, certifyInformation: CertifyIF) => {
