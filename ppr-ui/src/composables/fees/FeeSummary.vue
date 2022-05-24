@@ -71,6 +71,7 @@
         </li>
         <li
           v-if="hasProcessingFee"
+          id="processing-fee-summary"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
           :key="feeSummary.processingFee"
         >
