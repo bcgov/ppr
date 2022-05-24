@@ -42,6 +42,26 @@
             :setShowErrors="showErrors"
             class="pt-15"
           />
+
+          <!-- Staff Payment Section -->
+          <section v-if="getIsStaffClientPayment" class="mt-10">
+            <v-row no-gutters>
+              <v-col class="generic-label">
+                <h2>2. Staff Payment</h2>
+              </v-col>
+            </v-row>
+
+            <v-card flat class="mt-6 pa-6">
+              <staff-payment-component
+                :staffPaymentData="staffPaymentData"
+                :validate="true"
+                :displaySideLabel="false"
+                :displayPriorityCheckbox="false"
+                @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+              />
+            </v-card>
+          </section>
+
         </v-col>
         <v-col class="pl-6" cols="3">
           <aside>
@@ -83,9 +103,11 @@ import {
   StickyContainer
 } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
+import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 // local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
   ActionBindingIF,
   ErrorIF,
@@ -105,7 +127,8 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
     BaseDialog,
     FolioNumberSummary,
     StickyContainer,
-    SearchedResultMhr
+    SearchedResultMhr,
+    StaffPaymentComponent
   }
 })
 export default class ConfirmDischarge extends Vue {
@@ -113,11 +136,13 @@ export default class ConfirmDischarge extends Vue {
   @Getter isSearchCertified!: boolean
   @Getter isRoleStaffBcol: boolean
   @Getter isRoleStaffReg!: boolean
+  @Getter getIsStaffClientPayment!: boolean
   @Getter getStaffPayment!: StaffPaymentIF
   @Getter getManufacturedHomeSearchResults!: ManufacturedHomeSearchResponseIF
   @Getter getSelectedManufacturedHomes!: ManufacturedHomeSearchResultIF[]
 
   @Action setUnsavedChanges: ActionBindingIF
+  @Action setStaffPayment!: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
@@ -162,7 +187,19 @@ export default class ConfirmDischarge extends Vue {
     return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo).length
   }
 
-  private async loadSearchResult (): Promise<void> {
+  private get staffPaymentData (): any {
+    let pd = this.getStaffPayment
+    if (!pd) {
+      pd = {
+        option: StaffPaymentOptions.NONE,
+        routingSlipNumber: '',
+        bcolAccountNumber: '',
+        datNumber: '',
+        folioNumber: '',
+        isPriority: false
+      }
+    }
+    return pd
   }
 
   mounted () {
@@ -225,6 +262,54 @@ export default class ConfirmDischarge extends Vue {
       name: RouteNames.DASHBOARD
     })
     this.emitHaveData(false)
+  }
+
+  /** Called when component's staff payment data has been updated. */
+  private onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
+    let staffPaymentData: StaffPaymentIF = {
+      ...val
+    }
+
+    // disable validation
+    switch (staffPaymentData.option) {
+      case StaffPaymentOptions.FAS:
+        staffPaymentData = {
+          option: StaffPaymentOptions.FAS,
+          routingSlipNumber: staffPaymentData.routingSlipNumber,
+          isPriority: staffPaymentData.isPriority,
+          bcolAccountNumber: '',
+          datNumber: '',
+          folioNumber: ''
+        }
+        break
+
+      case StaffPaymentOptions.BCOL:
+        staffPaymentData = {
+          option: StaffPaymentOptions.BCOL,
+          bcolAccountNumber: staffPaymentData.bcolAccountNumber,
+          datNumber: staffPaymentData.datNumber,
+          folioNumber: staffPaymentData.folioNumber,
+          isPriority: staffPaymentData.isPriority,
+          routingSlipNumber: ''
+        }
+        break
+
+      case StaffPaymentOptions.NO_FEE:
+        staffPaymentData = {
+          option: StaffPaymentOptions.NO_FEE,
+          routingSlipNumber: '',
+          isPriority: false,
+          bcolAccountNumber: '',
+          datNumber: '',
+          folioNumber: ''
+        }
+        break
+
+      case StaffPaymentOptions.NONE: // should never happen
+        break
+    }
+
+    this.setStaffPayment(staffPaymentData)
   }
 
   /** Emits Have Data event. */

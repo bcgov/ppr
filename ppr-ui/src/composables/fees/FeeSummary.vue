@@ -163,7 +163,8 @@ export default defineComponent({
       type: String as () => UIRegistrationTypes
     },
     setStaffReg: { default: false },
-    setStaffSBC: { default: false }
+    setStaffSBC: { default: false },
+    setStaffClientPayment: { default: false }
   },
   setup (props) {
     const { getLengthTrust, isRoleStaff } = useGetters<any>(['getLengthTrust', 'isRoleStaff'])
@@ -187,7 +188,8 @@ export default defineComponent({
           localState.feeType,
           localState.registrationType,
           localState.registrationLength,
-          isRoleStaff.value
+          isRoleStaff.value,
+          props.setStaffClientPayment
         )
         if (props.setFeeQuantity) {
           feeSummary.quantity = props.setFeeQuantity
@@ -196,7 +198,7 @@ export default defineComponent({
           feeSummary.processingFee = 5
         }
         if (props.setFeeOverride) {
-          feeSummary.feeAmount = props.setFeeOverride.feeAmount
+          feeSummary.feeAmount = props.setFeeOverride?.feeAmount
         }
         if (props.setFeeOverride && feeSummary.serviceFee !== 0) {
           feeSummary.serviceFee = props.setFeeOverride.serviceFee
@@ -208,10 +210,17 @@ export default defineComponent({
           props.additionalFees?.feeType,
           props.additionalFees?.registrationType,
           props.additionalFees?.registrationLength,
-          isRoleStaff.value
+          isRoleStaff.value,
+          props.setStaffClientPayment
         )
         if (props.additionalFees?.quantity) {
           feeSummary.quantity = props.additionalFees?.quantity
+        }
+        if (feeSummary && props.setFeeOverride) {
+          feeSummary.feeAmount = props.setFeeOverride?.feeAmount
+        }
+        if (feeSummary && props.setFeeOverride && feeSummary.serviceFee !== 0) {
+          feeSummary.serviceFee = props.setFeeOverride.serviceFee
         }
         return feeSummary
       }),

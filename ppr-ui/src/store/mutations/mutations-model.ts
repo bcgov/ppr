@@ -24,7 +24,7 @@ import {
   RegistrationSummaryIF,
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
-  ManufacturedHomeSearchResultIF
+  ManufacturedHomeSearchResultIF, ActionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -96,6 +96,10 @@ export const mutateGeneralCollateral = (state: StateIF, generalCollateral: Gener
 
 export const mutateStaffPayment = (state: StateIF, staffPayment: StaffPaymentIF) => {
   state.stateModel.staffPayment = staffPayment
+}
+
+export const mutateIsStaffClientPayment = (state: StateIF, isStaffClientPayment: boolean) => {
+  state.stateModel.isStaffClientPayment = isStaffClientPayment
 }
 
 export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) => {

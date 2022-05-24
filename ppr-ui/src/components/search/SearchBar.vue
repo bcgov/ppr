@@ -223,11 +223,13 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
+      setIsStaffClientPayment,
       setSearching,
       setStaffPayment,
       setFolioOrReferenceNumber,
       setSelectedManufacturedHomes
     } = useActions<any>([
+      'setIsStaffClientPayment',
       'setSearching',
       'setStaffPayment',
       'setFolioOrReferenceNumber',
@@ -513,6 +515,9 @@ export default defineComponent({
       localState.validations = validateSearchAction(localState)
       if (localState.validations) {
         localState.autoCompleteIsActive = false
+      } else if (isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
+        setIsStaffClientPayment(true)
+        searchAction(true)
       } else {
         localState.staffPaymentDialogDisplay = true
       }

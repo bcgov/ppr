@@ -115,7 +115,7 @@
               <v-col cols="2">
                 <v-checkbox v-model="item.selected"/>
               </v-col>
-              <v-col>
+              <v-col class="owner-name-text" @click="item.selected = !item.selected">
                 {{ getOwnerName(item) }}
               </v-col>
             </v-row>
@@ -381,6 +381,9 @@ th {
 }
 .main-results-div {
   width: 100%;
+}
+.owner-name-text {
+  cursor: pointer;
 }
 .no-results-info {
   color: $gray7 !important;
