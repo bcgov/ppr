@@ -172,10 +172,8 @@ describe('Serial number search', () => {
     await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
     const searchText = wrapper.find('.select-search-text').text()
-    expect(searchText).toContain('Select a search category and then enter a value to search')
+    expect(searchText).toContain('Select a search category and then enter a criteria to search')
     expect(searchText).toContain('$8.50')
-    expect(searchText).toContain('$7.00')
-    expect(searchText).toContain('$12.00')
     wrapper.vm.returnSearchSelection(select)
     await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
@@ -199,9 +197,7 @@ describe('Serial number search', () => {
   it('hides and shows things for staff', async () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
     const searchText = wrapper.find('.select-search-text').text()
-    expect(searchText).toContain('Select a search category and then enter a value to search')
-    expect(searchText).toContain('$10.00')
-    expect(searchText).toContain('$15.00')
+    expect(searchText).toContain('Select a search category and then enter a criteria to search')
     await store.dispatch('setStaffPayment', {
       option: 1,
       routingSlipNumber: '888555222',
@@ -505,6 +501,8 @@ describe('Mhr Owner name search', () => {
     wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
+    const searchText = wrapper.find('.select-search-text').text()
+    expect(searchText).not.toContain('Each search will incur a fee')
     wrapper.vm.$data.searchValueFirst = 'test first'
     wrapper.vm.$data.searchValueSecond = 'test middle'
     wrapper.vm.$data.searchValueLast = 'test last'
