@@ -351,6 +351,7 @@ class Report:  # pylint: disable=too-few-public-methods
             else:
                 criteria = self._report_data['searchQuery']['criteria']['value'].upper()
             self._report_data['meta_subject'] = f'{search_desc} - "{criteria}"'
+            self._report_data['footer_content'] = f'{search_desc} Search - "{criteria}"'
 
     @staticmethod
     def _get_environment():
