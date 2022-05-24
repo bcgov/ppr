@@ -3,6 +3,10 @@
 		page: search-toc;
 	}
 
+	html body article#search-result {
+		page: search-result;
+	}
+
 	html body article#registration {
 		page: registration;
 	}
@@ -1231,6 +1235,18 @@
 		font-weight: bold;
 		color: #003366;
 		text-align: right;
+	}
+
+
+	.footer-search-result {
+		position: running(search_result_footer);
+		font-family: 'BCSans-Regular', sans-serif !important;
+		font-size: 9px;
+		font-weight: bold;
+		color: #003366;
+		text-align: right;
+		overflow-wrap: break-word;
+  		word-wrap: break-word;
 	}
 
 	.general-collateral-datetime {

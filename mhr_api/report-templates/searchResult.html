@@ -118,6 +118,11 @@
 
   </article>
 
+  <article id="search-result">
+    <div class="footer-search-result">
+      {{ footer_content }} | Page
+    </div>
+
     {% if totalResultsSize > 0 %}
       {% for detail in details %}
         <p style="page-break-before: always" ></p>
@@ -125,5 +130,6 @@
       {% endfor %}
     {% endif %}
 
-  </body>
+  </article>
+</body>
 </html>
