@@ -30,7 +30,7 @@
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
     </v-row>
-    <v-row v-if="typeOfSearch!=''">
+    <v-row v-if="typeOfSearch">
       <v-col>
         <div v-html="typeOfSearch" class="font-weight-bold"></div>
       </v-col>
@@ -347,7 +347,6 @@ export default defineComponent({
             }
           }
         }
-        return ''
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
