@@ -334,9 +334,31 @@ def get_registration_report(registration: Registration,  # pylint: disable=too-m
             return raw_data, response_status, {'Content-Type': 'application/pdf'}
 
         if report_info and not report_info.doc_storage_url:
-            current_app.logger.info(f'Pending report generation for reg id={registration_id}.')
-            return report_data, HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
-        # Edge case: too large to print in real time.
+            # Check if report api error: more than 15 minutes has elapsed since the request was queued and no report.
+            if not model_utils.report_retry_elapsed(report_info.create_ts):
+                current_app.logger.info(f'Pending report generation for reg id={registration_id}.')
+                return report_data, HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
+
+            current_app.logger.info(f'Retrying report generation for reg id={registration_id}.')
+            raw_data, status_code, headers = get_pdf(report_data,
+                                                     registration.account_id,
+                                                     report_type,
+                                                     token)
+            current_app.logger.debug(f'Retry report api call status={status_code}.')
+            if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+                current_app.logger.error(f'{registration_id} retry report api call failed: ' +
+                                         raw_data.get_data(as_text=True))
+            else:
+                doc_name = model_utils.get_doc_storage_name(registration)
+                current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
+                response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+                current_app.logger.info('Save document storage response: ' + json.dumps(response))
+                report_info.create_ts = model_utils.now_ts()
+                report_info.doc_storage_url = doc_name
+                report_info.save()
+            return raw_data, response_status, headers
+
+        # Edge case: too large to generate in real time.
         results_length = len(json.dumps(report_data))
         if results_length > current_app.config.get('MAX_SIZE_SEARCH_RT'):
             current_app.logger.info(f'Registration {registration_id} queued, size too large: {results_length}.')
