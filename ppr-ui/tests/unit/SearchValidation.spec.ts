@@ -401,7 +401,7 @@ describe('MHR validation', () => {
     await Vue.nextTick()
     const hints = wrapper.findAll('.v-messages__message')
     expect(hints.length).toBe(1)
-    expect(hints.at(0).text()).toContain('Manufactured home registration number must contain')
+    expect(hints.at(0).text()).toContain('Manufactured home registration numbers normally contain up to 6 digits')
     // popup
     wrapper.vm.$data.searchValue = '10'
     await Vue.nextTick()
