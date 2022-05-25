@@ -7,7 +7,8 @@ describe('Roles helper utility methods', () => {
 
         expect(getDescriptiveUserRole(['ppr_staff'])).toBe('STAFF_PPR')
 
-        expect(getDescriptiveUserRole(['staff', 'helpdesk'])).toBe('STAFF_PPR')
+        expect(getDescriptiveUserRole(['ppr', 'helpdesk'])).toBe('STAFF_PPR')
+        expect(getDescriptiveUserRole(['ppr', 'mhr', 'helpdesk'])).toBe('STAFF_PPR_MHR')
 
         expect(getDescriptiveUserRole(['staff', 'ppr'])).toBe('STAFF_PPR')
         expect(getDescriptiveUserRole(['staff', 'mhr'])).toBe('STAFF_MHR')

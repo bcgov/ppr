@@ -3,7 +3,6 @@ export function getDescriptiveUserRole (authRoles: Array<string>): string {
 
   if (authRoles.includes('ppr_staff')) return 'STAFF_PPR'
   if (authRoles.includes('mhr_staff')) return 'STAFF_MHR'
-  if (authRoles.includes('staff') && authRoles.includes('helpdesk')) return 'STAFF_PPR'
 
   if (authRoles.includes('staff') || authRoles.includes('sbc') ||
     authRoles.includes('helpdesk')) accessRole.push('STAFF')
