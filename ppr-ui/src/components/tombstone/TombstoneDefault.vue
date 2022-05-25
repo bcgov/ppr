@@ -7,7 +7,7 @@
           <span class="tombstone-header">
             <b>{{ header }}</b>
           </span>
-          <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="none">
+          <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="fade-transition">
             <template  v-slot:activator="{ on, attrs }">
               <a
               :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
