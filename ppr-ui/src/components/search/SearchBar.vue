@@ -85,6 +85,7 @@
             <v-text-field
               id="first-name-field"
               autocomplete="off"
+              maxlength="15"
               :error-messages="searchMessageFirst ? searchMessageFirst : ''"
               filled
               :hint="searchHintFirst"
@@ -98,6 +99,7 @@
             <v-text-field
               id="second-name-field"
               autocomplete="off"
+              maxlength="15"
               :error-messages="searchMessageSecond ? searchMessageSecond : ''"
               filled
               :hint="searchHintSecond"
@@ -111,6 +113,7 @@
             <v-text-field
               id="last-name-field"
               autocomplete="off"
+              maxlength="25"
               :error-messages="searchMessageLast ? searchMessageLast : ''"
               filled
               :hint="searchHintLast"
