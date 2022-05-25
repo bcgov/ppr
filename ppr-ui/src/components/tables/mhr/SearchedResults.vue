@@ -294,8 +294,10 @@ export default defineComponent({
       setFolioOrReferenceNumber(folioOrReference)
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
+      if (!resp) await router.push({ name: RouteNames.DASHBOARD })
+
       localState.searchValue = resp.searchQuery.criteria.value || getOwnerName(resp.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
