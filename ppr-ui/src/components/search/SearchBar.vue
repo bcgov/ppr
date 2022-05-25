@@ -16,11 +16,10 @@
     />
     <v-row no-gutters class="pt-2">
       <v-col :class="[$style['search-info'], 'select-search-text']">
-        <div>
-          Select a search category and then enter a value to search. Search fees are as follows:
-          Personal Property search - ${{personalPropertySearchFee}} Manufactured Home Search - ${{manHomeSearchFee}};
-          combined Personal Property and Manufactured Home search - ${{comboSearchFee}}.
-        </div>
+        Select a search category and then enter a criteria to search.
+        <span v-if="shouldShowFeeHint">
+          Each search will incur a fee of ${{ fee }}, including searches that return no results.
+        </span>
       </v-col>
       <v-col align-self="end" cols="3">
         <folio-number
@@ -278,7 +277,6 @@ export default defineComponent({
         return localState.validations?.category?.message || ''
       }),
       shouldShowFeeHint: computed((): boolean => {
-        if (hasMhrRole.value || isRoleStaffReg.value) return false
         return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
           (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
       }),
