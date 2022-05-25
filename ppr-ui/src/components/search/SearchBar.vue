@@ -15,7 +15,7 @@
       @proceed="onStaffPaymentChanges($event)"
     />
     <v-row no-gutters class="pt-2">
-      <v-col :class="[$style['search-info'], 'select-search-text']">
+      <v-col :class="[$style['search-info'], 'select-search-text','pt-4']">
         Select a search category and then enter a criteria to search.
         <span v-if="shouldShowFeeHint">
           Each search will incur a fee of ${{ fee }}, including searches that return no results.
@@ -30,7 +30,7 @@
       </v-col>
       <v-col align-self="end" cols="1" class="pl-3"/>
     </v-row>
-    <v-row>
+    <v-row v-if="typeOfSearch!=''">
       <v-col>
         <div v-html="typeOfSearch" class="font-weight-bold"></div>
       </v-col>
@@ -323,6 +323,9 @@ export default defineComponent({
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
       }),
+      isStaffSbc: computed((): boolean => {
+        return isRoleStaffSbc.value
+      }),
       searching: computed((): boolean => {
         return isSearching.value
       }),
@@ -344,6 +347,7 @@ export default defineComponent({
             }
           }
         }
+        return ''
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
