@@ -115,7 +115,7 @@
               <v-col cols="2">
                 <v-checkbox v-model="item.selected"/>
               </v-col>
-              <v-col>
+              <v-col class="owner-name-text" @click="item.selected = !item.selected">
                 {{ getOwnerName(item) }}
               </v-col>
             </v-row>
@@ -294,8 +294,10 @@ export default defineComponent({
       setFolioOrReferenceNumber(folioOrReference)
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
+      if (!resp) await router.push({ name: RouteNames.DASHBOARD })
+
       localState.searchValue = resp.searchQuery.criteria.value || getOwnerName(resp.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
@@ -381,6 +383,9 @@ th {
 }
 .main-results-div {
   width: 100%;
+}
+.owner-name-text {
+  cursor: pointer;
 }
 .no-results-info {
   color: $gray7 !important;

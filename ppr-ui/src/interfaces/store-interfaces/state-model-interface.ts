@@ -50,6 +50,7 @@ export interface StateModelIF {
     searchCertified: boolean
   }
   selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]
+  isStaffClientPayment: boolean
   staffPayment: StaffPaymentIF
   unsavedChanges: Boolean // used for cancel flows
   userInfo: UserInfoIF

@@ -101,6 +101,10 @@ export const mutateStaffPayment = (state: StateIF, staffPayment: StaffPaymentIF)
   state.stateModel.staffPayment = staffPayment
 }
 
+export const mutateIsStaffClientPayment = (state: StateIF, isStaffClientPayment: boolean) => {
+  state.stateModel.isStaffClientPayment = isStaffClientPayment
+}
+
 export const mutateLengthTrust = (state: StateIF, lengthTrust: LengthTrustIF) => {
   state.stateModel.registration.lengthTrust = lengthTrust
 }

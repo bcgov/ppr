@@ -10,7 +10,7 @@ import { FeeSummary } from '@/composables/fees'
 import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { UIRegistrationTypes } from '@/enums'
-import flushPromises from 'flush-promises'
+import { StateModelIF } from '@/interfaces'
 
 Vue.use(Vuetify)
 
@@ -632,6 +632,53 @@ describe('FeeSummary component tests', () => {
     expect(wrapper.vm.$data.totalAdditionalFees).toBe(36)
 
     expect(wrapper.vm.$data.totalAmount).toBe(51.5)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+  })
+
+  it('renders with correct values for a MHR Search as Staff', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
+      setRegistrationLength: null,
+      setRegistrationType: null
+    })
+    await Vue.nextTick()
+
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
+    expect(wrapper.vm.$data.totalFees).toBe(0)
+    expect(wrapper.vm.$data.totalAmount).toBe(0)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+  })
+
+  it('renders with correct values for a MHR Search as Staff on behalf of a client', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffReg: true,
+      setStaffClientPayment: true
+    })
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').text()).toContain('No Fee')
+    expect(wrapper.vm.$data.totalFees).toBe(10)
+    expect(wrapper.vm.$data.totalAmount).toBe(10)
     expect(wrapper.vm.$data.isComplete).toBe(true)
     expect(wrapper.vm.$data.hintFee).toBe('')
   })

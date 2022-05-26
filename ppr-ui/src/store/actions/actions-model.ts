@@ -87,6 +87,10 @@ export const setStaffPayment: ActionIF = ({ commit }, staffPayment: StaffPayment
   commit('mutateStaffPayment', staffPayment)
 }
 
+export const setIsStaffClientPayment: ActionIF = ({ commit }, isStaffClientPayment: boolean): void => {
+  commit('mutateIsStaffClientPayment', isStaffClientPayment)
+}
+
 export const setCollateralShowInvalid = ({ commit }, show: boolean): void => {
   commit('mutateCollateralShowInvalid', show)
 }

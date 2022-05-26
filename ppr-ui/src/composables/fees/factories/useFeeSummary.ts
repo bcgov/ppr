@@ -73,14 +73,17 @@ export function getFeeSummary (
   feeType: FeeSummaryTypes,
   registrationType: UIRegistrationTypes,
   registrationLength: RegistrationLengthI,
-  isStaff: boolean = false
+  isStaff: boolean = false,
+  isStaffClientPayment: boolean = false
 ): FeeSummaryI {
   if (feeType === FeeSummaryTypes.MHSEARCH) {
-    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_10] }
+    if (isStaff && isStaffClientPayment) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_10] }
+    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_7] }
   }
   if (feeType === FeeSummaryTypes.MHR_COMBINED_SEARCH) {
-    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_15] }
+    if (isStaff && isStaffClientPayment) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_15] }
+    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_12] }
   }
   if (feeType === FeeSummaryTypes.DISCHARGE) {

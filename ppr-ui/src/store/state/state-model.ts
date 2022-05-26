@@ -125,6 +125,7 @@ export const stateModel: StateModelIF = {
     searchCertified: false
   },
   selectedManufacturedHomes: [],
+  isStaffClientPayment: false,
   staffPayment: null,
   unsavedChanges: false,
   userInfo: {

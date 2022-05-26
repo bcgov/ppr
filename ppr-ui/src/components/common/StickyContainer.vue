@@ -10,6 +10,7 @@
       :setStaffReg="isStaffReg"
       :setStaffSBC="isStaffSBC"
       :additionalFees="setAdditionalFees"
+      :setStaffClientPayment="isStaffClientPayment"
     />
     <buttons-stacked
       v-if="showButtons"
@@ -113,9 +114,16 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      getUserServiceFee, isNonBillable, isRoleStaffReg, isRoleStaffSbc
+      getUserServiceFee, isNonBillable, getIsStaffClientPayment, isRoleStaffReg, isRoleStaffSbc, getStaffPayment
     } = useGetters<any>(
-      ['getUserServiceFee', 'isNonBillable', 'isRoleStaffReg', 'isRoleStaffSbc']
+      [
+        'getUserServiceFee',
+        'isNonBillable',
+        'getIsStaffClientPayment',
+        'isRoleStaffReg',
+        'isRoleStaffSbc',
+        'getStaffPayment'
+      ]
     )
 
     const localState = reactive({
@@ -132,7 +140,7 @@ export default defineComponent({
       saveBtn: props.setSaveBtn,
       disableSubmitBtn: props.setDisableSubmitBtn,
       feeOverride: computed(() => {
-        if (isNonBillable.value) {
+        if (isNonBillable.value || localState.isNoFeePayment) {
           return {
             feeAmount: 0,
             processingFee: null, // not used in override
@@ -147,6 +155,12 @@ export default defineComponent({
       }),
       isStaffSBC: computed(() => {
         return isRoleStaffSbc.value as boolean
+      }),
+      isStaffClientPayment: computed(() => {
+        return getIsStaffClientPayment
+      }),
+      isNoFeePayment: computed(() => {
+        return getStaffPayment.value?.option === 0
       })
     })
     const back = () => {

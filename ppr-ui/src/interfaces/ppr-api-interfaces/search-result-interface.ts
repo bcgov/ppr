@@ -10,4 +10,5 @@ export interface SearchResultIF {
   registrationType?: string
   vehicleCollateral?: VehicleCollateralIF // Conditional: included if not debtor search.
   debtor?: SearchNameIF // Conditional: included if business debtor name or indivdual debtor name search.
+  selected?: boolean
 }

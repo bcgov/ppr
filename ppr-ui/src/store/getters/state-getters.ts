@@ -293,6 +293,11 @@ export const getStaffPayment = (state: StateIF): StaffPaymentIF => {
   return state.stateModel.staffPayment
 }
 
+/** Is true when staff is doing a mhr search on behalf of a client. */
+export const getIsStaffClientPayment = (state: StateIF): boolean => {
+  return state.stateModel.isStaffClientPayment
+}
+
 /** Whether the app should show the step errors */
 export const showStepErrors = (state: StateIF): boolean => {
   return state.stateModel.registration.showStepErrors

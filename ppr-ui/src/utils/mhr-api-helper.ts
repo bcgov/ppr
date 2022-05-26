@@ -36,6 +36,7 @@ export async function mhrSearch (
       if (results) {
         results.forEach((item, index) => {
           item.id = index + 1
+          item.selected = false
         })
         data.results = results
       }
