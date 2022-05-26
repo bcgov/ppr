@@ -21,7 +21,7 @@ import copy
 
 import pytest
 
-from ppr_api.models import SearchRequest
+from ppr_api.models import SearchRequest, search_utils
 from ppr_api.models.search_request import CHARACTER_SET_UNSUPPORTED
 from ppr_api.models.utils import now_ts_offset, format_ts
 from ppr_api.exceptions import BusinessException
@@ -392,6 +392,13 @@ TEST_DEBTOR_NAME_DATA = [
     ('Invalid ind last name', IS_INVALID_NAME_JSON, False,
      CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
 ]
+# testdata pattern is ({mhr_number}, {expected_num})
+TEST_MHR_NUMBER_DATA = [
+    ('005794', '005794'),
+    (' 5794 ', '005794'),
+    ('5794', '005794'),
+    ('05794', '005794')
+]
 
 
 def test_search_no_account(session):
@@ -735,3 +742,22 @@ def test_validate_debtor_names(session, desc, json_data, valid, message_content)
         assert bad_request_err
         error_msg = bad_request_err.value.error
         assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('mhr_number,expected_number', TEST_MHR_NUMBER_DATA)
+def test_search_mhr_number(session, mhr_number, expected_number):
+    """Assert that an mhr number search works with different values."""
+    test_data = copy.deepcopy(MHR_NUMBER_JSON)
+    test_data['criteria']['value'] = mhr_number
+
+    format_test = copy.deepcopy(test_data)
+    search_utils.format_mhr_number(format_test)
+    assert format_test['criteria']['value'] == expected_number
+
+    query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
+    query.search()
+    result = query.json
+    # current_app.logger.debug(result)
+    assert len(result['results']) >= 1
+    assert result['results'][0]['matchType'] == 'EXACT'
+    assert result['searchQuery']['criteria']['value'] == expected_number
