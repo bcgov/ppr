@@ -21,6 +21,15 @@ import pytest
 from ppr_api.models import Address
 
 
+BASE_ADDRESS = {
+    'street': 'STREET',
+    'streetAdditional': 'STREET2',
+    'city': 'CITY',
+    'region': 'BC',
+    'country': 'CA',
+    'postalCode': 'V8V 1V1'
+}
+
 # testdata pattern is ({hasStreet}, {hasCity}, {hasRegion}, {hasCountry}, {hasPostalCode})
 TEST_LEGACY_DATA = [
     (True, False, False, False, False),
@@ -28,6 +37,29 @@ TEST_LEGACY_DATA = [
     (False, False, True, False, False),
     (False, False, False, True, False),
     (False, False, False, False, True)
+]
+# testdata pattern is ({equal}, {street}, {street2}, {city}, {region}, {country}, {postalCode})
+TEST_EQUALITY_DATA = [
+    (True, 'street', 'street2', 'city', 'BC', 'CA', 'V8V 1V1'),
+    (False, 'street', None, 'city', 'BC', 'CA', 'V8V 1V1'),
+    (False, 'street', 'street2', None, 'BC', 'CA', 'V8V 1V1'),
+    (False, 'street', 'street2', 'city', None, 'CA', 'V8V 1V1'),
+    (False, 'street', 'street2', 'city', 'BC', None, 'V8V 1V1'),
+    (False, 'street', 'street2', 'city', 'BC', 'CA', None),
+    (False, 'xtreet', 'street2', 'city', 'BC', 'CA', 'V8V 1V1'),
+    (False, 'street', 'xstreet2', 'city', 'BC', 'CA', 'V8V 1V1'),
+    (False, 'street', 'street2', 'xcity', 'AB', 'CA', 'V8V 1V1'),
+    (False, 'street', 'street2', 'city', 'BC', 'US', 'V8V 1V1'),
+    (False, 'street', 'street2', 'city', 'BC', 'CA', 'V8X 1V1')
+]
+# testdata pattern is ({test_value}, {country}, {expected_value})
+TEST_POSTAL_CODE_DATA = [
+    ('V8V 1V1', 'CA', 'V8V 1V1'),
+    ('V8V1V1', 'CA', 'V8V 1V1'),
+    ('V8V 1V1', None, 'V8V 1V1'),
+    ('V8V 1V1', 'US', 'V8V 1V1'),
+    ('V8V1V1', None, 'V8V1V1'),
+    ('V8V1V1', 'US', 'V8V1V1')
 ]
 
 
@@ -99,7 +131,6 @@ def test_address_json(session):
     assert address.json == address_json
 
 
-# testdata pattern is ({hasStreet}, {hasCity}, {hasRegion}, {hasCountry}, {hasPostalCode})
 @pytest.mark.parametrize('street,city,region,country,postal_code', TEST_LEGACY_DATA)
 def test_address_legacy_json(session, street, city, region, country, postal_code):
     """Assert that the address with poor legacy data renders to a json format correctly."""
@@ -136,3 +167,36 @@ def test_address_legacy_json(session, street, city, region, country, postal_code
         assert address_json['postalCode']
     else:
         assert 'postalCode' not in address_json
+
+
+@pytest.mark.parametrize('equal,street,street2,city,region,country,postal_code', TEST_EQUALITY_DATA)
+def test_address_equality(session, equal, street, street2, city, region, country, postal_code):
+    """Assert that the address equality check works as expected."""
+    address_json = {
+        'street': street,
+        'streetAdditional': street2,
+        'city': city,
+        'region': region,
+        'country': country,
+        'postalCode': postal_code
+    }
+    address = Address.create_from_json(address_json)
+    address_json = address.json
+    if equal:
+        assert address_json == BASE_ADDRESS
+    else:
+        assert address_json != BASE_ADDRESS
+
+
+@pytest.mark.parametrize('test_value,country,expected_value', TEST_POSTAL_CODE_DATA)
+def test_postal_code_format(session, test_value, country, expected_value):
+    """Assert that the Canada address postal code formatting works as expected."""
+    address_json = {
+        'street': 'street',
+        'city': 'city',
+        'region': 'BC',
+        'country': country,
+        'postalCode': test_value
+    }
+    address = Address.create_from_json(address_json)
+    assert address.postal_code == expected_value

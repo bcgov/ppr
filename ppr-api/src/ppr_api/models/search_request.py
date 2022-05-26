@@ -347,8 +347,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Execute a search with the previously set search type and criteria."""
         if self.search_type == self.SearchTypes.REGISTRATION_NUM.value:
             self.search_by_registration_number()
+        elif self.search_type == self.SearchTypes.MANUFACTURED_HOME_NUM.value:
+            # Format before searching
+            search_utils.format_mhr_number(self.request_json)
+            self.search_by_serial_type()
         elif self.search_type in (self.SearchTypes.SERIAL_NUM.value,
-                                  self.SearchTypes.MANUFACTURED_HOME_NUM.value,
                                   self.SearchTypes.AIRCRAFT_AIRFRAME_DOT.value):
             self.search_by_serial_type()
         elif self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:

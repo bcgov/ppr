@@ -17,6 +17,9 @@
 from .db import db
 
 
+COUNTRY_CANADA = 'CA'
+
+
 class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the registry addresses."""
 
@@ -79,6 +82,13 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return address
 
+    def format_postal_code(self):
+        """Format Canada postal code: insert space character."""
+        if self.country and self.country == COUNTRY_CANADA and self.postal_code:
+            self.postal_code = self.postal_code.strip()
+            if len(self.postal_code) == 6:
+                self.postal_code = self.postal_code[0:3] + ' ' + self.postal_code[3:]
+
     @staticmethod
     def create_from_dict(new_info: dict):
         """Create an address object from dict/json."""
@@ -91,7 +101,7 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
         # address.country = pycountry.countries.search_fuzzy(new_info.get('country'))[0].alpha_2
         address.country = new_info.get('country')
         address.postal_code = new_info.get('postalCode')
-
+        address.format_postal_code()
         return address
 
     @staticmethod
@@ -100,11 +110,15 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
         address = Address()
         # API requests everything but streetAdditional is mandatory.
         address.street = json_data['street'].strip().upper()
-        if 'streetAdditional' in json_data:
+        if json_data.get('streetAdditional'):
             address.street_additional = json_data['streetAdditional'].strip().upper()
-        address.city = json_data['city'].strip().upper()
-        address.region = json_data['region'].strip().upper()
-        address.country = json_data['country'].strip().upper()
-        address.postal_code = json_data['postalCode'].strip().upper()
-
+        if json_data.get('city'):
+            address.city = json_data['city'].strip().upper()
+        if json_data.get('region'):
+            address.region = json_data['region'].strip().upper()
+        if json_data.get('country'):
+            address.country = json_data['country'].strip().upper()
+        if json_data.get('postalCode'):
+            address.postal_code = json_data['postalCode'].strip().upper()
+            address.format_postal_code()
         return address
