@@ -354,7 +354,7 @@ describe('MHR validation', () => {
     expect(wrapper.vm.$data.validations.searchValue?.message).toBeDefined()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Enter a manufactured home registration number to search')
+    expect(messages.at(0).text()).toBe('Enter a manufactured home registration number')
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()

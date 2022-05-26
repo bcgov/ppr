@@ -100,7 +100,7 @@ export function validateSearchAction (
     case APIMHRMapSearchTypes.MHRMHR_NUMBER:
       if (!searchValue) {
         validation.searchValue.message =
-          'Enter a manufactured home registration number to search'
+          'Enter a manufactured home registration number'
       }
       if (searchValue?.length > 6) {
         validation.searchValue.message = 'Maximum 6 digits'
@@ -243,6 +243,10 @@ export function validateSearchRealTime (
     case APIMHRMapSearchTypes.MHRORGANIZATION_NAME:
       if (searchValue?.length > 70) {
         validation.searchValue.message = 'Maximum 70 characters'
+      }
+      if (specialCharsLax.test(searchValue)) {
+        validation.searchValue.message =
+          "Names don't normally contain special characters"
       }
       break
   }
