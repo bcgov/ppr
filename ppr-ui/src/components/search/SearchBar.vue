@@ -57,6 +57,7 @@
               id="search-bar-field"
               class="search-bar-text-field"
               autocomplete="off"
+              :maxlength="searchFieldMaxlength"
               :disabled="!selectedSearchType"
               :error-messages="searchMessage ? searchMessage : ''"
               filled
@@ -352,6 +353,24 @@ export default defineComponent({
             }
           }
         }
+      }),
+      searchFieldMaxlength: computed((): string => {
+        let maxlength = ''
+        switch (localState.selectedSearchType?.searchTypeAPI) {
+          case APIMHRMapSearchTypes.MHRORGANIZATION_NAME:
+            maxlength = '70'
+            break
+          case APIMHRMapSearchTypes.MHRSERIAL_NUMBER:
+            maxlength = '22'
+            break
+          case APIMHRMapSearchTypes.MHRMHR_NUMBER:
+          case APISearchTypes.MHR_NUMBER:
+            maxlength = '6'
+            break
+          default:
+            break
+        }
+        return maxlength
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
