@@ -57,31 +57,31 @@ export function validateSearchAction (
     case APISearchTypes.INDIVIDUAL_DEBTOR:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
-      } else if (first?.length > 50) {
-        validation.searchValue.messageFirst = 'Maximum 50 characters'
+      } else if (first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
       }
-      if (second && second?.length > 50) {
-        validation.searchValue.messageSecond = 'Maximum 50 characters'
+      if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
       }
       if (!last) {
         validation.searchValue.messageLast = 'Enter a last name'
-      } else if (last?.length > 50) {
-        validation.searchValue.messageLast = 'Maximum 50 characters'
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case APIMHRMapSearchTypes.MHROWNER_NAME:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
-      } else if (first?.length > 50) {
-        validation.searchValue.messageFirst = 'Maximum 50 characters'
+      } else if (first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
       }
-      if (second && second?.length > 50) {
-        validation.searchValue.messageSecond = 'Maximum 50 characters'
+      if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
       }
       if (!last) {
         validation.searchValue.messageLast = 'Enter a last name'
-      } else if (last?.length > 50) {
-        validation.searchValue.messageLast = 'Maximum 50 characters'
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case APISearchTypes.BUSINESS_DEBTOR:
@@ -185,20 +185,20 @@ export function validateSearchRealTime (
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst =
           "Names don't normally contain special characters"
-      } else if (first && first?.length > 50) {
-        validation.searchValue.messageFirst = 'Maximum 50 characters'
+      } else if (first && first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
       }
       if (second && specialCharsLax.test(second)) {
         validation.searchValue.messageSecond =
           "Names don't normally contain special characters"
-      } else if (second && second?.length > 50) {
-        validation.searchValue.messageSecond = 'Maximum 50 characters'
+      } else if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
       }
       if (last && specialCharsLax.test(last)) {
         validation.searchValue.messageLast =
           "Names don't normally contain special characters"
-      } else if (last?.length > 50) {
-        validation.searchValue.messageLast = 'Maximum 50 characters'
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case APISearchTypes.BUSINESS_DEBTOR:
