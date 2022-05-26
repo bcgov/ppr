@@ -57,7 +57,6 @@
               id="search-bar-field"
               class="search-bar-text-field"
               autocomplete="off"
-              :maxlength="searchFieldMaxlength"
               :disabled="!selectedSearchType"
               :error-messages="searchMessage ? searchMessage : ''"
               filled
@@ -86,7 +85,6 @@
             <v-text-field
               id="first-name-field"
               autocomplete="off"
-              maxlength="15"
               :error-messages="searchMessageFirst ? searchMessageFirst : ''"
               filled
               :hint="searchHintFirst"
@@ -100,7 +98,6 @@
             <v-text-field
               id="second-name-field"
               autocomplete="off"
-              maxlength="15"
               :error-messages="searchMessageSecond ? searchMessageSecond : ''"
               filled
               :hint="searchHintSecond"
@@ -114,7 +111,6 @@
             <v-text-field
               id="last-name-field"
               autocomplete="off"
-              maxlength="25"
               :error-messages="searchMessageLast ? searchMessageLast : ''"
               filled
               :hint="searchHintLast"
@@ -353,24 +349,6 @@ export default defineComponent({
             }
           }
         }
-      }),
-      searchFieldMaxlength: computed((): string => {
-        let maxlength = ''
-        switch (localState.selectedSearchType?.searchTypeAPI) {
-          case APIMHRMapSearchTypes.MHRORGANIZATION_NAME:
-            maxlength = '70'
-            break
-          case APIMHRMapSearchTypes.MHRSERIAL_NUMBER:
-            maxlength = '22'
-            break
-          case APIMHRMapSearchTypes.MHRMHR_NUMBER:
-          case APISearchTypes.MHR_NUMBER:
-            maxlength = '6'
-            break
-          default:
-            break
-        }
-        return maxlength
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''
