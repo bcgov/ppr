@@ -128,7 +128,7 @@ describe('TombstoneDefault component tests', () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr'])
     for (let i = 0; i < staffGroups.length; i++) {
       if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
-      else await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      else await store.dispatch('setAuthRoles', ['staff', 'ppr', staffGroups[i]])
       const header = wrapper.findAll(tombstoneHeader)
       expect(header.length).toBe(1)
       expect(header.at(0).text()).toContain('Staff Personal Property Registry')
@@ -154,6 +154,7 @@ describe('TombstoneDefault component tests', () => {
     const CLIENT_PPR = ['ppr']
     const STAFF_PPR_MHR = ['staff', 'ppr', 'mhr']
     const CLIENT_PPR_MHR = ['ppr', 'mhr']
+    const HELP_DESK_PPR_MHR = ['ppr', 'mhr', 'helpdesk']
 
     await assertHeaderForRole(wrapper, STAFF_PPR, true, 'Staff Personal Property Registry')
     await assertHeaderForRole(wrapper, STAFF_MHR, true, 'Staff Manufactured Home Registry')
@@ -161,6 +162,7 @@ describe('TombstoneDefault component tests', () => {
     await assertHeaderForRole(wrapper, CLIENT_PPR, false, 'My Personal Property Registry')
     await assertHeaderForRole(wrapper, STAFF_PPR_MHR, true, 'Staff Asset Registries')
     await assertHeaderForRole(wrapper, CLIENT_PPR_MHR, false, 'My Asset Registries')
+    await assertHeaderForRole(wrapper, HELP_DESK_PPR_MHR, true, 'Staff Asset Registries')
   })
   
 })
