@@ -40,6 +40,7 @@
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
+            :setIsMhr="true"
             class="pt-15"
           />
 
