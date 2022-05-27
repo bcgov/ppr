@@ -57,16 +57,16 @@ export function validateSearchAction (
     case APISearchTypes.INDIVIDUAL_DEBTOR:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
-      } else if (first?.length > 15) {
-        validation.searchValue.messageFirst = 'Maximum 15 characters'
+      } else if (first?.length > 50) {
+        validation.searchValue.messageFirst = 'Maximum 50 characters'
       }
-      if (second && second?.length > 15) {
-        validation.searchValue.messageSecond = 'Maximum 15 characters'
+      if (second && second?.length > 50) {
+        validation.searchValue.messageSecond = 'Maximum 50 characters'
       }
       if (!last) {
         validation.searchValue.messageLast = 'Enter a last name'
-      } else if (last?.length > 25) {
-        validation.searchValue.messageLast = 'Maximum 25 characters'
+      } else if (last?.length > 50) {
+        validation.searchValue.messageLast = 'Maximum 50 characters'
       }
       break
     case APIMHRMapSearchTypes.MHROWNER_NAME:
