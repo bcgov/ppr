@@ -128,3 +128,30 @@ export async function submitSelectedMhr (
       return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR
     })
 }
+
+// Get pdf for a previous search
+export async function searchMhrPDF (searchId: string): Promise<any> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = {
+    baseURL: url,
+    headers: { Accept: 'application/pdf' },
+    responseType: 'blob' as 'json'
+  }
+  return axios
+    .get(`search-results/${searchId}`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        error: {
+          category: ErrorCategories.REPORT_GENERATION,
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+        }
+      }
+    })
+}
