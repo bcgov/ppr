@@ -45,7 +45,8 @@ import {
   toRefs,
   watch,
   ref,
-  onMounted, computed
+  onMounted,
+  computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
