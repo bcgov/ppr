@@ -40,6 +40,7 @@
           <folio-number-summary
             @folioValid="setFolioValid($event)"
             :setShowErrors="showErrors"
+            :setIsMhr="true"
             class="pt-15"
           />
 
@@ -58,6 +59,7 @@
                 :displaySideLabel="false"
                 :displayPriorityCheckbox="false"
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+                @valid="staffPaymentValid = $event"
               />
             </v-card>
           </section>
@@ -160,6 +162,7 @@ export default class ConfirmDischarge extends Vue {
   private submitting = false
   private validConfirm = false // eslint-disable-line lines-between-class-members
   private validFolio = true
+  private staffPaymentValid = false
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -228,7 +231,7 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submit (): Promise<void> {
-    if (!this.validFolio) {
+    if (!this.validFolio || (this.getIsStaffClientPayment && !this.staffPaymentValid)) {
       this.showErrors = true
       return
     }

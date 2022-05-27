@@ -9,7 +9,7 @@
       <v-row no-gutters class="pb-6 pt-4">
         <v-col>
           Add an optional number for this transaction for your own tracking purposes.
-          This information is not used by the Personal Property Registry.
+          This information is not used by the {{ getTypeLabel }}.
         </v-col>
       </v-row>
 
@@ -45,13 +45,17 @@ import {
   toRefs,
   watch,
   ref,
-  onMounted
+  onMounted,
+  computed
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
   props: {
     setShowErrors: {
+      default: false
+    },
+    setIsMhr: {
       default: false
     }
   },
@@ -70,7 +74,10 @@ export default defineComponent({
       showErrors: props.setShowErrors,
       rules: [
         (v: string) => !v || v.length <= 50 || 'Maximum 50 characters reached' // maximum character count
-      ]
+      ],
+      getTypeLabel: computed((): string => {
+        return props.setIsMhr ? 'Manufactured Home Registry' : 'Personal Property Registry'
+      })
     })
 
     watch(() => props.setShowErrors, (val) => {
