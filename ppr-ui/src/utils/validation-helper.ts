@@ -162,7 +162,7 @@ export function validateSearchRealTime (
     case APISearchTypes.SERIAL_NUMBER:
       if (searchValue && specialCharsStrict.test(searchValue)) {
         validation.searchValue.message =
-          "Serial numbers don't normally contain special characters"
+          'Serial numbers don\'t normally contain special characters'
       }
       if (searchValue?.length < 4) {
         validation.searchValue.popUp = [
@@ -181,22 +181,41 @@ export function validateSearchRealTime (
       }
       break
     case APISearchTypes.INDIVIDUAL_DEBTOR:
+      if (first && specialCharsLax.test(first)) {
+        validation.searchValue.messageFirst =
+          'Names don\'t normally contain special characters'
+      } else if (first && first?.length > 50) {
+        validation.searchValue.messageFirst = 'Maximum 50 characters'
+      }
+      if (second && specialCharsLax.test(second)) {
+        validation.searchValue.messageSecond =
+          'Names don\'t normally contain special characters'
+      } else if (second && second?.length > 50) {
+        validation.searchValue.messageSecond = 'Maximum 50 characters'
+      }
+      if (last && specialCharsLax.test(last)) {
+        validation.searchValue.messageLast =
+          'Names don\'t normally contain special characters'
+      } else if (last?.length > 50) {
+        validation.searchValue.messageLast = 'Maximum 50 characters'
+      }
+      break
     case APIMHRMapSearchTypes.MHROWNER_NAME:
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       } else if (first && first?.length > 15) {
         validation.searchValue.messageFirst = 'Maximum 15 characters'
       }
       if (second && specialCharsLax.test(second)) {
         validation.searchValue.messageSecond =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       } else if (second && second?.length > 15) {
         validation.searchValue.messageSecond = 'Maximum 15 characters'
       }
       if (last && specialCharsLax.test(last)) {
         validation.searchValue.messageLast =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       } else if (last?.length > 25) {
         validation.searchValue.messageLast = 'Maximum 25 characters'
       }
@@ -246,7 +265,7 @@ export function validateSearchRealTime (
       }
       if (specialCharsLax.test(searchValue)) {
         validation.searchValue.message =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       }
       break
   }
