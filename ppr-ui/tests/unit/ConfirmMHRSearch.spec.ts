@@ -12,6 +12,7 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
+import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 import { BaseDialog } from '@/components/dialogs'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
@@ -102,6 +103,17 @@ describe('Confirm MHRSearch view', () => {
 
   it('shows errors when folio is invalid', async () => {
     await wrapper.findComponent(FolioNumberSummary).vm.$emit('folioValid', false)
+    // need to wait 2 secs so throttle is done
+    setTimeout(async () => {
+      await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+      // turn show errors on when invalid
+      expect(wrapper.vm.$data.showErrors).toBe(true)
+    }, 2000)
+  })
+
+  it('shows errors when staff payment is invalid', async () => {
+    store.state.stateModel.isStaffClientPayment = true
+    wrapper.vm.staffPaymentValid = false
     // need to wait 2 secs so throttle is done
     setTimeout(async () => {
       await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
