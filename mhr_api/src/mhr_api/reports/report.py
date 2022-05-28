@@ -30,7 +30,7 @@ from mhr_api.utils.base import BaseEnum
 TO_SEARCH_DESCRIPTION = {
     'OWNER_NAME': 'Owner Name',
     'ORGANIZATION_NAME': 'Organization Name',
-    'MHR_NUMBER': 'MHR Number',
+    'MHR_NUMBER': 'Manufactured Home Registration Number',
     'SERIAL_NUMBER': 'Serial Number'
 }
 TO_NOTE_DESCRIPTION = {
@@ -315,13 +315,13 @@ class Report:  # pylint: disable=too-few-public-methods
         if 'country' in address and address['country']:
             country = address['country']
             if country == 'CA':
-                address['country'] = 'Canada'
+                address['country'] = 'CANADA'
             elif country == 'US':
-                address['country'] = 'United States of America'
+                address['country'] = 'UNITED STATED OF AMERICA'
             else:
                 try:
-                    country = pycountry.countries.search_fuzzy(country)[0].name
-                    address['country'] = country
+                    country: str = pycountry.countries.search_fuzzy(country)[0].name
+                    address['country'] = country.upper()
                 except (AttributeError, TypeError):
                     address['country'] = country
 
@@ -351,7 +351,10 @@ class Report:  # pylint: disable=too-few-public-methods
             else:
                 criteria = self._report_data['searchQuery']['criteria']['value'].upper()
             self._report_data['meta_subject'] = f'{search_desc} - "{criteria}"'
-            self._report_data['footer_content'] = f'{search_desc} Search - "{criteria}"'
+            if search_type == 'MHR_NUMBER':
+                self._report_data['footer_content'] = f'MHR Number Search - "{criteria}"'
+            else:
+                self._report_data['footer_content'] = f'{search_desc} Search - "{criteria}"'
 
     @staticmethod
     def _get_environment():

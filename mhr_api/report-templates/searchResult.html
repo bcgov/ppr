@@ -14,7 +14,8 @@
     [[style.html]]
   </head>
   <body>    
-    <article id="search-toc">
+    <article id="search-result">
+    <div class="pt-2"></div>
     <div class="header">
       <table class="header-table" role="presentation">
         <tr class="no-page-break">
@@ -46,36 +47,36 @@
 
       <table class="business-details-table" role="presentation">
         <tr>
-          <td class="lbl-business-detail">
-            <div>Search Date and Time:</div>
-            <div>Account Name:</div>
-            <div>Folio Number:</div>
-          </td>
-          <td>
-            <div>{{searchDateTime}}</div>
-            <div>
+          <td class="lbl-business-detail">Search Date and Time:</td>
+          <td colspan="2">{{searchDateTime}}</td>
+        </tr>
+        <tr>
+          <td class="lbl-business-detail">Account Name:</td>
+          <td colspan="2">
               {% if meta_account_name is defined %}
                 {{meta_account_name}}
               {% else %}
                 Not available.
               {% endif %}
-            </div>
-            <div>
+          </td>
+        </tr>
+        <tr>
+          <td class="lbl-business-detail">Folio Number:</td>
+          <td colspan="2">
               {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
                 {{searchQuery.clientReferenceId}}
               {% else %}
                 N/A
               {% endif %}
-            </div>
-
           </td>
-          <td class="registar-certify-section">
-          </td>
-
         </tr>
       </table>
     </div>
-  
+
+    <div class="footer-search-result">
+      {{ footer_content }} <span class="footer-separator">|</span>
+    </div>
+
     <table class="header-table-toc mt-6" role="presentation">
       <tr>
         <th colspan="3" class="header-toc-title pt-2">
@@ -107,7 +108,6 @@
       </tr>
     </table>
 
-
     {% if totalResultsSize > 0 and selected is defined %}
         [[search-result/selected.html]]
 {#
@@ -115,13 +115,6 @@
       <div class="nil-message pt-6">The search returned a NIL result. 0 registrations were found.</div>
 #}
     {% endif %}
-
-  </article>
-
-  <article id="search-result">
-    <div class="footer-search-result">
-      {{ footer_content }} | Page
-    </div>
 
     {% if totalResultsSize > 0 %}
       {% for detail in details %}

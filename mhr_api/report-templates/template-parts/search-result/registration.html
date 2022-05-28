@@ -1,10 +1,7 @@
-
-
 <div class="business-details-container">
   <table class="registration-header-table" id="{{ detail.mhrNumber }}"  role="presentation">
     <tr>
-      <td>MHR Registration Number: {{ detail.mhrNumber }}</td>
-      <td></td>
+      <td colspan="2">Manufactured Home Registration Number: {{ detail.mhrNumber }}</td>
     </tr>
   </table>
   <table class="business-details-table-grey" role="presentation">
@@ -62,14 +59,8 @@
   [[search-result/location.html]]
   [[search-result/details.html]]
   [[search-result/sections.html]]
-  <div class="no-page-break">
-    <div class="separator-header mt-6"></div>
-    <div class="section-title-centre mt-2">UNIT NOTES</div>
-    <div class="section-statement mt-0">(Showing most recent first)</div>
-    <div class="separator-header mt-2"></div>
-  </div>
   [[search-result/notes.html]]
-  
+
   {% if detail.pprRegistrations is defined %}
     [[search-result/pprRegistrations.html]]
   {% endif %}

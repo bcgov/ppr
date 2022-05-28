@@ -24,7 +24,7 @@
 	.header {
 		/* NB: repeats on every page due to fixed position */
 		position: fixed;
-		top: -110px; /* -192 approx 2 in */
+		top: -110px; /* -110 */
 		width: 98%;
 	}
 
@@ -176,7 +176,7 @@
 		background-color: white; /* #38698A; */
 		vertical-align: middle;
 		text-align: center;
-		/* margin-top: -90px; */ /* -43px approx 0.45 in */
+		margin-top: -22px; /* -43px approx 0.45 in */
 	}
 
 	.registration-details-container {
@@ -273,6 +273,7 @@
 
 	.business-details-table td {
 		vertical-align: middle;
+		padding-bottom: 2px;
 	}
 
 	.business-details-table td:nth-child(1) {
@@ -483,7 +484,7 @@
 	.section-statement {
 		font-family: 'BCSans-Regular', sans-serif !important;
 		color: #234075;
-		font-size: 12pt;
+		font-size: 11pt;
 		text-align: center;
 	}
 
@@ -541,7 +542,6 @@
 
 	.section-data-table {
 		width: 100%;
-		table-layout: fixed;
 		border-collapse: collapse;
 	}
 
@@ -754,7 +754,14 @@
 	}
 
 	td.top-align {
-		vertical-align:top;
+		vertical-align:top !important;
+		padding-top: 10px;
+	}
+
+	td.bottom-align {
+		vertical-align:bottom !important;
+		padding-bottom: 5px;
+		margin-bottom: 0px;
 	}
 
 	.mt-1 { margin-top: 0.25rem; }
@@ -1095,7 +1102,7 @@
 
 	.selected-mhr-table td:nth-child(8) {
 		width: 5%;
-		padding-bottom: 1rem !important;
+		text-align: right !important;
 	}
 
 
@@ -1237,11 +1244,14 @@
 		text-align: right;
 	}
 
+	.footer-separator {
+		font-size: 12px;
+	}
 
 	.footer-search-result {
 		position: running(search_result_footer);
 		font-family: 'BCSans-Regular', sans-serif !important;
-		font-size: 9px;
+		font-size: 10px;
 		font-weight: bold;
 		color: #003366;
 		text-align: right;

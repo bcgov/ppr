@@ -49,7 +49,7 @@
 
 	@page search-result {
 		/* if you change the margins, also update .header and .business-details-container */
-		margin: 1.5in 0.4in 0.65in 0.4in;
+		margin: 1.3in 0.4in 0.65in 0.4in; /* 1.5in 0.4in 0.65in 0.4in; */
         size: Letter;
 		orphans: 4 !important;
 		widows: 2 !important;
@@ -60,7 +60,7 @@
 			font-size: 10px;
 			font-weight: bold;
 			color: #003366;
-			margin-right: 112px; /* 130px */
+			margin-right: 158px;
 			margin-left: 0px;
 			margin-bottom: 10px;
 			content: element(search_result_footer);
@@ -76,7 +76,7 @@
 			margin-left: 0px;
 			padding-left: 0px;
 			margin-bottom: 10px;
-    		content: counter(page) " of " counter(pages);
+    		content: "Page " counter(page) " of " counter(pages);
 		}
         @bottom-left {
 			margin-bottom: 14px;

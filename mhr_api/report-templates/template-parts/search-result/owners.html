@@ -19,10 +19,23 @@
                 <div class="pt-2">{{ party.address.street }}</div>
                 <div>{{ party.address.streetAdditional }}</div>
                 <div>{{ party.address.city }} {{ party.address.region }}</div>
-                <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                <div>
+                    {% if party.address.postalCode is defined and party.address.postalCode != '' %}
+                        {{ party.address.postalCode }}&nbsp;&nbsp; 
+                    {% endif %}
+                    {{ party.address.country}}
+                </div>
             </td>
             <td class="col-33">
-           </td>
+                <div class="section-sub-title">Tenancy Type</div>
+                {% if party.type == 'SO' %}
+                    Sole Owner
+                {% elif party.type == 'JT' %}
+                    Joint Owner
+                {% else %}
+                    Tenant in Common
+                {% endif %}
+            </td>
          </tr>
     {% endfor %}
     </table>
