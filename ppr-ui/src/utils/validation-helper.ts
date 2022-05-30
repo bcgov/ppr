@@ -72,16 +72,16 @@ export function validateSearchAction (
     case APIMHRMapSearchTypes.MHROWNER_NAME:
       if (!first) {
         validation.searchValue.messageFirst = 'Enter a first name'
-      } else if (first?.length > 50) {
-        validation.searchValue.messageFirst = 'Maximum 50 characters'
+      } else if (first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
       }
-      if (second && second?.length > 50) {
-        validation.searchValue.messageSecond = 'Maximum 50 characters'
+      if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
       }
       if (!last) {
         validation.searchValue.messageLast = 'Enter a last name'
-      } else if (last?.length > 50) {
-        validation.searchValue.messageLast = 'Maximum 50 characters'
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case APISearchTypes.BUSINESS_DEBTOR:
@@ -100,7 +100,7 @@ export function validateSearchAction (
     case APIMHRMapSearchTypes.MHRMHR_NUMBER:
       if (!searchValue) {
         validation.searchValue.message =
-          'Enter a manufactured home registration number to search'
+          'Enter a manufactured home registration number'
       }
       if (searchValue?.length > 6) {
         validation.searchValue.message = 'Maximum 6 digits'
@@ -162,7 +162,7 @@ export function validateSearchRealTime (
     case APISearchTypes.SERIAL_NUMBER:
       if (searchValue && specialCharsStrict.test(searchValue)) {
         validation.searchValue.message =
-          "Serial numbers don't normally contain special characters"
+          'Serial numbers don\'t normally contain special characters'
       }
       if (searchValue?.length < 4) {
         validation.searchValue.popUp = [
@@ -181,24 +181,43 @@ export function validateSearchRealTime (
       }
       break
     case APISearchTypes.INDIVIDUAL_DEBTOR:
-    case APIMHRMapSearchTypes.MHROWNER_NAME:
       if (first && specialCharsLax.test(first)) {
         validation.searchValue.messageFirst =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       } else if (first && first?.length > 50) {
         validation.searchValue.messageFirst = 'Maximum 50 characters'
       }
       if (second && specialCharsLax.test(second)) {
         validation.searchValue.messageSecond =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       } else if (second && second?.length > 50) {
         validation.searchValue.messageSecond = 'Maximum 50 characters'
       }
       if (last && specialCharsLax.test(last)) {
         validation.searchValue.messageLast =
-          "Names don't normally contain special characters"
+          'Names don\'t normally contain special characters'
       } else if (last?.length > 50) {
         validation.searchValue.messageLast = 'Maximum 50 characters'
+      }
+      break
+    case APIMHRMapSearchTypes.MHROWNER_NAME:
+      if (first && specialCharsLax.test(first)) {
+        validation.searchValue.messageFirst =
+          'Names don\'t normally contain special characters'
+      } else if (first && first?.length > 15) {
+        validation.searchValue.messageFirst = 'Maximum 15 characters'
+      }
+      if (second && specialCharsLax.test(second)) {
+        validation.searchValue.messageSecond =
+          'Names don\'t normally contain special characters'
+      } else if (second && second?.length > 15) {
+        validation.searchValue.messageSecond = 'Maximum 15 characters'
+      }
+      if (last && specialCharsLax.test(last)) {
+        validation.searchValue.messageLast =
+          'Names don\'t normally contain special characters'
+      } else if (last?.length > 25) {
+        validation.searchValue.messageLast = 'Maximum 25 characters'
       }
       break
     case APISearchTypes.BUSINESS_DEBTOR:
@@ -243,6 +262,10 @@ export function validateSearchRealTime (
     case APIMHRMapSearchTypes.MHRORGANIZATION_NAME:
       if (searchValue?.length > 70) {
         validation.searchValue.message = 'Maximum 70 characters'
+      }
+      if (specialCharsLax.test(searchValue)) {
+        validation.searchValue.message =
+          'Names don\'t normally contain special characters'
       }
       break
   }

@@ -459,7 +459,7 @@ describe('MHR search', () => {
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
-    expect(messages.at(0).text()).toContain('Manufactured home registration number must contain')
+    expect(messages.at(0).text()).toContain('Manufactured home registration numbers normally contain up to 6 digits')
     await Vue.nextTick()
     await Vue.nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()

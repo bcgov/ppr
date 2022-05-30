@@ -69,7 +69,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APISearchTypes.MHR_NUMBER,
     textLabel: 'Enter a manufactured home registration number',
     hints: {
-      searchValue: 'Manufactured home registration number must contain 6 digits'
+      searchValue: 'Manufactured home registration numbers normally contain up to 6 digits'
     },
     group: 1
   },
@@ -127,7 +127,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APIMHRMapSearchTypes.MHRMHR_NUMBER,
     textLabel: 'Enter a manufactured home registration number',
     hints: {
-      searchValue: 'Manufactured home registration number must contain 6 digits'
+      searchValue: 'Manufactured home registration numbers normally contain up to 6 digits'
     },
     group: 2
   },
