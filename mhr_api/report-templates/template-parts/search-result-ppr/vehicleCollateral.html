@@ -25,7 +25,13 @@
             <td>{{collateral.year}}</td>
             <td>{{collateral.make}} 
                {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
+            <td>
+               {% if collateral.serialNumber is defined and collateral.serialNumber != '' %}
+                  {{collateral.serialNumber}}
+               {% else %}
+                  N/A 
+               {% endif %}              
+            </td>
             {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
                <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
                   {{collateral.manufacturedHomeRegistrationNumber}}
@@ -61,7 +67,13 @@
             <td>{{collateral.year}}</td>
             <td>{{collateral.make}} 
                {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
+            <td>
+               {% if collateral.serialNumber is defined and collateral.serialNumber != '' %}
+                  {{collateral.serialNumber}}
+               {% else %}
+                  N/A 
+               {% endif %}              
+            </td>
             {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
                <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
                      {{collateral.manufacturedHomeRegistrationNumber}}
@@ -82,7 +94,13 @@
             <td>{{collateral.year}}</td>
             <td>{{collateral.make}} 
                {% if collateral.model is defined %} / {{collateral.model}}{% endif %}</td>
-            <td>{{collateral.serialNumber}}</td>
+            <td>
+               {% if collateral.serialNumber is defined and collateral.serialNumber != '' %}
+                  {{collateral.serialNumber}}
+               {% else %}
+                  N/A 
+               {% endif %}              
+            </td>            
             {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
                <td>{% if collateral.manufacturedHomeRegistrationNumber is defined %}
                      {{collateral.manufacturedHomeRegistrationNumber}}

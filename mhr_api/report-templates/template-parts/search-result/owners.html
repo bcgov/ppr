@@ -28,13 +28,15 @@
             </td>
             <td class="col-33">
                 <div class="section-sub-title">Tenancy Type</div>
-                {% if party.type == 'SO' %}
-                    Sole Owner
-                {% elif party.type == 'JT' %}
-                    Joint Owner
-                {% else %}
-                    Tenant in Common
-                {% endif %}
+                <div class="pt-2">
+                    {% if party.type == 'SO' %}
+                        Sole Owner
+                    {% elif party.type == 'JT' %}
+                        Joint Owner
+                    {% else %}
+                        Tenant in Common
+                    {% endif %}
+                </div>
             </td>
          </tr>
     {% endfor %}

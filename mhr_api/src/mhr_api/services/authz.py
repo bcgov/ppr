@@ -23,7 +23,7 @@ from urllib3.util.retry import Retry
 
 
 SYSTEM_ROLE = 'system'
-STAFF_ROLE = 'mhr_staff'
+STAFF_ROLE = 'ppr_staff'  # Share single role/account id with ppr for search, registration history.
 COLIN_ROLE = 'colin'
 MHR_ROLE = 'mhr'
 BASIC_USER = 'basic'

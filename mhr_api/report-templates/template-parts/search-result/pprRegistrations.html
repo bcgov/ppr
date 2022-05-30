@@ -1,10 +1,8 @@
-<div class="business-details-container pt-5">
-  <div class="no-page-break">
-    <div class="dashed-separator-header mt-6"></div>
-    <div class="section-title-centre mt-2">PERSONAL PROPERTY REGISTRY SEARCH RESULT</div>
-    <div class="section-statement mt-0">For MHR Number "{{ detail.mhrNumber }}" as of {{searchDateTime}}</div>
-    <div class="dashed-separator-header mt-2 mb-5"></div>
-  </div>
+<div class="no-page-break">
+  <div class="dashed-separator-header mt-6"></div>
+  <div class="section-title-centre mt-2">PERSONAL PROPERTY REGISTRY SEARCH RESULT</div>
+  <div class="section-statement mt-0">For MHR Number "{{ detail.mhrNumber }}" as of {{searchDateTime}}</div>
+  <div class="dashed-separator-header mt-2 mb-5"></div>
 </div>
 
   {% if detail.pprRegistrations|length > 0 %}
