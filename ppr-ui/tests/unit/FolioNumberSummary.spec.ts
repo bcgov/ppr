@@ -55,7 +55,9 @@ describe('Folio number on the summary page', () => {
   })
 
   it('sets the validity to false for > 50 characters', async () => {
-    wrapper.find('#txt-folio').setValue('MY TEST THAT IS VERY LONG IN FACT TOO LONG SKDJFA ASKDJFL ASDKFJL ASDKJFL ALKSJDFLKJ ALSDKFJ AKSDJF')
+    wrapper.find('#txt-folio').setValue(
+      'MY TEST THAT IS VERY LONG IN FACT TOO LONG SKDJFA ASKDJFL ASDKFJL ASDKJFL ALKSJDFLKJ ALSDKFJ AKSDJF'
+    )
     await Vue.nextTick()
     await Vue.nextTick()
     await Vue.nextTick()

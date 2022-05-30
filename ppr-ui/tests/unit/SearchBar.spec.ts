@@ -13,15 +13,15 @@ import { ConfirmationDialog } from '@/components/dialogs'
 import { SearchBar } from '@/components/search'
 
 // Other
-import {MHRSearchTypes, SearchTypes} from '@/resources'
-import {AutoCompleteResponseIF, ManufacturedHomeSearchResponseIF, SearchResponseIF, SearchTypeIF} from '@/interfaces'
+import { MHRSearchTypes, SearchTypes } from '@/resources'
+import { AutoCompleteResponseIF, ManufacturedHomeSearchResponseIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import {
   mockedDefaultUserSettingsResponse,
   mockedDisableAllUserSettingsResponse, mockedMHRSearchResponse,
   mockedSearchResponse,
   mockedVonResponse
 } from './test-data'
-import {APIMHRSearchTypes, UIMHRSearchTypes, UISearchTypes} from '@/enums'
+import { APIMHRSearchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
 import { FolioNumber } from '@/components/common'
 import { getLastEvent, getTestId } from './utils'
 import flushPromises from 'flush-promises'
@@ -695,7 +695,6 @@ describe('Registration number search', () => {
 })
 
 describe('Staff and Client search buttons', () => {
-
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -712,9 +711,8 @@ describe('Staff and Client search buttons', () => {
   })
 
   it('should show/hide Staff and Client search buttons', async () => {
-
     await store.dispatch('setRoleSbc', false)
-    
+
     // Staff Roles
     await store.dispatch('setAuthRoles', ['staff', 'mhr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
@@ -731,7 +729,7 @@ describe('Staff and Client search buttons', () => {
     await store.dispatch('setAuthRoles', ['mhr'])
     await store.dispatch('setRoleSbc', true)
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
-    
+
     await store.dispatch('setAuthRoles', ['ppr'])
     await store.dispatch('setRoleSbc', true)
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
@@ -743,6 +741,5 @@ describe('Staff and Client search buttons', () => {
 
     await store.dispatch('setAuthRoles', ['mhr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
-
   })
 })

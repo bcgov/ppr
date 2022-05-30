@@ -134,8 +134,12 @@ describe('Collateral validation tests', () => {
     wrapper.find('#txt-type-drop').setValue('MV')
     await Vue.nextTick()
     wrapper.find('#txt-serial').setValue('ABC123')
-    wrapper.find('#txt-make').setValue('This is a very long make for a car or any vehicle for that matter but is it too long')
-    wrapper.find('#txt-model').setValue('This is a very long model for a car or any vehicle for that matter but is it too long')
+    wrapper.find('#txt-make').setValue(
+      'This is a very long make for a car or any vehicle for that matter but is it too long'
+    )
+    wrapper.find('#txt-model').setValue(
+      'This is a very long model for a car or any vehicle for that matter but is it too long'
+    )
     wrapper.find('#txt-years').setValue(2016)
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()

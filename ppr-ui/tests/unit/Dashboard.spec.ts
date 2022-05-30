@@ -90,7 +90,8 @@ describe('Dashboard component', () => {
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
     const getRegistration = getStub.withArgs(`financing-statements/${regNum}`)
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
@@ -160,7 +161,6 @@ describe('Dashboard component', () => {
   })
 
   it('displays the search header', () => {
-    
     const header = wrapper.findAll(searchHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Personal Property Search')
@@ -305,7 +305,8 @@ describe('Dashboard registration table tests', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegDrafts) })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: cloneDeep(myRegHistory) })))
     const getDebtorNames = getStub
       .withArgs(`financing-statements/${mockedRegistration1.baseRegistrationNumber}/debtorNames`)
@@ -362,7 +363,9 @@ describe('Dashboard registration table tests', () => {
     expect(wrapper.vm.getRegTableBaseRegs).toEqual(myRegHistoryWithChildren)
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain(`Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`)
+    expect(header.at(0).text()).toContain(
+      `Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`
+    )
     // removed filter until UX decides they want it or not
     // expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)
@@ -508,7 +511,8 @@ describe('Dashboard add registration tests', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(
@@ -587,18 +591,21 @@ describe('Dashboard add registration tests', () => {
       'Registration was successfully added to your table.'
     )
     // reg table data updated with new reg
-    const expectedRegTableData: RegTableNewItemI = { addedReg: myRegAdd.registrationNumber, addedRegParent: '', addedRegSummary: myRegAdd, prevDraft: '' }
+    const expectedRegTableData: RegTableNewItemI = {
+      addedReg: myRegAdd.registrationNumber, addedRegParent: '', addedRegSummary: myRegAdd, prevDraft: ''
+    }
     expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem).toEqual(expectedRegTableData)
     expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegItem).toEqual(expectedRegTableData)
     // reg table data updated with blank values after 5 sec
-    const emptyRegTableData: RegTableNewItemI = { addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: '' }
+    const emptyRegTableData: RegTableNewItemI = {
+      addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: ''
+    }
     setTimeout(() => {
       expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem).toEqual(emptyRegTableData)
       expect(wrapper.findComponent(RegistrationTable).vm.$props.setNewRegItem).toEqual(emptyRegTableData)
     }, 5100)
   })
 })
-
 
 describe('Dashboard error modal tests', () => {
   setupIntersectionObserverMock()
@@ -616,7 +623,8 @@ describe('Dashboard error modal tests', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
     const getMyRegAdd = getStub.withArgs(

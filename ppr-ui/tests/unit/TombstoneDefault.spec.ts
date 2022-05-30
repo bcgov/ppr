@@ -50,7 +50,9 @@ function createComponent (mockRoute: string): Wrapper<any> {
  * Check tombstone header content against different roles.
  *
  */
-async function assertHeaderForRole (wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, headerContent: string) {
+async function assertHeaderForRole (
+  wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, headerContent: string
+) {
   await store.dispatch('setAuthRoles', roles)
   await store.dispatch('setRoleSbc', isSbc)
   const header = wrapper.findAll(tombstoneHeader)
@@ -164,5 +166,4 @@ describe('TombstoneDefault component tests', () => {
     await assertHeaderForRole(wrapper, CLIENT_PPR_MHR, false, 'My Asset Registries')
     await assertHeaderForRole(wrapper, HELP_DESK_PPR_MHR, true, 'Staff Asset Registries')
   })
-  
 })

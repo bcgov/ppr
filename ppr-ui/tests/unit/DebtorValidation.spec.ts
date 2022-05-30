@@ -43,7 +43,6 @@ function createComponent (
   })
 }
 
-
 describe('Debtor validation tests - business', () => {
   let wrapper: Wrapper<any>
 

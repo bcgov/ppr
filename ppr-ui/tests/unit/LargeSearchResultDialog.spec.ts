@@ -52,23 +52,22 @@ describe('Large Search Result Dialog', () => {
   })
 
   it('renders the component with all options', async () => {
-      const options = largeSearchReportError
+    const options = largeSearchReportError
 
-      expect(wrapper.findComponent(LargeSearchResultDialog).exists()).toBe(true)
-      expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
-      expect(wrapper.isVisible()).toBe(true)
-      expect(wrapper.find(title).text()).toBe(options.title)
-      // number of registrations
-      expect(wrapper.find(text).text()).toContain('75 registrations')
-      expect(wrapper.find(accept).exists()).toBe(true)
-      wrapper.find(accept).trigger('click')
-      await Vue.nextTick()
-      expect(getLastEvent(wrapper, proceed)).toEqual(true)
-    
-      expect(wrapper.find(cancel).exists()).toBe(true)
-      wrapper.find(cancel).trigger('click')
-      await Vue.nextTick()
-      expect(getLastEvent(wrapper, proceed)).toEqual(false)
-  
+    expect(wrapper.findComponent(LargeSearchResultDialog).exists()).toBe(true)
+    expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
+    expect(wrapper.isVisible()).toBe(true)
+    expect(wrapper.find(title).text()).toBe(options.title)
+    // number of registrations
+    expect(wrapper.find(text).text()).toContain('75 registrations')
+    expect(wrapper.find(accept).exists()).toBe(true)
+    wrapper.find(accept).trigger('click')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, proceed)).toEqual(true)
+
+    expect(wrapper.find(cancel).exists()).toBe(true)
+    wrapper.find(cancel).trigger('click')
+    await Vue.nextTick()
+    expect(getLastEvent(wrapper, proceed)).toEqual(false)
   })
 })

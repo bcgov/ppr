@@ -20,7 +20,7 @@
         >
           <template v-slot:body="{ items, headers }">
             <tbody v-if="items.length > 0">
-              <tr v-for="item in items" :key="item.name">
+              <tr v-for="item in items" :key="`${item.name}: ${items.indexOf(item) + keyValue}`">
                 <td>
                   <v-row no-gutters>
                     <v-col cols="2">
@@ -74,7 +74,8 @@
                 </td>
                 <td>
                   <v-btn
-                    v-if="item.searchId !== 'PENDING' && !item.inProgress && isPDFAvailable(item)"
+                    v-if="item.searchId !== 'PENDING' &&
+                    !item.inProgress && isPDFAvailable(item) && isMhrReportReady(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     depressed
@@ -93,8 +94,13 @@
                     transition="fade-transition"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <!-- FUTURE: @click to refresh history item -->
-                      <v-btn v-if="!item.inProgress" color="primary" icon :loading="item.loadingPDF">
+                      <v-btn
+                        icon
+                        v-if="!item.inProgress"
+                        color="primary"
+                        :loading="item.loadingPDF"
+                        @click="refreshRow(item)"
+                      >
                         <v-icon color="primary" v-bind="attrs" v-on="on">
                           mdi-information-outline
                         </v-icon>
@@ -188,6 +194,7 @@ export default defineComponent({
       'hasMhrRole'
     ])
     const localState = reactive({
+      keyValue: 0,
       headers: computed((): Array<any> => {
         const tableHeaders = cloneDeep(searchHistoryTableHeaders)
         if (localState.isStaff) {
@@ -263,7 +270,7 @@ export default defineComponent({
       }
       return UISearchType
     }
-    const downloadPDF = async (item: SearchResponseIF): Promise<void> => {
+    const downloadPDF = async (item: SearchResponseIF): Promise<boolean> => {
       item.loadingPDF = true
       let pdf:any = null
       if (isPprSearch(item)) {
@@ -272,7 +279,9 @@ export default defineComponent({
         pdf = await searchMhrPDF(item.searchId)
       }
       if (pdf.error) {
-        emit('error', pdf.error)
+        if (isPprSearch(item)) emit('error', pdf.error)
+        item.loadingPDF = false
+        return false
       } else {
         /* solution from https://github.com/axios/axios/issues/1392 */
 
@@ -303,6 +312,7 @@ export default defineComponent({
         }
       }
       item.loadingPDF = false
+      return true
     }
     const generateReport = _.throttle(async (item: SearchResponseIF): Promise<void> => {
       let callBack = false
@@ -366,7 +376,23 @@ export default defineComponent({
     const isPprSearch = (item: SearchResponseIF): boolean => {
       return item.exactResultsSize >= 0
     }
-
+    const isMhrReportReady = (item: SearchResponseIF): boolean => {
+      if (isPprSearch(item)) return true
+      else {
+        // Give the api 30s buffer to finish report generation
+        const now = new Date()
+        const searchDatetime = new Date(item.searchDateTime)
+        const diffTime = now.getTime() - searchDatetime.getTime()
+        return diffTime > 30000
+      }
+    }
+    const refreshRow = async (item): Promise<void> => {
+      const pdf = await downloadPDF(item)
+      if (pdf) {
+        // Update unique key value of table row to refresh singular component
+        localState.keyValue += 1
+      }
+    }
     return {
       ...toRefs(localState),
       displayDate,
@@ -376,9 +402,11 @@ export default defineComponent({
       downloadPDF,
       generateReport,
       getTooltipTxtPdf,
+      isMhrReportReady,
       isPDFAvailable,
       isPprSearch,
       isSearchOwner,
+      refreshRow,
       retrySearch
     }
   }

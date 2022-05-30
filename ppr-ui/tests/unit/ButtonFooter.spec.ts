@@ -34,7 +34,6 @@ const saveResumeBtn: string = '#reg-save-resume-btn'
 const backBtn: string = '#reg-back-btn'
 const nextBtn: string = '#reg-next-btn'
 
-
 const router = mockRouter.mock()
 
 /**
@@ -151,7 +150,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     await wrapper.find(cancelBtn).trigger('click')
     expect(wrapper.vm.showCancelDialog).toBe(false)
   })
-  
+
   it('Step 2 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
     await Vue.nextTick()
@@ -299,7 +298,6 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
   })
 })
 
-
 describe('Step 4 for SBC staff', () => {
   let wrapper: Wrapper<any>
   let wrapper2: any // eslint-disable-line no-unused-vars
@@ -320,26 +318,27 @@ describe('Step 4 for SBC staff', () => {
   it('renders with step 4 values', async () => {
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
-    
   })
- 
+
   it('doesnt show staff payment dialog on submit if not valid', async () => {
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
     expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(false)
-    expect(getLastEvent(wrapper, 'registration-incomplete')).toMatchObject({"message": "Registration incomplete: one or more steps is invalid.", "statusCode": 400})
+    expect(getLastEvent(wrapper, 'registration-incomplete')).toMatchObject({
+      message: 'Registration incomplete: one or more steps is invalid.', statusCode: 400
+    })
   })
 
   it('Shows staff payment dialog on submit', async () => {
     wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid = true
     wrapper.vm.$store.state.stateModel.registration.parties.valid = true
-    wrapper.vm.$store.state.stateModel.registration.collateral.valid  = true
+    wrapper.vm.$store.state.stateModel.registration.collateral.valid = true
     wrapper.vm.$props.certifyValid = true
     await Vue.nextTick()
     await Vue.nextTick()
     wrapper.find(nextBtn).trigger('click')
     await Vue.nextTick()
-    
+
     expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
   })
 
@@ -347,15 +346,13 @@ describe('Step 4 for SBC staff', () => {
     await store.dispatch('setAuthRoles', ['staff', 'helpdesk'])
     await Vue.nextTick()
     expect(wrapper.find(nextBtn).attributes('disabled')).toBe('disabled')
-    
   })
-
 })
 
 describe('Button events', () => {
   let wrapper: Wrapper<any>
   let sandbox
-  
+
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
     const post = sandbox.stub(axios, 'post')
@@ -376,7 +373,7 @@ describe('Button events', () => {
     wrapper.vm.$store.state.stateModel.registration = mockedModelAmendmdmentAdd.registration
     wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid = true
     wrapper.vm.$store.state.stateModel.registration.parties.valid = true
-    wrapper.vm.$store.state.stateModel.registration.collateral.valid  = true
+    wrapper.vm.$store.state.stateModel.registration.collateral.valid = true
     wrapper.vm.$props.certifyValid = true
     expect(getLastEvent(wrapper, 'error')).toBeNull()
     await wrapper.vm.submitNext()

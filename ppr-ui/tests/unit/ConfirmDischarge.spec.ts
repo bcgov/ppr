@@ -24,7 +24,9 @@ import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
-import { mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll, mockedPartyCodeSearchResults } from './test-data'
+import {
+  mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll, mockedPartyCodeSearchResults
+} from './test-data'
 
 Vue.use(Vuetify)
 
@@ -91,9 +93,13 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegNum).toContain(regNum)
     // eslint-disable-next-line max-len
-    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegType).toContain(state.registration.registrationType.registrationTypeUI)
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegType).toContain(
+      state.registration.registrationType.registrationTypeUI
+    )
     // eslint-disable-next-line max-len
-    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe('General Collateral and 2 Vehicles')
+    expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe(
+      'General Collateral and 2 Vehicles'
+    )
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(false)
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
@@ -151,7 +157,9 @@ describe('ConfirmDischarge registration view', () => {
   it('shows validation errors when needed when submitting', async () => {
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setShowErrors).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('< Please complete required information')
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe(
+      '< Please complete required information'
+    )
     // msgs go away when validation changes
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
@@ -184,8 +192,12 @@ describe('ConfirmDischarge registration view', () => {
       await flushPromises()
       expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
       // new dishcarge registration is in store regTableData
-      expect(wrapper.vm.$store.state.stateModel.regTableData.addedReg).toBe(mockedDischargeResponse.dischargeRegistrationNumber)
-      expect(wrapper.vm.$store.state.stateModel.regTableData.addedRegParent).toBe(mockedDischargeResponse.baseRegistrationNumber)
+      expect(wrapper.vm.$store.state.stateModel.regTableData.addedReg).toBe(
+        mockedDischargeResponse.dischargeRegistrationNumber
+      )
+      expect(wrapper.vm.$store.state.stateModel.regTableData.addedRegParent).toBe(
+        mockedDischargeResponse.baseRegistrationNumber
+      )
     }, 2000)
   })
 })

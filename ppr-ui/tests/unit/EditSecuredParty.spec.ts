@@ -184,7 +184,6 @@ describe('Secured Party edit individual tests', () => {
     await Vue.nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
-
 })
 
 describe('Registering party test', () => {

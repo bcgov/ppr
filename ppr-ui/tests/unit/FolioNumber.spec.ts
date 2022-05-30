@@ -13,7 +13,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-
 // Input field selectors / buttons
 
 const folioEditTxt: string = '#folio-edit-txt'
@@ -80,7 +79,6 @@ describe('Folio number tests', () => {
     await Vue.nextTick()
     const newEdit = wrapper.findAll(folioEditTxt)
     expect(newEdit.length).toBe(1)
-
   })
 
   it('validates the folio number', async () => {

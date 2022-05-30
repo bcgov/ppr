@@ -199,5 +199,4 @@ describe('Review Confirm new registration component', () => {
     await flushPromises()
     expect(getLastEvent(wrapper, 'error')).toEqual(error)
   })
-
 })

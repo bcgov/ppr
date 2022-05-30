@@ -23,7 +23,6 @@ const doneButtonSelector: string = '#done-btn-debtor'
 const cancelButtonSelector: string = '#cancel-btn-debtor'
 const removeButtonSelector: string = '#remove-btn-debtor'
 
-
 /**
  * Creates and mounts a component, so that it can be tested.
  *

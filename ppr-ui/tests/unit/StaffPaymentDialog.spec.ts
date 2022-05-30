@@ -85,7 +85,6 @@ describe('Payment component', () => {
     expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(true)
   })
 
-
   it('updates store payment info', async () => {
     wrapper.findComponent(StaffPaymentComponent).vm.$emit('update:staffPaymentData', {
       option: 1,
