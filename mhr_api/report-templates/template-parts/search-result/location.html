@@ -13,8 +13,12 @@
                 <div>{{ detail.location.address.streetAdditional }}</div>
                 <div>{{ detail.location.address.city }} 
                      {{ detail.location.address.region }}</div>
-                <div>{{ detail.location.address.postalCode }} 
-                     {{ detail.location.address.country }}</div>
+                <div>
+                    {% if detail.location.address.postalCode is defined and detail.location.address.postalCode != '' %}
+                        {{ detail.location.address.postalCode }}&nbsp;&nbsp; 
+                    {% endif %}
+                    {{ detail.location.address.country }}
+                </div>
             </td>
             <td class="col-33">
                 <div class="section-sub-title">Pad Number</div>
