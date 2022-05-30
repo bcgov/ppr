@@ -80,7 +80,4 @@ describe('Parties tests', () => {
     // show tooltip
     expect(wrapper.find('.registering-tooltip').exists()).toBeTruthy()
   })
-
- 
 })
-

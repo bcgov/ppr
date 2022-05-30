@@ -24,14 +24,14 @@ export function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  * overwrite method. `jest.fn()` mock functions can be passed here if the goal is to not only
  * mock the intersection observer, but its methods.
  */
- export function setupIntersectionObserverMock({
+export function setupIntersectionObserverMock ({
   root = null,
   rootMargin = '',
   thresholds = [],
   disconnect = () => null,
   observe = () => null,
   takeRecords = () => [],
-  unobserve = () => null,
+  unobserve = () => null
 } = {}): void {
   class MockIntersectionObserver implements IntersectionObserver {
     readonly root: Element | null = root;
@@ -50,13 +50,13 @@ export function getLastEvent (wrapper: Wrapper<any>, name: string): any {
       configurable: true,
       value: MockIntersectionObserver
     }
-  );
+  )
 }
 
 /**
  * Utility function that keeps tests looking cleaner (via string template).
  * @param dataTestId - Name of 'data-test-id' attribute in the component that needs to be tested.
  */
-export function getTestId(dataTestId: string) {
+export function getTestId (dataTestId: string) {
   return `[data-test-id='${dataTestId}']`
 }

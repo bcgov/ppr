@@ -191,42 +191,42 @@ describe('Test registration table with results', () => {
     // clear filters btn shows
     expect(wrapper.findAll('.v-btn.registration-action').length).toBe(1)
     // wait - sort will wait at least 1 second for debounce
-      setTimeout( async () => {
-        // emitted the new sort
+    setTimeout(async () => {
+      // emitted the new sort
+      expect(getLastEvent(wrapper, 'sort')).toEqual({
+        endDate: null,
+        folNum: '',
+        orderBy: '',
+        orderVal: '',
+        regBy: '',
+        regNum: '23',
+        regParty: '',
+        regType: '',
+        secParty: '',
+        startDate: null,
+        status: ''
+      })
+      // clear filters btn clears the filter
+      await wrapper.find('.v-btn.registration-action').trigger('click')
+      expect(wrapper.vm.registrationNumber).toBe('')
+      // need to wait 1 secs due to debounce
+      setTimeout(() => {
         expect(getLastEvent(wrapper, 'sort')).toEqual({
           endDate: null,
           folNum: '',
           orderBy: '',
           orderVal: '',
           regBy: '',
-          regNum: '23',
+          regNum: '',
           regParty: '',
           regType: '',
           secParty: '',
           startDate: null,
           status: ''
         })
-        // clear filters btn clears the filter
-        await wrapper.find('.v-btn.registration-action').trigger('click')
-        expect(wrapper.vm.registrationNumber).toBe('')
-        // need to wait 1 secs due to debounce
-        setTimeout(() => {
-          expect(getLastEvent(wrapper, 'sort')).toEqual({
-            endDate: null,
-            folNum: '',
-            orderBy: '',
-            orderVal: '',
-            regBy: '',
-            regNum: '',
-            regParty: '',
-            regType: '',
-            secParty: '',
-            startDate: null,
-            status: ''
-          })
-        }, 3000)
-        expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
       }, 3000)
+      expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
+    }, 3000)
   })
 
   it('renders and displays the typeahead dropdown', async () => {
@@ -261,7 +261,7 @@ describe('Test registration table with results', () => {
     wrapper.findComponent(DatePicker).vm.$emit('submit', { endDate: endDate, startDate: startDate })
     await flushPromises()
     // wait for debounce
-    setTimeout( async () => {
+    setTimeout(async () => {
       expect(wrapper.vm.showDatePicker).toBe(false)
       expect(wrapper.findComponent(DatePicker).isVisible()).toBe(false)
       expect(wrapper.vm.submittedStartDate).toBe(startDate)
@@ -320,12 +320,26 @@ describe('Test registration table with results', () => {
     const baseRegItem = newRegistrationHistory[2] as RegistrationSummaryIF
     const childDraftItem = baseRegItem.changes[0] as DraftResultIF
     const childRegItem = (newRegistrationHistory[3] as RegistrationSummaryIF).changes[0] as RegistrationSummaryIF
-    const testItems = [ firstItem, baseRegItem, childDraftItem, childRegItem  ]
+    const testItems = [firstItem, baseRegItem, childDraftItem, childRegItem]
 
-    const newRegFirstItem: RegTableNewItemI = { addedReg: firstItem.documentId, addedRegParent: '', addedRegSummary: firstItem, prevDraft: '' }
-    const newRegBaseItem: RegTableNewItemI = { addedReg: baseRegItem.registrationNumber, addedRegParent: '', addedRegSummary: baseRegItem, prevDraft: '' }
-    const newRegChildDraftItem: RegTableNewItemI = { addedReg: childDraftItem.documentId, addedRegParent: childDraftItem.baseRegistrationNumber, addedRegSummary: childDraftItem, prevDraft: '' }
-    const newRegChildItem: RegTableNewItemI = { addedReg: childRegItem.registrationNumber, addedRegParent: childRegItem.baseRegistrationNumber, addedRegSummary: childRegItem, prevDraft: '' }
+    const newRegFirstItem: RegTableNewItemI = {
+      addedReg: firstItem.documentId, addedRegParent: '', addedRegSummary: firstItem, prevDraft: ''
+    }
+    const newRegBaseItem: RegTableNewItemI = {
+      addedReg: baseRegItem.registrationNumber, addedRegParent: '', addedRegSummary: baseRegItem, prevDraft: ''
+    }
+    const newRegChildDraftItem: RegTableNewItemI = {
+      addedReg: childDraftItem.documentId,
+      addedRegParent: childDraftItem.baseRegistrationNumber,
+      addedRegSummary: childDraftItem,
+      prevDraft: ''
+    }
+    const newRegChildItem: RegTableNewItemI = {
+      addedReg: childRegItem.registrationNumber,
+      addedRegParent: childRegItem.baseRegistrationNumber,
+      addedRegSummary: childRegItem,
+      prevDraft: ''
+    }
 
     const emptyNewReg: RegTableNewItemI = { addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: '' }
 

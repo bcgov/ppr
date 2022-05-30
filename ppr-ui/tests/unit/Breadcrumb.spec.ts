@@ -62,7 +62,9 @@ function createComponent (
   })
 }
 
-async function assertBreadcrumbItemForRole (wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, breadcrumbItemContent: string) {
+async function assertBreadcrumbItemForRole (
+  wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, breadcrumbItemContent: string
+) {
   await store.dispatch('setAuthRoles', roles)
   await store.dispatch('setRoleSbc', isSbc)
   const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))

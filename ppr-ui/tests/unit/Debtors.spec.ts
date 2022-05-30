@@ -161,11 +161,9 @@ describe('Debtor amendment tests', () => {
   })
 
   it('fires the open event', async () => {
-    
     wrapper.vm.initEdit(1)
     expect(getLastEvent(wrapper, 'debtorOpen')).toBeTruthy()
   })
-
 })
 
 describe('Debtor validation tests', () => {

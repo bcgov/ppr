@@ -8,7 +8,9 @@ import sinon from 'sinon'
 // Components
 import { AmendRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
-import { AmendmentDescription, RegistrationLengthTrustAmendment, RegistrationLengthTrustSummary } from '@/components/registration'
+import {
+  AmendmentDescription, RegistrationLengthTrustAmendment, RegistrationLengthTrustSummary
+} from '@/components/registration'
 import { StickyContainer } from '@/components/common'
 import { Debtors } from '@/components/parties/debtor'
 import { SecuredParties } from '@/components/parties/party'
@@ -58,7 +60,7 @@ describe('Amendment registration component', () => {
     post.returns(new Promise(resolve => resolve({
       data: { ...mockedDraftAmendmentStatement }
     })))
-   
+
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
     localVue.use(VueRouter)

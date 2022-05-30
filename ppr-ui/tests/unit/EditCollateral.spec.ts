@@ -147,5 +147,4 @@ describe('Collateral edit tests', () => {
     await Vue.nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
-    
 })

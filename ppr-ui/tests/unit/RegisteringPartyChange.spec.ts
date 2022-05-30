@@ -60,7 +60,7 @@ describe('Parties tests', () => {
   it('renders with default values', async () => {
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     expect(wrapper.findComponent(RegisteringParty).exists()).toBe(true)
-    //does not show party search and edit when not change
+    // does not show party search and edit when not change
     expect(wrapper.findComponent(PartySearch).exists()).toBe(false)
     expect(wrapper.findComponent(EditParty).exists()).toBe(false)
   })
@@ -68,7 +68,7 @@ describe('Parties tests', () => {
   it('shows the search on change', async () => {
     wrapper.vm.openChangeScreen = true
     await Vue.nextTick()
-    //does not show party search and edit when not change
+    // does not show party search and edit when not change
     expect(wrapper.findComponent(PartySearch).exists()).toBe(true)
     expect(wrapper.findComponent(EditParty).exists()).toBe(false)
   })
@@ -121,8 +121,6 @@ describe('Parties tests', () => {
     expect(wrapper.vm.registeringParty).toEqual(newRegParty)
   })
 
-  
-
   it('trigger change registering party edit', async () => {
     wrapper.vm.changeRegisteringParty()
     await Vue.nextTick()
@@ -149,7 +147,6 @@ describe('Parties sbc user tests', () => {
     wrapper.destroy()
   })
 
-  
   it('shows the party search screen for sbc', async () => {
     expect(wrapper.findComponent(PartySearch).isVisible()).toBe(true)
     // no tooltip

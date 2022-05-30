@@ -65,7 +65,7 @@ describe('App component basic rendering normal account', () => {
       })))
 
     getSettings.withArgs('user-profile').returns(new Promise((resolve) => resolve({
-        data: mockedDisableAllUserSettingsResponse, status: StatusCodes.OK
+      data: mockedDisableAllUserSettingsResponse, status: StatusCodes.OK
     })))
 
     getFees.withArgs(`fees/PPR/${FeeCodes.SEARCH}`).returns(new Promise((resolve) => resolve({
@@ -146,7 +146,7 @@ describe('App component basic rendering non billable account', () => {
       })))
 
     getSettings.withArgs('user-profile').returns(new Promise((resolve) => resolve({
-        data: mockedDisableAllUserSettingsResponse, status: StatusCodes.OK
+      data: mockedDisableAllUserSettingsResponse, status: StatusCodes.OK
     })))
 
     getFees.withArgs(`fees/PPR/${FeeCodes.SEARCH}`).returns(new Promise((resolve) => resolve({

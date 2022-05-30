@@ -1,11 +1,10 @@
 import { RegistrationFlowType } from '@/enums'
 import {
-  AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF,
-  SearchTypeIF, RegTableDataI, UserInfoIF
+  AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
+  ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
+  AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF, SearchTypeIF, RegTableDataI,
+  UserInfoIF
 } from '@/interfaces'
-import { AccountProductSubscriptionIF } from '../account-interfaces'
-import { CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF, ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF } from '../ppr-api-interfaces'
-import { AddPartiesIF, AddCollateralIF, LengthTrustIF } from '../registration-interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
 // State model example

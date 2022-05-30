@@ -357,7 +357,6 @@ describe('Collateral Carbon Tax edit tests', () => {
     wrapper.destroy()
   })
 
-
   it('renders edit view with general collateral when none is given', async () => {
     await wrapper.setProps({ isSummary: false })
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)

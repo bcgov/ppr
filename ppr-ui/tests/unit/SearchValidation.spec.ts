@@ -330,7 +330,7 @@ describe('Business debtor validation', () => {
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
     expect(messages1.at(0).text()).toContain('Maximum 150 characters')
-    })
+  })
 })
 
 describe('MHR validation', () => {
@@ -504,7 +504,6 @@ describe('Aircraft validation', () => {
     const messages1 = wrapper.findAll('.v-messages__message')
     expect(messages1.length).toBe(1)
     expect(messages1.at(0).text()).toContain('Maximum 25 characters')
-
   })
 })
 

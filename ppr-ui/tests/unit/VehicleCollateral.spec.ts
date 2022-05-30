@@ -237,7 +237,6 @@ describe('Vehicle Collateral repairers lien amendment tests', () => {
   })
 })
 
-
 describe('Vehicle Collateral crown charge tests', () => {
   let wrapper: Wrapper<any>
 
