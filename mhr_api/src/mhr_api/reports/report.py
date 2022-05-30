@@ -354,7 +354,7 @@ class Report:  # pylint: disable=too-few-public-methods
             if search_type == 'MHR_NUMBER':
                 self._report_data['footer_content'] = f'MHR Number Search - "{criteria}"'
             else:
-                self._report_data['footer_content'] = f'{search_desc} Search - "{criteria}"'
+                self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
 
     @staticmethod
     def _get_environment():
