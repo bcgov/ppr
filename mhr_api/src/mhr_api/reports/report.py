@@ -391,7 +391,7 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
         ReportTypes.SEARCH_DETAIL_REPORT: {
             'reportDescription': 'SearchResult',
             'fileName': 'searchResult',
-            'metaTitle': 'Manufacutered Home Registry Search Result',
+            'metaTitle': 'Manufactured Home Registry Search Result',
             'metaSubject': ''
         }
     }
