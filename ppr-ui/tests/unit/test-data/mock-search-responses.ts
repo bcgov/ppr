@@ -132,11 +132,13 @@ export const mockedMHRSearchResponse: mockedMHRSearchResponse = {
   [UIMHRSearchTypes.MHRMHR_NUMBER]: {
     searchId: 'test',
     totalResultsSize: 5,
+    selectedResultsSize: 5,
     searchQuery: {
       type: APIMHRSearchTypes.MHRMHR_NUMBER, // One of APISearchTypes
       criteria: {
         value: 'test'
-      }
+      },
+      clientReferenceId: '123'
     },
     searchDateTime: '2022-04-05T20:31:45+00:00',
     results: mockedMHRSearchResults[UIMHRSearchTypes.MHRMHR_NUMBER]
@@ -144,11 +146,13 @@ export const mockedMHRSearchResponse: mockedMHRSearchResponse = {
   [UIMHRSearchTypes.MHROWNER_NAME]: {
     searchId: 'test',
     totalResultsSize: 5,
+    selectedResultsSize: 4,
     searchQuery: {
       type: APIMHRSearchTypes.MHROWNER_NAME, // One of APISearchTypes
       criteria: {
         value: 'test'
-      }
+      },
+      clientReferenceId: '123'
     },
     searchDateTime: '2022-04-05T20:31:45+00:00',
     results: mockedMHRSearchResults[UIMHRSearchTypes.MHROWNER_NAME]
@@ -156,11 +160,13 @@ export const mockedMHRSearchResponse: mockedMHRSearchResponse = {
   [UIMHRSearchTypes.MHRORGANIZATION_NAME]: {
     searchId: 'test',
     totalResultsSize: 5,
+    selectedResultsSize: 4,
     searchQuery: {
       type: APIMHRSearchTypes.MHRORGANIZATION_NAME, // One of APISearchTypes
       criteria: {
         value: 'test'
-      }
+      },
+      clientReferenceId: '123'
     },
     searchDateTime: '2022-04-05T20:31:45+00:00',
     results: mockedMHRSearchResults[UIMHRSearchTypes.MHRORGANIZATION_NAME]
@@ -168,11 +174,13 @@ export const mockedMHRSearchResponse: mockedMHRSearchResponse = {
   [UIMHRSearchTypes.MHRSERIAL_NUMBER]: {
     searchId: 'test',
     totalResultsSize: 5,
+    selectedResultsSize: 4,
     searchQuery: {
       type: APIMHRSearchTypes.MHRSERIAL_NUMBER, // One of APISearchTypes
       criteria: {
         value: 'test'
-      }
+      },
+      clientReferenceId: '123'
     },
     searchDateTime: '2022-04-05T20:31:45+00:00',
     results: mockedMHRSearchResults[UIMHRSearchTypes.MHRSERIAL_NUMBER]
