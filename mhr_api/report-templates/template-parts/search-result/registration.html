@@ -1,9 +1,7 @@
 <div class="business-details-container">
-  <table class="registration-header-table" id="{{ detail.mhrNumber }}"  role="presentation">
-    <tr>
-      <td colspan="2">Manufactured Home Registration Number: {{ detail.mhrNumber }}</td>
-    </tr>
-  </table>
+  <div class="business-name-header"  id="{{ detail.mhrNumber }}">
+    <span class="lbl-business-name ma-0 pa-0">Manufactured Home Registration Number: {{ detail.mhrNumber }}</span>
+  </div>
   <table class="business-details-table-grey" role="presentation">
     <tr>
       <td>Registration Type:</td>

@@ -7,6 +7,7 @@
     </div>
 
     {% for note in detail.notes %}
+    <div class="no-page-break">
         <div class="section-title mt-4">{{note.documentDescription}}</div>      
         <table class="no-page-break section-data details-table mt-4" role="presentation">
             <tr>
@@ -57,5 +58,6 @@
                 </td>
             </tr>
        </table>
+    </div>
     {% endfor %}
 {% endif %}
