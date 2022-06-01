@@ -45,13 +45,16 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
  WHERE mh.mhregnum = :query_value
    AND mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
-   AND mh.manhomid = o.manhomid
-   AND o.owngrpid = 1
-   AND o.ownerid = 1
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
+   AND mh.manhomid = o.manhomid
+   AND o.ownerid = 1
+   AND o.owngrpid IN (SELECT MIN(og2.owngrpid)
+                        FROM owngroup og2
+                       WHERE mh.manhomid = og2.manhomid
+                         AND og2.status IN ('3', '5'))
 """
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
@@ -63,12 +66,9 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
 --         WHERE o2.manhomid = mh.manhomid) as owner_names, 
        l.towncity, de.sernumb1, de.yearmade,
        de.makemodl
-  FROM amhrtdb.manuhome mh, amhrtdb.document d, amhrtdb.owner o, amhrtdb.location l, amhrtdb.descript de
+  FROM manuhome mh, document d, owner o, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
-   AND mh.manhomid = o.manhomid
-   AND o.owngrpid = 1
-   AND o.ownerid = 1
    AND (de.sernumb1 LIKE :query_value || '%' OR 
         de.sernumb2 LIKE :query_value || '%' OR 
         de.sernumb3 LIKE :query_value || '%' OR 
@@ -77,38 +77,50 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
+   AND mh.manhomid = o.manhomid
+   AND o.ownerid = 1
+   AND o.owngrpid IN (SELECT MIN(og2.owngrpid)
+                        FROM owngroup og2
+                       WHERE mh.manhomid = og2.manhomid
+                         AND og2.status IN ('3', '5'))
 ORDER BY d.regidate ASC
 """
 
 OWNER_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
        de.yearmade, de.makemodl
-  FROM manuhome mh, document d, owner o, location l, descript de
+  FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
-   AND mh.manhomid = o.manhomid
-   AND o.ownrtype = 'I'
-   AND o.compname LIKE :query_value || '%'
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
+   AND mh.manhomid = o.manhomid
+   AND o.ownrtype = 'I'
+   AND o.compname LIKE :query_value || '%'
+   AND o.manhomid = og.manhomid
+   AND o.owngrpid = og.owngrpid
+   AND og.status IN ('3', '5')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
 
 ORG_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
        de.yearmade, de.makemodl
-  FROM manuhome mh, document d, owner o, location l, descript de
+  FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
-   AND mh.manhomid = o.manhomid
-   AND o.ownrtype = 'B'
-   AND o.compname LIKE :query_value || '%'
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
+   AND mh.manhomid = o.manhomid
+   AND o.ownrtype = 'B'
+   AND o.compname LIKE :query_value || '%'
+   AND o.manhomid = og.manhomid
+   AND o.owngrpid = og.owngrpid
+   AND og.status IN ('3', '5')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
 

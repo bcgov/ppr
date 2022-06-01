@@ -108,6 +108,9 @@ class Db2Owner(db.Model):
         """Return a search registration dict of this object, with keys in JSON format."""
         # Response legacy data: allow for any column to be null.
         owner = {}
+        if self.owngroup and self.owngroup.status == self.owngroup.StatusTypes.PREVIOUS:
+            return owner
+
         if self.owner_type == Db2Owner.OwnerTypes.INDIVIDUAL:
             owner['individualName'] = model_utils.get_ind_name_from_db2(self.name)
         else:

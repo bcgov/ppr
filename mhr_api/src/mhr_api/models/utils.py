@@ -195,7 +195,7 @@ REG_TYPE_TO_REG_CLASS = {
 }
 
 # MHR Error messages
-ERR_REGISTRATION_NOT_FOUND = '{code}: no registration found for MHR number {mhr_number}.'
+ERR_REGISTRATION_NOT_FOUND_MHR = '{code}: no registration found for MHR number {mhr_number}.'
 ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
 ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
@@ -216,6 +216,42 @@ DB2_PROVINCE_MAPPING = {
     ' AB': 'AB',
     ', AB': 'AB',
     'ALBERTA': 'AB',
+    'MB': 'MB',
+    ' MB': 'MB',
+    ', MB': 'MB',
+    'MANITOBA': 'MB',
+    'NB': 'NB',
+    ' NB': 'NB',
+    ', NB': 'NB',
+    'NEW BRUSNWICK': 'NB',
+    'NL': 'NL',
+    ' NL': 'NL',
+    ', NL': 'NL',
+    'NEWFOUNDLAND': 'NL',
+    'NS': 'NS',
+    ' NS': 'NS',
+    ', NS': 'NS',
+    'NOVA SCOTIA': 'NS',
+    'NT': 'NT',
+    ' NT': 'NT',
+    ', NT': 'NT',
+    'NORTHWEST TERRITORIES': 'NT',
+    'NU': 'NU',
+    ' NU': 'NU',
+    ', NU': 'NU',
+    'NUNUVIT': 'NU',
+    'PE': 'PE',
+    ' PE': 'PE',
+    ', PE': 'PE',
+    'PRINCE EDWARD ISLAND': 'PE',
+    'QC': 'QC',
+    ' QC': 'QC',
+    ', QC': 'QC',
+    'QUEBEC': 'QC',
+    'YT': 'YT',
+    ' YT': 'YT',
+    ', YT': 'YT',
+    'YUKON TERRITORIES': 'YT',
     'SK': 'SK',
     ' SK': 'SK',
     ', SK': 'SK',
