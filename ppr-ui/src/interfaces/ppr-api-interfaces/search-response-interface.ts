@@ -21,6 +21,7 @@ export interface SearchResponseIF {
 export interface ManufacturedHomeSearchResponseIF {
   searchId: string,
   totalResultsSize: number,
+  selectedResultsSize?: number,
   searchDateTime?: string, // UTC ISO formatted date and time.
   searchQuery: SearchCriteriaIF, // Echoes request
   results: ManufacturedHomeSearchResultIF[],

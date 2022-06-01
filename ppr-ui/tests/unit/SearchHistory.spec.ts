@@ -11,7 +11,7 @@ import flushPromises from 'flush-promises'
 import { SearchHistory } from '@/components/tables'
 
 // Other
-import { mockedSearchHistory } from './test-data'
+import { mockedSearchHistory, mockedMHRSearchHistory } from './test-data'
 import { axios } from '@/utils/axios-ppr'
 
 // Vue.use(CompositionApi)
@@ -94,7 +94,17 @@ describe('Test result table with results', () => {
     const rows = wrapper.findAll('tr')
     // includes header so add 1
     expect(rows.length).toBe(mockedSearchHistory.searches.length + 1)
+    mockedSearchHistory.searches.sort((a, b) => {
+      if (a.searchDateTime > b.searchDateTime) {
+        return -1
+      } else if (a.searchDateTime < b.searchDateTime) {
+        return 1
+      } else {
+        return 0
+      }
+    })
     for (let i = 0; i < mockedSearchHistory.searches.length; i++) {
+      const temp = mockedSearchHistory.searches[i]
       const searchQuery = mockedSearchHistory.searches[i].searchQuery
       const searchDate = mockedSearchHistory.searches[i].searchDateTime
       const totalResultsSize = mockedSearchHistory.searches[i].totalResultsSize
@@ -117,6 +127,74 @@ describe('Test result table with results', () => {
           wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
           await Vue.nextTick()
           expect(downloadMock).toHaveBeenCalledWith(mockedSearchHistory.searches[i])
+        }
+      }
+    }
+  })
+})
+
+describe('Test result table with results', () => {
+  let wrapper: Wrapper<any>
+  let sandbox: any
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox()
+    const get = sandbox.stub(axios, 'get')
+    // GET search pdf
+    get.returns(new Promise(resolve => resolve({
+      data: { test: 'pdf' }
+    })))
+    await store.dispatch('setSearchHistory', mockedMHRSearchHistory.searches)
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    sandbox.restore()
+    wrapper.destroy()
+  })
+
+  it('renders and displays correct elements with results', async () => {
+    expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
+    expect(wrapper.vm.historyLength).toBe(mockedMHRSearchHistory.searches.length)
+    expect(wrapper.vm.searchHistory).toStrictEqual(mockedMHRSearchHistory.searches)
+    expect(wrapper.find(noResultsInfo).exists()).toBe(false)
+    const historyTableDisplay = wrapper.findAll(historyTable)
+    expect(historyTableDisplay.length).toBe(1)
+    const downloadMock = jest.fn()
+    wrapper.vm.downloadPDF = downloadMock
+    const rows = wrapper.findAll('tr')
+    // includes header so add 1
+    expect(rows.length).toBe(mockedMHRSearchHistory.searches.length + 1)
+    mockedMHRSearchHistory.searches.sort((a, b) => {
+      if (a.searchDateTime > b.searchDateTime) {
+        return -1
+      } else if (a.searchDateTime < b.searchDateTime) {
+        return 1
+      } else {
+        return 0
+      }
+    })
+    for (let i = 0; i < mockedMHRSearchHistory.searches.length; i++) {
+      const temp = mockedMHRSearchHistory.searches[i]
+      const searchQuery = mockedMHRSearchHistory.searches[i].searchQuery
+      const searchDate = mockedMHRSearchHistory.searches[i].searchDateTime
+      const totalResultsSize = mockedMHRSearchHistory.searches[i].totalResultsSize
+      const selectedResultsSize = mockedMHRSearchHistory.searches[i].selectedResultsSize
+      const searchId = mockedMHRSearchHistory.searches[i].searchId
+      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
+      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayType(searchQuery.type))
+      expect(rows.at(i + 1).text()).toContain(searchQuery.clientReferenceId)
+      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayDate(searchDate))
+      expect(rows.at(i + 1).text()).toContain(totalResultsSize)
+      expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
+      // PDF only shows for selected result size < 76
+      if (selectedResultsSize < 76) {
+        if (!wrapper.vm.isPDFAvailable(mockedMHRSearchHistory.searches[i])) {
+          expect(rows.at(i + 1).text()).not.toContain('PDF')
+        } else {
+          expect(rows.at(i + 1).text()).toContain('PDF')
+          wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
+          await Vue.nextTick()
+          expect(downloadMock).toHaveBeenCalledWith(mockedMHRSearchHistory.searches[i])
         }
       }
     }
