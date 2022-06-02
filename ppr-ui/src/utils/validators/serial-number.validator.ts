@@ -6,6 +6,7 @@ export const serialNumberValidator = ({ values }) => {
   let message = 'Maximum 25 characters'
   let emptyMessage = ''
   let valueToValidate = values.serialNumber?.trim()
+  const serialNumber = values.serialNumber?.trim()
 
   if (
     values.type === 'MH' &&
@@ -14,6 +15,8 @@ export const serialNumberValidator = ({ values }) => {
   ) {
     valueToValidate = values.manufacturedHomeRegistrationNumber.trim()
   }
+
+  console.log(valueToValidate)
 
   switch (values.type) {
     case 'AC':
