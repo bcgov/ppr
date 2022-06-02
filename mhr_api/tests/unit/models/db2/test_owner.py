@@ -54,17 +54,19 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
             assert owner.owngroup
             reg_json = owner.registration_json
             current_app.logger.debug(reg_json)
-            if owner.owner_type == Db2Owner.OwnerTypes.INDIVIDUAL:
-                assert reg_json.get('individualName')
+            if owner.owngroup and owner.owngroup.status == owner.owngroup.StatusTypes.PREVIOUS:
+                assert not reg_json
             else:
-                assert reg_json.get('organizationName')
-            assert reg_json.get('address')
-            assert reg_json['address']['street']
-            assert reg_json['address']['city']
-            assert reg_json['address']['region']
-            assert reg_json['address']['country']
-            assert reg_json.get('type')
-
+                if owner.owner_type == Db2Owner.OwnerTypes.INDIVIDUAL:
+                    assert reg_json.get('individualName')
+                else:
+                    assert reg_json.get('organizationName')
+                assert reg_json.get('address')
+                assert reg_json['address']['street']
+                assert reg_json['address']['city']
+                assert reg_json['address']['region']
+                assert reg_json['address']['country']
+                assert reg_json.get('type')
     else:
         assert not owners
 

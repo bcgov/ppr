@@ -105,8 +105,8 @@ class Db2Manuhome(db.Model):
 
         if not manuhome:
             raise BusinessException(
-                error=model_utils.ERR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
-                                                                    mhr_number=mhr_number),
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                        mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
         manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
@@ -166,7 +166,9 @@ class Db2Manuhome(db.Model):
         if self.reg_owners:
             owners = []
             for owner in self.reg_owners:
-                owners.append(owner.registration_json)
+                owner_json = owner.registration_json
+                if owner_json:
+                    owners.append(owner_json)
             man_home['owners'] = owners
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json

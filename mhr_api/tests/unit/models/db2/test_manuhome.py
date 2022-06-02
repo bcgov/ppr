@@ -54,7 +54,7 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
         assert manuhome.update_time is not None
         assert manuhome.accession_number is not None
         assert manuhome.box_number is not None
-        assert manuhome.reg_document
+        assert manuhome.reg_documents
         assert manuhome.reg_owners
         assert manuhome.reg_location
         assert manuhome.reg_descript
@@ -91,7 +91,7 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert manuhome.update_time is not None
         assert manuhome.accession_number is not None
         assert manuhome.box_number is not None
-        assert manuhome.reg_document
+        assert manuhome.reg_documents
         assert manuhome.reg_owners
         assert manuhome.reg_location
         assert manuhome.reg_descript

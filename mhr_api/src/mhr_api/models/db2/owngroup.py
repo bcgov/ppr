@@ -30,6 +30,13 @@ class Db2Owngroup(db.Model):
         JOINT = 'JT'
         COMMON = 'TC'
 
+    class StatusTypes(str, Enum):
+        """Render an Enum of the owner group status types."""
+
+        ACTIVE = '3'
+        PREVIOUS = '4'
+        EXEMPT = '5'
+
     __bind_key__ = 'db2'
     __tablename__ = 'owngroup'
 
