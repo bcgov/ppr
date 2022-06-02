@@ -6,7 +6,6 @@ export const serialNumberValidator = ({ values }) => {
   let message = 'Maximum 25 characters'
   let emptyMessage = ''
   let valueToValidate = values.serialNumber?.trim()
-  const serialNumber = values.serialNumber?.trim()
 
   if (
     values.type === 'MH' &&
@@ -51,7 +50,7 @@ export const serialNumberValidator = ({ values }) => {
   if (valueToValidate.length < minLen) {
     succeeded = false
   }
-  if (serialNumber.length > maxLen) {
+  if (values.serialNumber.length > maxLen) {
     succeeded = false
   }
   return {
