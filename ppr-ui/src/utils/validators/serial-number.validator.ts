@@ -16,8 +16,6 @@ export const serialNumberValidator = ({ values }) => {
     valueToValidate = values.manufacturedHomeRegistrationNumber.trim()
   }
 
-  console.log(valueToValidate)
-
   switch (values.type) {
     case 'AC':
       message = 'Maximum 25 characters'
