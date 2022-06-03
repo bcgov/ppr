@@ -84,7 +84,8 @@ import {
   onMounted,
   reactive,
   toRefs,
-  watch
+  watch,
+  onUnmounted
 } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 // local components
@@ -188,6 +189,18 @@ export default defineComponent({
                 'but not restricted to machinery, equipment, furniture, fixtures and receivables.'
             }])
           }
+        }
+      }
+    })
+
+    onUnmounted(() => {
+      // clear general collateral description if there is no valid text left in editor (html tags not included)
+      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').length === 0) {
+        setGeneralCollateral([])
+        // clear collateral step check mark if there are no vehicles
+        // (this resets check mark that was set by general collateral description)
+        if (getAddCollateral.value.vehicleCollateral.length === 0) {
+          getAddCollateral.value.valid = false
         }
       }
     })
