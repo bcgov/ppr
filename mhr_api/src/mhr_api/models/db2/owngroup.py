@@ -34,8 +34,8 @@ class Db2Owngroup(db.Model):
         """Render an Enum of the owner group status types."""
 
         ACTIVE = '3'
-        PREVIOUS = '4'
-        EXEMPT = '5'
+        EXEMPT = '4'
+        PREVIOUS = '5'
 
     __bind_key__ = 'db2'
     __tablename__ = 'owngroup'

@@ -54,7 +54,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
    AND o.owngrpid IN (SELECT MIN(og2.owngrpid)
                         FROM owngroup og2
                        WHERE mh.manhomid = og2.manhomid
-                         AND og2.status IN ('3', '5'))
+                         AND og2.status IN ('3', '4'))
 """
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
@@ -82,7 +82,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
    AND o.owngrpid IN (SELECT MIN(og2.owngrpid)
                         FROM owngroup og2
                        WHERE mh.manhomid = og2.manhomid
-                         AND og2.status IN ('3', '5'))
+                         AND og2.status IN ('3', '4'))
 ORDER BY d.regidate ASC
 """
 
@@ -101,7 +101,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND o.compname LIKE :query_value || '%'
    AND o.manhomid = og.manhomid
    AND o.owngrpid = og.owngrpid
-   AND og.status IN ('3', '5')
+   AND og.status IN ('3', '4')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
 
@@ -120,7 +120,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND o.compname LIKE :query_value || '%'
    AND o.manhomid = og.manhomid
    AND o.owngrpid = og.owngrpid
-   AND og.status IN ('3', '5')
+   AND og.status IN ('3', '4')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
 
