@@ -26,7 +26,7 @@ import { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 // unit test helpers/data
 import mockRouter from './MockRouter'
-import { mockedSelectSecurityAgreement } from './test-data'
+import { mockedSelectSecurityAgreement, mockedGeneralCollateral1 } from './test-data'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
@@ -186,6 +186,40 @@ describe('Review Confirm new registration component', () => {
       )
       wrapper.destroy()
     }
+  })
+
+  it('show error message in Collateral Summary section when description is empty', async () => {
+    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.dispatch('setAddCollateral', { generalCollateral: mockedGeneralCollateral1 } )
+
+    wrapper = createComponent()
+    await flushPromises()
+
+    expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.vm.appReady).toBe(true)
+    expect(wrapper.vm.dataLoaded).toBe(true)
+
+    expect(wrapper.findComponent(Collateral).exists()).toBe(true)
+    expect(wrapper.findComponent(Collateral).findAll('.invalid-message').exists()).toBe(false)
+
+    // Go back to Collateral step
+    await wrapper.find('#reg-back-btn').trigger('click')
+    expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)
+
+    // Delete text from General Collateral as leave just html styling tag (as per current behavior)
+    await store.dispatch('setAddCollateral', { generalCollateral: 
+      {
+        addedDateTime: '2021-09-16T05:56:20Z',
+        description: '<p></p>'
+      }}
+    )
+
+    // Go Next to Review page and check that Collateral sections has invalid message(s)
+    await wrapper.find('#reg-next-btn').trigger('click')
+    expect(wrapper.vm.stepName).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.find(title).text()).toContain('Review and Confirm')
+    expect(wrapper.findComponent(Collateral).findAll('.invalid-message').exists()).toBe(true)
   })
 
   it('emits error', async () => {
