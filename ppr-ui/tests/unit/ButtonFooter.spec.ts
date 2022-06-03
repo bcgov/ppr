@@ -35,7 +35,6 @@ const backBtn: string = '#reg-back-btn'
 const nextBtn: string = '#reg-next-btn'
 
 const router = mockRouter.mock()
-
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -83,7 +82,7 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
     expect(wrapper.find(backBtn).exists()).toBe(false)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
     expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
-    expect(wrapper.vm.stepName).toBe(RouteNames.LENGTH_TRUST)
+    expect(wrapper.props().currentStepName).toBe(RouteNames.LENGTH_TRUST)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
     expect(wrapper.vm.buttonConfig.showSaveResume).toBe(true)
@@ -135,7 +134,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
     expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
-    expect(wrapper.vm.stepName).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    expect(wrapper.props().currentStepName).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
     expect(wrapper.vm.buttonConfig.showSaveResume).toBe(true)
@@ -198,7 +197,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
     expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
-    expect(wrapper.vm.stepName).toBe(RouteNames.ADD_COLLATERAL)
+    expect(wrapper.props().currentStepName).toBe(RouteNames.ADD_COLLATERAL)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
     expect(wrapper.vm.buttonConfig.showSaveResume).toBe(true)
@@ -260,7 +259,7 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
     expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
-    expect(wrapper.vm.stepName).toBe(RouteNames.REVIEW_CONFIRM)
+    expect(wrapper.props().currentStepName).toBe(RouteNames.REVIEW_CONFIRM)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
     expect(wrapper.vm.buttonConfig.showSaveResume).toBe(true)

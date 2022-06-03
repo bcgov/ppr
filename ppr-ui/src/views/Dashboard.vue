@@ -322,6 +322,7 @@ export default class Dashboard extends Vue {
   @Getter getUserServiceFee!: number
   @Getter getUserSettings: UserSettingsIF
   @Getter hasMorePages: boolean
+  @Getter isMhrRegistration!: boolean
   @Getter isNonBillable!: boolean
   @Getter hasPprRole: boolean
   @Getter hasMhrRole: boolean
@@ -794,7 +795,9 @@ export default class Dashboard extends Vue {
     this.resetNewRegistration(null) // Clear store data from the previous registration.
     this.setRegistrationType(selectedRegistration)
     this.setRegTableCollapsed(null)
-    this.$router.replace({ name: RouteNames.LENGTH_TRUST })
+
+    const route = this.isMhrRegistration ? RouteNames.YOUR_HOME : RouteNames.LENGTH_TRUST
+    this.$router.replace({ name: route })
   }
 
   private async retrieveSearchHistory (): Promise<void> {

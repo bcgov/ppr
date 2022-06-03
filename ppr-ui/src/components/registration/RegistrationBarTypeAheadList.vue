@@ -55,13 +55,15 @@
   </v-container>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { RegistrationTypes } from '@/resources'
+import { MhrRegistrationType, RegistrationTypes } from '@/resources'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
+import { useGetters } from 'vuex-composition-helpers'
+import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -76,6 +78,12 @@ export default defineComponent({
   name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
   setup (props, { emit }) {
+    const {
+      isRoleStaff
+    } = useGetters<any>([
+      'isRoleStaff'
+    ])
+
     const localState = reactive({
       displayGroup: {
         1: true,
@@ -88,7 +96,10 @@ export default defineComponent({
       showDialog: false,
       dropdownLabel: props.defaultLabel,
       isDense: props.defaultDense,
-      isClearable: props.defaultClearable
+      isClearable: props.defaultClearable,
+      includeMhrSelection: computed((): boolean => {
+        return isRoleStaff.value && getFeatureFlag('mhr-ui-enabled')
+      })
     })
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) emit('selected', localState.selected)
@@ -165,6 +176,12 @@ export default defineComponent({
         localState.selected = null
       }
     })
+
+    watch(() => localState.includeMhrSelection, (val: boolean) => {
+      if (val) {
+        localState.origItems.push(MhrRegistrationType)
+      }
+    }, { deep: true, immediate: true })
 
     return {
       dialogSubmit,

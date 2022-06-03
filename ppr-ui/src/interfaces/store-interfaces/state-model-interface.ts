@@ -36,6 +36,7 @@ export interface StateModelIF {
     registrationTypeOtherDesc: string
     showStepErrors: boolean
   }
+  mhrRegistration: any // To be determined by Schema
   registrationTable: RegTableDataI
   search: {
     searchDebtorName: IndividualNameIF

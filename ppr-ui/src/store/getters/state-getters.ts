@@ -28,6 +28,7 @@ import {
   VehicleCollateralIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { YourHome, HomeLocation, HomeOwners, SubmittingParty, MhrReviewConfirm } from '@/views'
 
 /** The current account id. */
 export const getAccountId = (state: StateIF): number => {
@@ -130,6 +131,12 @@ export const getRegistrationNumber = (state: StateIF): String => {
 /** The selected registration type object. */
 export const getRegistrationType = (state: StateIF): RegistrationTypeIF => {
   return state.stateModel.registration.registrationType
+}
+
+/** Is true during an MHR Registration. */
+export const isMhrRegistration = (state: StateIF): boolean => {
+  return state.stateModel.registration?.registrationType?.registrationTypeAPI ===
+    APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION
 }
 
 /** The selected registration flow type object. */
@@ -307,8 +314,14 @@ export const showStepErrors = (state: StateIF): boolean => {
  * Returns the array of steps.
  */
 export const getSteps = (state: any, getters: any): Array<any> => {
+  return getters.isMhrRegistration
+    ? getters.getMhrSteps
+    : getters.getPprSteps
+}
+
+export const getPprSteps = (state: any, getters: any): Array<any> => {
   const regType:RegistrationTypeIF = getRegistrationType(state)
-  var lengthTrustText = 'Registration<br />Length'
+  let lengthTrustText = 'Registration<br />Length'
   if (regType.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
     lengthTrustText = 'Length and<br />Trust Indenture'
   }
@@ -358,55 +371,166 @@ export const getSteps = (state: any, getters: any): Array<any> => {
   return steps
 }
 
+export const getMhrSteps = (state: any, getters: any): Array<any> => {
+  const steps: Array<any> = [{
+    id: 'step-1-btn',
+    step: 1,
+    icon: 'mdi-calendar-clock',
+    text: 'Describe your \nHome',
+    to: RouteNames.YOUR_HOME,
+    disabled: getters.isBusySaving,
+    valid: false,
+    component: YourHome
+  },
+  {
+    id: 'step-2-btn',
+    step: 2,
+    icon: 'mdi-account-multiple-plus',
+    text: 'Submitting Party',
+    to: RouteNames.SUBMITTING_PARTY,
+    disabled: getters.isBusySaving,
+    valid: false,
+    component: SubmittingParty
+  },
+  {
+    id: 'step-3-btn',
+    step: 3,
+    icon: 'mdi-car',
+    text: 'List the Home Owners',
+    to: RouteNames.HOME_OWNERS,
+    disabled: getters.isBusySaving,
+    valid: false,
+    component: HomeOwners
+  },
+  {
+    id: 'step-4-btn',
+    step: 4,
+    icon: 'mdi-text-box-check-outline', // 'mdi-text-box-multiple'
+    text: 'Detail the Home Location',
+    to: RouteNames.HOME_LOCATION,
+    disabled: getters.isBusySaving,
+    valid: false,
+    component: HomeLocation
+  },
+  {
+    id: 'step-5-btn',
+    step: 5,
+    icon: 'mdi-text-box-check-outline', // 'mdi-text-box-multiple'
+    text: 'Review <br />and Confirm',
+    to: RouteNames.MHR_REVIEW_CONFIRM,
+    disabled: getters.isBusySaving,
+    valid: false,
+    component: MhrReviewConfirm
+  }]
+  return steps
+}
+
 /**
  * Returns the array of new financing statement registration buttons.
  */
-export const getFinancingButtons = (state: any): Array<ButtonConfigIF> => {
-  const buttons: Array<ButtonConfigIF> = [{
-    stepName: RouteNames.LENGTH_TRUST,
-    showCancel: true,
-    showSave: true,
-    showSaveResume: true,
-    showBack: false,
-    showNext: true,
-    backRouteName: '',
-    nextText: 'Add Secured Parties and Debtors',
-    nextRouteName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
-  },
-  {
-    stepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
-    showCancel: true,
-    showSave: true,
-    showSaveResume: true,
-    showBack: true,
-    showNext: true,
-    backRouteName: RouteNames.LENGTH_TRUST,
-    nextText: 'Add Collateral',
-    nextRouteName: RouteNames.ADD_COLLATERAL
-  },
-  {
-    stepName: RouteNames.ADD_COLLATERAL,
-    showCancel: true,
-    showSave: true,
-    showSaveResume: true,
-    showBack: true,
-    showNext: true,
-    backRouteName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
-    nextText: 'Review and Confirm',
-    nextRouteName: RouteNames.REVIEW_CONFIRM
-  },
-  {
-    stepName: RouteNames.REVIEW_CONFIRM,
-    showCancel: true,
-    showSave: true,
-    showSaveResume: true,
-    showBack: true,
-    showNext: true,
-    backRouteName: RouteNames.ADD_COLLATERAL,
-    nextText: 'Register and Pay',
-    nextRouteName: RouteNames.DASHBOARD
-  }]
-  return buttons
+export const getFinancingButtons = (state: any, getters: any): Array<ButtonConfigIF> => {
+  if (getters.isMhrRegistration) {
+    return [{
+      stepName: RouteNames.YOUR_HOME,
+      showCancel: true,
+      showSave: false,
+      showSaveResume: false,
+      showBack: false,
+      showNext: true,
+      backRouteName: '',
+      nextText: 'Submitting Party',
+      nextRouteName: RouteNames.SUBMITTING_PARTY
+    },
+    {
+      stepName: RouteNames.SUBMITTING_PARTY,
+      showCancel: true,
+      showSave: false,
+      showSaveResume: false,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.YOUR_HOME,
+      nextText: 'List the Home Owners',
+      nextRouteName: RouteNames.HOME_OWNERS
+    },
+    {
+      stepName: RouteNames.HOME_OWNERS,
+      showCancel: true,
+      showSave: false,
+      showSaveResume: false,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.SUBMITTING_PARTY,
+      nextText: 'Detail the home Location',
+      nextRouteName: RouteNames.HOME_LOCATION
+    },
+    {
+      stepName: RouteNames.HOME_LOCATION,
+      showCancel: true,
+      showSave: false,
+      showSaveResume: false,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.HOME_OWNERS,
+      nextText: 'Review and Confirm',
+      nextRouteName: RouteNames.MHR_REVIEW_CONFIRM
+    },
+    {
+      stepName: RouteNames.MHR_REVIEW_CONFIRM,
+      showCancel: true,
+      showSave: false,
+      showSaveResume: false,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.HOME_LOCATION,
+      nextText: 'Register and Pay',
+      nextRouteName: RouteNames.DASHBOARD
+    }]
+  } else {
+    return [{
+      stepName: RouteNames.LENGTH_TRUST,
+      showCancel: true,
+      showSave: true,
+      showSaveResume: true,
+      showBack: false,
+      showNext: true,
+      backRouteName: '',
+      nextText: 'Add Secured Parties and Debtors',
+      nextRouteName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
+    },
+    {
+      stepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+      showCancel: true,
+      showSave: true,
+      showSaveResume: true,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.LENGTH_TRUST,
+      nextText: 'Add Collateral',
+      nextRouteName: RouteNames.ADD_COLLATERAL
+    },
+    {
+      stepName: RouteNames.ADD_COLLATERAL,
+      showCancel: true,
+      showSave: true,
+      showSaveResume: true,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+      nextText: 'Review and Confirm',
+      nextRouteName: RouteNames.REVIEW_CONFIRM
+    },
+    {
+      stepName: RouteNames.REVIEW_CONFIRM,
+      showCancel: true,
+      showSave: true,
+      showSaveResume: true,
+      showBack: true,
+      showNext: true,
+      backRouteName: RouteNames.ADD_COLLATERAL,
+      nextText: 'Register and Pay',
+      nextRouteName: RouteNames.DASHBOARD
+    }]
+  }
 }
 
 /**

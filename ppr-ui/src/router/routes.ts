@@ -6,6 +6,7 @@ import {
   Dashboard,
   LengthTrust,
   MHRSearch,
+  MhrRegistration,
   ConfirmMHRSearch,
   ReviewConfirm,
   ReviewRegistration,
@@ -144,6 +145,56 @@ export const routes = [
     component: ReviewConfirm,
     meta: {
       step: 4,
+      label: 'Review and Confirm',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr-registration/your-home',
+    name: RouteNames.YOUR_HOME,
+    component: MhrRegistration,
+    meta: {
+      step: 1,
+      label: 'Describe your Home',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr-registration/submitting-party',
+    name: RouteNames.SUBMITTING_PARTY,
+    component: MhrRegistration,
+    meta: {
+      step: 2,
+      label: 'Submitting Party',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr-registration/home-owners',
+    name: RouteNames.HOME_OWNERS,
+    component: MhrRegistration,
+    meta: {
+      step: 3,
+      label: 'List the Home Owners',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr-registration/home-location',
+    name: RouteNames.HOME_LOCATION,
+    component: MhrRegistration,
+    meta: {
+      step: 4,
+      label: 'Detail the Home Location',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr-registration/mhr-review-confirm',
+    name: RouteNames.MHR_REVIEW_CONFIRM,
+    component: MhrRegistration,
+    meta: {
+      step: 5,
       label: 'Review and Confirm',
       requiresAuth: true
     }
