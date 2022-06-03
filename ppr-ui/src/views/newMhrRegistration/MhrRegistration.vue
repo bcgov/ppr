@@ -69,19 +69,15 @@ import { getFeatureFlag } from '@/utils'
 // local components
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 
 @Component({
   components: {
     ButtonFooter,
-    RegistrationLengthTrust,
-    RegistrationRepairersLien,
     Stepper,
     StickyContainer
   }
 })
 export default class MhrRegistration extends Vue {
-  @Getter getLengthTrust: LengthTrustIF
   @Getter getRegistrationFlowType: RegistrationFlowType
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string

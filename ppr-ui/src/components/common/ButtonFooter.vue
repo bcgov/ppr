@@ -185,10 +185,8 @@ export default defineComponent({
             localState.statementType.toUpperCase() ===
             StatementTypes.FINANCING_STATEMENT
           ) {
-            console.log('Inside button config')
             const stepConfig: Array<ButtonConfigIF> = getFinancingButtons.value
             let config: ButtonConfigIF
-            console.log(stepConfig)
             for (const i in stepConfig) {
               config = stepConfig[i]
               if (config.stepName === props.currentStepName) {
