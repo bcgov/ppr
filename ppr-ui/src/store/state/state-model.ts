@@ -86,6 +86,7 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
+  mhrRegistration: {},
   registrationTable: {
     baseRegs: [],
     draftsBaseReg: [],

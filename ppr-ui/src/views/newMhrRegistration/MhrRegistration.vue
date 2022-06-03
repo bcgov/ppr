@@ -47,31 +47,29 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
 // external
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
-// bcregistry
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
-  APIRegistrationTypes, // eslint-disable-line no-unused-vars
-  RegistrationFlowType, // eslint-disable-line no-unused-vars
-  RouteNames, // eslint-disable-line no-unused-vars
-  StatementTypes, UIRegistrationTypes // eslint-disable-line no-unused-vars
+  APIRegistrationTypes,
+  RegistrationFlowType,
+  RouteNames,
+  StatementTypes
 } from '@/enums'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
+/* eslint-disable no-unused-vars */
 import {
-  ErrorIF, GetterIF, // eslint-disable-line no-unused-vars
-  LengthTrustIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, StepIF // eslint-disable-line no-unused-vars
+  ErrorIF,
+  LengthTrustIF,
+  RegistrationTypeIF,
+  StepIF
 } from '@/interfaces'
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+/* eslint-enable no-unused-vars */
 import { getFeatureFlag } from '@/utils'
 // local components
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
-/* eslint-enable no-unused-vars */
 
 @Component({
   components: {
@@ -97,9 +95,8 @@ export default class MhrRegistration extends Vue {
   private isJestRunning: boolean
 
   private dataLoaded = false
-  private feeType = null // FeeSummaryTypes.NEW
+  private feeType = null // To be determined by fee codes
   private statementType = StatementTypes.FINANCING_STATEMENT
-  private stepName = RouteNames.LENGTH_TRUST
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
