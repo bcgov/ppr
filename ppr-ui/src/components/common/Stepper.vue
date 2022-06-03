@@ -48,11 +48,11 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
 
 // Interfaces
-import { GetterIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { StepIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 @Component({})
 export default class Stepper extends Vue {
-  @Getter getSteps!: GetterIF
+  @Getter getSteps!: Array<StepIF>
   @Getter showStepErrors: boolean
 
   @Prop({ default: false })
@@ -97,7 +97,6 @@ export default class Stepper extends Vue {
   align-items: center;
   justify-content: center;
   padding-bottom: 2rem;
-  min-width: 255px;
   border-bottom: 3px solid #ffffff !important;
 }
 
@@ -141,11 +140,14 @@ export default class Stepper extends Vue {
   height: 1px;
   width: 100%;
   background-color: $gray3;
-  transform: translateX(-50%);
 }
 
 .step:first-child .step__line {
-  display: none;
+  transform: translateX(50%);
+}
+
+.step:last-child .step__line {
+  transform: translateX(-50%);
 }
 
 .step__btn {

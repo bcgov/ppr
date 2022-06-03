@@ -287,6 +287,17 @@ export const RegistrationTypesStandard: Array<RegistrationTypeIF> = [
   }
 ]
 
+export const MhrRegistrationType: RegistrationTypeIF = {
+  class: 'registration-list-item',
+  disabled: false,
+  divider: false,
+  group: 3,
+  registrationTypeUI: UIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
+  registrationTypeAPI: APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
+  text:
+    `${UIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION} (${APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION})`
+}
+
 export const LegacyRegistrationTypes: Array<RegistrationTypeIF> = [
   {
     class: 'registration-list-item',

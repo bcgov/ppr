@@ -1,6 +1,7 @@
 export * from './auth'
 export * from './discharge'
 export * from './renew'
+export * from './newMhrRegistration'
 export * from './newRegistration'
 export * from './amendment'
 export { default as Dashboard } from './Dashboard.vue'

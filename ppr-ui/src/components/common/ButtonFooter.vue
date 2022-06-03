@@ -155,7 +155,6 @@ export default defineComponent({
       options: unsavedChangesDialog,
       showCancelDialog: false,
       statementType: props.currentStatementType,
-      stepName: props.currentStepName,
       staffPaymentDialogDisplay: false,
       staffPaymentDialogOptions: {
         acceptText: 'Submit Registration',
@@ -175,7 +174,7 @@ export default defineComponent({
       }),
       lastStepBcol: computed((): boolean => {
         // bcol can't submit
-        return ((localState.stepName === RouteNames.REVIEW_CONFIRM) && isRoleStaffBcol.value)
+        return ((props.currentStepName === RouteNames.REVIEW_CONFIRM) && isRoleStaffBcol.value)
       }),
       isStaffSbc: computed((): boolean => {
         return isRoleStaffSbc.value
@@ -186,11 +185,13 @@ export default defineComponent({
             localState.statementType.toUpperCase() ===
             StatementTypes.FINANCING_STATEMENT
           ) {
+            console.log('Inside button config')
             const stepConfig: Array<ButtonConfigIF> = getFinancingButtons.value
-            var config: ButtonConfigIF
-            for (var i in stepConfig) {
+            let config: ButtonConfigIF
+            console.log(stepConfig)
+            for (const i in stepConfig) {
               config = stepConfig[i]
-              if (config.stepName === localState.stepName) {
+              if (config.stepName === props.currentStepName) {
                 return config
               }
             }
@@ -250,7 +251,7 @@ export default defineComponent({
       if (
         localState.statementType.toUpperCase() ===
           StatementTypes.FINANCING_STATEMENT &&
-        localState.stepName === RouteNames.REVIEW_CONFIRM
+        props.currentStepName === RouteNames.REVIEW_CONFIRM
       ) {
         if (checkValid()) {
           if (localState.isStaffReg) {

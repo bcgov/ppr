@@ -28,6 +28,7 @@ export enum APIRegistrationTypes {
     LIEN_UNPAID_WAGES = 'WL',
     HERITAGE_CONSERVATION_NOTICE = 'HN',
     MANUFACTURED_HOME_NOTICE = 'MN',
+    MANUFACTURED_HOME_REGISTRATION = 'MHR',
     MAINTENANCE_LIEN = 'ML',
     PROCEEDS_CRIME_NOTICE = 'PN',
     // Existing legacy registrations types that can no longer be created.
@@ -52,6 +53,7 @@ export enum UIRegistrationTypes {
     SALE_OF_GOODS = 'Possession under S.30 of the Sale of Goods Act',
     LAND_TAX_LIEN = 'Land Tax Deferment Lien on a Manufactured Home',
     MANUFACTURED_HOME_LIEN = 'Tax Lien under S.27/28 of the Manufactured Home Act',
+    MANUFACTURED_HOME_REGISTRATION = 'Manufactured Home Registration',
     FORESTRY_CONTRACTOR_LIEN = 'Forestry - Contractor Lien',
     FORESTRY_CONTRACTOR_CHARGE = 'Forestry - Contractor Charge',
     FORESTRY_SUBCONTRACTOR_LIEN = 'Forestry - Sub-contractor Charge',
