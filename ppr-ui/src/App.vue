@@ -89,7 +89,8 @@ import {
   getPPRUserSettings,
   getSbcFromAuth,
   navigate,
-  updateLdUser
+  updateLdUser,
+  fetchAccountProducts
 } from '@/utils'
 // local Enums, Constants, Interfaces
 import { FeeCodes } from '@/composables/fees/enums'
@@ -130,6 +131,7 @@ export default class App extends Mixins(AuthMixin) {
   @Getter isRoleStaff!: boolean
   @Getter isRoleStaffBcol!: boolean
   @Getter isRoleStaffReg!: boolean
+  @Getter getAccountId!: number
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -139,6 +141,7 @@ export default class App extends Mixins(AuthMixin) {
   @Action setRegistrationNumber!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
+  @Action setUserProductSubscriptions: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -400,6 +403,13 @@ export default class App extends Mixins(AuthMixin) {
         this.setAuthRoles(authRoles)
       } else {
         throw new Error('Invalid auth roles')
+      }
+
+      const subscribedProducts = await fetchAccountProducts(this.getAccountId)
+      if (subscribedProducts) {
+        this.setUserProductSubscriptions(subscribedProducts)
+      } else {
+        throw new Error('Unable to get Products for the User')
       }
     } catch (error) {
       message = String(error)

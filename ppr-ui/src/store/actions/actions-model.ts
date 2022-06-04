@@ -24,7 +24,7 @@ import {
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
-  AuthorizationIF
+  UserProductSubscriptionIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -42,6 +42,10 @@ export const setAccountProductSubscribtion: ActionIF = (
   productSubscriptions: AccountProductSubscriptionIF
 ): void => {
   commit('mutateAccountProductSubscribtion', productSubscriptions)
+}
+
+export const setUserProductSubscriptions: ActionIF = ({ commit }, products: Array<UserProductSubscriptionIF>): void => {
+  commit('mutateUserProductSubscriptions', products)
 }
 
 export const setAccountInformation: ActionIF = ({ commit }, account: AccountInformationIF): void => {

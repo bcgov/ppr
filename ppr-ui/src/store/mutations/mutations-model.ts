@@ -24,7 +24,8 @@ import {
   RegistrationSummaryIF,
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
-  ManufacturedHomeSearchResultIF
+  ManufacturedHomeSearchResultIF,
+  UserProductSubscriptionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -32,6 +33,10 @@ export const mutateAccountProductSubscribtion = (
   state: StateIF, productSubscriptions: AccountProductSubscriptionIF
 ) => {
   state.stateModel.accountProductSubscriptions = productSubscriptions
+}
+
+export const mutateUserProductSubscriptions = (state: StateIF, products: Array<UserProductSubscriptionIF>) => {
+  state.stateModel.userProductSubscriptions = products
 }
 
 export const mutateAccountInformation = (state: StateIF, accountInformation: AccountInformationIF) => {

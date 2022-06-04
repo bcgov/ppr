@@ -6,11 +6,13 @@ import {
   UserInfoIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { UserProductSubscriptionIF } from '@/interfaces'
 
 // State model example
 export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
+  userProductSubscriptions: Array<UserProductSubscriptionIF>
   authorization: AuthorizationIF
   certifyInformation: CertifyIF
   folioOrReferenceNumber: string

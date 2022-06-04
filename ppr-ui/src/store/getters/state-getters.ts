@@ -24,6 +24,7 @@ import {
   SearchTypeIF,
   StateIF,
   StateModelIF,
+  UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF
 } from '@/interfaces'
@@ -44,6 +45,10 @@ export const getAccountProductSubscriptions = (
   state: StateIF
 ): AccountProductSubscriptionIF => {
   return state.stateModel.accountProductSubscriptions
+}
+
+export const getUserProductSubscriptions = (state: StateIF): Array<UserProductSubscriptionIF> => {
+  return state.stateModel.userProductSubscriptions
 }
 
 /** The registration collateral object. */
