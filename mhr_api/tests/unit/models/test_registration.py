@@ -22,7 +22,6 @@ import pytest
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import Registration, GeneralCollateral
-from mhr_api.models import registration_utils as registration_utils
 # from mhr_api.services.authz import STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 
 
@@ -162,7 +161,7 @@ def test_find_by_id_cs_su(session):
 def test_find_by_registration_number(session, desc, reg_number, account_id, status, staff, base_reg_number):
     """Assert that a fetch financing statement by registration number works as expected."""
     if status == HTTPStatus.OK:
-        registration = Registration.find_by_registration_number(reg_number, account_id, staff, base_reg_number)
+        registration = Registration.find_by_registration_number(reg_number, account_id)
         assert registration.id >= 200000000
         assert registration.registration_num == reg_number
         assert registration.base_registration_num
@@ -173,7 +172,7 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
         # assert registration.client_reference_id
     else:
         with pytest.raises(BusinessException) as request_err:
-            Registration.find_by_registration_number(reg_number, account_id, staff, base_reg_number)
+            Registration.find_by_registration_number(reg_number, account_id)
 
         # check
         assert request_err
@@ -183,7 +182,7 @@ def test_find_by_registration_number(session, desc, reg_number, account_id, stat
 
 def test_find_by_registration_num_fs(session):
     """Assert that find a financing statement by registration number contains all expected elements."""
-    registration = Registration.find_by_registration_number('TEST0001', 'PS12345', False)
+    registration = Registration.find_by_registration_number('TEST0001', 'PS12345')
     assert registration
     assert registration.id == 200000000
     assert registration.registration_num == 'TEST0001'
@@ -195,7 +194,7 @@ def test_find_by_registration_num_fs(session):
 
 def test_find_by_registration_num_ds(session):
     """Assert that find a discharge statement by registration number contains all expected elements."""
-    registration = Registration.find_by_registration_number('TEST00D4', 'PS12345', True)
+    registration = Registration.find_by_registration_number('TEST00D4', 'PS12345')
     assert registration
     assert registration.id == 200000004
     assert registration.registration_num == 'TEST00D4'
@@ -215,7 +214,7 @@ def test_find_by_registration_num_ds(session):
 
 def test_find_by_registration_num_gc(session):
     """Assert that find an amendment with general collateral changes contains all expected elements."""
-    registration = Registration.find_by_registration_number('TEST0018A3', 'PS12345', True)
+    registration = Registration.find_by_registration_number('TEST0018A3', 'PS12345')
     assert registration
     assert registration.registration_num == 'TEST0018A3'
     assert registration.registration_type == 'AM'
@@ -246,7 +245,7 @@ def test_find_by_id_invalid(session):
 @pytest.mark.parametrize('base_reg_num,reg_num,reg_num_name', TEST_VERIFICATION_DATA)
 def test_verification_json(session, base_reg_num, reg_num, reg_num_name):
     """Assert that generating verification statement json works as expected."""
-    registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
+    registration = Registration.find_by_registration_number(reg_num, 'PS12345')
     json_data = registration.verification_json(reg_num_name)
     assert json_data[reg_num_name] == reg_num
     assert json_data['baseRegistrationNumber'] == base_reg_num

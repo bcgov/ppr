@@ -18,6 +18,7 @@ from .db import db
 from .address import Address
 from .client_code import ClientCode
 from .court_order import CourtOrder
+from .db2.cmpserno import Db2Cmpserno
 from .db2.descript import Db2Descript
 from .db2.docdes import Db2Docdes
 from .db2.document import Db2Document
@@ -49,7 +50,7 @@ from .vehicle_collateral import VehicleCollateral
 
 __all__ = ('db',
            'Address', 'ClientCode', 'CountryType', 'CourtOrder',
-           'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manuhome', 'Db2Mhomnote',
+           'Db2Cmpserno', 'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manuhome', 'Db2Mhomnote',
            'Db2Owner', 'Db2Owngroup',
            'EventTracking', 'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'Party',
            'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',

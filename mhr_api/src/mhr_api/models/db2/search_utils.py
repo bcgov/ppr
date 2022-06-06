@@ -62,17 +62,13 @@ SERIAL_NUM_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
        o.ownrname,
 --       (SELECT LISTAGG(o2.ownrname, ',')
---          FROM amhrtdb.owner o2
+--          FROM owner o2
 --         WHERE o2.manhomid = mh.manhomid) as owner_names, 
        l.towncity, de.sernumb1, de.yearmade,
        de.makemodl
-  FROM manuhome mh, document d, owner o, location l, descript de
+  FROM manuhome mh, document d, owner o, location l, descript de, cmpserno c
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
-   AND (de.sernumb1 LIKE :query_value || '%' OR 
-        de.sernumb2 LIKE :query_value || '%' OR 
-        de.sernumb3 LIKE :query_value || '%' OR 
-        de.sernumb4 LIKE :query_value || '%')
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
@@ -83,6 +79,9 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
                         FROM owngroup og2
                        WHERE mh.manhomid = og2.manhomid
                          AND og2.status IN ('3', '4'))
+  AND mh.manhomid = c.manhomid
+  AND (c.serialno = :query_value OR
+       de.sernumb1 = :serial_value)
 ORDER BY d.regidate ASC
 """
 
@@ -123,7 +122,6 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND og.status IN ('3', '4')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
-
 
 def search_by_mhr_number(current_app, db, request_json):
      """Execute a DB2 search by mhr number query."""
@@ -171,11 +169,13 @@ def search_by_owner_name(current_app, db, request_json):
 def search_by_serial_number(current_app, db, request_json):
      """Execute a DB2 search by serial number query."""
      serial_num:str = request_json['criteria']['value']
-     serial_num = model_utils.get_serial_number_key(serial_num)
-     current_app.logger.info(f'DB2 search_by_serial_number search value={serial_num}.')
+     serial_key = model_utils.get_serial_number_key(serial_num)  # serial_num.upper().strip()
+     current_app.logger.debug(f'DB2 search_by_serial_number search value={serial_num}, key={serial_key}.')
      try:
           query = text(SERIAL_NUM_QUERY)
-          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': serial_num})
+          result = db.get_engine(current_app, 'db2').execute(query,
+                                                             {'query_value': serial_key,
+                                                              'serial_value': serial_num.strip()})
           return result
      except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_serial_number exception: ' + str(db_exception))
