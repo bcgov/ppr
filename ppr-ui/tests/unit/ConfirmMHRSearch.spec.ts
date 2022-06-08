@@ -22,6 +22,7 @@ import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
 import { SearchedResultMhr } from '@/components/tables'
+import { defaultFlagSet } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -37,6 +38,7 @@ describe('Confirm MHRSearch view', () => {
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
+    defaultFlagSet['mhr-ui-enabled'] = true
     delete window.location
     window.location = { assign: jest.fn() } as any
     const localVue = createLocalVue()
