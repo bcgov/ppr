@@ -65,7 +65,7 @@ import {
 import { useGetters } from 'vuex-composition-helpers'
 import { tombstoneTitles } from '@/resources'
 // local
-import { pacificDate, getDescriptiveUserRole } from '@/utils'
+import { pacificDate, getRoleProductCode } from '@/utils'
 
 export default defineComponent({
   name: 'TombstoneDefault',
@@ -77,7 +77,8 @@ export default defineComponent({
       isRoleStaff,
       isRoleStaffBcol,
       isRoleStaffSbc,
-      getUserRoles
+      getUserRoles,
+      getUserProductSubscriptions
     } = useGetters<any>([
       'getAccountLabel',
       'getUserFirstName',
@@ -85,7 +86,8 @@ export default defineComponent({
       'isRoleStaff',
       'isRoleStaffBcol',
       'isRoleStaffSbc',
-      'getUserRoles'
+      'getUserRoles',
+      'getUserProductSubscriptions'
     ])
     const localState = reactive({
       userName: computed((): string => {
@@ -93,7 +95,7 @@ export default defineComponent({
       }),
       date: '',
       header: computed((): string => {
-        return tombstoneTitles[getDescriptiveUserRole(getUserRoles.value)]
+        return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptions.value)]
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value

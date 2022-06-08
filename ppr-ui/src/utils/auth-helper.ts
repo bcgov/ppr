@@ -6,7 +6,9 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 // Interfaces, Enums
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
-import { AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF } from '@/interfaces'
+import {
+  AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF
+} from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
 
 /** Gets Keycloak JWT and parses it. */
@@ -149,7 +151,6 @@ export async function fetchAccountProducts (accountId: number): Promise<Array<Us
       if (!data) {
         throw new Error('Invalid API response')
       }
-      console.log(data)
       return data
     })
     .catch(error => {
