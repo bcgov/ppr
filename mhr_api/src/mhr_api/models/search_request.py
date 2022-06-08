@@ -129,6 +129,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             else:
                 status = 'HISTORIC'
         timestamp = row[3]
+        value: str = str(row[8])
+        year = int(value) if value.isnumeric() else 0
         result_json = {
             'mhrNumber': str(row[0]),
             'status': status,
@@ -136,7 +138,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             'homeLocation': str(row[6]).strip(),
             'serialNumber': str(row[7]).strip(),
             'baseInformation': {
-                'year': int(row[8]),
+                'year': year,
                 'make': str(row[9]).strip(),
                 'model': ''
             }
@@ -224,6 +226,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
+                # result = SearchRequest.__build_search_result(row)
+                # current_app.logger.debug(result)
                 results_json.append(SearchRequest.__build_search_result(row))
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size

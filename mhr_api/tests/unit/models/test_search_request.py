@@ -54,7 +54,7 @@ MH_NONE_JSON = {
 ORG_NAME_JSON = {
     'type': 'ORGANIZATION_NAME',
     'criteria': {
-        'value': 'GUTHRIE HOLDINGS LTD.'
+        'value': 'JANDEL HOMES LTD.'
     },
     'clientReferenceId': 'T-SQ-MO-1'
 }
@@ -89,9 +89,9 @@ OWNER_NAME_JSON2 = {
     'type': 'OWNER_NAME',
     'criteria': {
         'ownerName': {
-            'first': 'DWAYNE',
-            'middle': 'LARRY',
-            'last': 'MANKE'
+            'first': 'ROSE',
+            'middle': 'CHERYL',
+            'last': 'LESLIE'
         }
     },
     'clientReferenceId': 'T-SQ-MI-1'
@@ -116,7 +116,7 @@ MI_NONE_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': '4551'
+        'value': 'XF1048'
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
@@ -133,7 +133,7 @@ MS_INVALID_JSON = {
 MS_NONE_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': 'XXXXXXXXX'
+        'value': 'XXX999999999'
     },
     'clientReferenceId': 'T-SQ-MS-4'
 }
@@ -190,7 +190,7 @@ def test_search_valid(session, search_type, json_data):
     query.search()
     assert not query.updated_selection
     result = query.json
-    current_app.logger.debug(result)
+    current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
     assert query.id
     assert query.search_response
     assert query.account_id == 'PS12345'
@@ -209,8 +209,8 @@ def test_search_valid(session, search_type, json_data):
         assert match['homeLocation']
         assert match['serialNumber']
         assert match['baseInformation']
-        assert match['baseInformation']['year']
-        assert match['baseInformation']['make']
+        assert 'year' in match['baseInformation']
+        assert 'make' in match['baseInformation']
         assert match['baseInformation']['model'] is not None
         assert 'organizationName' in match or 'ownerName' in match
         if match.get('ownerName'):
