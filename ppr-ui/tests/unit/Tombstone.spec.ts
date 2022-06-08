@@ -10,8 +10,8 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { Tombstone, TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
 
 // Other
-import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
-import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
+import { AccountInformationIF, FinancingStatementIF, UserInfoIF, UserProductSubscriptionIF } from '@/interfaces'
+import { mockedFinancingStatementComplete, mockedProductSubscriptions, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { convertDate, pacificDate } from '@/utils'
@@ -101,6 +101,7 @@ describe('Tombstone component', () => {
     await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
     await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
     await store.dispatch('setAuthRoles', ['ppr'])
+    await store.dispatch('setUserProductSubscriptions', [mockedProductSubscriptions.PPR] as UserProductSubscriptionIF[])
   })
 
   afterEach(() => {

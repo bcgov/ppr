@@ -17,8 +17,8 @@ import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
-import { RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
+import { ProductCode, ProductStatus, RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
+import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI, UserProductSubscriptionIF } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   amendConfirmationDialog,
@@ -45,6 +45,7 @@ import {
   mockedUpdateRegTableUserSettingsResponse
 } from './test-data'
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
+import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 Vue.use(Vuetify)
 
@@ -76,6 +77,8 @@ describe('Dashboard component', () => {
 
   const regNum = '123456B'
   const draftDocId = 'D0034001'
+  const currentAccount = { id: 'test_id' }
+  sessionStorage.setItem(SessionStorageKeys.CurrentAccount, JSON.stringify(currentAccount))
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -97,10 +100,11 @@ describe('Dashboard component', () => {
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
     const getDebtorNames = getStub.withArgs(`financing-statements/${regNum}/debtorNames`)
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
-
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
     await store.dispatch('setAuthRoles', ['ppr'])
+    await store.dispatch('setUserProductSubscriptions', [{code: ProductCode.PPR, subscriptionStatus: ProductStatus.ACTIVE}] as UserProductSubscriptionIF[])
+    
     patchUserSettings.returns(new Promise(resolve => resolve(
       { data: mockedUpdateRegTableUserSettingsResponse }
     )))
