@@ -54,9 +54,10 @@
 
             <v-card flat class="mt-6 pa-6">
               <staff-payment-component
+                id="staff-payment-dialog"
                 :staffPaymentData="staffPaymentData"
-                :validate="true"
-                :displaySideLabel="false"
+                :validate="validatePayment"
+                :displaySideLabel="true"
                 :displayPriorityCheckbox="false"
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
@@ -160,16 +161,16 @@ export default class ConfirmDischarge extends Vue {
   private showCancelDialog = false
   private showErrors = false
   private submitting = false
-  private validConfirm = false // eslint-disable-line lines-between-class-members
   private validFolio = true
   private staffPaymentValid = false
+  private validatePayment = false
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
   private get stickyComponentErrMsg (): string {
-    if ((!this.validConfirm || !this.validFolio) && this.showErrors) {
+    if ((!this.validFolio || !this.staffPaymentValid) && this.showErrors) {
       return '< Please complete required information'
     }
     return ''
@@ -231,8 +232,11 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submit (): Promise<void> {
+    this.validatePayment = true
+    await Vue.nextTick()
     if (!this.validFolio || (this.getIsStaffClientPayment && !this.staffPaymentValid)) {
       this.showErrors = true
+      document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
       return
     }
     this.submitting = true
@@ -331,7 +335,7 @@ export default class ConfirmDischarge extends Vue {
     // do not proceed if app is not ready
     if (!val) return
     // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
