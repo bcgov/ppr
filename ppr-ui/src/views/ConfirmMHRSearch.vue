@@ -54,7 +54,7 @@
 
             <v-card flat class="mt-6 pa-6">
               <staff-payment-component
-                id='staff-payment-dialog'
+                id="staff-payment-dialog"
                 :staffPaymentData="staffPaymentData"
                 :validate="validatePayment"
                 :displaySideLabel="true"
