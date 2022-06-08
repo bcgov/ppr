@@ -54,9 +54,10 @@
 
             <v-card flat class="mt-6 pa-6">
               <staff-payment-component
+                id = 'staff-payment-dialog'
                 :staffPaymentData="staffPaymentData"
                 :validate="true"
-                :displaySideLabel="false"
+                :displaySideLabel="true"
                 :displayPriorityCheckbox="false"
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
@@ -233,6 +234,7 @@ export default class ConfirmDischarge extends Vue {
   private async submit (): Promise<void> {
     if (!this.validFolio || (this.getIsStaffClientPayment && !this.staffPaymentValid)) {
       this.showErrors = true
+      document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
       return
     }
     this.submitting = true
