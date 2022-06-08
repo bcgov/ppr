@@ -58,7 +58,7 @@
                 :staffPaymentData="staffPaymentData"
                 :validate="validatePayment"
                 :displaySideLabel="true"
-                :displayPriorityCheckbox="true"
+                :displayPriorityCheckbox="false"
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
               />
