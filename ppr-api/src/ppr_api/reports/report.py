@@ -67,6 +67,17 @@ TO_CHANGE_TYPE_DESCRIPTION = {
     'AU': 'Collateral Substitution',
     'RC': 'Registry Correction'
 }
+# Map post go-live amendment descriptions
+TO_AMEND_TYPE_DESCRIPTION = {
+    'AA': 'Amendment - Collateral Added',
+    'AM': 'Amendment',
+    'CO': 'Amendment - Court Order',
+    'AR': 'Amendment - Debtors Deleted',
+    'AD': 'Amendment - Debtors Amended',
+    'AP': 'Amendment - Collateral Deleted',
+    'AS': 'Amendment - Secured Parties Amended',
+    'AU': 'Amendment - Collateral Amended'
+}
 
 
 class ReportTypes(Enum):
@@ -619,12 +630,15 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _set_change_date_time(statement):   # pylint: disable=too-many-branches
         """Replace non-financing statement API ISO UTC strings with local report format strings."""
+        if 'changeType' in statement:
+            if statement.get('amendmentRegistrationNumber') and model_utils.after_go_live(statement['createDateTime']):
+                statement['changeType'] = TO_AMEND_TYPE_DESCRIPTION[statement['changeType']].upper()
+            else:
+                statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
             order_date = Report._to_report_datetime(statement['courtOrderInformation']['orderDate'], False)
             statement['courtOrderInformation']['orderDate'] = order_date
-        if 'changeType' in statement:
-            statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
         if 'expiryDate' in statement and len(statement['expiryDate']) > 10:
             statement['expiryDate'] = Report._to_report_datetime_expiry(statement['expiryDate'])
         if 'surrenderDate' in statement:

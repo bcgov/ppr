@@ -75,7 +75,7 @@
               <div class="doc-description">Province of British Columbia</div>
               <div class="registrar-title">Registrar of Personal Property</div>
               [[registrarSignature.html]]
-              <div class="registrar-name">KAINE SPARKS</div>
+              <div class="registrar-name">T.K. SPARKS</div>
             {% endif %}
           </td>
 
@@ -98,11 +98,11 @@
       <tr class="mt-2">
           <td>
             {% if totalResultsSize == 1 %}
-              1 Match in 1 Registration
+              1 Match in 1 Registration in Report
             {% elif totalResultsSize > 1 %}
-              {{ selected|length }} Matches in {{ totalResultsSize }} Registrations
+              {{ selected|length }} Matches in {{ totalResultsSize }} Registrations in Report
             {% else %}
-              0 Matches in 0 Registrations
+              0 Matches in 0 Registrations in Report
             {% endif %}  
           </td>
           <td>Exact Matches: {% if totalResultsSize == 0 %} 0 {% else %} {{ exactMatchCount }} {% endif %} (*)</td>
