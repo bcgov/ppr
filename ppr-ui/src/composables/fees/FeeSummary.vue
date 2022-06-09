@@ -70,6 +70,19 @@
           <div class="fee-list__hint">{{ hintFee }}</div>
         </li>
         <li
+          v-if="hasPriorityFee"
+          id="priority-fee"
+          :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+          key="PriorityFee"
+        >
+          <div :class="$style['fee-list__item-name']">
+            Priority Fee
+          </div>
+          <div :class="$style['fee-list__item-value']">
+            $ 100.00
+          </div>
+        </li>
+        <li
           v-if="hasProcessingFee"
           id="processing-fee-summary"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
@@ -168,10 +181,17 @@ export default defineComponent({
     setStaffClientPayment: { default: false }
   },
   setup (props) {
-    const { getLengthTrust, isRoleStaff } = useGetters<any>(['getLengthTrust', 'isRoleStaff'])
+    const {
+      getLengthTrust, isRoleStaff, getStaffPayment
+    } = useGetters<any>([
+      'getLengthTrust', 'isRoleStaff', 'getStaffPayment'
+    ])
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
+      hasPriorityFee: computed((): Boolean => {
+        return getStaffPayment.value.isPriority
+      }),
       registrationLength: computed((): RegistrationLengthI => {
         return props.setRegistrationLength
       }),
@@ -246,6 +266,9 @@ export default defineComponent({
           let extraFee = localState.feeSummary.serviceFee
           if (localState.hasProcessingFee) {
             extraFee = localState.feeSummary.processingFee
+          }
+          if (getStaffPayment.value.isPriority) {
+            extraFee = extraFee + 100
           }
           return (
             (localState.feeSummary.feeAmount *
