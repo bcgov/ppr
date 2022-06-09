@@ -195,7 +195,7 @@ export default defineComponent({
 
     onUnmounted(() => {
       // clear general collateral description if there is no valid text left in editor (html tags not included)
-      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').length === 0) {
+      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
         setGeneralCollateral([])
         // clear collateral step check mark if there are no vehicles
         // (this resets check mark that was set by general collateral description)
