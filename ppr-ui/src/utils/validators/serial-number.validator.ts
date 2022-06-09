@@ -50,7 +50,7 @@ export const serialNumberValidator = ({ values }) => {
   if (valueToValidate.length < minLen) {
     succeeded = false
   }
-  if (valueToValidate.length > maxLen) {
+  if (values.serialNumber.length > maxLen) {
     succeeded = false
   }
   return {
