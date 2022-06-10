@@ -17,13 +17,13 @@
 """The simple pay-api client is defined here."""
 import copy
 import json
-from enum import Enum
 from functools import wraps
 
 import requests
 from flask import current_app
 
 from mhr_api.services.payment import TransactionTypes
+from mhr_api.utils.base import BaseEnum
 
 
 MSG_CLIENT_CREDENTIALS_REQ_FAILED = 'Client credentials request failed'
@@ -128,7 +128,7 @@ class ApiRequestError(Exception):
         super().__init__(self.message)
 
 
-class HttpVerbs(Enum):
+class HttpVerbs(BaseEnum):
     """Enumeration of HTTP verbs."""
 
     GET = 'get'
@@ -279,6 +279,8 @@ class SBCPaymentClient(BaseClient):
                 if 'datNumber' in transaction_info:
                     account_info['datNumber'] = transaction_info['datNumber']
                 data['accountInfo'] = account_info
+            if transaction_info.get('priority'):
+                data['filingInfo']['filingTypes'][0]['priority'] = True
         return data
 
     @staticmethod
@@ -361,6 +363,8 @@ class SBCPaymentClient(BaseClient):
             if 'datNumber' in transaction_info:
                 account_info['datNumber'] = transaction_info['datNumber']
             data['accountInfo'] = account_info
+        if transaction_info.get('priority'):
+            data['filingInfo']['filingTypes'][0]['priority'] = True
         return data
 
     def create_payment(  # pylint: disable=too-many-arguments
@@ -475,7 +479,7 @@ class SBCPaymentClient(BaseClient):
             }
             data = f'grant_type=client_credentials&scope=openid&client_id={client_id}&client_secret={client_secret}'
             response = requests.request(
-                HttpVerbs.POST.value,
+                HttpVerbs.POST,
                 oidc_token_url,
                 data=data,
                 params=None,

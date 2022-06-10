@@ -22,7 +22,7 @@ from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.models import EventTracking, SearchRequest, SearchResult  # , utils as model_utils
+from mhr_api.models import EventTracking, SearchRequest, SearchResult
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import authorized, is_bcol_help, is_gov_account, is_staff_account
 # from mhr_api.reports import ReportTypes, get_pdf
@@ -67,6 +67,8 @@ CERTIFIED_PARAM = 'certified'
 ROUTING_SLIP_PARAM = 'routingSlipNumber'
 DAT_NUMBER_PARAM = 'datNumber'
 BCOL_NUMBER_PARAM = 'bcolAccountNumber'
+PRIORITY_PARAM = 'priority'
+CLIENT_REF_PARAM = 'clientReferenceId'
 
 
 @bp.route('/<string:search_id>', methods=['POST', 'OPTIONS'])
@@ -140,6 +142,12 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         invoice_id = pay_ref['invoiceId']
         query.pay_invoice_id = int(invoice_id)
         query.pay_path = pay_ref['receipt']
+        # Conditionally update client reference id from request parameter
+        if request.args.get(CLIENT_REF_PARAM):
+            client_ref: str = request.args.get(CLIENT_REF_PARAM)
+            client_ref = client_ref.strip()
+            if client_ref and len(client_ref) < 51:
+                query.client_reference_id = client_ref
         try:
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
@@ -160,8 +168,6 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         # queue report generation.
         enqueue_search_report(search_id)
         response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
-        # Results data that is too large for real time report generation (small number of results) is also
-        # asynchronous.
         if callback_url is None and search_detail.callback_url is not None:
             callback_url = search_detail.callback_url
             response_data['callbackURL'] = requests.utils.unquote(callback_url)
@@ -272,6 +278,7 @@ def build_staff_payment(req: request, account_id: str):
     routing_slip = req.args.get(ROUTING_SLIP_PARAM)
     bcol_number = req.args.get(BCOL_NUMBER_PARAM)
     dat_number = req.args.get(DAT_NUMBER_PARAM)
+    priority = req.args.get(PRIORITY_PARAM)
     if certified is not None and isinstance(certified, bool) and certified:
         payment_info[CERTIFIED_PARAM] = True
     elif certified is not None and isinstance(certified, str) and \
@@ -283,6 +290,11 @@ def build_staff_payment(req: request, account_id: str):
         payment_info[BCOL_NUMBER_PARAM] = str(bcol_number)
     if dat_number is not None:
         payment_info[DAT_NUMBER_PARAM] = str(dat_number)
+    if priority is not None and isinstance(priority, bool) and priority:
+        payment_info[PRIORITY_PARAM] = True
+    elif priority is not None and isinstance(priority, str) and \
+            priority.lower() in ['true', '1', 'y', 'yes']:
+        payment_info[PRIORITY_PARAM] = True
 
     if ROUTING_SLIP_PARAM in payment_info or BCOL_NUMBER_PARAM in payment_info:
         payment_info['waiveFees'] = False
@@ -302,8 +314,8 @@ def enqueue_search_report(search_id: str):
         GoogleQueueService().publish_search_report(payload)
         current_app.logger.info(f'Enqueue search report successful for id={search_id}.')
     except Exception as err:  # noqa: B902; do not alter app processing
-        current_app.logger.error(f'Enqueue search report failed for id={search_id}: ' + repr(err))
+        current_app.logger.error(f'Enqueue search report failed for id={search_id}: ' + str(err))
         EventTracking.create(search_id,
                              EventTracking.EventTrackingTypes.SEARCH_REPORT,
                              int(HTTPStatus.INTERNAL_SERVER_ERROR),
-                             'Enqueue search report event failed: ' + repr(err))
+                             'Enqueue search report event failed: ' + str(err))

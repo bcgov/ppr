@@ -113,16 +113,18 @@ TEST_PAYMENT_DATA_SEARCH = [
     ('Search Staff Both', SELECT_BOTH, '1234', 'UT-00001', 1, 1, True)
 ]
 
-# testdata pattern is ({selection}, {pay_trans_type}, {routingSlip}, {bcolNumber}, 'datNUmber', 'waiveFees')
+# testdata pattern is ({selection}, {routingSlip}, {bcolNumber}, 'datNUmber', 'waiveFees', 'priority')
 TEST_PAY_STAFF_SEARCH = [
-    (SELECT_MHR_ONLY, '12345', None, None, False),
-    (SELECT_MHR_ONLY, None, '62345', None, False),
-    (SELECT_MHR_ONLY, None, '62345', '72345', False),
-    (SELECT_MHR_ONLY, None, None, None, True),
-    (SELECT_COMBO_ONLY, '12345', None, None, False),
-    (SELECT_COMBO_ONLY, None, '62345', None, False),
-    (SELECT_COMBO_ONLY, None, '62345', '72345', False),
-    (SELECT_COMBO_ONLY, None, None, None, True)
+    (SELECT_MHR_ONLY, '12345', None, None, False, False),
+    (SELECT_MHR_ONLY, '12345', None, None, False, True),
+    (SELECT_MHR_ONLY, None, '62345', None, False, False),
+    (SELECT_MHR_ONLY, None, '62345', '72345', False, False),
+    (SELECT_MHR_ONLY, None, None, None, True, False),
+    (SELECT_COMBO_ONLY, '12345', None, None, False, False),
+    (SELECT_COMBO_ONLY, '12345', None, None, False, True),
+    (SELECT_COMBO_ONLY, None, '62345', None, False, False),
+    (SELECT_COMBO_ONLY, None, '62345', '72345', False, False),
+    (SELECT_COMBO_ONLY, None, None, None, True, False)
 ]
 # testdata pattern is ({desc}, {selection}, {pay_url}, {details}, {error})
 TEST_PAYMENT_MOCK = [
@@ -131,8 +133,9 @@ TEST_PAYMENT_MOCK = [
     ('Unauthorized', SELECT_MHR_ONLY, MOCK_URL, None, True)
 ]
 
-@pytest.mark.parametrize('selection,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_SEARCH)
-def test_payment_data_staff_search(client, jwt, selection, routing_slip, bcol_number, dat_number, waive_fees):
+
+@pytest.mark.parametrize('selection,routing_slip,bcol_number,dat_number,waive_fees,priority', TEST_PAY_STAFF_SEARCH)
+def test_payment_data_staff_search(client, jwt, selection, routing_slip, bcol_number, dat_number, waive_fees, priority):
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
     }
@@ -144,6 +147,9 @@ def test_payment_data_staff_search(client, jwt, selection, routing_slip, bcol_nu
         transaction_info['datNumber'] = dat_number
     if waive_fees:
         transaction_info['waiveFees'] = True
+    if priority:
+        transaction_info['priority'] = True
+
     # test
     data = SBCPaymentClient.create_payment_staff_search_data(selection, transaction_info, 'TEST', 'UT-PAY-0001')
     # check
@@ -162,6 +168,10 @@ def test_payment_data_staff_search(client, jwt, selection, routing_slip, bcol_nu
         assert 'accountInfo' in data and data['accountInfo']['bcolAccountNumber'] == bcol_number
         if dat_number:
             assert data['accountInfo']['datNumber'] == dat_number
+    if priority:
+        assert data['filingInfo']['filingTypes'][0]['priority']
+    else:
+        assert not data['filingInfo']['filingTypes'][0]['priority']
 
 
 @pytest.mark.parametrize('filing_type,selection,staff', TEST_PAY_TYPE_FILING_TYPE_SEARCH)
@@ -211,8 +221,9 @@ def test_payment_data_search(client, jwt, desc, selection, trans_id, client_id, 
     assert data['filingInfo']['filingTypes'][0]['quantity'] == 1
 
 
-@pytest.mark.parametrize('selection,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_SEARCH)
-def test_payment_staff_search_mock(session, client, jwt, selection, routing_slip, bcol_number, dat_number, waive_fees):
+@pytest.mark.parametrize('selection,routing_slip,bcol_number,dat_number,waive_fees,priority', TEST_PAY_STAFF_SEARCH)
+def test_payment_staff_search_mock(session, client, jwt, selection, routing_slip, bcol_number, dat_number, waive_fees,
+                                   priority):
     """Assert that a pay-api staff search payment request works as expected with the mock service endpoint."""
     # setup
     token = helper_create_jwt(jwt, [MHR_ROLE])
