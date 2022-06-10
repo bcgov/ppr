@@ -103,7 +103,7 @@ def test_save(session, reg_type, account_id, create_draft):
         del json_data['trustIndenture']
         del json_data['generalCollateral']
     if reg_type == model_utils.REG_TYPE_OTHER:
-        json_data['otherTypeDescription'] = 'OTHER ACT'
+        json_data['otherTypeDescription'] = 'Other ACT'
 
     if create_draft:
         draft_json = copy.deepcopy(DRAFT_FINANCING_STATEMENT)
@@ -132,7 +132,7 @@ def test_save(session, reg_type, account_id, create_draft):
     assert 'documentId' not in result
     if reg_type == model_utils.REG_TYPE_OTHER:
         assert result['registrationDescription'] == 'CROWN CHARGE - OTHER - FILED PURSUANT TO OTHER ACT'
-        assert result['otherTypeDescription'] == 'OTHER ACT'
+        assert result['otherTypeDescription'] == 'Other ACT'
 
 
 def test_find_all_by_account_id(session):

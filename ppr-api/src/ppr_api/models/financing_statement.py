@@ -121,7 +121,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 if reg.registration_type == model_utils.REG_TYPE_OTHER and self.crown_charge_other:
                     statement['otherTypeDescription'] = self.crown_charge_other
                     statement['registrationDescription'] = \
-                        f'CROWN CHARGE - OTHER - FILED PURSUANT TO {self.crown_charge_other}'
+                        f'CROWN CHARGE - OTHER - FILED PURSUANT TO {self.crown_charge_other.upper()}'
 
             statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
 
