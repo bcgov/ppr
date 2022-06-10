@@ -123,11 +123,18 @@
           <td>{% if trustIndenture == true %}Yes{% else %}No{% endif %}</td>
         </tr>
         {% endif %}
-        {% if clientReferenceId is defined and clientReferenceId != "" %}
+        {% if not changes and clientReferenceId is defined and clientReferenceId != "" %}
         <tr>
           <td>Folio Number:</td>
           <td>
               {{clientReferenceId}}
+          </td>
+        </tr>
+        {% elif changes and changes[0].clientReferenceId is defined and changes[0].clientReferenceId != "" %}
+        <tr>
+          <td>Folio Number:</td>
+          <td>
+              {{changes[0].clientReferenceId}}
           </td>
         </tr>
         {% endif %}

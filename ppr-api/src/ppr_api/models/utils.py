@@ -565,6 +565,7 @@ ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already pro
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
 
 SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
+GO_LIVE_DATE = date.fromisoformat('2022-01-25')
 
 
 def get_max_registrations_size():
@@ -873,7 +874,7 @@ def amendment_change_type(json_data):
 
 
 def valid_court_order_date(financing_ts, order_ts: str):
-    """Verify requuest court order date is between the financing statement date and the current date."""
+    """Verify request court order date is between the financing statement date and the current date."""
     if not financing_ts or not order_ts:
         return False
     financing_date = date(financing_ts.year, financing_ts.month, financing_ts.day)
@@ -882,6 +883,12 @@ def valid_court_order_date(financing_ts, order_ts: str):
     now = now_ts()
     today_date = date(now.year, now.month, now.day)
     return financing_date <= order_date <= today_date
+
+
+def after_go_live(registration_ts: str):
+    """Verify registration date is after PPR went to production."""
+    reg_date = date.fromisoformat(registration_ts[:10])
+    return reg_date >= GO_LIVE_DATE
 
 
 def report_retry_elapsed(last_ts: _datetime):
