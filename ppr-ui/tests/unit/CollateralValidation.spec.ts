@@ -147,23 +147,6 @@ describe('Collateral validation tests', () => {
     )
   })
 
-  it('validates serial number max length for manufactured home', async () => {
-    wrapper.find('#txt-type-drop').setValue('MH')
-    await Vue.nextTick()
-    wrapper.find('#txt-man').setValue('123456')
-    wrapper.find('#txt-serial').setValue('123456789012345678901234567890')
-    wrapper.find('#txt-make').setValue('Honda')
-    wrapper.find('#txt-model').setValue('Civic')
-    wrapper.find('#txt-years').setValue(2012)
-    wrapper.find(doneButtonSelector).trigger('click')
-    await flushPromises()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(2)
-    expect(messages.at(0).text()).toBe(
-      'Maximum 25 characters (for longer Serial Numbers include only the last 25 characters)'
-    )
-  })
-
   it('validates max lengths', async () => {
     wrapper.find('#txt-type-drop').setValue('MV')
     await Vue.nextTick()
