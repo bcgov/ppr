@@ -15,8 +15,7 @@ export function getRoleProductCode (
   let role: string
 
   if (authRoles.includes('staff') || authRoles.includes('sbc') ||
-    authRoles.includes('helpdesk') || authRoles.includes('ppr_staff') ||
-    authRoles.includes('mhr_staff')) role = 'STAFF'
+    authRoles.includes('helpdesk') || authRoles.includes('ppr_staff')) role = 'STAFF'
   else role = 'CLIENT'
 
   // Get active product codes (MHR/PPR) and sort them for consistency

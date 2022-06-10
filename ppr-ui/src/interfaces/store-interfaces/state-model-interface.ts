@@ -13,6 +13,7 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
   userProductSubscriptions: Array<UserProductSubscriptionIF>
+  userProductSubscriptionsCodes: Array<string>,
   authorization: AuthorizationIF
   certifyInformation: CertifyIF
   folioOrReferenceNumber: string

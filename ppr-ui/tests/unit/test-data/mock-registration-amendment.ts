@@ -442,6 +442,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   },
   accountProductSubscriptions: null,
   userProductSubscriptions: [],
+  userProductSubscriptionsCodes: [],
   authorization: {
     authRoles: [],
     isSbc: false
@@ -552,6 +553,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   },
   accountProductSubscriptions: null,
   userProductSubscriptions: [],
+  userProductSubscriptionsCodes: [],
   authorization: {
     authRoles: [],
     isSbc: false
@@ -662,6 +664,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   },
   accountProductSubscriptions: null,
   userProductSubscriptions: [],
+  userProductSubscriptionsCodes: [],
   authorization: {
     authRoles: [],
     isSbc: false
@@ -773,6 +776,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
   },
   accountProductSubscriptions: null,
   userProductSubscriptions: [],
+  userProductSubscriptionsCodes: [],
   authorization: {
     authRoles: [],
     isSbc: false

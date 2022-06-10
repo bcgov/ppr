@@ -97,7 +97,7 @@ import { FeeCodes } from '@/composables/fees/enums'
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
   ErrorCategories,
-  ErrorCodes, RegistrationFlowType, RouteNames
+  ErrorCodes, ProductCode, ProductStatus, RegistrationFlowType, RouteNames
 } from '@/enums'
 import {
   AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
@@ -142,6 +142,7 @@ export default class App extends Mixins(AuthMixin) {
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
   @Action setUserProductSubscriptions: ActionBindingIF
+  @Action setUserProductSubscriptionsCodes: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -408,6 +409,11 @@ export default class App extends Mixins(AuthMixin) {
       const subscribedProducts = await fetchAccountProducts(this.getAccountId)
       if (subscribedProducts) {
         this.setUserProductSubscriptions(subscribedProducts)
+
+        const activeProductCodes = subscribedProducts
+          .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
+          .map(product => product.code)
+        this.setUserProductSubscriptionsCodes(activeProductCodes)
       } else {
         throw new Error('Unable to get Products for the User')
       }

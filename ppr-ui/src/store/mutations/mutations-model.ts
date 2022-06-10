@@ -39,6 +39,10 @@ export const mutateUserProductSubscriptions = (state: StateIF, products: Array<U
   state.stateModel.userProductSubscriptions = products
 }
 
+export const mutateUserProductSubscriptionsCodes = (state: StateIF, activeProducts: Array<string>) => {
+  state.stateModel.userProductSubscriptionsCodes = activeProducts
+}
+
 export const mutateAccountInformation = (state: StateIF, accountInformation: AccountInformationIF) => {
   state.stateModel.accountInformation = accountInformation
 }

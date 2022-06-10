@@ -19,12 +19,12 @@ describe('Roles helper utility methods', () => {
     expect(getRoleProductCode(['ppr', 'mhr'], [products.PPR, products.MHR])).toBe('CLIENT_MHR_PPR')
 
     expect(getRoleProductCode(['ppr_staff'], [products.PPR, products.BUSINESS])).toBe('STAFF_PPR')
-    expect(getRoleProductCode(['mhr_staff'], [products.BUSINESS, products.MHR])).toBe('STAFF_MHR')
-    expect(getRoleProductCode(['ppr_staff', 'mhr_staff'], [products.BUSINESS, products.MHR, products.PPR])).toBe('STAFF_MHR_PPR')
-    expect(getRoleProductCode(['staff', 'ppr', 'ppr_staff', 'mhr', 'mhr_staff'], [...products.ALL])).toBe('STAFF_MHR_PPR')
+    expect(getRoleProductCode(['staff'], [products.BUSINESS, products.MHR])).toBe('STAFF_MHR')
+    expect(getRoleProductCode(['ppr_staff'], [products.BUSINESS, products.MHR, products.PPR])).toBe('STAFF_MHR_PPR')
+    expect(getRoleProductCode(['staff', 'ppr', 'ppr_staff', 'mhr'], [...products.ALL])).toBe('STAFF_MHR_PPR')
 
     expect(getRoleProductCode(['ppr_staff', 'mhr'], [...products.ALL])).toBe('STAFF_MHR_PPR')
-    expect(getRoleProductCode(['mhr_staff', 'ppr'], [...products.ALL])).toBe('STAFF_MHR_PPR')
+    expect(getRoleProductCode(['ppr'], [...products.ALL])).toBe('CLIENT_MHR_PPR')
     expect(getRoleProductCode(['staff', 'ppr', 'mhr'], [...products.ALL])).toBe('STAFF_MHR_PPR')
   })
 })

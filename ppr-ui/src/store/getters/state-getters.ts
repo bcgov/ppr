@@ -51,6 +51,10 @@ export const getUserProductSubscriptions = (state: StateIF): Array<UserProductSu
   return state.stateModel.userProductSubscriptions
 }
 
+export const getUserProductSubscriptionsCodes = (state: StateIF): Array<string> => {
+  return state.stateModel.userProductSubscriptionsCodes
+}
+
 /** The registration collateral object. */
 export const getAddCollateral = (state: StateIF): AddCollateralIF => {
   return state.stateModel.registration.collateral

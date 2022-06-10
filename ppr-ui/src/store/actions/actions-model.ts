@@ -48,6 +48,10 @@ export const setUserProductSubscriptions: ActionIF = ({ commit }, products: Arra
   commit('mutateUserProductSubscriptions', products)
 }
 
+export const setUserProductSubscriptionsCodes: ActionIF = ({ commit }, activeProducts: Array<string>): void => {
+  commit('mutateUserProductSubscriptionsCodes', activeProducts)
+}
+
 export const setAccountInformation: ActionIF = ({ commit }, account: AccountInformationIF): void => {
   commit('mutateAccountInformation', account)
 }
