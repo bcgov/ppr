@@ -565,8 +565,8 @@ ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already pro
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
 
 SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
-
 GO_LIVE_DATE = date.fromisoformat('2022-01-25')
+
 
 def get_max_registrations_size():
     """Get the configurable results maximum size for account registrations."""
@@ -883,6 +883,7 @@ def valid_court_order_date(financing_ts, order_ts: str):
     now = now_ts()
     today_date = date(now.year, now.month, now.day)
     return financing_date <= order_date <= today_date
+
 
 def after_go_live(registration_ts: str):
     """Verify registration date is after PPR went to production."""
