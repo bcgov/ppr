@@ -179,6 +179,10 @@ export function validateSearchRealTime (
       if (searchValue?.length > 20) {
         validation.searchValue.message = 'Maximum 20 characters'
       }
+      if (searchValue && specialCharsStrict.test(searchValue)) {
+        validation.searchValue.message =
+          'Serial numbers don\'t normally contain special characters'
+      }
       break
     case APISearchTypes.INDIVIDUAL_DEBTOR:
       if (first && specialCharsLax.test(first)) {

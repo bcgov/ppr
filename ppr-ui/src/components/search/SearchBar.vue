@@ -84,6 +84,7 @@
           <v-col cols="4">
             <v-text-field
               id="first-name-field"
+              :class="[$style[wrapClass]]"
               autocomplete="off"
               :error-messages="searchMessageFirst ? searchMessageFirst : ''"
               filled
@@ -309,6 +310,11 @@ export default defineComponent({
           return true
         }
         return false
+      }),
+      wrapClass: computed(() => {
+        // Add wrap css class only to MHR Home Owner search fields
+        if (localState.selectedSearchType?.searchTypeAPI !== APIMHRMapSearchTypes.MHROWNER_NAME) return ''
+        return localState.searchMessageFirst || localState.searchMessageSecond ? 'hint-wrap' : 'hint-no-wrap'
       }),
       personalPropertySearchFee: computed((): string => {
         return localState.isRoleStaff || localState.isStaffSbc ? '10.00' : '8.50'
@@ -570,6 +576,18 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
+
+.hint-no-wrap {
+  white-space: nowrap;
+  div {
+    overflow: unset;
+  }
+}
+
+.hint-wrap {
+  white-space: normal;
+}
+
 #search-btn, #client-search {
   height: 2.85rem;
   min-width: 0 !important;
