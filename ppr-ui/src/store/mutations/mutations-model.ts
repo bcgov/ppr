@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -39,7 +39,7 @@ export const mutateUserProductSubscriptions = (state: StateIF, products: Array<U
   state.stateModel.userProductSubscriptions = products
 }
 
-export const mutateUserProductSubscriptionsCodes = (state: StateIF, activeProducts: Array<string>) => {
+export const mutateUserProductSubscriptionsCodes = (state: StateIF, activeProducts: Array<ProductCode>) => {
   state.stateModel.userProductSubscriptionsCodes = activeProducts
 }
 

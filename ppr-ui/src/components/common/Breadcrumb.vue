@@ -67,9 +67,9 @@ export default defineComponent({
       getRegistrationType,
       isRoleStaff,
       getUserRoles,
-      getUserProductSubscriptions
+      getUserProductSubscriptionsCodes
     } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType',
-      'isRoleStaff', 'getUserRoles', 'getUserProductSubscriptions'])
+      'isRoleStaff', 'getUserRoles', 'getUserProductSubscriptionsCodes'])
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
@@ -84,7 +84,7 @@ export default defineComponent({
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
         const roleBasedBreadcrumbTitle = breadcrumbsTitles[
-          getRoleProductCode(getUserRoles.value, getUserProductSubscriptions.value)
+          getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
         ]
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text

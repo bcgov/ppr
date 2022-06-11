@@ -78,7 +78,7 @@ export default defineComponent({
       isRoleStaffBcol,
       isRoleStaffSbc,
       getUserRoles,
-      getUserProductSubscriptions
+      getUserProductSubscriptionsCodes
     } = useGetters<any>([
       'getAccountLabel',
       'getUserFirstName',
@@ -87,7 +87,7 @@ export default defineComponent({
       'isRoleStaffBcol',
       'isRoleStaffSbc',
       'getUserRoles',
-      'getUserProductSubscriptions'
+      'getUserProductSubscriptionsCodes'
     ])
     const localState = reactive({
       userName: computed((): string => {
@@ -95,7 +95,7 @@ export default defineComponent({
       }),
       date: '',
       header: computed((): string => {
-        return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptions.value)]
+        return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)]
       }),
       isStaff: computed((): boolean => {
         return isRoleStaff.value

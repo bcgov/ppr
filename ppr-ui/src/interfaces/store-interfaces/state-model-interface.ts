@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
   ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
@@ -13,7 +13,7 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
   userProductSubscriptions: Array<UserProductSubscriptionIF>
-  userProductSubscriptionsCodes: Array<string>,
+  userProductSubscriptionsCodes: Array<ProductCode>,
   authorization: AuthorizationIF
   certifyInformation: CertifyIF
   folioOrReferenceNumber: string

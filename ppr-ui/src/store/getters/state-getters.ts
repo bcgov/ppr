@@ -1,5 +1,5 @@
 // Enums and Interfaces
-import { AccountTypes, APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
+import { AccountTypes, APIRegistrationTypes, ProductCode, RegistrationFlowType, RouteNames } from '@/enums'
 import {
   AccountProductSubscriptionIF,
   AddCollateralIF,
@@ -51,7 +51,7 @@ export const getUserProductSubscriptions = (state: StateIF): Array<UserProductSu
   return state.stateModel.userProductSubscriptions
 }
 
-export const getUserProductSubscriptionsCodes = (state: StateIF): Array<string> => {
+export const getUserProductSubscriptionsCodes = (state: StateIF): Array<ProductCode> => {
   return state.stateModel.userProductSubscriptionsCodes
 }
 

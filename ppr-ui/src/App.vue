@@ -97,7 +97,7 @@ import { FeeCodes } from '@/composables/fees/enums'
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
   ErrorCategories,
-  ErrorCodes, ProductCode, ProductStatus, RegistrationFlowType, RouteNames
+  ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames
 } from '@/enums'
 import {
   AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line

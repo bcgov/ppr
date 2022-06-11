@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -48,7 +48,7 @@ export const setUserProductSubscriptions: ActionIF = ({ commit }, products: Arra
   commit('mutateUserProductSubscriptions', products)
 }
 
-export const setUserProductSubscriptionsCodes: ActionIF = ({ commit }, activeProducts: Array<string>): void => {
+export const setUserProductSubscriptionsCodes: ActionIF = ({ commit }, activeProducts: Array<ProductCode>): void => {
   commit('mutateUserProductSubscriptionsCodes', activeProducts)
 }
 

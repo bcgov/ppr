@@ -325,7 +325,7 @@ export default class Dashboard extends Vue {
   @Getter hasMorePages: boolean
   @Getter isMhrRegistration!: boolean
   @Getter isNonBillable!: boolean
-  @Getter getUserProductSubscriptions: UserProductSubscriptionIF[]
+  @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
 
   @Action resetNewRegistration: ActionBindingIF
   @Action resetRegTableData: ActionBindingIF
@@ -432,17 +432,11 @@ export default class Dashboard extends Vue {
   }
 
   private get hasPPRProduct (): boolean {
-    return this.getUserProductSubscriptions
-      .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
-      .map(product => product.code)
-      .includes(ProductCode.PPR)
+    return this.getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
   }
 
   private get hasMHRProduct (): boolean {
-    return this.getUserProductSubscriptions
-      .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
-      .map(product => product.code)
-      .includes(ProductCode.MHR)
+    return this.getUserProductSubscriptionsCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
   }
 
   private async addRegistration (regNum: string): Promise<void> {
