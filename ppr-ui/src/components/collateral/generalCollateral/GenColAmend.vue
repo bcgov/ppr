@@ -185,6 +185,9 @@ export default defineComponent({
 
     const onSubmitForm = () => {
       const newGeneralCollateral = localState.generalCollateral
+
+      if (localState.addDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.addDesc = ''
+      if (localState.delDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.delDesc = ''
       const amendedGC = {
         descriptionAdd: localState.addDesc,
         descriptionDelete: localState.delDesc
