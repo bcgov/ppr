@@ -358,6 +358,7 @@ export default class ConfirmDischarge extends Vue {
 @import '@/assets/styles/theme.scss';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 #staff-payment-dialog {
   .title-label{
@@ -365,4 +366,6 @@ export default class ConfirmDischarge extends Vue {
   }
 }
 >>>>>>> show error border and label when validation fails
+=======
+>>>>>>> remove redundant code, fix code style
 </style>
