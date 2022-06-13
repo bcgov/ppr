@@ -132,22 +132,22 @@ TEST_PAYMENT_DETAILS_DATA = [
     ('Serial number', 'MS', SERIAL_NUMBER_JSON, SELECTED_JSON, 'MHR Search', '4551')
 ]
 
-# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {priority}, {status})
 TEST_STAFF_SEARCH_DATA = [
-    (STAFF_ROLE, None, None, None, HTTPStatus.OK),
-    (STAFF_ROLE, '12345', None, None, HTTPStatus.OK),
-    (STAFF_ROLE, None, '654321', '111111', HTTPStatus.OK),
-    (STAFF_ROLE, '12345', '654321', '111111', HTTPStatus.BAD_REQUEST),
-    (BCOL_HELP, None, None, None, HTTPStatus.OK),
-    (GOV_ACCOUNT_ROLE, '12345', None, None, HTTPStatus.OK),
-    (GOV_ACCOUNT_ROLE, None, '654321', '111111', HTTPStatus.OK),
-    (GOV_ACCOUNT_ROLE, None, None, None, HTTPStatus.OK)
+    (STAFF_ROLE, None, None, None, False, HTTPStatus.OK),
+    (STAFF_ROLE, '12345', None, None, True, HTTPStatus.OK),
+    (STAFF_ROLE, None, '654321', '111111', False, HTTPStatus.OK),
+    (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST),
+    (BCOL_HELP, None, None, None, False, HTTPStatus.OK),
+    (GOV_ACCOUNT_ROLE, '12345', None, None, False, HTTPStatus.OK),
+    (GOV_ACCOUNT_ROLE, None, '654321', '111111', False, HTTPStatus.OK),
+    (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.OK)
 ]
-# testdata pattern is ({description}, {JSON data}, {mhr_num}, {match_count})
+# testdata pattern is ({description}, {JSON data}, {mhr_num}, {client_ref_id}, {match_count})
 TEST_PPR_SEARCH_DATA = [
-    ('Combo no match mhr number', SELECTED_JSON_COMBO, '022911', 0),
-    ('Not combo no ppr registration info', SELECTED_JSON, '022911', 0),
-    ('Double match mhr number', SELECTED_JSON_COMBO, '022000', 1)
+    ('Combo no match mhr number', SELECTED_JSON_COMBO, '022911', 'UT-0002', 0),
+    ('Not combo no ppr registration info', SELECTED_JSON, '022911', None, 0),
+    ('Double match mhr number', SELECTED_JSON_COMBO, '022000', None, 1)
 ]
 
 
@@ -180,8 +180,8 @@ def test_post_selected(session, client, jwt, desc, json_data, search_id, roles, 
         assert rv.status_code == status
 
 
-@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,status', TEST_STAFF_SEARCH_DATA)
-def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, status):
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,priority,status', TEST_STAFF_SEARCH_DATA)
+def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, priority, status):
     """Assert that staff search requests returns the correct status."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
@@ -197,6 +197,8 @@ def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat
     if dat_number:
         if len(params) > 0:
             params += '&datNumber=' + str(dat_number)
+    if priority:
+        params += '&priority=true'
     print('params=' + params)
     roles = [MHR_ROLE]
     account_id = role
@@ -255,8 +257,8 @@ def test_get_payment_details(session, client, jwt, desc, type, search_data, sele
     assert details['value'] == value
 
 
-@pytest.mark.parametrize('desc,json_data,mhr_num,match_count', TEST_PPR_SEARCH_DATA)
-def test_post_selected_combo(session, client, jwt, desc, json_data, mhr_num, match_count):
+@pytest.mark.parametrize('desc,json_data,mhr_num,client_ref_id,match_count', TEST_PPR_SEARCH_DATA)
+def test_post_selected_combo(session, client, jwt, desc, json_data, mhr_num, client_ref_id, match_count):
     """Assert that valid search criteria with PPR search returns a 201 status."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
@@ -269,18 +271,23 @@ def test_post_selected_combo(session, client, jwt, desc, json_data, mhr_num, mat
 
     # test
     rv = client.post('/api/v1/searches',
-                    json=search_criteria,
-                    headers=headers,
-                    content_type='application/json')
+                     json=search_criteria,
+                     headers=headers,
+                     content_type='application/json')
     test_search_id = rv.json['searchId']
-    rv = client.post('/api/v1/search-results/' + test_search_id,
-                        json=select_data,
-                        headers=headers,
-                        content_type='application/json')
+    path = '/api/v1/search-results/' + test_search_id
+    if client_ref_id:
+        path += '?clientReferenceId=' + client_ref_id
+    rv = client.post(path,
+                     json=select_data,
+                     headers=headers,
+                     content_type='application/json')
     # check
     # current_app.logger.debug(rv.json)
     assert rv.status_code == HTTPStatus.OK
     response_json = rv.json
+    if client_ref_id:
+        assert response_json['searchQuery']['clientReferenceId'] == client_ref_id
     if json_data[0].get('includeLienInfo', False) and response_json.get('details'):
         assert 'pprRegistrations' in response_json['details'][0]
         if match_count > 0:

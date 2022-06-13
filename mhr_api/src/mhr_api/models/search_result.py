@@ -85,22 +85,25 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
 
         Remove any original matches that are not in the current search query selection.
         """
-        # Nothing to do if search had no results.
-        if self.search.total_results_size < 1:
-            return
-
         # Build default summary information
         detail_response = {
             'searchDateTime': model_utils.format_ts(self.search.search_ts),
-            'searchQuery': self.search.search_criteria,
-            'details': []
+            'searchQuery': self.search.search_criteria
         }
+        client_ref: str = '' if not self.search.client_reference_id else self.search.client_reference_id
+        detail_response['searchQuery']['clientReferenceId'] = client_ref
         if self.search.pay_invoice_id and self.search.pay_path:
             payment = {
                 'invoiceId': str(self.search.pay_invoice_id),
                 'receipt': self.search.pay_path
             }
             detail_response['payment'] = payment
+        # Nothing else to do if search had no results.
+        if self.search.total_results_size < 1:
+            detail_response['totalResultsSize'] = self.search.total_results_size
+            self.search_response = detail_response
+            self.save()
+            return
 
         self.set_search_selection(search_select)
         results = self.search_response
