@@ -621,6 +621,10 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
   color: $error;
 }
 
+.error-text {
+  color: $error !important;
+}
+
 // custom common padding shortcut classes
 .pb-30px {
   padding-bottom: 30px !important;

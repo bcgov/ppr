@@ -11,6 +11,7 @@ import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { UIRegistrationTypes } from '@/enums'
 import { StateModelIF } from '@/interfaces'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 
 Vue.use(Vuetify)
 
@@ -109,6 +110,7 @@ describe('FeeSummary component tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
+    await store.dispatch('setStaffPayment', { isPriority: false } as StaffPaymentIF)
     // these props will be changed in each test
     wrapper = createComponent(
       FeeSummaryTypes.NEW,
@@ -681,5 +683,33 @@ describe('FeeSummary component tests', () => {
     expect(wrapper.vm.$data.totalAmount).toBe(10)
     expect(wrapper.vm.$data.isComplete).toBe(true)
     expect(wrapper.vm.$data.hintFee).toBe('')
+  })
+
+  it('renders priority fee for a MHR Search as Staff on behalf of a client', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffReg: true,
+      setStaffClientPayment: true
+    })
+    await store.dispatch('setStaffPayment', { isPriority: true })
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').text()).toContain('No Fee')
+    expect(wrapper.vm.$data.totalFees).toBe(10)
+    expect(wrapper.vm.$data.totalAmount).toBe(110)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.find('#priority-fee').exists()).toBe(true)
+    expect(wrapper.find('#priority-fee').text()).toContain('Priority Fee')
+    expect(wrapper.find('#priority-fee').text()).toContain('$ 100.00')
   })
 })
