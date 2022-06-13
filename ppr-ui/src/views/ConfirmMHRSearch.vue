@@ -52,7 +52,7 @@
               </v-col>
             </v-row>
 
-            <v-card flat class="mt-6 pa-6" :class="staffPaymentValid? '' :'border-error-left'">
+            <v-card flat class="mt-6 pa-6" :class="staffPaymentValid? '' : 'border-error-left'">
               <staff-payment-component
                 id="staff-payment-dialog"
                 :staffPaymentData="staffPaymentData"
@@ -357,9 +357,4 @@ export default class ConfirmDischarge extends Vue {
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 
-#staff-payment-dialog {
-  .title-label{
-    color: red !important;
-  }
-}
 </style>
