@@ -190,7 +190,7 @@ export default defineComponent({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
       hasPriorityFee: computed((): Boolean => {
-        return getStaffPayment.value.isPriority
+        return getStaffPayment.value?.isPriority
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return props.setRegistrationLength
@@ -267,7 +267,7 @@ export default defineComponent({
           if (localState.hasProcessingFee) {
             extraFee = localState.feeSummary.processingFee
           }
-          if (getStaffPayment.value.isPriority) {
+          if (getStaffPayment.value?.isPriority) {
             extraFee = extraFee + 100
           }
           return (
