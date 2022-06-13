@@ -357,4 +357,12 @@ export default class ConfirmDischarge extends Vue {
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
 
+<<<<<<< HEAD
+=======
+#staff-payment-dialog {
+  .title-label{
+    color: red !important;
+  }
+}
+>>>>>>> show error border and label when validation fails
 </style>
