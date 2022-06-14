@@ -52,14 +52,14 @@
               </v-col>
             </v-row>
 
-            <v-card flat class="mt-6 pa-6" :class="staffPaymentValid ? '' : 'border-error-left'">
+            <v-card flat class="mt-6 pa-6" :class="showErrorAlert ? 'border-error-left' : ''">
               <staff-payment-component
                 id="staff-payment-dialog"
                 :staffPaymentData="staffPaymentData"
-                :validate="validatePayment"
+                :validate="true"
                 :displaySideLabel="true"
                 :displayPriorityCheckbox="true"
-                :invalidSection="!staffPaymentValid"
+                :invalidSection="showErrorAlert"
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
               />
@@ -164,14 +164,17 @@ export default class ConfirmDischarge extends Vue {
   private submitting = false
   private validFolio = true
   private staffPaymentValid = false
-  private validatePayment = false
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
+  private get showErrorAlert (): boolean {
+    return (!this.validFolio || !this.staffPaymentValid) && this.showErrors
+  }
+
   private get stickyComponentErrMsg (): string {
-    if ((!this.validFolio || !this.staffPaymentValid) && this.showErrors) {
+    if (this.showErrorAlert) {
       return '< Please complete required information'
     }
     return ''
@@ -233,8 +236,6 @@ export default class ConfirmDischarge extends Vue {
   }
 
   private async submit (): Promise<void> {
-    this.validatePayment = true
-    await Vue.nextTick()
     if (!this.validFolio || (this.getIsStaffClientPayment && !this.staffPaymentValid)) {
       this.showErrors = true
       document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
