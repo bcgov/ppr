@@ -88,6 +88,9 @@ function mhrStaffPaymentParameters (staffPayment: StaffPaymentIF) {
         paymentParams = paymentParams + '&datNumber=' + staffPayment.datNumber
         break
     }
+    if (staffPayment.isPriority) {
+      paymentParams = paymentParams + '&priority=true'
+    }
   }
   return paymentParams
 }
