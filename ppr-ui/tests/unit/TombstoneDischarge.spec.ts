@@ -11,7 +11,7 @@ import { TombstoneDischarge } from '@/components/tombstone'
 
 // Other
 import { FinancingStatementIF } from '@/interfaces'
-import { mockedFinancingStatementComplete, mockedProductSubscriptions, mockedSelectSecurityAgreement } from './test-data'
+import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { pacificDate } from '@/utils'
@@ -68,7 +68,6 @@ describe('Tombstone component', () => {
     await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
     await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
     await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
-    await store.dispatch('setUserProductSubscriptions', [mockedProductSubscriptions.PPR])
   })
 
   afterEach(() => {

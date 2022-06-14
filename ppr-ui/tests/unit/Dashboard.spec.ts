@@ -17,8 +17,8 @@ import { SearchBar } from '@/components/search'
 import { RegistrationTable, SearchHistory } from '@/components/tables'
 import { RegistrationBar } from '@/components/registration'
 // local types/helpers, etc.
-import { ProductCode, ProductStatus, RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI, UserProductSubscriptionIF } from '@/interfaces'
+import { AuthRoles, ProductCode, RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
+import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
   amendConfirmationDialog,
@@ -102,8 +102,8 @@ describe('Dashboard component', () => {
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
-    await store.dispatch('setAuthRoles', ['ppr'])
-    await store.dispatch('setUserProductSubscriptions', [{code: ProductCode.PPR, subscriptionStatus: ProductStatus.ACTIVE}] as UserProductSubscriptionIF[])
+    await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, 'ppr'])
+    await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
     
     patchUserSettings.returns(new Promise(resolve => resolve(
       { data: mockedUpdateRegTableUserSettingsResponse }

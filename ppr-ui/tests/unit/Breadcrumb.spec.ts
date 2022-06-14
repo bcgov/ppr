@@ -9,7 +9,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // Components
 import { Breadcrumb } from '@/components/common'
 // Other
-import { RouteNames } from '@/enums'
+import { AuthRoles, ProductCode, RouteNames } from '@/enums'
 import {
   tombstoneBreadcrumbDashboard,
   tombstoneBreadcrumbDischarge,
@@ -24,9 +24,7 @@ import { getTestId } from './utils'
 
 // unit test resources
 import mockRouter from './MockRouter'
-import { getRoleProductCode } from '@/utils'
-import { mockedProductSubscriptions as products } from './test-data'
-import { UserProductSubscriptionIF } from '@/interfaces'
+import { defaultFlagSet, getRoleProductCode } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -64,12 +62,11 @@ function createComponent (
 }
 
 async function assertBreadcrumbItemForRole (
-  wrapper: Wrapper<any>, roles: Array<string>, isSbc: boolean, subscribedProducts: UserProductSubscriptionIF[], breadcrumbItemContent: string
+  wrapper: Wrapper<any>, roles: Array<AuthRoles>, breadcrumbItemContent: string, subscribedProductsCodes: Array<ProductCode> = []
 ) {
   await store.dispatch('setAuthRoles', roles)
-  await store.dispatch('setRoleSbc', isSbc)
-  await store.dispatch('setUserProductSubscriptions', subscribedProducts)
-  Vue.nextTick()
+  await store.dispatch('setRoleSbc', !roles.includes(AuthRoles.PUBLIC))
+  await store.dispatch('setUserProductSubscriptionsCodes', subscribedProductsCodes)
   const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
   expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
   expect(breadcrumbs.at(1).text()).toContain(breadcrumbItemContent)
@@ -121,7 +118,6 @@ describe('Breadcrumb component tests', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     await store.dispatch('setAuthRoles', ['staff', 'ppr', 'sbc'])
-    await store.dispatch('setUserProductSubscriptions', [products.PPR])
   })
 
   afterEach(() => {
@@ -131,7 +127,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on dashboard with breadcrumb', () => {
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
@@ -143,7 +139,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on search with breadcrumb', () => {
     wrapper = createComponent(RouteNames.SEARCH, searchRoute.path, searchRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbSearch.length)
@@ -155,7 +151,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on discharge: review discharge with breadcrumb', () => {
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE, reviewDischargeRoute.path, reviewDischargeRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
@@ -167,7 +163,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on discharge: confirm discharge with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_DISCHARGE, confirmDischargeRoute.path, confirmDischargeRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
@@ -179,7 +175,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: length trust with breadcrumb', () => {
     wrapper = createComponent(RouteNames.LENGTH_TRUST, addLengthTrustRoute.path, addLengthTrustRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
@@ -191,7 +187,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: secured parties / debtors with breadcrumb', () => {
     wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS, addPartiesRoute.path, addPartiesRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
@@ -203,7 +199,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: collateral with breadcrumb', () => {
     wrapper = createComponent(RouteNames.ADD_COLLATERAL, addCollateralRoute.path, addCollateralRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
@@ -215,7 +211,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on new reg: review confirm with breadcrumb', () => {
     wrapper = createComponent(RouteNames.REVIEW_CONFIRM, confirmNewRegRoute.path, confirmNewRegRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
@@ -227,7 +223,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on renew: review renewal with breadcrumb', () => {
     wrapper = createComponent(RouteNames.RENEW_REGISTRATION, reviewRenewRoute.path, reviewRenewRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
@@ -239,7 +235,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on renew: confirm renewal with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_RENEWAL, confirmRenewRoute.path, confirmRenewRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
@@ -251,7 +247,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on amendment: review amendment with breadcrumb', () => {
     wrapper = createComponent(RouteNames.AMEND_REGISTRATION, reviewAmendRoute.path, reviewAmendRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
@@ -263,7 +259,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders on amendment: confirm amendment with breadcrumb', () => {
     wrapper = createComponent(RouteNames.CONFIRM_AMENDMENT, confirmAmendRoute.path, confirmAmendRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
@@ -275,7 +271,7 @@ describe('Breadcrumb component tests', () => {
 
   it('renders staff dashboard with breadcrumb', () => {
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
-    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [products.PPR])
+    const userRoleProductCode = getRoleProductCode(store.getters.getUserRoles, [ProductCode.PPR])
     expect(wrapper.find(backBtn).exists()).toBe(true)
     const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
@@ -286,18 +282,22 @@ describe('Breadcrumb component tests', () => {
   it('displays different breadcrumbs for different auth roles', async () => {
     wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
 
-    const STAFF_PPR = ['staff', 'ppr']
-    const STAFF_MHR = ['staff', 'mhr']
-    const CLIENT_MHR = ['mhr']
-    const CLIENT_PPR = ['ppr']
-    const STAFF_PPR_MHR = ['staff', 'ppr', 'mhr']
-    const CLIENT_PPR_MHR = ['ppr', 'mhr']
+    const STAFF_PPR = [AuthRoles.STAFF, AuthRoles.PPR]
+    const STAFF_MHR = [AuthRoles.STAFF, AuthRoles.MHR]
+    const CLIENT_MHR = [AuthRoles.PUBLIC, AuthRoles.MHR]
+    const CLIENT_PPR = [AuthRoles.PUBLIC, AuthRoles.PPR]
+    const STAFF_PPR_MHR = [AuthRoles.STAFF, AuthRoles.PPR, AuthRoles.MHR]
+    const CLIENT_PPR_MHR = [AuthRoles.PUBLIC, AuthRoles.PPR, AuthRoles.MHR]
 
-    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, true, [products.PPR], 'Staff Personal Property Registry')
-    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, true, [products.MHR], 'Staff Manufactured Home Registry')
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, false, [products.MHR], 'My Manufactured Home Registry')
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR, false, [products.PPR], 'My Personal Property Registry')
-    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, true, [...products.ALL], 'Staff Asset Registries')
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, false, [...products.ALL], 'My Asset Registries')
+    defaultFlagSet['mhr-ui-enabled'] = false
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry', [ProductCode.PPR])
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Personal Property Registry')
+    defaultFlagSet['mhr-ui-enabled'] = true
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Asset Registries')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Asset Registries')
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry', [ProductCode.MHR])
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, 'Staff Asset Registries', [])
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries', [ProductCode.MHR, ProductCode.PPR])
   })
 })
