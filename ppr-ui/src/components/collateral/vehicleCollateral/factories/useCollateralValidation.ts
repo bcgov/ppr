@@ -39,12 +39,7 @@ export const useCollateralValidation = () => {
   const validateCollateralForm = async currentVehicle => {
     const validationResult = await formValidation.validateForm(currentVehicle)
     errors.value = { ...errors.value, ...validationResult.fieldErrors }
-    if ((currentVehicle.type === 'MH') && (errors.value.manufacturedHomeRegistrationNumber.succeeded)) {
-      errors.value.manufacturedHomeRegistrationNumber =
-        validationResult.recordErrors.serialNumber
-    } else {
-      errors.value.serialNumber = validationResult.recordErrors.serialNumber
-    }
+
     return validationResult.succeeded
   }
 
