@@ -105,6 +105,7 @@ describe('TombstoneDefault component tests', () => {
     // setup data used by header
     await store.dispatch('setAccountInformation', accountInfo)
     await store.dispatch('setUserInfo', userInfo)
+    defaultFlagSet['mhr-ui-enabled'] = false
   })
 
   afterEach(() => {
@@ -131,7 +132,6 @@ describe('TombstoneDefault component tests', () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
     const staffGroups = ['helpdesk', 'ppr_staff']
     await store.dispatch('setAuthRoles', ['staff', 'ppr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
     for (let i = 0; i < staffGroups.length; i++) {
       if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
       else await store.dispatch('setAuthRoles', ['staff', 'ppr', staffGroups[i]])

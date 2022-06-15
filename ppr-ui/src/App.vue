@@ -402,20 +402,22 @@ export default class App extends Mixins(AuthMixin) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
+
+        if (this.getAccountId) {
+          const subscribedProducts = await fetchAccountProducts(this.getAccountId)
+          if (subscribedProducts) {
+            this.setUserProductSubscriptions(subscribedProducts)
+
+            const activeProductCodes = subscribedProducts
+              .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
+              .map(product => product.code)
+            this.setUserProductSubscriptionsCodes(activeProductCodes)
+          } else {
+            throw new Error('Unable to get Products for the User')
+          }
+        }
       } else {
         throw new Error('Invalid auth roles')
-      }
-
-      const subscribedProducts = await fetchAccountProducts(this.getAccountId)
-      if (subscribedProducts) {
-        this.setUserProductSubscriptions(subscribedProducts)
-
-        const activeProductCodes = subscribedProducts
-          .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
-          .map(product => product.code)
-        this.setUserProductSubscriptionsCodes(activeProductCodes)
-      } else {
-        throw new Error('Unable to get Products for the User')
       }
     } catch (error) {
       message = String(error)
