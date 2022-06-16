@@ -30,9 +30,9 @@
                   id="search-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
-              <b v-if="hasPprRole && hasMhrRole">Manufactured Home and Personal Property Registry Search</b>
-              <b v-else-if="hasPprRole">Personal Property Search</b>
-              <b v-else-if="hasMhrRole">Manufactured Home Search</b>
+              <b v-if="hasPPRProduct && hasMHRProduct">Manufactured Home and Personal Property Registry Search</b>
+              <b v-else-if="hasPPRProduct">Personal Property Search</b>
+              <b v-else-if="hasMHRProduct">Manufactured Home Search</b>
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -237,7 +237,8 @@ import { cloneDeep } from 'lodash'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local helpers/enums/interfaces/resources
 import {
-  APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
+  APIStatusTypes, ErrorCategories, ProductCode, ProductStatus, // eslint-disable-line no-unused-vars
+  RouteNames, SettingOptions, TableActions // eslint-disable-line no-unused-vars
 } from '@/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
@@ -250,7 +251,7 @@ import {
   RegistrationSummaryIF, // eslint-disable-line no-unused-vars
   RegistrationTypeIF, RegTableDataI, RegTableNewItemI, // eslint-disable-line no-unused-vars
   SearchResponseIF, SearchTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
+  StateModelIF, UserProductSubscriptionIF, // eslint-disable-line no-unused-vars
   UserSettingsIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 import {
@@ -324,8 +325,7 @@ export default class Dashboard extends Vue {
   @Getter hasMorePages: boolean
   @Getter isMhrRegistration!: boolean
   @Getter isNonBillable!: boolean
-  @Getter hasPprRole: boolean
-  @Getter hasMhrRole: boolean
+  @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
 
   @Action resetNewRegistration: ActionBindingIF
   @Action resetRegTableData: ActionBindingIF
@@ -429,6 +429,14 @@ export default class Dashboard extends Vue {
 
   private get searchHistoryLength (): number {
     return this.getSearchHistory?.length || 0
+  }
+
+  private get hasPPRProduct (): boolean {
+    return this.getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
+  }
+
+  private get hasMHRProduct (): boolean {
+    return this.getUserProductSubscriptionsCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
   }
 
   private async addRegistration (regNum: string): Promise<void> {
@@ -835,7 +843,7 @@ export default class Dashboard extends Vue {
 
     // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
     if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      window.alert('Personal Property Registry is under contruction. Please check again later.')
+      window.alert('Personal Property Registry is under construction. Please check again later.')
       this.redirectRegistryHome()
       return
     }

@@ -6,7 +6,9 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 // Interfaces, Enums
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
-import { AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF } from '@/interfaces'
+import {
+  AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF
+} from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
 
 /** Gets Keycloak JWT and parses it. */
@@ -132,6 +134,29 @@ export async function getSbcFromAuth (): Promise<boolean> {
                         error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
       }
     )
+}
+
+/**
+ * Fetches product subscription authorizations from Auth API.
+ */
+export async function fetchAccountProducts (accountId: number): Promise<Array<UserProductSubscriptionIF>> {
+  const config = {
+    baseURL: sessionStorage.getItem(SessionStorageKeys.AuthApiUrl),
+    headers: { Accept: 'application/json' }
+  }
+
+  return axios.get(`orgs/${accountId}/products`, config)
+    .then(response => {
+      const data = response?.data as Array<UserProductSubscriptionIF>
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      throw new Error('Error fetching account products, status code = ' +
+        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+    })
 }
 
 // get product subscription authorizations

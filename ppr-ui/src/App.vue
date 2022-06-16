@@ -89,14 +89,15 @@ import {
   getPPRUserSettings,
   getSbcFromAuth,
   navigate,
-  updateLdUser
+  updateLdUser,
+  fetchAccountProducts
 } from '@/utils'
 // local Enums, Constants, Interfaces
 import { FeeCodes } from '@/composables/fees/enums'
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
   ErrorCategories,
-  ErrorCodes, RegistrationFlowType, RouteNames
+  ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames
 } from '@/enums'
 import {
   AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
@@ -130,6 +131,7 @@ export default class App extends Mixins(AuthMixin) {
   @Getter isRoleStaff!: boolean
   @Getter isRoleStaffBcol!: boolean
   @Getter isRoleStaffReg!: boolean
+  @Getter getAccountId!: number
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -139,6 +141,8 @@ export default class App extends Mixins(AuthMixin) {
   @Action setRegistrationNumber!: ActionBindingIF
   @Action setUserInfo: ActionBindingIF
   @Action setRoleSbc: ActionBindingIF
+  @Action setUserProductSubscriptions: ActionBindingIF
+  @Action setUserProductSubscriptionsCodes: ActionBindingIF
 
   // Local Properties
   private currentPath = ''
@@ -398,6 +402,20 @@ export default class App extends Mixins(AuthMixin) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
+
+        if (this.getAccountId) {
+          const subscribedProducts = await fetchAccountProducts(this.getAccountId)
+          if (subscribedProducts) {
+            this.setUserProductSubscriptions(subscribedProducts)
+
+            const activeProductCodes = subscribedProducts
+              .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
+              .map(product => product.code)
+            this.setUserProductSubscriptionsCodes(activeProductCodes)
+          } else {
+            throw new Error('Unable to get Products for the User')
+          }
+        }
       } else {
         throw new Error('Invalid auth roles')
       }

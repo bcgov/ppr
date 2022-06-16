@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -24,7 +24,7 @@ import {
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
-  AuthorizationIF
+  UserProductSubscriptionIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -42,6 +42,14 @@ export const setAccountProductSubscribtion: ActionIF = (
   productSubscriptions: AccountProductSubscriptionIF
 ): void => {
   commit('mutateAccountProductSubscribtion', productSubscriptions)
+}
+
+export const setUserProductSubscriptions: ActionIF = ({ commit }, products: Array<UserProductSubscriptionIF>): void => {
+  commit('mutateUserProductSubscriptions', products)
+}
+
+export const setUserProductSubscriptionsCodes: ActionIF = ({ commit }, activeProducts: Array<ProductCode>): void => {
+  commit('mutateUserProductSubscriptionsCodes', activeProducts)
 }
 
 export const setAccountInformation: ActionIF = ({ commit }, account: AccountInformationIF): void => {

@@ -14,7 +14,7 @@ import { FinancingStatementIF } from '@/interfaces'
 import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
-import { convertDate, pacificDate } from '@/utils'
+import { pacificDate } from '@/utils'
 
 Vue.use(Vuetify)
 

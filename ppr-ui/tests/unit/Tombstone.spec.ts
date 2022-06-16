@@ -13,7 +13,7 @@ import { Tombstone, TombstoneDefault, TombstoneDischarge } from '@/components/to
 import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
 import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
-import { RouteNames } from '@/enums'
+import { AuthRoles, ProductCode, RouteNames } from '@/enums'
 import { convertDate, pacificDate } from '@/utils'
 
 Vue.use(Vuetify)
@@ -100,7 +100,8 @@ describe('Tombstone component', () => {
     await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
     await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
     await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
-    await store.dispatch('setAuthRoles', ['ppr'])
+    await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, 'ppr'])
+    await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
   })
 
   afterEach(() => {

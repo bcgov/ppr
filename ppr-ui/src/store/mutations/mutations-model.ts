@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -24,7 +24,8 @@ import {
   RegistrationSummaryIF,
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
-  ManufacturedHomeSearchResultIF
+  ManufacturedHomeSearchResultIF,
+  UserProductSubscriptionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -32,6 +33,14 @@ export const mutateAccountProductSubscribtion = (
   state: StateIF, productSubscriptions: AccountProductSubscriptionIF
 ) => {
   state.stateModel.accountProductSubscriptions = productSubscriptions
+}
+
+export const mutateUserProductSubscriptions = (state: StateIF, products: Array<UserProductSubscriptionIF>) => {
+  state.stateModel.userProductSubscriptions = products
+}
+
+export const mutateUserProductSubscriptionsCodes = (state: StateIF, activeProducts: Array<ProductCode>) => {
+  state.stateModel.userProductSubscriptionsCodes = activeProducts
 }
 
 export const mutateAccountInformation = (state: StateIF, accountInformation: AccountInformationIF) => {

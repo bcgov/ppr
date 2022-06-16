@@ -9,6 +9,8 @@ export const stateModel: StateModelIF = {
     type: ''
   },
   accountProductSubscriptions: null,
+  userProductSubscriptions: [],
+  userProductSubscriptionsCodes: [],
   authorization: {
     authRoles: [],
     isSbc: false

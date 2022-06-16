@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
   ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
@@ -6,11 +6,14 @@ import {
   UserInfoIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { UserProductSubscriptionIF } from '@/interfaces'
 
 // State model example
 export interface StateModelIF {
   accountInformation: AccountInformationIF
   accountProductSubscriptions: AccountProductSubscriptionIF
+  userProductSubscriptions: Array<UserProductSubscriptionIF>
+  userProductSubscriptionsCodes: Array<ProductCode>,
   authorization: AuthorizationIF
   certifyInformation: CertifyIF
   folioOrReferenceNumber: string

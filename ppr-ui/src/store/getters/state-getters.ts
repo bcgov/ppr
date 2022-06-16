@@ -1,5 +1,5 @@
 // Enums and Interfaces
-import { AccountTypes, APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
+import { AccountTypes, APIRegistrationTypes, ProductCode, RegistrationFlowType, RouteNames } from '@/enums'
 import {
   AccountProductSubscriptionIF,
   AddCollateralIF,
@@ -24,6 +24,7 @@ import {
   SearchTypeIF,
   StateIF,
   StateModelIF,
+  UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF
 } from '@/interfaces'
@@ -44,6 +45,14 @@ export const getAccountProductSubscriptions = (
   state: StateIF
 ): AccountProductSubscriptionIF => {
   return state.stateModel.accountProductSubscriptions
+}
+
+export const getUserProductSubscriptions = (state: StateIF): Array<UserProductSubscriptionIF> => {
+  return state.stateModel.userProductSubscriptions
+}
+
+export const getUserProductSubscriptionsCodes = (state: StateIF): Array<ProductCode> => {
+  return state.stateModel.userProductSubscriptionsCodes
 }
 
 /** The registration collateral object. */
