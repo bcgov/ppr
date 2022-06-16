@@ -1,12 +1,6 @@
 <template>
   <div id="mhr-describe-your-home">
-    <section id="mhr-make-model" class="mt-10" >
-      <h2 class="sub-header">Manufacturer, Make, and Model</h2>
-
-      <v-card flat class="mt-5">
-        <span>MAKE AND MODEL PLACEHOLDER</span>
-      </v-card>
-    </section>
+    <ManufacturerMakeModel />
 
     <section id="mhr-home-sections" class="mt-10">
       <h2>Home Sections</h2>
@@ -42,16 +36,17 @@
 </template>
 
 <script lang="ts">
+import { ManufacturerMakeModel } from '@/components/mhr'
 import { Component, Vue } from 'vue-property-decorator'
 import { HomeSections } from '@/components/mhrRegistration/YourHome'
 
 @Component({
   components: {
-    HomeSections
+    HomeSections,
+    ManufacturerMakeModel
   }
 })
-export default class YourHome extends Vue {
-}
+export default class YourHome extends Vue {}
 </script>
 
 <style lang="scss" scoped>
