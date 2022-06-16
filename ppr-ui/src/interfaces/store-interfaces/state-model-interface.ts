@@ -3,10 +3,9 @@ import {
   AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
   ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
   AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF, SearchTypeIF, RegTableDataI,
-  UserInfoIF, MhrRegistrationIF
+  UserInfoIF, MhrRegistrationIF, UserProductSubscriptionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { UserProductSubscriptionIF } from '@/interfaces'
 
 // State model example
 export interface StateModelIF {
