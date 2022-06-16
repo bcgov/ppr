@@ -47,9 +47,9 @@
 </template>
 
 <script lang="ts">
-// external
+/* eslint-disable no-unused-vars */
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
+import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   APIRegistrationTypes,
@@ -57,18 +57,17 @@ import {
   RouteNames,
   StatementTypes
 } from '@/enums'
-/* eslint-disable no-unused-vars */
 import {
+  ActionBindingIF,
   ErrorIF,
   LengthTrustIF,
   RegistrationTypeIF,
   StepIF
 } from '@/interfaces'
-/* eslint-enable no-unused-vars */
 import { getFeatureFlag } from '@/utils'
-// local components
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
+/* eslint-enable no-unused-vars */
 
 @Component({
   components: {
@@ -82,6 +81,9 @@ export default class MhrRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
   @Getter getSteps!: Array<StepIF>
+
+  @Action setRegistrationFlowType!: ActionBindingIF
+  @Action setRegistrationType!: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })

@@ -24,7 +24,8 @@ import {
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
-  UserProductSubscriptionIF
+  UserProductSubscriptionIF,
+  HomeSectionIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -285,4 +286,8 @@ export const setRegTableTotalRowCount: ActionIF = ({ commit }, count: number): v
 
 export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean): void => {
   commit('mutateUnsavedChanges', unsavedChanges)
+}
+
+export const setHomeSection: ActionIF = ({ commit }, homeSection: HomeSectionIF): void => {
+  commit('mutateHomeSection', homeSection)
 }

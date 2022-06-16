@@ -488,7 +488,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
       debtors: mockedDebtorsAdd
     }
   },
-  mhrRegistration: {},
+  mhrRegistration: null,
   registrationTable: null,
   originalRegistration: {
     collateral: {
@@ -599,7 +599,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
       debtors: mockedDebtorsDelete
     }
   },
-  mhrRegistration: {},
+  mhrRegistration: null,
   registrationTable: null,
   originalRegistration: {
     collateral: {
@@ -711,7 +711,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
       debtors: mockedDebtorsEdit
     }
   },
-  mhrRegistration: {},
+  mhrRegistration: null,
   registrationTable: null,
   originalRegistration: {
     collateral: {
@@ -822,7 +822,7 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
       debtors: []
     }
   },
-  mhrRegistration: {},
+  mhrRegistration: null,
   registrationTable: null,
   originalRegistration: {
     collateral: {

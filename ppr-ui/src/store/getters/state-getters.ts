@@ -337,7 +337,7 @@ export const getPprSteps = (state: any, getters: any): Array<any> => {
   if (regType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     lengthTrustText = 'Amount and Date<br /> of Surrender'
   }
-  const steps: Array<any> = [{
+  return [{
     id: 'step-1-btn',
     step: 1,
     icon: 'mdi-calendar-clock',
@@ -377,14 +377,13 @@ export const getPprSteps = (state: any, getters: any): Array<any> => {
     valid: getters.isRegistrationValid,
     component: 'review-confirm'
   }]
-  return steps
 }
 
 export const getMhrSteps = (state: any, getters: any): Array<any> => {
-  const steps: Array<any> = [{
+  return [{
     id: 'step-1-btn',
     step: 1,
-    icon: 'mdi-calendar-clock',
+    icon: 'mdi-home',
     text: 'Describe your \nHome',
     to: RouteNames.YOUR_HOME,
     disabled: getters.isBusySaving,
@@ -394,7 +393,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
   {
     id: 'step-2-btn',
     step: 2,
-    icon: 'mdi-account-multiple-plus',
+    icon: 'mdi-account',
     text: 'Submitting Party',
     to: RouteNames.SUBMITTING_PARTY,
     disabled: getters.isBusySaving,
@@ -431,7 +430,6 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     valid: false,
     component: MhrReviewConfirm
   }]
-  return steps
 }
 
 /**

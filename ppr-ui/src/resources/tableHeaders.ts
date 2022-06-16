@@ -529,3 +529,36 @@ export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
     value: 'edit'
   }
 ]
+
+export const homeSectionsTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Section',
+    value: 'section'
+  },
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Length',
+    value: 'length'
+  },
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Width',
+    value: 'width'
+  },
+  {
+    class: 'actions',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]

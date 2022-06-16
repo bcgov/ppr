@@ -1,7 +1,9 @@
 {
   "name": "ppr-ui",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
+  "appName": "Assets UI",
+  "sbcName": "SBC Common Components",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -42,7 +44,7 @@
     "vuex-composition-helpers": "^1.0.22"
   },
   "devDependencies": {
-    "@mdi/font": "^6.1.95",
+    "@mdi/font":  "^6.7.96",
     "@types/jest": "^25.1.4",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",

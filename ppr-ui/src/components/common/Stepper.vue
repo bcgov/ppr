@@ -17,7 +17,7 @@
             tabindex="-1"
             :disabled=step.disabled
             :ripple="false">
-            <v-icon :class="isCurrentStep(step) ?
+            <v-icon class="step-icon" :class="isCurrentStep(step) ?
               [$style['selected-icon'], $style['step__icon']]: $style['step__icon']">
               {{ step.icon }}
             </v-icon>
@@ -155,6 +155,7 @@ export default class Stepper extends Vue {
   background-color: $BCgovInputBG;
   z-index: 2;
   .step__icon {
+    font-size: 30px !important;
     color: $primary-blue;
     background-color: inherit;
   }
@@ -200,5 +201,4 @@ export default class Stepper extends Vue {
 .step__border__current {
   border-bottom: 3px solid $primary-blue !important;
 }
-
 </style>

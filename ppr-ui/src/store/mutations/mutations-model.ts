@@ -25,7 +25,8 @@ import {
   DraftResultIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
-  UserProductSubscriptionIF
+  UserProductSubscriptionIF,
+  HomeSectionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -349,4 +350,8 @@ export const mutateRegistrationTableTotalRowCount = (state: StateIF, count: numb
 
 export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) => {
   state.stateModel.unsavedChanges = unsavedChanges
+}
+
+export const mutateHomeSection = (state: StateIF, homeSection: HomeSectionIF) => {
+  // Add/Edit Home Section according to index here
 }

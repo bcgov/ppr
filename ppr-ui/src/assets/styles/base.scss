@@ -396,14 +396,14 @@ tr.disabled-text-not-action td, tr.disabled-text-not-first td {
   border-bottom: thin solid rgba(0, 0, 0, 0.35);
 }
 
-.theme--light.v-data-table > .v-data-table__wrapper > table > tbody tr.disabled-text-not-action td:last-child, 
+.theme--light.v-data-table > .v-data-table__wrapper > table > tbody tr.disabled-text-not-action td:last-child,
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody tr.disabled-text-not-action td:first-child,
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody tr.disabled-text-not-first td:first-child {
   opacity: 1;
 }
 
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody
-  tr:not(:last-child).disabled-text-not-action td:last-child, 
+  tr:not(:last-child).disabled-text-not-action td:last-child,
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody
   tr:not(:last-child).disabled-text-not-action td:first-child,
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody

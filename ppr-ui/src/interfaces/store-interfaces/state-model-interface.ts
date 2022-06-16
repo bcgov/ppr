@@ -3,7 +3,7 @@ import {
   AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
   ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
   AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF, SearchTypeIF, RegTableDataI,
-  UserInfoIF
+  UserInfoIF, MhrRegistrationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UserProductSubscriptionIF } from '@/interfaces'
@@ -39,7 +39,7 @@ export interface StateModelIF {
     registrationTypeOtherDesc: string
     showStepErrors: boolean
   }
-  mhrRegistration: any // To be determined by Schema
+  mhrRegistration: MhrRegistrationIF
   registrationTable: RegTableDataI
   search: {
     searchDebtorName: IndividualNameIF
