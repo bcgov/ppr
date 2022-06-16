@@ -30,9 +30,10 @@
                   id="search-header"
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
-              <b v-if="hasPPRProduct && hasMHRProduct">Manufactured Home and Personal Property Registry Search</b>
-              <b v-else-if="hasPPRProduct">Personal Property Search</b>
-              <b v-else-if="hasMHRProduct">Manufactured Home Search</b>
+              <b v-if="hasPPR && hasMHR">
+                Manufactured Home and Personal Property Registry Search</b>
+              <b v-else-if="hasPPR">Personal Property Search</b>
+              <b v-else-if="hasMHR">Manufactured Home Search</b>
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -324,6 +325,11 @@ export default class Dashboard extends Vue {
   @Getter getUserSettings: UserSettingsIF
   @Getter hasMorePages: boolean
   @Getter isMhrRegistration!: boolean
+  @Getter isRoleStaff!: boolean
+  @Getter isRoleStaffBcol!: boolean
+  @Getter isRoleStaffReg!: boolean
+  @Getter hasMhrRole!: boolean
+  @Getter hasPprRole!: boolean
   @Getter isNonBillable!: boolean
   @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
 
@@ -431,12 +437,22 @@ export default class Dashboard extends Vue {
     return this.getSearchHistory?.length || 0
   }
 
-  private get hasPPRProduct (): boolean {
-    return this.getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
+  private get hasPPR (): boolean {
+    // For Staff we check roles, for Client we check Products
+    if (this.isRoleStaff || this.isRoleStaffBcol || this.isRoleStaffReg) {
+      return this.hasPprRole
+    } else {
+      return this.getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
+    }
   }
 
-  private get hasMHRProduct (): boolean {
-    return this.getUserProductSubscriptionsCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
+  private get hasMHR (): boolean {
+    // For Staff we check roles, for Client we check Products
+    if (this.isRoleStaff || this.isRoleStaffBcol || this.isRoleStaffReg) {
+      return this.hasMhrRole && getFeatureFlag('mhr-ui-enabled')
+    } else {
+      return this.getUserProductSubscriptionsCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
+    }
   }
 
   private async addRegistration (regNum: string): Promise<void> {

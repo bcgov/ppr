@@ -46,6 +46,7 @@ import {
 } from './test-data'
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { defaultFlagSet } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -164,10 +165,14 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(BaseSnackbar).vm.$props.toggleSnackbar).toBe(false)
   })
 
-  it('displays the search header', () => {
+  it('displays the search header', async () => {
     const header = wrapper.findAll(searchHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Personal Property Search')
+
+    defaultFlagSet['mhr-ui-enabled'] = true
+    await store.dispatch('setAuthRoles', [AuthRoles.STAFF, AuthRoles.MHR, AuthRoles.PPR])
+    await expect(header.at(0).text()).toContain('Manufactured Home and Personal Property Registry Search')
   })
 
   it('displays default search history header', () => {
