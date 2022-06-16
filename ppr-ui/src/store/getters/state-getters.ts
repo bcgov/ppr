@@ -610,3 +610,19 @@ export const hasMorePages = (state: StateIF): boolean => {
 export const getMhrHomeSections = (state: StateIF): Array<HomeSectionIF> => {
   return state.stateModel.mhrRegistration.description.sections
 }
+
+export const getMhrRegistrationManufacturerName = (state: StateIF): string => {
+  return state.stateModel.mhrRegistration.yourHome.manufacturerName
+}
+
+export const getMhrRegistrationYearOfManufacture = (state: StateIF): string => {
+  return state.stateModel.mhrRegistration.yourHome.yearOfManufacture
+}
+
+export const getMhrRegistrationHomeMake = (state: StateIF): string => {
+  return state.stateModel.mhrRegistration.yourHome.make
+}
+
+export const getMhrRegistrationHomeModel = (state: StateIF): string => {
+  return state.stateModel.mhrRegistration.yourHome.model
+}
