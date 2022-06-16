@@ -284,6 +284,7 @@ export default defineComponent({
     const onSubmitForm = async () => {
       const isValid = await validateCollateralForm(currentVehicle.value)
       if (!isValid) {
+        console.log(document.getElementsByClassName('v-messages__message').length)
         return
       }
 
