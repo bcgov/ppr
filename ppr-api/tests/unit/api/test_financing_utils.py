@@ -21,7 +21,7 @@ from http import HTTPStatus
 import pytest
 # from flask import current_app
 
-from ppr_api.models import Registration, FinancingStatement
+from ppr_api.models import Registration, FinancingStatement, VerificationReport, utils as model_utils
 from ppr_api.reports import ReportTypes
 from ppr_api.resources import financing_utils as fs_utils
 from ppr_api.services.payment.client import SBCPaymentClient
@@ -44,6 +44,12 @@ def test_get_registration_report(session, client, jwt, desc, status, reg_id, is_
     registration: Registration = Registration.find_by_id(reg_id)
     valid_status: int = HTTPStatus.CREATED if is_create else HTTPStatus.OK
     report_data = registration.verification_json('changeRegistrationNumber')
+    if reg_id == 200000000:
+        report_info: VerificationReport = VerificationReport.find_by_registration_id(reg_id)
+        if report_info:
+            report_info.create_ts = model_utils.now_ts()
+            report_info.save()
+
     # test
     raw_data, resp_status, headers = fs_utils.get_registration_report(registration,
                                                                       report_data,

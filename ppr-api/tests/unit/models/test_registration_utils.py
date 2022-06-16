@@ -20,8 +20,6 @@ Test-Suite to ensure that the Registration Model is working as expected.
 
 import pytest
 
-# from flask import current_app
-
 from ppr_api.models import Registration, registration_utils as registration_utils, utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
 
@@ -110,15 +108,15 @@ def test_account_reg_base_query(session, reg_num, reg_type, client_ref, register
     params.status_type = status
     params.start_date_time = start_ts
     params.end_date_time = end_ts
-    query = registration_utils.build_account_reg_base_query(params)
+    query = registration_utils.build_account_reg_base_query(params, True)
     if params.registration_number:
         assert query.find(registration_utils.QUERY_ACCOUNT_REG_NUM_CLAUSE) != -1
     if params.registration_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_REG_TYPE_CLAUSE) != -1
-    if params.client_reference_id:
-        assert query.find(registration_utils.QUERY_ACCOUNT_CLIENT_REF_CLAUSE) != -1
-    if params.registering_name:
-        assert query.find(registration_utils.QUERY_ACCOUNT_REG_NAME_CLAUSE) != -1
+    # if params.client_reference_id:
+    #     assert query.find(registration_utils.QUERY_ACCOUNT_CLIENT_REF_CLAUSE) != -1
+    # if params.registering_name:
+    #     assert query.find(registration_utils.QUERY_ACCOUNT_REG_NAME_CLAUSE) != -1
     if params.status_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_STATUS_CLAUSE) != -1
     if params.start_date_time and params.end_date_time:
@@ -173,17 +171,17 @@ def test_account_reg_query(session, reg_num, reg_type, client_ref, registering, 
     params.status_type = status
     params.start_date_time = start_ts
     params.end_date_time = end_ts
-    query = registration_utils.build_account_reg_query(params)
+    query = registration_utils.build_account_reg_query(params, True)
     # current_app.logger.debug('reg query:')
     # current_app.logger.debug('\n' + query)
     if params.registration_number:
         assert query.find(registration_utils.QUERY_ACCOUNT_REG_NUM_CLAUSE) != -1
     if params.registration_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_REG_TYPE_CLAUSE) != -1
-    if params.client_reference_id:
-        assert query.find(registration_utils.QUERY_ACCOUNT_CLIENT_REF_CLAUSE) != -1
-    if params.registering_name:
-        assert query.find(registration_utils.QUERY_ACCOUNT_REG_NAME_CLAUSE) != -1
+    # if params.client_reference_id:
+    #    assert query.find(registration_utils.QUERY_ACCOUNT_CLIENT_REF_CLAUSE) != -1
+    # if params.registering_name:
+    #    assert query.find(registration_utils.QUERY_ACCOUNT_REG_NAME_CLAUSE) != -1
     if params.status_type:
         assert query.find(registration_utils.QUERY_ACCOUNT_STATUS_CLAUSE) != -1
     if params.start_date_time and params.end_date_time:
@@ -351,7 +349,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
     if start_ts and end_ts:
         params.start_date_time = start_ts
         params.end_date_time = model_utils.format_ts(model_utils.now_ts())
-    statement_list = Registration.find_all_by_account_id_api_filter(params)
+    statement_list = Registration.find_all_by_account_id_api_filter(params, True)
     assert statement_list
     assert 'totalRegistrationCount' not in statement_list[0]
     for statement in statement_list:

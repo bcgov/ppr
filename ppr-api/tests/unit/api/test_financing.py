@@ -434,7 +434,7 @@ TEST_VERIFICATION_CALLBACK_DATA = [
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account', TEST_CREATE_DATA)
-def test_create(session, client, jwt, requests_mock, desc, json_data, roles, status, has_account):
+def test_create(session, client, jwt, desc, json_data, roles, status, has_account):
     """Assert that a post financing statement works as expected."""
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
@@ -444,7 +444,6 @@ def test_create(session, client, jwt, requests_mock, desc, json_data, roles, sta
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', '1234')
-        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -607,7 +606,7 @@ def test_account_get_registration(session, client, jwt, desc, roles, status, acc
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, reg_num', TEST_GET_STATEMENT)
-def test_get_statement(session, client, jwt, requests_mock, desc, roles, status, has_account, reg_num):
+def test_get_statement(session, client, jwt, desc, roles, status, has_account, reg_num):
     """Assert that a get financing statement by registration number works as expected."""
     # setup
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
@@ -620,7 +619,6 @@ def test_get_statement(session, client, jwt, requests_mock, desc, roles, status,
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', '1234')
-        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
