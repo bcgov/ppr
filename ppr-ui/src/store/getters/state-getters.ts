@@ -330,7 +330,7 @@ export const getSteps = (state: any, getters: any): Array<any> => {
 }
 
 export const getPprSteps = (state: any, getters: any): Array<any> => {
-  const regType:RegistrationTypeIF = getRegistrationType(state)
+  const regType: RegistrationTypeIF = getRegistrationType(state)
   let lengthTrustText = 'Registration<br />Length'
   if (regType.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
     lengthTrustText = 'Length and<br />Trust Indenture'
@@ -625,4 +625,8 @@ export const getMhrRegistrationHomeMake = (state: StateIF): string => {
 
 export const getMhrRegistrationHomeModel = (state: StateIF): string => {
   return state.stateModel.mhrRegistration.yourHome.model
+}
+
+export const getMhrRegistrationOtherInfo = (state: StateIF): string => {
+  return state.stateModel.mhrRegistration.description.otherRemarks
 }

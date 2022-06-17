@@ -18,6 +18,7 @@
         </v-col>
         <v-col cols="10">
           <v-textarea
+            v-model="otherInfo"
             filled
             name="name"
             counter="140"
@@ -31,11 +32,31 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   setup () {
-    return {}
+    const { getMhrRegistrationOtherInfo } = useGetters<any>([
+      'getMhrRegistrationOtherInfo'
+    ])
+
+    const { setMhrRegistrationOtherInfo } = useActions<any>([
+      'setMhrRegistrationOtherInfo'
+    ])
+
+    const localState = reactive({
+      otherInfo: getMhrRegistrationOtherInfo.value
+    })
+
+    watch(
+      () => localState.otherInfo,
+      (val: string) => {
+        setMhrRegistrationOtherInfo(val)
+      }
+    )
+
+    return { ...toRefs(localState) }
   }
 })
 </script>

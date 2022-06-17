@@ -308,3 +308,7 @@ export const setMhrRegistrationHomeMake: ActionIF = ({ commit }, make: string): 
 export const setMhrRegistrationHomeModel: ActionIF = ({ commit }, model: string): void => {
   commit('mutateMhrRegistrationHomeModel', model)
 }
+
+export const setMhrRegistrationOtherInfo: ActionIF = ({ commit }, info: string): void => {
+  commit('mutateMhrRegistrationOtherInfo', info)
+}
