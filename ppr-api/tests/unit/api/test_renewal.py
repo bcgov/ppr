@@ -291,8 +291,7 @@ def test_create_renewal(session, client, jwt, desc, json_data, roles, status, ha
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
-        current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
-        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
+        current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
         headers = create_header_account(jwt, roles, 'test-user', '1234')
     elif has_account:
         headers = create_header_account(jwt, roles)
@@ -339,7 +338,7 @@ def test_create_renewal_staff(session, client, jwt, role, routing_slip, bcol_num
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)
-def test_get_renewal(session, client, jwt, desc, requests_mock, roles, status, has_account, reg_num, base_reg_num):
+def test_get_renewal(session, client, jwt, desc, roles, status, has_account, reg_num, base_reg_num):
     """Assert that a get renewal registration statement works as expected."""
     # setup
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
@@ -352,7 +351,6 @@ def test_get_renewal(session, client, jwt, desc, requests_mock, roles, status, h
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', '1234')
-        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:

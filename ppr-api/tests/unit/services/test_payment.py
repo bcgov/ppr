@@ -383,7 +383,7 @@ def test_payment_with_details_search_mock(client, jwt):
 
 
 def test_payment_exception(client, jwt):
-    """Assert that a pay-api payment request works as expected with a 500 exception."""
+    """Assert that a pay-api payment request works as expected with a 401 exception."""
     # setup
     token = helper_create_jwt(jwt, [PPR_ROLE])
     payment = Payment(jwt=token, account_id='PS12345')
@@ -394,7 +394,7 @@ def test_payment_exception(client, jwt):
         payment.create_payment(TransactionTypes.SEARCH.value, 1, '200000001', 'UT-PAY-SEARCH-01')
 
     assert request_err
-    assert request_err.value.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert request_err.value.status_code == HTTPStatus.UNAUTHORIZED
 
 
 def test_payment_apikey(client, jwt):

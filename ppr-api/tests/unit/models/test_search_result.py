@@ -19,6 +19,7 @@ results) is working as expected.
 """
 from http import HTTPStatus
 
+from flask import current_app
 import pytest
 
 from ppr_api.models import SearchResult, SearchRequest
@@ -438,12 +439,16 @@ def test_search_history_sort(session, client, jwt):
     search_query.search()
     search_detail = SearchResult.create_from_search_query(search_query)
     search_detail.save()
+    query_json = search_query.json
+    # current_app.logger.info(query_json)
+    query_results_json = query_json['results']
+    search_detail.update_selection(query_results_json)
 
     # check
     assert search_detail.search_id == search_query.id
     result = search_detail.json
-    # print(details_json)
-    history = result[0]['financingStatement']['changes']
+    # current_app.logger.info(result)
+    history = result['details'][0]['financingStatement']['changes']
     assert len(history) == 4
     assert history[0]['changeRegistrationNumber'] == 'TEST0010'
     assert history[1]['changeRegistrationNumber'] == 'TEST0009'

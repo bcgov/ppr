@@ -1,0 +1,65 @@
+{
+  "baseRegistrationNumber": "256935N",
+  "createDateTime": "2022-04-25T17:05:34+00:00",
+  "debtors": [
+    {
+      "address": {
+        "city": "BLACK CREEK",
+        "country": "CA",
+        "postalCode": "V9J 1H9",
+        "region": "BC",
+        "street": "8869 ERICKSON PL"
+      },
+      "birthDate": "1977-04-24T08:00:00+00:00",
+      "partyId": 5818392,
+      "personName": {
+        "first": "PRIA",
+        "last": "ORTEGA",
+        "middle": "VALESKA"
+      }
+    }
+  ],
+  "expiryDate": "2027-04-26T06:59:59+00:00",
+  "generalCollateral": [
+    {
+      "addedDateTime": "2022-04-25T17:05:34+00:00",
+      "collateralId": 591,
+      "description": "<p>Testing of Formatting<\/p><p><u>Testing of Formatting<\/u><\/p><p><s>Testing of Formatting<\/s><\/p><p><em>Testing of Formatting<\/em><\/p><p><\/p><ul><li><p>List of things 1<\/p><\/li><li><p>List of things 2<\/p><\/li><li><p>List of things 3<\/p><\/li><\/ul><p><\/p><hr><ol><li><p>Numbered list 1$<\/p><\/li><li><p>Numbered list 2@<\/p><\/li><li><p>Numbered list 3#<\/p><\/li><li><p>Numbered list 4%<\/p><\/li><li><p>Numbered list 5^<\/p><\/li><li><p>Numbered list 6&amp;<\/p><\/li><li><p>Numbered list 7*<\/p><\/li><li><p>Numbered list 8!<\/p><\/li><li><p>Numbered list 9(<\/p><\/li><li><p>Numbered list 0)<\/p><\/li><\/ol><p><\/p><h1>Heading 1<\/h1><h2>Heading 2<\/h2><h3>Heading 3<\/h3><p><strong>Bold for this whole sentence starting with bold and ending with a period.</strong></p><table><tbody><tr><th><p>General collateral item<\/p><\/th><th><p>General collateral item description<\/p><\/th><th><p>General collateral item cost<\/p><\/th><\/tr><tr><td><p>Electric bike<\/p><\/td><td><p>Fastest, shiniest, e-bike available to date. This e-bike can ride for 75 km with one charge.<\/p><\/td><td><p>$9,000.00<\/p><\/td><\/tr><\/tbody><\/table>"
+    }
+  ],
+  "lifeYears": 5,
+  "payment": {
+    "invoiceId": "18675",
+    "receipt": "/api/v1/payment-requests/18675/receipts"
+  },
+  "registeringParty": {
+    "address": {
+      "city": "VICTORIA",
+      "country": "CA",
+      "postalCode": "V8W3E6",
+      "region": "BC",
+      "street": "2ND FLOOR, 940 BLANSHARD ST"
+    },
+    "businessName": "REGISTRAR, PERSONAL PROPERTY REGISTRY",
+    "code": "99990008"
+  },
+  "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+  "registrationDescription": "PPSA SECURITY AGREEMENT",
+  "securedParties": [
+    {
+      "address": {
+        "city": "CALGARY",
+        "country": "CA",
+        "postalCode": "T2C5N6",
+        "region": "AB",
+        "street": "10768 74 STREET SE"
+      },
+      "businessName": "ESSEX LEASE FINANCIAL CORPORATION",
+      "code": "25100009",
+      "partyId": 5818391
+    }
+  ],
+  "statusType": "ACT",
+  "trustIndenture": true,
+  "type": "SA"
+}

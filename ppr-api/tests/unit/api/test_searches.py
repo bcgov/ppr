@@ -31,7 +31,7 @@ from ppr_api.resources.searches import get_payment_details
 from ppr_api.services.authz import BCOL_HELP, COLIN_ROLE, PPR_ROLE, GOV_ACCOUNT_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 
-MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/auth/api/v1/'
+MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
@@ -137,13 +137,13 @@ def test_staff_search_certified(session, client, jwt, search_type, json_data):
 
 # testdata pattern is ({role}, {routing_slip}, {bcol_number}, {datNUmber}, {certified}, {status})
 @pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,certified,status', TEST_STAFF_SEARCH_DATA)
-def test_staff_search(session, client, jwt, requests_mock, role, routing_slip, bcol_number, dat_number, certified, status):
+def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, certified, status):
     """Assert that staff search requests returns the correct status."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
-    requests_mock.get(f'{MOCK_AUTH_URL}orgs/1234', json={'branchName': 'Service BC'})
     params = ''
+    headers = None
     if certified:
         params = '?certified=true'
     if routing_slip:
@@ -160,14 +160,19 @@ def test_staff_search(session, client, jwt, requests_mock, role, routing_slip, b
         if len(params) > 0:
             params += '&datNumber=' + str(dat_number)
     print('params=' + params)
-    roles = [PPR_ROLE]
-    account_id = role
-    if role == GOV_ACCOUNT_ROLE:
-        roles.append(GOV_ACCOUNT_ROLE)
-        account_id = '1234'
+    roles = [PPR_ROLE, role]
+    if role == BCOL_HELP:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif role == STAFF_ROLE:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif role == GOV_ACCOUNT_ROLE:
+        headers = create_header_account(jwt, roles, 'test-user', '1234')
+    else:
+        headers = create_header(jwt, roles)
+ 
     rv = client.post('/api/v1/searches' + params,
                      json=REGISTRATION_NUMBER_JSON,
-                     headers=create_header_account(jwt, roles, 'test-user', account_id),
+                     headers=headers,
                      content_type='application/json')
     # check
     assert rv.status_code == status

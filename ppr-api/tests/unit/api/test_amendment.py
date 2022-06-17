@@ -294,7 +294,7 @@ TEST_DATA_AMENDMENT_CHANGE_TYPE = [
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
-def test_create_amendment(session, client, jwt, requests_mock, desc, json_data, roles, status, has_account, reg_num):
+def test_create_amendment(session, client, jwt, desc, json_data, roles, status, has_account, reg_num):
     """Assert that a post amendment registration statement works as expected."""
     headers = None
     # setup
@@ -306,7 +306,6 @@ def test_create_amendment(session, client, jwt, requests_mock, desc, json_data, 
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
         headers = create_header_account(jwt, roles, 'test-user', '1234')
-        requests_mock.get(f'{MOCK_URL_NO_KEY}orgs/1234', json={'branchName': 'Service BC'})
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
