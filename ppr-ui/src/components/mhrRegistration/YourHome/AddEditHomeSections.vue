@@ -5,7 +5,7 @@
         <v-col cols="12" sm="2">
           <label class="generic-label">Add Section</label>
         </v-col>
-        <v-col cols="12" sm="10">
+        <v-col cols="12" sm="10" class="pl-2">
           <!-- Add Edit Form -->
           <label class="generic-label">Serial Number</label>
           <v-text-field

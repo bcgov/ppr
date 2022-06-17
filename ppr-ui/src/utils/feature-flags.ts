@@ -9,7 +9,8 @@ export const defaultFlagSet: LDFlagSet = {
   'bcregistry-ui-mhr-enabled': false,
   'search-registration-number': false,
   'search-serial-number': false,
-  'mhr-ui-enabled': false
+  'mhr-ui-enabled': false,
+  'mhr-registration-enabled': true
 }
 
 /**

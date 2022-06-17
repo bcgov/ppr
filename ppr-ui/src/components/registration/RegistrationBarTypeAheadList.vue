@@ -98,7 +98,7 @@ export default defineComponent({
       isDense: props.defaultDense,
       isClearable: props.defaultClearable,
       includeMhrSelection: computed((): boolean => {
-        return isRoleStaff.value && getFeatureFlag('mhr-ui-enabled')
+        return isRoleStaff.value && getFeatureFlag('mhr-registration-enabled')
       })
     })
     const dialogSubmit = (proceed: boolean) => {

@@ -288,6 +288,6 @@ export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean)
   commit('mutateUnsavedChanges', unsavedChanges)
 }
 
-export const setHomeSection: ActionIF = ({ commit }, homeSection: HomeSectionIF): void => {
-  commit('mutateHomeSection', homeSection)
+export const setHomeSections: ActionIF = ({ commit }, homeSections: Array<HomeSectionIF>): void => {
+  commit('mutateHomeSections', homeSections)
 }
