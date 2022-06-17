@@ -88,7 +88,78 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
-  mhrRegistration: {},
+  mhrRegistration: {
+    clientReferenceId: '',
+    declaredValue: '',
+    submittingParty: {
+      businessName: '',
+      address: {
+        street: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      },
+      emailAddress: '',
+      phoneNumber: null,
+      phoneExtension: null
+    },
+    owners: [
+      {
+        individualName: {
+          first: '',
+          last: ''
+        },
+        address: {
+          street: '',
+          city: '',
+          region: '',
+          country: '',
+          postalCode: ''
+        },
+        type: ''
+      }
+    ],
+    location: {
+      parkName: '',
+      pad: null,
+      address: {
+        street: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      }
+    },
+    description: {
+      manufacturer: '',
+      baseInformation: {
+        year: null,
+        make: '',
+        model: ''
+      },
+      sectionCount: null,
+      sections: [],
+      csaNumber: null,
+      csaStandard: ''
+    },
+    notes: [
+      {
+        documentType: '',
+        documentId: '',
+        createDateTime: '',
+        remarks: '',
+        contactName: '',
+        contactAddress: {
+          street: '',
+          city: '',
+          region: '',
+          postalCode: '',
+          country: ''
+        }
+      }
+    ]
+  },
   registrationTable: {
     baseRegs: [],
     draftsBaseReg: [],
