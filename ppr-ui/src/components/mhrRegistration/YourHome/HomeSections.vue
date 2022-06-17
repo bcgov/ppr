@@ -5,7 +5,7 @@
       class="add-home-section-btn"
       color="primary"
       :ripple="false"
-      :disabled="showAddEditHomeSections"
+      :disabled="showAddEditHomeSections || isEditingHomeSection"
       @click="showAddEditHomeSections = true"
     >
       <v-icon class="pr-1">mdi-home-plus</v-icon> Add a Section
@@ -25,8 +25,9 @@
     <article class="mt-6">
       <p>Number of Sections: {{getMhrHomeSections.length}}</p>
       <HomeSectionsTable
-        :isEditing="showAddEditHomeSections"
+        :isAdding="showAddEditHomeSections"
         :homeSections="getMhrHomeSections"
+        @isEditing="isEditingHomeSection = $event"
         @edit="editHomeSection($event)"
         @remove="removeHomeSection($event)"
       />
@@ -71,6 +72,7 @@ export default defineComponent({
       'getMhrHomeSections'
     ])
     const localState = reactive({
+      isEditingHomeSection: false,
       isNewHomeSection: true,
       showAddEditHomeSections: false
     })
@@ -81,12 +83,13 @@ export default defineComponent({
       setHomeSections(homeSections)
     }
     const editHomeSection = (homeSection: HomeSectionIF): void => {
-      console.log(homeSection)
-      // const homeSections = [...getMhrHomeSections.value]
-      // // Add new home section to array
-      // homeSections.push(homeSection)
-      //
-      // setHomeSections(homeSections)
+      const homeSections = [...getMhrHomeSections.value]
+      // Create edited homeSection without id
+      const { id, ...editedSection } = homeSection
+      // Apply edited section to temp array
+      homeSections[homeSection.id] = editedSection
+
+      setHomeSections(homeSections)
     }
     const removeHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
