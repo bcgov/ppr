@@ -2,17 +2,19 @@ import { HomeSectionIF } from '@/interfaces'
 
 export interface MhrRegistrationIF {
   clientReferenceId: string,
-    declaredValue: string,
-    registeringParty: {
+  declaredValue: string,
+  submittingParty: {
     businessName: string,
       address: {
       street: string,
-        city: string,
-        region: string,
-        country: string,
-        postalCode: string
+      city: string,
+      region: string,
+      country: string,
+      postalCode: string
     },
-    emailAddress: string
+    emailAddress: string,
+    phoneNumber: number,
+    phoneExtension: number
   },
   owners: [
     {
@@ -30,10 +32,10 @@ export interface MhrRegistrationIF {
       type: string
     }
   ],
-    location: {
+  location: {
     parkName: string,
-      pad: number,
-      address: {
+    pad: number,
+    address: {
       street: string,
       city: string,
       region: string,
@@ -43,8 +45,8 @@ export interface MhrRegistrationIF {
   },
   description: {
     manufacturer: string,
-      baseInformation: {
-      year: number,
+    baseInformation: {
+        year: number,
         make: string,
         model: string
     },
