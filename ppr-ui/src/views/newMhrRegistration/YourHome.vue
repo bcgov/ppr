@@ -25,23 +25,18 @@
       </v-card>
     </section>
 
-    <section id="mhr-other-information" class="mt-10">
-      <h2>Other Information</h2>
-
-      <v-card flat class="mt-5">
-        <span>OTHER INFORMATION PLACEHOLDER</span>
-      </v-card>
-    </section>
+    <OtherInformation :getErrorMessage="getMessage" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
 import {
   HomeSections,
   ManufacturerMakeModel,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
+import { ErrorMixin } from '@/mixins'
 
 @Component({
   components: {
@@ -49,7 +44,7 @@ import {
     ManufacturerMakeModel
   }
 })
-export default class YourHome extends Vue {}
+export default class YourHome extends Mixins(ErrorMixin) {}
 </script>
 
 <style lang="scss" scoped>

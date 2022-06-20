@@ -20,6 +20,9 @@
           <v-textarea
             v-model="otherInfo"
             filled
+            :error-messages="
+              getErrorMessage('mhrRegistration.description.otherRemarks')
+            "
             name="name"
             counter="140"
             placeholder="Enter other details about the home (Optional)"
@@ -36,6 +39,12 @@ import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
+  props: {
+    // Retrieve error message via ErrorMixin
+    // Pass field id for which to get the messages
+    // Field id must match the state model field
+    getErrorMessage: Function
+  },
   setup () {
     const { getMhrRegistrationOtherInfo } = useGetters<any>([
       'getMhrRegistrationOtherInfo'
