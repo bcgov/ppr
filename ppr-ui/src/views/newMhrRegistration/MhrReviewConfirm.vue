@@ -1,18 +1,133 @@
 <template>
-  <div>REVIEW AND CONFIRM PLACEHOLDER</div>
+  <div id="mhr-review-confirm">
+    <!-- Review and Confirm -->
+    <section class="mt-10">
+      <article>
+        <h2>Review and Confirm</h2>
+        <p class="mt-4">
+          Review the information in your registration and complete the additional information below. If you need to
+          change anything, return to the previous step to make the necessary change.
+        </p>
+      </article>
+
+      <!-- Your Home Summary -->
+      <v-card flat id="mhr-registration-summary" class="mt-6">
+        <header class="review-header">
+          <v-icon class="ml-2" color="darkBlue">mdi-home</v-icon>
+          <label class="font-weight-bold pl-2">Your Home</label>
+        </header>
+
+        <div :class="{ 'invalid-section': false }">
+          <section class="mx-6 pt-8" v-if="true">
+            <span>
+              <v-icon color="error">mdi-information-outline</v-icon>
+              <span class="error-text mx-1">This step is unfinished.</span>
+              <router-link
+                :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.YOUR_HOME}` }"
+              >Return to this step to finish it</router-link>
+            </span>
+          </section>
+
+          <!-- Review Placeholder -->
+          <template v-if="true">
+            <section class="py-6">
+            </section>
+          </template>
+
+          <!-- divider -->
+          <div class="px-2">
+            <v-container class="py-0">
+              <v-divider />
+            </v-container>
+          </div>
+
+          <!-- Home Sections Review -->
+          <template v-if="true">
+            <section class="py-6" id="review-home-sections">
+              <h2 class="px-7">Home Sections</h2>
+              <HomeSections class=" mt-n4 px-7 py-0" :isReviewMode="true" />
+            </section>
+          </template>
+        </div>
+      </v-card>
+    </section>
+
+    <!-- Transactional Folio Number -->
+    <section id="folio-number-section" class="mt-10" v-if="false">
+      <article>
+        <h2>Folio or Reference Number</h2>
+        <p class="mt-4">
+          Enter the folio or reference number you want to use for this filing for your own tracking
+          purposes. The Business Folio or Reference Number is displayed below (if available).
+          Entering a different value below will not change the Business Folio or Reference Number.
+          Only the number below will appear on the transaction report and receipt for this filing.
+        </p>
+      </article>
+
+      <v-card flat class="mt-6">
+       <!-- Folio Number Placeholder -->
+      </v-card>
+    </section>
+
+    <!-- Certify -->
+    <section id="certify-section" class="mt-10" v-if="false">
+      <article>
+        <h2>Certify</h2>
+        <p class="mt-4">
+          Confirm the legal name of the person authorized to complete and submit this dissolution.
+        </p>
+      </article>
+
+      <v-card flat class="mt-6">
+        <!-- Certify Placeholder -->
+      </v-card>
+    </section>
+
+    <!-- Staff Payment -->
+    <section id="staff-payment-section" class="mt-10" v-if="false">
+      <article>
+        <h2>Staff Payment</h2>
+        <p class="mt-4"></p>
+      </article>
+
+      <v-card flat class="mt-6">
+        <!-- Staff Payment Piece -->
+      </v-card>
+    </section>
+  </div>
 </template>
 
 <script lang="ts">
+/* eslint-disable no-unused-vars */
 import { Component, Vue } from 'vue-property-decorator'
+import { HomeSections } from '@/components/mhrRegistration/YourHome'
+import { RouteNames } from '@/enums'
+/* eslint-enable no-unused-vars */
 
 @Component({
   components: {
+    HomeSections
   }
 })
 export default class MhrReviewConfirm extends Vue {
+  private RouteNames = RouteNames
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.review-header {
+  display: flex; // to align icons
+  background-color: $BCgovBlue5O;
+  padding: 1.25rem;
+  color: $gray9;
+}
+
+#review-home-sections {
+  ::v-deep {
+    .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
+      padding-left: 0 !important;
+    }
+  }
+}
 </style>

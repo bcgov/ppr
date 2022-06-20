@@ -3,9 +3,9 @@
     <v-form ref="addEditHomeSectionsForm" v-model="addEditValid">
       <v-row no-gutters>
         <v-col cols="12" sm="2">
-          <label class="generic-label">Add Section</label>
+          <label class="generic-label">{{ isNewHomeSection ? 'Add' : 'Edit' }} Section</label>
         </v-col>
-        <v-col cols="12" sm="10">
+        <v-col cols="12" sm="10" class="pl-2">
           <!-- Add Edit Form -->
           <label class="generic-label">Serial Number</label>
           <v-text-field
@@ -73,6 +73,7 @@
                   id="remove-btn-party"
                   class="remove-btn"
                   :disabled="isNewHomeSection"
+                  @click="remove()"
                 >
                   Remove
                 </v-btn>
@@ -107,17 +108,16 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import Vue from 'vue'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
-import { FormIF, HomeSectionIF } from '@/interfaces'
+import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 /* eslint-disable no-unused-vars */
 
 export default defineComponent({
   name: 'AddEditHomeSections',
   props: {
-    isNewHomeSection: { type: Boolean, default: true }
+    isNewHomeSection: { type: Boolean, default: true },
+    editHomeSection: { type: Object as () => HomeSectionIF, default: () => {} }
   },
   setup (props, context) {
     const {
@@ -128,17 +128,17 @@ export default defineComponent({
 
     const localState = reactive({
       addEditValid: false,
-      serialNumber: '',
-      lengthFeet: null,
-      lengthInches: null,
-      widthFeet: null,
-      widthInches: null,
+      serialNumber: props.editHomeSection?.serialNumber || '',
+      lengthFeet: props.editHomeSection?.lengthFeet || null,
+      lengthInches: props.editHomeSection?.lengthInches || null,
+      widthFeet: props.editHomeSection?.widthFeet || null,
+      widthInches: props.editHomeSection?.widthInches || null,
       hasSubmit: false
     })
 
     const close = (): void => { context.emit('close') }
+    const remove = (): void => { context.emit('remove') }
     const submit = async (): Promise<void> => {
-      // Set submission flag to apply validation rules
       localState.hasSubmit = true
       // @ts-ignore - function exists
       await context.refs.addEditHomeSectionsForm.validate()
@@ -157,6 +157,7 @@ export default defineComponent({
 
     return {
       close,
+      remove,
       submit,
       requiredStringRules,
       optionalNumberRules,
@@ -165,7 +166,6 @@ export default defineComponent({
     }
   }
 })
-/* eslint-enable no-unused-vars */
 </script>
 
 <style lang="scss" scoped>

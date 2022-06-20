@@ -352,6 +352,6 @@ export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) =>
   state.stateModel.unsavedChanges = unsavedChanges
 }
 
-export const mutateHomeSection = (state: StateIF, homeSection: HomeSectionIF) => {
-  // Add/Edit Home Section according to index here
+export const mutateHomeSections = (state: StateIF, homeSections: Array<HomeSectionIF>) => {
+  state.stateModel.mhrRegistration.description.sections = homeSections
 }

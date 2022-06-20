@@ -11,6 +11,7 @@ import {
   DraftIF,
   DraftResultIF,
   GeneralCollateralIF,
+  HomeSectionIF,
   IndividualNameIF,
   LengthTrustIF,
   ManufacturedHomeSearchResponseIF,
@@ -604,4 +605,8 @@ export const getRegTableTotalRowCount = (state: StateIF): number => {
 
 export const hasMorePages = (state: StateIF): boolean => {
   return state.stateModel.registrationTable.sortHasMorePages
+}
+
+export const getMhrHomeSections = (state: StateIF): Array<HomeSectionIF> => {
+  return state.stateModel.mhrRegistration.description.sections
 }

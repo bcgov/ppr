@@ -16,6 +16,7 @@ export enum RouteNames {
   LOGIN = 'login',
   MHRSEARCH = 'mhr-search',
   MHRSEARCH_CONFIRM = 'mhr-search-confirm',
+  MHR_REGISTRATION = 'mhr-registration',
   MHR_REVIEW_CONFIRM = 'mhr-review-confirm',
   RENEW_REGISTRATION = 'renew-registration',
   REVIEW_CONFIRM = 'review-confirm',
