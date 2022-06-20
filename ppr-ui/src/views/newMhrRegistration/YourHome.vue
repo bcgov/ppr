@@ -36,9 +36,12 @@
 </template>
 
 <script lang="ts">
-import { ManufacturerMakeModel } from '@/components/mhr'
 import { Component, Vue } from 'vue-property-decorator'
-import { HomeSections } from '@/components/mhrRegistration/YourHome'
+import {
+  HomeSections,
+  ManufacturerMakeModel,
+  OtherInformation
+} from '@/components/mhrRegistration/YourHome'
 
 @Component({
   components: {
