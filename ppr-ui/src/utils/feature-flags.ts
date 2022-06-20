@@ -10,7 +10,7 @@ export const defaultFlagSet: LDFlagSet = {
   'search-registration-number': false,
   'search-serial-number': false,
   'mhr-ui-enabled': false,
-  'mhr-registration-enabled': true
+  'mhr-registration-enabled': false
 }
 
 /**

@@ -562,3 +562,30 @@ export const homeSectionsTableHeaders: Array<BaseHeaderIF> = [
     value: 'actions'
   }
 ]
+
+export const homeSectionsReviewTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Section',
+    value: 'section'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Length',
+    value: 'length'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Width',
+    value: 'width'
+  }
+]

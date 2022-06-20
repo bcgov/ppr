@@ -33,7 +33,7 @@
           <td>{{ row.item.serialNumber }}</td>
           <td>{{ row.item.lengthFeet }} feet {{ row.item.lengthInches ? row.item.lengthInches + ' inches' : '' }}</td>
           <td>{{ row.item.widthFeet }} feet {{ row.item.widthInches ? row.item.widthInches + ' inches' : '' }}</td>
-          <td>
+          <td v-if="!isReviewMode">
             <v-btn
               text small
               color="primary"
@@ -80,7 +80,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { BaseHeaderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { homeSectionsTableHeaders } from '@/resources/tableHeaders'
+import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 export default defineComponent({
   name: 'HomeSectionsTable',
@@ -95,7 +95,7 @@ export default defineComponent({
       activeIndex: -1,
       isEditingHomeSection: false,
       headers: computed((): Array<BaseHeaderIF> => {
-        return homeSectionsTableHeaders
+        return props.isReviewMode ? homeSectionsReviewTableHeaders : homeSectionsTableHeaders
       }),
       isEditing: computed((): boolean => {
         return localState.activeIndex >= 0
