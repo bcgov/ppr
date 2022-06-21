@@ -393,11 +393,22 @@ export default defineComponent({
       })
     })
 
+    const cleanUpInput = (dirtyValue: string|undefined) => {
+      if (dirtyValue === undefined) {
+        return undefined
+      }
+      return dirtyValue
+        .trim()
+        .replaceAll(/[\u200B-\u200D\uFEFF\u200E\u200F]|(?:&#x200E;)/g, '')
+        .replaceAll(/[\u2018\u2019]/g, "'")
+        .replaceAll(/[\u201C\u201D]/g, '"')
+    }
+
     const getCriteria = () => {
       if (localState.isIndividual) {
-        const first = localState.searchValueFirst?.trim()
-        const second = localState.searchValueSecond?.trim()
-        const last = localState.searchValueLast?.trim()
+        const first = cleanUpInput(localState.searchValueFirst)
+        const second = cleanUpInput(localState.searchValueSecond)
+        const last = cleanUpInput(localState.searchValueLast)
 
         if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
           return { debtorName: { first: first, second: second, last: last } }
@@ -406,9 +417,9 @@ export default defineComponent({
           return { ownerName: { first: first, second: second, last: last } }
         }
       } else if (localState.selectedSearchType.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR) {
-        return { debtorName: { business: localState.searchValue?.trim() } }
+        return { debtorName: { business: cleanUpInput(localState.searchValue) } }
       } else {
-        const cleanedSearchValue = localState.searchValue?.trim()
+        const cleanedSearchValue = cleanUpInput(localState.searchValue)
         return { value: cleanedSearchValue }
       }
     }
