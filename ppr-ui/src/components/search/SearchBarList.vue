@@ -37,6 +37,7 @@
         </template>
         <template v-else class="search-list">
           <v-list-item
+            :id="`list-${item.searchTypeAPI}`"
             v-if="displayGroup[item.group]"
             class="copy-normal"
             @click="selectSearchType(item)"
