@@ -29,7 +29,7 @@
     <!-- Home Sections Table -->
     <article class="mt-6">
       <v-row no-gutters>
-        <p v-if="!isReviewMode">Number of Sections: {{getMhrHomeSections.length}}</p>
+        <p v-if="!isReviewMode" id="section-count">Number of Sections: {{getMhrHomeSections.length}}</p>
         <span v-if="false && hasMinimumHomeSections" class="pl-4 error-text">
           Your registration must contain at least one section
         </span>
