@@ -18,11 +18,9 @@
         </v-col>
         <v-col cols="10">
           <v-textarea
-            v-model="otherInfo"
+            v-model="otherRemarks"
             filled
-            :error-messages="
-              getErrorMessage('mhrRegistration.description.otherRemarks')
-            "
+            :error-messages="errorMessages.otherRemarks"
             name="name"
             counter="140"
             placeholder="Enter other details about the home (Optional)"
@@ -37,14 +35,9 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useMhrRegistrationValidation as getMhrRegistrationErrors } from '@/composables/useMhrRegistrationValidation'
 
 export default defineComponent({
-  props: {
-    // Retrieve error message via ErrorMixin
-    // Pass field id for which to get the messages
-    // Field id must match the state model field
-    getErrorMessage: Function
-  },
   setup () {
     const { getMhrRegistrationOtherInfo } = useGetters<any>([
       'getMhrRegistrationOtherInfo'
@@ -55,13 +48,20 @@ export default defineComponent({
     ])
 
     const localState = reactive({
-      otherInfo: getMhrRegistrationOtherInfo.value
+      otherRemarks: getMhrRegistrationOtherInfo.value,
+      errorMessages: {
+        otherRemarks: ''
+      }
     })
 
     watch(
-      () => localState.otherInfo,
+      () => localState.otherRemarks,
       (val: string) => {
         setMhrRegistrationOtherInfo(val)
+        localState.errorMessages.otherRemarks = getMhrRegistrationErrors(
+          localState,
+          'otherRemarks'
+        )
       }
     )
 

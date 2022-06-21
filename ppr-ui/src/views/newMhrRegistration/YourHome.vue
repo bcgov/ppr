@@ -25,26 +25,26 @@
       </v-card>
     </section>
 
-    <OtherInformation :getErrorMessage="getMessage" />
+    <OtherInformation />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import {
   HomeSections,
   ManufacturerMakeModel,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
-import { ErrorMixin } from '@/mixins'
 
 @Component({
   components: {
     HomeSections,
-    ManufacturerMakeModel
+    ManufacturerMakeModel,
+    OtherInformation
   }
 })
-export default class YourHome extends Mixins(ErrorMixin) {}
+export default class YourHome extends Vue {}
 </script>
 
 <style lang="scss" scoped>

@@ -612,19 +612,19 @@ export const getMhrHomeSections = (state: StateIF): Array<HomeSectionIF> => {
 }
 
 export const getMhrRegistrationManufacturerName = (state: StateIF): string => {
-  return state.stateModel.mhrRegistration.yourHome.manufacturerName
+  return state.stateModel.mhrRegistration.description.manufacturer
 }
 
-export const getMhrRegistrationYearOfManufacture = (state: StateIF): string => {
-  return state.stateModel.mhrRegistration.yourHome.yearOfManufacture
+export const getMhrRegistrationYearOfManufacture = (state: StateIF): number => {
+  return state.stateModel.mhrRegistration.description.baseInformation.year
 }
 
 export const getMhrRegistrationHomeMake = (state: StateIF): string => {
-  return state.stateModel.mhrRegistration.yourHome.make
+  return state.stateModel.mhrRegistration.description.baseInformation.make
 }
 
 export const getMhrRegistrationHomeModel = (state: StateIF): string => {
-  return state.stateModel.mhrRegistration.yourHome.model
+  return state.stateModel.mhrRegistration.description.baseInformation.model
 }
 
 export const getMhrRegistrationOtherInfo = (state: StateIF): string => {
