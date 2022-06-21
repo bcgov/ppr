@@ -393,6 +393,12 @@ export default defineComponent({
       })
     })
 
+    /**
+     * the function take a string and remove all the zero-width space characters
+     * and replace all smart quotes (closing single quote also used as apostrophe) to its corresponding straight quotes
+     * @param dirtyValue the string we want to clean
+     * @return the cleaned up string
+     */
     const cleanUpInput = (dirtyValue: string|undefined) => {
       if (dirtyValue === undefined) {
         return undefined
