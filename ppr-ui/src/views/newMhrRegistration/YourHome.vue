@@ -1,7 +1,7 @@
 <template>
   <div id="mhr-describe-your-home">
     <section id="mhr-make-model" class="mt-10" >
-      <h2 class="sub-header">Make/Model</h2>
+      <h2 class="sub-header">Manufacturer, Make, and Model</h2>
 
       <v-card flat class="mt-5">
         <span>MAKE AND MODEL PLACEHOLDER</span>
