@@ -124,15 +124,13 @@ export async function submitSelectedMhr (
   }
 
   if (shouldCallback || selected.length >= 75) {
-    const callBackURL = 'callbackURL=PPR_UI'
-    if (extraParams) {
-      if (extraParams.length > 1) {
-        extraParams += '&'
-      }
-      extraParams += callBackURL
-    } else {
-      extraParams += '?' + callBackURL
+    if (!extraParams) {
+      extraParams += '?'
     }
+    if (extraParams.length > 1) {
+      extraParams += '&'
+    }
+    extraParams += 'callbackURL=PPR_UI'
   }
 
   return axios
