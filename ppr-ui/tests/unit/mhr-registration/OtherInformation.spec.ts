@@ -41,6 +41,7 @@ describe('Other Information component', () => {
     wrapper.find(getTestId('otherRemarks')).exists()
     wrapper.find(getTestId('otherRemarks')).setValue('x'.repeat(150))
     await Vue.nextTick()
+    await Vue.nextTick()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Maximum 140 characters')
