@@ -59,11 +59,7 @@
               <h3>Other Information</h3>
             </v-col>
             <v-col cols="9">
-              <div>
-                <p>
-                  {{ getMhrRegistrationOtherInfo || '(Not Entered)' }}
-                </p>
-              </div>
+              <p>{{ getMhrRegistrationOtherInfo || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
         </div>
@@ -152,7 +148,7 @@ export default class MhrReviewConfirm extends Vue {
   p {
     margin-bottom: unset;
     line-height: 24px;
-    color: #495057;
+    color: $gray7;
   }
 }
 

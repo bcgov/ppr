@@ -1,12 +1,15 @@
 <template>
   <div>
-    <v-card flat class="white pb-6 pt-6 pr-10 pl-8 rounded">
-      <v-row>
+    <v-card flat class="py-6 px-8 rounded">
+      <v-row id="mhr-home-manufacturer-name">
         <v-col cols="2">
-          <label class="generic-label ml" for="">Manufacturer's Name</label>
+          <label class="generic-label" for="manufacturer-name"
+            >Manufacturer's Name</label
+          >
         </v-col>
         <v-col cols="10">
           <v-text-field
+            id="manufacturer-name"
             v-model="manufacturerName"
             filled
             label="Business Legal Name (Optional)"
@@ -14,12 +17,15 @@
         </v-col>
       </v-row>
 
-      <v-row>
+      <v-row id="mhr-home-manufacturer-year">
         <v-col cols="2">
-          <label class="generic-label ml" for="">Year of Manufacture</label>
+          <label class="generic-label" for="manufacturer-year"
+            >Year of Manufacture</label
+          >
         </v-col>
         <v-col cols="4">
           <v-text-field
+            id="manufacturer-year"
             v-model="yearOfManufacture"
             filled
             label="Year of Manufacture"
@@ -36,23 +42,33 @@
         </v-col>
       </v-row>
 
-      <v-divider class="ma-0 pa-0 mt-2 mb-5" />
+      <v-divider class="mt-2 mb-5" />
 
-      <v-row>
+      <v-row id="mhr-home-manufacturer-make">
         <v-col cols="2">
-          <label class="generic-label ml" for="">Make</label>
+          <label class="generic-label" for="manufacturer-make">Make</label>
         </v-col>
         <v-col cols="10">
-          <v-text-field v-model="make" filled label="Make" />
+          <v-text-field
+            id="manufacturer-make"
+            v-model="make"
+            filled
+            label="Make"
+          />
         </v-col>
       </v-row>
 
-      <v-row>
+      <v-row id="mhr-home-manufacturer-model">
         <v-col cols="2">
-          <label class="generic-label ml" for="">Model</label>
+          <label class="generic-label" for="manufacturer-model">Model</label>
         </v-col>
         <v-col cols="10">
-          <v-text-field v-model="model" filled label="Model" />
+          <v-text-field
+            id="manufacturer-model"
+            v-model="model"
+            filled
+            label="Model"
+          />
         </v-col>
       </v-row>
     </v-card>
@@ -104,7 +120,7 @@ export default defineComponent({
 
     watch(
       () => localState.yearOfManufacture,
-      (val: string) => {
+      (val: number) => {
         setMhrRegistrationYearOfManufacture(val)
       }
     )

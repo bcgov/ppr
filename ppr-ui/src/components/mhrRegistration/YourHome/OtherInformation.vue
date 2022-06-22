@@ -1,25 +1,24 @@
 <template>
-  <div>
-    <v-card flat class="white pb-6 pt-6 pr-10 pl-8 rounded">
-      <v-row>
-        <v-col cols="2">
-          <label class="generic-label ml" for="">Other</label>
-        </v-col>
-        <v-col cols="10">
-          <v-textarea
-            v-model="otherRemarks"
-            filled
-            :error-messages="errorMessages.otherRemarks"
-            name="name"
-            counter="140"
-            placeholder="Enter other details about the home (Optional)"
-            class="other-info"
-            data-test-id="otherRemarks"
-          ></v-textarea>
-        </v-col>
-      </v-row>
-    </v-card>
-  </div>
+  <v-card id="mhr-home-other-information" flat class="py-6 px-8 rounded">
+    <v-row>
+      <v-col cols="2">
+        <label class="generic-label" for="other-remarks">Other</label>
+      </v-col>
+      <v-col cols="10">
+        <v-textarea
+          id="other-remarks"
+          v-model="otherRemarks"
+          filled
+          :error-messages="errorMessages.otherRemarks"
+          name="name"
+          counter="140"
+          placeholder="Enter other details about the home (Optional)"
+          class="other-info"
+          data-test-id="otherRemarks"
+        ></v-textarea>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">

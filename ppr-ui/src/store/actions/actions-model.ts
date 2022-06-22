@@ -297,7 +297,7 @@ export const setMhrRegistrationManufacturerName: ActionIF = ({ commit }, name: s
   commit('mutateMhrRegistrationManufacturerName', name)
 }
 
-export const setMhrRegistrationYearOfManufacture: ActionIF = ({ commit }, year: string): void => {
+export const setMhrRegistrationYearOfManufacture: ActionIF = ({ commit }, year: number): void => {
   commit('mutateMhrRegistrationYearOfManufacture', year)
 }
 
