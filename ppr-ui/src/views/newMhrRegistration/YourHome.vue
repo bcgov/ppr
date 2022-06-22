@@ -1,6 +1,13 @@
 <template>
   <div id="mhr-describe-your-home">
-    <ManufacturerMakeModel />
+    <section id="mhr-make-model" class="mt-10">
+      <h2>Manufacturer, Make, and Model</h2>
+      <p class="mt-2 mb-6">
+        Enter the Year of Manufacture (not the model year), Make, and Model of
+        the home.
+      </p>
+      <ManufacturerMakeModel />
+    </section>
 
     <section id="mhr-home-sections" class="mt-10">
       <h2>Home Sections</h2>
@@ -25,7 +32,13 @@
       </v-card>
     </section>
 
-    <OtherInformation />
+    <section id="mhr-other-information" class="mt-10">
+      <h2>Other Information</h2>
+      <p class="mt-2 mb-6">
+        Include an other relevant information about the home.
+      </p>
+      <OtherInformation />
+    </section>
   </div>
 </template>
 
