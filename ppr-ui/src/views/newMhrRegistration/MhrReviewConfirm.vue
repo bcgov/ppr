@@ -44,10 +44,28 @@
           <!-- Home Sections Review -->
           <template v-if="true">
             <section class="py-6" id="review-home-sections">
-              <h2 class="px-7">Home Sections</h2>
+              <h3 class="px-7">Home Sections</h3>
               <HomeSections class=" mt-n4 px-7 py-0" :isReviewMode="true" />
             </section>
           </template>
+
+          <div class="px-4">
+            <v-divider />
+          </div>
+
+          <!-- Other Information Review -->
+          <v-row class="pa-6">
+            <v-col cols="3">
+              <h3>Other Information</h3>
+            </v-col>
+            <v-col cols="9">
+              <div>
+                <p>
+                  {{ getMhrRegistrationOtherInfo || '(Not Entered)' }}
+                </p>
+              </div>
+            </v-col>
+          </v-row>
         </div>
       </v-card>
     </section>
@@ -102,6 +120,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { HomeSections } from '@/components/mhrRegistration/YourHome'
 import { RouteNames } from '@/enums'
+import { Getter } from 'vuex-class'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -110,6 +129,8 @@ import { RouteNames } from '@/enums'
   }
 })
 export default class MhrReviewConfirm extends Vue {
+  @Getter getMhrRegistrationOtherInfo!: string
+
   private RouteNames = RouteNames
 }
 </script>
@@ -121,6 +142,18 @@ export default class MhrReviewConfirm extends Vue {
   background-color: $BCgovBlue5O;
   padding: 1.25rem;
   color: $gray9;
+}
+
+#mhr-registration-summary {
+  h3 {
+    line-height: unset;
+  }
+
+  p {
+    margin-bottom: unset;
+    line-height: 24px;
+    color: #495057;
+  }
 }
 
 #review-home-sections {
