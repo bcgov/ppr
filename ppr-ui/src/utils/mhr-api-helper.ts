@@ -100,7 +100,8 @@ export async function submitSelectedMhr (
   searchId: string,
   selected: Array<ManufacturedHomeSearchResultIF>,
   staffPayment: StaffPaymentIF = null,
-  isCertified: boolean = false
+  isCertified: boolean = false,
+  shouldCallback: boolean = false
 ): Promise<number> {
   const url = sessionStorage.getItem('MHR_API_URL')
   // change to application/pdf to get the pdf right away
@@ -119,6 +120,18 @@ export async function submitSelectedMhr (
     if (paymentParams.length > 0) {
       if (isCertified) extraParams += '&'
       extraParams += `${paymentParams}`
+    }
+  }
+
+  if (shouldCallback || selected.length >= 75) {
+    const callBackURL = 'callbackURL=PPR_UI'
+    if (extraParams) {
+      if (extraParams.length > 1) {
+        extraParams += '&'
+      }
+      extraParams += callBackURL
+    } else {
+      extraParams += '?' + callBackURL
     }
   }
 
