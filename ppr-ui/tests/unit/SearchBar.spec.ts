@@ -323,6 +323,26 @@ describe('Individual debtor search', () => {
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
+  it('special characters are being replaced', async () => {
+    wrapper.vm.returnSearchSelection(select)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValueFirst = 'Apostrophe’'
+    wrapper.vm.$data.searchValueSecond = '‘Single Quotes’'
+    wrapper.vm.$data.searchValueLast = '“Double Quotes”'
+    wrapper.vm.$data.folioNumber = '123'
+    expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
+      type: select.searchTypeAPI,
+      criteria: {
+        debtorName: {
+          first: 'Apostrophe\'',
+          second: '\'Single Quotes\'',
+          last: '"Double Quotes"'
+        }
+      },
+      clientReferenceId: '123'
+    })
+  })
 })
 
 describe('Business debtor search', () => {
@@ -417,6 +437,21 @@ describe('Business debtor search', () => {
     expect(wrapper.vm.$data.searchValue).toEqual(selectedText)
     const autoCompleteNamesAfterClose = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNamesAfterClose.length).toBe(0)
+  })
+  it('special characters are being replaced', async () => {
+    wrapper.vm.returnSearchSelection(select)
+    wrapper.vm.$data.selectedSearchType = select
+    await Vue.nextTick()
+    wrapper.vm.$data.searchValue = 'Apostrophe’ ‘Single Quotes’ “Double Quotes”'
+    expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
+      type: select.searchTypeAPI,
+      criteria: {
+        debtorName: {
+          business: 'Apostrophe\' \'Single Quotes\' "Double Quotes"'
+        }
+      },
+      clientReferenceId: ''
+    })
   })
 })
 
