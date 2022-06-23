@@ -11,17 +11,18 @@
 
     <section id="mhr-home-sections" class="mt-10">
       <h2>Home Sections</h2>
-      <p>Add the Serial Number and dimensions for each section of the home.</p>
+      <p class="mt-1">Add the Serial Number and dimensions for each section of the home.</p>
 
       <HomeSections />
     </section>
 
     <section id="mhr-home-certification" class="mt-10">
       <h2>Home Certification</h2>
+      <p class="mt-1">
+        Enter either the Canadian Standards Association (CSA) number OR the Engineer's inspection information.
+      </p>
 
-      <v-card flat class="mt-5">
-        <span>HOME CERTIFICATION PLACEHOLDER</span>
-      </v-card>
+      <HomeCertification />
     </section>
 
     <section id="mhr-rebuilt-status" class="mt-10">
@@ -45,6 +46,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import {
+  HomeCertification,
   HomeSections,
   ManufacturerMakeModel,
   OtherInformation
@@ -52,6 +54,7 @@ import {
 
 @Component({
   components: {
+    HomeCertification,
     HomeSections,
     ManufacturerMakeModel,
     OtherInformation

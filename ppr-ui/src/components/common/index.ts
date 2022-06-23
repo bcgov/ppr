@@ -12,3 +12,6 @@ export { default as FolioNumber } from './FolioNumber.vue'
 export { default as FolioNumberSummary } from './FolioNumberSummary.vue'
 export { default as Stepper } from './Stepper.vue'
 export { default as StickyContainer } from './StickyContainer.vue'
+
+// Shared DatePicker Component
+export { DatePicker as SharedDatePicker } from '@bcrs-shared-components/date-picker'
