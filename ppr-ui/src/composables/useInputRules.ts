@@ -1,4 +1,3 @@
-
 export const useInputRules = () => {
   const optionalStringRules = (): Array<Function> => {
     return [
@@ -32,10 +31,15 @@ export const useInputRules = () => {
     ]
   }
 
+  const maxLengthRules = (maxLength: number): Array<Function> => {
+    return [v => v.length <= maxLength || `Maximum ${maxLength} characters`]
+  }
+
   return {
     optionalStringRules,
     requiredStringRules,
     optionalNumberRules,
-    requiredNumberRules
+    requiredNumberRules,
+    maxLengthRules
   }
 }

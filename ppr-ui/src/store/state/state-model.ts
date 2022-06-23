@@ -141,7 +141,9 @@ export const stateModel: StateModelIF = {
       sectionCount: null,
       sections: [],
       csaNumber: null,
-      csaStandard: ''
+      csaStandard: '',
+      rebuiltRemarks: '',
+      otherRemarks: ''
     },
     notes: [
       {

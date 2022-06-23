@@ -5,7 +5,7 @@ export interface MhrRegistrationIF {
   declaredValue: string,
   submittingParty: {
     businessName: string,
-      address: {
+    address: {
       street: string,
       city: string,
       region: string,
@@ -46,14 +46,16 @@ export interface MhrRegistrationIF {
   description: {
     manufacturer: string,
     baseInformation: {
-        year: number,
-        make: string,
-        model: string
+      year: number,
+      make: string,
+      model: string
     },
     sectionCount: number,
     sections: Array<HomeSectionIF>,
     csaNumber: number,
-    csaStandard: string
+    csaStandard: string,
+    rebuiltRemarks: string,
+    otherRemarks: string
   },
   notes: [
     {
