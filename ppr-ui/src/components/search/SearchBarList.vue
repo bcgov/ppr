@@ -37,7 +37,7 @@
         </template>
         <template v-else class="search-list">
           <v-list-item
-            :id="`list-${item.searchTypeAPI}`"
+            :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
             v-if="displayGroup[item.group]"
             class="copy-normal"
             @click="selectSearchType(item)"
