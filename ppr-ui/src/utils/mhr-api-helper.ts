@@ -100,8 +100,7 @@ export async function submitSelectedMhr (
   searchId: string,
   selected: Array<ManufacturedHomeSearchResultIF>,
   staffPayment: StaffPaymentIF = null,
-  isCertified: boolean = false,
-  shouldCallback: boolean = false
+  isCertified: boolean = false
 ): Promise<number> {
   const url = sessionStorage.getItem('MHR_API_URL')
   // change to application/pdf to get the pdf right away
@@ -123,7 +122,7 @@ export async function submitSelectedMhr (
     }
   }
 
-  if (shouldCallback || selected.length >= 75) {
+  if (selected.length >= 75) {
     if (!extraParams) {
       extraParams += '?'
     }
