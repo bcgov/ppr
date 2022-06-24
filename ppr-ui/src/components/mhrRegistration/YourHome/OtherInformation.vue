@@ -3,14 +3,14 @@
     <v-card id="mhr-home-other-information" flat class="py-6 px-8 rounded">
       <v-row>
         <v-col cols="2">
-          <label class="generic-label" for="other-remarks">Other</label>
+          <label class="generic-label" for="other-remarks" :class="{'error-text': false}">Other</label>
         </v-col>
         <v-col cols="10">
           <v-textarea
             id="other-remarks"
             v-model="otherRemarks"
             filled
-            :rules="maxLengthRules(140)"
+            :rules="maxLength(140)"
             name="name"
             counter="140"
             label="Other details about the home (Optional)"
@@ -30,7 +30,7 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
-    const { maxLengthRules } = useInputRules()
+    const { maxLength } = useInputRules()
 
     const { getMhrRegistrationOtherInfo } = useGetters<any>([
       'getMhrRegistrationOtherInfo'
@@ -52,7 +52,7 @@ export default defineComponent({
       }
     )
 
-    return { maxLengthRules, ...toRefs(localState) }
+    return { maxLength, ...toRefs(localState) }
   }
 })
 </script>

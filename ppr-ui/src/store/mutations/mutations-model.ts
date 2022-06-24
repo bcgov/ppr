@@ -376,3 +376,7 @@ export const mutateMhrRegistrationHomeModel = (state: StateIF, model: string) =>
 export const mutateMhrRegistrationOtherInfo = (state: StateIF, info: string) => {
   state.stateModel.mhrRegistration.description.otherRemarks = info
 }
+
+export const mutateMhrHomeCertification = (state: StateIF, { key, value }) => {
+  state.stateModel.mhrRegistration.description[key] = value
+}

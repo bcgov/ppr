@@ -28,21 +28,63 @@
             </span>
           </section>
 
-          <!-- Review Placeholder -->
-          <template v-if="true">
-            <section class="py-6">
-            </section>
+          <!-- CSA Review -->
+          <template v-if="isCSA || isEngineerInspection">
+            <template v-if="isCSA">
+              <v-row no-gutters class="pa-6">
+                <v-col cols="3" class="pt-1">
+                  <h3>CSA Number</h3>
+                </v-col>
+                <v-col cols="9" class="pt-1">
+                  <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
+                </v-col>
+                <v-col cols="3" class="pt-1">
+                  <h3>CSA Standard</h3>
+                </v-col>
+                <v-col cols="9" class="pt-1">
+                  <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
+                </v-col>
+              </v-row>
+            </template>
+
+            <!-- Engineer Review -->
+            <template v-if="isEngineerInspection">
+              <v-row no-gutters class="pa-6">
+                <v-col cols="3" class="pt-1">
+                  <h3>Engineer's Name</h3>
+                </v-col>
+                <v-col cols="9" class="pt-1">
+                  <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
+                </v-col>
+                <v-col cols="3" class="pt-1">
+                  <h3>Date of Engineer's<br>Report</h3>
+                </v-col>
+                <v-col cols="9" class="pt-1">
+                  <p>{{ getMhrRegistrationHomeDescription.engineerReportDate || '(Not Entered)' }}</p>
+                </v-col>
+              </v-row>
+            </template>
+          </template>
+
+          <!-- Default no Home Certification option is selected -->
+          <template v-else>
+            <v-row no-gutters class="pa-6">
+              <v-col cols="3">
+                <h3>Home Certification</h3>
+              </v-col>
+              <v-col cols="9">
+                <p>(Not Entered)</p>
+              </v-col>
+            </v-row>
           </template>
 
           <!-- divider -->
-          <div class="px-2">
-            <v-container class="py-0">
-              <v-divider />
-            </v-container>
+          <div class="px-4">
+            <v-divider />
           </div>
 
           <!-- Home Sections Review -->
-          <template v-if="true">
+          <template>
             <section class="py-6" id="review-home-sections">
               <h3 class="px-7">Home Sections</h3>
               <HomeSections class=" mt-n4 px-7 py-0" :isReviewMode="true" />
@@ -54,7 +96,7 @@
           </div>
 
           <!-- Other Information Review -->
-          <v-row class="pa-6">
+          <v-row no-gutters class="pa-6">
             <v-col cols="3">
               <h3>Other Information</h3>
             </v-col>
@@ -115,8 +157,9 @@
 /* eslint-disable no-unused-vars */
 import { Component, Vue } from 'vue-property-decorator'
 import { HomeSections } from '@/components/mhrRegistration/YourHome'
-import { RouteNames } from '@/enums'
+import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { Getter } from 'vuex-class'
+import { MhrRegistrationDescriptionIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -126,8 +169,18 @@ import { Getter } from 'vuex-class'
 })
 export default class MhrReviewConfirm extends Vue {
   @Getter getMhrRegistrationOtherInfo!: string
+  @Getter getMhrRegistrationHomeDescription!: MhrRegistrationDescriptionIF
 
+  private HomeCertificationOptions = HomeCertificationOptions
   private RouteNames = RouteNames
+
+  private get isCSA (): boolean {
+    return this.getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.CSA
+  }
+
+  private get isEngineerInspection (): boolean {
+    return this.getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.ENGINEER_INSPECTION
+  }
 }
 </script>
 

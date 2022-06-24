@@ -312,3 +312,7 @@ export const setMhrRegistrationHomeModel: ActionIF = ({ commit }, model: string)
 export const setMhrRegistrationOtherInfo: ActionIF = ({ commit }, info: string): void => {
   commit('mutateMhrRegistrationOtherInfo', info)
 }
+
+export const setMhrHomeCertification: ActionIF = ({ commit }, { key, value }): void => {
+  commit('mutateMhrHomeCertification', { key, value })
+}

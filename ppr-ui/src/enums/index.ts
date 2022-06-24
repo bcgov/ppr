@@ -19,6 +19,7 @@ export * from './productType'
 export * from './productStatus'
 export * from './productCode'
 export * from './authRoles'
+export * from './homeCertificationOptions'
 
 // external enums
 export { CorpTypeCd } from '@bcrs-shared-components/corp-type-module'
