@@ -122,6 +122,16 @@ export async function submitSelectedMhr (
     }
   }
 
+  if (selected.length >= 75) {
+    if (!extraParams) {
+      extraParams += '?'
+    }
+    if (extraParams.length > 1) {
+      extraParams += '&'
+    }
+    extraParams += 'callbackURL=PPR_UI'
+  }
+
   return axios
     .post(`search-results/${searchId}${extraParams}`, selected, config)
     .then(response => {
