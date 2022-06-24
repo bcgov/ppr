@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded id="mhr-home-certification-form" class="mt-8 pa-8">
+  <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8">
     <v-row no-gutters>
       <v-col cols="12" sm="2">
         <label class="generic-label" :class="{'error-text': false}">Certification</label>

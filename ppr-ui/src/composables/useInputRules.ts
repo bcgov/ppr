@@ -25,6 +25,7 @@ export const useInputRules = () => {
     ]
   }
 
+  /** Create a custom rules array use predefined rules. **/
   const customRules = (...rules: any) => {
     return [].concat(...rules)
   }
