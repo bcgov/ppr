@@ -16,8 +16,6 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-// Events
-
 const addEditHomeSectionBtn = '.add-home-section-btn'
 const sectionCounter = '#section-count'
 const errorText = '.error-text'

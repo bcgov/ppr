@@ -6,87 +6,84 @@
       </v-col>
       <v-col cols="12" sm="10" class="pl-2">
         <v-radio-group
+          id="certification-option-btns"
           v-model="certificationOption"
           class="mt-0" row
           hide-details="true"
         >
           <v-radio
+            id="csa-option"
             class="csa-radio"
             label="CSA Number"
             :value="HomeCertificationOptions.CSA"
-            id="csa-option"
           />
           <v-radio
+            id="engineer-option"
             class="engineer-radio"
             label="Engineer's Inspection"
             :value="HomeCertificationOptions.ENGINEER_INSPECTION"
-            id="engineer-option"
           />
         </v-radio-group>
 
         <!-- CSA Section -->
         <template v-if="isCsaOption">
           <v-divider class="my-9 mx-0" />
-          <v-form>
-            <v-row no-gutters>
-              <v-col cols="12">
-                <v-form ref="csaForm" v-model="isCsaValid">
-                  <label class="generic-label" for="csa-number">CSA Number</label>
-                  <v-text-field
-                    filled
-                    id="csa-number"
-                    class="pt-4 pr-2"
-                    label="CSA Number"
-                    v-model="csaNumber"
-                    :rules="csaNumberRules"
-                  />
+          <v-row no-gutters>
+            <v-col cols="12">
+              <v-form id="csa-form" ref="csaForm" v-model="isCsaValid">
+                <label class="generic-label" for="csa-number">CSA Number</label>
+                <v-text-field
+                  filled
+                  id="csa-number"
+                  class="pt-4 pr-2"
+                  label="CSA Number"
+                  v-model="csaNumber"
+                  :rules="csaNumberRules"
+                />
 
-                  <label class="generic-label" for="csa-standard">CSA Standard</label>
-                  <v-select
-                    filled
-                    :items="csaStandardOptions"
-                    id="csa-standard"
-                    class="pt-4 pr-2"
-                    label="CSA Standard (Optional)"
-                    v-model="csaStandard"
-                  />
-                </v-form>
-              </v-col>
-            </v-row>
-          </v-form>
+                <label class="generic-label" for="csa-standard">CSA Standard</label>
+                <v-select
+                  filled
+                  :items="csaStandardOptions"
+                  id="csa-standard"
+                  class="pt-4 pr-2"
+                  label="CSA Standard (Optional)"
+                  v-model="csaStandard"
+                />
+              </v-form>
+            </v-col>
+          </v-row>
         </template>
 
         <!-- Engineer Section -->
         <template v-if="isEngineerOption">
           <v-divider class="my-9 mx-0" />
-          <v-form>
-            <v-row no-gutters>
-              <v-col cols="12">
-                <v-form ref="engineerForm" v-model="isEngineerValid">
-                  <label class="generic-label" for="engineer-name">Engineer's Name</label>
-                  <v-text-field
-                    filled
-                    id="engineer-name"
-                    class="pt-4 pr-2"
-                    label="Engineer's Name"
-                    v-model="engineerName"
-                    :rules="nameRules"
-                  />
+          <v-row no-gutters>
+            <v-col cols="12">
+              <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
+                <label class="generic-label" for="engineer-name">Engineer's Name</label>
+                <v-text-field
+                  filled
+                  id="engineer-name"
+                  class="pt-4 pr-2"
+                  label="Engineer's Name"
+                  v-model="engineerName"
+                  :rules="nameRules"
+                />
 
-                  <label class="generic-label" for="date-of-engineer-report">Date of Engineer's Report</label>
-                  <SharedDatePicker
-                    ref="datePicker"
-                    id="date-of-engineer-report"
-                    class="pt-4 pr-2"
-                    :minDate="minDate"
-                    :maxDate="today"
-                    :inputRules="required('Select a date of engineer\'s report')"
-                    @emitDate="engineerReportDate = $event "
-                  />
-                </v-form>
-              </v-col>
-            </v-row>
-          </v-form>
+                <label class="generic-label" for="date-of-engineer-report">Date of Engineer's Report</label>
+                <SharedDatePicker
+                  ref="datePicker"
+                  id="date-of-engineer-report"
+                  class="pt-4 pr-2"
+                  :minDate="minDate"
+                  :maxDate="today"
+                  :inputRules="required('Select a date of engineer\'s report')"
+                  @emitDate="engineerReportDate = $event "
+                />
+              </v-form>
+            </v-col>
+          </v-row>
         </template>
       </v-col>
     </v-row>
