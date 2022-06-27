@@ -565,7 +565,7 @@ export const homeSectionsTableHeaders: Array<BaseHeaderIF> = [
 
 export const homeSectionsReviewTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-lg',
+    class: 'column-mdl',
     sortable: false,
     text: 'Section',
     value: 'section'

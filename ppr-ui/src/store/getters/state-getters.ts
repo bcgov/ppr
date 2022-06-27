@@ -16,6 +16,7 @@ import {
   LengthTrustIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
+  MhrRegistrationDescriptionIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -629,4 +630,8 @@ export const getMhrRegistrationHomeModel = (state: StateIF): string => {
 
 export const getMhrRegistrationOtherInfo = (state: StateIF): string => {
   return state.stateModel.mhrRegistration.description.otherRemarks
+}
+
+export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrationDescriptionIF => {
+  return state.stateModel.mhrRegistration.description
 }

@@ -1,4 +1,4 @@
-import { HomeSectionIF } from '@/interfaces'
+import { MhrRegistrationDescriptionIF } from '@/interfaces'
 
 export interface MhrRegistrationIF {
   clientReferenceId: string,
@@ -43,20 +43,7 @@ export interface MhrRegistrationIF {
       postalCode: string
     }
   },
-  description: {
-    manufacturer: string,
-    baseInformation: {
-      year: number,
-      make: string,
-      model: string
-    },
-    sectionCount: number,
-    sections: Array<HomeSectionIF>,
-    csaNumber: number,
-    csaStandard: string,
-    rebuiltRemarks: string,
-    otherRemarks: string
-  },
+  description: MhrRegistrationDescriptionIF,
   notes: [
     {
       documentType: string,

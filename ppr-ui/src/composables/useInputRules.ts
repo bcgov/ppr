@@ -1,45 +1,40 @@
+/** Common Input Field Validation Functions. **/
 export const useInputRules = () => {
-  const optionalStringRules = (): Array<Function> => {
+  const maxLength = (maxLength: number): Array<Function> => {
+    return [
+      v => v.length <= maxLength || `Maximum ${maxLength} characters`
+    ]
+  }
+
+  const invalidSpaces = (): Array<Function> => {
     return [
       v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
       v => !/\s$/g.test(v) || 'Invalid spaces' // trailing spaces
     ]
   }
 
-  const requiredStringRules = (stringDescription: string): Array<Function> => {
+  const required = (stringDescription: string): Array<Function> => {
     return [
-      v => !!v || `A ${stringDescription} is required`,
-      v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
-      v => !/\s$/g.test(v) || 'Invalid spaces' // trailing spaces
+      v => !!v || `${stringDescription}`
     ]
   }
 
-  const optionalNumberRules = (): Array<Function> => {
+  const isNumber = (): Array<Function> => {
     return [
-      v => (v ? /^\d+$/g.test(v) : true) || 'Invalid characters',
-      v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
-      v => !/\s$/g.test(v) || 'Invalid spaces' // trailing spaces
+      v => (v ? /^\d+$/g.test(v) : true) || 'Invalid number'
     ]
   }
 
-  const requiredNumberRules = (numberDescription: string): Array<Function> => {
-    return [
-      v => !!v || `A ${numberDescription} is required`,
-      v => /^\d+$/g.test(v) || 'Invalid characters',
-      v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
-      v => !/\s$/g.test(v) || 'Invalid spaces' // trailing spaces
-    ]
-  }
-
-  const maxLengthRules = (maxLength: number): Array<Function> => {
-    return [v => v.length <= maxLength || `Maximum ${maxLength} characters`]
+  /** Create a custom rules array use predefined rules. **/
+  const customRules = (...rules: any) => {
+    return [].concat(...rules)
   }
 
   return {
-    optionalStringRules,
-    requiredStringRules,
-    optionalNumberRules,
-    requiredNumberRules,
-    maxLengthRules
+    customRules,
+    invalidSpaces,
+    required,
+    isNumber,
+    maxLength
   }
 }

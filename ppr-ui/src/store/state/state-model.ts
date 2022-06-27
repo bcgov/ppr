@@ -140,8 +140,11 @@ export const stateModel: StateModelIF = {
       },
       sectionCount: null,
       sections: [],
-      csaNumber: null,
+      csaNumber: '',
       csaStandard: '',
+      engineerName: '',
+      engineerReportDate: '',
+      certificationOption: null,
       rebuiltRemarks: '',
       otherRemarks: ''
     },

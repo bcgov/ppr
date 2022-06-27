@@ -14,7 +14,7 @@
             class="pt-4"
             label="Serial Number"
             v-model="serialNumber"
-            :rules="hasSubmit ? requiredStringRules('serial number') : []"
+            :rules="hasSubmit ? required('Enter a serial number') : []"
             persistent-hint
           />
 
@@ -26,7 +26,7 @@
               class="numberInput pr-2"
               label="Feet"
               v-model.number="lengthFeet"
-              :rules="hasSubmit ? requiredNumberRules('foot length') : []"
+              :rules="hasSubmit ? lengthFeetRules : []"
               persistent-hint
             />
             <v-text-field
@@ -35,7 +35,7 @@
               class="numberInput pl-2"
               label="Inches (Optional)"
               v-model.number="lengthInches"
-              :rules="hasSubmit ? optionalNumberRules() : []"
+              :rules="hasSubmit ? customRules(invalidSpaces(), isNumber()) : []"
               persistent-hint
             />
           </v-row>
@@ -48,7 +48,7 @@
               class="numberInput pr-2"
               label="Feet"
               v-model.number="widthFeet"
-              :rules="hasSubmit ? requiredNumberRules('foot width') : []"
+              :rules="hasSubmit ? widthFeetRules : []"
               persistent-hint
             />
             <v-text-field
@@ -57,7 +57,7 @@
               class="pl-2"
               label="Inches (Optional)"
               v-model.number="widthInches"
-              :rules="hasSubmit ? optionalNumberRules() : []"
+              :rules="hasSubmit ? customRules(invalidSpaces(), isNumber()) : []"
               persistent-hint
             />
           </v-row>
@@ -108,7 +108,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 /* eslint-disable no-unused-vars */
@@ -121,9 +121,10 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      requiredStringRules,
-      optionalNumberRules,
-      requiredNumberRules
+      required,
+      invalidSpaces,
+      isNumber,
+      customRules
     } = useInputRules()
 
     const localState = reactive({
@@ -133,7 +134,13 @@ export default defineComponent({
       lengthInches: props.editHomeSection?.lengthInches || null,
       widthFeet: props.editHomeSection?.widthFeet || null,
       widthInches: props.editHomeSection?.widthInches || null,
-      hasSubmit: false
+      hasSubmit: false,
+      lengthFeetRules: computed((): Array<Function> => {
+        return customRules(required('Enter a foot length'), invalidSpaces(), isNumber())
+      }),
+      widthFeetRules: computed((): Array<Function> => {
+        return customRules(required('Enter a foot width'), invalidSpaces(), isNumber())
+      })
     })
 
     const close = (): void => { context.emit('close') }
@@ -159,9 +166,10 @@ export default defineComponent({
       close,
       remove,
       submit,
-      requiredStringRules,
-      optionalNumberRules,
-      requiredNumberRules,
+      required,
+      invalidSpaces,
+      isNumber,
+      customRules,
       ...toRefs(localState)
     }
   }
