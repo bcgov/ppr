@@ -138,7 +138,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: APIMHRMapSearchTypes.MHROWNER_NAME,
     textLabel: '',
     hints: {
-      searchValueFirst: 'Owner names normally contain letters and numbers only'
+      searchValueFirst: ''
     },
     group: 2
   },
