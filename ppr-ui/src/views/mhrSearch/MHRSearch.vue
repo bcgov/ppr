@@ -4,7 +4,7 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <v-container class="container">
-      <b :class="$style['search-title']">Search Results</b>
+      <b :class="$style['search-title']">Selection List</b>
       <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
       </p>
