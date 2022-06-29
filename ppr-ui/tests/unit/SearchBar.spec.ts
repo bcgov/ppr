@@ -556,7 +556,7 @@ describe('Mhr Owner name search', () => {
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
-    expect(wrapper.find('.v-messages__message').exists()).toBe(true)
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
     await Vue.nextTick()
     await Vue.nextTick()
 
@@ -589,7 +589,7 @@ describe('Mhr Owner name search', () => {
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
-    expect(wrapper.find('.v-messages__message').exists()).toBe(true)
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
     await Vue.nextTick()
     await Vue.nextTick()
 
@@ -620,7 +620,7 @@ describe('Mhr Owner name search', () => {
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
     expect(wrapper.vm.$data.validations).toBeNull()
-    expect(wrapper.find('.v-messages__message').exists()).toBe(true)
+    expect(wrapper.find('.v-messages__message').exists()).toBe(false)
     await Vue.nextTick()
     await Vue.nextTick()
 
