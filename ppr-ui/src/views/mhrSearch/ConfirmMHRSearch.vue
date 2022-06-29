@@ -165,7 +165,7 @@ export default class ConfirmMHRSearch extends Vue {
   private validFolio = true
   private staffPaymentValid = false
   private validating = false
-  private curOption = StaffPaymentOptions.NONE
+  private paymentOption = StaffPaymentOptions.NONE
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -286,9 +286,9 @@ export default class ConfirmMHRSearch extends Vue {
     if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
       this.validating = true
     } else {
-      if (staffPaymentData.option !== this.curOption) {
+      if (staffPaymentData.option !== this.paymentOption) {
         this.validating = false
-        this.curOption = staffPaymentData.option
+        this.paymentOption = staffPaymentData.option
       }
     }
 
