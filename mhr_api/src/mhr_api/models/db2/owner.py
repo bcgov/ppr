@@ -15,11 +15,24 @@
 from enum import Enum
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 
 from .owngroup import Db2Owngroup
+
+
+OWNERS_QUERY = """
+select o.manhomid, o.owngrpid, o.ownerid, o.ownseqno, o.verified, o.ownrfone, o.ownrpoco, o.ownrname, o.ownrsuff,
+       o.ownraddr, og.copgrpid, og.grpseqno, og.status, og.pending, og.regdocid, og.candocid, og.tenytype,
+       og.lessee, og.lessor, og.interest, og.intnumer, og.tenyspec, o.ownrtype
+  from owner o, owngroup og
+ where o.manhomid = :query_value
+   and og.manhomid = o.manhomid
+   and o.owngrpid = og.owngrpid
+   and og.status in ('3', '4')
+"""
 
 
 class Db2Owner(db.Model):
@@ -84,6 +97,53 @@ class Db2Owner(db.Model):
                 owner.strip()
                 if owner.group_id and owner.group_id > 0:
                     owner.owngroup = Db2Owngroup.find_by_manuhome_id(owner.manuhome_id, owner.group_id)
+        return owners
+
+    @classmethod
+    def find_by_manuhome_id_registration(cls, manuhome_id: int):
+        """Return the owners matching the manuhome id."""
+        owners = None
+        rows = None
+        if manuhome_id and manuhome_id > 0:
+            try:
+                query = text(OWNERS_QUERY)
+                result = db.get_engine(current_app, 'db2').execute(query, {'query_value': manuhome_id})
+                rows = result.fetchall()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB2Owner.find_by_manuhome_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+        if rows is not None:
+            owners = []
+            for row in rows:
+                owner: Db2Owner = Db2Owner(manuhome_id=manuhome_id)
+                owngroup: Db2Owngroup = Db2Owngroup(manuhome_id=manuhome_id)
+                owner.group_id = int(row[1])
+                owner.owner_id = int(row[2])
+                owner.sequence_number = int(row[3])
+                owner.verified_flag = str(row[4])
+                owner.phone_number = str(row[5])
+                owner.postal_code = str(row[6])
+                owner.name = str(row[7])
+                owner.suffix = str(row[8])
+                owner.legacy_address = str(row[9])
+                owngroup.group_id = owner.group_id
+                owngroup.copy_id = int(row[10])
+                owngroup.sequence_number = int(row[11])
+                owngroup.status = str(row[12])
+                owngroup.pending_flag = str(row[13])
+                owngroup.reg_document_id = str(row[14])
+                owngroup.can_document_id = str(row[15])
+                owngroup.tenancy_type = str(row[16])
+                owngroup.lessee = str(row[17])
+                owngroup.lessor = str(row[18])
+                owngroup.interest = str(row[19])
+                owngroup.interest_numerator = int(row[20])
+                owngroup.tenancy_specified = str(row[21])
+                owner.owner_type = str(row[22])
+                owngroup.strip()
+                owner.strip()
+                owner.owngroup = owngroup
+                owners.append(owner)
         return owners
 
     @property

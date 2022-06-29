@@ -272,8 +272,11 @@ def format_ts(time_stamp):
     """Build a UTC ISO 8601 date and time string with no microseconds."""
     formatted_ts = None
     if time_stamp:
-        formatted_ts = time_stamp.replace(tzinfo=timezone.utc).replace(microsecond=0).isoformat()
-
+        try:
+            formatted_ts = time_stamp.replace(tzinfo=timezone.utc).replace(microsecond=0).isoformat()
+        except Exception as format_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('format_ts exception: ' + str(format_exception))
+            formatted_ts = time_stamp.isoformat()
     return formatted_ts
 
 
@@ -489,6 +492,50 @@ def get_compressed_key(name: str) -> str:
     if len(key) > 30:
         return key[0:30]
     return key
+
+
+def get_serial_number_key_hex(serial_num: str) -> str:
+    """Get the compressed search serial number key for the MH serial number."""
+    key: str = ''
+
+    if not serial_num:
+        return key
+    key = serial_num.strip().upper()
+    # 1. Remove all non-alphanumberic characters.
+    key = re.sub('[^0-9A-Z]+', '', key)
+    # current_app.logger.debug(f'1: key={key}')
+    # 2. Add 6 zeroes to the start of the serial number.
+    key = '000000' + key
+    # current_app.logger.debug(f'2: key={key}')
+    # 3. Determine the value of I as last position in the serial number that contains a numeric value.
+    last_pos: int = 0
+    for index, char in enumerate(key):
+        if char.isdigit():
+            last_pos = index
+    # current_app.logger.debug(f'3: last_pos={last_pos}')
+    # 4. Replace alphas with the corresponding integers:
+    # 08600064100100000050000042  where A=0, B=8, C=6…Z=2
+    key = key.replace('B', '8')
+    key = key.replace('C', '6')
+    key = key.replace('G', '6')
+    key = key.replace('H', '4')
+    key = key.replace('I', '1')
+    key = key.replace('L', '1')
+    key = key.replace('S', '5')
+    key = key.replace('Y', '4')
+    key = key.replace('Z', '2')
+    key = re.sub('[A-Z]', '0', key)
+    # current_app.logger.debug(f'4: key={key}')
+    # 5. Take 6 characters of the string beginning at position I – 5 and ending with the position determined by I
+    # in step 3.
+    start_pos = last_pos - 5
+    key = key[start_pos:(last_pos + 1)]
+    # current_app.logger.debug(f'5: key={key}')
+    # 6. Convert it to bytes and return the last 3.
+    key_bytes: bytes = int(key).to_bytes(3, 'big')
+    key_hex = key_bytes.hex().upper()
+    current_app.logger.debug(f'key={key} last 3 bytes={key_bytes} hex={key_hex}')
+    return key_hex
 
 
 def get_serial_number_key(serial_num: str) -> str:

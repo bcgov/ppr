@@ -106,8 +106,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         try:
             db.session.add(self)
             db.session.commit()
+            current_app.logger.debug('DB search_request.save completed')
         except Exception as db_exception:
-            current_app.logger.error('DB search_client save exception: ' + repr(db_exception))
+            current_app.logger.error('DB search_request save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
     def update_search_selection(self, search_json):
@@ -128,7 +129,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 status = 'EXEMPT'
             else:
                 status = 'HISTORIC'
+        # current_app.logger.info('Mapping timestamp')
         timestamp = row[3]
+        # current_app.logger.info('Timestamp mapped')
         value: str = str(row[8])
         year = int(value) if value.isnumeric() else 0
         result_json = {
@@ -141,8 +144,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 'year': year,
                 'make': str(row[9]).strip(),
                 'model': ''
-            }
+            },
+            'mhId': int(row[10])
         }
+        # current_app.logger.info(result_json)
         owner_type = str(row[4])
         owner_name = str(row[5]).strip()
         if owner_type != 'I':

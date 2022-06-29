@@ -61,13 +61,15 @@ TEST_DB2_ADDRESS = [
 ]
 # testdata pattern is ({serial_num}, {hex_value})
 TEST_DATA_SERIAL_KEY = [
-    ('WIN14569401627', '0620db'),
-    ('A4492', '00118c'),
-    ('3E3947', '04a34b'),
-    ('6436252B10FK', '03db8a'),
-    ('I1724B', '002dcc'),
-    ('2427', '00097b'),
-    ('123', '00007b')
+    ('WIN14569401627', '0620DB'),
+    ('A4492', '00118C'),
+    ('3E3947', '04A34B'),
+    ('6436252B10FK', '03DB8A'),
+    ('I1724B', '002DCC'),
+    ('2427', '00097B'),
+    ('123', '00007B'),
+    ('12345', '003039'),
+    ('999999', '0F423F')
 ]
 
 
@@ -88,10 +90,10 @@ def test_search_key_owner(name, key_value):
 @pytest.mark.parametrize('serial_num, hex_value', TEST_DATA_SERIAL_KEY)
 def test_search_key_serial(session, serial_num, hex_value):
     """Assert that computing a serial number search key works as expected."""
-    value = model_utils.get_serial_number_key(serial_num)
+    value = model_utils.get_serial_number_key_hex(serial_num)
     # current_app.logger.info(f'Key={value}')
-    assert len(value) == 3
-    assert value.hex() == hex_value
+    assert len(value) == 6
+    assert value == hex_value
 
 
 @pytest.mark.parametrize('street1, street2, city, region, address', TEST_DB2_ADDRESS)
