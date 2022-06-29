@@ -58,7 +58,9 @@ def post_searches():
         query: SearchRequest = SearchRequest.create_from_json(request_json, account_id,
                                                               g.jwt_oidc_token_info.get('username', None))
         # Execute the search query: treat no results as a success.
+        current_app.logger.debug('query.search() start')
         query.search()
+        current_app.logger.debug('query.search() end')
 
         # Now save the initial detail results in the search_result table with no
         # search selection criteria (the absence indicates an incomplete search).

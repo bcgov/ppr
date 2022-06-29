@@ -106,43 +106,62 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             return
 
         self.set_search_selection(search_select)
-        results = self.search_response
-        new_results = []
-        select_count = 0
-        for select in self.search_select:
-            if 'selected' not in select or select['selected']:
-                mhr_num = select['mhrNumber']
-                for result in results:
-                    if mhr_num == result['mhrNumber']:
-                        select_count += 1
-                        # Now if combined search add PPR MHR search financing statement info.
-                        if select.get('includeLienInfo', False):
-                            current_app.logger.info(f'Searching PPR for MHR num {mhr_num}.')
-                            ppr_registrations = SearchResult.search_ppr_by_mhr_number(mhr_num)
-                            result['pprRegistrations'] = ppr_registrations
-                        new_results.append(result)
-
+        detail_response['details'] = self.build_details()
         # current_app.logger.debug('saving updates')
         # Update summary information and save.
+        select_count = len(detail_response['details'])
         self.exact_match_count = select_count
         detail_response['totalResultsSize'] = select_count
-        detail_response['details'] = new_results
         self.search_response = detail_response
         if account_name:
             self.account_name = account_name
         if callback_url:
             self.callback_url = callback_url
         else:
-            results_length = len(json.dumps(new_results))
+            results_length = len(json.dumps(detail_response['details']))
             current_app.logger.debug(f'Search id= {self.search_id} results size={results_length}.')
             if results_length > current_app.config.get('MAX_SIZE_SEARCH_RT'):
                 current_app.logger.info(f'Search id={self.search_id} size exceeds RT max, setting up async report.')
                 self.callback_url = current_app.config.get('UI_SEARCH_CALLBACK_URL')
         self.save()
 
+    def build_details(self):
+        """Generate the search selection details."""
+        new_results = []
+        for select in self.search_select:
+            if 'selected' not in select or select['selected']:
+                mhr_num = select['mhrNumber']
+                found = False
+                if new_results:  # Check for duplicates.
+                    for match in new_results:
+                        if match['mhrNumber'] == mhr_num:
+                            found = True
+                if not found:  # No duplicates.
+                    # Load registration details here.
+                    current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_num} start')
+                    mh_id = select.get('mhId', None)
+                    record: Db2Manuhome = Db2Manuhome.find_by_id(mh_id)
+                    current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_num} end')
+                    result = record.registration_json
+                    if select.get('includeLienInfo', False):
+                        current_app.logger.info(f'Searching PPR for MHR num {mhr_num}.')
+                        ppr_registrations = SearchResult.search_ppr_by_mhr_number(mhr_num)
+                        result['pprRegistrations'] = ppr_registrations
+                    new_results.append(result)
+        return new_results
+
     def set_search_selection(self, update_select):
         """Sort the selection for the report TOC."""
-        self.search_select = SearchResult.__sort_mhr_number(update_select)
+        original_results = self.search.search_response
+        final_selection = []
+        for result in original_results:
+            for match in update_select:
+                if result['mhrNumber'] == match['mhrNumber']:
+                    if match.get('includeLienInfo', False):
+                        result['includeLienInfo'] = match.get('includeLienInfo')
+                    final_selection.append(result)
+                    break
+        self.search_select = SearchResult.__sort_mhr_number(final_selection)
 
     @classmethod
     def __sort_mhr_number(cls, update_select):
@@ -214,21 +233,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             return SearchResult.create_from_search_query_no_results(search_query)
 
         search_result = SearchResult(search_id=search_query.id, exact_match_count=0, similar_match_count=0)
-        query_results = search_query.search_response
+        # query_results = search_query.search_response
         detail_results = []
-        for result in query_results:
-            mhr_num = result['mhrNumber']
-            found = False
-            if detail_results:  # Check for duplicates.
-                for match in detail_results:
-                    if match['mhrNumber'] == mhr_num:
-                        found = True
-            if not found:  # No duplicates.
-                record: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
-                mhr_json = record.registration_json
-                # current_app.logger.debug(mhr_json)
-                detail_results.append(mhr_json)
-
         search_result.search_response = detail_results
         return search_result
 
@@ -239,13 +245,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         search.search_id = search_id
         search.search_select = search_json
         detail_results = []
-        for result in search_json:
-            mhr_num = result['mhrNumber']
-            record: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
-            mhr_json = record.registration_json
-            current_app.logger.debug(mhr_json)
-            detail_results.append(mhr_json)
-
         search.search_response = detail_results
         return search
 

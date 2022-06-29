@@ -213,12 +213,14 @@ def test_search_sort(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
 
     # test
     search_result: SearchResult = SearchResult()
+    search_request: SearchRequest = SearchRequest(search_response=select_data)
+    search_result.search = search_request
     search_result.set_search_selection(select_data)
     sorted_data = search_result.search_select
 
     # check
     assert len(sorted_data) == 4
-    assert select_data[0]['mhrNumber'] == '000199'
-    assert select_data[1]['mhrNumber'] == '001999'
-    assert select_data[2]['mhrNumber'] == '002200'
-    assert select_data[3]['mhrNumber'] == '022911'
+    assert sorted_data[0]['mhrNumber'] == '000199'
+    assert sorted_data[1]['mhrNumber'] == '001999'
+    assert sorted_data[2]['mhrNumber'] == '002200'
+    assert sorted_data[3]['mhrNumber'] == '022911'

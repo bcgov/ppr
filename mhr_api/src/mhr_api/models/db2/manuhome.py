@@ -80,22 +80,34 @@ class Db2Manuhome(db.Model):
         manuhome = None
         if id and id > 0:
             try:
+                current_app.logger.debug('Db2Manuhome.find_by_id query.')
                 manuhome = cls.query.get(id)
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
         if manuhome:
-            manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
-            manuhome.reg_owners = Db2Owner.find_by_manuhome_id(manuhome.id)
+            current_app.logger.debug('Db2Manuhome.find_by_id Db2Document query.')
+            documents = []
+            doc = Db2Document.find_by_doc_id(manuhome.reg_document_id)
+            if doc:
+                documents.append(doc)
+            manuhome.reg_documents = documents
+            current_app.logger.debug('Db2Manuhome.find_by_id Db2Owner query.')
+            manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
+            current_app.logger.debug('Db2Manuhome.find_by_id Db2Descript query.')
             manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
+            current_app.logger.debug('Db2Manuhome.find_by_id Db2Location query.')
             manuhome.reg_location = Db2Location.find_by_manuhome_id_active(manuhome.id)
+            current_app.logger.debug('Db2Manuhome.find_by_id Db2Mhomnote query.')
             manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id_active(manuhome.id)
+            current_app.logger.debug('Db2Manuhome.find_by_id completed.')
         return manuhome
 
     @classmethod
     def find_by_mhr_number(cls, mhr_number: str):
         """Return the MH registration matching the MHR number."""
         manuhome = None
+        current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_number}.')
         if mhr_number:
             try:
                 manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
@@ -109,11 +121,17 @@ class Db2Manuhome(db.Model):
                                                                         mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
+        current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Document query.')
         manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
+        current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Owner query.')
         manuhome.reg_owners = Db2Owner.find_by_manuhome_id(manuhome.id)
+        current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Descript query.')
         manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
+        current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Location query.')
         manuhome.reg_location = Db2Location.find_by_manuhome_id_active(manuhome.id)
+        current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Mhomnote query.')
         manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id_active(manuhome.id)
+        current_app.logger.debug('Db2Manuhome.find_by_mhr_number completed.')
         return manuhome
 
     @property

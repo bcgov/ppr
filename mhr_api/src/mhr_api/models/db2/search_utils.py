@@ -40,7 +40,7 @@ RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
 
 MHR_NUM_QUERY = """
 SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl
+       de.makemodl, mh.manhomid
   FROM manuhome mh, document d, owner o, location l, descript de
  WHERE mh.mhregnum = :query_value
    AND mh.mhregnum = d.mhregnum
@@ -65,7 +65,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
 --          FROM owner o2
 --         WHERE o2.manhomid = mh.manhomid) as owner_names, 
        l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl
+       de.makemodl, mh.manhomid
   FROM manuhome mh, document d, owner o, location l, descript de, cmpserno c
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -80,14 +80,13 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
                        WHERE mh.manhomid = og2.manhomid
                          AND og2.status IN ('3', '4'))
   AND mh.manhomid = c.manhomid
-  AND (c.serialno = :query_value OR
-       de.sernumb1 = :serial_value)
+  AND HEX(c.serialno) = :query_value
 ORDER BY d.regidate ASC
 """
 
 OWNER_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
-       de.yearmade, de.makemodl
+       de.yearmade, de.makemodl, mh.manhomid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -100,13 +99,13 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND o.compname LIKE :query_value || '%'
    AND o.manhomid = og.manhomid
    AND o.owngrpid = og.owngrpid
-   AND og.status IN ('3', '4')
+   AND og.status IN ('3', '4', '5')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
 
 ORG_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
-       de.yearmade, de.makemodl
+       de.yearmade, de.makemodl, mh.manhomid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -119,9 +118,10 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND o.compname LIKE :query_value || '%'
    AND o.manhomid = og.manhomid
    AND o.owngrpid = og.owngrpid
-   AND og.status IN ('3', '4')
+   AND og.status IN ('3', '4', '5')
 ORDER BY o.ownrname ASC, d.regidate ASC
 """
+
 
 def search_by_mhr_number(current_app, db, request_json):
      """Execute a DB2 search by mhr number query."""
@@ -169,13 +169,11 @@ def search_by_owner_name(current_app, db, request_json):
 def search_by_serial_number(current_app, db, request_json):
      """Execute a DB2 search by serial number query."""
      serial_num:str = request_json['criteria']['value']
-     serial_key = model_utils.get_serial_number_key(serial_num)  # serial_num.upper().strip()
+     serial_key = model_utils.get_serial_number_key_hex(serial_num)  # serial_num.upper().strip()
      current_app.logger.debug(f'DB2 search_by_serial_number search value={serial_num}, key={serial_key}.')
      try:
           query = text(SERIAL_NUM_QUERY)
-          result = db.get_engine(current_app, 'db2').execute(query,
-                                                             {'query_value': serial_key,
-                                                              'serial_value': serial_num.strip()})
+          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': serial_key})
           return result
      except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_serial_number exception: ' + str(db_exception))

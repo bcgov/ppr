@@ -151,8 +151,10 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         try:
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
+            current_app.logger.debug('SearchResult.update_selection start')
             search_detail.update_selection(request_json, account_name, callback_url)
             query.save()
+            current_app.logger.debug('SearchResult.update_selection end')
         except Exception as db_exception:   # noqa: B902; handle all db related errors.
             current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, str(db_exception)))
             if invoice_id is not None:
