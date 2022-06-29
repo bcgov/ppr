@@ -63,7 +63,7 @@ import { getFeatureFlag, navigate } from '@/utils'
     SearchedResultMhr
   }
 })
-export default class Search extends Vue {
+export default class MHRSearch extends Vue {
   @Getter getSearchDebtorName: IndividualNameIF
   @Getter getManufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF
   @Getter getSearchedValue: string

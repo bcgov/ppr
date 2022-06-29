@@ -29,6 +29,7 @@ import {
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { mutateMhrHomeDescription } from '@/store/mutations'
 
 export const resetNewRegistration: ActionIF = ({ commit }): void => {
   commit('mutateNewRegistration')
@@ -288,10 +289,6 @@ export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean)
   commit('mutateUnsavedChanges', unsavedChanges)
 }
 
-export const setHomeSections: ActionIF = ({ commit }, homeSections: Array<HomeSectionIF>): void => {
-  commit('mutateHomeSections', homeSections)
-}
-
 // MHR Registration
 export const setMhrRegistrationManufacturerName: ActionIF = ({ commit }, name: string): void => {
   commit('mutateMhrRegistrationManufacturerName', name)
@@ -309,10 +306,6 @@ export const setMhrRegistrationHomeModel: ActionIF = ({ commit }, model: string)
   commit('mutateMhrRegistrationHomeModel', model)
 }
 
-export const setMhrRegistrationOtherInfo: ActionIF = ({ commit }, info: string): void => {
-  commit('mutateMhrRegistrationOtherInfo', info)
-}
-
-export const setMhrHomeCertification: ActionIF = ({ commit }, { key, value }): void => {
-  commit('mutateMhrHomeCertification', { key, value })
+export const setMhrHomeDescription: ActionIF = ({ commit }, { key, value }): void => {
+  commit('mutateMhrHomeDescription', { key, value })
 }

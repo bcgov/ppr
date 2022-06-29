@@ -89,6 +89,10 @@ tbody {
   transform: translateY(-8px) scale(0.75);
 }
 
+.v-input textarea, .v-input input {
+  color: $gray7 !important;
+}
+
 .registrationTypeAhead.theme--light.v-text-field--filled .v-input__control .v-input__slot {
   background-color: white;
 }
@@ -487,10 +491,10 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   padding-left: 28px !important;
 }
 
-#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td, 
-#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th, 
-#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td, 
-#registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td, 
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+#registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
+#registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > td,
+#registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > td,
 #registration-table.v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
   font-size: 0.875rem !important;
   padding: 0;
@@ -526,7 +530,7 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   font-size: 0.875rem;
 }
 
-.column-selection .v-list-item--dense .v-list-item__title, 
+.column-selection .v-list-item--dense .v-list-item__title,
 .column-selection  .v-list--dense .v-list-item .v-list-item__title {
   line-height: 1.2;
 }

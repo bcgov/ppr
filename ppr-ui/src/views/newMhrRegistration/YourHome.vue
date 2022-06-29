@@ -27,19 +27,21 @@
 
     <section id="mhr-rebuilt-status" class="mt-10">
       <h2>Rebuilt Status</h2>
+      <p class="mt-2">
+        If the home was rebuilt, include the description of the changes to the home (normally accompanied by a statutory
+        declaration).
+      </p>
 
-      <v-card flat class="mt-5">
-        <span>REBUILT STATUS PLACEHOLDER</span>
-      </v-card>
+      <RebuiltStatus class="mt-6" :class="{ 'border-error-left': false }" />
     </section>
 
     <section id="mhr-other-information" class="mt-10">
       <h2>Other Information</h2>
-      <p class="mt-2 mb-6">
+      <p class="mt-2">
         Include an other relevant information about the home.
       </p>
 
-      <OtherInformation :class="{ 'border-error-left': false }"/>
+      <OtherInformation class="mt-6" :class="{ 'border-error-left': false }" />
     </section>
   </div>
 </template>
@@ -50,6 +52,7 @@ import {
   HomeCertification,
   HomeSections,
   ManufacturerMakeModel,
+  RebuiltStatus,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
 
@@ -58,6 +61,7 @@ import {
     HomeCertification,
     HomeSections,
     ManufacturerMakeModel,
+    RebuiltStatus,
     OtherInformation
   }
 })

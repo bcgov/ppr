@@ -135,7 +135,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
     StaffPaymentComponent
   }
 })
-export default class ConfirmDischarge extends Vue {
+export default class ConfirmMHRSearch extends Vue {
   @Getter getStateModel: StateModelIF
   @Getter isSearchCertified!: boolean
   @Getter isRoleStaffBcol: boolean

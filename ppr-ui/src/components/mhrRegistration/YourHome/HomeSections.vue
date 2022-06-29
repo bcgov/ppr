@@ -57,6 +57,7 @@ import {
 } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
+import { setMhrHomeDescription } from '@/store/actions'
 export default defineComponent({
   name: 'HomeSections',
   components: {
@@ -71,9 +72,9 @@ export default defineComponent({
   },
   setup () {
     const {
-      setHomeSections
+      setMhrHomeDescription
     } = useActions<any>([
-      'setHomeSections'
+      'setMhrHomeDescription'
     ])
     const {
       getMhrHomeSections
@@ -101,7 +102,7 @@ export default defineComponent({
       const homeSections = [...getMhrHomeSections.value]
       // Add new home section to array
       homeSections.push(homeSection)
-      setHomeSections(homeSections)
+      setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
     const editHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
@@ -110,13 +111,13 @@ export default defineComponent({
       // Apply edited section to temp array
       homeSections[homeSection.id] = editedSection
 
-      setHomeSections(homeSections)
+      setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
     const removeHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
       // Remove home section from array
       homeSections.splice(homeSections.indexOf(homeSection), 1)
-      setHomeSections(homeSections)
+      setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
     return {
       addHomeSection,

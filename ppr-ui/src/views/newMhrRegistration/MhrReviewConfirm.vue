@@ -95,6 +95,20 @@
             <v-divider />
           </div>
 
+          <!-- Rebuilt Status Review -->
+          <v-row no-gutters class="pa-6">
+            <v-col cols="3">
+              <h3>Rebuilt Status</h3>
+            </v-col>
+            <v-col cols="9">
+              <p>{{ getMhrRegistrationHomeDescription.rebuiltRemarks || '(Not Entered)' }}</p>
+            </v-col>
+          </v-row>
+
+          <div class="px-4">
+            <v-divider />
+          </div>
+
           <!-- Other Information Review -->
           <v-row no-gutters class="pa-6">
             <v-col cols="3">

@@ -29,7 +29,7 @@
         </tr>
         <!-- Table Rows -->
         <tr v-else :key="row.item.id">
-          <td>{{ homeSections.indexOf(row.item) + 1 }}</td>
+          <td :class="{ 'pl-0': isReviewMode }">{{ homeSections.indexOf(row.item) + 1 }}</td>
           <td>{{ row.item.serialNumber }}</td>
           <td>{{ row.item.lengthFeet }} feet {{ row.item.lengthInches ? row.item.lengthInches + ' inches' : '' }}</td>
           <td>{{ row.item.widthFeet }} feet {{ row.item.widthInches ? row.item.widthInches + ' inches' : '' }}</td>
