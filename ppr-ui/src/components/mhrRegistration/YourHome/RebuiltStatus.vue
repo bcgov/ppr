@@ -10,8 +10,8 @@
             filled
             id="rebuilt-status-text"
             counter="280"
-            v-model="rebuiltRemarks"
-            :rules="maxLength(280)"
+            v-model.trim="rebuiltRemarks"
+            :rules="customRules(invalidSpaces(), maxLength(280))"
             label="Description of the rebuilt status of the home (Optional)"
           ></v-textarea>
         </v-col>
@@ -30,7 +30,7 @@ export default defineComponent({
   components: {},
   props: {},
   setup () {
-    const { maxLength } = useInputRules()
+    const { customRules, maxLength, invalidSpaces } = useInputRules()
 
     const { getMhrRegistrationHomeDescription } = useGetters<any>([
       'getMhrRegistrationHomeDescription'
@@ -52,7 +52,7 @@ export default defineComponent({
       }
     )
 
-    return { maxLength, ...toRefs(localState) }
+    return { customRules, invalidSpaces, maxLength, ...toRefs(localState) }
   }
 })
 </script>
