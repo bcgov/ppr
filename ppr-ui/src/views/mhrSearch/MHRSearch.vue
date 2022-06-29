@@ -12,13 +12,12 @@
         <v-row no-gutters class="mt-6">
           <v-col class="pr-6" :class="$style['search-info']">
             <span v-if="totalResultsLength !== 0" id="results-info">
-              Select the manufactured home to download the full details of the home. Selecting the home will debit
-              your search fee from your BC Online account. The downloaded report will contain the full record of
-              the registration for the home and will be automatically saved to your dashboard.
+              Select the manufactured home to download the full details of the home. Selecting the home will debit your
+              search fee. The downloaded report will contain the full record of the registration for the home and will
+              be automatically saved to your dashboard for up to 14 days.
             </span>
             <span v-else id="no-results-info">
-              No Registrations were found. A printable PDF search result report and a general record of your search
-              will be saved to your Personal Property Registry dashboard.
+              No Registrations were found.
             </span>
           </v-col>
         </v-row>
