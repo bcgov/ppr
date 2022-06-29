@@ -207,6 +207,9 @@ export default defineComponent({
         } else {
           newGeneralCollateral.push(amendedGC)
         }
+        if (localState.addDesc === '' && localState.delDesc === '') { // remove empty collateral altogether
+          newGeneralCollateral.pop()
+        }
         setGeneralCollateral(newGeneralCollateral)
       }
       emit('closeGenColAmend', true)
