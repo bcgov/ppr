@@ -57,30 +57,30 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
                          AND og2.status IN ('3', '4'))
 """
 
-# Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
+# Example if changing to include all owner names.
+#       (SELECT LISTAGG(o2.ownrname, ',')
+#          FROM owner o2
+#        WHERE o2.manhomid = mh.manhomid) as owner_names, 
 SERIAL_NUM_QUERY = """
-SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype,
-       o.ownrname,
---       (SELECT LISTAGG(o2.ownrname, ',')
---          FROM owner o2
---         WHERE o2.manhomid = mh.manhomid) as owner_names, 
+SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
+       (SELECT o.ownrtype || o.ownrname
+          FROM owner o, owngroup og
+         WHERE mh.manhomid = o.manhomid
+           AND mh.manhomid = og.manhomid
+           AND o.owngrpid = og.owngrpid
+           AND og.status IN ('3', '4')
+           FETCH FIRST 1 ROWS ONLY) AS owner_info,
        l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl, mh.manhomid
-  FROM manuhome mh, document d, owner o, location l, descript de, cmpserno c
+       de.makemodl, mh.manhomid, c.cmpserid, de.sernumb2, de.sernumb3, de.sernumb4
+  FROM manuhome mh, document d, location l, descript de, cmpserno c
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
-   AND mh.manhomid = o.manhomid
-   AND o.ownerid = 1
-   AND o.owngrpid IN (SELECT MIN(og2.owngrpid)
-                        FROM owngroup og2
-                       WHERE mh.manhomid = og2.manhomid
-                         AND og2.status IN ('3', '4'))
-  AND mh.manhomid = c.manhomid
-  AND HEX(c.serialno) = :query_value
+   AND mh.manhomid = c.manhomid
+   AND HEX(c.serialno) = :query_value
 ORDER BY d.regidate ASC
 """
 

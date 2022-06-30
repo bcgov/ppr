@@ -156,6 +156,52 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
         return result_json
 
+    @classmethod
+    def __build_search_result_serial(cls, row):
+        """Build a single search summary json from a DB row for a serial number search."""
+        status = 'ACTIVE'
+        mh_status = str(row[1])
+        exempt = str(row[2])
+        if mh_status != 'R':
+            if exempt and exempt != 'N':
+                status = 'EXEMPT'
+            else:
+                status = 'HISTORIC'
+        # current_app.logger.info('Mapping timestamp')
+        timestamp = row[3]
+        # current_app.logger.info('Timestamp mapped')
+        value: str = str(row[7])
+        year = int(value) if value.isnumeric() else 0
+        result_json = {
+            'mhrNumber': str(row[0]),
+            'status': status,
+            'createDateTime': model_utils.format_ts(timestamp),
+            'homeLocation': str(row[5]).strip(),
+            'serialNumber': str(row[6]).strip(),
+            'baseInformation': {
+                'year': year,
+                'make': str(row[8]).strip(),
+                'model': ''
+            },
+            'mhId': int(row[9])
+        }
+        # current_app.logger.info(result_json)
+        owner_info = str(row[4])
+        owner_type = owner_info[0:1]
+        owner_name = owner_info[1:].strip()
+        if owner_type != 'I':
+            result_json['organizationName'] = owner_name
+        else:
+            result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+        serial_index = int(row[10])
+        if serial_index == 2:
+            result_json['serialNumber'] = str(row[11]).strip()
+        elif serial_index == 3:
+            result_json['serialNumber'] = str(row[12]).strip()
+        elif serial_index == 4:
+            result_json['serialNumber'] = str(row[13]).strip()
+        return result_json
+
     def search_by_mhr_number_db2(self):
         """Execute a search by mhr number query."""
         result = db2_search_utils.search_by_mhr_number(current_app, db, self.request_json)
@@ -233,7 +279,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             for row in rows:
                 # result = SearchRequest.__build_search_result(row)
                 # current_app.logger.debug(result)
-                results_json.append(SearchRequest.__build_search_result(row))
+                results_json.append(SearchRequest.__build_search_result_serial(row))
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json
