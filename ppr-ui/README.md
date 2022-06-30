@@ -1,8 +1,6 @@
-# ppr-ui
-
+# ppr-u
 ## Project setup
-```
-npm install
+```npm install
 ```
 
 ### Compiles and hot-reloads for development
@@ -20,7 +18,7 @@ npm run build
 npm run test:unit
 ```
 
-d### Lints and fixes files
+### Lints and fixes files
 ```
 npm run lint
 ```
