@@ -56,7 +56,7 @@
               <staff-payment-component
                 id="staff-payment-dialog"
                 :staffPaymentData="staffPaymentData"
-                :validate="true"
+                :validate="validating||showErrors"
                 :displaySideLabel="true"
                 :displayPriorityCheckbox="true"
                 :invalidSection="showErrorAlert"
@@ -164,6 +164,8 @@ export default class ConfirmMHRSearch extends Vue {
   private submitting = false
   private validFolio = true
   private staffPaymentValid = false
+  private validating = false
+  private paymentOption = StaffPaymentOptions.NONE
 
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -236,6 +238,8 @@ export default class ConfirmMHRSearch extends Vue {
   }
 
   private async submit (): Promise<void> {
+    this.validating = true
+    await Vue.nextTick()
     if (!this.validFolio || (this.getIsStaffClientPayment && !this.staffPaymentValid)) {
       this.showErrors = true
       document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
@@ -274,9 +278,18 @@ export default class ConfirmMHRSearch extends Vue {
   }
 
   /** Called when component's staff payment data has been updated. */
-  private onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
+  private onStaffPaymentDataUpdate (val: StaffPaymentIF) {
     let staffPaymentData: StaffPaymentIF = {
       ...val
+    }
+
+    if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
+      this.validating = true
+    } else {
+      if (staffPaymentData.option !== this.paymentOption) {
+        this.validating = false
+        this.paymentOption = staffPaymentData.option
+      }
     }
 
     // disable validation

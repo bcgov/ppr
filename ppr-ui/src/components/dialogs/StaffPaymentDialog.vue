@@ -7,7 +7,7 @@
     <template v-slot:content>
       <staff-payment-component
         :staffPaymentData="staffPaymentData"
-        :validate="true"
+        :validate="validating"
         :displaySideLabel="false"
         :displayPriorityCheckbox="false"
         @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
@@ -81,6 +81,7 @@ export default defineComponent({
     const localState = reactive({
       certify: false,
       valid: false,
+      validating: false,
       paymentOption: StaffPaymentOptions.NONE,
       display: computed(() => {
         return props.setDisplay
@@ -137,6 +138,15 @@ export default defineComponent({
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
         ...val
+      }
+
+      if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
+        localState.validating = true
+      } else {
+        if (localState.paymentOption !== staffPaymentData.option) {
+          localState.validating = false
+          localState.paymentOption = staffPaymentData.option
+        }
       }
 
       // disable validation
