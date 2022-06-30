@@ -115,7 +115,7 @@
               <h3>Other Information</h3>
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationOtherInfo || '(Not Entered)' }}</p>
+              <p v-html="getMhrRegistrationOtherInfo.replace(/\r?\n/g, '<br />') || '(Not Entered)'"></p>
             </v-col>
           </v-row>
         </div>

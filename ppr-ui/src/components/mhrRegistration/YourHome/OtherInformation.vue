@@ -10,7 +10,7 @@
             id="other-remarks"
             v-model="otherRemarks"
             filled
-            :rules="maxLength(140)"
+            :rules="customRules(isEmpty(), maxLength(140))"
             name="name"
             counter="140"
             label="Other details about the home (Optional)"
@@ -30,7 +30,7 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
-    const { maxLength } = useInputRules()
+    const { maxLength, customRules, isEmpty } = useInputRules()
 
     const { getMhrRegistrationOtherInfo } = useGetters<any>([
       'getMhrRegistrationOtherInfo'
@@ -52,7 +52,7 @@ export default defineComponent({
       }
     )
 
-    return { maxLength, ...toRefs(localState) }
+    return { maxLength, customRules, isEmpty, ...toRefs(localState) }
   }
 })
 </script>
