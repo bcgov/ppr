@@ -468,6 +468,9 @@ export default defineComponent({
             resp = await search(getSearchApiParams(), '')
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
+            // If SBC Staff - is always a search on clients behalf
+            if (localState.isStaffSbc) setIsStaffClientPayment(true)
+
             setSelectedManufacturedHomes([])
             setFolioOrReferenceNumber(localState.folioNumber)
             resp = await mhrSearch(getSearchApiParams(), '')
