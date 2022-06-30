@@ -13,6 +13,7 @@
             v-model.trim="rebuiltRemarks"
             :rules="customRules(invalidSpaces(), maxLength(280))"
             label="Description of the rebuilt status of the home (Optional)"
+            validate-on-blur
           ></v-textarea>
         </v-col>
       </v-row>
