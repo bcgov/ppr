@@ -1,4 +1,5 @@
-# ppr-u
+# ppr-ui
+
 ## Project setup
 ```npm install
 ```
