@@ -186,13 +186,13 @@ export default defineComponent({
     const onSubmitForm = () => {
       const newGeneralCollateral = localState.generalCollateral
 
-      if (localState.addDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.addDesc = ''
-      if (localState.delDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.delDesc = ''
-      const amendedGC = {
-        descriptionAdd: localState.addDesc,
-        descriptionDelete: localState.delDesc
-      }
       if (localState.addDesc || localState.delDesc) {
+        if (localState.addDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.addDesc = ''
+        if (localState.delDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.delDesc = ''
+        const amendedGC = {
+          descriptionAdd: localState.addDesc,
+          descriptionDelete: localState.delDesc
+        }
         if (newGeneralCollateral.length > 0) {
           // if there is no general collateral at the end of the array with a blank date time,
           // we know we are adding
@@ -206,6 +206,9 @@ export default defineComponent({
           }
         } else {
           newGeneralCollateral.push(amendedGC)
+        }
+        if (localState.addDesc === '' && localState.delDesc === '') { // remove empty collateral altogether
+          newGeneralCollateral.pop()
         }
         setGeneralCollateral(newGeneralCollateral)
       }
