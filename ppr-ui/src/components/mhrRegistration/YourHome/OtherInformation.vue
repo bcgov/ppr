@@ -8,9 +8,9 @@
         <v-col cols="10">
           <v-textarea
             id="other-remarks"
-            v-model="otherRemarks"
+            v-model.trim="otherRemarks"
             filled
-            :rules="customRules(isEmpty(), maxLength(140))"
+            :rules="maxLength(140)"
             name="name"
             counter="140"
             label="Other details about the home (Optional)"
@@ -30,7 +30,7 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
-    const { maxLength, customRules, isEmpty } = useInputRules()
+    const { maxLength } = useInputRules()
 
     const { getMhrRegistrationOtherInfo } = useGetters<any>([
       'getMhrRegistrationOtherInfo'
@@ -52,7 +52,7 @@ export default defineComponent({
       }
     )
 
-    return { maxLength, customRules, isEmpty, ...toRefs(localState) }
+    return { maxLength, ...toRefs(localState) }
   }
 })
 </script>
