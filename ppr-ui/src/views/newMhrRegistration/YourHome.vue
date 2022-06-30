@@ -11,7 +11,8 @@
 
     <section id="mhr-home-sections" class="mt-10">
       <h2>Home Sections</h2>
-      <p class="mt-2">Add the Serial Number and dimensions for each section of the home.</p>
+      <p class="mt-2">Add the Serial Number and dimensions for each section of the home. You can include up to four
+      sections in a home.</p>
 
       <HomeSections />
     </section>

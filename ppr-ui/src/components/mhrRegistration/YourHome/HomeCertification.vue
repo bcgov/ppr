@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8">
+  <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8 pr-6">
     <v-row no-gutters>
       <v-col cols="12" sm="2">
         <label class="generic-label" :class="{'error-text': false}">Certification</label>
@@ -15,12 +15,14 @@
             id="csa-option"
             class="csa-radio"
             label="CSA Number"
+            active-class="selected-radio"
             :value="HomeCertificationOptions.CSA"
           />
           <v-radio
             id="engineer-option"
             class="engineer-radio"
             label="Engineer's Inspection"
+            active-class="selected-radio"
             :value="HomeCertificationOptions.ENGINEER_INSPECTION"
           />
         </v-radio-group>
@@ -78,7 +80,10 @@
                   class="pt-4 pr-2"
                   :minDate="minDate"
                   :maxDate="today"
-                  :inputRules="required('Select a date of engineer\'s report')"
+                  :title="'Date of Engineer\'s Report'"
+                  :nudge-top="180"
+                  :nudge-right="150"
+                  :inputRules="engineerReportDate ? required('Select a date of engineer\'s report'): []"
                   @emitDate="engineerReportDate = $event "
                 />
               </v-form>
@@ -153,8 +158,7 @@ export default defineComponent({
         return customRules(
           required('Enter a CSA number'),
           maxLength(10),
-          invalidSpaces(),
-          isNumber()
+          invalidSpaces()
         )
       }),
       isHomeCertificationValid: computed((): boolean => {
@@ -230,5 +234,32 @@ export default defineComponent({
   height: 60px;
   padding: 10px;
   margin-right: 0px !important;
+}
+.selected-radio {
+  border: 1px solid $app-blue;
+  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+    color: $gray9 !important;
+  }
+}
+
+::v-deep {
+  .theme--light.v-select .v-select__selection--comma {
+    color: $gray9;
+  }
+  .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
+    color: $gray7;
+  }
+  .v-list-item--link[aria-selected='true'] {
+    background-color: $blueSelected !important;
+    .v-list-item__title, .v-list-item .v-list-item__subtitle {
+      color: $app-blue !important;
+    }
+  }
+  .v-list-item--link:hover {
+    background-color: $gray1 !important;
+    .v-list-item__title, .v-list-item .v-list-item__subtitle {
+      color: $app-blue !important;
+    }
+  }
 }
 </style>

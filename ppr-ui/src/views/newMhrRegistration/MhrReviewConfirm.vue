@@ -57,10 +57,10 @@
                   <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
                 </v-col>
                 <v-col cols="3" class="pt-1">
-                  <h3>Date of Engineer's<br>Report</h3>
+                  <h3>Date of Engineer's Report</h3>
                 </v-col>
                 <v-col cols="9" class="pt-1">
-                  <p>{{ getMhrRegistrationHomeDescription.engineerReportDate || '(Not Entered)' }}</p>
+                  <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
                 </v-col>
               </v-row>
             </template>
@@ -85,9 +85,9 @@
 
           <!-- Home Sections Review -->
           <template>
-            <section class="py-6" id="review-home-sections">
-              <h3 class="px-7">Home Sections</h3>
-              <HomeSections class=" mt-n4 px-7 py-0" :isReviewMode="true" />
+            <section class="pt-6" id="review-home-sections">
+              <h3 class="px-6">Home Sections</h3>
+              <HomeSections class="mt-n4 px-6 py-0" :isReviewMode="true" />
             </section>
           </template>
 
@@ -155,11 +155,12 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Mixins, Vue } from 'vue-property-decorator'
 import { HomeSections } from '@/components/mhrRegistration/YourHome'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { Getter } from 'vuex-class'
 import { MhrRegistrationDescriptionIF } from '@/interfaces'
+import { DateMixin } from '@/mixins'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -167,7 +168,7 @@ import { MhrRegistrationDescriptionIF } from '@/interfaces'
     HomeSections
   }
 })
-export default class MhrReviewConfirm extends Vue {
+export default class MhrReviewConfirm extends Mixins(DateMixin) {
   @Getter getMhrRegistrationOtherInfo!: string
   @Getter getMhrRegistrationHomeDescription!: MhrRegistrationDescriptionIF
 
@@ -180,6 +181,10 @@ export default class MhrReviewConfirm extends Vue {
 
   private get isEngineerInspection (): boolean {
     return this.getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.ENGINEER_INSPECTION
+  }
+
+  private get engineerDisplayDate (): string {
+    return this.yyyyMmDdToPacificDate(this.getMhrRegistrationHomeDescription.engineerReportDate, true)
   }
 }
 </script>

@@ -6,6 +6,12 @@ export const useInputRules = () => {
     ]
   }
 
+  const isStringOrNumber = (): Array<Function> => {
+    return [
+      v => (v ? /^[a-zA-Z0-9_ ]*$/g.test(v) : true) || 'Invalid characters'
+    ]
+  }
+
   const invalidSpaces = (): Array<Function> => {
     return [
       v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
@@ -19,9 +25,13 @@ export const useInputRules = () => {
     ]
   }
 
-  const isNumber = (): Array<Function> => {
+  const isNumber = (numberType: string, maxDigits: number = null, maxValue: number = null): Array<Function> => {
+    const maxDigitRule = new RegExp(`^\\d{1,${maxDigits}}$`)
+
     return [
-      v => (v ? /^\d+$/g.test(v) : true) || 'Invalid number'
+      v => (v ? /^\d+$/g.test(v) : true) || `${numberType} must be a valid whole number (cannot contain decimals)`,
+      v => ((v && maxDigits) ? maxDigitRule.test(v) : true) || `Maximum ${maxDigits} characters`,
+      v => ((v && maxValue) ? v < maxValue : true) || `${numberType} must be less than ${maxValue}`
     ]
   }
 
@@ -33,6 +43,7 @@ export const useInputRules = () => {
   return {
     customRules,
     invalidSpaces,
+    isStringOrNumber,
     required,
     isNumber,
     maxLength

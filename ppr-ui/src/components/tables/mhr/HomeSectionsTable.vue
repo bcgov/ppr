@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded>
+  <v-card flat rounded class="mt-2">
     <v-data-table
       id="mh-home-sections-table"
       class="home-sections-table"
@@ -31,18 +31,24 @@
         <tr v-else :key="row.item.id">
           <td>{{ homeSections.indexOf(row.item) + 1 }}</td>
           <td>{{ row.item.serialNumber }}</td>
-          <td>{{ row.item.lengthFeet }} feet {{ row.item.lengthInches ? row.item.lengthInches + ' inches' : '' }}</td>
-          <td>{{ row.item.widthFeet }} feet {{ row.item.widthInches ? row.item.widthInches + ' inches' : '' }}</td>
-          <td v-if="!isReviewMode">
+          <td>
+            {{ row.item.lengthFeet }} <span class="pr-1">feet</span>
+            {{ row.item.lengthInches ? row.item.lengthInches + ' inches' : '0 inches' }}
+          </td>
+          <td>
+            {{ row.item.widthFeet }} <span class="pr-1">feet</span>
+            {{ row.item.widthInches ? row.item.widthInches + ' inches' : '0 inches' }}
+          </td>
+          <td v-if="!isReviewMode" class="text-right pr-3">
             <v-btn
-              text small
+              text
               color="primary"
-              class="ml-n2"
+              class="px-0"
               :disabled="isAdding || isEditing"
               @click="activeIndex = homeSections.indexOf(row.item)"
             >
               <v-icon small>mdi-pencil</v-icon>
-              <span class="ml-1">Edit</span>
+              <span>Edit</span>
             </v-btn>
 
             <!-- Actions drop down menu -->
@@ -53,10 +59,10 @@
                   small
                   v-on="on"
                   color="primary"
-                  class="smaller-actions actions__more-actions__btn"
                   :disabled="isAdding || isEditing"
                 >
-                  <v-icon>mdi-menu-down</v-icon>
+                  <v-divider class="ma-0" vertical />
+                  <v-icon class="pl-2">mdi-menu-down</v-icon>
                 </v-btn>
               </template>
 
@@ -65,7 +71,7 @@
                 <v-list-item class="my-n2">
                   <v-list-item-subtitle class="pa-0" @click="remove(row.item)">
                     <v-icon small>mdi-delete</v-icon>
-                    <span class="ml-1">Remove</span>
+                    <span class="ml-1 remove-btn-text">Remove</span>
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>
@@ -135,14 +141,25 @@ td {
   cursor: pointer;
 }
 ::v-deep {
+  .v-data-table--fixed-header > .v-data-table__wrapper {
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+  }
   .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
     padding: 15px 28px;
   }
   .v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-    padding: 0 28px;
+    padding: 20px 28px;
   }
   .add-edit-form-cell {
     padding: 0 !important;
+  }
+  .v-btn.v-btn--disabled {
+    color: $app-blue !important;
+    opacity: .4;
+  }
+  .v-list-item .v-list-item__title, .v-list-item .v-list-item__subtitle {
+    line-height: 1.6 !important;
   }
 }
 </style>
