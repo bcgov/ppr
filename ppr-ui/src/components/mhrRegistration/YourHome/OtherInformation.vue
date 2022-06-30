@@ -27,6 +27,7 @@
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables/useInputRules'
+import { toHtml } from '@/utils'
 
 export default defineComponent({
   setup () {
@@ -48,7 +49,7 @@ export default defineComponent({
     watch(
       () => localState.otherRemarks,
       (val: string) => {
-        setMhrHomeDescription({ key: 'otherRemarks', value: val })
+        setMhrHomeDescription({ key: 'otherRemarks', value: toHtml(val) })
       }
     )
 

@@ -115,7 +115,7 @@
               <h3>Other Information</h3>
             </v-col>
             <v-col cols="9">
-              <p v-html="toHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+              <p v-html="getMhrRegistrationOtherInfo || '(Not Entered)'"></p>
             </v-col>
           </v-row>
         </div>
@@ -189,7 +189,6 @@ export default class MhrReviewConfirm extends Vue {
 
   private HomeCertificationOptions = HomeCertificationOptions
   private RouteNames = RouteNames
-  private toHtml = toHtml
 
   private yyyyMmDdToPacificDate = yyyyMmDdToPacificDate
 
