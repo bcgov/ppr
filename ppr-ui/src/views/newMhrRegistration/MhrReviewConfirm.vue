@@ -155,12 +155,12 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { Component, Mixins, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { HomeSections } from '@/components/mhrRegistration/YourHome'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { Getter } from 'vuex-class'
 import { MhrRegistrationDescriptionIF } from '@/interfaces'
-import { DateMixin } from '@/mixins'
+import { useDateHelper } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -168,12 +168,15 @@ import { DateMixin } from '@/mixins'
     HomeSections
   }
 })
-export default class MhrReviewConfirm extends Mixins(DateMixin) {
+export default class MhrReviewConfirm extends Vue {
   @Getter getMhrRegistrationOtherInfo!: string
   @Getter getMhrRegistrationHomeDescription!: MhrRegistrationDescriptionIF
 
   private HomeCertificationOptions = HomeCertificationOptions
   private RouteNames = RouteNames
+
+  // Composables
+  private yyyyMmDdToPacificDate = useDateHelper().yyyyMmDdToPacificDate
 
   private get isCSA (): boolean {
     return this.getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.CSA

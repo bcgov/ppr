@@ -91,6 +91,7 @@ export const useDateHelper = () => {
 
   return {
     createUtcDate,
-    dateToYyyyMmDd
+    dateToYyyyMmDd,
+    yyyyMmDdToPacificDate
   }
 }
