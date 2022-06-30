@@ -8,7 +8,13 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { YourHome } from '@/views'
-import { HomeSections } from '@/components/mhrRegistration'
+import {
+  HomeCertification,
+  HomeSections,
+  ManufacturerMakeModel,
+  RebuiltStatus,
+  OtherInformation
+} from '@/components/mhrRegistration'
 import { MhrRegistrationType } from '@/resources'
 import { defaultFlagSet } from '@/utils'
 import mockRouter from './MockRouter'
@@ -67,10 +73,14 @@ describe('Your Home', () => {
 
   it('renders and displays the correct headers and sub components', async () => {
     expect(wrapper.find('#mhr-make-model h2').text()).toBe('Manufacturer, Make, and Model')
+    expect(wrapper.findComponent(ManufacturerMakeModel).exists()).toBe(true)
     expect(wrapper.find('#mhr-home-sections h2').text()).toBe('Home Sections')
     expect(wrapper.findComponent(HomeSections).exists()).toBe(true)
     expect(wrapper.find('#mhr-home-certification h2').text()).toBe('Home Certification')
+    expect(wrapper.findComponent(HomeCertification).exists()).toBe(true)
     expect(wrapper.find('#mhr-rebuilt-status h2').text()).toBe('Rebuilt Status')
+    expect(wrapper.findComponent(RebuiltStatus).exists()).toBe(true)
     expect(wrapper.find('#mhr-other-information h2').text()).toBe('Other Information')
+    expect(wrapper.findComponent(OtherInformation).exists()).toBe(true)
   })
 })

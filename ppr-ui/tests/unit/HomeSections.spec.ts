@@ -43,7 +43,7 @@ describe('Home Sections', () => {
 
   beforeEach(async () => {
     // Set home sections default
-    await store.dispatch('setHomeSections', [])
+    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: [] })
 
     wrapper = createComponent()
   })
@@ -85,7 +85,7 @@ describe('Home Sections', () => {
 
   it('counts the added Home Sections', async () => {
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 0')
-    await store.dispatch('setHomeSections', mockedHomeSections)
+    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: mockedHomeSections })
 
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 4')
   })
@@ -96,7 +96,7 @@ describe('Home Sections', () => {
     expect(wrapper.find(errorText).exists()).toBe(false)
 
     // Set homeSections
-    await store.dispatch('setHomeSections', mockedHomeSections)
+    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: mockedHomeSections })
 
     // Verify sections added
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 4')

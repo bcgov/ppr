@@ -3,7 +3,7 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import { getTestId } from '../utils'
+import { getTestId } from './utils'
 import { OtherInformation } from '@/components/mhrRegistration'
 
 Vue.use(Vuetify)

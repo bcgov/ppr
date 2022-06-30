@@ -36,8 +36,8 @@ export default defineComponent({
       'getMhrRegistrationOtherInfo'
     ])
 
-    const { setMhrRegistrationOtherInfo } = useActions<any>([
-      'setMhrRegistrationOtherInfo'
+    const { setMhrHomeDescription } = useActions<any>([
+      'setMhrHomeDescription'
     ])
 
     const localState = reactive({
@@ -48,7 +48,7 @@ export default defineComponent({
     watch(
       () => localState.otherRemarks,
       (val: string) => {
-        setMhrRegistrationOtherInfo(val)
+        setMhrHomeDescription({ key: 'otherRemarks', value: val })
       }
     )
 
@@ -59,8 +59,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-::v-deep .other-info {
-  color: $gray7;
-}
 </style>

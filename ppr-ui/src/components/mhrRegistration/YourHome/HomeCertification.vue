@@ -106,9 +106,9 @@ export default defineComponent({
   props: {},
   setup (props, context) {
     const {
-      setMhrHomeCertification
+      setMhrHomeDescription
     } = useActions<any>([
-      'setMhrHomeCertification'
+      'setMhrHomeDescription'
     ])
     const {
       getMhrRegistrationHomeDescription
@@ -174,19 +174,19 @@ export default defineComponent({
 
     /** Apply local models to store when they change. **/
     watch(() => localState.certificationOption, () => {
-      setMhrHomeCertification({ key: 'certificationOption', value: localState.certificationOption })
+      setMhrHomeDescription({ key: 'certificationOption', value: localState.certificationOption })
     })
     watch(() => localState.csaNumber, () => {
-      setMhrHomeCertification({ key: 'csaNumber', value: localState.csaNumber })
+      setMhrHomeDescription({ key: 'csaNumber', value: localState.csaNumber })
     })
     watch(() => localState.csaStandard, () => {
-      setMhrHomeCertification({ key: 'csaStandard', value: localState.csaStandard })
+      setMhrHomeDescription({ key: 'csaStandard', value: localState.csaStandard })
     })
     watch(() => localState.engineerName, () => {
-      setMhrHomeCertification({ key: 'engineerName', value: localState.engineerName })
+      setMhrHomeDescription({ key: 'engineerName', value: localState.engineerName })
     })
     watch(() => localState.engineerReportDate, () => {
-      setMhrHomeCertification({ key: 'engineerReportDate', value: localState.engineerReportDate })
+      setMhrHomeDescription({ key: 'engineerReportDate', value: localState.engineerReportDate })
     })
 
     /** Clear/reset forms when select option changes. **/
