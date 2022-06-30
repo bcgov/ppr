@@ -3,7 +3,6 @@
 ## Project setup
 ```
 npm install
-
 ```
 
 ### Compiles and hot-reloads for development
@@ -21,7 +20,7 @@ npm run build
 npm run test:unit
 ```
 
-### Lints and fixes files
+d### Lints and fixes files
 ```
 npm run lint
 ```
