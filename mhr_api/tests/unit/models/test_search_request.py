@@ -167,6 +167,10 @@ TEST_MHR_NUMBER_DATA = [
     ('1232', '001232'),
     ('01232', '001232')
 ]
+# testdata pattern is ({search_value}, {count}, {mhr_num}, {serial1}, {serial2}, {serial3}, {serial4})
+TEST_SERIAL_NUMBER_DATA = [
+    ('123ABC', 13, '089036', '123A', '123B', '123C', '123D')
+]
 
 
 def test_search_no_account(session):
@@ -273,3 +277,31 @@ def test_search_mhr_number(session, mhr_number, expected_number):
     # current_app.logger.debug(result)
     assert len(result['results']) >= 1
     assert result['results'][0]['mhrNumber'] == expected_number
+
+
+@pytest.mark.parametrize('search_value,count,mhr_num,serial1,serial2,serial3,serial4', TEST_SERIAL_NUMBER_DATA)
+def test_search_serial(session, search_value, count, mhr_num, serial1, serial2, serial3, serial4):
+    """Assert that a valid search returns the expected serial number search result."""
+    test_data = copy.deepcopy(SERIAL_NUMBER_JSON)
+    test_data['criteria']['value'] = search_value
+
+    query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
+    query.search()
+    assert not query.updated_selection
+    result = query.json
+    current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
+    assert query.id
+    assert len(result['results']) >= count
+    match_count = 0
+    for match in result['results']:
+        if match['mhrNumber'] == mhr_num:
+            match_count += 1
+            if match_count == 1:
+                assert match['serialNumber'] == serial1
+            elif match_count == 2:
+                assert match['serialNumber'] == serial2
+            elif match_count == 3:
+                assert match['serialNumber'] == serial3
+            elif match_count == 4:
+                assert match['serialNumber'] == serial4
+    assert match_count == 4
