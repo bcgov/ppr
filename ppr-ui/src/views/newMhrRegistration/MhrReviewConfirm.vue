@@ -160,7 +160,7 @@ import { HomeSections } from '@/components/mhrRegistration/YourHome'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { Getter } from 'vuex-class'
 import { MhrRegistrationDescriptionIF } from '@/interfaces'
-import { useDateHelper } from '@/composables'
+import { yyyyMmDdToPacificDate } from '@/utils'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -175,8 +175,7 @@ export default class MhrReviewConfirm extends Vue {
   private HomeCertificationOptions = HomeCertificationOptions
   private RouteNames = RouteNames
 
-  // Composables
-  private yyyyMmDdToPacificDate = useDateHelper().yyyyMmDdToPacificDate
+  private yyyyMmDdToPacificDate = yyyyMmDdToPacificDate
 
   private get isCSA (): boolean {
     return this.getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.CSA

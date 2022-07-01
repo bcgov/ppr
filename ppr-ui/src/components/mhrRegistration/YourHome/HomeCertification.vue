@@ -100,8 +100,9 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
-import { useDateHelper, useInputRules } from '@/composables'
+import { useInputRules } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import { createUtcDate, dateToYyyyMmDd } from '@/utils'
 
 export default defineComponent({
   name: 'HomeCertification',
@@ -122,12 +123,10 @@ export default defineComponent({
     ])
 
     // Composable(s)
-    const { createUtcDate, dateToYyyyMmDd } = useDateHelper()
     const {
       customRules,
       invalidSpaces,
       maxLength,
-      isNumber,
       required
     } = useInputRules()
 
