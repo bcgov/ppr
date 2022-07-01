@@ -3,7 +3,7 @@
     <v-row v-if="!isReviewMode" no-gutters>
       <v-btn
         outlined
-        class=" my-1 add-home-section-btn"
+        class="mt-1 add-home-section-btn"
         color="primary"
         :ripple="false"
         :disabled="showAddEditHomeSections || isEditingHomeSection"
@@ -14,6 +14,13 @@
       <span v-if="displayHomeSectionsError && isMaxHomeSections" class="pl-7 pt-4 error-text">
         Your registration cannot contain more than four sections
       </span>
+    </v-row>
+
+    <v-row no-gutters class="mt-6">
+      <p v-if="!isReviewMode" id="section-count">Number of Sections: {{getMhrHomeSections.length}}</p>
+      <span v-if="false && hasMinimumHomeSections" class="pl-4 error-text">
+          Your registration must contain at least one section
+        </span>
     </v-row>
 
     <!-- Add New Home Section Form -->
@@ -27,23 +34,15 @@
     </v-expand-transition>
 
     <!-- Home Sections Table -->
-    <article class="mt-6">
-      <v-row no-gutters>
-        <p v-if="!isReviewMode" id="section-count">Number of Sections: {{getMhrHomeSections.length}}</p>
-        <span v-if="false && hasMinimumHomeSections" class="pl-4 error-text">
-          Your registration must contain at least one section
-        </span>
-      </v-row>
-      <HomeSectionsTable
-        :class="{ 'border-error-left': false }"
-        :isAdding="showAddEditHomeSections"
-        :homeSections="getMhrHomeSections"
-        :isReviewMode="isReviewMode"
-        @isEditing="isEditingHomeSection = $event"
-        @edit="editHomeSection($event)"
-        @remove="removeHomeSection($event)"
-      />
-    </article>
+    <HomeSectionsTable
+      :class="{ 'border-error-left': false }"
+      :isAdding="showAddEditHomeSections"
+      :homeSections="getMhrHomeSections"
+      :isReviewMode="isReviewMode"
+      @isEditing="isEditingHomeSection = $event"
+      @edit="editHomeSection($event)"
+      @remove="removeHomeSection($event)"
+    />
   </div>
 </template>
 
@@ -96,6 +95,7 @@ export default defineComponent({
     const openAddNewHomeSectionForm = (): void => {
       if (!localState.isMaxHomeSections) {
         localState.showAddEditHomeSections = true
+        localState.displayHomeSectionsError = false
       } else localState.displayHomeSectionsError = true
     }
     const addHomeSection = (homeSection: HomeSectionIF): void => {

@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded id="add-edit-home-sections-form" class="mt-8 pa-8">
+  <v-card flat rounded id="add-edit-home-sections-form" class="mt-2 mb-5 pa-7">
     <v-form ref="addEditHomeSectionsForm" v-model="addEditValid">
       <v-row no-gutters>
         <v-col cols="12" sm="2">
@@ -14,52 +14,64 @@
             class="pt-4"
             label="Serial Number"
             v-model="serialNumber"
-            :rules="hasSubmit ? required('Enter a serial number') : []"
+            :rules="serialNumberRules"
             persistent-hint
           />
 
           <label class="generic-label">Length</label>
           <v-row no-gutters class="pt-4">
-            <v-text-field
-              filled
-              id="length-feet"
-              class="numberInput pr-2"
-              label="Feet"
-              v-model.number="lengthFeet"
-              :rules="hasSubmit ? lengthFeetRules : []"
-              persistent-hint
-            />
-            <v-text-field
-              filled
-              id="length-inches"
-              class="numberInput pl-2"
-              label="Inches (Optional)"
-              v-model.number="lengthInches"
-              :rules="hasSubmit ? customRules(invalidSpaces(), isNumber()) : []"
-              persistent-hint
-            />
+            <v-col>
+              <v-text-field
+                filled
+                id="length-feet"
+                class="numberInput pr-2"
+                label="Feet"
+                v-model.number="lengthFeet"
+                :rules="lengthFeetRules"
+                persistent-hint
+                @keydown.space.prevent
+              />
+            </v-col>
+            <v-col>
+              <v-text-field
+                filled
+                id="length-inches"
+                class="numberInput pl-2"
+                label="Inches (Optional)"
+                v-model.number="lengthInches"
+                :rules="isNumber('Inches', 2, 12)"
+                persistent-hint
+                @keydown.space.prevent
+              />
+            </v-col>
           </v-row>
 
           <label class="generic-label">Width</label>
           <v-row no-gutters class="pt-4">
-            <v-text-field
-              filled
-              id="width-feet"
-              class="numberInput pr-2"
-              label="Feet"
-              v-model.number="widthFeet"
-              :rules="hasSubmit ? widthFeetRules : []"
-              persistent-hint
-            />
-            <v-text-field
-              filled
-              id="numberInput width-inches"
-              class="pl-2"
-              label="Inches (Optional)"
-              v-model.number="widthInches"
-              :rules="hasSubmit ? customRules(invalidSpaces(), isNumber()) : []"
-              persistent-hint
-            />
+            <v-col>
+              <v-text-field
+                filled
+                id="width-feet"
+                class="numberInput pr-2"
+                label="Feet"
+                v-model.number="widthFeet"
+                :rules="widthFeetRules"
+                persistent-hint
+                @keydown.space.prevent
+              />
+            </v-col>
+            <v-col>
+              <v-text-field
+                filled
+                id="numberInput width-inches"
+                class="pl-2"
+                label="Inches (Optional)"
+                v-model.number="widthInches"
+                :rules="(isNumber('Inches', 2, 12))"
+                persistent-hint
+                @keydown.space.prevent
+              />
+            </v-col>
           </v-row>
 
           <!-- Action buttons -->
@@ -121,10 +133,12 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      required,
+      customRules,
       invalidSpaces,
+      isStringOrNumber,
       isNumber,
-      customRules
+      maxLength,
+      required
     } = useInputRules()
 
     const localState = reactive({
@@ -135,11 +149,21 @@ export default defineComponent({
       widthFeet: props.editHomeSection?.widthFeet || null,
       widthInches: props.editHomeSection?.widthInches || null,
       hasSubmit: false,
+      serialNumberRules: computed((): Array<Function> => {
+        let rules = customRules(isStringOrNumber(), maxLength(20))
+        // Only validate required on submission
+        if (localState.hasSubmit) rules = customRules(...rules, required('Enter a serial number'))
+        return rules
+      }),
       lengthFeetRules: computed((): Array<Function> => {
-        return customRules(required('Enter a foot length'), invalidSpaces(), isNumber())
+        let rules = customRules(isNumber('Feet', 2))
+        if (localState.hasSubmit) rules = customRules(...rules, required('Enter a foot length'))
+        return rules
       }),
       widthFeetRules: computed((): Array<Function> => {
-        return customRules(required('Enter a foot width'), invalidSpaces(), isNumber())
+        let rules = customRules(isNumber('Feet', 2))
+        if (localState.hasSubmit) rules = customRules(...rules, required('Enter a foot width'))
+        return rules
       })
     })
 
@@ -152,7 +176,7 @@ export default defineComponent({
 
       if (localState.addEditValid) {
         context.emit('submit', {
-          serialNumber: localState.serialNumber,
+          serialNumber: localState.serialNumber.replace(/\s/g, ''),
           lengthFeet: localState.lengthFeet,
           lengthInches: localState.lengthInches,
           widthFeet: localState.widthFeet,
@@ -170,6 +194,7 @@ export default defineComponent({
       invalidSpaces,
       isNumber,
       customRules,
+      maxLength,
       ...toRefs(localState)
     }
   }
