@@ -11,7 +11,7 @@ export const useInputRules = () => {
       v => (v ? /^[a-zA-Z0-9_ ]*$/g.test(v) : true) || 'Invalid characters'
     ]
   }
-  
+
   // check if entire value has empty spaces
   const isEmpty = (): Array<Function> => {
     return [
