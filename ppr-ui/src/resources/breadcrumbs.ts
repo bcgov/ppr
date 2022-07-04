@@ -95,7 +95,7 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Search Results'
+    text: 'Selection List'
   }
 ]
 export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
@@ -112,7 +112,7 @@ export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'mhr/search',
-    text: 'Search Results'
+    text: 'Selection List'
   },
   {
     disabled: true,
