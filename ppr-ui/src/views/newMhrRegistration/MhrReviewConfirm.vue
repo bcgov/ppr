@@ -175,7 +175,6 @@ import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { Getter } from 'vuex-class'
 import { MhrRegistrationDescriptionIF } from '@/interfaces'
 import { yyyyMmDdToPacificDate } from '@/utils'
-import { toHtml } from '@/utils'
 /* eslint-enable no-unused-vars */
 
 @Component({
