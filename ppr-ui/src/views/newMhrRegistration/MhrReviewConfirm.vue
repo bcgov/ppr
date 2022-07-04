@@ -115,7 +115,7 @@
               <h3>Other Information</h3>
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationOtherInfo || '(Not Entered)' }}</p>
+              <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
             </v-col>
           </v-row>
         </div>
@@ -174,7 +174,8 @@ import { HomeSections } from '@/components/mhrRegistration/YourHome'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { Getter } from 'vuex-class'
 import { MhrRegistrationDescriptionIF } from '@/interfaces'
-import { yyyyMmDdToPacificDate } from '@/utils'
+import { yyyyMmDdToPacificDate, formatAsHtml } from '@/utils'
+
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -188,6 +189,7 @@ export default class MhrReviewConfirm extends Vue {
 
   private HomeCertificationOptions = HomeCertificationOptions
   private RouteNames = RouteNames
+  private formatAsHtml = formatAsHtml
 
   private yyyyMmDdToPacificDate = yyyyMmDdToPacificDate
 

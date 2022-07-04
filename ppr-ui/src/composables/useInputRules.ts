@@ -12,6 +12,13 @@ export const useInputRules = () => {
     ]
   }
 
+  // check if entire value has empty spaces
+  const isEmpty = (): Array<Function> => {
+    return [
+      v => !/^\s+$/g.test(v) || 'Invalid spaces'
+    ]
+  }
+
   const invalidSpaces = (): Array<Function> => {
     return [
       v => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
@@ -42,6 +49,7 @@ export const useInputRules = () => {
 
   return {
     customRules,
+    isEmpty,
     invalidSpaces,
     isStringOrNumber,
     required,

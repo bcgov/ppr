@@ -8,7 +8,7 @@
         <v-col cols="10">
           <v-textarea
             id="other-remarks"
-            v-model="otherRemarks"
+            v-model.trim="otherRemarks"
             filled
             :rules="maxLength(140)"
             name="name"
