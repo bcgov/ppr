@@ -183,6 +183,8 @@ export default class LengthTrust extends Vue {
       case APIRegistrationTypes.SCHOOL_ACT:
       case APIRegistrationTypes.PROPERTY_TRANSFER_TAX:
       case APIRegistrationTypes.MINERAL_LAND_TAX:
+      case APIRegistrationTypes.TOBACCO_TAX:
+      case APIRegistrationTypes.SPECULATION_VACANCY_TAX:
         return (
           'The registration length for this registration is automatically set to infinite. ' +
           'There is no fee for this registration.'

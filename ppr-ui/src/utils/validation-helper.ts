@@ -306,7 +306,9 @@ export function isSecuredPartyRestrictedList (regType: string): boolean {
     APIRegistrationTypes.CROWN_CONSUMPTION_TRANSITION_TAX,
     APIRegistrationTypes.CROWN_HOTEL_ROOM_TAX,
     APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
-    APIRegistrationTypes.TRANSITION_TAX_LIEN
+    APIRegistrationTypes.TRANSITION_TAX_LIEN,
+    APIRegistrationTypes.TOBACCO_TAX,
+    APIRegistrationTypes.SPECULATION_VACANCY_TAX
   ]
   // @ts-ignore - it doesn't like the string comparison for some reason
   if (restrictedList.includes(regType)) {
