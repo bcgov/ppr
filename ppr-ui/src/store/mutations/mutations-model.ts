@@ -29,6 +29,7 @@ import {
   HomeSectionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { set } from 'lodash'
 
 export const mutateAccountProductSubscribtion = (
   state: StateIF, productSubscriptions: AccountProductSubscriptionIF
@@ -371,4 +372,8 @@ export const mutateMhrRegistrationHomeModel = (state: StateIF, model: string) =>
 
 export const mutateMhrHomeDescription = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.description[key] = value
+}
+
+export const mutateMhrRegistration = (state: StateIF, { key, value }) => {
+  set(state.stateModel.mhrRegistration, key, value)
 }
