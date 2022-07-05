@@ -45,7 +45,7 @@
             class="float-left"
             data-test-id="circa-year-checkbox"
           />
-           <v-tooltip
+          <v-tooltip
             top
             content-class="top-tooltip pa-5"
             transition="fade-transition"
@@ -55,7 +55,9 @@
               <v-icon
                 class="circa-tooltip-icon ml-2 mt-n1"
                 color="primary"
-                v-on="on">mdi-information-outline</v-icon>
+                v-on="on"
+                >mdi-information-outline</v-icon
+              >
             </template>
             When the exact year of manufacture is unknown, enter an estimated
             year and indicate that the year is approximate.
@@ -102,66 +104,83 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs,
+  watch,
+} from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
-    const { customRules, required, minLength, maxLength, startsWith, graterThan, isNumber } = useInputRules()
+    const {
+      customRules,
+      required,
+      minLength,
+      maxLength,
+      startsWith,
+      graterThan,
+      isNumber,
+    } = useInputRules()
 
     const {
       getMhrRegistrationManufacturerName,
       getMhrRegistrationYearOfManufacture,
       getMhrRegistrationIsYearApproximate,
       getMhrRegistrationHomeMake,
-      getMhrRegistrationHomeModel
+      getMhrRegistrationHomeModel,
     } = useGetters<any>([
       'getMhrRegistrationManufacturerName',
       'getMhrRegistrationYearOfManufacture',
       'getMhrRegistrationIsYearApproximate',
       'getMhrRegistrationHomeMake',
-      'getMhrRegistrationHomeModel'
+      'getMhrRegistrationHomeModel',
     ])
 
-    const {
-      setMhrHomeDescription,
-      setMhrHomeBaseInformation
-    } = useActions<any>([
-      'setMhrHomeDescription',
-      'setMhrHomeBaseInformation'
-    ])
+    const { setMhrHomeDescription, setMhrHomeBaseInformation } = useActions<
+      any
+    >(['setMhrHomeDescription', 'setMhrHomeBaseInformation'])
 
-    const manufactureYearRules = computed((): Array<Function> =>
-      customRules(
-        required('Enter a year of manufacture'),
-        isNumber(),
-        minLength(4, true),
-        maxLength(4, true),
-        startsWith(['19', '20'], 'Year must begin with 19 or 20'),
-        graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future')
-      )
+    const manufactureYearRules = computed(
+      (): Array<Function> =>
+        customRules(
+          required('Enter a year of manufacture'),
+          isNumber(),
+          minLength(4, true),
+          maxLength(4, true),
+          startsWith(['19', '20'], 'Year must begin with 19 or 20'),
+          graterThan(
+            new Date().getFullYear() + 1,
+            'Year cannot be more than 1 year in the future'
+          )
+        )
     )
 
     const combinedMakeModelLengthRule = (localState): Array<Function> => {
       return [
-        () => (0 || localState.model.length) + (0 || localState.make.length) <= 65 ||
-          'Make and Model combined cannot exceed 65 characters'
+        () =>
+          (0 || localState.model.length) + (0 || localState.make.length) <=
+            65 || 'Make and Model combined cannot exceed 65 characters',
       ]
     }
 
-    const makeRules = computed((): Array<Function> =>
-      customRules(
-        required('Enter a make'),
-        combinedMakeModelLengthRule(localState)
-      )
+    const makeRules = computed(
+      (): Array<Function> =>
+        customRules(
+          required('Enter a make'),
+          combinedMakeModelLengthRule(localState)
+        )
     )
 
-    const modelRules = computed((): Array<Function> =>
-      customRules(
-        required('Enter a model'),
-        combinedMakeModelLengthRule(localState)
-      )
+    const modelRules = computed(
+      (): Array<Function> =>
+        customRules(
+          required('Enter a model'),
+          combinedMakeModelLengthRule(localState)
+        )
     )
 
     const localState = reactive({
@@ -169,7 +188,7 @@ export default defineComponent({
       yearOfManufacture: getMhrRegistrationYearOfManufacture.value,
       circa: getMhrRegistrationIsYearApproximate.value,
       make: getMhrRegistrationHomeMake.value,
-      model: getMhrRegistrationHomeModel.value
+      model: getMhrRegistrationHomeModel.value,
     })
 
     watch(
@@ -213,9 +232,9 @@ export default defineComponent({
       modelRules,
       maxLength,
       graterThan,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 
