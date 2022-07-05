@@ -133,6 +133,24 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 1,
+    registrationTypeUI: UIRegistrationTypes.SPECULATION_VACANCY_TAX,
+    registrationTypeAPI: APIRegistrationTypes.SPECULATION_VACANCY_TAX,
+    text: `${UIRegistrationTypes.SPECULATION_VACANCY_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
+    registrationTypeUI: UIRegistrationTypes.TOBACCO_TAX,
+    registrationTypeAPI: APIRegistrationTypes.TOBACCO_TAX,
+    text: `${UIRegistrationTypes.TOBACCO_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
     registrationTypeUI: UIRegistrationTypes.OTHER,
     registrationTypeAPI: APIRegistrationTypes.OTHER,
     text: `${UIRegistrationTypes.OTHER}`
