@@ -179,7 +179,7 @@ class Db2Owner(db.Model):
         if self.owngroup:
             owner['type'] = self.owngroup.tenancy_type
             if self.owngroup.status == '3':
-                owner['status'] = 'ACTVIE'
+                owner['status'] = 'ACTIVE'
             elif self.owngroup.status == '4':
                 owner['status'] = 'EXEMPT'
             else:
