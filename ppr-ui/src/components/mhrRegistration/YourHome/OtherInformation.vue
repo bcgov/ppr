@@ -14,7 +14,7 @@
             name="name"
             counter="140"
             label="Other details about the home (Optional)"
-            class="other-info"
+            class="other-info pl-1"
             data-test-id="otherRemarks"
           ></v-textarea>
         </v-col>
