@@ -23,5 +23,6 @@
   "POD_NAMESPACE": "dev",
   "ADDRESS_COMPLETE_KEY": "",
   "SYSTEM_MESSAGE": "<a style='text-decoration: underline; color:inherit;' href='https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/permits-licences/news-updates/modernization/personal-property-registry-transition' target='_blank'>See known issues and updates for Personal Property Registry here</a>.",
-  "SYSTEM_MESSAGE_TYPE": "warning"
+  "SYSTEM_MESSAGE_TYPE": "warning",
+  "SITEMINDER_LOGOUT_URL": "https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi"
 }

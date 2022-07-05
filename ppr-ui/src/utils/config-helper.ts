@@ -136,4 +136,9 @@ export async function fetchConfig (): Promise<any> {
     (<any>window).addressCompleteKey = addressCompleteKey
     console.info('Set Address Complete Key.')
   }
+
+  const siteminderLogoutUrl: string = response.data.SITEMINDER_LOGOUT_URL
+  if (siteminderLogoutUrl) {
+    sessionStorage.setItem('SITEMINDER_LOGOUT_URL', siteminderLogoutUrl)
+  }
 }
