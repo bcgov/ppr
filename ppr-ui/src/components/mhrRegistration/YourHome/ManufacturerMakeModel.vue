@@ -93,15 +93,9 @@ export default defineComponent({
       'getMhrRegistrationHomeModel'
     ])
     const {
-      setMhrRegistrationManufacturerName,
-      setMhrRegistrationYearOfManufacture,
-      setMhrRegistrationHomeMake,
-      setMhrRegistrationHomeModel
+      setMhrHomeRegistration
     } = useActions<any>([
-      'setMhrRegistrationManufacturerName',
-      'setMhrRegistrationYearOfManufacture',
-      'setMhrRegistrationHomeMake',
-      'setMhrRegistrationHomeModel'
+      'setMhrHomeRegistration'
     ])
 
     const localState = reactive({
@@ -114,28 +108,28 @@ export default defineComponent({
     watch(
       () => localState.manufacturerName,
       (val: string) => {
-        setMhrRegistrationManufacturerName(val)
+        setMhrHomeRegistration({ key: 'description.manufacturer', value: val })
       }
     )
 
     watch(
       () => localState.yearOfManufacture,
       (val: number) => {
-        setMhrRegistrationYearOfManufacture(val)
+        setMhrHomeRegistration({ key: 'description.baseInformation.year', value: val })
       }
     )
 
     watch(
       () => localState.make,
       (val: string) => {
-        setMhrRegistrationHomeMake(val)
+        setMhrHomeRegistration({ key: 'description.baseInformation.make', value: val })
       }
     )
 
     watch(
       () => localState.model,
       (val: string) => {
-        setMhrRegistrationHomeModel(val)
+        setMhrHomeRegistration({ key: 'description.baseInformation.model', value: val })
       }
     )
 
