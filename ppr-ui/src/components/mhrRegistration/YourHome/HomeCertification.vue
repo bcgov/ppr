@@ -8,7 +8,7 @@
         <v-radio-group
           id="certification-option-btns"
           v-model="certificationOption"
-          class="mt-0" row
+          class="mt-0 pr-1" row
           hide-details="true"
         >
           <v-radio
@@ -29,7 +29,7 @@
 
         <!-- CSA Section -->
         <template v-if="isCsaOption">
-          <v-divider class="my-9 mx-0" />
+          <v-divider class="my-9 ml-0 mr-2" />
           <v-row no-gutters>
             <v-col cols="12">
               <v-form id="csa-form" ref="csaForm" v-model="isCsaValid">
@@ -59,7 +59,7 @@
 
         <!-- Engineer Section -->
         <template v-if="isEngineerOption">
-          <v-divider class="my-9 mx-0" />
+          <v-divider class="my-9 ml-0 mr-2" />
           <v-row no-gutters>
             <v-col cols="12">
               <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
@@ -236,6 +236,7 @@ export default defineComponent({
 }
 .selected-radio {
   border: 1px solid $app-blue;
+  background-color: white;
   ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
     color: $gray9 !important;
   }
