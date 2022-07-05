@@ -39,7 +39,7 @@
             {{ row.item.widthFeet }} <span class="pr-1">feet</span>
             {{ row.item.widthInches ? row.item.widthInches + ' inches' : '0 inches' }}
           </td>
-          <td v-if="!isReviewMode" class="text-right pr-3">
+          <td v-if="!isReviewMode" class="text-right pr-2">
             <v-btn
               text
               color="primary"
@@ -49,8 +49,8 @@
             >
               <v-icon small>mdi-pencil</v-icon>
               <span>Edit</span>
+              <v-divider class="ma-0 pl-3" vertical />
             </v-btn>
-
             <!-- Actions drop down menu -->
             <v-menu offset-y left nudge-bottom="4">
               <template v-slot:activator="{ on }">
@@ -61,8 +61,7 @@
                   color="primary"
                   :disabled="isAdding || isEditing"
                 >
-                  <v-divider class="ma-0" vertical />
-                  <v-icon class="pl-2">mdi-menu-down</v-icon>
+                  <v-icon class="ml-n1">mdi-menu-down</v-icon>
                 </v-btn>
               </template>
 

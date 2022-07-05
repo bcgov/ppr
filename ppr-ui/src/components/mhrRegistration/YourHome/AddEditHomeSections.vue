@@ -135,7 +135,6 @@ export default defineComponent({
     const {
       customRules,
       invalidSpaces,
-      isStringOrNumber,
       isNumber,
       maxLength,
       required
@@ -150,19 +149,21 @@ export default defineComponent({
       widthInches: props.editHomeSection?.widthInches || null,
       hasSubmit: false,
       serialNumberRules: computed((): Array<Function> => {
-        let rules = customRules(isStringOrNumber(), maxLength(20))
+        let rules = customRules(maxLength(20))
         // Only validate required on submission
         if (localState.hasSubmit) rules = customRules(...rules, required('Enter a serial number'))
         return rules
       }),
       lengthFeetRules: computed((): Array<Function> => {
         let rules = customRules(isNumber('Feet', 2))
-        if (localState.hasSubmit) rules = customRules(...rules, required('Enter a foot length'))
+        // Only validate required on submission
+        if (localState.hasSubmit) rules = customRules(...rules, required('Enter the length in feet'))
         return rules
       }),
       widthFeetRules: computed((): Array<Function> => {
         let rules = customRules(isNumber('Feet', 2))
-        if (localState.hasSubmit) rules = customRules(...rules, required('Enter a foot width'))
+        // Only validate required on submission
+        if (localState.hasSubmit) rules = customRules(...rules, required('Enter the width in feet'))
         return rules
       })
     })
