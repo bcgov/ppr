@@ -178,6 +178,13 @@ class Db2Owner(db.Model):
         owner['address'] = model_utils.get_address_from_db2(self.legacy_address, self.postal_code)
         if self.owngroup:
             owner['type'] = self.owngroup.tenancy_type
+            if self.owngroup.status == '3':
+                owner['status'] = 'ACTIVE'
+            elif self.owngroup.status == '4':
+                owner['status'] = 'EXEMPT'
+            else:
+                owner['status'] = 'PREVIOUS'
+
         return owner
 
     @staticmethod
