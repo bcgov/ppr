@@ -35,6 +35,12 @@ from .db import db
 REPORT_STATUS_PENDING = 'PENDING'
 CHARACTER_SET_UNSUPPORTED = 'The search name {} charcter set is not supported.\n'
 
+LEGACY_TO_OWNER_STATUS = {
+    '3': 'ACTIVE',
+    '4': 'EXEMPT',
+    '5': 'PREVIOUS'
+}
+
 
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search query (search step 1) information."""
@@ -154,6 +160,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             result_json['organizationName'] = owner_name
         else:
             result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+        result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[str(row[11])]
         return result_json
 
     @classmethod
@@ -188,11 +195,13 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         # current_app.logger.info(result_json)
         owner_info = str(row[4])
         owner_type = owner_info[0:1]
-        owner_name = owner_info[1:].strip()
+        owner_status = owner_info[1:2]
+        owner_name = owner_info[2:].strip()
         if owner_type != 'I':
             result_json['organizationName'] = owner_name
         else:
             result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+        result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
         serial_index = int(row[10])
         if serial_index == 2:
             result_json['serialNumber'] = str(row[11]).strip()

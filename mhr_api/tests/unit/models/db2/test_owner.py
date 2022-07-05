@@ -67,6 +67,7 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
                 assert reg_json['address']['region']
                 assert reg_json['address']['country']
                 assert reg_json.get('type')
+                assert reg_json.get('status')
     else:
         assert not owners
 

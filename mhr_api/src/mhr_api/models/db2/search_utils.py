@@ -40,7 +40,7 @@ RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
 
 MHR_NUM_QUERY = """
 SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl, mh.manhomid
+       de.makemodl, mh.manhomid, '3'
   FROM manuhome mh, document d, owner o, location l, descript de
  WHERE mh.mhregnum = :query_value
    AND mh.mhregnum = d.mhregnum
@@ -63,7 +63,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
 #        WHERE o2.manhomid = mh.manhomid) as owner_names, 
 SERIAL_NUM_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
-       (SELECT o.ownrtype || o.ownrname
+       (SELECT o.ownrtype || og.status || o.ownrname
           FROM owner o, owngroup og
          WHERE mh.manhomid = o.manhomid
            AND mh.manhomid = og.manhomid
@@ -86,7 +86,7 @@ ORDER BY d.regidate ASC
 
 OWNER_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
-       de.yearmade, de.makemodl, mh.manhomid
+       de.yearmade, de.makemodl, mh.manhomid, og.status
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -105,7 +105,7 @@ ORDER BY o.ownrname ASC, d.regidate ASC
 
 ORG_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
-       de.yearmade, de.makemodl, mh.manhomid
+       de.yearmade, de.makemodl, mh.manhomid, og.status
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid

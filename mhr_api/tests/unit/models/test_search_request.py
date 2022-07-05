@@ -220,6 +220,7 @@ def test_search_valid(session, search_type, json_data):
         if match.get('ownerName'):
             assert match['ownerName']['first']
             assert match['ownerName']['last']
+        assert match['ownerStatus'] in ('ACTIVE', 'EXEMPT', 'PREVIOUS')
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_NONE_DATA)
