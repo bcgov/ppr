@@ -101,7 +101,7 @@
               <h3>Rebuilt Status</h3>
             </v-col>
             <v-col cols="9">
-              <p>{{ getMhrRegistrationHomeDescription.rebuiltRemarks || '(Not Entered)' }}</p>
+              <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
             </v-col>
           </v-row>
 

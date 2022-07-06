@@ -4,7 +4,7 @@
       <v-col cols="12" sm="2">
         <label class="generic-label" :class="{'error-text': false}">Certification</label>
       </v-col>
-      <v-col cols="12" sm="10" class="pl-2">
+      <v-col cols="12" sm="10" class="pl-1">
         <v-radio-group
           id="certification-option-btns"
           v-model="certificationOption"

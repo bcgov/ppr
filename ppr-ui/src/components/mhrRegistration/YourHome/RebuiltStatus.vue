@@ -1,15 +1,16 @@
 <template>
   <v-form ref="rebuiltStatus" v-model=isRebuiltStatusValid>
     <v-card id="mhr-rebuilt-status" flat class="py-6 px-8 rounded">
-      <v-row no-gutters>
-        <v-col cols="2">
-          <label class="generic-label" for="rebuilt-status" :class="{'error-text': false}">Rebuilt Status</label>
+      <v-row>
+        <v-col cols="2" class="px-0">
+          <label class="generic-label" for="rebuilt-status" :class="{'error-text': false}">Rebuilt Description</label>
         </v-col>
         <v-col cols="10">
           <v-textarea
             filled
             id="rebuilt-status-text"
             counter="280"
+            class="pl-1"
             v-model.trim="rebuiltRemarks"
             :rules="maxLength(280)"
             label="Description of the rebuilt status of the home (Optional)"
