@@ -358,6 +358,6 @@ export const mutateMhrHomeDescription = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.description[key] = value
 }
 
-export const mutateMhrRegistration = (state: StateIF, { key, value }) => {
-  set(state.stateModel.mhrRegistration, key, value)
+export const mutateMhrBaseInformation = (state: StateIF, { key, value }) => {
+  set(state.stateModel.mhrRegistration.description.baseInformation[key], value)
 }

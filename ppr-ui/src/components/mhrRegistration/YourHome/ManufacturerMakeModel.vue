@@ -125,12 +125,14 @@ export default defineComponent({
     ])
 
     const {
-      setMhrHomeRegistration
+      setMhrHomeDescription,
+      setMhrHomeBaseInformation
     } = useActions<any>([
-      'setMhrHomeRegistration'
+      'setMhrHomeDescription',
+      'setMhrHomeBaseInformation'
     ])
 
-    const manufactureYearRules: Array<Function> =
+    const manufactureYearRules = computed((): Array<Function> =>
       customRules(
         required('Enter a year of manufacture'),
         isNumber(),
@@ -139,6 +141,7 @@ export default defineComponent({
         startsWith(['19', '20'], 'Year must begin with 19 or 20'),
         graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future')
       )
+    )
 
     const combinedMakeModelLengthRule = (localState): Array<Function> => {
       return [
@@ -172,35 +175,35 @@ export default defineComponent({
     watch(
       () => localState.manufacturerName,
       (val: string) => {
-        setMhrHomeRegistration({ key: 'description.manufacturer', value: val })
+        setMhrHomeDescription({ key: 'manufacturer', value: val })
       }
     )
 
     watch(
       () => localState.yearOfManufacture,
       (val: number) => {
-        setMhrHomeRegistration({ key: 'description.baseInformation.year', value: val })
+        setMhrHomeBaseInformation({ key: 'year', value: val })
       }
     )
 
     watch(
       () => localState.circa,
       (val: boolean) => {
-        setMhrHomeRegistration({ key: 'description.baseInformation.circa', value: val })
+        setMhrHomeBaseInformation({ key: 'circa', value: val })
       }
     )
 
     watch(
       () => localState.make,
       (val: string) => {
-        setMhrHomeRegistration({ key: 'description.baseInformation.make', value: val })
+        setMhrHomeBaseInformation({ key: 'make', value: val })
       }
     )
 
     watch(
       () => localState.model,
       (val: string) => {
-        setMhrHomeRegistration({ key: 'description.baseInformation.model', value: val })
+        setMhrHomeBaseInformation({ key: 'model', value: val })
       }
     )
 
