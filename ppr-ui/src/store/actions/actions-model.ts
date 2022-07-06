@@ -301,7 +301,3 @@ export const setMhrHomeBaseInformation: ActionIF = ({ commit }, { key, value }):
 export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrSubmittingParty', { key, value })
 }
-
-export const setMhrHomeRegistration: ActionIF = ({ commit }, { key, value }): void => {
-  commit('mutateMhrRegistration', { key, value })
-}
