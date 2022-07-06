@@ -280,7 +280,6 @@ export default defineComponent({
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
-      console.log(item.ownerName)
       if (item.ownerName) {
         return `
           ${item.ownerName?.last},
