@@ -92,7 +92,6 @@
             filled
             :rules="modelRules"
             label="Model"
-            counter="65"
             data-test-id="manufacturer-model"
           >
           </v-text-field>
