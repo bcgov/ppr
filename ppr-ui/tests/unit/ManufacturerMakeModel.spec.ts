@@ -90,7 +90,13 @@ describe('Other Information component', () => {
     expect(manufacturerSection.findAll(ERROR_MSG).at(0).text()).toContain('Maximum 4')
 
     yearInputField.setValue('')
-    yearInputField.setValue('2333') // Enter grater number than year + 1
+    yearInputField.setValue('20aa')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(manufacturerSection.findAll(ERROR_MSG).at(0).text()).toContain('numbers only')
+
+    yearInputField.setValue('')
+    yearInputField.setValue('2033') // Enter grater number than year + 1
     await Vue.nextTick()
     await Vue.nextTick()
     expect(manufacturerSection.findAll(ERROR_MSG).at(0).text()).toContain('more than 1')

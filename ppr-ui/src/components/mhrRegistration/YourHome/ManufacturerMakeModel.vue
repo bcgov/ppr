@@ -108,7 +108,7 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
-    const { customRules, required, minLength, maxLength, startsWith, graterThan } = useInputRules()
+    const { customRules, required, minLength, maxLength, startsWith, graterThan, isNumber } = useInputRules()
 
     const {
       getMhrRegistrationManufacturerName,
@@ -133,10 +133,11 @@ export default defineComponent({
     const manufactureYearRules: Array<Function> =
       customRules(
         required('Enter a year of manufacture'),
-        minLength(4),
-        maxLength(4),
-        graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future'),
-        startsWith('Year must begin with 19 or 20', '19', '20')
+        isNumber(),
+        minLength(4, true),
+        maxLength(4, true),
+        startsWith(['19', '20'], 'Year must begin with 19 or 20'),
+        graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future')
       )
 
     const combinedMakeModelLengthRule = (localState): Array<Function> => {

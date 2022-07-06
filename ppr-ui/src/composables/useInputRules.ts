@@ -1,14 +1,14 @@
 /** Common Input Field Validation Functions. **/
 export const useInputRules = () => {
-  const maxLength = (maxLength: number): Array<Function> => {
+  const maxLength = (maxLength: number, isMaxLengthForDigits: boolean = false): Array<Function> => {
     return [
-      v => (v || '').length <= maxLength || `Maximum ${maxLength} characters`
+      v => (v || '').length <= maxLength || `Maximum ${maxLength} ${isMaxLengthForDigits ? 'digits' : 'characters'}`
     ]
   }
 
-  const minLength = (minLength: number): Array<Function> => {
+  const minLength = (minLength: number, isMinLengthForDigits: boolean = false): Array<Function> => {
     return [
-      v => (v || '').length >= minLength || `Minimum ${minLength} characters`
+      v => (v || '').length >= minLength || `Minimum ${minLength} ${isMinLengthForDigits ? 'digits' : 'characters'}`
     ]
   }
 
@@ -38,19 +38,20 @@ export const useInputRules = () => {
     ]
   }
 
-  const isNumber = (numberType: string, maxDigits: number = null, maxValue: number = null): Array<Function> => {
+  const isNumber = (numberType: string = null, maxDigits: number = null, maxValue: number = null): Array<Function> => {
     const maxDigitRule = new RegExp(`^\\d{1,${maxDigits}}$`)
 
     return [
-      v => (v ? /^\d+$/g.test(v) : true) || `${numberType} must be a valid whole number (cannot contain decimals)`,
+      v => ((v && numberType) ? /^\d+$/g.test(v) : true) || `${numberType} must be a valid whole number (cannot contain decimals)`,
       v => ((v && maxDigits) ? maxDigitRule.test(v) : true) || `Maximum ${maxDigits} characters`,
-      v => ((v && maxValue) ? v < maxValue : true) || `${numberType} must be less than ${maxValue}`
+      v => ((v && maxValue) ? v < maxValue : true) || `${numberType} must be less than ${maxValue}`,
+      v => (v ? /^\d+$/g.test(v) : true) || 'Must contain numbers only'
     ]
   }
 
   // Check if string starts with any of the search values
-  const startsWith = (errorMessage: string, ...searchValues: string[]): Array<Function> => {
-    const values = '^' + Object.values({ ...searchValues }).join('|^')
+  const startsWith = (searchValues: Array<string>, errorMessage: string): Array<Function> => {
+    const values = '^' + searchValues.join('|^')
     const exp = new RegExp(values, 'g')
     return [
       (v:any) => !!(v || '').match(exp) || errorMessage
