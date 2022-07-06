@@ -45,7 +45,7 @@
           />
 
           <!-- Staff Payment Section -->
-          <section v-if="getIsStaffClientPayment" class="mt-10">
+          <section v-if="getIsStaffClientPayment && !isRoleStaffSbc" class="mt-10">
             <v-row no-gutters>
               <v-col class="generic-label">
                 <h2>2. Staff Payment</h2>
@@ -140,6 +140,7 @@ export default class ConfirmMHRSearch extends Vue {
   @Getter isSearchCertified!: boolean
   @Getter isRoleStaffBcol: boolean
   @Getter isRoleStaffReg!: boolean
+  @Getter isRoleStaffSbc!: boolean
   @Getter getIsStaffClientPayment!: boolean
   @Getter getStaffPayment!: StaffPaymentIF
   @Getter getManufacturedHomeSearchResults!: ManufacturedHomeSearchResponseIF
@@ -240,7 +241,7 @@ export default class ConfirmMHRSearch extends Vue {
   private async submit (): Promise<void> {
     this.validating = true
     await Vue.nextTick()
-    if (!this.validFolio || (this.getIsStaffClientPayment && !this.staffPaymentValid)) {
+    if (!this.validFolio || ((this.getIsStaffClientPayment && !this.isRoleStaffSbc) && !this.staffPaymentValid)) {
       this.showErrors = true
       document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
       return
