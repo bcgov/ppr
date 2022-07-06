@@ -290,22 +290,6 @@ export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean)
 }
 
 // MHR Registration
-export const setMhrRegistrationManufacturerName: ActionIF = ({ commit }, name: string): void => {
-  commit('mutateMhrRegistrationManufacturerName', name)
-}
-
-export const setMhrRegistrationYearOfManufacture: ActionIF = ({ commit }, year: number): void => {
-  commit('mutateMhrRegistrationYearOfManufacture', year)
-}
-
-export const setMhrRegistrationHomeMake: ActionIF = ({ commit }, make: string): void => {
-  commit('mutateMhrRegistrationHomeMake', make)
-}
-
-export const setMhrRegistrationHomeModel: ActionIF = ({ commit }, model: string): void => {
-  commit('mutateMhrRegistrationHomeModel', model)
-}
-
 export const setMhrHomeDescription: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrHomeDescription', { key, value })
 }
