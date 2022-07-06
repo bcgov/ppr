@@ -54,14 +54,14 @@ export const useInputRules = () => {
     const values = '^' + searchValues.join('|^')
     const exp = new RegExp(values, 'g')
     return [
-      (v:any) => !!(v || '').match(exp) || errorMessage
+      (v: any) => !!(v || '').match(exp) || errorMessage
     ]
   }
 
   // Check if value is a greater than maxNumber
   const graterThan = (maxNumber: number, errorMessage: string) => {
     return [
-      (v:number) => !v || v <= maxNumber || errorMessage
+      (v: number) => !v || v <= maxNumber || errorMessage
     ]
   }
 
