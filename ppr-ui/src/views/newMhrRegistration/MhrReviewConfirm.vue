@@ -28,6 +28,46 @@
             </span>
           </section>
 
+          <!-- Manufacturer Make Model -->
+          <section class="py-6">
+            <v-row no-gutters class="px-6">
+              <v-col cols="3">
+                <h3>Manufacturer's Name</h3>
+              </v-col>
+              <v-col cols="9">
+                <p>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</p>
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="pt-3 px-6">
+              <v-col cols="3">
+                <h3>Year of Manufacture</h3>
+              </v-col>
+              <v-col cols="9">
+                <p>{{ getMhrRegistrationHomeDescription.baseInformation.year }}</p>
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="pt-3 px-6">
+              <v-col cols="3">
+                <h3>Make</h3>
+              </v-col>
+              <v-col cols="9">
+                <p>{{ getMhrRegistrationHomeDescription.baseInformation.make }}</p>
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="pt-3 px-6">
+              <v-col cols="3">
+                <h3>Model</h3>
+              </v-col>
+              <v-col cols="9">
+                <p>{{ getMhrRegistrationHomeDescription.baseInformation.model }}</p>
+              </v-col>
+            </v-row>
+          </section>
+
+          <div class="px-4">
+            <v-divider />
+          </div>
+
           <!-- CSA Review -->
           <template v-if="isCSA || isEngineerInspection">
             <template v-if="isCSA">
