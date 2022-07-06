@@ -2,7 +2,13 @@
 export const useInputRules = () => {
   const maxLength = (maxLength: number): Array<Function> => {
     return [
-      v => v.length <= maxLength || `Maximum ${maxLength} characters`
+      v => (v || '').length <= maxLength || `Maximum ${maxLength} characters`
+    ]
+  }
+
+  const minLength = (minLength: number): Array<Function> => {
+    return [
+      v => (v || '').length >= minLength || `Minimum ${minLength} characters`
     ]
   }
 
@@ -42,6 +48,22 @@ export const useInputRules = () => {
     ]
   }
 
+  // Check if string starts with any of the search values
+  const startsWith = (errorMessage: string, ...searchValues: string[]): Array<Function> => {
+    const values = '^' + Object.values({ ...searchValues }).join('|^')
+    const exp = new RegExp(values, 'g')
+    return [
+      (v:any) => !!(v || '').match(exp) || errorMessage
+    ]
+  }
+
+  // Check if value is a greater than maxNumber
+  const graterThan = (maxNumber: number, errorMessage: string) => {
+    return [
+      (v:number) => !v || v <= maxNumber || errorMessage
+    ]
+  }
+
   /** Create a custom rules array use predefined rules. **/
   const customRules = (...rules: any) => {
     return [].concat(...rules)
@@ -54,6 +76,9 @@ export const useInputRules = () => {
     isStringOrNumber,
     required,
     isNumber,
+    startsWith,
+    graterThan,
+    minLength,
     maxLength
   }
 }
