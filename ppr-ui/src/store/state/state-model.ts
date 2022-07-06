@@ -135,6 +135,7 @@ export const stateModel: StateModelIF = {
       manufacturer: '',
       baseInformation: {
         year: null,
+        circa: false,
         make: '',
         model: ''
       },

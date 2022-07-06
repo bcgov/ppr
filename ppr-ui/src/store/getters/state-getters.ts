@@ -620,6 +620,10 @@ export const getMhrRegistrationYearOfManufacture = (state: StateIF): number => {
   return state.stateModel.mhrRegistration.description.baseInformation.year
 }
 
+export const getMhrRegistrationIsYearApproximate = (state: StateIF): boolean => {
+  return state.stateModel.mhrRegistration.description.baseInformation.circa
+}
+
 export const getMhrRegistrationHomeMake = (state: StateIF): string => {
   return state.stateModel.mhrRegistration.description.baseInformation.make
 }
