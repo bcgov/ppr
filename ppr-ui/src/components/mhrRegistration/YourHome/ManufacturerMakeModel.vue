@@ -12,7 +12,9 @@
             id="manufacturer-name"
             v-model="manufacturerName"
             filled
+            :rules="maxLength(65)"
             label="Business Legal Name (Optional)"
+            data-test-id="manufacturer-name"
           />
         </v-col>
       </v-row>
@@ -28,17 +30,36 @@
             id="manufacturer-year"
             v-model="yearOfManufacture"
             filled
+            :rules="manufactureYearRules"
             label="Year of Manufacture"
             persistent-hint
             hint="YYYY"
+            data-test-id="manufacture-year"
           />
         </v-col>
         <v-col cols="6">
-          <v-checkbox>
-            <template v-slot:label>
-              This Year of Manufacture is approximate
+          <v-checkbox
+            id="circa-year"
+            label="This Year of Manufacture is approximate"
+            v-model="circa"
+            class="float-left"
+            data-test-id="circa-year-checkbox"
+          />
+           <v-tooltip
+            top
+            content-class="top-tooltip pa-5"
+            transition="fade-transition"
+            data-test-id="circa-year-tooltip"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="circa-tooltip-icon ml-2 mt-n1"
+                color="primary"
+                v-on="on">mdi-information-outline</v-icon>
             </template>
-          </v-checkbox>
+            When the exact year of manufacture is unknown, enter an estimated
+            year and indicate that the year is approximate.
+          </v-tooltip>
         </v-col>
       </v-row>
 
@@ -53,7 +74,9 @@
             id="manufacturer-make"
             v-model="make"
             filled
+            :rules="makeRules"
             label="Make"
+            data-test-id="manufacturer-make"
           />
         </v-col>
       </v-row>
@@ -67,8 +90,12 @@
             id="manufacturer-model"
             v-model="model"
             filled
+            :rules="modelRules"
             label="Model"
-          />
+            counter="65"
+            data-test-id="manufacturer-model"
+          >
+          </v-text-field>
         </v-col>
       </v-row>
     </v-card>
@@ -76,31 +103,69 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
+    const { customRules, required, isNumber, minLength, maxLength, startsWith, graterThan } = useInputRules()
+
     const {
       getMhrRegistrationManufacturerName,
       getMhrRegistrationYearOfManufacture,
+      getMhrRegistrationIsYearApproximate,
       getMhrRegistrationHomeMake,
       getMhrRegistrationHomeModel
     } = useGetters<any>([
       'getMhrRegistrationManufacturerName',
       'getMhrRegistrationYearOfManufacture',
+      'getMhrRegistrationIsYearApproximate',
       'getMhrRegistrationHomeMake',
       'getMhrRegistrationHomeModel'
     ])
+
     const {
       setMhrHomeRegistration
     } = useActions<any>([
       'setMhrHomeRegistration'
     ])
 
+    const manufactureYearRules: Array<Function> =
+      customRules(
+        required('Enter a year of manufacture'),
+        minLength(4),
+        maxLength(4),
+        isNumber(),
+        graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future'),
+        startsWith('Year must begin with 19 or 20', '19', '20')
+      )
+
+    const combinedMakeModelLengthRule = (localState): Array<Function> => {
+      return [
+        () => (0 || localState.model.length) + (0 || localState.make.length) <= 65 ||
+          'Make and Model combined cannot exceed 65 characters'
+      ]
+    }
+
+    const makeRules = computed((): Array<Function> =>
+      customRules(
+        required('Enter a make'),
+        combinedMakeModelLengthRule(localState)
+      )
+    )
+
+    const modelRules = computed((): Array<Function> =>
+      customRules(
+        required('Enter a model'),
+        combinedMakeModelLengthRule(localState)
+      )
+    )
+
     const localState = reactive({
       manufacturerName: getMhrRegistrationManufacturerName.value,
       yearOfManufacture: getMhrRegistrationYearOfManufacture.value,
+      circa: getMhrRegistrationIsYearApproximate.value,
       make: getMhrRegistrationHomeMake.value,
       model: getMhrRegistrationHomeModel.value
     })
@@ -120,6 +185,13 @@ export default defineComponent({
     )
 
     watch(
+      () => localState.circa,
+      (val: boolean) => {
+        setMhrHomeRegistration({ key: 'description.baseInformation.circa', value: val })
+      }
+    )
+
+    watch(
       () => localState.make,
       (val: string) => {
         setMhrHomeRegistration({ key: 'description.baseInformation.make', value: val })
@@ -134,10 +206,19 @@ export default defineComponent({
     )
 
     return {
+      manufactureYearRules,
+      makeRules,
+      modelRules,
+      maxLength,
+      graterThan,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+::v-deep .circa-tooltip-icon {
+  line-height: 3em;
+}
+</style>
