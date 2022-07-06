@@ -109,7 +109,7 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   setup () {
-    const { customRules, required, isNumber, minLength, maxLength, startsWith, graterThan } = useInputRules()
+    const { customRules, required, minLength, maxLength, startsWith, graterThan } = useInputRules()
 
     const {
       getMhrRegistrationManufacturerName,
@@ -136,7 +136,6 @@ export default defineComponent({
         required('Enter a year of manufacture'),
         minLength(4),
         maxLength(4),
-        isNumber(),
         graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future'),
         startsWith('Year must begin with 19 or 20', '19', '20')
       )
