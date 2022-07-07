@@ -52,6 +52,11 @@
         </v-row>
       </section>
 
+      <!-- divider -->
+      <div class="px-4">
+        <v-divider />
+      </div>
+
       <!-- CSA Review -->
       <template v-if="isCSA || isEngineerInspection">
         <template v-if="isCSA">
