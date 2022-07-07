@@ -353,22 +353,10 @@ export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) =>
 }
 
 // MHR Registration
-export const mutateMhrRegistrationManufacturerName = (state: StateIF, name: string) => {
-  state.stateModel.mhrRegistration.description.manufacturer = name
-}
-
-export const mutateMhrRegistrationYearOfManufacture = (state: StateIF, year: number) => {
-  state.stateModel.mhrRegistration.description.baseInformation.year = year
-}
-
-export const mutateMhrRegistrationHomeMake = (state: StateIF, make: string) => {
-  state.stateModel.mhrRegistration.description.baseInformation.make = make
-}
-
-export const mutateMhrRegistrationHomeModel = (state: StateIF, model: string) => {
-  state.stateModel.mhrRegistration.description.baseInformation.model = model
-}
-
 export const mutateMhrHomeDescription = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.description[key] = value
+}
+
+export const mutateMhrBaseInformation = (state: StateIF, { key, value }) => {
+  state.stateModel.mhrRegistration.description.baseInformation[key] = value
 }

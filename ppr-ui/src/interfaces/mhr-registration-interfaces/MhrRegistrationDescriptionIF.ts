@@ -5,6 +5,7 @@ export interface MhrRegistrationDescriptionIF {
   manufacturer: string,
   baseInformation: {
     year: number,
+    circa: boolean,
     make: string,
     model: string
   },
