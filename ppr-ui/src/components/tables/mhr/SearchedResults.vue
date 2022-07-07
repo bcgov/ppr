@@ -284,7 +284,7 @@ export default defineComponent({
         return `
           ${item.ownerName?.last},
           ${item.ownerName?.first}
-          ${item.ownerName?.middle || ''}`
+          ${item.ownerName?.middle || item.ownerName?.second || ''}`
       } else if (item.organizationName) {
         return item.organizationName
       } else return '-'
