@@ -39,7 +39,8 @@
         "vault": "web-url",
         "application": [
             "auth-web",
-            "registry"
+            "registry",
+            "siteminder"
         ]
     },
     {
