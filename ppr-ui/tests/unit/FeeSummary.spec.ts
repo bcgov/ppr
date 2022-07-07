@@ -44,6 +44,8 @@ const newRegMisc = [
   UIRegistrationTypes.PROVINCIAL_SALES_TAX,
   UIRegistrationTypes.RURAL_PROPERTY_TAX,
   UIRegistrationTypes.SCHOOL_ACT,
+  UIRegistrationTypes.SPECULATION_VACANCY_TAX,
+  UIRegistrationTypes.TOBACCO_TAX,
   UIRegistrationTypes.OTHER,
   // miscelaneous registration other
   UIRegistrationTypes.LIEN_UNPAID_WAGES,

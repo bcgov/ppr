@@ -36,7 +36,9 @@ export const useGeneralCollateral = () => {
       APIRegistrationTypes.TRANSITION_FINANCING_STATEMENT,
       APIRegistrationTypes.TRANSITION_SALE_OF_GOODS,
       APIRegistrationTypes.TRANSITION_TAX_LIEN,
-      APIRegistrationTypes.TRANSITION_MH
+      APIRegistrationTypes.TRANSITION_MH,
+      APIRegistrationTypes.TOBACCO_TAX,
+      APIRegistrationTypes.SPECULATION_VACANCY_TAX
     ]
     return ghArray.includes(registrationType)
   }
@@ -49,7 +51,9 @@ export const useGeneralCollateral = () => {
       APIRegistrationTypes.PROVINCIAL_SALES_TAX,
       APIRegistrationTypes.INCOME_TAX,
       APIRegistrationTypes.MOTOR_FUEL_TAX,
-      APIRegistrationTypes.EXCISE_TAX
+      APIRegistrationTypes.EXCISE_TAX,
+      APIRegistrationTypes.TOBACCO_TAX,
+      APIRegistrationTypes.SPECULATION_VACANCY_TAX
     ]
     return gcList.includes(registrationType)
   }

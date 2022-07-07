@@ -23,6 +23,8 @@ export enum APIRegistrationTypes {
     PROVINCIAL_SALES_TAX = 'PS',
     RURAL_PROPERTY_TAX = 'RA',
     SCHOOL_ACT = 'SC',
+    SPECULATION_VACANCY_TAX = 'SV',
+    TOBACCO_TAX = 'TO',
     OTHER = 'OT',
     // miscelaneous registration other
     LIEN_UNPAID_WAGES = 'WL',
@@ -71,6 +73,8 @@ export enum UIRegistrationTypes {
     PROVINCIAL_SALES_TAX = 'Crown Charge - Provincial Sales Tax Act',
     RURAL_PROPERTY_TAX = 'Crown Charge - Taxation (Rural Area) Act',
     SCHOOL_ACT = 'Crown Charge - School Act',
+    SPECULATION_VACANCY_TAX = 'Crown Charge - Speculation and Vacancy Tax Act',
+    TOBACCO_TAX = 'Crown Charge - Tobacco Tax Act',
     OTHER = 'Crown Charge - Other',
       // miscelaneous registration other
     LIEN_UNPAID_WAGES = 'Lien for Unpaid Wages',
