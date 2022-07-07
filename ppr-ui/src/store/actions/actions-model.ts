@@ -295,5 +295,9 @@ export const setMhrHomeDescription: ActionIF = ({ commit }, { key, value }): voi
 }
 
 export const setMhrHomeBaseInformation: ActionIF = ({ commit }, { key, value }): void => {
-  commit('mutateMhrBaseInformation', { key, value })
+  commit('mutateMhrBaseInformation', {key, value})
+}
+
+export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): void => {
+  commit('mutateMhrSubmittingParty', { key, value })
 }

@@ -3,7 +3,7 @@ import { MhrRegistrationDescriptionIF } from '@/interfaces'
 export interface MhrRegistrationIF {
   clientReferenceId: string,
   declaredValue: string,
-  submittingParty: {
+  registeringParty: {
     businessName: string,
     address: {
       street: string,

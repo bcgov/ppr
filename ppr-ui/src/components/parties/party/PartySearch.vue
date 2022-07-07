@@ -4,7 +4,7 @@
       <v-col cols="6">
         <v-text-field
           filled
-          :label="isRegisteringParty ? 'Registering Party Code or Name' : 'Secured Party Code or Name'"
+          :label="searchFieldLabel"
           id="txt-code"
           v-model="searchValue"
           persistent-hint
@@ -13,16 +13,18 @@
           :disabled="autoCompleteDisabled"
         />
       </v-col>
-      <v-col cols="6" :class="{ 'disabled-text': autoCompleteDisabled }">
+      <v-col cols="6" class="pt-0 mt-n5" :class="{ 'disabled-text': autoCompleteDisabled }">
         or
         <a
+          v-if="!isMhrPartySearch"
           id="add-party"
           class="generic-link pl-2"
           :class="{ 'disabled-text': autoCompleteDisabled }"
           @click="goToAddSecuredParty"
           :disabled="autoCompleteDisabled"
-          >Add a {{ partyWord}} Party that doesn't have a code</a
-        >
+          >Add a {{ partyWord}} Party that doesn't have a code
+        </a>
+        <span v-else>Manually enter submitting party information below</span>
       </v-col>
     </v-row>
     <v-row no-gutters>
@@ -32,6 +34,7 @@
           :defaultClickToAdd="false"
           :setAutoCompleteActive="setAutoCompleteActive"
           :setIsRegisteringParty="isRegisteringParty"
+          :isMhrPartySearch="isMhrPartySearch"
           @selectItem="selectItem"
         />
       </v-col>
@@ -39,7 +42,7 @@
     <v-row
       class="px-6"
       align="center"
-      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty"
+      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
     >
       <v-col cols="auto" class="pr-0">
         <v-checkbox
@@ -92,6 +95,10 @@ export default defineComponent({
     setIsRegisteringParty: {
       type: Boolean,
       default: false
+    },
+    isMhrPartySearch: {
+      type: Boolean,
+      default: false
     }
   },
   emits: [
@@ -107,6 +114,10 @@ export default defineComponent({
     const localState = reactive({
       searchValue: '',
       autoCompleteResults: null,
+      setAutoCompleteActive: false,
+      registeringPartySelected: false,
+      resultAdded: [],
+      partyCode: 0,
       autoCompleteDisabled: computed((): boolean => {
         return props.isAutoCompleteDisabled
       }),
@@ -119,10 +130,11 @@ export default defineComponent({
         }
         return 'Secured'
       }),
-      setAutoCompleteActive: false,
-      registeringPartySelected: false,
-      resultAdded: [],
-      partyCode: 0
+      searchFieldLabel: computed((): string => {
+        if (props.isMhrPartySearch) return 'Use PPR Party Code or Name'
+        else if (localState.isRegisteringParty) return 'Registering Party Code or Name'
+        else return 'Secured Party Code or Name'
+      })
     })
 
     const goToAddSecuredParty = () => {

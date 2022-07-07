@@ -91,7 +91,7 @@ export const stateModel: StateModelIF = {
   mhrRegistration: {
     clientReferenceId: '',
     declaredValue: '',
-    submittingParty: {
+    registeringParty: {
       businessName: '',
       address: {
         street: '',
