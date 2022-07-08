@@ -40,7 +40,7 @@
                   id="first-name"
                   class="pt-4 pr-2"
                   label="First Name"
-                  v-model="registeringParty.personName.first"
+                  v-model="submittingParty.personName.first"
                   :rules="[]"
                 />
               </v-col>
@@ -50,7 +50,7 @@
                   id="middle-name"
                   class="pt-4 px-2"
                   label="Middle Name (Optional)"
-                  v-model="registeringParty.personName.middle"
+                  v-model="submittingParty.personName.middle"
                   :rules="[]"
                 />
               </v-col>
@@ -60,7 +60,7 @@
                   id="last-name"
                   class="pt-4 px-2"
                   label="Last Name"
-                  v-model="registeringParty.personName.last"
+                  v-model="submittingParty.personName.last"
                   :rules="[]"
                 />
               </v-col>
@@ -77,7 +77,7 @@
                   id="business-name"
                   class="pt-4 pr-2"
                   label="Business Name"
-                  v-model="registeringParty.businessName"
+                  v-model="submittingParty.businessName"
                   :rules="[]"
                 />
               </v-col>
@@ -91,7 +91,7 @@
             id="submitting-party-email"
             class="pt-4 pr-2"
             label="Email Address"
-            v-model="registeringParty.emailAddress"
+            v-model="submittingParty.emailAddress"
             :rules="[]"
           />
 
@@ -104,7 +104,7 @@
                 id="submitting-party-phone"
                 class="pt-4 pr-3"
                 label="Phone Number"
-                v-model="registeringParty.phoneNumber"
+                v-model="submittingParty.phoneNumber"
                 :rules="[]"
               />
             </v-col>
@@ -114,7 +114,7 @@
                 id="submitting-party-phone-ext"
                 class="pt-4 px-2"
                 label="Extension (Optional)"
-                v-model="registeringParty.phoneExtension"
+                v-model="submittingParty.phoneExtension"
                 :rules="[]"
               />
             </v-col>
@@ -130,7 +130,7 @@
               ref="submittingPartyAddress"
               id="submitting-party-address"
               :schema="PartyAddressSchema"
-              :value="registeringParty.address"
+              :value="submittingParty.address"
               @valid="updateValidity($event)"
             />
           </article>
@@ -180,7 +180,7 @@ export default defineComponent({
       enableLookUp: true,
       submittingPartyType: '',
       submittingPartyValid: '',
-      registeringParty: {
+      submittingParty: {
         personName: {
           first: '',
           last: '',
@@ -215,25 +215,25 @@ export default defineComponent({
     watch(() => getMhrRegistrationSubmittingParty.value, () => {
       if (localState.enableLookUp) {
         // Copy submitting party to local model if data is retrieved through the look-up
-        localState.registeringParty = cloneDeep({
-          ...localState.registeringParty,
+        localState.submittingParty = cloneDeep({
+          ...localState.submittingParty,
           ...getMhrRegistrationSubmittingParty.value
         })
 
         // Apply party type if data is retrieved through the look-up
-        localState.registeringParty.businessName
+        localState.submittingParty.businessName
           ? localState.submittingPartyType = SubmittingPartyTypes.BUSINESS
           : localState.submittingPartyType = SubmittingPartyTypes.PERSON
       }
     }, { deep: true, immediate: true })
 
     /** Apply local model updates to store. **/
-    watch(() => localState.registeringParty, async () => {
+    watch(() => localState.submittingParty, async () => {
       // Disable look up during local model changes
       localState.enableLookUp = false
 
       // Set submitting party data to store
-      for (const [key, value] of Object.entries(localState.registeringParty)) {
+      for (const [key, value] of Object.entries(localState.submittingParty)) {
         await setMhrSubmittingParty({ key, value })
       }
 
@@ -244,10 +244,10 @@ export default defineComponent({
     /** Handle party type changes. **/
     watch(() => localState.submittingPartyType, () => {
       if (localState.isPersonOption) {
-        localState.registeringParty.businessName = ''
+        localState.submittingParty.businessName = ''
       }
       if (localState.isBusinessOption) {
-        localState.registeringParty.personName = {
+        localState.submittingParty.personName = {
           first: '',
           middle: '',
           last: ''

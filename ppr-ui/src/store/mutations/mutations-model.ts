@@ -362,5 +362,5 @@ export const mutateMhrBaseInformation = (state: StateIF, { key, value }) => {
 }
 
 export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
-  state.stateModel.mhrRegistration.registeringParty[key] = value
+  state.stateModel.mhrRegistration.submittingParty[key] = value
 }

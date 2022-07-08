@@ -9,7 +9,7 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <base-dialog
-      setAttach="#confirm-discharge"
+      setAttach="#confirm-mhr-search"
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
@@ -119,7 +119,7 @@ import {
   DialogOptionsIF,
   ManufacturedHomeSearchResultIF, ManufacturedHomeSearchResponseIF
 } from '@/interfaces'
-import { notCompleteDialog } from '@/resources/dialogOptions'
+import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
@@ -159,7 +159,7 @@ export default class ConfirmMHRSearch extends Vue {
   private dataLoaded = false
   private dataLoadError = false
   private feeType = FeeSummaryTypes.MHSEARCH
-  private options: DialogOptionsIF = notCompleteDialog
+  private options: DialogOptionsIF = notCompleteSearchDialog
   private showCancelDialog = false
   private showErrors = false
   private submitting = false
@@ -236,6 +236,7 @@ export default class ConfirmMHRSearch extends Vue {
 
   private showDialog (): void {
     this.showCancelDialog = true
+    console.log('showDialog trigered')
   }
 
   private async submit (): Promise<void> {

@@ -641,5 +641,5 @@ export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrati
 }
 
 export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
-  return state.stateModel.mhrRegistration.registeringParty
+  return state.stateModel.mhrRegistration.submittingParty
 }
