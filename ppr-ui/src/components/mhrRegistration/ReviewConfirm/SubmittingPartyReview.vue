@@ -1,8 +1,8 @@
 <template>
   <v-card flat id="-summary" class="mt-6">
     <header class="review-header">
-      <v-icon class="ml-2" color="darkBlue">mdi-home</v-icon>
-      <label class="font-weight-bold pl-2">Your Home</label>
+      <v-icon class="ml-2" color="darkBlue">mdi-account</v-icon>
+      <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 
     <div :class="{ 'invalid-section': false }">
@@ -23,8 +23,7 @@
 
       <!-- -->
       <template>
-        <section class="pt-6" id="review-home-sections">
-          <h3 class="px-6">Home Sections</h3>
+        <section class="pt-6" id="review-submitting-party-section">
           <!-- Insert Review mode of component here -->
         </section>
       </template>
@@ -37,12 +36,11 @@ import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { RouteNames } from '@/enums'
 
 export default defineComponent({
-  name: 'YourHomeReview',
+  name: 'SubmittingPartyReview',
   components: {},
   props: {},
   setup () {
-    const localState = reactive({
-    })
+    const localState = reactive({})
 
     return {
       RouteNames,
