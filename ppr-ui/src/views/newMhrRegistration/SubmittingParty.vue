@@ -38,24 +38,7 @@ import { PartySearch } from '@/components/parties/party'
     MhrSubmittingParty
   }
 })
-export default class SubmittingParty extends Vue {
-  private addItem = (val): void => {
-    console.log(val)
-    console.log('Add Item')
-  }
-
-  private initAdd = (): void => {
-    console.log('initAdd')
-  }
-
-  private addRegisteringParty = (): void => {
-    console.log('addRegisteringParty')
-  }
-
-  private removeRegisteringParty = (): void => {
-    console.log('removeRegisteringParty')
-  }
-}
+export default class SubmittingParty extends Vue {}
 </script>
 
 <style lang="scss" scoped>
