@@ -236,7 +236,6 @@ export default class ConfirmMHRSearch extends Vue {
 
   private showDialog (): void {
     this.showCancelDialog = true
-    console.log('showDialog trigered')
   }
 
   private async submit (): Promise<void> {

@@ -139,7 +139,7 @@ export default class MhrRegistration extends Vue {
       this.$router.push({
         name: RouteNames.DASHBOARD
       })
-      // return
+      return
     }
     // page is ready to view
     this.emitHaveData(true)
