@@ -191,12 +191,18 @@ TEST_MD_PT_SC_DATA = [
     (DESC_VALID, True, 'MD', None),
     (DESC_VALID, True, 'PT', None),
     (DESC_VALID, True, 'SC', None),
+    (DESC_VALID, True, 'TO', None),
+    (DESC_VALID, True, 'SV', None),
     (DESC_MISSING_GC, False, 'MD', validator.GC_REQUIRED),
     (DESC_INCLUDES_VC, True, 'MD', None),
     (DESC_MISSING_GC, False, 'PT', validator.GC_REQUIRED),
     (DESC_INCLUDES_VC, True, 'PT', None),
     (DESC_MISSING_GC, False, 'SC', validator.GC_REQUIRED),
-    (DESC_INCLUDES_VC, True, 'SC', None)
+    (DESC_INCLUDES_VC, True, 'SC', None),
+    (DESC_MISSING_GC, False, 'TO', validator.GC_REQUIRED),
+    (DESC_INCLUDES_VC, True, 'TO', None),
+    (DESC_MISSING_GC, False, 'SV', validator.GC_REQUIRED),
+    (DESC_INCLUDES_VC, True, 'SV', None)
 ]
 
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
