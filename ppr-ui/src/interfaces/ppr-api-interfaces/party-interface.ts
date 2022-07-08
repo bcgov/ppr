@@ -4,6 +4,11 @@ import { ActionTypes } from '@/enums'
 // Party interface represents a single registering party, secured party, or debtor.
 export interface PartyIF {
   code?: string, // Only for registering and submitting parties, provide code or name/address.
+  contact?: {
+    areaCode?: string
+    name?: string
+    phoneNumber?: string
+  }
   businessName?: string, // Either businessName or personName is required if no code. Max length 150.
   personName?: IndividualNameIF, // Either businessName or personName is required if no code.
   birthDate?: string, // Debtor only UTC ISO 8601 datetime format YYYY-MM-DDThh:mm:ssTZD.

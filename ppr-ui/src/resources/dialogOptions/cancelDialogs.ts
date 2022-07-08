@@ -17,3 +17,12 @@ export const notCompleteDialog: DialogOptionsIF = {
   text: 'Your registration has not been completed. Do you want to exit and discard ' +
     'this registration, or return to your registration and complete it?'
 }
+
+export const notCompleteSearchDialog: DialogOptionsIF = {
+  acceptText: 'Return to My Search',
+  cancelText: 'Exit and Discard',
+  title: 'MHR Search Not Complete',
+  label: '',
+  text: 'Your manufactured home search has not been completed. Do you want to exit and discard ' +
+    'this search, or return to complete it?'
+}

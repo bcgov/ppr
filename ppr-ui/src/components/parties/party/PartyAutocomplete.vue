@@ -39,6 +39,7 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action
+                v-if="!isMhrPartySearch"
                 :class="[$style['auto-complete-action'], 'mt-n1']"
               >
                 <span v-if="!resultAdded[i] && !isExistingSecuredParty(result.code)" @click="addResult(result, i)">
@@ -81,6 +82,7 @@ import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes } from '@/enums'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
   props: {
@@ -95,9 +97,18 @@ export default defineComponent({
     setIsRegisteringParty: {
       type: Boolean,
       default: false
+    },
+    isMhrPartySearch: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
+    const {
+      setMhrSubmittingParty
+    } = useActions<any>([
+      'setMhrSubmittingParty'
+    ])
     const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
@@ -119,20 +130,27 @@ export default defineComponent({
 
     const addResult = (party: SearchPartyIF, resultIndex) => {
       localState.resultAdded[resultIndex] = true
-
       const newParty: PartyIF = {
         code: party.code,
         businessName: party.businessName,
         emailAddress: party.emailAddress || '',
         address: party.address,
-        personName: { first: '', middle: '', last: '' }
+        personName: { first: '', middle: '', last: '' },
+        contact: { ...party.contact }
       }
+
       if (localState.isRegisteringParty) {
         newParty.action = ActionTypes.EDITED
         setRegisteringParty(newParty)
+      } else if (props.isMhrPartySearch) {
+        // Set submitting party data to store
+        for (const [key, value] of Object.entries(newParty)) {
+          setMhrSubmittingParty({ key, value })
+        }
       } else {
         addSecuredParty(newParty)
       }
+
       context.emit('selectItem')
       closeAutoComplete()
     }

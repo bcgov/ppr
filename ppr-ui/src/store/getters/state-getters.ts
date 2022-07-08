@@ -639,3 +639,7 @@ export const getMhrRegistrationOtherInfo = (state: StateIF): string => {
 export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrationDescriptionIF => {
   return state.stateModel.mhrRegistration.description
 }
+
+export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
+  return state.stateModel.mhrRegistration.submittingParty
+}
