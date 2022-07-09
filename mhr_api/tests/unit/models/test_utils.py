@@ -71,6 +71,18 @@ TEST_DATA_SERIAL_KEY = [
     ('12345', '003039'),
     ('999999', '0F423F')
 ]
+#3737 PALM HARBOR DRIVE                  MILLERSBURG,OR  97321   
+# testdata pattern is ({street1}, {city}, {region}, {country}, {postal_code}, {address})
+TEST_DB2_ADDRESS_MANUFACT = [
+    ('PO BOX 190 STATION MAIN', 'PENTICTON', 'BC', 'CA', 'V2A 6J9',
+     'PO BOX 190 STATION MAIN                 PENTICTON, BC V2A 6J9'),
+    ('3737 PALM HARBOR DRIVE', 'MILLERSBURG', 'OR', 'US', '97321',
+     '3737 PALM HARBOR DRIVE                  MILLERSBURG,OR  97321'),
+    ('PO BOX 188', 'SHERIDAN', 'OR', 'US', 'USA 97378',
+     'PO BOX 188                              SHERIDAN OR USA 97378'),
+    ('RR1, S2,C23', 'OKANAGAN FALLS', 'BC', 'CA', 'V0H1RO',
+     'RR1, S2,C23                             OKANAGAN FALLS B.C. V0H1RO')
+]
 
 
 @pytest.mark.parametrize('name, key_value', TEST_DATA_ORG_KEY)
@@ -107,3 +119,15 @@ def test_db2_address(session, street1, street2, city, region, address):
         assert 'streetAdditional' not in test_address
     else:
         assert test_address['streetAdditional'] == street2
+
+
+@pytest.mark.parametrize('street1, city, region, country, postal_code, address', TEST_DB2_ADDRESS_MANUFACT)
+def test_db2_address_manufact(session, street1, city, region, country, postal_code, address):
+    """Assert that parsing a legacy db2 manufact table address works as expected."""
+    test_address = model_utils.get_address_from_db2_manufact(address)
+    current_app.logger.info(test_address)
+    assert test_address['street'] == street1
+    assert test_address['city'] == city
+    assert test_address['region'] == region
+    assert test_address['country'] == country
+    assert test_address['postalCode'] == postal_code
