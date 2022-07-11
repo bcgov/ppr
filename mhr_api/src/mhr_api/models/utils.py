@@ -261,6 +261,9 @@ DB2_PROVINCE_MAPPING = {
     ', ON': 'ON',
     'ONTARIO': 'ON'
 }
+COUNTRY_CA = 'CA'
+COUNTRY_US = 'US'
+PROVINCE_BC = 'BC'
 
 
 def get_max_registrations_size():
@@ -796,10 +799,43 @@ def get_long_address_from_db2(legacy_address: str, postal_code: str = ''):
     return address
 
 
+def get_address_from_db2_manufact(legacy_address: str):
+    """Get an address json from a DB2 legacy manufact table address."""
+    street = legacy_address[0:38].strip()
+    legacy_text = legacy_address[39:].strip()
+    pos = legacy_text.find(',')
+    if pos == -1:
+        pos = legacy_text.find(' ')
+        if len(legacy_text[(pos + 1):]) > 12:
+            next_pos = legacy_text[(pos + 1):].find(' ')
+            pos += next_pos + 1
+    city = legacy_text[0:pos]
+    legacy_text = legacy_text[(pos + 1):].strip()
+    legacy_text = legacy_text.replace('.', '')
+    pos = legacy_text.find(' ')
+    province = legacy_text[0:pos]
+    postal_code = legacy_text[(pos + 1):].strip()
+    address = {
+        'city': city,
+        'street': street,
+        'region': province,
+        'country': get_country_from_province(province),
+        'postalCode': postal_code
+    }
+    return address
+
+
 def get_province_db2(legacy_value: str, default: str):
     """Get a province code from DB2 legacy address text."""
     for text in DB2_REMOVE_ADRRESS:
         if legacy_value.endswith(text) and DB2_PROVINCE_MAPPING.get(text):
             if len(legacy_value) == 2 or len(text) > 2:
                 return DB2_PROVINCE_MAPPING[text]
+    return default
+
+
+def get_country_from_province(province: str, default: str = COUNTRY_US):
+    """Get a country code from province code."""
+    if province == PROVINCE_BC or DB2_PROVINCE_MAPPING.get(province):
+        return COUNTRY_CA
     return default

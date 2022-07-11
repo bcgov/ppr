@@ -3,7 +3,8 @@
 		"_postman_id": "53809702-5212-459e-a0cb-92524c3c8867",
 		"name": "MHR API Unit Tests",
 		"description": "Requests to demonstrate the Manufactured Home Registry API. The requests use a test consumer API key and account ID.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10405485"
 	},
 	"item": [
 		{
@@ -568,6 +569,64 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "manufacturers",
+			"item": [
+				{
+					"name": "Get account manufacturer information",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294376/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/manufacturers/parties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"manufacturers",
+								"parties"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
@@ -626,6 +685,11 @@
 		{
 			"key": "jwt",
 			"value": "PROVIDE",
+			"type": "string"
+		},
+		{
+			"key": "base_url_local",
+			"value": "http://localhost:5000",
 			"type": "string"
 		}
 	]

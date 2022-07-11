@@ -154,12 +154,17 @@ def test_payment_data_staff_search(client, jwt, selection, routing_slip, bcol_nu
     data = SBCPaymentClient.create_payment_staff_search_data(selection, transaction_info, 'TEST', 'UT-PAY-0001')
     # check
     assert data
-    assert len(data['filingInfo']['filingTypes']) == 1
     if waive_fees:
         assert data['filingInfo']['filingTypes'][0]['waiveFees']
     else:
         assert 'waiveFees' not in data['filingInfo']['filingTypes'][0]
-
+    assert not data['filingInfo']['filingTypes'][0]['priority']
+    if priority:
+        assert len(data['filingInfo']['filingTypes']) == 2
+        assert data['filingInfo']['filingTypes'][1]['filingTypeCode'] == 'PRIMH'
+        assert data['filingInfo']['filingTypes'][1]['priority']
+    else:
+        assert len(data['filingInfo']['filingTypes']) == 1
     if not routing_slip and not bcol_number:
         assert 'accountInfo' not in data
     elif routing_slip:
@@ -168,10 +173,6 @@ def test_payment_data_staff_search(client, jwt, selection, routing_slip, bcol_nu
         assert 'accountInfo' in data and data['accountInfo']['bcolAccountNumber'] == bcol_number
         if dat_number:
             assert data['accountInfo']['datNumber'] == dat_number
-    if priority:
-        assert data['filingInfo']['filingTypes'][0]['priority']
-    else:
-        assert not data['filingInfo']['filingTypes'][0]['priority']
 
 
 @pytest.mark.parametrize('filing_type,selection,staff', TEST_PAY_TYPE_FILING_TYPE_SEARCH)

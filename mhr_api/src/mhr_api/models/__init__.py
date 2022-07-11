@@ -15,6 +15,7 @@
 """This exports all of the models and schemas used by the application."""
 # flake8: noqa I001
 from .db import db
+from .account_bcol_id import AccountBcolId
 from .address import Address
 from .client_code import ClientCode
 from .court_order import CourtOrder
@@ -23,6 +24,7 @@ from .db2.descript import Db2Descript
 from .db2.docdes import Db2Docdes
 from .db2.document import Db2Document
 from .db2.location import Db2Location
+from .db2.manufact import Db2Manufact
 from .db2.manuhome import Db2Manuhome
 from .db2.mhomnote import Db2Mhomnote
 from .db2.owner import Db2Owner
@@ -49,9 +51,9 @@ from .type_tables import (
 from .vehicle_collateral import VehicleCollateral
 
 __all__ = ('db',
-           'Address', 'ClientCode', 'CountryType', 'CourtOrder',
-           'Db2Cmpserno', 'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manuhome', 'Db2Mhomnote',
-           'Db2Owner', 'Db2Owngroup',
+           'AccountBcolId', 'Address', 'ClientCode', 'CountryType', 'CourtOrder',
+           'Db2Cmpserno', 'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manufact', 'Db2Manuhome',
+           'Db2Mhomnote', 'Db2Owner', 'Db2Owngroup',
            'EventTracking', 'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'Party',
            'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
            'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',

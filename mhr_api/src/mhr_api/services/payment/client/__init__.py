@@ -73,6 +73,13 @@ PAYMENT_REQUEST_TEMPLATE = {
         }
     ]
 }
+PRIORITY_FILING_TYPE = {
+    'filingTypeCode': 'PRIMH',
+    'priority': True,
+    'futureEffective': False,
+    'quantity': 1
+}
+
 
 PAYMENT_REFUND_TEMPLATE = {
     'reason': 'Immediate transaction rollback.'
@@ -260,27 +267,30 @@ class SBCPaymentClient(BaseClient):
     @staticmethod
     def create_payment_staff_search_data(selections, transaction_info, mhr_id, client_reference_id=None):
         """Build the staff search payment-request body formatted as JSON."""
-        data = SBCPaymentClient.create_payment_search_data(selections, mhr_id, client_reference_id, False)
         if transaction_info.get('waiveFees'):
+            data = SBCPaymentClient.create_payment_search_data(selections, mhr_id, client_reference_id, False)
             for filing_type in data['filingInfo']['filingTypes']:
                 filing_type['waiveFees'] = True
-        else:
-            # set up FAS payment
-            if 'routingSlipNumber' in transaction_info:
-                account_info = {
-                    'routingSlip': transaction_info['routingSlipNumber']
-                }
-                data['accountInfo'] = account_info
-            # setup BCOL account payment
-            elif 'bcolAccountNumber' in transaction_info:
-                account_info = {
-                    'bcolAccountNumber': transaction_info['bcolAccountNumber']
-                }
-                if 'datNumber' in transaction_info:
-                    account_info['datNumber'] = transaction_info['datNumber']
-                data['accountInfo'] = account_info
-            if transaction_info.get('priority'):
-                data['filingInfo']['filingTypes'][0]['priority'] = True
+            return data
+
+        data = SBCPaymentClient.create_payment_search_data(selections, mhr_id, client_reference_id, True)
+        # set up FAS payment
+        if 'routingSlipNumber' in transaction_info:
+            account_info = {
+                'routingSlip': transaction_info['routingSlipNumber']
+            }
+            data['accountInfo'] = account_info
+        # setup BCOL account payment
+        elif 'bcolAccountNumber' in transaction_info:
+            account_info = {
+                'bcolAccountNumber': transaction_info['bcolAccountNumber']
+            }
+            if 'datNumber' in transaction_info:
+                account_info['datNumber'] = transaction_info['datNumber']
+            data['accountInfo'] = account_info
+        # Add priority filing type
+        if transaction_info.get('priority'):
+            data['filingInfo']['filingTypes'].append(PRIORITY_FILING_TYPE)
         return data
 
     @staticmethod

@@ -17,6 +17,7 @@ from typing import Optional
 
 from flask import Flask
 
+from .manufacturer import bp as manufacturers_bp
 from .meta import bp as meta_bp
 from .ops import bp as ops_bp
 from .registration_report_callback import bp as registration_report_callback_bp
@@ -40,6 +41,7 @@ class V1Endpoint:
 
         self.app = app
 
+        self.app.register_blueprint(manufacturers_bp)
         self.app.register_blueprint(meta_bp)
         self.app.register_blueprint(ops_bp)
         self.app.register_blueprint(searches_bp)
