@@ -23,7 +23,6 @@ from .db import db
 class AccountBcolId(db.Model):
     """Map a user account ID to one or more BCOL account numbers."""
 
-    __versioned__ = {}
     __tablename__ = 'account_bcol_ids'
     CROWN_CHARGE_YES = 'Y'
 
