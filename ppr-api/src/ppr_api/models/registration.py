@@ -63,6 +63,8 @@ class CrownChargeTypes(str, Enum):
     PROPERTY_TRANSFER_TAX = 'PT'
     RURAL_TAX = 'RA'
     SCHOOL_ACT = 'SC'
+    TOBACCO_TAX_ACT = 'TO'
+    SPECULATION_VACANCY_TAX_ACT = "SV"
     SOCIAL_TAX = 'SS'
     TAX_LIEN = 'TL'
 
@@ -336,8 +338,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """Lookup registration type record if it has not already been fetched."""
         if self.reg_type is None and self.registration_type:
             self.reg_type = db.session.query(RegistrationType).\
-                            filter(RegistrationType.registration_type == self.registration_type).\
-                            one_or_none()
+                filter(RegistrationType.registration_type == self.registration_type).\
+                one_or_none()
 
     def is_financing(self):
         """Check if the registration is a financing registration for some conditions."""
