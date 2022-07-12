@@ -86,7 +86,7 @@ ORDER BY d.regidate ASC
 
 OWNER_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
-       de.yearmade, de.makemodl, mh.manhomid, og.status
+       de.yearmade, de.makemodl, mh.manhomid, og.status, og.owngrpid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -105,7 +105,7 @@ ORDER BY o.ownrname ASC, d.regidate ASC
 
 ORG_NAME_QUERY = """
 SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
-       de.yearmade, de.makemodl, mh.manhomid, og.status
+       de.yearmade, de.makemodl, mh.manhomid, og.status, og.owngrpid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
