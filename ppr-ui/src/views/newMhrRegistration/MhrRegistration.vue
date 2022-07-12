@@ -112,7 +112,6 @@ export default class MhrRegistration extends Vue {
 
   mounted () {
     this.onAppReady(this.appReady)
-    this.setMhrRegistrationReviewing(false)
   }
 
   /** Emits error to app.vue for handling */
