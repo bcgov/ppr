@@ -150,7 +150,7 @@ export default class MhrRegistration extends Vue {
   }
 
   @Watch('$route.name')
-  private toggleMhrRegistrationReviewing (val: string) {
+  private startMhrRegistrationReviewing (val: string) {
     if (this.$route.name === RouteNames.MHR_REVIEW_CONFIRM && !this.getMhrRegistrationReviewing) {
       this.setMhrRegistrationReviewing(true)
     }
