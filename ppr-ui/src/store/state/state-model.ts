@@ -149,8 +149,7 @@ export const stateModel: StateModelIF = {
           country: ''
         }
       }
-    ],
-    reviewing: false
+    ]
   },
   registrationTable: {
     baseRegs: [],

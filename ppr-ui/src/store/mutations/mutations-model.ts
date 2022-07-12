@@ -369,7 +369,3 @@ export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
 export const mutateMhrHomeOwners = (state: StateIF, owners: Array<MhrRegistrationHomeOwnersIF>) => {
   state.stateModel.mhrRegistration.owners = owners
 }
-
-export const mutateMhrRegistrationReviewing = (state: StateIF, value: boolean) => {
-  state.stateModel.mhrRegistration.reviewing = value
-}

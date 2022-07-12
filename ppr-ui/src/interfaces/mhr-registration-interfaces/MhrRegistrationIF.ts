@@ -44,6 +44,5 @@ export interface MhrRegistrationIF {
         country: string
       }
     }
-  ],
-  reviewing: boolean
+  ]
 }

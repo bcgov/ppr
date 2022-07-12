@@ -131,7 +131,6 @@
               id="submitting-party-address"
               :schema="PartyAddressSchema"
               :value="submittingParty.address"
-              :trigger-errors="isReviewing"
               @valid="updateValidity($event)"
             />
           </article>
@@ -150,7 +149,6 @@ import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
-import { getMhrRegistrationReviewing } from '@/store/getters'
 
 export default defineComponent({
   name: 'MhrSubmittingParty',
@@ -165,11 +163,9 @@ export default defineComponent({
       'setMhrSubmittingParty'
     ])
     const {
-      getMhrRegistrationSubmittingParty,
-      getMhrRegistrationReviewing
+      getMhrRegistrationSubmittingParty
     } = useGetters<any>([
-      'getMhrRegistrationSubmittingParty',
-      'getMhrRegistrationReviewing'
+      'getMhrRegistrationSubmittingParty'
     ])
 
     // InputField Rules
@@ -212,94 +208,38 @@ export default defineComponent({
       }),
       isBusinessOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.BUSINESS
-      }),
-      isReviewing: computed((): boolean => {
-        return getMhrRegistrationReviewing.value
       })
     })
 
-    const firstNameRule = computed(() => {
-      const rule = customRules(
-        isStringOrNumber(),
-        maxLength(15),
-        invalidSpaces()
-      )
-      if (localState.isReviewing === true) {
-        rule.unshift(...required('Enter a first name'))
-      }
-      return rule
-    })
+    const firstNameRule = customRules(
+      required('Enter a first name'),
+      isStringOrNumber(),
+      maxLength(15),
+      invalidSpaces()
+    )
 
-    const middleNameRule = computed(() => {
-      return customRules(
-        isStringOrNumber(),
-        maxLength(15),
-        invalidSpaces()
-      )
-    })
+    const middleNameRule = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
 
-    const lastNameRule = computed(() => {
-      const rule = customRules(
-        isStringOrNumber(),
-        maxLength(25),
-        invalidSpaces()
-      )
-      if (localState.isReviewing === true) {
-        rule.unshift(...required('Enter a last name'))
-      }
-      return rule
-    })
+    const lastNameRule = customRules(
+      required('Enter a last name'),
+      isStringOrNumber(),
+      maxLength(25),
+      invalidSpaces())
 
-    const businessNameRule = computed(() => {
-      const rule = customRules(
-        isStringOrNumber(),
-        invalidSpaces()
-      )
-      if (localState.isReviewing === true) {
-        rule.unshift(...required('Business name is required'))
-      }
-      return rule
-    })
+    const businessNameRule = customRules(
+      required('Business name is required'),
+      isStringOrNumber(),
+      invalidSpaces())
 
-    const emailRule = computed(() => {
-      const rule = customRules(
-        invalidSpaces()
-      )
-      if (localState.isReviewing === true) {
-        rule.unshift(...required('Email address is required'))
-      }
-      return rule
-    })
+    const emailRule = customRules(required('Email address is required'), invalidSpaces())
 
-    const phoneRule = computed(() => {
-      const rule = customRules(
-        isNumber(),
-        invalidSpaces()
-      )
-      if (localState.isReviewing === true) {
-        rule.unshift(...required('Phone number is required'))
-      }
-      return rule
-    })
+    const phoneRule = customRules(required('Phone number is required'), isNumber(), invalidSpaces())
 
-    const phoneExtensionRule = computed(() => {
-      return customRules(
-        isNumber(),
-        invalidSpaces()
-      )
-    })
+    const phoneExtensionRule = customRules(isNumber(), invalidSpaces())
 
     const updateValidity = (valid) => {
       localState.addressValid = valid
     }
-
-    const submittingPartyForm = ref(null)
-
-    watch(() => getMhrRegistrationReviewing.value, () => {
-      if (getMhrRegistrationReviewing.value) {
-        submittingPartyForm.value.validate()
-      }
-    })
 
     /** Apply store properties to local model. **/
     watch(() => getMhrRegistrationSubmittingParty.value, () => {
@@ -357,7 +297,6 @@ export default defineComponent({
       emailRule,
       phoneRule,
       phoneExtensionRule,
-      submittingPartyForm,
       ...toRefs(localState)
     }
   }
