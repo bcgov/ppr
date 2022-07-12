@@ -50,6 +50,8 @@
             content-class="top-tooltip pa-5"
             transition="fade-transition"
             data-test-id="circa-year-tooltip"
+            nudge-right="3"
+            nudge-bottom="22"
           >
             <template v-slot:activator="{ on }">
               <v-icon
@@ -65,7 +67,7 @@
         </v-col>
       </v-row>
 
-      <v-divider class="mt-2 mb-5" />
+      <v-divider class="mt-2 mb-5 mx-0 w-100" />
 
       <v-row id="mhr-home-manufacturer-make">
         <v-col cols="2">

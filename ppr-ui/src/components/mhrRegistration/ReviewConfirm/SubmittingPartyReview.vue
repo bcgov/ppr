@@ -12,7 +12,7 @@
           <span class="error-text mx-1">This step is unfinished.</span>
           <router-link
             :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.SUBMITTING_PARTY}` }"
-          >Return to this step to finish it</router-link>
+          >Return to this step to complete it.</router-link>
         </span>
       </section>
 
@@ -58,4 +58,9 @@ export default defineComponent({
   padding: 1.25rem;
   color: $gray9;
 }
+
+.error-text {
+  font-size: 16px;
+}
+
 </style>
