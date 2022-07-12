@@ -17,6 +17,7 @@ import {
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
   MhrRegistrationDescriptionIF,
+  MhrRegistrationHomeOwnersIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -642,4 +643,8 @@ export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrati
 
 export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
   return state.stateModel.mhrRegistration.submittingParty
+}
+
+export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnersIF[] => {
+  return state.stateModel.mhrRegistration.owners
 }
