@@ -41,7 +41,7 @@
                   class="pt-4 pr-2"
                   label="First Name"
                   v-model="submittingParty.personName.first"
-                  :rules="[]"
+                  :rules="firstNameRule"
                 />
               </v-col>
               <v-col>
@@ -51,7 +51,7 @@
                   class="pt-4 px-2"
                   label="Middle Name (Optional)"
                   v-model="submittingParty.personName.middle"
-                  :rules="[]"
+                  :rules="middleNameRule"
                 />
               </v-col>
               <v-col>
@@ -61,7 +61,7 @@
                   class="pt-4 px-2"
                   label="Last Name"
                   v-model="submittingParty.personName.last"
-                  :rules="[]"
+                  :rules="lastNameRule"
                 />
               </v-col>
             </v-row>
@@ -78,7 +78,7 @@
                   class="pt-4 pr-2"
                   label="Business Name"
                   v-model="submittingParty.businessName"
-                  :rules="[]"
+                  :rules="businessNameRule"
                 />
               </v-col>
             </v-row>
@@ -92,7 +92,7 @@
             class="pt-4 pr-2"
             label="Email Address"
             v-model="submittingParty.emailAddress"
-            :rules="[]"
+            :rules="emailRule"
           />
 
           <!-- Phone Number -->
@@ -105,7 +105,7 @@
                 class="pt-4 pr-3"
                 label="Phone Number"
                 v-model="submittingParty.phoneNumber"
-                :rules="[]"
+                :rules="phoneRule"
               />
             </v-col>
             <v-col>
@@ -115,7 +115,7 @@
                 class="pt-4 px-2"
                 label="Extension (Optional)"
                 v-model="submittingParty.phoneExtension"
-                :rules="[]"
+                :rules="phoneExtensionRule"
               />
             </v-col>
           </v-row>
@@ -131,6 +131,7 @@
               id="submitting-party-address"
               :schema="PartyAddressSchema"
               :value="submittingParty.address"
+              :trigger-errors="isReviewing"
               @valid="updateValidity($event)"
             />
           </article>
@@ -142,13 +143,14 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch, ref } from '@vue/composition-api'
 import { useInputRules } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
+import { getMhrRegistrationReviewing } from '@/store/getters'
 
 export default defineComponent({
   name: 'MhrSubmittingParty',
@@ -163,9 +165,11 @@ export default defineComponent({
       'setMhrSubmittingParty'
     ])
     const {
-      getMhrRegistrationSubmittingParty
+      getMhrRegistrationSubmittingParty,
+      getMhrRegistrationReviewing
     } = useGetters<any>([
-      'getMhrRegistrationSubmittingParty'
+      'getMhrRegistrationSubmittingParty',
+      'getMhrRegistrationReviewing'
     ])
 
     // InputField Rules
@@ -173,7 +177,9 @@ export default defineComponent({
       customRules,
       invalidSpaces,
       maxLength,
-      required
+      required,
+      isStringOrNumber,
+      isNumber
     } = useInputRules()
 
     const localState = reactive({
@@ -200,16 +206,100 @@ export default defineComponent({
           deliveryInstructions: ''
         }
       },
+      addressValid: true,
       isPersonOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.PERSON
       }),
       isBusinessOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.BUSINESS
+      }),
+      isReviewing: computed((): boolean => {
+        return getMhrRegistrationReviewing.value
       })
     })
 
+    const firstNameRule = computed(() => {
+      const rule = customRules(
+        isStringOrNumber(),
+        maxLength(15),
+        invalidSpaces()
+      )
+      if (localState.isReviewing === true) {
+        rule.unshift(...required('Enter a first name'))
+      }
+      return rule
+    })
+
+    const middleNameRule = computed(() => {
+      return customRules(
+        isStringOrNumber(),
+        maxLength(15),
+        invalidSpaces()
+      )
+    })
+
+    const lastNameRule = computed(() => {
+      const rule = customRules(
+        isStringOrNumber(),
+        maxLength(25),
+        invalidSpaces()
+      )
+      if (localState.isReviewing === true) {
+        rule.unshift(...required('Enter a last name'))
+      }
+      return rule
+    })
+
+    const businessNameRule = computed(() => {
+      const rule = customRules(
+        isStringOrNumber(),
+        invalidSpaces()
+      )
+      if (localState.isReviewing === true) {
+        rule.unshift(...required('Business name is required'))
+      }
+      return rule
+    })
+
+    const emailRule = computed(() => {
+      const rule = customRules(
+        invalidSpaces()
+      )
+      if (localState.isReviewing === true) {
+        rule.unshift(...required('Email address is required'))
+      }
+      return rule
+    })
+
+    const phoneRule = computed(() => {
+      const rule = customRules(
+        isNumber(),
+        invalidSpaces()
+      )
+      if (localState.isReviewing === true) {
+        rule.unshift(...required('Phone number is required'))
+      }
+      return rule
+    })
+
+    const phoneExtensionRule = computed(() => {
+      return customRules(
+        isNumber(),
+        invalidSpaces()
+      )
+    })
+
     const updateValidity = (valid) => {
+      localState.addressValid = valid
     }
+
+    const submittingPartyForm = ref(null)
+
+    watch(() => getMhrRegistrationReviewing.value, () => {
+      if (getMhrRegistrationReviewing.value) {
+        submittingPartyForm.value.validate()
+      }
+    })
 
     /** Apply store properties to local model. **/
     watch(() => getMhrRegistrationSubmittingParty.value, () => {
@@ -260,6 +350,14 @@ export default defineComponent({
       updateValidity,
       PartyAddressSchema,
       SubmittingPartyTypes,
+      firstNameRule,
+      middleNameRule,
+      lastNameRule,
+      businessNameRule,
+      emailRule,
+      phoneRule,
+      phoneExtensionRule,
+      submittingPartyForm,
       ...toRefs(localState)
     }
   }

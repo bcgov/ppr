@@ -306,3 +306,7 @@ export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): voi
 export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRegistrationHomeOwnersIF[]): void => {
   commit('mutateMhrHomeOwners', owners)
 }
+
+export const setMhrRegistrationReviewing: ActionIF = ({ commit }, value: boolean): void => {
+  commit('mutateMhrRegistrationReviewing', value)
+}

@@ -80,8 +80,10 @@ export default class MhrRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
   @Getter getSteps!: Array<StepIF>
+  @Getter getMhrRegistrationReviewing: boolean
   @Action setRegistrationFlowType!: ActionBindingIF
   @Action setRegistrationType!: ActionBindingIF
+  @Action setMhrRegistrationReviewing: ActionBindingIF
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
@@ -110,6 +112,7 @@ export default class MhrRegistration extends Vue {
 
   mounted () {
     this.onAppReady(this.appReady)
+    this.setMhrRegistrationReviewing(false)
   }
 
   /** Emits error to app.vue for handling */
@@ -144,6 +147,14 @@ export default class MhrRegistration extends Vue {
     // page is ready to view
     this.emitHaveData(true)
     this.dataLoaded = true
+    this.setMhrRegistrationReviewing(false)
+  }
+
+  @Watch('$route.name')
+  private toggleMhrRegistrationReviewing (val: string) {
+    if (this.$route.name === RouteNames.MHR_REVIEW_CONFIRM && !this.getMhrRegistrationReviewing) {
+      this.setMhrRegistrationReviewing(true)
+    }
   }
 }
 </script>
