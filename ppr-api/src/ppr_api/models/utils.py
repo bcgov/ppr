@@ -165,6 +165,8 @@ REG_TYPE_TO_REG_CLASS = {
     'PT': 'CROWNLIEN',
     'RA': 'CROWNLIEN',
     'SC': 'CROWNLIEN',
+    'TO': 'CROWNLIEN',
+    'SV': 'CROWNLIEN',
     'SS': 'CROWNLIEN',
     'TL': 'CROWNLIEN',
     'DC': 'DISCHARGE',
