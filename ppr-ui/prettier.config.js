@@ -8,7 +8,7 @@ module.exports = {
   singleQuote: true,
   jsxSingleQuote: false,
   tabWidth: 2,
-  trailingComma: 'es5',
+  trailingComma: 'none',
   useTabs: false,
   vueIndentScriptAndStyle: false
 }
