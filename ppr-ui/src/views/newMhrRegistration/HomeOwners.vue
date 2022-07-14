@@ -10,7 +10,7 @@
       </p>
 
       <p>Your registration must contain:</p>
-      <p>
+      <div class="my-7">
         <v-icon
           v-if="getMhrRegistrationHomeOwners.length > 0"
           color="green darken-2"
@@ -19,7 +19,7 @@
         </v-icon>
         <v-icon v-else color="black">mdi-circle-small</v-icon>
         At least one owner
-      </p>
+      </div>
       <v-btn
         outlined
         color="primary"
@@ -39,8 +39,11 @@
         :disabled="showAddPersonOrganizationSection || showAddPersonSection"
         @click="showAddPersonOrganizationSection = true"
       >
-        <v-icon class="pr-1">mdi-domain-plus</v-icon> Add an Organization
+        <v-icon class="pr-1">mdi-domain-plus</v-icon>
+        Add a Business or Organization
       </v-btn>
+
+      <div class="my-6">Tenancy Type: {{ tenancyType }}</div>
     </section>
 
     <v-expand-transition>
@@ -93,6 +96,13 @@ export default class HomeOwners extends Vue {
 
   public showAddPersonSection = false
   public showAddPersonOrganizationSection = false
+
+  public get tenancyType (): string {
+    if (this.getMhrRegistrationHomeOwners?.length === 0) return 'N/A'
+    return this.getMhrRegistrationHomeOwners?.length === 1
+      ? 'Sole Ownership'
+      : 'Joint Tenancy'
+  }
 
   private async addPerson (personData): Promise<void> {
     const homeOwners = [...this.getMhrRegistrationHomeOwners]
