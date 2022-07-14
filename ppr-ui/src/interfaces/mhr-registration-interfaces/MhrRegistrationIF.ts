@@ -17,6 +17,7 @@ export interface MhrRegistrationIF {
     phoneExtension: number
   },
   owners: MhrRegistrationHomeOwnersIF[],
+  attentionReferenceNum: string,
   location: {
     parkName: string,
     pad: number,

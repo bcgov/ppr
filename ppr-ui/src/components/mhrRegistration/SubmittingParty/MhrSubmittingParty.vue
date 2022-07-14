@@ -29,6 +29,13 @@
 
         <v-divider class="my-9 ml-0 mr-2" />
 
+        <v-card v-if="showImportantMsg" outlined id="important-message" class="rounded-0 mb-9">
+          <p>
+            <strong>Important:</strong> If you make changes to the submitting party information below, the changes will
+            only be applicable to this registration. The party code information will not be updated.
+          </p>
+        </v-card>
+
         <v-form id="submitting-party-form" ref="submittingPartyForm" v-model="submittingPartyValid">
           <!-- Person Name Input -->
           <template v-if="isPersonOption">
@@ -142,7 +149,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch, ref } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { BaseAddress } from '@/composables/address'
@@ -203,6 +210,7 @@ export default defineComponent({
         }
       },
       addressValid: true,
+      showImportantMsg: false,
       isPersonOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.PERSON
       }),
@@ -226,10 +234,7 @@ export default defineComponent({
       maxLength(25),
       invalidSpaces())
 
-    const businessNameRule = customRules(
-      required('Business name is required'),
-      isStringOrNumber(),
-      invalidSpaces())
+    const businessNameRule = customRules(required('Business name is required'), invalidSpaces())
 
     const emailRule = customRules(required('Email address is required'), invalidSpaces())
 
@@ -254,6 +259,10 @@ export default defineComponent({
         localState.submittingParty.businessName
           ? localState.submittingPartyType = SubmittingPartyTypes.BUSINESS
           : localState.submittingPartyType = SubmittingPartyTypes.PERSON
+
+        if (getMhrRegistrationSubmittingParty.value.businessName) {
+          localState.showImportantMsg = true
+        }
       }
     }, { deep: true, immediate: true })
 
@@ -328,6 +337,19 @@ p {
   background-color: white;
   ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
     color: $gray9 !important;
+  }
+}
+#important-message {
+  background-color: $BCgovGold0 !important;
+  border-color: $BCgovGold5 !important;
+  border-radius: 0;
+
+  p {
+    margin: 1.25rem;
+    padding: 0;
+    font-size: $px-14;
+    letter-spacing: 0.01rem;
+    color: $gray7;
   }
 }
 ::v-deep {

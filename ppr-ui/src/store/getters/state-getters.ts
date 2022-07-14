@@ -648,3 +648,7 @@ export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
 export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnersIF[] => {
   return state.stateModel.mhrRegistration.owners
 }
+
+export const getMhrAttentionReferenceNum = (state: StateIF): any => {
+  return state.stateModel.mhrRegistration.attentionReferenceNum
+}
