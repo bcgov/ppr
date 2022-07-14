@@ -1,3 +1,5 @@
+import { AddressIF } from "@/composables/address/interfaces"
+
 export interface MhrRegistrationHomeOwnersIF {
   individualName: {
     first: string,
@@ -6,12 +8,6 @@ export interface MhrRegistrationHomeOwnersIF {
   },
   phoneNumber: number,
   phoneExtension: number
-  // address: {
-  //   street: string,
-  //   city: string,
-  //   region: string,
-  //   country: string,
-  //   postalCode: string
-  // },
+  address: AddressIF
   // type: string
 }

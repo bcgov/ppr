@@ -75,6 +75,7 @@
           <base-address
             :editing="true"
             :schema="{ ...addressSchema }"
+            v-model="address"
             class="mt-2"
           />
 
@@ -138,7 +139,16 @@ export default defineComponent({
         last: ''
       },
       phoneNumber: null,
-      phoneExtension: null
+      phoneExtension: null,
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: '',
+        deliveryInstructions: ''
+      }
     }
 
     const localState = reactive({

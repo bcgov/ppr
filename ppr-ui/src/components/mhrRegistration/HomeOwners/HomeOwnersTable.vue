@@ -14,13 +14,21 @@
     >
       <template v-slot:item="row">
         <tr :key="row.item.id">
-          <td>
+          <td class="py-6">
+            <v-icon color="darker">mdi-account</v-icon>
             {{ row.item.individualName.first }}
             {{ row.item.individualName.middle }}
             {{ row.item.individualName.last }}
           </td>
-          <td></td>
-          <td>{{ row.item.phoneNumber }} Ext {{ row.item.phoneExtension }}</td>
+          <td class="py-6">
+            <base-address :schema="addressSchema" :value="row.item.address" />
+          </td>
+          <td class="py-6">
+            {{ row.item.phoneNumber }}
+            <span v-if="row.item.phoneExtension">
+              Ext {{ row.item.phoneExtension }}
+            </span>
+          </td>
         </tr>
       </template>
     </v-data-table>
@@ -30,14 +38,22 @@
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
+import { BaseAddress } from '@/composables/address'
+import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
     homeOwners: { default: [] }
   },
+  components: {
+    BaseAddress
+  },
   setup () {
+    const addressSchema = PartyAddressSchema
+
     return {
+      addressSchema,
       homeOwnersTableHeaders
     }
   }
