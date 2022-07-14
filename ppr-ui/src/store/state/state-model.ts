@@ -104,22 +104,7 @@ export const stateModel: StateModelIF = {
       phoneNumber: null,
       phoneExtension: null
     },
-    owners: [
-      {
-        individualName: {
-          first: '',
-          last: ''
-        },
-        address: {
-          street: '',
-          city: '',
-          region: '',
-          country: '',
-          postalCode: ''
-        },
-        type: ''
-      }
-    ],
+    owners: [],
     location: {
       parkName: '',
       pad: null,
