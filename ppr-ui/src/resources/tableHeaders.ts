@@ -589,3 +589,24 @@ export const homeSectionsReviewTableHeaders: Array<BaseHeaderIF> = [
     value: 'width'
   }
 ]
+
+export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Name',
+    value: 'fullName'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Mailing Address',
+    value: 'mailingAddress'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Phone Number',
+    value: 'phoneNumber'
+  }
+]
