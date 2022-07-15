@@ -196,9 +196,13 @@ def set_path(params: AccountRegistrationParams, result, reg_num: str, base_reg_n
     elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
         result['path'] = FINANCING_PATH + base_reg_num + '/amendments/' + reg_num
 
-    if pending_count > 0 or not can_access_report(params.account_id, params.account_name, result, params.sbc_staff):
+    if not can_access_report(params.account_id, params.account_name, result, params.sbc_staff):
         result['path'] = ''
-
+    elif pending_count > 0:
+        # Allow report regeneration if pending and > 15 minutes has elapsed.
+        last_ts = model_utils.ts_from_iso_format(result['lastUpdateDateTime'])
+        if not model_utils.report_retry_elapsed(last_ts):
+            result['path'] = ''
     return result
 
 
