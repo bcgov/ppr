@@ -45,17 +45,21 @@
             class="float-left"
             data-test-id="circa-year-checkbox"
           />
-           <v-tooltip
+          <v-tooltip
             top
             content-class="top-tooltip pa-5"
             transition="fade-transition"
             data-test-id="circa-year-tooltip"
+            nudge-right="3"
+            nudge-bottom="22"
           >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="circa-tooltip-icon ml-2 mt-n1"
                 color="primary"
-                v-on="on">mdi-information-outline</v-icon>
+                v-on="on"
+                >mdi-information-outline</v-icon
+              >
             </template>
             When the exact year of manufacture is unknown, enter an estimated
             year and indicate that the year is approximate.
@@ -63,52 +67,69 @@
         </v-col>
       </v-row>
 
-      <v-divider class="mt-2 mb-5" />
+      <v-divider class="mt-2 mb-5 mx-0 w-100" />
 
-      <v-row id="mhr-home-manufacturer-make">
-        <v-col cols="2">
-          <label class="generic-label" for="manufacturer-make">Make</label>
-        </v-col>
-        <v-col cols="10">
-          <v-text-field
-            id="manufacturer-make"
-            v-model="make"
-            filled
-            :rules="makeRules"
-            label="Make"
-            data-test-id="manufacturer-make"
-          />
-        </v-col>
-      </v-row>
+      <v-form ref="makeModelComboForm">
+        <v-row id="mhr-home-manufacturer-make">
+          <v-col cols="2">
+            <label class="generic-label" for="manufacturer-make">Make</label>
+          </v-col>
+          <v-col cols="10">
+            <v-text-field
+              id="manufacturer-make"
+              v-model="make"
+              filled
+              :rules="makeRules"
+              label="Make"
+              data-test-id="manufacturer-make"
+            />
+          </v-col>
+        </v-row>
 
-      <v-row id="mhr-home-manufacturer-model">
-        <v-col cols="2">
-          <label class="generic-label" for="manufacturer-model">Model</label>
-        </v-col>
-        <v-col cols="10">
-          <v-text-field
-            id="manufacturer-model"
-            v-model="model"
-            filled
-            :rules="modelRules"
-            label="Model"
-            data-test-id="manufacturer-model"
-          >
-          </v-text-field>
-        </v-col>
-      </v-row>
+        <v-row id="mhr-home-manufacturer-model">
+          <v-col cols="2">
+            <label class="generic-label" for="manufacturer-model">Model</label>
+          </v-col>
+          <v-col cols="10">
+            <v-text-field
+              id="manufacturer-model"
+              v-model="model"
+              filled
+              :rules="modelRules"
+              label="Model"
+              data-test-id="manufacturer-model"
+            >
+            </v-text-field>
+          </v-col>
+        </v-row>
+      </v-form>
     </v-card>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  watch
+} from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
-  setup () {
-    const { customRules, required, minLength, maxLength, startsWith, graterThan, isNumber } = useInputRules()
+  setup (props, context) {
+    const {
+      customRules,
+      required,
+      minLength,
+      maxLength,
+      startsWith,
+      graterThan,
+      isNumber
+    } = useInputRules()
 
     const {
       getMhrRegistrationManufacturerName,
@@ -131,6 +152,8 @@ export default defineComponent({
       'setMhrHomeDescription',
       'setMhrHomeBaseInformation'
     ])
+
+    const makeModelComboForm = ref(null)
 
     const manufactureYearRules = computed((): Array<Function> =>
       customRules(
@@ -196,6 +219,8 @@ export default defineComponent({
     watch(
       () => localState.make,
       (val: string) => {
+        // @ts-ignore - function exists
+        context.refs.makeModelComboForm.validate()
         setMhrHomeBaseInformation({ key: 'make', value: val })
       }
     )
@@ -203,11 +228,14 @@ export default defineComponent({
     watch(
       () => localState.model,
       (val: string) => {
+        // @ts-ignore - function exists
+        context.refs.makeModelComboForm.validate()
         setMhrHomeBaseInformation({ key: 'model', value: val })
       }
     )
 
     return {
+      makeModelComboForm,
       manufactureYearRules,
       makeRules,
       modelRules,

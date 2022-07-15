@@ -12,7 +12,7 @@
           <span class="error-text mx-1">This step is unfinished.</span>
           <router-link
             :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.YOUR_HOME}` }"
-          >Return to this step to finish it</router-link>
+          >Return to this step to complete it.</router-link>
         </span>
       </section>
 
@@ -31,7 +31,7 @@
             <h3>Year of Manufacture</h3>
           </v-col>
           <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.baseInformation.year }}</p>
+            <p>{{ getMhrRegistrationHomeDescription.baseInformation.year || '(Not Entered)' }}</p>
           </v-col>
         </v-row>
         <v-row no-gutters class="pt-3 px-6">
@@ -39,7 +39,7 @@
             <h3>Make</h3>
           </v-col>
           <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.baseInformation.make }}</p>
+            <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)'  }}</p>
           </v-col>
         </v-row>
         <v-row no-gutters class="pt-3 px-6">
@@ -47,13 +47,13 @@
             <h3>Model</h3>
           </v-col>
           <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.baseInformation.model }}</p>
+            <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)'  }}</p>
           </v-col>
         </v-row>
       </section>
 
       <!-- divider -->
-      <div class="px-4">
+      <div class="px-6">
         <v-divider />
       </div>
 
@@ -108,7 +108,7 @@
       </template>
 
       <!-- divider -->
-      <div class="px-4">
+      <div class="px-6">
         <v-divider />
       </div>
 
@@ -120,7 +120,7 @@
         </section>
       </template>
 
-      <div class="px-4">
+      <div class="px-6">
         <v-divider />
       </div>
 
@@ -134,7 +134,7 @@
         </v-col>
       </v-row>
 
-      <div class="px-4">
+      <div class="px-5">
         <v-divider />
       </div>
 
@@ -212,6 +212,10 @@ export default defineComponent({
     line-height: 24px;
     color: $gray7;
   }
+}
+
+.error-text {
+  font-size: 16px;
 }
 
 #review-home-sections {
