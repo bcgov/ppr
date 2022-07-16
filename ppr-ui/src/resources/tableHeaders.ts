@@ -595,7 +595,8 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-mdl',
     sortable: false,
     text: 'Name',
-    value: 'fullName'
+    value: 'fullName',
+    width: '11rem'
   },
   {
     class: 'column-lg',
@@ -608,5 +609,11 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber'
+  },
+  {
+    class: 'actions',
+    sortable: false,
+    text: '',
+    value: 'actions'
   }
 ]
