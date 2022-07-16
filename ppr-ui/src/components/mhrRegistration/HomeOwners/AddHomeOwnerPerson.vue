@@ -8,76 +8,81 @@
           </label>
         </v-col>
         <v-col cols="9">
-          <label class="generic-label" for="manufacturer-name">
-            Person's Name
-          </label>
-          <v-row>
-            <v-col cols="4">
-              <v-text-field
-                id="first-name"
-                v-model="individualName.first"
-                filled
-                :rules="maxLength(15)"
-                label="First Name"
-                data-test-id="first-name"
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                id="middle-name"
-                v-model="individualName.middle"
-                filled
-                :rules="maxLength(15)"
-                label="Middle Name"
-                data-test-id="first-name"
-            /></v-col>
-            <v-col cols="4">
-              <v-text-field
-                id="last-name"
-                v-model="individualName.last"
-                filled
-                :rules="maxLength(15)"
-                label="Last Name"
-                data-test-id="first-name"
-            /></v-col>
-          </v-row>
+          <v-form
+            id="addPersonForm"
+            ref="addPersonForm"
+            v-model="isAddPersonFormValid"
+          >
+            <label class="generic-label" for="manufacturer-name">
+              Person's Name
+            </label>
+            <v-row>
+              <v-col cols="4">
+                <v-text-field
+                  id="first-name"
+                  v-model="individualName.first"
+                  filled
+                  :rules="firsNameRules"
+                  label="First Name"
+                  data-test-id="first-name"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  id="middle-name"
+                  v-model="individualName.middle"
+                  filled
+                  label="Middle Name"
+                  data-test-id="first-name"
+              /></v-col>
+              <v-col cols="4">
+                <v-text-field
+                  id="last-name"
+                  v-model="individualName.last"
+                  filled
+                  :rules="maxLength(15)"
+                  label="Last Name"
+                  data-test-id="first-name"
+              /></v-col>
+            </v-row>
 
-          <label class="generic-label" for="manufacturer-name">
-            Phone Number
-          </label>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field
-                id="phone-number"
-                v-model="phoneNumber"
-                filled
-                :rules="maxLength(15)"
-                label="Phone Number"
-                data-test-id="phone-number"
-              />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field
-                id="phone-ext"
-                v-model="phoneExtension"
-                filled
-                :rules="maxLength(15)"
-                label="Extension (Optional)"
-                data-test-id="phone-ext"
-              />
-            </v-col>
-          </v-row>
+            <label class="generic-label" for="manufacturer-name">
+              Phone Number
+            </label>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field
+                  id="phone-number"
+                  v-model="phoneNumber"
+                  filled
+                  :rules="maxLength(15)"
+                  label="Phone Number"
+                  data-test-id="phone-number"
+                />
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  id="phone-ext"
+                  v-model="phoneExtension"
+                  filled
+                  :rules="maxLength(15)"
+                  label="Extension (Optional)"
+                  data-test-id="phone-ext"
+                />
+              </v-col>
+            </v-row>
 
-          <label class="generic-label" for="manufacturer-name">
-            Mailing Address
-          </label>
+            <label class="generic-label" for="manufacturer-name">
+              Mailing Address
+            </label>
 
-          <base-address
-            :editing="true"
-            :schema="{ ...addressSchema }"
-            v-model="address"
-            class="mt-2"
-          />
+            <base-address
+              :editing="true"
+              :schema="{ ...addressSchema }"
+              v-model="address"
+              class="mt-2"
+            />
+          </v-form>
 
           <v-row>
             <v-col cols="6">
@@ -115,10 +120,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs
+} from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
+import { focusOnFirstError } from '@/utils'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
 /* eslint-enable no-unused-vars */
@@ -129,8 +141,9 @@ export default defineComponent({
     BaseAddress
   },
   setup (props, context) {
-    const { maxLength } = useInputRules()
+    const { required, maxLength, customRules } = useInputRules()
     const addressSchema = PartyAddressSchema
+    const addPersonForm = ref(null)
 
     const defaultPersonOwner: MhrRegistrationHomeOwnersIF = {
       individualName: {
@@ -152,12 +165,24 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      ...defaultPersonOwner
+      ...defaultPersonOwner,
+      isAddPersonFormValid: false,
+      firsNameRules: computed(
+        (): Array<Function> => {
+          return customRules(required('This field is required'), maxLength(15))
+        }
+      )
     })
 
     const done = (): void => {
-      context.emit('done', localState)
-      cancel()
+      // @ts-ignore - function exists
+      context.refs.addPersonForm.validate()
+      if (localState.isAddPersonFormValid) {
+        context.emit('done', localState)
+        cancel()
+      } else {
+        focusOnFirstError('addPersonForm')
+      }
     }
     const remove = (): void => {
       context.emit('remove')
@@ -170,6 +195,7 @@ export default defineComponent({
       done,
       remove,
       cancel,
+      addPersonForm,
       maxLength,
       addressSchema,
       ...toRefs(localState)
