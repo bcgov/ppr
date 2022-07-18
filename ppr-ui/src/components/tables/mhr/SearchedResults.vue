@@ -98,14 +98,14 @@
             >
               <span v-if="group === 'ACTIVE'">
                 <span class="pl-8">
-                  ACTIVE ({{ activeMatchesLength }})
+                  ACTIVE OWNERS ({{ activeMatchesLength }})
                 </span>
               </span>
               <span v-else-if="group === 'EXEMPT'" class="pl-8">
-                EXEMPT ({{ exemptMatchesLength }})
+                EXEMPT OWNERS ({{ exemptMatchesLength }})
               </span>
               <span v-else-if="group === 'HISTORIC'" class="pl-8">
-                HISTORIC ({{ historicalMatchesLength }})
+                HISTORIC OWNERS ({{ historicalMatchesLength }})
               </span>
             </td>
           </template>
