@@ -50,7 +50,6 @@
       <AddHomeOwnerPerson
         v-if="showAddPersonSection"
         @done="addPerson($event)"
-        @remove="() => {}"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
@@ -65,7 +64,11 @@
     </v-expand-transition>
 
     <div>
-      <HomeOwnersTable :homeOwners="getMhrRegistrationHomeOwners" />
+      <HomeOwnersTable
+        :homeOwners="getMhrRegistrationHomeOwners"
+        @edit="editHomeOwner($event)"
+        @remove="removeHomeOwner($event)"
+      />
     </div>
   </div>
 </template>
@@ -107,6 +110,24 @@ export default class HomeOwners extends Vue {
   private async addPerson (personData): Promise<void> {
     const homeOwners = [...this.getMhrRegistrationHomeOwners]
     homeOwners.push(personData)
+    this.setMhrRegistrationHomeOwners(homeOwners)
+  }
+
+  public async editHomeOwner (owner): Promise<void> {
+    console.log('Editing Home Owner')
+
+    const homeOwners = [...this.getMhrRegistrationHomeOwners]
+    // Create edited homeSection without id
+    const { id, ...editedOwner } = owner
+    // Apply edited section to temp array
+    homeOwners[owner.id] = editedOwner
+
+    this.setMhrRegistrationHomeOwners(homeOwners)
+  }
+
+  public async removeHomeOwner (owner): Promise<void> {
+    const homeOwners = [...this.getMhrRegistrationHomeOwners]
+    homeOwners.splice(homeOwners.indexOf(owner), 1)
     this.setMhrRegistrationHomeOwners(homeOwners)
   }
 }

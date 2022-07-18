@@ -3,8 +3,10 @@
     <v-card flat class="py-6 px-8 rounded">
       <v-row id="mhr-home-manufacturer-name">
         <v-col cols="3">
-          <label class="generic-label">
-            Add a Person
+          <label
+            class="generic-label"
+            v-text="isAddingHomeOwner ? 'Add a Person' : 'Edit Person'"
+          >
           </label>
         </v-col>
         <v-col cols="9">
@@ -34,7 +36,8 @@
                   filled
                   label="Middle Name"
                   data-test-id="first-name"
-              /></v-col>
+                />
+              </v-col>
               <v-col cols="4">
                 <v-text-field
                   id="last-name"
@@ -43,7 +46,8 @@
                   :rules="maxLength(15)"
                   label="Last Name"
                   data-test-id="first-name"
-              /></v-col>
+                />
+              </v-col>
             </v-row>
 
             <label class="generic-label" for="manufacturer-name">
@@ -90,7 +94,7 @@
                 outlined
                 color="error"
                 class="remove-btn"
-                :disabled="true"
+                :disabled="!isAddingHomeOwner"
                 :ripple="false"
                 @click="remove()"
               >
@@ -140,6 +144,12 @@ export default defineComponent({
   components: {
     BaseAddress
   },
+  props: {
+    editHomeOwner: {
+      type: Object as () => MhrRegistrationHomeOwnersIF,
+      default: null
+    }
+  },
   setup (props, context) {
     const { required, maxLength, customRules } = useInputRules()
     const addressSchema = PartyAddressSchema
@@ -147,7 +157,7 @@ export default defineComponent({
 
     const defaultPersonOwner: MhrRegistrationHomeOwnersIF = {
       individualName: {
-        first: '',
+        first: props.editHomeOwner?.individualName.first || '',
         middle: '',
         last: ''
       },
@@ -166,6 +176,7 @@ export default defineComponent({
 
     const localState = reactive({
       ...defaultPersonOwner,
+      isAddingHomeOwner: props.editHomeOwner == null,
       isAddPersonFormValid: false,
       firsNameRules: computed(
         (): Array<Function> => {
