@@ -11,7 +11,6 @@ export const defaultFlagSet: LDFlagSet = {
   'search-serial-number': false,
   'mhr-ui-enabled': false,
   'mhr-registration-enabled': false
-}
 
 /**
  * The Launch Darkly client instance.
