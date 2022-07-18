@@ -137,20 +137,3 @@ class JobTracker:
         finally:
             if cursor is not None:
                 cursor.close()
-
-
-# Start script
-if __name__ == "__main__":
-    opts = {'host': 'localhost', 'port': 5432, 'dbname': 'jobs', 'user': 'job_runner', 'password': 'jw8s0F4'}
-    job = JobTracker(**opts)
-    job_id = job._get_job_id('assets', 'ppr_mhr_dissolutions')
-
-    running_id = job.start_job('assets', 'ppr_mhr_dissolutions', JobStateEnum.RUNNING)
-
-    job.stop_job(running_id, JobStateEnum.DONE)
-
-    running_id = job.start_job('assets', 'ppr_mhr_dissolutions', JobStateEnum.RUNNING)
-
-    job.stop_job(running_id, JobStateEnum.ERROR, '001', 'some general error info')
-
-    print(job_id)

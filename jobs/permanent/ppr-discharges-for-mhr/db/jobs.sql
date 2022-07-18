@@ -1,7 +1,7 @@
 
 create database jobs;
-create user job_runner WITH PASSWORD 'jw8s0F4';
-create user job_owner WITH PASSWORD 'jownSF124';
+create user job_runner WITH PASSWORD '<replace this>';
+create user job_owner WITH PASSWORD '<replace this>';
 
 
 CREATE SCHEMA jobs;
