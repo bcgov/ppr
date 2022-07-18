@@ -10,6 +10,7 @@ import requests
 from .common.datetime import datetime
 from .services.job_tracking import JobStateEnum, JobTracker
 from .services.logging import logging
+from .services.notify import Notify
 from .services.secrets.google_secrets import GoogleSecretService
 from .services.storage import AbstractStorageService, GoogleCloudStorage, StorageDocumentTypes
 
@@ -65,6 +66,7 @@ def job(config):
 
     try:
         # Get the secrets that provide the params for the SQL used in the Job
+        logging.info(f'Get the secrets for {START_TIME_NAME}, {END_TIME_NAME}.')
         secrets = GoogleSecretService()
         secrets.connect(**{'project_id': config.PROJECT_ID})
         start = secrets.get_secret_version(START_TIME_NAME)
@@ -73,42 +75,55 @@ def job(config):
 
         # Build query
         query = QUERY.format(start_time=start, end_time=end)
+        logging.info(f'Format query: {query}')
 
         # Connect to the app database and do a CSV COPY of the query
         db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
         err, csv_buffer = csv_export(db_conn, query)
+        logging.info('Completed the CSV Extract')
 
+        # setup the filename to store the CSV file
         filename = config.FILENAME_TEMPLATE.format(date=datetime.utcnow().strftime('%Y-%m-%d-%H-%M-%S'))
         if config.STORAGE_FILEPATH:
             filename = config.STORAGE_FILEPATH + filename
 
+        # store the CSV to google cloud storage
         storage = GoogleCloudStorage(config)
         storage.connect()
         storage.save_document(bucket_name=config.STORAGE_BUCKET_NAME,
                               filename=filename,
                               raw_data=csv_buffer.getvalue(),
                               doc_type=StorageDocumentTypes.TEXT.value)
+        logging.info(f'Stored the filename: {filename}')
         
+        # Create hte time limited, signed URL
         doc_url = storage.generate_download_signed_url(bucket_name=config.STORAGE_BUCKET_NAME,
-                              blob_name=filename)
+                                                       blob_name=filename,
+                                                       available_days=2)
+        logging.info('Doc URL created.')
         
-        json_data = {"recipients": config.EMAIL_RECIPIENTS,
+        email_data = {"recipients": config.EMAIL_RECIPIENTS,
                      "content": {
                         'subject': EMAIL_SUBJECT.format(filename),
                         'body': EMAIL_BODY.format(filename, doc_url)
                      }
                     }
-                   
-        res = requests.post(url=config.NOTIFY_URL,
-                             json=json_data)
-        
-        if res.status_code != HTTPStatus.OK:
-            raise Exception('email not sent')
-        
-        secrets.add_secret_version(START_TIME_NAME, end)
 
+        # Send email
+        notify = Notify(**{'url': config.NOTIFY_URL})
+        ret = notify.send_email(email_data)
+        logging.info(f'Email sent, return code: {ret}')
+        if ret != HTTPStatus.OK:
+            raise Exception('email not sent')
+
+        # Update the secrets.
+        secrets.add_secret_version(START_TIME_NAME, end)
+        logging.info('Secret updated.')
+
+        # Close off the job
         job_tracker.stop_job(running_job_id, JobStateEnum.DONE)
 
     except Exception as err:
-        job_tracker.stop_job(running_job_id, JobStateEnum.ERROR, error_code='001', error_additional_details=err.__str__)
+        job_tracker.stop_job(running_job_id, JobStateEnum.ERROR, error_code='001', error_additional_details=err)
+        logging.error(f'Job failed: {err}', err)
         sys.exit(1)  # Retry Job Task by exiting the process

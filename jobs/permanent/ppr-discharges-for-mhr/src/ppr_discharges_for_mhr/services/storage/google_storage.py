@@ -102,9 +102,7 @@ class GoogleCloudStorage(AbstractStorageService):
 
         url = blob.generate_signed_url(
             version="v4",
-            # This URL is valid for 15 minutes
             expiration=datetime.timedelta(days=available_days, hours=available_hours, minutes=available_minutes),
-            # Allow GET requests using this URL.
             method="GET",
         )
         return url

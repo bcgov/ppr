@@ -30,6 +30,6 @@ RUN pip install .
 USER 1001
 
 # Set Python path
-# ENV PYTHONPATH=/opt/app-root/src
+ENV PYTHONPATH=/opt/app-root/src
 
-CMD [ "python", "-m  ppr_discharges_for_mhr" ]
+CMD [ "python", "-m", "ppr_discharges_for_mhr" ]
