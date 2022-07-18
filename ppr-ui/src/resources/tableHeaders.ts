@@ -454,7 +454,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Status',
+    text: 'Owner Status',
     value: 'state'
   },
   {

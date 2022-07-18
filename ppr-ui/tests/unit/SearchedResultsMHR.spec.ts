@@ -115,8 +115,8 @@ describe('Serial number results', () => {
     expect(rows.length).toBe(testResults.results.length + 3)
 
     const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE OWNERS (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT OWNERS (2)')
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -203,8 +203,8 @@ describe('Owner name debtor results', () => {
     expect(rows.length).toBe(testResults.results.length + 3)
 
     const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE OWNERS (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT OWNERS (2)')
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -291,8 +291,8 @@ describe('Business debtor results', () => {
     expect(rows.length).toBe(testResults.results.length + 3)
 
     const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE OWNERS (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT OWNERS (2)')
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -375,9 +375,9 @@ describe('Manufactured home results', () => {
     expect(rows.length).toBe(testResults.results.length + 4)
 
     const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT (2)')
-    expect(groupHeaders.at(2).text()).toBe('HISTORIC (1)')
+    expect(groupHeaders.at(0).text()).toBe('ACTIVE OWNERS (2)')
+    expect(groupHeaders.at(1).text()).toBe('EXEMPT OWNERS (2)')
+    expect(groupHeaders.at(2).text()).toBe('HISTORIC OWNERS (1)')
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
