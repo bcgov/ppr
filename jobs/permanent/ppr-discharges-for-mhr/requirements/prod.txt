@@ -1,0 +1,8 @@
+google-auth
+google-cloud-secret-manager
+google-cloud-storage
+google-crc32c
+six
+psycopg2-binary
+python-dotenv
+requests
