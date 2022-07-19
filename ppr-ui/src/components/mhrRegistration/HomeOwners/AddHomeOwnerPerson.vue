@@ -43,7 +43,7 @@
                   id="last-name"
                   v-model="individualName.last"
                   filled
-                  :rules="maxLength(15)"
+                  :rules="lastNameRules"
                   label="Last Name"
                   data-test-id="last-name"
                 />
@@ -59,7 +59,7 @@
                   id="phone-number"
                   v-model="phoneNumber"
                   filled
-                  :rules="maxLength(15)"
+                  :rules="phoneNumberRules"
                   label="Phone Number"
                   data-test-id="phone-number"
                 />
@@ -69,7 +69,7 @@
                   id="phone-ext"
                   v-model="phoneExtension"
                   filled
-                  :rules="maxLength(15)"
+                  :rules="maxLength(5, true)"
                   label="Extension (Optional)"
                   data-test-id="phone-ext"
                 />
@@ -84,6 +84,8 @@
               :editing="true"
               :schema="{ ...addressSchema }"
               v-model="address"
+              :triggerErrors="triggerAddressErrors"
+              @valid="isAddressFormValid = $event"
               class="mt-2"
             />
           </v-form>
@@ -124,13 +126,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  reactive,
-  ref,
-  toRefs
-} from '@vue/composition-api'
+import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
@@ -151,7 +147,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { required, maxLength, customRules } = useInputRules()
+    const { required, customRules, maxLength } = useInputRules()
     const addressSchema = PartyAddressSchema
     const addPersonForm = ref(null)
 
@@ -179,20 +175,24 @@ export default defineComponent({
       ...defaultPersonOwner,
       isAddingHomeOwner: props.editHomeOwner == null,
       isAddPersonFormValid: false,
-      firsNameRules: computed(
-        (): Array<Function> => {
-          return customRules(required('This field is required'), maxLength(15))
-        }
+      isAddressFormValid: false,
+      triggerAddressErrors: false,
+      firsNameRules: customRules(required('Enter a first name'), maxLength(15)),
+      lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
+      phoneNumberRules: customRules(
+        required('Enter a phone number'),
+        maxLength(10, true)
       )
     })
 
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addPersonForm.validate()
-      if (localState.isAddPersonFormValid) {
+      if (localState.isAddPersonFormValid && localState.isAddressFormValid) {
         context.emit('done', localState)
         cancel()
       } else {
+        localState.triggerAddressErrors = !localState.triggerAddressErrors
         focusOnFirstError('addPersonForm')
       }
     }
