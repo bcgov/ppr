@@ -234,7 +234,11 @@ export default defineComponent({
       maxLength(25),
       invalidSpaces())
 
-    const businessNameRule = customRules(required('Business name is required'), invalidSpaces())
+    const businessNameRule = customRules(
+      required('Business name is required'),
+      maxLength(70),
+      invalidSpaces()
+    )
 
     const emailRule = customRules(required('Email address is required'), invalidSpaces())
 

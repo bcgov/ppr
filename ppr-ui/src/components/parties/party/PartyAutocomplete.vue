@@ -137,10 +137,7 @@ export default defineComponent({
     })
 
     const wasSelected = (val: SearchPartyIF) => {
-      if (localState.selectedCode === val.code) {
-        return 'wasSelected'
-      }
-      return ''
+      return localState.selectedCode === val.code ? 'was-selected' : ''
     }
 
     const addResult = (party: SearchPartyIF, resultIndex) => {
@@ -248,7 +245,7 @@ export default defineComponent({
   color: $gray7 !important;
 }
 
-.wasSelected {
+.was-selected {
   background-color: $blueSelected;
   color: $primary-blue !important;
 }

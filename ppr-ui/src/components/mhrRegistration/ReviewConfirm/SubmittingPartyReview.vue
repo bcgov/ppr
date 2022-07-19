@@ -2,7 +2,7 @@
   <v-card flat id="submitting-party-summary" class="mt-6 pb-6">
     <header class="review-header">
       <v-icon class="ml-2" color="darkBlue">mdi-account</v-icon>
-      <label class="font-weight-bold pl-2">Submitting Party</label>
+      <label class="font-weight-bold pl-2">Submitting Party </label>
     </header>
 
     <div :class="{ 'invalid-section': false }">
@@ -55,7 +55,14 @@
               </v-row>
             </v-col>
             <v-col cols="3">
-              <p class="content" v-html="parseAddress()"></p>
+              <base-address
+                v-if="!Object.values(address).every((val) => { return !val })"
+                class="content"
+                :schema="addressSchema"
+                :value="address"
+              >
+              </base-address>
+              <p v-else class="content"> (Not Entered) </p>
             </v-col>
             <v-col cols="3">
               <p class="content">{{getMhrRegistrationSubmittingParty.emailAddress || '(Not Entered)'}}</p>
@@ -84,14 +91,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { RouteNames } from '@/enums'
 import { useGetters } from 'vuex-composition-helpers'
-import { useCountriesProvinces, formatAddress } from '@/composables/address/factories'
+import { BaseAddress } from '@/composables/address'
+import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
   name: 'SubmittingPartyReview',
-  components: {},
+  components: {
+    BaseAddress
+  },
   props: {},
   setup () {
     const {
@@ -104,26 +114,17 @@ export default defineComponent({
 
     const localState = reactive({})
 
-    const parseAddress = () => {
-      let address = getMhrRegistrationSubmittingParty.value.address
-      if (Object.values(address).every((val) => { return !val })) {
-        return '(Not Entered)'
-      }
-      address = formatAddress(address)
-      const street = address.street ? address.street + '<br>' : ''
-      const city = address.city ? address.city + ' ' : ''
-      const region = address.region ? address.region + ' &nbsp;' : ''
-      const postalCode = address.postalCode ? address.postalCode + '<br>' : ''
-      const country = address.country ? useCountriesProvinces().getCountryName(address.country) + '<br>' : ''
-      const details = address.deliveryInstructions ? '<br><i>' + address.deliveryInstructions + '</i>' : ''
-      return `${street}${city}${region}${postalCode}${country}${details}`
-    }
+    const addressSchema = PartyAddressSchema
+
+    const address = computed(() => {
+      return getMhrRegistrationSubmittingParty.value.address
+    })
 
     const parsePhoneNumber = () => {
       const phone = getMhrRegistrationSubmittingParty.value
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
-      if (!phoneNum && !ext) {
+      if (!phoneNum || !ext) {
         return '(Not Entered)'
       }
       return `${phoneNum}${ext}`
@@ -131,9 +132,10 @@ export default defineComponent({
 
     return {
       RouteNames,
+      addressSchema,
       getMhrRegistrationSubmittingParty,
       getMhrAttentionReferenceNum,
-      parseAddress,
+      address,
       parsePhoneNumber,
       ...toRefs(localState)
     }
