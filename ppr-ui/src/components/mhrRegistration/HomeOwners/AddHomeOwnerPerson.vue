@@ -35,7 +35,7 @@
                   v-model="individualName.middle"
                   filled
                   label="Middle Name"
-                  data-test-id="first-name"
+                  data-test-id="middle-name"
                 />
               </v-col>
               <v-col cols="4">
@@ -45,7 +45,7 @@
                   filled
                   :rules="maxLength(15)"
                   label="Last Name"
-                  data-test-id="first-name"
+                  data-test-id="last-name"
                 />
               </v-col>
             </v-row>
@@ -94,7 +94,7 @@
                 outlined
                 color="error"
                 class="remove-btn"
-                :disabled="!isAddingHomeOwner"
+                :disabled="isAddingHomeOwner"
                 :ripple="false"
                 @click="remove()"
               >
@@ -158,19 +158,20 @@ export default defineComponent({
     const defaultPersonOwner: MhrRegistrationHomeOwnersIF = {
       individualName: {
         first: props.editHomeOwner?.individualName.first || '',
-        middle: '',
-        last: ''
+        middle: props.editHomeOwner?.individualName.middle || '',
+        last: props.editHomeOwner?.individualName.last || ''
       },
-      phoneNumber: null,
-      phoneExtension: null,
+      phoneNumber: props.editHomeOwner?.phoneNumber || null,
+      phoneExtension: props.editHomeOwner?.phoneExtension || null,
       address: {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: '',
-        country: '',
-        postalCode: '',
-        deliveryInstructions: ''
+        street: props.editHomeOwner?.address.street || '',
+        streetAdditional: props.editHomeOwner?.address.streetAdditional || '',
+        city: props.editHomeOwner?.address.city || '',
+        region: props.editHomeOwner?.address.region || '',
+        country: props.editHomeOwner?.address.country || '',
+        postalCode: props.editHomeOwner?.address.postalCode || '',
+        deliveryInstructions:
+          props.editHomeOwner?.address.deliveryInstructions || ''
       }
     }
 
