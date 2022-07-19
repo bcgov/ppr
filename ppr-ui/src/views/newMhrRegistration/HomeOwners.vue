@@ -2,15 +2,57 @@
   <div id="mhr-home-owners-list">
     <section id="mhr-owners" class="mt-10">
       <h2>Owners</h2>
-      <p class="mt-2 mb-6">
+      <p class="mt-2 mb-0">
         Add a person or an organization as the owner of the home. You can add
         multiple owners to form joint tenancy or tenants in common ownership.
         Note: Tenants in common ownership requires more than one group of
         owners.
       </p>
 
-      <p>Your registration must contain:</p>
-      <div class="my-7">
+      <div class="help-with-owners">
+        <v-expansion-panels>
+          <v-expansion-panel @change="() => (isPanelOpen = !isPanelOpen)">
+            <v-expansion-panel-header
+              class="px-0 py-2 primary--text"
+              :hide-actions="true"
+            >
+              <div>
+                <v-icon color="primary">mdi-information-outline </v-icon>
+                {{ header }}
+              </div>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="help-toggle-content">
+              <hr class="my-8" />
+              <h3 class="text-center">Help with Owners</h3>
+              <h4>Sole Ownership</h4>
+              <p>
+                This applies when the home is owned by a single individual or
+                organization.
+              </p>
+              <h4>Joint Tenancy</h4>
+              <p>
+                This applies when the home is jointly owned by a number of
+                individuals or organizations or some combination of the two.
+              </p>
+              <h4>Tenants in Common</h4>
+              <p>
+                This applies when the home is owned by a number of groups or
+                individuals or organizations or some combination of the two
+                (where a group could consist of a single owner) and each group
+                of owners has the right to dispose of their share independent of
+                the other owner groups and will be disposed of as part of the
+                estate in the case of a death.
+              </p>
+              <hr class="my-8" />
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </div>
+
+      <label class="generic-label">
+        Your registration must include the following:
+      </label>
+      <div class="mt-5 mb-11">
         <v-icon
           v-if="getMhrRegistrationHomeOwners.length > 0"
           color="green darken-2"
@@ -24,7 +66,11 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="showAddPersonSection || showAddPersonOrganizationSection"
+        :disabled="
+          showAddPersonSection ||
+            showAddPersonOrganizationSection ||
+            isEditingMode
+        "
         @click="showAddPersonSection = true"
       >
         <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
@@ -36,7 +82,11 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="showAddPersonOrganizationSection || showAddPersonSection"
+        :disabled="
+          showAddPersonOrganizationSection ||
+            showAddPersonSection ||
+            isEditingMode
+        "
         @click="showAddPersonOrganizationSection = true"
       >
         <v-icon class="pr-1">mdi-domain-plus</v-icon>
@@ -49,7 +99,7 @@
     <v-expand-transition>
       <AddHomeOwnerPerson
         v-if="showAddPersonSection"
-        @done="addPerson($event)"
+        @done="addHomeOwner($event)"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
@@ -57,8 +107,7 @@
     <v-expand-transition>
       <AddHomeOwnerOrganization
         v-if="showAddPersonOrganizationSection"
-        @done="addPerson($event)"
-        @remove="() => {}"
+        @done="addHomeOwner($event)"
         @cancel="showAddPersonOrganizationSection = false"
       />
     </v-expand-transition>
@@ -66,6 +115,7 @@
     <div>
       <HomeOwnersTable
         :homeOwners="getMhrRegistrationHomeOwners"
+        @isEditing="isEditingMode = $event"
         @edit="editHomeOwner($event)"
         @remove="removeHomeOwner($event)"
       />
@@ -97,35 +147,36 @@ export default class HomeOwners extends Vue {
   @Getter getMhrRegistrationHomeOwners: MhrRegistrationHomeOwnersIF[]
   @Action setMhrRegistrationHomeOwners: ActionBindingIF
 
-  public showAddPersonSection = false
-  public showAddPersonOrganizationSection = false
+  private showAddPersonSection = false
+  private showAddPersonOrganizationSection = false
+  private isPanelOpen = false
+  private isEditingMode = false
 
-  public get tenancyType (): string {
+  private get tenancyType (): string {
     if (this.getMhrRegistrationHomeOwners?.length === 0) return 'N/A'
     return this.getMhrRegistrationHomeOwners?.length === 1
       ? 'Sole Ownership'
       : 'Joint Tenancy'
   }
 
-  private async addPerson (personData): Promise<void> {
+  private get header (): string {
+    return this.isPanelOpen ? 'Hide Help with Owners' : 'Help with Owners'
+  }
+
+  private async addHomeOwner (owner): Promise<void> {
     const homeOwners = [...this.getMhrRegistrationHomeOwners]
-    homeOwners.push(personData)
+    homeOwners.push(owner)
     this.setMhrRegistrationHomeOwners(homeOwners)
   }
 
-  public async editHomeOwner (owner): Promise<void> {
-    console.log('Editing Home Owner')
-
+  private async editHomeOwner (owner): Promise<void> {
     const homeOwners = [...this.getMhrRegistrationHomeOwners]
-    // Create edited homeSection without id
     const { id, ...editedOwner } = owner
-    // Apply edited section to temp array
     homeOwners[owner.id] = editedOwner
-
     this.setMhrRegistrationHomeOwners(homeOwners)
   }
 
-  public async removeHomeOwner (owner): Promise<void> {
+  private async removeHomeOwner (owner): Promise<void> {
     const homeOwners = [...this.getMhrRegistrationHomeOwners]
     homeOwners.splice(homeOwners.indexOf(owner), 1)
     this.setMhrRegistrationHomeOwners(homeOwners)
@@ -133,6 +184,22 @@ export default class HomeOwners extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.help-with-owners ::v-deep {
+  .v-expansion-panel-header {
+    background-color: $gray1;
+    height: 64px;
+  }
+
+  .v-expansion-panel-content__wrap {
+    padding: 0;
+    background-color: $gray1;
+  }
+
+  h4 {
+    color: #495057;
+  }
+}
 </style>

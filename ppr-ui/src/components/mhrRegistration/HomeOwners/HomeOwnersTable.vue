@@ -4,8 +4,6 @@
       id="mh-home-owners-table"
       class="home-owners-table"
       disable-sort
-      fixed
-      fixed-header
       :headers="homeOwnersTableHeaders"
       hide-default-footer
       :items="homeOwners"
@@ -19,19 +17,21 @@
               <AddHomeOwnerPerson
                 :editHomeOwner="row.item"
                 @done="edit($event)"
-                @cancel="activeIndex = -1"
+                @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
               />
             </v-expand-transition>
           </td>
         </tr>
 
-        <tr v-else :key="row.item.id">
-          <td class="py-6">
-            <v-icon color="darker">mdi-account</v-icon>
-            {{ row.item.individualName.first }}
-            {{ row.item.individualName.middle }}
-            {{ row.item.individualName.last }}
+        <tr v-else :key="row.item.id" class="owner-info">
+          <td class="owner-name py-6">
+            <v-icon>mdi-account</v-icon>
+            <strong>
+              {{ row.item.individualName.first }}
+              {{ row.item.individualName.middle }}
+              {{ row.item.individualName.last }}
+            </strong>
           </td>
           <td class="py-6">
             <base-address :schema="addressSchema" :value="row.item.address" />
@@ -42,13 +42,13 @@
               Ext {{ row.item.phoneExtension }}
             </span>
           </td>
-          <td class="text-right pr-2">
+          <td class="text-right py-4">
             <v-btn
               text
               color="primary"
-              class="px-0"
+              class="pr-0"
               :ripple="false"
-              :disabled="isAdding"
+              :disabled="isAdding || isEditing"
               @click="openForEditing(homeOwners.indexOf(row.item))"
             >
               <v-icon small>mdi-pencil</v-icon>
@@ -56,16 +56,16 @@
               <v-divider class="ma-0 pl-3" vertical />
             </v-btn>
             <!-- Actions drop down menu -->
-            <v-menu offset-y left nudge-bottom="4">
+            <v-menu offset-y left nudge-bottom="0">
               <template v-slot:activator="{ on }">
                 <v-btn
                   text
-                  small
                   v-on="on"
                   color="primary"
+                  class="px-0"
                   :disabled="isAdding"
                 >
-                  <v-icon class="ml-n1">mdi-menu-down</v-icon>
+                  <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
               </template>
 
@@ -87,7 +87,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs,
+  watch
+} from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
@@ -108,25 +114,39 @@ export default defineComponent({
     const addressSchema = PartyAddressSchema
 
     const localState = reactive({
-      activeIndex: -1
+      currentlyEditingHomeOwnerId: -1,
+      isEditing: computed((): boolean => {
+        return localState.currentlyEditingHomeOwnerId >= 0
+      })
     })
 
     const edit = (item): void => {
-      context.emit('edit', { ...item, id: localState.activeIndex })
+      context.emit('edit', {
+        ...item,
+        id: localState.currentlyEditingHomeOwnerId
+      })
     }
 
     const remove = (item): void => {
-      localState.activeIndex = -1
+      localState.currentlyEditingHomeOwnerId = -1
       context.emit('remove', item)
     }
 
     const openForEditing = (index: number) => {
-      localState.activeIndex = index
+      localState.currentlyEditingHomeOwnerId = index
     }
 
     const isCurrentlyEditing = (index: number): boolean => {
-      return index === localState.activeIndex
+      return index === localState.currentlyEditingHomeOwnerId
     }
+
+    // Emit whenever editing mode is on or off
+    watch(
+      () => localState.currentlyEditingHomeOwnerId,
+      () => {
+        context.emit('isEditing', localState.isEditing)
+      }
+    )
 
     return {
       addressSchema,
@@ -141,4 +161,17 @@ export default defineComponent({
 })
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+
+.home-owners-table ::v-deep {
+  .owner-name,
+  i {
+    color: $gray9;
+  }
+  .owner-info td {
+    white-space: normal;
+    vertical-align: top;
+  }
+}
+</style>
