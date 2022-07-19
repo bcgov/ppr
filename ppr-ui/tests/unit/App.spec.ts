@@ -59,10 +59,12 @@ describe('App component basic rendering normal account', () => {
     const getAuthorizations = get.withArgs(`accounts/${currentAccount.id}/products/${AccountProductCodes.RPPR}/authorizations`)
 
     getProducts.returns(new Promise(resolve => resolve({ data: mockedProductSubscriptions.ALL })))
-    getAuthorizations.returns(new Promise(resolve => resolve({ data: {
-      membership: AccountProductMemberships.MEMBER,
-      roles: ['search']
-    } })))
+    getAuthorizations.returns(new Promise(resolve => resolve({
+      data: {
+        membership: AccountProductMemberships.MEMBER,
+        roles: ['search']
+      }
+    })))
 
     // GET current user
     get.withArgs('users/@me').returns(new Promise((resolve) => resolve(
@@ -150,11 +152,13 @@ describe('App component basic rendering non billable account', () => {
     const getAuthorizations = get.withArgs(`accounts/${currentAccount.id}/products/${AccountProductCodes.RPPR}/authorizations`)
 
     getProducts.returns(new Promise(resolve => resolve({ data: mockedProductSubscriptions.ALL })))
-    getAuthorizations.returns(new Promise(resolve => resolve({ data: {
-      membership: AccountProductMemberships.MEMBER,
-      roles: ['search']
-    } })))
-    
+    getAuthorizations.returns(new Promise(resolve => resolve({
+      data: {
+        membership: AccountProductMemberships.MEMBER,
+        roles: ['search']
+      }
+    })))
+
     // GET current user
     get.withArgs('users/@me').returns(new Promise((resolve) => resolve(
       {

@@ -292,15 +292,9 @@ export default defineComponent({
 
     const getOwnerStatus = (ownerStatus: string): string => {
       if (ownerStatus) {
-       if(ownerStatus=='PREVIOUS')
-       {
-         return 'HISTORICAL'
-       } 
-       else
-         return ownerStatus
-      }
-      else
-         return ''
+        if (ownerStatus === 'PREVIOUS') return 'HISTORICAL'
+        else return ownerStatus
+      } else return ''
     }
 
     const updateFolioOrReference = (folioOrReference: string): void => {
