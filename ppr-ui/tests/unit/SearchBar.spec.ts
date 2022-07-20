@@ -547,7 +547,7 @@ describe('Mhr Owner name search', () => {
       criteria: {
         ownerName: {
           first: 'test first',
-          second: 'test middle',
+          middle: 'test middle',
           last: 'test last'
         }
       },
@@ -580,7 +580,7 @@ describe('Mhr Owner name search', () => {
       criteria: {
         ownerName: {
           first: 'test first',
-          second: 'test middle',
+          middle: 'test middle',
           last: 'test last'
         }
       },
@@ -611,7 +611,7 @@ describe('Mhr Owner name search', () => {
       criteria: {
         ownerName: {
           first: 'test first',
-          second: undefined,
+          middle: undefined,
           last: 'test last'
         }
       },

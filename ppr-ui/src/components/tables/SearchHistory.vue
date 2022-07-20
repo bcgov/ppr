@@ -239,7 +239,7 @@ export default defineComponent({
     const displaySearchValue = (query: SearchCriteriaIF): string => {
       const individualKey = Object.keys(query?.criteria)[0]
       const first = query?.criteria?.[individualKey]?.first
-      const second = query?.criteria?.[individualKey]?.second
+      const second = query?.criteria?.[individualKey]?.second || query?.criteria?.[individualKey]?.middle
       const last = query?.criteria?.[individualKey]?.last
       const business = query?.criteria?.debtorName?.business
       if (first && last) {
