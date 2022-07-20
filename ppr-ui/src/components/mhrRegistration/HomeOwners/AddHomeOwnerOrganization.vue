@@ -1,14 +1,13 @@
 <template>
-  <div>
     <v-card flat class="py-6 px-8 rounded">
-      <v-row id="mhr-home-manufacturer-name">
+      <v-row id="mhr-home-add-org">
         <v-col cols="3">
           <label class="generic-label">
             Add an Organization
           </label>
         </v-col>
         <v-col cols="9">
-          <label class="generic-label" for="org-legal-name">
+          <label class="generic-label" for="org-name">
             Organization Legal Name
           </label>
           <v-row>
@@ -28,9 +27,7 @@
                       :hide-actions="true"
                     >
                       <div>
-                        <v-icon color="primary" v-on="on"
-                          >mdi-information-outline
-                        </v-icon>
+                        <v-icon color="primary" v-on="on">mdi-information-outline</v-icon>
                         Help with Proprietorships / Partnerships
                       </div>
                     </v-expansion-panel-header>
@@ -63,7 +60,7 @@
               </auto-complete>
             </v-col>
           </v-row>
-          <label class="generic-label" for="manufacturer-name">
+          <label class="generic-label">
             Phone Number
           </label>
           <v-row>
@@ -87,7 +84,7 @@
             </v-col>
           </v-row>
 
-          <label class="generic-label" for="manufacturer-name">
+          <label class="generic-label">
             Mailing Address
           </label>
           <base-address
@@ -128,7 +125,6 @@
         </v-col>
       </v-row>
     </v-card>
-  </div>
 </template>
 
 <script lang="ts">
@@ -141,7 +137,7 @@ import {
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 
-import { OrganizationAddressSchema } from '@/schemas'
+import { PartyAddressSchema } from '@/schemas'
 
 export default defineComponent({
   name: 'AddHomeOwnerOrganization',
@@ -153,7 +149,7 @@ export default defineComponent({
     const { maxLength } = useInputRules()
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const addressSchema = OrganizationAddressSchema
+    const addressSchema = PartyAddressSchema
 
     const localState = reactive({
       organizationName: '',

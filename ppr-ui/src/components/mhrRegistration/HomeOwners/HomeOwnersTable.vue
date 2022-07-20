@@ -14,7 +14,7 @@
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
             <v-expand-transition>
-              <AddHomeOwnerPerson
+              <AddEditHomeOwnerPerson
                 :editHomeOwner="row.item"
                 @done="edit($event)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
@@ -98,7 +98,7 @@ import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 
-import { AddHomeOwnerPerson } from '@/components/mhrRegistration/HomeOwners'
+import { AddEditHomeOwnerPerson } from '@/components/mhrRegistration/HomeOwners'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -108,7 +108,7 @@ export default defineComponent({
   },
   components: {
     BaseAddress,
-    AddHomeOwnerPerson
+    AddEditHomeOwnerPerson
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema

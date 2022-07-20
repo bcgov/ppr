@@ -66,11 +66,7 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="
-          showAddPersonSection ||
-            showAddPersonOrganizationSection ||
-            isEditingMode
-        "
+        :disabled="disableAddPersonBtn"
         @click="showAddPersonSection = true"
       >
         <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
@@ -82,11 +78,7 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="
-          showAddPersonOrganizationSection ||
-            showAddPersonSection ||
-            isEditingMode
-        "
+        :disabled="disableAddOrgBtn"
         @click="showAddPersonOrganizationSection = true"
       >
         <v-icon class="pr-1">mdi-domain-plus</v-icon>
@@ -97,7 +89,7 @@
     </section>
 
     <v-expand-transition>
-      <AddHomeOwnerPerson
+      <AddEditHomeOwnerPerson
         v-if="showAddPersonSection"
         @done="addHomeOwner($event)"
         @cancel="showAddPersonSection = false"
@@ -125,7 +117,7 @@
 
 <script lang="ts">
 import {
-  AddHomeOwnerPerson,
+  AddEditHomeOwnerPerson,
   AddHomeOwnerOrganization,
   HomeOwnersTable
 } from '@/components/mhrRegistration/HomeOwners'
@@ -138,7 +130,7 @@ import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-inter
 
 @Component({
   components: {
-    AddHomeOwnerPerson,
+    AddEditHomeOwnerPerson,
     AddHomeOwnerOrganization,
     HomeOwnersTable
   }
@@ -161,6 +153,18 @@ export default class HomeOwners extends Vue {
 
   private get header (): string {
     return this.isPanelOpen ? 'Hide Help with Owners' : 'Help with Owners'
+  }
+
+  private get disableAddPersonBtn (): boolean {
+    return this.showAddPersonOrganizationSection ||
+      this.showAddPersonSection ||
+      this.isEditingMode
+  }
+
+  private get disableAddOrgBtn (): boolean {
+    return this.showAddPersonOrganizationSection ||
+      this.showAddPersonSection ||
+      this.isEditingMode
   }
 
   private async addHomeOwner (owner): Promise<void> {
