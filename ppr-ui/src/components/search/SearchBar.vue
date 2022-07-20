@@ -413,14 +413,14 @@ export default defineComponent({
     const getCriteria = () => {
       if (localState.isIndividual) {
         const first = cleanUpInput(localState.searchValueFirst)
-        const second = cleanUpInput(localState.searchValueSecond)
+        const second = cleanUpInput(localState.searchValueSecond) // Also used for middle name in MHR searches
         const last = cleanUpInput(localState.searchValueLast)
 
         if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
           return { debtorName: { first: first, second: second, last: last } }
         }
         if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
-          return { ownerName: { first: first, second: second, last: last } }
+          return { ownerName: { first: first, middle: second, last: last } }
         }
       } else if (localState.selectedSearchType.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR) {
         return { debtorName: { business: cleanUpInput(localState.searchValue) } }
