@@ -51,6 +51,7 @@ import { PartySearch } from '@/components/parties/party'
 import { Action } from 'vuex-class'
 // eslint-disable-next-line no-unused-vars
 import { ActionBindingIF } from '@/interfaces'
+import { useInputRules } from '@/composables'
 
 @Component({
   components: {
@@ -63,9 +64,7 @@ export default class SubmittingParty extends Vue {
 
   private attentionReferenceNum = ''
 
-  private attentionReferenceNumRule = [
-    v => (v || '').length <= 40 || 'Maximum 40 characters reached'
-  ]
+  private attentionReferenceNumRule = useInputRules().maxLength(40)
 
   @Watch('attentionReferenceNum')
   private updateAttentionReferenceNum (val) {

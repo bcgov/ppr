@@ -22,16 +22,16 @@
           <!-- Insert Review mode of component here -->
           <v-row no-gutters class="px-6 pb-7">
             <v-col cols="3">
-              <h3 class="headers">Name</h3>
+              <h3 class="table-header">Name</h3>
             </v-col>
             <v-col cols="3" class="pl-1">
-              <h3 class="headers">Mailing Address</h3>
+              <h3 class="table-header">Mailing Address</h3>
             </v-col>
             <v-col cols="3" class="pl-3">
-              <h3 class="headers">Email Address</h3>
+              <h3 class="table-header">Email Address</h3>
             </v-col>
             <v-col cols="3" class="pl-4">
-              <h3 class="headers">Phone Number</h3>
+              <h3 class="table-header">Phone Number</h3>
             </v-col>
           </v-row>
 
@@ -43,20 +43,20 @@
             <v-col cols="3">
               <v-row no-gutters>
                 <v-col cols="1" class="mr-2">
-                  <v-icon color="black">
+                  <v-icon class="side-header-icon">
                     {{getMhrRegistrationSubmittingParty.businessName ? 'mdi-domain' : 'mdi-account'}}
                   </v-icon>
                 </v-col>
                 <v-col>
-                  <p class="first-col pt-1 font-weight-bold">
-                    {{ getName() }}
+                  <p class="side-header pt-1 font-weight-bold">
+                    {{ getSubmittingPartyName() }}
                   </p>
                 </v-col>
               </v-row>
             </v-col>
             <v-col cols="3" class="pl-1">
               <base-address
-                v-if="!emptyAddress()"
+                v-if="hasAddress"
                 class="content"
                 :schema="addressSchema"
                 :value="address"
@@ -78,7 +78,7 @@
 
           <v-row no-gutters class="px-6 py-7">
             <v-col cols="3">
-              <p class="first-col">Attention or<br>Reference Number</p>
+              <p class="side-header">Attention or<br>Reference Number</p>
             </v-col>
             <v-col cols="9">
               <p class="content">{{getMhrAttentionReferenceNum || '(Not Entered)'}}</p>
@@ -115,7 +115,8 @@ export default defineComponent({
     const localState = reactive({
       address: computed(() => getMhrRegistrationSubmittingParty.value.address),
       businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
-      personName: computed(() => getMhrRegistrationSubmittingParty.value.personName)
+      personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
+      hasAddress: computed(() => !Object.values(localState.address).every(val => !val))
     })
 
     const addressSchema = PartyAddressSchema
@@ -130,11 +131,7 @@ export default defineComponent({
       return `${phoneNum}${ext}`
     }
 
-    const emptyAddress = () => {
-      return Object.values(localState.address).every(val => !val)
-    }
-
-    const getName = () => {
+    const getSubmittingPartyName = () => {
       if (!localState.businessName && Object.values(localState.personName).every(val => !val)) {
         return '(Not Entered)'
       } else {
@@ -149,8 +146,7 @@ export default defineComponent({
       addressSchema,
       getMhrRegistrationSubmittingParty,
       getMhrAttentionReferenceNum,
-      getName,
-      emptyAddress,
+      getSubmittingPartyName,
       parsePhoneNumber,
       ...toRefs(localState)
     }
@@ -171,16 +167,22 @@ export default defineComponent({
   font-size: 16px;
 }
 
-.headers{
+.table-header {
   font-size: 14px;
   color: $gray9;
 }
-.first-col{
+
+.side-header {
   font-weight: bold;
   font-size: 16px;
   color: $gray9;
 }
-.content{
+
+.side-header-icon {
+  color: $gray9;
+}
+
+.content {
   margin-bottom: unset;
   line-height: 24px;
   font-size: 14px;

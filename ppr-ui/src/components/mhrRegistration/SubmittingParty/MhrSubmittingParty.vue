@@ -48,7 +48,7 @@
                   class="pt-4 pr-2"
                   label="First Name"
                   v-model="submittingParty.personName.first"
-                  :rules="firstNameRule"
+                  :rules="firstNameRules"
                 />
               </v-col>
               <v-col>
@@ -58,7 +58,7 @@
                   class="pt-4 px-2"
                   label="Middle Name (Optional)"
                   v-model="submittingParty.personName.middle"
-                  :rules="middleNameRule"
+                  :rules="middleNameRules"
                 />
               </v-col>
               <v-col>
@@ -68,7 +68,7 @@
                   class="pt-4 px-2"
                   label="Last Name"
                   v-model="submittingParty.personName.last"
-                  :rules="lastNameRule"
+                  :rules="lastNameRules"
                 />
               </v-col>
             </v-row>
@@ -85,7 +85,7 @@
                   class="pt-4 pr-2"
                   label="Business Name"
                   v-model="submittingParty.businessName"
-                  :rules="businessNameRule"
+                  :rules="businessNameRules"
                 />
               </v-col>
             </v-row>
@@ -99,7 +99,7 @@
             class="pt-4 pr-2"
             label="Email Address"
             v-model="submittingParty.emailAddress"
-            :rules="emailRule"
+            :rules="emailRules"
           />
 
           <!-- Phone Number -->
@@ -112,7 +112,7 @@
                 class="pt-4 pr-3"
                 label="Phone Number"
                 v-model="submittingParty.phoneNumber"
-                :rules="phoneRule"
+                :rules="phoneRules"
               />
             </v-col>
             <v-col>
@@ -122,7 +122,7 @@
                 class="pt-4 px-2"
                 label="Extension (Optional)"
                 v-model="submittingParty.phoneExtension"
-                :rules="phoneExtensionRule"
+                :rules="phoneExtensionRules"
               />
             </v-col>
           </v-row>
@@ -219,32 +219,32 @@ export default defineComponent({
       })
     })
 
-    const firstNameRule = customRules(
+    const firstNameRules = customRules(
       required('Enter a first name'),
       isStringOrNumber(),
       maxLength(15),
       invalidSpaces()
     )
 
-    const middleNameRule = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
+    const middleNameRules = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
 
-    const lastNameRule = customRules(
+    const lastNameRules = customRules(
       required('Enter a last name'),
       isStringOrNumber(),
       maxLength(25),
       invalidSpaces())
 
-    const businessNameRule = customRules(
+    const businessNameRules = customRules(
       required('Business name is required'),
       maxLength(70),
       invalidSpaces()
     )
 
-    const emailRule = customRules(required('Email address is required'), invalidSpaces())
+    const emailRules = customRules(required('Email address is required'), invalidSpaces())
 
-    const phoneRule = customRules(required('Phone number is required'), isNumber(), invalidSpaces())
+    const phoneRules = customRules(required('Phone number is required'), isNumber(), invalidSpaces())
 
-    const phoneExtensionRule = customRules(isNumber(), invalidSpaces())
+    const phoneExtensionRules = customRules(isNumber(), invalidSpaces())
 
     const updateValidity = (valid) => {
       localState.addressValid = valid
@@ -303,13 +303,13 @@ export default defineComponent({
       updateValidity,
       PartyAddressSchema,
       SubmittingPartyTypes,
-      firstNameRule,
-      middleNameRule,
-      lastNameRule,
-      businessNameRule,
-      emailRule,
-      phoneRule,
-      phoneExtensionRule,
+      firstNameRules,
+      middleNameRules,
+      lastNameRules,
+      businessNameRules,
+      emailRules,
+      phoneRules,
+      phoneExtensionRules,
       ...toRefs(localState)
     }
   }
