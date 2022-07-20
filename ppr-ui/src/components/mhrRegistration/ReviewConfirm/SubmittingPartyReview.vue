@@ -2,7 +2,7 @@
   <v-card flat id="submitting-party-summary" class="mt-6 pb-6">
     <header class="review-header">
       <v-icon class="ml-2" color="darkBlue">mdi-account</v-icon>
-      <label class="font-weight-bold pl-2">Submitting Party </label>
+      <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 
     <div :class="{ 'invalid-section': false }">
@@ -24,13 +24,13 @@
             <v-col cols="3">
               <h3 class="headers">Name</h3>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="3" class="pl-1">
               <h3 class="headers">Mailing Address</h3>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="3" class="pl-3">
               <h3 class="headers">Email Address</h3>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="3" class="pl-4">
               <h3 class="headers">Phone Number</h3>
             </v-col>
           </v-row>
@@ -44,19 +44,19 @@
               <v-row no-gutters>
                 <v-col cols="1" class="mr-2">
                   <v-icon color="black">
-                    mdi-domain
+                    {{getMhrRegistrationSubmittingParty.businessName ? 'mdi-domain' : 'mdi-account'}}
                   </v-icon>
                 </v-col>
                 <v-col>
                   <p class="first-col pt-1 font-weight-bold">
-                    {{ getMhrRegistrationSubmittingParty.businessName || '(Not Entered)' }}
+                    {{ getName() }}
                   </p>
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="3" class="pl-1">
               <base-address
-                v-if="!Object.values(address).every((val) => { return !val })"
+                v-if="!emptyAddress()"
                 class="content"
                 :schema="addressSchema"
                 :value="address"
@@ -64,10 +64,10 @@
               </base-address>
               <p v-else class="content"> (Not Entered) </p>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="3" class="pl-3">
               <p class="content">{{getMhrRegistrationSubmittingParty.emailAddress || '(Not Entered)'}}</p>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="3" class="pl-4">
               <p class="content" v-html="parsePhoneNumber()"></p>
             </v-col>
           </v-row>
@@ -112,22 +112,36 @@ export default defineComponent({
       'getMhrAttentionReferenceNum'
     ])
 
-    const localState = reactive({})
+    const localState = reactive({
+      address: computed(() => getMhrRegistrationSubmittingParty.value.address),
+      businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
+      personName: computed(() => getMhrRegistrationSubmittingParty.value.personName)
+    })
 
     const addressSchema = PartyAddressSchema
-
-    const address = computed(() => {
-      return getMhrRegistrationSubmittingParty.value.address
-    })
 
     const parsePhoneNumber = () => {
       const phone = getMhrRegistrationSubmittingParty.value
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
-      if (!phoneNum || !ext) {
+      if (!phoneNum) {
         return '(Not Entered)'
       }
       return `${phoneNum}${ext}`
+    }
+
+    const emptyAddress = () => {
+      return Object.values(localState.address).every(val => !val)
+    }
+
+    const getName = () => {
+      if (!localState.businessName && Object.values(localState.personName).every(val => !val)) {
+        return '(Not Entered)'
+      } else {
+        return localState.businessName
+          ? localState.businessName
+          : localState.personName.first + ' ' + (localState.personName.middle || '') + ' ' + localState.personName.last
+      }
     }
 
     return {
@@ -135,7 +149,8 @@ export default defineComponent({
       addressSchema,
       getMhrRegistrationSubmittingParty,
       getMhrAttentionReferenceNum,
-      address,
+      getName,
+      emptyAddress,
       parsePhoneNumber,
       ...toRefs(localState)
     }

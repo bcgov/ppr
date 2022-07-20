@@ -4,6 +4,11 @@ export interface MhrRegistrationIF {
   clientReferenceId: string,
   declaredValue: string,
   submittingParty: {
+    personName:{
+      first:string,
+      last: string,
+      middle: string
+    }
     businessName: string,
     address: {
       street: string,

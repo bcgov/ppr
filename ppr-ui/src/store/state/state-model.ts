@@ -92,6 +92,11 @@ export const stateModel: StateModelIF = {
     clientReferenceId: '',
     declaredValue: '',
     submittingParty: {
+      personName: {
+        first: '',
+        last: '',
+        middle: ''
+      },
       businessName: '',
       address: {
         street: '',
