@@ -80,7 +80,6 @@
                 :setBackBtn="'Back'"
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Pay and Download Result'"
-                :setDisableSubmitBtn="isRoleStaffBcol"
                 :setAdditionalFees="combinedSearchFees"
                 @back="goToSearchResult()"
                 @cancel="showDialog()"
