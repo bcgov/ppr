@@ -124,7 +124,7 @@
             {{ item.mhrNumber }}
           </template>
           <template v-slot:[`item.state`]="{ item }">
-            {{ item.status }}
+            {{ getOwnerStatus(item.ownerStatus) }}
           </template>
           <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
             {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
@@ -290,6 +290,13 @@ export default defineComponent({
       } else return '-'
     }
 
+    const getOwnerStatus = (ownerStatus: string): string => {
+      if (ownerStatus) {
+        if (ownerStatus === 'PREVIOUS') return 'HISTORICAL'
+        else return ownerStatus
+      } else return ''
+    }
+
     const updateFolioOrReference = (folioOrReference: string): void => {
       setFolioOrReferenceNumber(folioOrReference)
     }
@@ -345,6 +352,7 @@ export default defineComponent({
     return {
       reviewAndConfirm,
       getOwnerName,
+      getOwnerStatus,
       updateFolioOrReference,
       ...toRefs(localState)
     }

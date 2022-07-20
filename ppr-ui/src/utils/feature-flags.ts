@@ -12,7 +12,6 @@ export const defaultFlagSet: LDFlagSet = {
   'mhr-ui-enabled': false,
   'mhr-registration-enabled': false
 }
-
 /**
  * The Launch Darkly client instance.
  */

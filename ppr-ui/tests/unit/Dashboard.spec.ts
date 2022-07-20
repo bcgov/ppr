@@ -105,7 +105,7 @@ describe('Dashboard component', () => {
     const patchUserSettings = patchStub.withArgs('user-profile')
     await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, 'ppr'])
     await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
-    
+
     patchUserSettings.returns(new Promise(resolve => resolve(
       { data: mockedUpdateRegTableUserSettingsResponse }
     )))

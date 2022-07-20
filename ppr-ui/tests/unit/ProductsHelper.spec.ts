@@ -1,10 +1,9 @@
 
 import { defaultFlagSet, getRoleProductCode } from '@/utils'
-import { AuthRoles, ProductCode as Products} from '@/enums'
+import { AuthRoles, ProductCode as Products } from '@/enums'
 
 describe('Roles helper utility methods', () => {
   it('should properly construct descriptive role names from authRoles', () => {
-
     const CLIENT = [AuthRoles.PUBLIC]
     const STAFF = [AuthRoles.PPR_STAFF]
     const STAFF_MHR_PPR = [AuthRoles.PPR_STAFF, AuthRoles.MHR]

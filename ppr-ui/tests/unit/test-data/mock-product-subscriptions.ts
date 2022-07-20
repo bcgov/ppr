@@ -1,5 +1,5 @@
-import { ProductCode, ProductStatus } from "@/enums"
-import { UserProductSubscriptionIF } from "@/interfaces"
+import { ProductCode, ProductStatus } from '@/enums'
+import { UserProductSubscriptionIF } from '@/interfaces'
 
 type mockedProductSubscriptions = {
   ['ALL']?: UserProductSubscriptionIF[],
@@ -9,7 +9,7 @@ type mockedProductSubscriptions = {
 }
 
 export const mockedProductSubscriptions: mockedProductSubscriptions = {
-  'ALL': [
+  ALL: [
     {
       premiumOnly: false,
       type: null,
@@ -39,9 +39,9 @@ export const mockedProductSubscriptions: mockedProductSubscriptions = {
       needReview: false,
       description: '',
       subscriptionStatus: ProductStatus.ACTIVE
-    },
+    }
   ],
-  'MHR': {
+  MHR: {
     premiumOnly: false,
     type: null,
     url: '',
@@ -51,7 +51,7 @@ export const mockedProductSubscriptions: mockedProductSubscriptions = {
     description: '',
     subscriptionStatus: ProductStatus.ACTIVE
   },
-  'PPR': {
+  PPR: {
     premiumOnly: false,
     type: null,
     url: '',
@@ -61,7 +61,7 @@ export const mockedProductSubscriptions: mockedProductSubscriptions = {
     description: '',
     subscriptionStatus: ProductStatus.ACTIVE
   },
-  'BUSINESS': {
+  BUSINESS: {
     premiumOnly: false,
     type: null,
     url: '',
@@ -70,5 +70,5 @@ export const mockedProductSubscriptions: mockedProductSubscriptions = {
     needReview: false,
     description: '',
     subscriptionStatus: ProductStatus.ACTIVE
-  },
+  }
 }

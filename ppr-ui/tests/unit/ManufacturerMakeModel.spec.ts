@@ -48,7 +48,6 @@ describe('Other Information component', () => {
   })
 
   it('show error messages for Manufacturer Make Model inputs', async () => {
-   
     const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)
     manufacturerSection.find(getTestId('manufacturer-name')).setValue('x'.repeat(70))
     manufacturerSection.find(getTestId('manufacture-year')).setValue('x'.repeat(6))
@@ -61,10 +60,9 @@ describe('Other Information component', () => {
   })
 
   it('show error messages for Year of Manufacture field', async () => {
-
     const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)
     const yearInputField = manufacturerSection.find(getTestId('manufacture-year'))
-   
+
     yearInputField.setValue('1899')
     await Vue.nextTick()
     await Vue.nextTick()
@@ -103,7 +101,6 @@ describe('Other Information component', () => {
   })
 
   it('show error messages for Make and Model fields', async () => {
-   
     const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)
     manufacturerSection.find(getTestId('manufacturer-make')).setValue('x'.repeat(30))
     manufacturerSection.find(getTestId('manufacturer-model')).setValue('x'.repeat(30))
@@ -111,7 +108,7 @@ describe('Other Information component', () => {
     await Vue.nextTick()
     expect(manufacturerSection.findAll(ERROR_MSG).length).toBe(0)
 
-    // Enter more than 65 chars into Make and Model field to 
+    // Enter more than 65 chars into Make and Model field to
     // exceed the limit for combined field length
     manufacturerSection.find(getTestId('manufacturer-make')).setValue('x'.repeat(35))
     manufacturerSection.find(getTestId('manufacturer-model')).setValue('x'.repeat(35))
