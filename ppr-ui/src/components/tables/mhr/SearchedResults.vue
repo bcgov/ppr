@@ -70,14 +70,14 @@
               id="select-all-checkbox"
               class="header-checkbox ma-0 pa-0"
               hide-details
-              label="Owner Name"
+              :label="personOrOrgLabel"
               v-model="selectAll"
               :indeterminate="isIndeterminate"
             />
           </template>
 
           <template  v-else v-slot:[`header.ownerName`]>
-            <span class="pl-8">Owner Name</span>
+            <span class="pl-8">{{ personOrOrgLabel }}</span>
           </template>
 
           <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
@@ -98,14 +98,14 @@
             >
               <span v-if="group === 'ACTIVE'">
                 <span class="pl-8">
-                  ACTIVE OWNERS ({{ activeMatchesLength }})
+                  ACTIVE HOMES ({{ activeMatchesLength }})
                 </span>
               </span>
               <span v-else-if="group === 'EXEMPT'" class="pl-8">
-                EXEMPT OWNERS ({{ exemptMatchesLength }})
+                EXEMPT HOMES ({{ exemptMatchesLength }})
               </span>
               <span v-else-if="group === 'HISTORIC'" class="pl-8">
-                HISTORIC OWNERS ({{ historicalMatchesLength }})
+                HISTORIC HOMES ({{ historicalMatchesLength }})
               </span>
             </td>
           </template>
@@ -187,7 +187,7 @@ import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersR
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
-import { RouteNames } from '@/enums'
+import { APIMHRMapSearchTypes, RouteNames } from '@/enums'
 import { cloneDeep } from 'lodash'
 
 export default defineComponent({
@@ -240,6 +240,11 @@ export default defineComponent({
       }),
       headers: computed((): Array<BaseHeaderIF> => {
         return props.isReviewMode ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
+      }),
+      personOrOrgLabel: computed((): string => {
+        return getManufacturedHomeSearchResults.value.searchQuery.type === APIMHRMapSearchTypes.MHRORGANIZATION_NAME
+          ? 'Organization Name'
+          : 'Owner Name'
       }),
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
@@ -433,6 +438,9 @@ th {
         vertical-align: baseline;
         overflow: hidden;
         white-space: normal;
+      }
+      td:not(:last-child) {
+        word-break: break-word;
       }
     }
   }
