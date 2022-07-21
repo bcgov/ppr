@@ -185,6 +185,10 @@ export default defineComponent({
     vertical-align: top;
   }
 
+  .v-data-table-header th {
+    padding: 0 24px;
+  }
+
   .suffix {
     color: #495057;
     font-size: 14px;
