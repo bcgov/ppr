@@ -470,7 +470,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'make'
   },
   {
-    class: 'column-mds',
+    class: 'column-sm',
     sortable: false,
     text: 'Model',
     value: 'model'
@@ -481,7 +481,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'homeLocation'
   },
   {
-    class: 'column-sm',
+    class: 'column-md',
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -518,7 +518,7 @@ export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
     value: 'homeLocation'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     text: 'Serial Number',
     value: 'serialNumber'
   },
