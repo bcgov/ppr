@@ -86,19 +86,22 @@
         Add a Business or Organization
       </v-btn>
 
-      <div class="my-6">Tenancy Type: {{ tenancyType }}</div>
+      <div class="my-6">
+        <span class="generic-label">Home Tenancy Type: </span>{{ tenancyType }}
+      </div>
     </section>
 
     <v-expand-transition>
-      <AddEditHomeOwnerPerson
+      <AddEditHomeOwner
         v-if="showAddPersonSection"
+        :isHomeOwnerPerson="true"
         @done="addHomeOwner($event)"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
 
     <v-expand-transition>
-      <AddHomeOwnerOrganization
+      <AddEditHomeOwner
         v-if="showAddPersonOrganizationSection"
         @done="addHomeOwner($event)"
         @cancel="showAddPersonOrganizationSection = false"
@@ -118,8 +121,7 @@
 
 <script lang="ts">
 import {
-  AddEditHomeOwnerPerson,
-  AddHomeOwnerOrganization,
+  AddEditHomeOwner,
   HomeOwnersTable
 } from '@/components/mhrRegistration/HomeOwners'
 import { Component, Vue } from 'vue-property-decorator'
@@ -127,12 +129,13 @@ import { Action, Getter } from 'vuex-class'
 /* eslint-disable no-unused-vars */
 import { ActionBindingIF } from '@/interfaces/store-interfaces/action-interface'
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
+import { SimpleHelpToggle } from '@/components/common'
+
 /* eslint-enable no-unused-vars */
 
 @Component({
   components: {
-    AddEditHomeOwnerPerson,
-    AddHomeOwnerOrganization,
+    AddEditHomeOwner,
     HomeOwnersTable,
     SimpleHelpToggle
   }
@@ -149,7 +152,7 @@ export default class HomeOwners extends Vue {
     if (this.getMhrRegistrationHomeOwners?.length === 0) return 'N/A'
     return this.getMhrRegistrationHomeOwners?.length === 1
       ? 'Sole Ownership'
-      : 'Joint Tenancy'
+      : 'Joint Tenants'
   }
 
   private get disableAddPersonBtn (): boolean {

@@ -14,8 +14,9 @@
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
             <v-expand-transition>
-              <AddEditHomeOwnerPerson
+              <AddEditHomeOwner
                 :editHomeOwner="row.item"
+                :isHomeOwnerPerson="!row.item.organizationName"
                 @done="edit($event)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
@@ -25,19 +26,26 @@
         </tr>
 
         <tr v-else :key="row.item.id" class="owner-info">
-          <td class="owner-name py-6">
-            <v-icon>mdi-account</v-icon>
-            <strong>
+          <td class="owner-name pa-6">
+            <strong v-if="row.item.individualName">
+              <v-icon class="mr-2">mdi-account</v-icon>
               {{ row.item.individualName.first }}
               {{ row.item.individualName.middle }}
               {{ row.item.individualName.last }}
             </strong>
+            <strong v-else>
+              <v-icon class="mr-2">mdi-domain</v-icon>
+              {{ row.item.organizationName }}
+            </strong>
+            <div v-if="row.item.suffix" class="suffix">
+              {{ row.item.suffix }}
+            </div>
           </td>
-          <td class="py-6">
+          <td class="pa-6">
             <base-address :schema="addressSchema" :value="row.item.address" />
           </td>
-          <td class="py-6">
-            {{ row.item.phoneNumber }}
+          <td class="pa-6">
+            {{ toDisplayPhone(row.item.phoneNumber) }}
             <span v-if="row.item.phoneExtension">
               Ext {{ row.item.phoneExtension }}
             </span>
@@ -97,8 +105,8 @@ import {
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-
-import { AddEditHomeOwnerPerson } from '@/components/mhrRegistration/HomeOwners'
+import { toDisplayPhone } from '@/utils'
+import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -108,7 +116,7 @@ export default defineComponent({
   },
   components: {
     BaseAddress,
-    AddEditHomeOwnerPerson
+    AddEditHomeOwner
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -150,6 +158,7 @@ export default defineComponent({
 
     return {
       addressSchema,
+      toDisplayPhone,
       homeOwnersTableHeaders,
       openForEditing,
       isCurrentlyEditing,
@@ -166,12 +175,21 @@ export default defineComponent({
 
 .home-owners-table ::v-deep {
   .owner-name,
-  i {
+  i,
+  strong {
     color: $gray9;
+    // #212529
   }
   .owner-info td {
     white-space: normal;
     vertical-align: top;
+  }
+
+  .suffix {
+    color: #495057;
+    font-size: 14px;
+    line-height: 22px;
+    margin-left: 34px;
   }
 }
 </style>

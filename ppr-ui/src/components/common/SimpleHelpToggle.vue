@@ -16,7 +16,7 @@
       <div v-show="isHelpContentOpen" class="help-content">
         <hr class="my-4" />
         <slot></slot>
-        <div class="align-right" v-if="hasBottomHideToggle">
+        <div class="align-right" v-if="showBottomToggle">
           <v-btn
             text
             color="primary"
@@ -47,7 +47,7 @@ export default defineComponent({
     const localState = reactive({
       isHelpContentOpen: false,
       title: props.toggleButtonTitle,
-      hasBottomHideToggle: props.hasBottomHideToggle
+      showBottomToggle: props.hasBottomHideToggle
     })
 
     return {
