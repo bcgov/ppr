@@ -9,77 +9,46 @@
         owners.
       </p>
 
-      <div>
-        <v-btn
-          text
-          color="primary"
-          class="help-btn px-0 my-3"
-          :ripple="false"
-          @click="() => (isPanelOpen = !isPanelOpen)"
-        >
-          <v-icon>
-            mdi-information-outline
-          </v-icon>
-          {{ header }}
-        </v-btn>
-      </div>
-
-      <v-expand-transition>
-        <div v-show="isPanelOpen" class="help-with-owners">
-          <hr class="my-4" />
-          <h3 class="text-center">Help with Owners</h3>
-          <h4>Sole Ownership</h4>
-          <p>
-            This applies when the home is owned by a single individual or
-            organization.
-          </p>
-          <h4>Joint Tenancy</h4>
-          <p>
-            This applies when the home is jointly owned by a number of
-            individuals or organizations or some combination of the two.
-          </p>
-          <h4>Tenants in Common</h4>
-          <p>
-            This applies when the home is owned by a number of groups or
-            individuals or organizations or some combination of the two (where a
-            group could consist of a single owner) and each group of owners has
-            the right to dispose of their share independent of the other owner
-            groups and will be disposed of as part of the estate in the case of
-            a death.
-          </p>
-          <p>
-            Each group will hold a certain share of the home. To record this it
-            is necessary to express this as some number of a total number of
-            equal shares. For example if the home is owned by two owner groups
-            each of whom owns half of the home this can be seen as each group
-            holding 1 of 2 shares. If the home is owned by two groups but one
-            holds two thirds and one holds the other third this can be expressed
-            as the first holding 2 of 3 shares and the second holding 1 of 3
-            shares.
-          </p>
-          <p>
-            The total number of shares in a home must be entered when the number
-            of owner groups is entered. Then the number of shares each group
-            owns can be entered when the details of each group are gathered.
-          </p>
-          <p>
-            If your tenancy structure cannot be accomodated by the online system
-            please contact the Manufactured Home Registry.
-          </p>
-          <div class="align-right">
-            <v-btn
-              text
-              color="primary"
-              class="hide-help-btn pa-0"
-              :ripple="false"
-              @click="() => (isPanelOpen = !isPanelOpen)"
-            >
-              Hide Help
-            </v-btn>
-          </div>
-          <hr class="mt-2 mb-8" />
-        </div>
-      </v-expand-transition>
+      <simple-help-toggle toggleButtonTitle="Help with Owners" class="my-3">
+        <h3 class="text-center mb-2">Help with Owners</h3>
+        <h4>Sole Ownership</h4>
+        <p>
+          This applies when the home is owned by a single individual or
+          organization.
+        </p>
+        <h4>Joint Tenancy</h4>
+        <p>
+          This applies when the home is jointly owned by a number of individuals
+          or organizations or some combination of the two.
+        </p>
+        <h4>Tenants in Common</h4>
+        <p>
+          This applies when the home is owned by a number of groups or
+          individuals or organizations or some combination of the two (where a
+          group could consist of a single owner) and each group of owners has
+          the right to dispose of their share independent of the other owner
+          groups and will be disposed of as part of the estate in the case of a
+          death.
+        </p>
+        <p>
+          Each group will hold a certain share of the home. To record this it is
+          necessary to express this as some number of a total number of equal
+          shares. For example if the home is owned by two owner groups each of
+          whom owns half of the home this can be seen as each group holding 1 of
+          2 shares. If the home is owned by two groups but one holds two thirds
+          and one holds the other third this can be expressed as the first
+          holding 2 of 3 shares and the second holding 1 of 3 shares.
+        </p>
+        <p>
+          The total number of shares in a home must be entered when the number
+          of owner groups is entered. Then the number of shares each group owns
+          can be entered when the details of each group are gathered.
+        </p>
+        <p>
+          If your tenancy structure cannot be accommodated by the online system
+          please contact the Manufactured Home Registry.
+        </p>
+      </simple-help-toggle>
 
       <label class="generic-label">
         Your registration must include the following:
@@ -164,7 +133,8 @@ import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-inter
   components: {
     AddEditHomeOwnerPerson,
     AddHomeOwnerOrganization,
-    HomeOwnersTable
+    HomeOwnersTable,
+    SimpleHelpToggle
   }
 })
 export default class HomeOwners extends Vue {
@@ -173,7 +143,6 @@ export default class HomeOwners extends Vue {
 
   private showAddPersonSection = false
   private showAddPersonOrganizationSection = false
-  private isPanelOpen = false
   private isEditingMode = false
 
   private get tenancyType (): string {
@@ -181,10 +150,6 @@ export default class HomeOwners extends Vue {
     return this.getMhrRegistrationHomeOwners?.length === 1
       ? 'Sole Ownership'
       : 'Joint Tenancy'
-  }
-
-  private get header (): string {
-    return this.isPanelOpen ? 'Hide Help with Owners' : 'Help with Owners'
   }
 
   private get disableAddPersonBtn (): boolean {
@@ -226,25 +191,4 @@ export default class HomeOwners extends Vue {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-
-// remove hover effect
-.help-btn::before,
-.hide-help-btn::before {
-  display: none;
-}
-
-.help-btn {
-  font-size: 16px;
-}
-
-.hide-help-btn {
-  font-size: 14px;
-  text-decoration: underline;
-}
-
-.help-with-owners {
-  h4 {
-    color: #495057;
-  }
-}
 </style>
