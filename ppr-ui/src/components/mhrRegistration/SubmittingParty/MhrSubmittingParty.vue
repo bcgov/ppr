@@ -29,7 +29,7 @@
 
         <v-divider class="my-9 ml-0 mr-2" />
 
-        <v-card v-if="showImportantMsg" outlined id="important-message" class="rounded-0 mb-9">
+        <v-card v-if="isBusinessLookup" outlined id="important-message" class="rounded-0 mb-9">
           <p>
             <strong>Important:</strong> If you make changes to the submitting party information below, the changes will
             only be applicable to this registration. The party code information will not be updated.
@@ -210,7 +210,7 @@ export default defineComponent({
         }
       },
       addressValid: true,
-      showImportantMsg: false,
+      isBusinessLookup: false,
       isPersonOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.PERSON
       }),
@@ -265,7 +265,7 @@ export default defineComponent({
           : localState.submittingPartyType = SubmittingPartyTypes.PERSON
 
         if (getMhrRegistrationSubmittingParty.value.businessName) {
-          localState.showImportantMsg = true
+          localState.isBusinessLookup = true
         }
       }
     }, { deep: true, immediate: true })
