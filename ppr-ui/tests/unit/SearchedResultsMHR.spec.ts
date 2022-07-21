@@ -377,7 +377,7 @@ describe('Manufactured home results', () => {
     const groupHeaders = wrapper.findAll('.group-header')
     expect(groupHeaders.at(0).text()).toBe('ACTIVE HOME REGISTRATIONS (2)')
     expect(groupHeaders.at(1).text()).toBe('EXEMPT HOME REGISTRATIONS (2)')
-    expect(groupHeaders.at(2).text()).toBe('HISTORIC HOME REGISTRATIONS (1)')
+    expect(groupHeaders.at(2).text()).toBe('HISTORICAL HOME REGISTRATIONS (1)')
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)

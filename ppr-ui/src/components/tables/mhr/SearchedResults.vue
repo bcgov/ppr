@@ -105,7 +105,7 @@
                 EXEMPT HOME REGISTRATIONS ({{ exemptMatchesLength }})
               </span>
               <span v-else-if="group === 'HISTORIC'" class="pl-8">
-                HISTORIC HOME REGISTRATIONS ({{ historicalMatchesLength }})
+                HISTORICAL HOME REGISTRATIONS ({{ historicalMatchesLength }})
               </span>
             </td>
           </template>
