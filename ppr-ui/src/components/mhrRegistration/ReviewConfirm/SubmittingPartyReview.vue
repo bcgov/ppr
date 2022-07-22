@@ -125,10 +125,7 @@ export default defineComponent({
       const phone = getMhrRegistrationSubmittingParty.value
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
-      if (!phoneNum) {
-        return '(Not Entered)'
-      }
-      return `${phoneNum}${ext}`
+      return phoneNum ? `${phoneNum}${ext}` : '(Not Entered)'
     }
 
     const getSubmittingPartyName = () => {
@@ -137,7 +134,9 @@ export default defineComponent({
       } else {
         return localState.businessName
           ? localState.businessName
-          : localState.personName.first + ' ' + (localState.personName.middle || '') + ' ' + localState.personName.last
+          : localState.personName.middle
+            ? localState.personName.first + ' ' + localState.personName.middle + ' ' + localState.personName.last
+            : localState.personName.first + ' ' + localState.personName.last
       }
     }
 

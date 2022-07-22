@@ -15,7 +15,7 @@
       <MhrSubmittingParty />
     </section>
 
-    <section id="mhr-submitting-partyy-reference" class="mt-10">
+    <section id="mhr-submitting-party-reference" class="mt-10">
       <h2>Attention or Reference Number</h2>
       <p class="mt-2">
         THIS COPY NEEDS TO BE REWRITTEN Add optional attention or reference number information for this transaction
