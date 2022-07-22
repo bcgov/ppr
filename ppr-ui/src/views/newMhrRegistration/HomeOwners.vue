@@ -1,18 +1,197 @@
 <template>
-  <div>HOME OWNERS PLACEHOLDER</div>
+  <div id="mhr-home-owners-list">
+    <section id="mhr-owners" class="mt-10">
+      <h2>Owners</h2>
+      <p class="mt-2 mb-0">
+        Add a person or an organization as the owner of the home. You can add
+        multiple owners to form joint tenancy or tenants in common ownership.
+        Note: Tenants in common ownership requires more than one group of
+        owners.
+      </p>
+
+      <simple-help-toggle toggleButtonTitle="Help with Owners" class="my-3">
+        <h3 class="text-center mb-2">Help with Owners</h3>
+        <h4>Sole Ownership</h4>
+        <p>
+          This applies when the home is owned by a single individual or
+          organization.
+        </p>
+        <h4>Joint Tenancy</h4>
+        <p>
+          This applies when the home is jointly owned by a number of individuals
+          or organizations or some combination of the two.
+        </p>
+        <h4>Tenants in Common</h4>
+        <p>
+          This applies when the home is owned by a number of groups or
+          individuals or organizations or some combination of the two (where a
+          group could consist of a single owner) and each group of owners has
+          the right to dispose of their share independent of the other owner
+          groups and will be disposed of as part of the estate in the case of a
+          death.
+        </p>
+        <p>
+          Each group will hold a certain share of the home. To record this it is
+          necessary to express this as some number of a total number of equal
+          shares. For example if the home is owned by two owner groups each of
+          whom owns half of the home this can be seen as each group holding 1 of
+          2 shares. If the home is owned by two groups but one holds two thirds
+          and one holds the other third this can be expressed as the first
+          holding 2 of 3 shares and the second holding 1 of 3 shares.
+        </p>
+        <p>
+          The total number of shares in a home must be entered when the number
+          of owner groups is entered. Then the number of shares each group owns
+          can be entered when the details of each group are gathered.
+        </p>
+        <p>
+          If your tenancy structure cannot be accommodated by the online system
+          please contact the Manufactured Home Registry.
+        </p>
+      </simple-help-toggle>
+
+      <label class="generic-label">
+        Your registration must include the following:
+      </label>
+      <div class="mt-5 mb-11">
+        <v-icon
+          v-if="getMhrRegistrationHomeOwners.length > 0"
+          color="green darken-2"
+        >
+          mdi-check
+        </v-icon>
+        <v-icon v-else color="black">mdi-circle-small</v-icon>
+        At least one owner
+      </div>
+      <v-btn
+        outlined
+        color="primary"
+        :ripple="false"
+        :disabled="disableAddPersonBtn"
+        @click="showAddPersonSection = true"
+      >
+        <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
+      </v-btn>
+
+      <span class="mx-2"></span>
+
+      <v-btn
+        outlined
+        color="primary"
+        :ripple="false"
+        :disabled="disableAddOrgBtn"
+        @click="showAddPersonOrganizationSection = true"
+      >
+        <v-icon class="pr-1">mdi-domain-plus</v-icon>
+        Add a Business or Organization
+      </v-btn>
+
+      <div class="my-6">
+        <span class="generic-label">Home Tenancy Type: </span>{{ tenancyType }}
+      </div>
+    </section>
+
+    <v-expand-transition>
+      <AddEditHomeOwner
+        v-if="showAddPersonSection"
+        :isHomeOwnerPerson="true"
+        @done="addHomeOwner($event)"
+        @cancel="showAddPersonSection = false"
+      />
+    </v-expand-transition>
+
+    <v-expand-transition>
+      <AddEditHomeOwner
+        v-if="showAddPersonOrganizationSection"
+        @done="addHomeOwner($event)"
+        @cancel="showAddPersonOrganizationSection = false"
+      />
+    </v-expand-transition>
+
+    <div>
+      <HomeOwnersTable
+        :homeOwners="getMhrRegistrationHomeOwners"
+        @isEditing="isEditingMode = $event"
+        @edit="editHomeOwner($event)"
+        @remove="removeHomeOwner($event)"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
+import {
+  AddEditHomeOwner,
+  HomeOwnersTable
+} from '@/components/mhrRegistration/HomeOwners'
 import { Component, Vue } from 'vue-property-decorator'
+import { Action, Getter } from 'vuex-class'
+/* eslint-disable no-unused-vars */
+import { ActionBindingIF } from '@/interfaces/store-interfaces/action-interface'
+import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
+import { SimpleHelpToggle } from '@/components/common'
+
+/* eslint-enable no-unused-vars */
 
 @Component({
   components: {
+    AddEditHomeOwner,
+    HomeOwnersTable,
+    SimpleHelpToggle
   }
 })
 export default class HomeOwners extends Vue {
+  @Getter getMhrRegistrationHomeOwners: MhrRegistrationHomeOwnersIF[]
+  @Action setMhrRegistrationHomeOwners: ActionBindingIF
+
+  private showAddPersonSection = false
+  private showAddPersonOrganizationSection = false
+  private isEditingMode = false
+
+  private get tenancyType (): string {
+    if (this.getMhrRegistrationHomeOwners?.length === 0) return 'N/A'
+    return this.getMhrRegistrationHomeOwners?.length === 1
+      ? 'Sole Ownership'
+      : 'Joint Tenants'
+  }
+
+  private get disableAddPersonBtn (): boolean {
+    return (
+      this.showAddPersonOrganizationSection ||
+      this.showAddPersonSection ||
+      this.isEditingMode
+    )
+  }
+
+  private get disableAddOrgBtn (): boolean {
+    return (
+      this.showAddPersonOrganizationSection ||
+      this.showAddPersonSection ||
+      this.isEditingMode
+    )
+  }
+
+  private async addHomeOwner (owner): Promise<void> {
+    const homeOwners = [...this.getMhrRegistrationHomeOwners]
+    homeOwners.push(owner)
+    this.setMhrRegistrationHomeOwners(homeOwners)
+  }
+
+  private async editHomeOwner (owner): Promise<void> {
+    const homeOwners = [...this.getMhrRegistrationHomeOwners]
+    const { id, ...editedOwner } = owner
+    homeOwners[owner.id] = editedOwner
+    this.setMhrRegistrationHomeOwners(homeOwners)
+  }
+
+  private async removeHomeOwner (owner): Promise<void> {
+    const homeOwners = [...this.getMhrRegistrationHomeOwners]
+    homeOwners.splice(homeOwners.indexOf(owner), 1)
+    this.setMhrRegistrationHomeOwners(homeOwners)
+  }
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 </style>

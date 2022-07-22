@@ -25,7 +25,8 @@ import {
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
-  HomeSectionIF
+  HomeSectionIF,
+  MhrRegistrationHomeOwnersIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -300,4 +301,8 @@ export const setMhrHomeBaseInformation: ActionIF = ({ commit }, { key, value }):
 
 export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrSubmittingParty', { key, value })
+}
+
+export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRegistrationHomeOwnersIF[]): void => {
+  commit('mutateMhrHomeOwners', owners)
 }
