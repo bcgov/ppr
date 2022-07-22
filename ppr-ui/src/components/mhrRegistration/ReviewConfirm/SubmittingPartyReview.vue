@@ -132,11 +132,13 @@ export default defineComponent({
       if (!localState.businessName && Object.values(localState.personName).every(val => !val)) {
         return '(Not Entered)'
       } else {
-        return localState.businessName
-          ? localState.businessName
-          : localState.personName.middle
+        if (localState.businessName) {
+          return localState.businessName
+        } else {
+          return localState.personName.middle
             ? localState.personName.first + ' ' + localState.personName.middle + ' ' + localState.personName.last
             : localState.personName.first + ' ' + localState.personName.last
+        }
       }
     }
 
