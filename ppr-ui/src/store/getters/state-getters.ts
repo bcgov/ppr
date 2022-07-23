@@ -29,7 +29,8 @@ import {
   StateModelIF,
   UserProductSubscriptionIF,
   UserSettingsIF,
-  VehicleCollateralIF
+  VehicleCollateralIF,
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { YourHome, HomeLocation, HomeOwners, SubmittingParty, MhrReviewConfirm } from '@/views'
@@ -655,4 +656,8 @@ export const getMhrAttentionReferenceNum = (state: StateIF): any => {
 
 export const getMhrRegistrationLocation = (state: StateIF): MhrRegistrationHomeLocationIF => {
   return state.stateModel.mhrRegistration.location
+}
+
+export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
+  return state.stateModel.mhrRegistration.ownerGroups
 }
