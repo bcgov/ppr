@@ -127,6 +127,7 @@ export default defineComponent({
     const handleStaff = (breadcrumbText): string => {
       if (localState.isStaff) {
         breadcrumbText = breadcrumbText.replace('My', 'Staff')
+        if (breadcrumbText === 'BC Registries Dashboard') breadcrumbText = 'Staff Dashboard'
       }
       return breadcrumbText
     }
