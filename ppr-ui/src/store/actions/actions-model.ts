@@ -30,7 +30,6 @@ import {
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { mutateMhrHomeDescription } from '@/store/mutations'
 
 export const resetNewRegistration: ActionIF = ({ commit }): void => {
   commit('mutateNewRegistration')
@@ -305,4 +304,8 @@ export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): voi
 
 export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRegistrationHomeOwnersIF[]): void => {
   commit('mutateMhrHomeOwners', owners)
+}
+
+export const setMhrAttentionReferenceNum: ActionIF = ({ commit }, value): void => {
+  commit('mutateMhrAttentionReferenceNum', value)
 }

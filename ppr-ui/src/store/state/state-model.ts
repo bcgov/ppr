@@ -92,6 +92,11 @@ export const stateModel: StateModelIF = {
     clientReferenceId: '',
     declaredValue: '',
     submittingParty: {
+      personName: {
+        first: '',
+        last: '',
+        middle: ''
+      },
       businessName: '',
       address: {
         street: '',
@@ -105,6 +110,7 @@ export const stateModel: StateModelIF = {
       phoneExtension: null
     },
     owners: [],
+    attentionReferenceNum: '',
     location: {
       parkName: '',
       pad: null,

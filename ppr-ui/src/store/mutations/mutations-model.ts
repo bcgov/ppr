@@ -369,3 +369,7 @@ export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
 export const mutateMhrHomeOwners = (state: StateIF, owners: Array<MhrRegistrationHomeOwnersIF>) => {
   state.stateModel.mhrRegistration.owners = owners
 }
+
+export const mutateMhrAttentionReferenceNum = (state: StateIF, value) => {
+  state.stateModel.mhrRegistration.attentionReferenceNum = value
+}

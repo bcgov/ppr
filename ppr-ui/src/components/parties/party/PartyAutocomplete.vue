@@ -14,14 +14,20 @@
             <v-list-item
               v-for="(result, i) in autoCompleteResults"
               :key="i"
-              :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]"
+              :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item'], $style[wasSelected(result)]]"
+              @mouseover="mouseOver = true"
+              @mouseleave="mouseOver = false"
             >
               <v-list-item-content
                 :class="[$style['auto-complete-item'], 'pt-2', 'pb-2']"
                 @click="addResult(result, i)"
               >
                 <v-list-item-subtitle>
-                  <v-row :class="$style['auto-complete-row']">
+                  <v-row :class="[
+                    $style['auto-complete-row'],
+                    $style[mouseOver? '' : wasSelected(result)]
+                    ]
+                  ">
                     <v-col cols="2" :class="$style['title-size']">
                       {{ result.code }}
                     </v-col>
@@ -117,6 +123,8 @@ export default defineComponent({
       autoCompleteSelected: -1,
       autoCompleteResults: [],
       resultAdded: [],
+      selectedCode: null,
+      mouseOver: false,
       isRegisteringParty: computed((): boolean => {
         return props.setIsRegisteringParty
       }),
@@ -127,6 +135,10 @@ export default defineComponent({
         return 'Secured'
       })
     })
+
+    const wasSelected = (val: SearchPartyIF) => {
+      return localState.selectedCode === val.code ? 'was-selected' : ''
+    }
 
     const addResult = (party: SearchPartyIF, resultIndex) => {
       localState.resultAdded[resultIndex] = true
@@ -143,6 +155,7 @@ export default defineComponent({
         newParty.action = ActionTypes.EDITED
         setRegisteringParty(newParty)
       } else if (props.isMhrPartySearch) {
+        localState.selectedCode = newParty.code
         // Set submitting party data to store
         for (const [key, value] of Object.entries(newParty)) {
           setMhrSubmittingParty({ key, value })
@@ -184,6 +197,7 @@ export default defineComponent({
       addResult,
       closeAutoComplete,
       isExistingSecuredParty,
+      wasSelected,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }
@@ -200,6 +214,10 @@ export default defineComponent({
 .auto-complete-item:hover {
   color: $primary-blue !important;
   background-color: $gray1 !important;
+}
+
+.auto-complete-item:hover .auto-complete-row{
+  color: $primary-blue !important;
 }
 
 .auto-complete-item[aria-selected='true'] {
@@ -225,6 +243,11 @@ export default defineComponent({
 .auto-complete-row {
   width: 35rem;
   color: $gray7 !important;
+}
+
+.was-selected {
+  background-color: $blueSelected;
+  color: $primary-blue !important;
 }
 
 .auto-complete-row:hover {
