@@ -287,15 +287,15 @@ TEST_INVALID_DATA = [
 
 # testdata pattern is ({description}, {select_data}, {select_count})
 TEST_SEARCH_SELECT_DATA = [
-    ('All selection', SEARCH_SELECT_1, 7),
+    ('All selection', SEARCH_SELECT_1, 6),
     ('EXACT missing 1 selection', SEARCH_SELECT_2, 2),
     ('Just 1 SIMILAR selection', SEARCH_SELECT_3, 3),
-    ('All exact, 2 SIMILAR selection', SEARCH_SELECT_4, 4)
+    ('All exact, 2 SIMILAR selection', SEARCH_SELECT_4, 3)
 ]
 
 # testdata pattern is ({description}, {select_data}, {select_count}, {orig_data}, {search_type})
 TEST_SEARCH_SORT_DATA = [
-    ('Serial Number', SEARCH_SELECT_1, 7, SET_SELECT, SearchRequest.SearchTypes.SERIAL_NUM.value),
+    ('Serial Number', SEARCH_SELECT_1, 6, SET_SELECT, SearchRequest.SearchTypes.SERIAL_NUM.value),
     ('Registration Number', SEARCH_SELECT_2, 1, SET_SELECT_RG, SearchRequest.SearchTypes.REGISTRATION_NUM.value),
     ('Bus Debtor', SEARCH_SELECT_BS, 7, SET_SELECT_BS, SearchRequest.SearchTypes.BUSINESS_DEBTOR.value),
     ('Ind Debtor', SEARCH_SELECT_IS, 8, SET_SELECT_IS, SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value),
@@ -505,7 +505,6 @@ def test_search_sort(session, client, jwt, desc, select_data, select_count, orig
         assert selection[3]['vehicleCollateral']['model'] == 'Sort 4'
         assert selection[4]['vehicleCollateral']['model'] == 'Sort 5'
         assert selection[5]['vehicleCollateral']['model'] == 'Sort 6'
-        assert selection[6]['vehicleCollateral']['model'] == 'Sort 7'
     elif search_type == SearchRequest.SearchTypes.REGISTRATION_NUM.value:
         assert selection[0]['baseRegistrationNumber'] == 'TEST0004'
         assert selection[0]['matchType'] == 'EXACT'

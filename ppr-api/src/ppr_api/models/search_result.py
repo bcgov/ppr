@@ -104,23 +104,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             detail_response['payment'] = payment
 
-        results = self.search_response
-        new_results = []
-        similar_count = 0
         self.search_select = self.set_search_selection(search_select)
-        # Use the same order as the search selection match list in the registration list.
-        for select in self.search_select:
-            if select['matchType'] == model_utils.SEARCH_MATCH_EXACT or \
-                    ('selected' not in select or select['selected']):
-                reg_num = select['baseRegistrationNumber']
-                for result in results:
-                    if reg_num == result['financingStatement']['baseRegistrationNumber']:
-                        new_results.append(result)
-                        if result['matchType'] == model_utils.SEARCH_MATCH_SIMILAR:
-                            similar_count += 1
-                            break
-
-        self.similar_match_count = similar_count
+        new_results = self.build_details()
         # current_app.logger.debug('saving updates')
         # Update summary information and save.
         detail_response['similarResultsSize'] = self.similar_match_count
@@ -139,6 +124,33 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 self.callback_url = current_app.config.get('UI_SEARCH_CALLBACK_URL')
         self.save()
 
+    def build_details(self):
+        # pylint: disable=too-many-nested-blocks
+        """Generate the search selection details from the search selection order without duplicates."""
+        results = self.search_response
+        new_results = []
+        similar_count = 0
+        # Use the same order as the search selection match list in the registration list.
+        for select in self.search_select:
+            if select['matchType'] == model_utils.SEARCH_MATCH_EXACT or \
+                    ('selected' not in select or select['selected']):
+                reg_num = select['baseRegistrationNumber']
+                found = False
+                if new_results:  # Check for duplicates.
+                    for match in new_results:
+                        if match['financingStatement']['baseRegistrationNumber'] == reg_num:
+                            found = True
+                if not found:  # No duplicates.
+                    for result in results:
+                        if reg_num == result['financingStatement']['baseRegistrationNumber']:
+                            new_results.append(result)
+                            if result['matchType'] == model_utils.SEARCH_MATCH_SIMILAR:
+                                similar_count += 1
+                                break
+
+        self.similar_match_count = similar_count
+        return new_results
+
     def set_search_selection(self, search_select):
         """Replace the request items with the matching search query items so selection is complete for report TOC."""
         original_select = self.search.search_response
@@ -155,7 +167,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         for reg_num in reg_list:
             for original in original_select:
                 if original['matchType'] != model_utils.SEARCH_MATCH_EXACT and \
-                        original['baseRegistrationNumber'] == reg_num:
+                        original['baseRegistrationNumber'] == reg_num and \
+                        not SearchResult.__already_added(update_select, reg_num):
                     update_select.append(original)
 
         # Now sort by search type.
@@ -166,6 +179,14 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.search.search_type != SearchRequest.SearchTypes.REGISTRATION_NUM.value:
             return SearchResult.__sort_serial_num(update_select)
         return update_select
+
+    @classmethod
+    def __already_added(cls, update_select, reg_num: str):
+        """Verify base reg number has not already been added to the results list (no duplicates)."""
+        for select in update_select:
+            if select['baseRegistrationNumber'] == reg_num:
+                return True
+        return False
 
     @classmethod
     def __select_sort_ts(cls, item):
