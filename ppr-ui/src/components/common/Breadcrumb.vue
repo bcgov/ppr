@@ -86,15 +86,18 @@ export default defineComponent({
         const roleBasedBreadcrumbTitle = breadcrumbsTitles[
           getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
         ]
+        const allTombstoneBreadcrumbs = [
+          tombstoneBreadcrumbDashboard,
+          tombstoneBreadcrumbDischarge,
+          tombstoneBreadcrumbRenewal,
+          tombstoneBreadcrumbAmendment,
+          tombstoneBreadcrumbRegistration,
+          tombstoneBreadcrumbSearch,
+          tombstoneBreadcrumbSearchConfirm
+        ]
         if (localState.isStaff) {
           const staffBreadcrumbText = 'Staff Dashboard'
-          tombstoneBreadcrumbDashboard[0].text = staffBreadcrumbText
-          tombstoneBreadcrumbDischarge[0].text = staffBreadcrumbText
-          tombstoneBreadcrumbRenewal[0].text = staffBreadcrumbText
-          tombstoneBreadcrumbAmendment[0].text = staffBreadcrumbText
-          tombstoneBreadcrumbRegistration[0].text = staffBreadcrumbText
-          tombstoneBreadcrumbSearch[0].text = staffBreadcrumbText
-          tombstoneBreadcrumbSearchConfirm[0].text = staffBreadcrumbText
+          allTombstoneBreadcrumbs.forEach((val) => { val[0].text = staffBreadcrumbText })
         }
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
