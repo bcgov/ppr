@@ -125,7 +125,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         self.save()
 
     def build_details(self):
-        # pylint: disable=too-many-nested-blocks
         """Generate the search selection details from the search selection order without duplicates."""
         results = self.search_response
         new_results = []
@@ -134,6 +133,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         for select in self.search_select:
             if select['matchType'] == model_utils.SEARCH_MATCH_EXACT or \
                     ('selected' not in select or select['selected']):
+                if select['matchType'] != model_utils.SEARCH_MATCH_EXACT:
+                    similar_count += 1
                 reg_num = select['baseRegistrationNumber']
                 found = False
                 if new_results:  # Check for duplicates.
@@ -144,10 +145,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     for result in results:
                         if reg_num == result['financingStatement']['baseRegistrationNumber']:
                             new_results.append(result)
-                            if result['matchType'] == model_utils.SEARCH_MATCH_SIMILAR:
-                                similar_count += 1
-                                break
-
+                            break
         self.similar_match_count = similar_count
         return new_results
 
@@ -167,8 +165,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         for reg_num in reg_list:
             for original in original_select:
                 if original['matchType'] != model_utils.SEARCH_MATCH_EXACT and \
-                        original['baseRegistrationNumber'] == reg_num and \
-                        not SearchResult.__already_added(update_select, reg_num):
+                        original['baseRegistrationNumber'] == reg_num:
                     update_select.append(original)
 
         # Now sort by search type.
@@ -179,14 +176,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.search.search_type != SearchRequest.SearchTypes.REGISTRATION_NUM.value:
             return SearchResult.__sort_serial_num(update_select)
         return update_select
-
-    @classmethod
-    def __already_added(cls, update_select, reg_num: str):
-        """Verify base reg number has not already been added to the results list (no duplicates)."""
-        for select in update_select:
-            if select['baseRegistrationNumber'] == reg_num:
-                return True
-        return False
 
     @classmethod
     def __select_sort_ts(cls, item):
