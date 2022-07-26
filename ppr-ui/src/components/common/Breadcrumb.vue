@@ -96,9 +96,8 @@ export default defineComponent({
           tombstoneBreadcrumbSearchConfirm
         ]
         if (localState.isStaff) {
-          const staffBreadcrumbText = 'Staff Dashboard'
-          for (const tombstoneBreadcrumbs of allTombstoneBreadcrumbs) {
-            tombstoneBreadcrumbs[0].text = staffBreadcrumbText
+          for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
+            tombstoneBreadcrumb[0].text = 'Staff Dashboard'
           }
         }
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
