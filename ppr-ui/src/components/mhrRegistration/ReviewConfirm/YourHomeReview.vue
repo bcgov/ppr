@@ -31,7 +31,13 @@
             <h3>Year of Manufacture</h3>
           </v-col>
           <v-col cols="9">
-            <p>{{ manufactureYear }}</p>
+            <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
+              {{ getMhrRegistrationHomeDescription.baseInformation.circa
+              ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
+              : getMhrRegistrationHomeDescription.baseInformation.year
+              }}
+            </p>
+            <p v-else>(Not Entered)</p>
           </v-col>
         </v-row>
         <v-row no-gutters class="pt-3 px-6">
@@ -179,16 +185,6 @@ export default defineComponent({
       }),
       engineerDisplayDate: computed((): string => {
         return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerReportDate, true)
-      }),
-      manufactureYear: computed((): string => {
-        const year = getMhrRegistrationHomeDescription.value.baseInformation.year
-        if (!year) {
-          return '(Not Entered)'
-        }
-        if (getMhrRegistrationHomeDescription.value.baseInformation.circa) {
-          return 'Circa ' + year
-        }
-        return year
       })
     })
 
