@@ -86,6 +86,16 @@ export default defineComponent({
         const roleBasedBreadcrumbTitle = breadcrumbsTitles[
           getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
         ]
+        if (localState.isStaff) {
+          const staffBreadcrumbText = 'Staff Dashboard'
+          tombstoneBreadcrumbDashboard[0].text = staffBreadcrumbText
+          tombstoneBreadcrumbDischarge[0].text = staffBreadcrumbText
+          tombstoneBreadcrumbRenewal[0].text = staffBreadcrumbText
+          tombstoneBreadcrumbAmendment[0].text = staffBreadcrumbText
+          tombstoneBreadcrumbRegistration[0].text = staffBreadcrumbText
+          tombstoneBreadcrumbSearch[0].text = staffBreadcrumbText
+          tombstoneBreadcrumbSearchConfirm[0].text = staffBreadcrumbText
+        }
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard
@@ -126,7 +136,7 @@ export default defineComponent({
 
     const handleStaff = (breadcrumbText): string => {
       if (localState.isStaff) {
-        breadcrumbText = breadcrumbText.replace(/My|BC Registries/, 'Staff')
+        breadcrumbText = breadcrumbText.replace('My', 'Staff')
       }
       return breadcrumbText
     }
