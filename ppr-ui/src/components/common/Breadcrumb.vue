@@ -97,7 +97,9 @@ export default defineComponent({
         ]
         if (localState.isStaff) {
           const staffBreadcrumbText = 'Staff Dashboard'
-          allTombstoneBreadcrumbs.forEach((val) => { val[0].text = staffBreadcrumbText })
+          for (const tombstoneBreadcrumbs of allTombstoneBreadcrumbs) {
+            tombstoneBreadcrumbs[0].text = staffBreadcrumbText
+          }
         }
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
