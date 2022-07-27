@@ -30,7 +30,6 @@
                 >
                   <v-text-field
                     filled
-                    id=""
                     class="ml-8 pt-2"
                     label="Dealer / Manufacturer Name"
                     v-model="dealerManufacturerLot"
@@ -58,7 +57,6 @@
                 >
                   <v-text-field
                     filled
-                    id=""
                     class="ml-8 pt-2"
                     label="Park Name"
                     v-model="homeParkName"
@@ -66,7 +64,6 @@
 
                   <v-text-field
                     filled
-                    id=""
                     class="ml-8"
                     label="Pad Number"
                     v-model="homeParkPad"
@@ -95,14 +92,14 @@
                   hide-details="true"
                 >
                   <v-radio
-                    id=""
+                    id="reserve-option"
                     class="home-type-radio"
                     label="Indian Reserve"
                     active-class="selected-radio"
                     :value="HomeLocationTypes.OTHER_RESERVE"
                   />
                   <v-radio
-                    id="lot-option"
+                    id="strata-option"
                     class="home-type-radio"
                     label="Strata"
                     active-class="selected-radio"
@@ -120,7 +117,7 @@
                   </v-expand-transition>
 
                   <v-radio
-                    id="lot-option"
+                    id="other-land-option"
                     class="home-type-radio"
                     label="Other"
                     active-class="selected-radio"
