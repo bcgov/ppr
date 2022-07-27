@@ -117,6 +117,6 @@ export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
   {
     disabled: true,
     href: '',
-    text: 'Search Results Review'
+    text: 'Selection Review'
   }
 ]
