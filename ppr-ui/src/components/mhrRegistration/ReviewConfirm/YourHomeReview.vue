@@ -31,7 +31,13 @@
             <h3>Year of Manufacture</h3>
           </v-col>
           <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.baseInformation.year || '(Not Entered)' }}</p>
+            <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
+              {{ getMhrRegistrationHomeDescription.baseInformation.circa
+              ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
+              : getMhrRegistrationHomeDescription.baseInformation.year
+              }}
+            </p>
+            <p v-else>(Not Entered)</p>
           </v-col>
         </v-row>
         <v-row no-gutters class="pt-3 px-6">
