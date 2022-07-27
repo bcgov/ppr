@@ -53,7 +53,7 @@
       </section>
 
       <!-- divider -->
-      <div class="px-6">
+      <div class="px-4">
         <v-divider />
       </div>
 
@@ -108,7 +108,7 @@
       </template>
 
       <!-- divider -->
-      <div class="px-6">
+      <div class="px-4">
         <v-divider />
       </div>
 
@@ -120,7 +120,7 @@
         </section>
       </template>
 
-      <div class="px-6">
+      <div class="px-4">
         <v-divider />
       </div>
 
@@ -134,7 +134,7 @@
         </v-col>
       </v-row>
 
-      <div class="px-5">
+      <div class="px-4">
         <v-divider />
       </div>
 

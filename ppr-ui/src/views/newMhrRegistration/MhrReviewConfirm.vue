@@ -15,6 +15,9 @@
 
       <!-- Submitting Party Review -->
       <SubmittingPartyReview />
+
+      <!-- Home Location Review -->
+      <HomeLocationReview />
     </section>
 
     <!-- Transactional Folio Number -->
@@ -65,13 +68,14 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { Component, Vue } from 'vue-property-decorator'
-import { SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
+import { HomeLocationReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 /* eslint-enable no-unused-vars */
 
 @Component({
   components: {
     YourHomeReview,
-    SubmittingPartyReview
+    SubmittingPartyReview,
+    HomeLocationReview
   }
 })
 export default class MhrReviewConfirm extends Vue {

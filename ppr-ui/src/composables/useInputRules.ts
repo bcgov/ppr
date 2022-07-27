@@ -38,14 +38,19 @@ export const useInputRules = () => {
     ]
   }
 
-  const isNumber = (numberType: string = null, maxDigits: number = null, maxValue: number = null): Array<Function> => {
+  const isNumber = (
+    numberType: string = null,
+    maxDigits: number = null,
+    maxValue: number = null,
+    customMsg: string = null
+  ): Array<Function> => {
     const maxDigitRule = new RegExp(`^\\d{1,${maxDigits}}$`)
 
     return [
       v => ((v && numberType) ? /^\d+$/g.test(v) : true) || `${numberType} must be a valid whole number (cannot contain decimals)`,
       v => ((v && maxDigits) ? maxDigitRule.test(v) : true) || `Maximum ${maxDigits} characters`,
       v => ((v && maxValue) ? v < maxValue : true) || `${numberType} must be less than ${maxValue}`,
-      v => (v ? /^\d+$/g.test(v) : true) || 'Must contain numbers only'
+      v => (v ? /^\d+$/g.test(v) : true) || `${customMsg || 'Must contain numbers only'}`
     ]
   }
 
@@ -59,7 +64,7 @@ export const useInputRules = () => {
   }
 
   // Check if value is a greater than maxNumber
-  const graterThan = (maxNumber: number, errorMessage: string) => {
+  const greaterThan = (maxNumber: number, errorMessage: string) => {
     return [
       (v: number) => !v || v <= maxNumber || errorMessage
     ]
@@ -78,7 +83,7 @@ export const useInputRules = () => {
     required,
     isNumber,
     startsWith,
-    graterThan,
+    greaterThan,
     minLength,
     maxLength
   }

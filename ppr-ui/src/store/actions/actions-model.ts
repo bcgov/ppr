@@ -309,3 +309,7 @@ export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRe
 export const setMhrAttentionReferenceNum: ActionIF = ({ commit }, value): void => {
   commit('mutateMhrAttentionReferenceNum', value)
 }
+
+export const setMhrLocation: ActionIF = ({ commit }, { key, value }): void => {
+  commit('mutateMhrLocation', { key, value })
+}

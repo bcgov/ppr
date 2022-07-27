@@ -20,6 +20,7 @@ export * from './productStatus'
 export * from './productCode'
 export * from './authRoles'
 export * from './homeCertificationOptions'
+export * from './homeLocationTypes'
 export * from './submittingPartyTypes'
 
 // external enums

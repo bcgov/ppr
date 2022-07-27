@@ -1,4 +1,4 @@
-import { MhrRegistrationDescriptionIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationDescriptionIF, MhrRegistrationHomeOwnersIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 export interface MhrRegistrationIF {
   clientReferenceId: string,
@@ -23,17 +23,7 @@ export interface MhrRegistrationIF {
   },
   owners: MhrRegistrationHomeOwnersIF[],
   attentionReferenceNum: string,
-  location: {
-    parkName: string,
-    pad: number,
-    address: {
-      street: string,
-      city: string,
-      region: string,
-      country: string,
-      postalCode: string
-    }
-  },
+  location:MhrRegistrationHomeLocationIF,
   description: MhrRegistrationDescriptionIF,
   notes: [
     {

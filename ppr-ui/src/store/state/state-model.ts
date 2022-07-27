@@ -113,14 +113,21 @@ export const stateModel: StateModelIF = {
     attentionReferenceNum: '',
     location: {
       parkName: '',
-      pad: null,
+      pad: '',
       address: {
         street: '',
         city: '',
         region: '',
         country: '',
         postalCode: ''
-      }
+      },
+      leaveProvince: false,
+      pidNumber: '',
+      taxCertificate: false,
+      dealerName: '',
+      additionalDescription: '',
+      locationType: null,
+      otherType: null
     },
     description: {
       manufacturer: '',
