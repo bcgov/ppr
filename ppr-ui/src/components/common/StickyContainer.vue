@@ -1,7 +1,8 @@
 <template :class="{ 'pl-15': leftOffset, 'pr-15': rightOffset }">
-  <div>
+  <div id="sticky-container">
     <fee-summary
       v-if="showFeeSummary"
+      class="overlap"
       :setFeeOverride="feeOverride"
       :setFeeType="setFeeType"
       :setFeeQuantity="setFeeQuantity"
@@ -14,7 +15,7 @@
     />
     <buttons-stacked
       v-if="showButtons"
-      class="pt-4 buttons-stacked"
+      class="pt-4 buttons-stacked overlap"
       :setBackBtn="backBtn"
       :setCancelBtn="cancelBtn"
       :setSubmitBtn="submitBtn"
@@ -197,6 +198,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.overlap {
+  z-index: 10;
+}
 .err-msg {
   color: $error;
   font-size: 0.75rem;

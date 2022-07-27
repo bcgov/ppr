@@ -77,6 +77,7 @@ export default class Stepper extends Vue {
 @import '@/assets/styles/theme.scss';
 
 .step-buttons-container {
+  min-width: 830px;
   display: flex;
   justify-content: space-evenly;
   margin: 0;

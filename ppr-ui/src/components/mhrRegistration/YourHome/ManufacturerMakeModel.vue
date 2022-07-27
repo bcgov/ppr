@@ -127,7 +127,7 @@ export default defineComponent({
       minLength,
       maxLength,
       startsWith,
-      graterThan,
+      greaterThan,
       isNumber
     } = useInputRules()
 
@@ -162,7 +162,7 @@ export default defineComponent({
         minLength(4, true),
         maxLength(4, true),
         startsWith(['19', '20'], 'Year must begin with 19 or 20'),
-        graterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future')
+        greaterThan(new Date().getFullYear() + 1, 'Year cannot be more than 1 year in the future')
       )
     )
 
@@ -240,7 +240,7 @@ export default defineComponent({
       makeRules,
       modelRules,
       maxLength,
-      graterThan,
+      greaterThan,
       ...toRefs(localState)
     }
   }

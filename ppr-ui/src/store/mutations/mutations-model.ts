@@ -373,3 +373,7 @@ export const mutateMhrHomeOwners = (state: StateIF, owners: Array<MhrRegistratio
 export const mutateMhrAttentionReferenceNum = (state: StateIF, value) => {
   state.stateModel.mhrRegistration.attentionReferenceNum = value
 }
+
+export const mutateMhrLocation = (state: StateIF, { key, value }) => {
+  state.stateModel.mhrRegistration.location[key] = value
+}

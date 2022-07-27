@@ -16,7 +16,7 @@ import {
   LengthTrustIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
-  MhrRegistrationDescriptionIF,
+  MhrRegistrationDescriptionIF, MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnersIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
@@ -387,7 +387,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     id: 'step-1-btn',
     step: 1,
     icon: 'mdi-home',
-    text: 'Describe your \nHome',
+    text: 'Describe <br />your Home',
     to: RouteNames.YOUR_HOME,
     disabled: getters.isBusySaving,
     valid: false,
@@ -397,7 +397,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     id: 'step-2-btn',
     step: 2,
     icon: 'mdi-account',
-    text: 'Submitting Party',
+    text: 'Submitting <br />Party',
     to: RouteNames.SUBMITTING_PARTY,
     disabled: getters.isBusySaving,
     valid: false,
@@ -406,8 +406,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
   {
     id: 'step-3-btn',
     step: 3,
-    icon: 'mdi-car',
-    text: 'List the Home Owners',
+    icon: 'mdi-home', // TO BE UPDATED
+    text: 'List Home <br />Owners',
     to: RouteNames.HOME_OWNERS,
     disabled: getters.isBusySaving,
     valid: false,
@@ -416,8 +416,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
   {
     id: 'step-4-btn',
     step: 4,
-    icon: 'mdi-text-box-check-outline', // 'mdi-text-box-multiple'
-    text: 'Detail the Home Location',
+    icon: 'mdi-home', // TO BE UPDATED
+    text: 'Location <br />of Home',
     to: RouteNames.HOME_LOCATION,
     disabled: getters.isBusySaving,
     valid: false,
@@ -651,4 +651,8 @@ export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHom
 
 export const getMhrAttentionReferenceNum = (state: StateIF): any => {
   return state.stateModel.mhrRegistration.attentionReferenceNum
+}
+
+export const getMhrRegistrationLocation = (state: StateIF): MhrRegistrationHomeLocationIF => {
+  return state.stateModel.mhrRegistration.location
 }
