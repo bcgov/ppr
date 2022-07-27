@@ -35,7 +35,6 @@
       <v-text-field
         id="pid-three-input"
         ref="pidThreeRef"
-        class=""
         filled
         maxlength="3"
         :readonly="enablePidLoader"

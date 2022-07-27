@@ -136,20 +136,10 @@ export default class MhrRegistration extends Vue {
     }
     // redirect if store doesn't contain all needed data (happens on page reload, etc.)
     if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
-      // this.$router.push({
-      //   name: RouteNames.DASHBOARD
-      // })
-      // TODO: Cameron-Remove Dev Code
-      this.setRegistrationType({
-        class: 'registration-list-item',
-        disabled: false,
-        divider: false,
-        group: 3,
-        registrationTypeUI: 'Manufactured Home Registration',
-        registrationTypeAPI: 'MHR',
-        text: 'Manufactured Home Registration (MHR)'
+      this.$router.push({
+        name: RouteNames.DASHBOARD
       })
-      // return
+      return
     }
     // page is ready to view
     this.emitHaveData(true)
