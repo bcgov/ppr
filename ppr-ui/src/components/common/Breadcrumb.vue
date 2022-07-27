@@ -86,6 +86,20 @@ export default defineComponent({
         const roleBasedBreadcrumbTitle = breadcrumbsTitles[
           getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
         ]
+        const allTombstoneBreadcrumbs = [
+          tombstoneBreadcrumbDashboard,
+          tombstoneBreadcrumbDischarge,
+          tombstoneBreadcrumbRenewal,
+          tombstoneBreadcrumbAmendment,
+          tombstoneBreadcrumbRegistration,
+          tombstoneBreadcrumbSearch,
+          tombstoneBreadcrumbSearchConfirm
+        ]
+        if (localState.isStaff) {
+          for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
+            tombstoneBreadcrumb[0].text = 'Staff Dashboard'
+          }
+        }
         if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard

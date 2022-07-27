@@ -133,7 +133,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
     tombstoneBreadcrumbDashboard[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbDashboard.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDashboard[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbDashboard[i].text))
     }
   })
 
@@ -145,7 +145,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbSearch.length)
     tombstoneBreadcrumbSearch[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbSearch.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbSearch[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbSearch[i].text))
     }
   })
 
@@ -157,7 +157,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
     tombstoneBreadcrumbDischarge[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDischarge[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbDischarge[i].text))
     }
   })
 
@@ -169,7 +169,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDischarge.length)
     tombstoneBreadcrumbDischarge[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbDischarge.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbDischarge[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbDischarge[i].text))
     }
   })
 
@@ -181,7 +181,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
     }
   })
 
@@ -193,7 +193,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
     }
   })
 
@@ -205,7 +205,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
     }
   })
 
@@ -217,7 +217,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
     tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRegistration[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
     }
   })
 
@@ -229,7 +229,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
     tombstoneBreadcrumbRenewal[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRenewal[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRenewal[i].text))
     }
   })
 
@@ -241,7 +241,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRenewal.length)
     tombstoneBreadcrumbRenewal[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbRenewal.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbRenewal[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRenewal[i].text))
     }
   })
 
@@ -253,7 +253,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
     tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbAmendment[i].text))
     }
   })
 
@@ -265,7 +265,7 @@ describe('Breadcrumb component tests', () => {
     expect(breadcrumbs.length).toBe(tombstoneBreadcrumbAmendment.length)
     tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRoleProductCode]
     for (let i = 0; i < tombstoneBreadcrumbAmendment.length; i++) {
-      expect(breadcrumbs.at(i).text()).toContain(tombstoneBreadcrumbAmendment[i].text)
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbAmendment[i].text))
     }
   })
 
