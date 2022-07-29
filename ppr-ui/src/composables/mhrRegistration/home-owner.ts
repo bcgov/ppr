@@ -6,7 +6,7 @@ import '@/utils/use-composition-api'
 
 import { ref, computed, readonly } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { filter, some } from 'lodash'
+import { find, filter, some } from 'lodash'
 
 // when home owners not added to any groups
 // then do not show it on the UI
@@ -57,9 +57,10 @@ export function useHomeOwners (
     }
   }
 
-  const getGroupIdForOwner = (
+  const getGroupForOwner = (
     ownerId: string
   ): MhrRegistrationHomeOwnerGroupIF => {
+    if (!showGroupsUI.value) return null
     return filter(
       getMhrRegistrationHomeOwnerGroups.value,
       (group: MhrRegistrationHomeOwnerGroupIF) =>
@@ -71,20 +72,20 @@ export function useHomeOwners (
     owner: MhrRegistrationHomeOwnersIF,
     groupId: string
   ) => {
-    console.log('Adding owner to group:', groupId || '1')
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
 
     // Try to find a group to add the owner
     const groupToUpdate =
-      homeOwnerGroups.find(group => group.groupId === groupId) ||
-      ({} as MhrRegistrationHomeOwnerGroupIF)
+      homeOwnerGroups.find(
+        (group: MhrRegistrationHomeOwnerGroupIF) =>
+          group.groupId === groupId || '1'
+      ) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
     if (groupToUpdate.owners) {
       console.log('Found the group. Updating')
       groupToUpdate.owners.push(owner)
     } else {
       // No groups exist, need to create a new one
-      console.log('No group found. Adding.')
       const newGroup = {
         groupId: groupId || '1',
         owners: [owner] as MhrRegistrationHomeOwnersIF[]
@@ -95,12 +96,54 @@ export function useHomeOwners (
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
+  const editHomeOwner = (
+    owner: MhrRegistrationHomeOwnersIF,
+    groupId: string
+  ) => {
+    removeOwner(owner)
+    addOwnerToTheGroup(owner, groupId)
+  }
+
+  const removeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
+    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+    // find group id that owner belongs to
+    const groupIdOfOwner = getGroupForOwner(owner.id)?.groupId || '1'
+    // find group to remove the owner from
+    const groupToUpdate = homeOwnerGroups.find(
+      group => group.groupId === groupIdOfOwner
+    ) as MhrRegistrationHomeOwnerGroupIF
+    // remove the owner from the group
+    groupToUpdate.owners.splice(groupToUpdate.owners.indexOf(owner), 1)
+    // update all groups
+    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    if (groupToUpdate.owners.length === 0) {
+      // delete owner group because it has no owners
+      const emptyGroupIndex = homeOwnerGroups.indexOf(groupToUpdate)
+      homeOwnerGroups.splice(emptyGroupIndex, 1)
+      // decrease all subsequent groupIds by 1,
+      // as if owners got moved from group 3 to 2, 2 to 1 etc.
+      find(
+        homeOwnerGroups,
+        group => {
+          group.groupId = (Number(group.groupId) - 1).toString()
+        },
+        emptyGroupIndex
+      )
+    }
+    // if we removed all owners from all groups - reset the groups UI flag
+    if (homeOwnerGroups.length === 0) {
+      setShowGroupsUI(false)
+    }
+  }
+
   return {
     showGroupsUI: readonly(showGroupsUI),
     getSideTitle,
     addOwnerToTheGroup,
+    editHomeOwner,
+    removeOwner,
     getGroupsDropdownItems,
-    getGroupIdForOwner,
+    getGroupForOwner,
     setShowGroupsUI
   }
 }
