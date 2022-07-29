@@ -1,0 +1,74 @@
+<template>
+  <div id="mhr-home-owner-groups">
+    <label class="generic-label">
+      Multiple Groups of Owners (Tenants in Common)
+    </label>
+    <ul class="my-2">
+      <li>
+        Select a group if you have
+        <b>multiple groups of owners</b> (tenants in common).
+      </li>
+      <li>
+        Leave this empty if you have <b>only one owner</b>, or
+        <b>one group of owners</b> (sole ownership or joint tenancy).
+      </li>
+    </ul>
+    <v-select
+      id="home-owner-groups"
+      label="Select a Group"
+      v-model="ownerGroupId"
+      :items="groups"
+      :rules="showGroupsUI ? required('Select a group for this owner') : []"
+      class="owner-groups-select my-8"
+      filled
+      @change="setOwnerGroupId($event)"
+    ></v-select>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { useHomeOwners } from '@/composables/mhrRegistration'
+import { useInputRules } from '@/composables'
+
+export default defineComponent({
+  name: 'HomeOwnerGroups',
+  props: {
+    groupId: { type: String }
+  },
+  setup (props, { emit }) {
+    const { required } = useInputRules()
+    const { getGroupsDropdownItems, showGroupsUI } = useHomeOwners()
+
+    const localState = reactive({
+      ownerGroupId: props.groupId,
+      groups: getGroupsDropdownItems()
+    })
+
+    const setOwnerGroupId = groupId => {
+      emit('setOwnerGroupId', groupId)
+    }
+
+    return {
+      showGroupsUI,
+      required,
+      setOwnerGroupId,
+      ...toRefs(localState)
+    }
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+
+#mhr-home-owner-groups::v-deep {
+  ul {
+    color: #495057;
+  }
+
+  .owner-groups-select {
+    width: 200px;
+  }
+}
+</style>

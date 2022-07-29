@@ -2,7 +2,7 @@ import { AddressIF } from '@/composables/address/interfaces'
 import { MhrRegistrationHomeOwnersIF } from './MhrRegistrationHomeOwnersIF'
 
 export interface MhrRegistrationHomeOwnerGroupIF {
-  groupId: number,
+  groupId: string,
   owners: MhrRegistrationHomeOwnersIF[],
   type?: string,
   interest?: string,
