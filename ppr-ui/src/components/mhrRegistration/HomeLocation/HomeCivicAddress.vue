@@ -10,6 +10,8 @@
                   v-model="address"
                   :editing="true"
                   :schema="{ ...addressSchema }"
+                  :regionDisabled="true"
+                  :deliveryOptionsVisible="false"
                   :triggerErrors="showAllAddressErrors"
                   @valid="updateValidity($event)"
                 />
@@ -44,7 +46,7 @@ export default defineComponent({
       street: '',
       streetAdditional: '',
       city: '',
-      region: '',
+      region: 'BC',
       country: '',
       postalCode: ''
     }
@@ -60,7 +62,8 @@ export default defineComponent({
     const addressSchema = PartyAddressSchema
 
     const localState = reactive({
-      isValidLot: false
+      isValidLot: false,
+      showAllAddressErrors: false
     })
     localState.isValidLot = true
     /** Apply local models to store when they change. **/

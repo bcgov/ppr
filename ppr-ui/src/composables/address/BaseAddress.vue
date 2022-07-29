@@ -105,6 +105,7 @@
             :name="Math.random()"
             v-model="addressLocal.region"
             :rules="[...schemaLocal.region]"
+            :disabled="regionDisabled"
           />
           <v-text-field
             filled
@@ -117,6 +118,7 @@
         </div>
         <div class="form__row">
           <v-textarea
+            v-if="deliveryOptionsVisible"
             auto-grow
             filled
             class="delivery-instructions"
@@ -161,6 +163,14 @@ export default defineComponent({
         deliveryInstructions: ''
       })
     },
+    regionDisabled: {
+      type: Boolean,
+      default: false
+    },
+    deliveryOptionsVisible: {
+      type: Boolean,
+      default: true
+    },
     /* used for readonly mode vs edit mode */
     editing: {
       type: Boolean,
@@ -186,6 +196,9 @@ export default defineComponent({
       isSchemaRequired,
       labels
     } = useAddress(toRefs(props).value, props.schema)
+
+    const deliveryOptionsVisibile = props.deliveryOptionsVisible
+    const regionDisabled = props.regionDisabled
 
     const origPostalCodeRules = schemaLocal.value.postalCode
     const origRegionRules = schemaLocal.value.region
@@ -261,7 +274,9 @@ export default defineComponent({
       schemaLocal,
       useCountryRegions,
       ...uniqueIds,
-      validate
+      validate,
+      regionDisabled,
+      deliveryOptionsVisibile
     }
   }
 })
