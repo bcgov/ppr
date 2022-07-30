@@ -3,11 +3,14 @@
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
-      disable-sort
       :headers="homeOwnersTableHeaders"
       hide-default-footer
       :items="homeOwners"
-      item-key="id"
+      item-key="groupId"
+      group-by="groupId"
+      disable-sort
+      disable-pagination
+      no-data-text="No owners added yet"
     >
       <template v-slot:item="row">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
@@ -108,7 +111,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
 } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
@@ -120,11 +123,11 @@ export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
     homeOwners: { default: [] },
-    isAdding: { default: false }
+    isAdding: { default: false },
   },
   components: {
     BaseAddress,
-    AddEditHomeOwner
+    AddEditHomeOwner,
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -134,13 +137,13 @@ export default defineComponent({
       isEditingMode: computed(
         (): boolean => localState.currentlyEditingHomeOwnerId >= 0
       ),
-      isAddingMode: computed((): boolean => props.isAdding)
+      isAddingMode: computed((): boolean => props.isAdding),
     })
 
     const edit = (item): void => {
       context.emit('edit', {
         ...item,
-        id: localState.currentlyEditingHomeOwnerId
+        id: localState.currentlyEditingHomeOwnerId,
       })
     }
 
@@ -173,9 +176,9 @@ export default defineComponent({
       isCurrentlyEditing,
       edit,
       remove,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 
@@ -222,6 +225,12 @@ export default defineComponent({
 
   .v-data-table-header th {
     padding: 0 12px;
+  }
+
+  .v-row-group__header {
+    button {
+      display: none;
+    }
   }
 
   .suffix {

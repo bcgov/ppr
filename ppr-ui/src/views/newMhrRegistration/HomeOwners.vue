@@ -129,9 +129,11 @@ import { Component, Vue } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 /* eslint-disable no-unused-vars */
 import { ActionBindingIF } from '@/interfaces/store-interfaces/action-interface'
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
+import {
+  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationHomeOwnerGroupIF
+} from '@/interfaces/mhr-registration-interfaces'
 import { SimpleHelpToggle } from '@/components/common'
-
 /* eslint-enable no-unused-vars */
 
 @Component({
