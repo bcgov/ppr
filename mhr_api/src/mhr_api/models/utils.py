@@ -839,3 +839,9 @@ def get_country_from_province(province: str, default: str = COUNTRY_US):
     if province == PROVINCE_BC or DB2_PROVINCE_MAPPING.get(province):
         return COUNTRY_CA
     return default
+
+
+def format_mhr_number(mhr_number: str):
+    """Trim and pad with zeroes search query mhr number query."""
+    formatted = mhr_number.strip().rjust(6, '0')
+    return formatted

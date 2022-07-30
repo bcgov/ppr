@@ -19,7 +19,7 @@ from http import HTTPStatus
 from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from mhr_api.models import utils as model_utils
+from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.utils.base import BaseEnum
 
 from .db import db
@@ -29,12 +29,7 @@ from .party import Party
 from .type_tables import RegistrationType
 
 
-# from .trust_indenture import TrustIndenture
-# from .vehicle_collateral import VehicleCollateral
-# noqa: I003
-
-
-FINANCING_PATH = '/ppr/api/v1/financing-statements/'
+REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 
 
 class CrownChargeTypes(BaseEnum):
@@ -331,6 +326,21 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         if registration_id:
             registration = cls.query.get(registration_id)
         return registration
+
+    @classmethod
+    def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str):
+        """Return the registration matching the registration number."""
+        formatted_mhr = model_utils.format_mhr_number(mhr_number)
+        current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
+        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
+        if use_legacy_db:
+            registration = Db2Manuhome.find_summary_by_mhr_number(formatted_mhr)
+            if registration:
+                registration['path'] = REGISTRATION_PATH + mhr_number
+                # For new MHR registrations inject username, submitting party here.
+            return registration
+
+        raise DatabaseException('Registration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
 
     @classmethod
     def find_by_registration_number(cls, registration_num: str, account_id: str):
