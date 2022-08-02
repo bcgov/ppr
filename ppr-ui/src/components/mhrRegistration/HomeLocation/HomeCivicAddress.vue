@@ -5,16 +5,70 @@
         <label class="generic-label" :class="{'error-text': false}">Civic Address</label>
       </v-col>
       <v-col cols="12" sm="10" class="mt-n1">
-      <base-address
-                  ref="civicAddress"
-                  v-model="address"
-                  :editing="true"
-                  :schema="{ ...addressSchema }"
-                  :regionDisabled="true"
-                  :deliveryOptionsVisible="false"
-                  :triggerErrors="showAllAddressErrors"
-                  @valid="updateValidity($event)"
-                />
+
+      <div class="base-address">
+        <!-- Display fields -->
+        <!-- Edit fields -->
+
+          <v-form ref="addressForm" name="address-form" lazy-validation>
+            <div class="form__row">
+              <!-- NB1: AddressComplete needs to be enabled each time user clicks in this search field.
+                  NB2: Only process first keypress -- assumes if user moves between instances of this
+                      component then they are using the mouse (and thus, clicking). -->
+              <v-text-field
+                autocomplete="new-password"
+                class="street-address"
+                filled
+                hint="Street address, PO box, rural route, or general delivery address"
+                label="Street Address"
+                :name="Math.random()"
+                persistent-hint
+                v-model="address.street"
+                :rules="[...addressSchema.street]"
+              />
+            </div>
+            <div class="form__row">
+              <v-textarea
+                autocomplete="new-password"
+                auto-grow
+                filled
+                class="street-address-additional"
+                label="Additional Street Address (Optional)"
+                :name="Math.random()"
+                rows="1"
+                v-model="address.streetAdditional"
+                :rules="[...addressSchema.streetAdditional]"
+              />
+            </div>
+            <div class="form__row two-column">
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    autocomplete="new-password"
+                    filled
+                    class="item address-city"
+                    label="City"
+                    :name="Math.random()"
+                    v-model="address.city"
+                    :rules="[...addressSchema.city]"
+                  />
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    filled
+                    :disabled=true
+                    class="item address-region"
+                    label="Province"
+                    hint="Address must be in B.C."
+                    :name="Math.random()"
+                    v-model="address.region"
+                    :rules="[...addressSchema.region]"
+                  />
+                </v-col>
+              </v-row>
+            </div>
+          </v-form>
+      </div>
       </v-col>
     </v-row>
   </v-card>
@@ -23,11 +77,8 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
-import { formatAddress } from '@/composables/address/factories'
-import { useValidation } from '@/utils/validators/use-validation'
 import { AddressIF } from '@/composables/address/interfaces'
 import { PartyAddressSchema } from '@/schemas/party-address'
 
@@ -39,14 +90,20 @@ export default defineComponent({
     BaseAddress,
     AutoComplete
   },
-  props: {},
+  props: {
+    /* used for readonly mode vs edit mode */
+    editing: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup (props, context) {
     /* const {} = useActions<any>([]) */
     const initAddress : AddressIF = {
       street: '',
       streetAdditional: '',
       city: '',
-      region: 'BC',
+      region: 'British Columbia',
       country: '',
       postalCode: ''
     }
