@@ -54,6 +54,14 @@ export const useInputRules = () => {
     ]
   }
 
+  const isEmail = (): Array<Function> => [
+    (v: string) => !!v || 'Email address is required',
+    (v: string) => {
+      const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      return pattern.test(v) || 'Valid email is required'
+    }
+  ]
+
   // Check if string starts with any of the search values
   const startsWith = (searchValues: Array<string>, errorMessage: string): Array<Function> => {
     const values = '^' + searchValues.join('|^')
@@ -77,6 +85,7 @@ export const useInputRules = () => {
 
   return {
     customRules,
+    isEmail,
     isEmpty,
     invalidSpaces,
     isStringOrNumber,

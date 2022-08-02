@@ -50,7 +50,7 @@
             autocomplete="new-password"
             class="street-address"
             filled
-            hint="Street address, PO box, rural route, or general delivery address"
+            :hint="hideAddressHint ? '' :  'Street address, PO box, rural route, or general delivery address'"
             :id="streetId"
             :label="streetLabel"
             :name="Math.random()"
@@ -173,6 +173,11 @@ export default defineComponent({
     },
     /* triggers all current form validation errors */
     triggerErrors: {
+      type: Boolean,
+      default: false
+    },
+    /* Hides the persistent hint field on Address Input */
+    hideAddressHint: {
       type: Boolean,
       default: false
     }
