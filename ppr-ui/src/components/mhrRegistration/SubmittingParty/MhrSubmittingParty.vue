@@ -111,6 +111,8 @@
                 id="submitting-party-phone"
                 class="pt-4 pr-3"
                 label="Phone Number"
+                hint="Example: (555) 555-5555"
+                persistent-hint
                 v-model="submittingParty.phoneNumber"
                 :rules="phoneRules"
               />
@@ -128,12 +130,13 @@
           </v-row>
 
           <!-- Mailing Address -->
-          <article class="pr-1">
+          <article class="pt-4 pr-1">
             <label class="generic-label" for="submitting-party-address">Mailing Address</label>
-            <p class="py-1">The registration verification statement and the decals will be mailed to this address.</p>
+            <p class="py-1">Verification of Service registration document and decals will be mailed to this address.</p>
 
             <base-address
               editing
+              hideAddressHint
               ref="submittingPartyAddress"
               id="submitting-party-address"
               :schema="PartyAddressSchema"
@@ -156,6 +159,7 @@ import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
+/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrSubmittingParty',
@@ -180,8 +184,10 @@ export default defineComponent({
       customRules,
       invalidSpaces,
       maxLength,
+      minLength,
       required,
       isStringOrNumber,
+      isEmail,
       isNumber
     } = useInputRules()
 
@@ -240,9 +246,14 @@ export default defineComponent({
       invalidSpaces()
     )
 
-    const emailRules = customRules(required('Email address is required'), invalidSpaces())
+    const emailRules = customRules(required('Email address is required'), invalidSpaces(), isEmail())
 
-    const phoneRules = customRules(required('Phone number is required'), isNumber(), invalidSpaces())
+    const phoneRules = customRules(
+      required('Enter a phone number'),
+      minLength(10),
+      maxLength(15),
+      invalidSpaces()
+    )
 
     const phoneExtensionRules = customRules(isNumber(), invalidSpaces())
 
@@ -314,7 +325,6 @@ export default defineComponent({
     }
   }
 })
-/* eslint-enable no-unused-vars */
 </script>
 
 <style lang="scss" scoped>

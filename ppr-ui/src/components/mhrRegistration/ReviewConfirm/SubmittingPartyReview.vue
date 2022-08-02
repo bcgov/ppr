@@ -81,7 +81,7 @@
               <p class="side-header">Attention or<br>Reference Number</p>
             </v-col>
             <v-col cols="9">
-              <p class="content">{{getMhrAttentionReferenceNum || '(Not Entered)'}}</p>
+              <p class="content ref-text">{{getMhrAttentionReferenceNum || '(Not Entered)'}}</p>
             </v-col>
           </v-row>
         </section>
@@ -96,6 +96,7 @@ import { RouteNames } from '@/enums'
 import { useGetters } from 'vuex-composition-helpers'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
+import { toDisplayPhone } from '@/utils'
 
 export default defineComponent({
   name: 'SubmittingPartyReview',
@@ -125,7 +126,7 @@ export default defineComponent({
       const phone = getMhrRegistrationSubmittingParty.value
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
-      return phoneNum ? `${phoneNum}${ext}` : '(Not Entered)'
+      return phoneNum ? `${toDisplayPhone(phoneNum)}${ext}` : '(Not Entered)'
     }
 
     const getSubmittingPartyName = () => {
@@ -166,6 +167,10 @@ export default defineComponent({
 
 .error-text {
   font-size: 16px;
+}
+
+.ref-text {
+  font-size: 16px !important;
 }
 
 .table-header {
