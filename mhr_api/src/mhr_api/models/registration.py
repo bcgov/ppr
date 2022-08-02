@@ -20,6 +20,7 @@ from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils, Db2Manuhome
+from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.utils.base import BaseEnum
 
 from .db import db
@@ -329,7 +330,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
 
     @classmethod
     def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str):
-        """Return the registration matching the registration number."""
+        """Return the registration summary information matching the registration number."""
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
         use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
@@ -337,6 +338,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             registration = Db2Manuhome.find_summary_by_mhr_number(formatted_mhr)
             if registration:
                 registration['path'] = REGISTRATION_PATH + mhr_number
+                # Set inUserList to true if MHR number already added to account extra registrations.
+                extra_reg: MhrExtraRegistration = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
+                if extra_reg:
+                    registration['inUserList'] = True
                 # For new MHR registrations inject username, submitting party here.
             return registration
 

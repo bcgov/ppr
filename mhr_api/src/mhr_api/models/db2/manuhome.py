@@ -229,7 +229,7 @@ class Db2Manuhome(db.Model):
 
     @classmethod
     def find_summary_by_mhr_number(cls, mhr_number: str):
-        """Return the MH registration summary informaiton matching the MHR number."""
+        """Return the MH registration summary information matching the MHR number."""
         summary = None
         try:
             query = text(QUERY_ACCOUNT_ADD_REGISTRATION)
