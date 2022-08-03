@@ -7,7 +7,6 @@
       @proceed="dialogSubmit($event)"
     />
     <v-autocomplete
-      id="registrationTypeAhead"
       class="registrationTypeAhead rounded-top"
       :class="{ 'reg-filter': isClearable, 'light-background': isLightBackGround }"
       allow-overflow
