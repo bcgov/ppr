@@ -7,11 +7,28 @@
       hide-default-footer
       :items="homeOwners"
       item-key="groupId"
-      group-by="groupId"
+      :group-by="showGroupsUI ? 'groupId' : null"
       disable-sort
       disable-pagination
       no-data-text="No owners added yet"
     >
+      <template
+        v-slot:group.header="{ group, items: owners }"
+        class="group-header"
+      >
+        <td :colspan="4" class="py-4">
+          <span class="ma-2 font-weight-bold">Group {{ group }}</span>
+          |
+          <span class="ma-2">Owners: {{ owners.length }} </span>
+          |
+          <span class="ma-2">Group Tenancy Type: </span>
+          |
+          <span class="ma-2">
+            {{ getOwnershipInterest(Number(group) - 1) }}
+          </span>
+        </td>
+      </template>
+
       <template v-slot:item="row">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
@@ -115,9 +132,11 @@ import {
 } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
+import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
+import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -131,6 +150,12 @@ export default defineComponent({
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
+
+    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
+      'getMhrRegistrationHomeOwnerGroups'
+    ])
+
+    const { showGroupsUI, removeOwner } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
@@ -149,7 +174,7 @@ export default defineComponent({
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
-      context.emit('remove', item)
+      removeOwner(item)
     }
 
     const openForEditing = (index: number) => {
@@ -158,6 +183,12 @@ export default defineComponent({
 
     const isCurrentlyEditing = (index: number): boolean => {
       return index === localState.currentlyEditingHomeOwnerId
+    }
+
+    // Get interest based on idex of the group
+    const getOwnershipInterest = (index: number): string => {
+      const interest = getMhrRegistrationHomeOwnerGroups.value[index]?.interest
+      return interest ? 'Interest: ' + interest : ''
     }
 
     // Emit whenever editing mode is on or off
@@ -174,6 +205,8 @@ export default defineComponent({
       homeOwnersTableHeaders,
       openForEditing,
       isCurrentlyEditing,
+      showGroupsUI,
+      getOwnershipInterest,
       edit,
       remove,
       ...toRefs(localState),
@@ -186,6 +219,11 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .home-owners-table ::v-deep {
+  tr.v-row-group__header,
+  tbody tr.v-row-group__header:hover {
+    background-color: #e2e8ee;
+  }
+
   .owner-name,
   i,
   strong {

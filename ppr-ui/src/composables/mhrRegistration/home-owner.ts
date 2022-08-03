@@ -6,7 +6,7 @@ import '@/utils/use-composition-api'
 
 import { ref, computed, readonly } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { find, cloneDeep, remove } from 'lodash'
+import { find, cloneDeep, remove, merge } from 'lodash'
 
 // when home owners not added to any groups
 // then do not show it on the UI
@@ -40,7 +40,10 @@ export function useHomeOwners (
   // WORKING WITH GROUPS FUNCTIONS
 
   // Generate dropdown items for the group selection
-  const getGroupsDropdownItems = (): Array<any> => {
+  const getGroupsDropdownItems = (isAddingHomeOwner: Boolean): Array<any> => {
+    // Make additional Group available in dropdown when adding a new home owner
+    // const additionalGroup = isAddingHomeOwner ? 1 : 0
+
     if (showGroupsUI.value) {
       return Array(getMhrRegistrationHomeOwnerGroups.value.length + 1)
         .fill({})
@@ -80,7 +83,6 @@ export function useHomeOwners (
       ) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
     if (groupToUpdate.owners) {
-      console.log('Found the group. Updating')
       groupToUpdate.owners.push(owner)
     } else {
       // No groups exist, need to create a new one
@@ -114,12 +116,19 @@ export function useHomeOwners (
       )
     } else {
       // need to move the owner to new group
-      const clone = cloneDeep(updatedOwner)
-      removeOwner(updatedOwner)
-      addOwnerToTheGroup(clone, newGroupId)
+
+      // groupToUpdate.owners.splice(groupToUpdate.owners.indexOf(updatedOwner), 1)
+      // groupToUpdate.owners.splice(
+      //   groupToUpdate.owners.length - 1,
+      //   0,
+      //   updatedOwner
+      // )
+      // removeOwner(updatedOwner)
+      remove(groupToUpdate.owners, owner => owner.id === updatedOwner.id)
+      addOwnerToTheGroup(updatedOwner, newGroupId)
     }
 
-    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    removeEmptyGroups()
   }
 
   const removeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
@@ -133,30 +142,53 @@ export function useHomeOwners (
       group => group.groupId === groupIdOfOwner
     ) as MhrRegistrationHomeOwnerGroupIF
     // remove the owner from the group
-    groupToUpdate.owners.splice(groupToUpdate.owners.indexOf(owner), 1)
+    // groupToUpdate.owners.splice(groupToUpdate.owners.indexOf(owner), 1)
     // update all groups
+
+    remove(groupToUpdate.owners, o => o.id === owner.id)
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
 
     if (groupToUpdate.owners.length === 0) {
-      // delete owner group because it has no owners
-      const emptyGroupIndex = homeOwnerGroups.indexOf(groupToUpdate)
-      homeOwnerGroups.splice(emptyGroupIndex, 1)
-      // decrease all subsequent groupIds by 1,
-      // as if owners got moved from group 3 to 2, 2 to 1 etc.
-      find(
-        homeOwnerGroups,
-        group => {
-          group.groupId = (Number(group.groupId) - 1).toString()
-        },
-        emptyGroupIndex
-      )
-
-      setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+      removeEmptyGroups()
     }
+
     // if we removed all owners from all groups - reset the groups UI flag
     if (homeOwnerGroups.length === 0) {
       setShowGroupsUI(false)
     }
+  }
+
+  const removeEmptyGroups = () => {
+    const homeOwnerGroups = [
+      ...getMhrRegistrationHomeOwnerGroups.value
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    const newOwnerGroups = homeOwnerGroups.filter(
+      group => group.owners.length > 0
+    )
+
+    newOwnerGroups.forEach((group, index) => {
+      group.groupId = (index + 1).toString()
+    })
+
+    setMhrRegistrationHomeOwnerGroups(newOwnerGroups)
+
+    // if (groupToUpdate.owners.length === 0) {
+    //   // delete owner group because it has no owners
+    //   const emptyGroupIndex = homeOwnerGroups.indexOf(groupToUpdate)
+    //   homeOwnerGroups.splice(emptyGroupIndex, 1)
+    //   // decrease all subsequent groupIds by 1,
+    //   // as if owners got moved from group 3 to 2, 2 to 1 etc.
+    //   find(
+    //     homeOwnerGroups,
+    //     group => {
+    //       group.groupId = (Number(group.groupId) - 1).toString()
+    //     },
+    //     emptyGroupIndex
+    //   )
+
+    //   setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    // }
   }
 
   return {

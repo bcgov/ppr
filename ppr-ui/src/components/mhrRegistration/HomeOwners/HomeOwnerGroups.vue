@@ -27,14 +27,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs
+} from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 
 export default defineComponent({
   name: 'HomeOwnerGroups',
   props: {
-    groupId: { type: String }
+    groupId: { type: String },
+    isAddingHomeOwner: { type: Boolean } // make additional Group available in dropdown when adding a new home owner
   },
   setup (props, { emit }) {
     const { required } = useInputRules()
@@ -42,7 +48,7 @@ export default defineComponent({
 
     const localState = reactive({
       ownerGroupId: props.groupId,
-      groups: getGroupsDropdownItems()
+      groups: computed(() => getGroupsDropdownItems(props.isAddingHomeOwner))
     })
 
     const setOwnerGroupId = groupId => {
