@@ -16,6 +16,7 @@ from enum import Enum
 from http import HTTPStatus
 
 from flask import current_app
+from sqlalchemy.sql import text
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
@@ -28,6 +29,32 @@ from .mhomnote import Db2Mhomnote
 from .owner import Db2Owner
 
 
+QUERY_ACCOUNT_ADD_REGISTRATION = """
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.attnref), TRIM(d.docutype),
+       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", TRIM(o2.ownrname))) AS CLOB)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.status IN ('3', '4')) as owner_names
+  FROM manuhome mh, document d
+ WHERE mh.mhregnum = :query_mhr_number
+   AND mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+"""
+REGISTRATION_DESC_NEW = 'Manufactured Home Registration'
+LEGACY_STATUS_DESCRIPTION = {
+    'R': 'ACTIVE',
+    'E': 'EXEMPT',
+    'D': 'DRAFT',
+    'C': 'HISTORICAL'
+}
+LEGACY_REGISTRATION_DESCRIPTION = {
+    '101': REGISTRATION_DESC_NEW,
+    'CONV': REGISTRATION_DESC_NEW
+}
+
+
 class Db2Manuhome(db.Model):
     """This class manages all of the legacy DB2 MHR manufauctured home base information."""
 
@@ -35,8 +62,8 @@ class Db2Manuhome(db.Model):
         """Render an Enum of the MH status types."""
 
         CANCELLED = 'C'
-        DELETED = 'D'
-        EXPIRED = 'E'
+        DRAFT = 'D'
+        EXEMPT = 'E'
         REGISTERED = 'R'
 
     __bind_key__ = 'db2'
@@ -201,6 +228,42 @@ class Db2Manuhome(db.Model):
         return man_home
 
     @classmethod
+    def find_summary_by_mhr_number(cls, mhr_number: str):
+        """Return the MH registration summary information matching the MHR number."""
+        summary = None
+        try:
+            query = text(QUERY_ACCOUNT_ADD_REGISTRATION)
+            result = db.get_engine(current_app, 'db2').execute(query, {'query_mhr_number': mhr_number})
+            rows = result.fetchall()
+            if rows is not None:
+                for row in rows:
+                    timestamp = row[2]
+                    owners = str(row[6])
+                    owners = owners.replace('<owner>', '')
+                    owners = owners.replace('</owner>', '\n')
+                    owner_list = owners.split('\n')
+                    owner_names = ''
+                    for name in owner_list:
+                        if name.strip() != '':
+                            owner_names += Db2Manuhome.get_summary_name(name) + '\n'
+                    summary = {
+                        'mhrNumber': mhr_number,
+                        'registrationDescription': LEGACY_REGISTRATION_DESCRIPTION.get(str(row[5]),
+                                                                                       REGISTRATION_DESC_NEW),
+                        'username': str(row[3]),
+                        'statusType': LEGACY_STATUS_DESCRIPTION.get(str(row[1])),
+                        'createDateTime': model_utils.format_ts(timestamp),
+                        'submittingParty': '',
+                        'clientReferenceId': str(row[4]),
+                        'ownerNames': owner_names,
+                        'inUserList': False
+                    }
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+        return summary
+
+    @classmethod
     def __sort_notes(cls, notes):
         """Sort notes by registration timesamp."""
         notes.sort(key=Db2Manuhome.__sort_key_notes_ts, reverse=True)
@@ -237,3 +300,16 @@ class Db2Manuhome(db.Model):
             manuhome.update_id = manuhome.update_id.strip()
 
         return manuhome
+
+    @staticmethod
+    def get_summary_name(db2_name: str):
+        """Get an individual name json from a DB2 legacy name."""
+        last = db2_name[0:24].strip()
+        first = db2_name[25:].strip()
+        middle = None
+        if len(db2_name) > 40:
+            first = db2_name[25:38].strip()
+            middle = db2_name[39:].strip()
+        if middle:
+            return first + ' ' + middle + ' ' + last
+        return first + ' ' + last
