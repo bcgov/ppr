@@ -116,6 +116,7 @@ export const stateModel: StateModelIF = {
       pad: '',
       address: {
         street: '',
+        streetAdditional: '',
         city: '',
         region: '',
         country: '',

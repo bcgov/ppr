@@ -5,27 +5,18 @@
         <label class="generic-label" :class="{'error-text': false}">Civic Address</label>
       </v-col>
       <v-col cols="12" sm="10" class="mt-n1">
-
-      <div class="base-address">
-        <!-- Display fields -->
-        <!-- Edit fields -->
-
           <v-form ref="addressForm" name="address-form" lazy-validation>
-            <div class="form__row">
-              <!-- NB1: AddressComplete needs to be enabled each time user clicks in this search field.
-                  NB2: Only process first keypress -- assumes if user moves between instances of this
-                      component then they are using the mouse (and thus, clicking). -->
-              <v-text-field
-                autocomplete="new-password"
-                class="street-address"
-                filled
-                hint="Street address, PO box, rural route, or general delivery address"
-                label="Street Address"
-                :name="Math.random()"
-                persistent-hint
-                v-model="address.street"
-                :rules="[...addressSchema.street]"
-              />
+              <div class="form__row">
+                <v-text-field
+                  autocomplete="new-password"
+                  class="street-address"
+                  filled
+                  label="Street Address"
+                  :name="Math.random()"
+                  persistent-hint
+                  v-model="address.street"
+                  :rules="[...addressSchema.street]"
+                />
             </div>
             <div class="form__row">
               <v-textarea
@@ -37,7 +28,6 @@
                 :name="Math.random()"
                 rows="1"
                 v-model="address.streetAdditional"
-                :rules="[...addressSchema.streetAdditional]"
               />
             </div>
             <div class="form__row two-column">
@@ -56,10 +46,11 @@
                 <v-col>
                   <v-text-field
                     filled
-                    :disabled=true
+                    :disabled="true"
                     class="item address-region"
                     label="Province"
                     hint="Address must be in B.C."
+                    persistent-hint
                     :name="Math.random()"
                     v-model="address.region"
                     :rules="[...addressSchema.region]"
@@ -68,7 +59,7 @@
               </v-row>
             </div>
           </v-form>
-      </div>
+
       </v-col>
     </v-row>
   </v-card>
@@ -77,19 +68,12 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { AutoComplete } from '@/components/search'
-import { BaseAddress } from '@/composables/address'
-import { AddressIF } from '@/composables/address/interfaces'
-import { PartyAddressSchema } from '@/schemas/party-address'
-
+import { CivicAddressSchema } from '@/schemas/civic-address'
+import { useActions } from 'vuex-composition-helpers'
 /* eslint-enable no-unused-vars */
-
 export default defineComponent({
   name: 'HomeCivicAddress',
-  components: {
-    BaseAddress,
-    AutoComplete
-  },
+  components: {},
   props: {
     /* used for readonly mode vs edit mode */
     editing: {
@@ -97,35 +81,36 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    /* const {} = useActions<any>([]) */
-    const initAddress : AddressIF = {
-      street: '',
-      streetAdditional: '',
-      city: '',
-      region: 'British Columbia',
-      country: '',
-      postalCode: ''
-    }
+  setup () {
+    const {
+      setMhrLocation
+    } = useActions<any>([
+      'setMhrLocation'
+    ])
 
-    const address : AddressIF = {
-      street: initAddress.street,
-      city: initAddress.city,
-      region: initAddress.region,
-      postalCode: initAddress.postalCode,
-      country: initAddress.country
-    }
-
-    const addressSchema = PartyAddressSchema
+    const addressSchema = CivicAddressSchema
 
     const localState = reactive({
       isValidLot: false,
-      showAllAddressErrors: false
+      showAllAddressErrors: false,
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: 'British Columbia'
+      }
     })
     localState.isValidLot = true
-    /** Apply local models to store when they change. **/
+
+    /** Apply local model updates to store. **/
+    watch(() => localState, async () => {
+      // Set civic address data to store
+      for (const [key, value] of Object.entries(localState)) {
+        await setMhrLocation({ key, value })
+      }
+    }, { deep: true })
     /** Clear/reset forms when select option changes. **/
-    return { address, addressSchema }
+    return { addressSchema, ...toRefs(localState) }
   }
 })
 </script>
