@@ -9,7 +9,6 @@
               <div class="form__row">
                 <v-text-field
                   id="street"
-                  autocomplete="new-password"
                   class="street-address"
                   filled
                   label="Street Address"
@@ -22,7 +21,6 @@
             <div class="form__row">
               <v-textarea
                 id="streetAdditional"
-                autocomplete="new-password"
                 auto-grow
                 filled
                 class="street-address-additional"
@@ -37,7 +35,6 @@
                 <v-col>
                   <v-text-field
                     id="city"
-                    autocomplete="new-password"
                     filled
                     class="item address-city"
                     label="City"
@@ -49,10 +46,9 @@
                 <v-col>
                   <v-text-field
                     id="region"
-                    filled
-                    :disabled="true"
-                    class="item address-region"
                     label="Province"
+                    filled
+                    disabled
                     hint="Address must be in B.C."
                     persistent-hint
                     :name="Math.random()"
