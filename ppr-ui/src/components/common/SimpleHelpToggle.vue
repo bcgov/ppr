@@ -7,8 +7,8 @@
       :ripple="false"
       @click="isHelpContentOpen = !isHelpContentOpen"
     >
-      <v-icon>
-        mdi-information-outline
+      <v-icon class="mr-1">
+        mdi-help-circle-outline
       </v-icon>
       {{ isHelpContentOpen ? 'Hide ' + title : title }}
     </v-btn>
@@ -58,6 +58,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+
 // Remove background on hover
 .help-btn::before,
 .hide-help-btn::before {
@@ -75,9 +77,6 @@ export default defineComponent({
 }
 
 .help-content {
-  h3,
-  h4 {
-    color: #495057;
-  }
+  color: $gray7;
 }
 </style>

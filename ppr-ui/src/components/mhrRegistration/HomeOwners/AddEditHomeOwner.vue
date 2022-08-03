@@ -30,7 +30,8 @@
                   id="middle-name"
                   v-model="owner.individualName.middle"
                   filled
-                  label="Middle Name"
+                  label="Middle Name (Optional)"
+                  :rules="maxLength(15)"
                   data-test-id="middle-name"
                 />
               </v-col>
@@ -80,9 +81,9 @@
                 <v-text-field
                   filled
                   id="org-name"
-                  label="Full legal name of the organization"
+                  label="Full Legal Name of Business or Organization"
                   v-model="owner.organizationName"
-                  :rules="maxLength(70)"
+                  :rules="orgNameRules"
                 />
                 <!--
                   TODO: Finish this auto-complete
@@ -106,7 +107,7 @@
               data-test-id="suffix-tooltip"
             >
               <template v-slot:activator="{ on }">
-                <v-icon class="ml-2 mt-n1" color="primary" v-on="on">
+                <v-icon class="mt-n1" color="primary" v-on="on">
                   mdi-information-outline
                 </v-icon>
               </template>
@@ -170,6 +171,7 @@
             :triggerErrors="triggerAddressErrors"
             @valid="isAddressFormValid = $event"
             class="mt-2"
+            hideAddressHint
           />
         </v-form>
 
@@ -235,7 +237,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { required, customRules, minLength, maxLength } = useInputRules()
+    const { required, customRules, maxLength } = useInputRules()
 
     const { getSideTitle } = useHomeOwners(
       props.isHomeOwnerPerson,
@@ -281,9 +283,12 @@ export default defineComponent({
       isHelpPanelOpen: false,
       firsNameRules: customRules(required('Enter a first name'), maxLength(15)),
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
+      orgNameRules: customRules(
+        required('Enter an organization name'),
+        maxLength(150)
+      ),
       phoneNumberRules: customRules(
         required('Enter a phone number'),
-        minLength(10),
         maxLength(15)
       )
     })

@@ -8,7 +8,7 @@
       hide-default-footer
       :items="homeOwners"
       item-key="id"
-      no-data-text="No owners added yet"
+      no-data-text="No owners added yet."
     >
       <template v-slot:item="row">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
