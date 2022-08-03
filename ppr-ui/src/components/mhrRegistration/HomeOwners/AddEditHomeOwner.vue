@@ -173,8 +173,13 @@
             class="mt-2"
             hideAddressHint
           />
+          <hr class="mt-3 mb-10" />
+          <HomeOwnerGroups
+            :groupId="ownersGroupId"
+            :isAddingHomeOwner="isAddingHomeOwner"
+            @setOwnerGroupId="updateGroupIdForOwner($event)"
+          />
         </v-form>
-
         <v-row>
           <v-col>
             <div class="form__row form__btns">
@@ -230,37 +235,47 @@ import { SimpleHelpToggle } from '@/components/common'
 import { useSearch } from '@/composables/useSearch'
 import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
+import HomeOwnerGroups from '@/components/mhrRegistration/HomeOwners/HomeOwnerGroups.vue'
+
+let DEFAULT_OWNER_ID = 1
 
 export default defineComponent({
   name: 'AddEditHomeOwner',
   components: {
     AutoComplete,
     BaseAddress,
-    SimpleHelpToggle
+    SimpleHelpToggle,
+    HomeOwnerGroups,
   },
   props: {
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null
+      default: null,
     },
     isHomeOwnerPerson: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   setup (props, context) {
     const { required, customRules, maxLength } = useInputRules()
 
-    const { getSideTitle } = useHomeOwners(
-      props.isHomeOwnerPerson,
-      props.editHomeOwner == null
-    )
+    const {
+      getSideTitle,
+      getGroupForOwner,
+      addOwnerToTheGroup,
+      editHomeOwner,
+      showGroupsUI,
+      setShowGroupsUI,
+    } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
+
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
 
     const { searchBusiness } = useSearch()
 
     const defaultHomeOwner: MhrRegistrationHomeOwnersIF = {
+      id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
       suffix: props.editHomeOwner?.suffix || '',
@@ -272,15 +287,15 @@ export default defineComponent({
         country: props.editHomeOwner?.address.country || '',
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions:
-          props.editHomeOwner?.address.deliveryInstructions || ''
-      }
+          props.editHomeOwner?.address.deliveryInstructions || '',
+      },
     }
 
     if (props.isHomeOwnerPerson) {
       defaultHomeOwner.individualName = {
         first: props.editHomeOwner?.individualName.first || '',
         middle: props.editHomeOwner?.individualName.middle || '',
-        last: props.editHomeOwner?.individualName.last || ''
+        last: props.editHomeOwner?.individualName.last || '',
       }
     } else {
       defaultHomeOwner.organizationName =
@@ -288,7 +303,11 @@ export default defineComponent({
     }
 
     const localState = reactive({
+      ownersGroupId: showGroupsUI.value
+        ? getGroupForOwner(props.editHomeOwner?.id)?.groupId
+        : null,
       owner: { ...defaultHomeOwner },
+      ownerGroupId: props.editHomeOwner?.groupId || undefined,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
       isHomeOwnerFormValid: false,
@@ -304,14 +323,31 @@ export default defineComponent({
       phoneNumberRules: customRules(
         required('Enter a phone number'),
         maxLength(15)
-      )
+      ),
     })
+
+    const updateGroupIdForOwner = (groupId: string) => {
+      localState.ownerGroupId = groupId
+    }
 
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-      if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
-        context.emit('done', localState.owner)
+
+      if (localState.isHomeOwnerFormValid) {
+        if (props.editHomeOwner) {
+          editHomeOwner(
+            localState.owner as MhrRegistrationHomeOwnersIF,
+            (localState.ownerGroupId as string) || '1'
+          )
+        } else {
+          addOwnerToTheGroup(
+            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.ownerGroupId as string
+          )
+        }
+        localState.ownerGroupId && setShowGroupsUI(true)
+
         cancel()
       } else {
         localState.triggerAddressErrors = !localState.triggerAddressErrors
@@ -342,11 +378,12 @@ export default defineComponent({
       remove,
       cancel,
       addHomeOwnerForm,
+      updateGroupIdForOwner,
       maxLength,
       addressSchema,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 

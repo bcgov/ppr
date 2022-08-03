@@ -18,7 +18,7 @@
       label="Select a Group"
       v-model="ownerGroupId"
       :items="groups"
-      :rules="showGroupsUI ? required('Select a group for this owner') : []"
+      :rules="groupRules"
       class="owner-groups-select my-8"
       filled
       @change="setOwnerGroupId($event)"
@@ -48,7 +48,10 @@ export default defineComponent({
 
     const localState = reactive({
       ownerGroupId: props.groupId,
-      groups: computed(() => getGroupsDropdownItems(props.isAddingHomeOwner))
+      groups: computed(() => getGroupsDropdownItems(props.isAddingHomeOwner)),
+      groupRules: computed(() =>
+        showGroupsUI.value ? required('Select a group for this owner') : []
+      )
     })
 
     const setOwnerGroupId = groupId => {
@@ -56,8 +59,6 @@ export default defineComponent({
     }
 
     return {
-      showGroupsUI,
-      required,
       setOwnerGroupId,
       ...toRefs(localState)
     }
