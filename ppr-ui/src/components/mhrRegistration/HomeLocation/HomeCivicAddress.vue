@@ -8,6 +8,7 @@
           <v-form ref="addressForm" name="address-form" lazy-validation>
               <div class="form__row">
                 <v-text-field
+                  id="street"
                   autocomplete="new-password"
                   class="street-address"
                   filled
@@ -20,6 +21,7 @@
             </div>
             <div class="form__row">
               <v-textarea
+                id="streetAdditional"
                 autocomplete="new-password"
                 auto-grow
                 filled
@@ -34,6 +36,7 @@
               <v-row>
                 <v-col>
                   <v-text-field
+                    id="city"
                     autocomplete="new-password"
                     filled
                     class="item address-city"
@@ -45,6 +48,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
+                    id="region"
                     filled
                     :disabled="true"
                     class="item address-region"
