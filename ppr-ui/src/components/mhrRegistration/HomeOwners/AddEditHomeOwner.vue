@@ -245,17 +245,17 @@ export default defineComponent({
     AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
-    HomeOwnerGroups,
+    HomeOwnerGroups
   },
   props: {
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null,
+      default: null
     },
     isHomeOwnerPerson: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   setup (props, context) {
     const { required, customRules, maxLength } = useInputRules()
@@ -266,7 +266,7 @@ export default defineComponent({
       addOwnerToTheGroup,
       editHomeOwner,
       showGroupsUI,
-      setShowGroupsUI,
+      setShowGroupsUI
     } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
 
     const addressSchema = PartyAddressSchema
@@ -287,15 +287,15 @@ export default defineComponent({
         country: props.editHomeOwner?.address.country || '',
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions:
-          props.editHomeOwner?.address.deliveryInstructions || '',
-      },
+          props.editHomeOwner?.address.deliveryInstructions || ''
+      }
     }
 
     if (props.isHomeOwnerPerson) {
       defaultHomeOwner.individualName = {
         first: props.editHomeOwner?.individualName.first || '',
         middle: props.editHomeOwner?.individualName.middle || '',
-        last: props.editHomeOwner?.individualName.last || '',
+        last: props.editHomeOwner?.individualName.last || ''
       }
     } else {
       defaultHomeOwner.organizationName =
@@ -323,7 +323,7 @@ export default defineComponent({
       phoneNumberRules: customRules(
         required('Enter a phone number'),
         maxLength(15)
-      ),
+      )
     })
 
     const updateGroupIdForOwner = (groupId: string) => {
@@ -381,9 +381,9 @@ export default defineComponent({
       updateGroupIdForOwner,
       maxLength,
       addressSchema,
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 

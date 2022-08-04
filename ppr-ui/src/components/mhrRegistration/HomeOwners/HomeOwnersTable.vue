@@ -128,7 +128,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  watch,
+  watch
 } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
@@ -142,11 +142,11 @@ export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
     homeOwners: { default: [] },
-    isAdding: { default: false },
+    isAdding: { default: false }
   },
   components: {
     BaseAddress,
-    AddEditHomeOwner,
+    AddEditHomeOwner
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -162,13 +162,13 @@ export default defineComponent({
       isEditingMode: computed(
         (): boolean => localState.currentlyEditingHomeOwnerId >= 0
       ),
-      isAddingMode: computed((): boolean => props.isAdding),
+      isAddingMode: computed((): boolean => props.isAdding)
     })
 
     const edit = (item): void => {
       context.emit('edit', {
         ...item,
-        id: localState.currentlyEditingHomeOwnerId,
+        id: localState.currentlyEditingHomeOwnerId
       })
     }
 
@@ -209,9 +209,9 @@ export default defineComponent({
       getOwnershipInterest,
       edit,
       remove,
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 
