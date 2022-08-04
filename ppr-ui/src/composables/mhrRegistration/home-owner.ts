@@ -9,7 +9,7 @@ export function useHomeOwners (
     if (isPerson) {
       return isEditMode ? 'Add a Person' : 'Edit Person'
     } else {
-      return isEditMode ? 'Add a Business' : 'Edit Business'
+      return isEditMode ? 'Add a Business or Organization' : 'Edit Business'
     }
   })
 

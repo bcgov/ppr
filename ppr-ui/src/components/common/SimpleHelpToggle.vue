@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="help-toggle-container">
     <v-btn
       text
       color="primary"
@@ -13,9 +13,9 @@
       {{ isHelpContentOpen ? 'Hide ' + title : title }}
     </v-btn>
     <v-expand-transition>
-      <div v-show="isHelpContentOpen" class="help-content">
+      <div v-show="isHelpContentOpen" class="help-content mb-10">
         <hr class="my-4" />
-        <slot></slot>
+        <slot class="content"></slot>
         <div class="align-right" v-if="showBottomToggle">
           <v-btn
             text
@@ -60,23 +60,35 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-// Remove background on hover
-.help-btn::before,
-.hide-help-btn::before {
-  display: none;
-}
+#help-toggle-container::v-deep {
+  // Remove background on hover
+  .help-btn::before,
+  .hide-help-btn::before {
+    display: none;
+  }
 
-.help-btn {
-  font-size: 16px;
-}
+  .help-btn {
+    font-size: 16px;
+    height: 24px;
+  }
 
-.hide-help-btn {
-  font-size: 14px;
-  text-decoration: underline;
-  height: 25px;
-}
+  .hide-help-btn {
+    font-size: 14px;
+    text-decoration: underline;
+    height: 25px;
+  }
 
-.help-content {
-  color: $gray7;
+  .help-content {
+    h3 {
+      color: $gray9;
+    }
+    h4,
+    p {
+      color: $gray7;
+    }
+    hr {
+      border-top: 1px dashed $gray6;
+    }
+  }
 }
 </style>

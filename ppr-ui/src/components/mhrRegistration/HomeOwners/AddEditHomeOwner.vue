@@ -49,7 +49,7 @@
           </div>
           <div v-else>
             <label class="generic-label" for="org-name">
-              Organization Legal Name
+              Business or Organization Name
             </label>
             <v-row>
               <v-col>
@@ -176,27 +176,37 @@
         </v-form>
 
         <v-row>
-          <v-col cols="6">
-            <v-btn
-              outlined
-              color="error"
-              class="remove-btn"
-              :disabled="isAddingHomeOwner"
-              :ripple="false"
-              @click="remove()"
-            >
-              Remove
-            </v-btn>
-          </v-col>
-          <v-col cols="3">
-            <v-btn :ripple="false" width="100%" @click="cancel()">
-              Cancel
-            </v-btn>
-          </v-col>
-          <v-col cols="3">
-            <v-btn color="primary" :ripple="false" width="100%" @click="done()">
-              Done
-            </v-btn>
+          <v-col>
+            <div class="form__row form__btns">
+              <v-btn
+                outlined
+                color="error"
+                class="remove-btn"
+                :disabled="isAddingHomeOwner"
+                :ripple="false"
+                @click="remove()"
+              >
+                Remove
+              </v-btn>
+              <v-btn
+                color="primary"
+                class="ml-auto"
+                :ripple="false"
+                large
+                @click="done()"
+              >
+                Done
+              </v-btn>
+              <v-btn
+                :ripple="false"
+                large
+                color="primary"
+                outlined
+                @click="cancel()"
+              >
+                Cancel
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </v-col>

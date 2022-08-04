@@ -470,7 +470,7 @@ export const getFinancingButtons = (state: any, getters: any): Array<ButtonConfi
       showBack: true,
       showNext: true,
       backRouteName: RouteNames.SUBMITTING_PARTY,
-      nextText: 'Detail the home Location',
+      nextText: 'Location of Home',
       nextRouteName: RouteNames.HOME_LOCATION
     },
     {
