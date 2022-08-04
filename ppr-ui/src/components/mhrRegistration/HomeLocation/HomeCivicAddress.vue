@@ -47,6 +47,7 @@
                   <v-text-field
                     id="region"
                     label="Province"
+                    class="item address-region"
                     filled
                     disabled
                     hint="Address must be in B.C."
@@ -100,7 +101,6 @@ export default defineComponent({
         region: 'British Columbia'
       }
     })
-    localState.isValidLot = true
 
     /** Apply local model updates to store. **/
     watch(() => localState, async () => {
