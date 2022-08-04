@@ -54,7 +54,7 @@ class MhrExtraRegistration(db.Model):
 
     @classmethod
     def find_by_account_id(cls, account_id: str):
-        """Return an list of user extra registration matching the account id."""
+        """Return a list of user extra registrations matching the account id."""
         if account_id:
             return db.session.query(MhrExtraRegistration).\
                                     filter(MhrExtraRegistration.account_id == account_id).all()
@@ -62,7 +62,7 @@ class MhrExtraRegistration(db.Model):
 
     @classmethod
     def find_mhr_numbers_by_account_id(cls, account_id: str):
-        """Return an list of user extra registration MHR numbers matching the account id."""
+        """Return a list of user extra registration MHR numbers matching the account id."""
         mhr_numbers = []
         if account_id:
             registrations = db.session.query(MhrExtraRegistration).\

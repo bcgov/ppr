@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests to verify the account extra/other registrations endpoint.
+"""Tests to verify the endpoints for maintaining MH registrations.
 
-Test-Suite to ensure that the /other-registrations/{mhr_number} endpoint is working as expected.
+Test-Suite to ensure that the /registrations endpoint is working as expected.
 """
 import copy
 from http import HTTPStatus

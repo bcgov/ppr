@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API endpoints for requests to view registrations created by another account."""
-
-# pylint: disable=too-many-return-statements
+"""API endpoints for requests to maintain MH registrations."""
 
 from http import HTTPStatus
 
